@@ -96,18 +96,19 @@ class ExperienceDetailView(DetailView):
 
                 if i < experience.guest_number_max :
                     sdt_local = sdt.astimezone(local_timezone)
-                    dict = {'available_seat': experience.guest_number_max - i, 
-                            'date_string': sdt_local.strftime("%d/%m/%Y"), 
-                            'time_string': sdt_local.strftime("%H:%M"), 
-                            'datetime': sdt_local}
-                    available_options.append(dict)
+                    if experience.repeat_cycle != "Hourly" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
+                        dict = {'available_seat': experience.guest_number_max - i, 
+                                'date_string': sdt_local.strftime("%d/%m/%Y"), 
+                                'time_string': sdt_local.strftime("%H:%M"), 
+                                'datetime': sdt_local}
+                        available_options.append(dict)
 
-                    if sdt.astimezone(local_timezone).date() != last_sdt.astimezone(local_timezone).date():
-                        new_date = ((sdt_local.strftime("%d/%m/%Y"),
-                                         sdt_local.strftime("%d/%m/%Y")),)
-                        available_date += new_date
+                        if sdt.astimezone(local_timezone).date() != last_sdt.astimezone(local_timezone).date():
+                            new_date = ((sdt_local.strftime("%d/%m/%Y"),
+                                             sdt_local.strftime("%d/%m/%Y")),)
+                            available_date += new_date
+                            last_sdt = sdt
 
-            last_sdt = sdt
             if experience.repeat_cycle == "Hourly" :
                 sdt += timedelta(hours=experience.repeat_frequency)
             elif experience.repeat_cycle == "Daily" :
