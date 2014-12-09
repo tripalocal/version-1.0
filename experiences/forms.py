@@ -15,8 +15,8 @@ Type = (('SEE', 'See'),('DO', 'Do'),('EAT', 'Eat'),)
 
 Location = (('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Brisbane', 'Brisbane'),)
 
-Repeat_Cycle = (('Daily', 'Daily'),
-    ('Weekly', 'Weekly'),('Monthly', 'Monthly'),)
+Repeat_Cycle = (('Hourly','Hourly'), ('Daily', 'Daily'),
+    ('Weekly', 'Weekly'),)
 
 Repeat_Frequency = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),
     ('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)

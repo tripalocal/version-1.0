@@ -17,8 +17,8 @@ class RegisteredUser(models.Model):
     bio = models.TextField()
     rate = models.DecimalField(max_digits=2, decimal_places=1)
 
-    #def __str__(self):
-    #    return self.username
+    def __str__(self):
+        return self.user.username
 
 class Experience(models.Model):
     type = models.CharField(max_length=50)

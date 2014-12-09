@@ -7,6 +7,7 @@
 
 {% block content %}
 
+    {% if expired == None or not expired %}
     <div class="jumbotron experienceImg" style="background-image:url(		
 		{% for photo in experience.photo_set.all %}
             {% if forloop.first %}
@@ -126,7 +127,7 @@
         <div class="row">
             <div class="fixCenter">
                 <div class="bioBox">
-                	<h2>Host Profile - {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endif %} {% endfor %}</h2>
+                	<h2>About the Host, {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endif %} {% endfor %}</h2>
                     <div class="profile-lg"><img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240"></div>
                     <div class="bioText">
                         <p>{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.bio }} {% endif %} {% endfor %}</p>
@@ -178,6 +179,7 @@
                 </div>
         </div>
     </div>  
+    {%endif%}
 {% endblock %} 
 
 {% block scripts %}
@@ -198,7 +200,7 @@ $(function(){
 
         first_date = $("#date_string_0").text().trim()
 
-        for(var i=0; $("#date_string_"+i).text().trim() == first_date; i++)
+        for(var i=0; first_date && $("#date_string_"+i).text().trim() == first_date; i++)
         {
             $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
         }
