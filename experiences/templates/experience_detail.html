@@ -127,7 +127,7 @@
         <div class="row">
             <div class="fixCenter">
                 <div class="bioBox">
-                	<h2>About the Host, {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endif %} {% endfor %}</h2>
+                	<h2>Host profile - {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endif %} {% endfor %}</h2>
                     <div class="profile-lg"><img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240"></div>
                     <div class="bioText">
                         <p>{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.bio }} {% endif %} {% endfor %}</p>
