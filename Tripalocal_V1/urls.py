@@ -66,4 +66,6 @@ urlpatterns = patterns('',
     url(r'^experiences_ch$', 'experiences.views.experiences_ch', name='experiences_ch'),
     url(r'^prelaunch/livesite/experiences$', 'experiences.views.experiences_pre', name='experiences_pre'),
     url(r'^prelaunch/livesite/experiences_ch$', 'experiences.views.experiences_ch_pre', name='experiences_ch_pre'),
+
+    url(r'^s/(?P<city>\S+)/$', ByCityExperienceListView, name='ByCityExperienceListView'),
 )

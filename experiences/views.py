@@ -44,15 +44,15 @@ class ExperienceDetailView(DetailView):
         #    return HttpResponseForbidden()
 
         self.object = self.get_object()
-        
+
         if request.method == 'POST':
             form = BookingConfirmationForm(request.POST)
             form.data = form.data.copy()
             form.data['user_id'] = request.user.id;
             experience = Experience.objects.get(id=form.data['experience_id'])
-            return render(request, 'experience_booking_confirmation.html', 
-                          {'form': form, 'eid':self.object.id, 
-                           'experience': experience, 
+            return render(request, 'experience_booking_confirmation.html',
+                          {'form': form, 'eid':self.object.id,
+                           'experience': experience,
                            'guest_number':form.data['guest_number'],
                            'date':form.data['date'],
                            'time':form.data['time'],
@@ -75,7 +75,7 @@ class ExperienceDetailView(DetailView):
             context['expired'] = True
             return context
 
-        while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC)):     
+        while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC)):
 
             if experience.repeat_cycle == "Hourly" :
                 sdt += timedelta(hours=experience.repeat_frequency)
@@ -102,9 +102,9 @@ class ExperienceDetailView(DetailView):
                 if i < experience.guest_number_max :
                     sdt_local = sdt.astimezone(local_timezone)
                     if experience.repeat_cycle != "Hourly" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
-                        dict = {'available_seat': experience.guest_number_max - i, 
-                                'date_string': sdt_local.strftime("%d/%m/%Y"), 
-                                'time_string': sdt_local.strftime("%H:%M"), 
+                        dict = {'available_seat': experience.guest_number_max - i,
+                                'date_string': sdt_local.strftime("%d/%m/%Y"),
+                                'time_string': sdt_local.strftime("%H:%M"),
                                 'datetime': sdt_local}
                         available_options.append(dict)
 
@@ -148,7 +148,7 @@ TEMPLATES = {"experience": "add_experience.html",
 def experience_booking_successful(request, experience, guest_number, booking_datetime):
     if not request.user.is_authenticated():
         return HttpResponseRedirect("/accounts/login/")
-    
+
     return render(request,'experience_booking_successful.html',{'experience': experience,
                                                                     'guest_number':guest_number,
                                                                     'booking_datetime':booking_datetime,
@@ -169,21 +169,21 @@ def experience_booking_confirmation(request):
 
         # Have we been provided with a valid form?
         if form.is_valid():
-            return experience_booking_successful(request, 
-                                                 Experience.objects.get(id=form.data['experience_id']), 
+            return experience_booking_successful(request,
+                                                 Experience.objects.get(id=form.data['experience_id']),
                                                  int(form.data['guest_number']),
                                                  datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"))
             # Save to the database.
             #user = User.objects.get(id=form.data['user_id'])
             #experience = Experience.objects.get(id=form.data['experience_id'])
-            #booking = Booking(user = user, experience= experience, guest_number = form.data['guest_number'], 
-            #                    datetime=datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"), 
+            #booking = Booking(user = user, experience= experience, guest_number = form.data['guest_number'],
+            #                    datetime=datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
             #                    submitted_datetime = datetime.utcnow(), status=form.data['status'])
             #booking.save()
             ##add the user to the guest list
             #if user not in experience.guests.all():
             #    experience.guests.add(user)
-            
+
             ##redirect to payment page
             #form = ExperiencePaymentForm()
             #form.data = form.data.copy()
@@ -194,9 +194,9 @@ def experience_booking_confirmation(request):
             #{'experience_id':form.data['experience_id'], 'guest_number':form.data['guest_number'], 'date':form.data['date'], 'time':form.data['time']})
         else:
             experience = Experience.objects.get(id=form.data['experience_id'])
-            return render_to_response('experience_booking_confirmation.html', {'form': form, 
+            return render_to_response('experience_booking_confirmation.html', {'form': form,
                                                                        'display_error':display_error,
-                                                                       'experience': experience, 
+                                                                       'experience': experience,
                                                                        'guest_number':form.data['guest_number'],
                                                                        'date':form.data['date'],
                                                                        'time':form.data['time'],
@@ -223,16 +223,16 @@ def create_experience(request, id=None):
 
     if id:
         experience = get_object_or_404(Experience, pk=id)
-        if len(experience.whatsincluded_set.filter(item="Food")) > 0: 
+        if len(experience.whatsincluded_set.filter(item="Food")) > 0:
             if experience.whatsincluded_set.filter(item="Food")[0].included:
-                included_food = "Yes" 
+                included_food = "Yes"
             else:
-                included_food = "No" 
+                included_food = "No"
             include_food_detail = experience.whatsincluded_set.filter(item="Food")[0].details
         else:
             included_food = "No"
             include_food_detail = None
-        
+
         if len(experience.whatsincluded_set.filter(item="Ticket")) >0:
             if experience.whatsincluded_set.filter(item="Ticket")[0].included:
                 included_ticket = "Yes"
@@ -256,7 +256,7 @@ def create_experience(request, id=None):
         for i in range(1,6):
             if len(experience.photo_set.filter(name__startswith='experience'+str(id)+'_'+str(i)))>0:
                 photo = experience.photo_set.filter(name__startswith='experience'+str(id)+'_'+str(i))[0]
-                photos['experience_photo_'+str(i)] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+photo.directory+photo.name, 
+                photos['experience_photo_'+str(i)] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+photo.directory+photo.name,
                                                                              File(open(settings.MEDIA_ROOT+'/'+photo.directory+photo.name, 'rb')).read())
             #else:
             #    photos['experience'+str(id)+'_'+str(i)] = None
@@ -299,7 +299,7 @@ def create_experience(request, id=None):
                                         end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_datetime'], "%Y-%m-%d %H:%M")),
                                         repeat_cycle = form.data['repeat_cycle'],
                                         repeat_frequency = form.data['repeat_frequency'],
-                                        title = form.data['title'], 
+                                        title = form.data['title'],
                                         description = form.data['summary'],
                                         guest_number_min = form.data['guest_number_min'],
                                         guest_number_max = form.data['guest_number_max'],
@@ -312,7 +312,7 @@ def create_experience(request, id=None):
                                         meetup_spot = form.data['meetup_spot'],
                                         status = 'Listed'
                                         )
-            
+
             else:
                 experience.start_datetime = datetime.strptime(form.data['start_datetime'], "%Y-%m-%d %H:%M")
                 experience.end_datetime = datetime.strptime(form.data['end_datetime'], "%Y-%m-%d %H:%M")
@@ -329,9 +329,9 @@ def create_experience(request, id=None):
                 experience.dress = form.data['dress_code']
                 experience.city = form.data['suburb']
                 experience.meetup_spot = form.data['meetup_spot']
-            
+
             experience.save()
-            
+
             #save images
             dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
             if not os.path.isdir(dirname):
@@ -346,11 +346,11 @@ def create_experience(request, id=None):
                     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                         filename = 'experience' + str(experience.id) + '_' + str(count) + extension
                         for chunk in request.FILES['experience_photo_'+str(index)].chunks():
-                            destination = open(dirname + filename, 'wb+')               
+                            destination = open(dirname + filename, 'wb+')
                             destination.write(chunk)
                             destination.close()
                         if not len(experience.photo_set.filter(name__startswith=filename))>0:
-                            photo = Photo(name = filename, directory = 'experiences/' + str(experience.id) + '/', 
+                            photo = Photo(name = filename, directory = 'experiences/' + str(experience.id) + '/',
                                           image = 'experiences/' + str(experience.id) + '/' + filename, experience = experience)
                             photo.save()
 
@@ -382,8 +382,8 @@ def create_experience(request, id=None):
                 wh.details = form.data['included_transport_detail']
                 wh.save()
 
-            return HttpResponseRedirect('/experiencelist/') 
-            
+            return HttpResponseRedirect('/experiencelist/')
+
     else:
         form = CreateExperienceForm(data=data, files=photos)
 
@@ -416,21 +416,21 @@ def booking_accepted(request, id=None):
             booking.status = "accepted"
             booking.save()
             #send an email to the traveller
-            send_mail('[Tripalocal] Booking confirmed', '', 
+            send_mail('[Tripalocal] Booking confirmed', '',
                       Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail,
-                        [Aliases.objects.get(destination__startswith=User.objects.get(id=booking.user_id).email).mail], 
-                        fail_silently=False, 
+                        [Aliases.objects.get(destination__startswith=User.objects.get(id=booking.user_id).email).mail],
+                        fail_silently=False,
                         html_message=loader.render_to_string('email_booking_confirmed_traveler.html',
                                                                 {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':user,
                                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-            
+
             #send an email to the host
-            send_mail('[Tripalocal] Booking confirmed', '', 
+            send_mail('[Tripalocal] Booking confirmed', '',
                       Aliases.objects.get(destination__startswith=User.objects.get(id=booking.user_id).email).mail,
-                        [Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail], 
-                        fail_silently=False, 
+                        [Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail],
+                        fail_silently=False,
                         html_message=loader.render_to_string('email_booking_confirmed_host.html',
                                                                 {'experience': experience,
                                                                     'booking':booking,
@@ -442,27 +442,27 @@ def booking_accepted(request, id=None):
                             'user':user,
                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                             'webpage':True})
-        
-        elif accepted == "no":         
+
+        elif accepted == "no":
             payment = Payment.objects.get(booking_id=booking.id)
             success, response = payment.refund(payment.charge_id)
             if success:
                 booking.status = "rejected"
                 #send an email to the traveller
-                send_mail('[Tripalocal] Your experience is cancelled', '', 
+                send_mail('[Tripalocal] Your experience is cancelled', '',
                           Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail,
                             [Aliases.objects.get(destination__startswith=User.objects.get(id=booking.user_id).email).mail],
-                            fail_silently=False, 
+                            fail_silently=False,
                             html_message=loader.render_to_string('email_booking_cancelled_traveler.html',
                                                                  {'experience': experience,
                                                                   'booking':booking,
                                                                   'user':user,
                                                                   'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
                 #send an email to the host
-                send_mail('[Tripalocal] Cancellation confirmed', '', 
+                send_mail('[Tripalocal] Cancellation confirmed', '',
                           Aliases.objects.get(destination__startswith=User.objects.get(id=booking.user_id).email).mail,
-                            [Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail], 
-                            fail_silently=False, 
+                            [Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail],
+                            fail_silently=False,
                             html_message=loader.render_to_string('email_booking_cancelled_host.html',
                                                                 {'experience': experience,
                                                                  'booking':booking,
@@ -481,17 +481,17 @@ def booking_accepted(request, id=None):
                 return render(request, 'app/index.html', {'form': form})
 
     #wrong format
-    return HttpResponseRedirect('/') 
+    return HttpResponseRedirect('/')
 
 #def charge(request):
 #    if request.method == "POST":
 #        form = ExperiencePaymentForm(request.POST)
- 
+
 #        if form.is_valid(): # charges the card
 #            return HttpResponseRedirect("/experience_booking_successful/")
 #    else:
 #        form = ExperiencePaymentForm()
- 
+
 #    return render_to_response("payment.html", RequestContext( request, {'form': form} ) )
 
 # Takes the experience primary key and returns the number of reviews it has received.
@@ -571,3 +571,71 @@ def experiences_pre(request):
 
 def experiences_ch_pre(request):
     return render(request,'experiences_ch_pre.html')
+
+# Takes the experience primary key and returns the number of reviews it has received.
+def getNReviews(experienceKey):
+    nReviews = 0
+    reviewList = Review.objects.all()
+    for review in reviewList:
+        if (review.experience.id == experienceKey):
+            nReviews += 1
+
+    return nReviews
+
+# Takes the experience primary key and returns the background image
+def getBGImageURL(experienceKey):
+    BGImageURL = ""
+    photoList = Photo.objects.all()
+    for photo in photoList:
+        if (photo.experience.id == experienceKey):
+            BGImageURL = photo.image
+            break
+    return BGImageURL
+
+def ByCityExperienceListView(request, city):
+    template = loader.get_template('app/search_result.html')
+
+    # Add all experiences that belong to the specified city to a new list
+    # alongside a list with all the number of reviews
+    experienceList = Experience.objects.all()
+    cityExperienceList = []
+    cityExperienceReviewList = []
+    formattedTitleList = []
+    BGImageURLList = []
+    profileImageURLList = []
+
+    i = 0
+    while i < len(experienceList):
+        experience = experienceList[i]
+        if (experience.city.lower() == city.lower()):
+            cityExperienceList.append(experience)
+            cityExperienceReviewList.append(getNReviews(experience.id))
+            # Fetch BGImageURL
+            BGImageURL = getBGImageURL(experience.id)
+            if (BGImageURL):
+                BGImageURLList.append(BGImageURL)
+            else:
+                BGImageURLList.append("default_experience_background.jpg")
+            # Fetch profileImageURL
+            profileImageURL = RegisteredUser.objects.get(id=experience.hosts.all()[0].id).image_url
+            if (profileImageURL):
+                profileImageURLList.append(profileImageURL)
+            else:
+                profileImageURLList.append("profile_default.jpg")
+            # Format title & Description
+            if (len(experience.title) > 50):
+                formattedTitleList.append(experience.title[:47] + "...")
+            else:
+                formattedTitleList.append(experience.title)
+        i += 1
+
+    sydneySelected = False
+    if (city == "sydney"):
+        sydneySelected = True
+
+    context = RequestContext(request, {
+        'city' : city,
+        'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
+        'sydneySelected' : sydneySelected,
+        })
+    return HttpResponse(template.render(context))

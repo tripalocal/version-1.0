@@ -30,7 +30,7 @@
     <![endif]-->
 {%endblock%}
 
-{% block content %}    
+{% block content %}
     <div class="container-fluid searchbar">
     	<div class="row">
         <div class="fixCenter">
@@ -49,7 +49,7 @@
   </ul>
 </div>
     </div></div></div>
-    
+
     <div class="container-fluid searchresult">
     	<div class="row">
         <div class="fixCenter">
@@ -58,16 +58,14 @@
           <!-- Each Individual Experiene Listing -->
           {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
           <div class="expList">
-          <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}">
-              <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
-                  <div class="priceBox">
-                    $<span>{{ experience.price }}</span> AUD
-                  </div>
-              </div>
-          </a>
-          <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
+          <a href="/experience/{{experience.id}}"><div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
+              <div class="priceBox">
+                $<span>{{ experience.price }}</span> AUD
+                </div>
+            </div></a>
+          <a href="/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
             <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
-          
+
           <p>{{ experience.description }}</p>
             <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#">{{ review }} reviews</a> · {{ experience.duration }} hrs · Up to {{ experience.guest_number_max }} people</div>
            </div>
@@ -75,7 +73,7 @@
 
 
 
-        </div>       
+        </div>
         </div>
       </div>
     </div>
@@ -91,5 +89,5 @@
     <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/ie10-viewport-bug-workaround.js"></script>
-  
+
 {% endblock %}
