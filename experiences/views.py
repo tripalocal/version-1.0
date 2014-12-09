@@ -70,6 +70,11 @@ class ExperienceDetailView(DetailView):
         available_options = []
         available_date = ()
 
+        if experience.end_datetime < datetime.utcnow().replace(tzinfo=pytz.UTC):
+            # experience already expired
+            context['expired'] = True
+            return context
+
         while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC)):     
 
             if experience.repeat_cycle == "Hourly" :
