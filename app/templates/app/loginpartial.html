@@ -1,0 +1,29 @@
+{% if user.is_authenticated %}
+<!--
+<form id="logoutForm" action="/logout" method="post" class="navbar-right">
+    {% csrf_token %}
+    <ul class="nav navbar-nav navbar-right">
+        <li><span class="navbar-brand">Hello {{ user.username }}!</span></li>
+        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+    </ul>
+
+</form>-->
+<ul class="menu">
+        <li><a href="/accounts/logout/">Log out</a></li>
+        <li>{{ user.first_name }}</li>
+        <li>
+            <div class="profile-xs">
+                <img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/>
+            </div>
+        </li>    
+    </ul>
+
+
+{% else %}
+
+<ul class="menu">
+    <li><a href="/accounts/signup/?next={{ request.path }}">Sign up</a></li>
+    <li><a href="/accounts/login/?next={{ request.path }}">Log in</a></li> <!---->
+</ul>
+
+{% endif %}

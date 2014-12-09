@@ -1,0 +1,220 @@
+{% extends "app/layout.html" %}
+
+{% load i18n %}
+
+{% block head %}
+    {% load staticfiles %}
+    <title>Create/Edit Content: Ebook Please</title>
+    <link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+    <div class="container">
+        <div class="leftColumn">
+            <div class="operation"></div>
+            <ul class="subMenu">
+                <li>Add new experience</li>
+            </ul>
+            <div class="clear"></div>
+            <div>
+                {% if form.errors and display_error%}
+                    <p style="color:red">The following fields are required</p>
+                    {% for error in form.errors %}
+                        <p>{{error}}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <form id="create_experience_form" enctype="multipart/form-data" method="post" action="">
+                {% csrf_token %}
+                <table border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td class="coRight">Start from</td>
+                        <td colspan="1">{{form.start_datetime}}</td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Until</td>
+                        <td colspan="1">{{form.end_datetime}}</td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Repeats</td>
+                        <td colspan="1">{{form.repeat_cycle}}</td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Repeat every</td>
+                        <td colspan="1">{{form.repeat_frequency}} <label id="repeat_frequency_label"></label></td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Title</td>
+                        <td colspan="3">{{form.title}}</td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Summary</td>
+                        <td colspan="3">{{form.summary}}</td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Group size</td>
+                        <td colspan="1"><label>Min </label>{{form.guest_number_min}} {{form.guest_number_max}}<label> Max</label></td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Pricing</td>
+                        <td colspan="2">
+                            <label>Price per person ${{form.price}} + 25% booking fee = Customer pay ${{form.price_with_booking_fee}}
+                            <br />
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Duration</td>
+                        <td colspan="2">
+                            <label>{{form.duration}}Hours 
+                            <br />
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">What's included</td>
+                        <td colspan="2">
+                            <table  border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                  <td>&nbsp;</td>
+                                  <td>Yes / No</td>
+                                  <td>Detail</td>
+                                </tr>
+                                <tr>
+                                    <td>Food</td>
+                                    <td>{{form.included_food}}</td>
+                                    <td>{{form.included_food_detail}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Transport</td>
+                                    <td>{{form.included_transport}}</td>
+                                    <td>{{form.included_transport_detail}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Ticket</td>
+                                    <td>{{form.included_ticket}}</td>
+                                    <td>{{form.included_ticket_detail}}</td>
+                                </tr>
+                            </table>
+                            <label><br /></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">What sort of activities would you offer on your experience?</td>
+                        <td colspan="2">{{form.activity}}</td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">How would you interact with your guests?</td>
+                        <td colspan="2">{{form.interaction}}</textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Appropriate dress code</td>
+                        <td colspan="2">{{form.dress_code}}</td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Suburb</td>
+                        <td colspan="2">{{form.suburb}}</td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Meet up spot (Meet up direction for confirmed guest)</td>
+                        <td colspan="2">{{form.meetup_spot}}</textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">Experience photo</td>
+                        <td colspan="2">
+                            {{form.experience_photo_1}}
+                            {{form.experience_photo_2}}
+                            {{form.experience_photo_3}}
+                            {{form.experience_photo_4}}
+                            {{form.experience_photo_5}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="coRight">&nbsp;</td>
+                        <td colspan="2">
+      	                    <input type="submit" name="button" id="big_button" value="Save" />
+                        </td>
+                    </tr>
+                </table>
+            </form>          
+        </div>
+    </div>
+{% else %}
+    <p> Please login first</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+
+<script charset="utf-8" type="text/javascript">
+
+$(function(){
+    $(document).ready(function(){
+        $("#repeat_frequency_label").text("Days");
+        $("#id_title").css("width", "100%");
+        $("#id_summary").css("width", "100%");
+        $("#id_summary").attr("cols", 45);
+        $("#id_summary").attr("rows", 5);
+        $("#id_price").css("width", "70px");
+        $("#id_price_with_booking_fee").css("width", "70px");
+        $("#id_activity").css("width", "100%");
+        $("#id_interaction").css("width", "100%");
+        $("#id_dress_code").css("width", "100%");
+        $("#id_meetup_spot").css("width", "100%");
+        $("#id_activity").attr("cols", 45);
+        $("#id_interaction").attr("cols", 45);
+        $("#id_dress_code").attr("cols", 45);
+        $("#id_meetup_spot").attr("cols", 45);
+        $("#id_activity").attr("rows", 5);
+        $("#id_interaction").attr("rows", 5);
+        $("#id_dress_code").attr("rows", 3);
+        $("#id_meetup_spot").attr("rows", 5);
+    })
+})
+
+$(function(){
+    $("#id_repeat_cycle").change(function(){
+        if($("#id_repeat_cycle").val().trim()=="Hourly")
+        {
+            $("#repeat_frequency_label").text('Hours');
+        }
+        else if($("#id_repeat_cycle").val().trim()=="Daily")
+        {
+            $("#repeat_frequency_label").text('Days');
+        }
+        else if($("#id_repeat_cycle").val().trim()=="Weekly")
+        {
+            $("#repeat_frequency_label").text('Weeks');
+        }
+        else
+        {
+            $("#repeat_frequency_label").text('Months');
+        }
+    })
+})
+
+$(function(){  
+    $("#id_price").keyup(function()
+    {
+        var price = parseFloat($("#id_price").val());
+        if(typeof price === 'number')
+        {  
+            $("#id_price_with_booking_fee").val(price*1.25);
+        }
+    })
+})
+
+$(function(){
+    $("#id_price_with_booking_fee").keyup(function()
+    {
+        var price = parseFloat($("#id_price_with_booking_fee").val());
+        if(typeof price === 'number')
+        {
+            $("#id_price").val(price*0.80);
+        }
+    })
+})
+</script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "app/layout.html" %}
+
+{% block head %}
+<!--
+    {% load staticfiles %}
+    <title>Create/Edit Content: Ebook Please</title>
+    <link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet">
+-->
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<!--
+    <div class="container">
+        <div class="leftColumn">
+            <div class="operation"></div>
+            <ul class="subMenu">
+                <li>Experience List</li>
+            </ul>
+            <div class="clear"></div>
+
+            <table border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td colspan="9" class="tableEdit">&nbsp;&nbsp;?<input name="input" type="button" value="Delete" /></td>
+                </tr> 
+
+
+            </table>
+        </div>
+        <div class="rightColumn">
+
+        </div>
+    </div>
+-->
+    <h2> Experience List </h2>
+    <p> Click to edit</p>
+    <ul>
+        {% for experience in object_list %}
+            <!--<li>{{ experience.title }}</li>-->
+            <li><a href="/editexperience/{{experience.id}}">{{experience.title}}</a></li>
+        {% endfor %}
+    </ul>
+    <a href="/createexperience/">Add an experience</a>
+{% else %}
+    <p> Please login first</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "app/layout.html" %}
+
+{% block head %}
+    {% load staticfiles%}
+    <link href="{% static 'app/content/prelaunch.css' %}" rel="stylesheet">
+    <title>Tripalocal | Experience it like a local</title>
+    <!-- H1 google font -->
+    <link href='http://fonts.googleapis.com/css?family=Cutive' rel='stylesheet' type='text/css'>
+
+    <style id="clearly_highlighting_css" type="text/css">
+    /* selection */ 
+    html.clearly_highlighting_enabled ::-moz-selection { background: rgba(246, 238, 150, 0.99); } 
+    html.clearly_highlighting_enabled ::selection { background: rgba(246, 238, 150, 0.99); } 
+    /* cursor */ 
+    html.clearly_highlighting_enabled {    
+    /* cursor and hot-spot position -- requires a default cursor, after the URL one */    
+    cursor: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--cursor.png") 14 16, text; 
+    } 
+    /* highlight tag */ 
+    em.clearly_highlight_element {    
+    font-style: inherit !important; 
+    font-weight: inherit !important;    
+    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow.png");    
+    background-repeat: repeat-x; background-position: top left; background-size: 100% 100%; 
+    } 
+    /* the delete-buttons are positioned relative to this */ 
+    em.clearly_highlight_element.clearly_highlight_first { position: relative; } 
+    /* delete buttons */ 
+    em.clearly_highlight_element a.clearly_highlight_delete_element {    
+    display: none; 
+    cursor: pointer;    
+    padding: 0; 
+    margin: 0; 
+    line-height: 0;    
+    position: absolute; 
+    width: 34px; 
+    height: 34px; 
+    left: -17px; 
+    top: -17px;    
+    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite.png"); 
+    background-repeat: no-repeat; 
+    background-position: 0px 0px; 
+    } 
+    em.clearly_highlight_element a.clearly_highlight_delete_element:hover { background-position: -34px 0px; } 
+    /* retina */ 
+    @media (min--moz-device-pixel-ratio: 2), (-webkit-min-device-pixel-ratio: 2), (min-device-pixel-ratio: 2) {    
+    em.clearly_highlight_element { 
+    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow@2x.png"); 
+    }    
+    em.clearly_highlight_element a.clearly_highlight_delete_element { 
+    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite@2x.png"); background-size: 68px 34px; } } 
+</style>
+<style>
+    [touch-action="none"]
+    { -ms-touch-action: none; touch-action: none; }
+    [touch-action="pan-x"]
+    { -ms-touch-action: pan-x; touch-action: pan-x; }
+    [touch-action="pan-y"]
+    { -ms-touch-action: pan-y; touch-action: pan-y; }
+    [touch-action="scroll"],[touch-action="pan-x pan-y"],[touch-action="pan-y pan-x"]
+    { -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; }
+</style>
+  
+<!-- start Mixpanel -->
+<script type="text/javascript">(function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}
+var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};
+i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
+for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
+mixpanel.init("f94e94414c9de0cc38874706d853c400");
+</script>
+<!-- end Mixpanel -->
+{% endblock %}
+
+{% block content %}
+
+    <div id="StayFocusd-infobar" style="display:none;">
+        <img src="chrome-extension://laankejkbhbdhmipfmgcngdelahlfoji/common/img/eye_19x19_red.png">
+        <span id="StayFocusd-infobar-msg"></span>
+        <span id="StayFocusd-infobar-links">
+            <a id="StayFocusd-infobar-never-show">hide forever</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a id="StayFocusd-infobar-hide">hide once</a>
+        </span>
+    </div>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="priority">
+        <div class="container">
+            <h1>Disclaimer</h1>
+            <p>Welcome to Tripalocal. By continuing to browse and use this website, you are agreeing that www.tripalocal.com (the "Site") makes available a platform for travellers and local hosts to connect online and arrange for local experiences (the "Services"). You understand that Tripalocal does not provide any experiences published on the Site, is not a party to any agreements entered into between the travellers and local hosts and is not an agent or insurer. Tripalocal is only to be used to facilitate connections between travellers and local hosts. Tripalocal makes no representations or warranties of any kind, express or implied, about the accuracy, reliability, or suitability of the experiences provided through this website. Tripalocal has no control over the conduct of the travellers, local hosts and other users of the Services or any local experiences, and disclaims all liability in this regard. As such, the use of the Site and the provision and participation in any of the local experiences is solely at your own risk.</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <h1>Copyright Policy</h1>
+          
+            <p>The contents of the Site including but not limited to all text, graphics, data, designs, photographs, and other content are owned by Tripalocal, or are used with the owner's permission. You may not copy, download, store, distribute commercially or use anything from this website without our prior written permission.</p>
+      </div>
+    </div>
+        
+      
+	<div class="footer">
+        <div class="container">
+            <h1>See it, feel it, experience it<br>like a local</h1>
+            <img src="{% static 'app/images/tripalocal_Logo.png' %}" width="294" height="101" alt="Tripalocal">
+            <p><a href="mailto:enquiries@tripalocal.com">enquiries@tripalocal.com<br></a>COPYRIGHT @ TRIPALOCAL 2014 | <a href="/disclaimer" target="_blank">DISCLAIMER</a></p>
+            <p><a class="btn btn-default" role="button" id="twitter" href="http://twitter.com/tripalocal" target="_blank"><span style="background-image:url({{MEDIA_URL}}icons.png); background-position: 0 -30px;"></span></a>
+                <a class="btn btn-default" role="button" id="facebook" href="http://facebook.com/tripalocal" target="_blank"><span style="background-image:url({{MEDIA_URL}}icons.png);background-position: -30px -30px;"></span></a>
+                <a class="btn btn-default" role="button" id="linkedin" href="http://www.linkedin.com/company/tripalocal" target="_blank"><span style="background-image:url({{MEDIA_URL}}icons.png);background-position: -90px -30px;"></span></a>        
+            </p>
+        </div>
+    </div>
+{% endblock %}

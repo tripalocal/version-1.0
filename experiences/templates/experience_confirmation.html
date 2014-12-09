@@ -1,0 +1,16 @@
+{% extends "app/layout.html" %}
+
+{% load i18n %}
+
+{% block head %}
+{{ form.media }}
+{% endblock %}
+
+{% block content %}
+    <p>Experience confirmation</p>
+    {% for form in form_list %}
+        <table>
+            {{ form.as_table }}
+        </table>
+    {% endfor %}  
+{% endblock %}  

@@ -1,0 +1,129 @@
+{% block head %}
+    {% load i18n %}
+    {% load account %}
+    {% load url from future %}
+
+    {% load staticfiles %}
+    <link href="{% static 'app/content/email.css' %}" rel="stylesheet">
+    {% if form %}
+        {{ form.media }}
+    {% endif %}
+    <title></title>
+{% endblock %}
+
+{% block content %}       
+    <center>
+        <table align="center" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable">
+            <tr>
+                <td align="center" valign="top" id="bodyCell">
+                    <!-- BEGIN TEMPLATE // -->
+                    <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateContainer">
+                        <tr>
+                            <td align="center" valign="top">
+                                <!-- BEGIN PREHEADER // -->
+                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templatePreheader">
+                                    <tr>
+                                        <td valign="top" class="preheaderContainer" style="padding-top:9px;"></td>
+                                    </tr>
+                                </table>
+                                <!-- // END PREHEADER -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" valign="top">
+                                <!-- BEGIN HEADER // -->
+                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateHeader">
+                                    <tr>
+                                        <td valign="top" class="headerContainer">
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnImageBlock">
+							                    <tbody class="mcnImageBlockOuter">
+								                    <tr>
+									                    <td valign="top" style="padding:9px" class="mcnImageBlockInner">
+										                    <table align="left" width="100%" border="0" cellpadding="0" cellspacing="0" class="mcnImageContentContainer">
+											                    <tbody>
+												                    <tr>
+													                    <td class="mcnImageContent" valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0;">
+														                    <img align="left" alt="" src="https://gallery.mailchimp.com/12d0686497f605217203bf2be/images/73468143-d086-470b-9c08-799cb653adc0.jpg" width="564" style="max-width:600px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage">
+													                    </td>
+												                    </tr>
+											                    </tbody>
+										                    </table>
+									                    </td>
+								                    </tr>
+							                    </tbody>
+                                            </table>
+						                </td>
+                                    </tr>
+                                </table>
+                                <!-- // END HEADER -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" valign="top">
+                                <!-- BEGIN BODY // -->
+                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateBody">
+                                    <tr>
+                                        <td valign="top" class="bodyContainer">
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock">
+							                    <tbody class="mcnTextBlockOuter">
+								                    <tr>
+									                    <td valign="top" class="mcnTextBlockInner">
+										                    <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
+											                    <tbody>
+												                    <tr>
+													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
+													                    <h1 style="text-align: center;"><font size="5">Welcome to Tripalocal</font></h1>
+														                    <p style="text-align: center;">Want to get one free experience and early access?<br>
+                                                                                Invite 5 friends to sign up using this unique URL:<br><br>
+                                                                                <a href="{{ref_url}}" target="_blank">{{ref_url}}</a><br><br>
+                                                                                Tripalocal is a new platform that connects travellers with locals for real local experiences. Travel is more than just taking photos, it should be a journey of discovery. The sooner we bring Tripalocal to market, the closer we are to bring travel back to its core. So please help us spread the mission by inviting 5 friends to sign up using the unique link above. You will then get one free experience and early access!
+                                                                            </p>
+                                                                            
+													                    </td>
+												                    </tr>
+											                    </tbody>
+										                    </table>
+									                    </td>
+								                    </tr>
+							                    </tbody>
+                                            </table>
+						                </td>
+                                    </tr>
+                                </table>
+                                <!-- // END BODY -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" valign="top">
+                                <!-- BEGIN FOOTER // -->
+                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateFooter">
+                                    <tr>
+                                        <td valign="top" class="footerContainer" style="padding-bottom:9px;">
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock">
+							                    <tbody class="mcnTextBlockOuter">
+								                    <tr>
+									                    <td valign="top" class="mcnTextBlockInner">
+										                    <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
+											                    <tbody><tr>
+												                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
+													                    <div style="text-align: right;"><a class="utilityLink" href="">unsubscribe</a></div>
+												                    </td>
+											                    </tr>
+										                    </tbody></table>
+									                    </td>
+								                    </tr>
+							                    </tbody>
+                                            </table>
+						                </td>
+                                    </tr>
+                                </table>
+                                <!-- // END FOOTER -->
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- // END TEMPLATE -->
+                </td>
+            </tr>
+        </table>
+    </center>
+{% endblock %}

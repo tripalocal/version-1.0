@@ -1,0 +1,215 @@
+{% extends "app/layout.html" %}
+{% load mathfilters %}
+
+{% block content %}
+    <div>
+        {% if form.errors and display_error%}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    {{error}}{% if not forloop.last %}, {%endif%}
+                {% endfor %}
+            {% else %}
+                <p style="color:red">The following fields are required</p>
+                {% for error in form.errors %}
+                    {{error}}{% if not forloop.last %}, {%endif%}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+    </div>
+    
+    <div class="container-fluid experience">
+        <div class="row">
+            <div class="fixCenter">
+                <form id="category_form" method="post" action="/experience_booking_confirmation/">
+                    {% csrf_token %}
+                    <div style="display:none">
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    </div>
+                    <div class="checkoutBox">
+                        <h2>Request to book</h2>
+                        We do not charge your card until your reservation is confirmed
+
+                        <div class="row">
+                            <p>Card Number</p>
+                            <form class="navbar-form navbar-left" role="search">
+                                <div class="form-group">
+                                    {{ form.card_number }}
+                                </div>
+                            </form>
+
+                            <table width="0" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <p>Expires On</p>
+                                        <div class="dropdown">
+                                            {{ form.expiration }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>Security Code</p>
+                                        <div class="navbar-form navbar-left" role="search">
+                                            <div class="form-group">
+                                                {{ form.cvv }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <table width="0" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <p>First Name</p>
+                                        <div class="navbar-form navbar-left" role="search">
+                                            <div class="form-group">
+                                                {{ form.first_name }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>Last Name</p>
+                                        <div class="navbar-form navbar-left" role="search">
+                                            <div class="form-group">
+                                                {{ form.last_name }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table width="0" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <p>Street Address</p>
+                                        <div class="navbar-form navbar-left" role="search">
+                                            <div class="form-group">
+                                                {{ form.street1 }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>Street Address 2</p>
+                                        <div class="navbar-form navbar-left" role="search">
+                                            <div class="form-group">
+                                                {{ form.street2 }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table width="0" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td>
+                                        <p>City</p>
+                                        <div class="navbar-form navbar-left" role="search">
+                                            <div class="form-group">
+                                                {{ form.city }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>State</p>
+                                        <div class="navbar-form navbar-left" role="search">
+                                            <div class="form-group">
+                                                {{ form.state }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>Postcode</p>
+                                        <div class="navbar-form navbar-left" role="search">
+                                            <div class="form-group">
+                                                {{ form.postcode }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>Country</p>
+                                        <div class="dropdown">
+                                            {{ form.country }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p>Mobile Number</p>
+                            <div class="navbar-form" role="search">
+                                <div class="form-group">
+                                    {{ form.phone_number }}
+                                </div>
+                            </div>
+                            <p class="help-message">Booking requests require host to accept the request within 24 hours. We will authorize your card for the full amount, but you will not be charged until the host accepts.</p>
+                        </div>
+                        <div class="row">
+                            <input type="checkbox"><p class="help-message">By booking this listing, you agree to pay the total amount shown including the Service Fees and agree to Tripalocal's Terms and Conditions.
+                            </p>
+                        </div>
+                        <input type="submit" id="submit_booking" name="Request to Book" value="Request to Book" class="btn btn-primary btn-lg" style="max-width:100%" />
+                    </div>
+                </form>
+                <div class="expList checkoutDetails">
+                	<div class="listingImg" style="background-image:url(		
+		            {% for photo in experience.photo_set.all %}
+                        {% if forloop.first %}
+				            {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
+                        {% endif %}
+                    {% endfor %})">
+                    	<div class="profile-md checkout-profile">
+                            <img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240">
+                        </div>
+                    </div>
+                    <h3>{{ experience.title }}</h3>
+                    <p>{{ experience.city }}</p>
+                    <form action="/experience/{{eid}}/" method="get">
+                        <p>Reservation for <strong>{{ guest_number }} person(s)</strong><br>
+                            on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> (<input type="submit" value="Change" name="change" style="border:none;background:none;color:#3cc"/>)
+                        </p>
+                        <p>Rate: ${{ experience.price|mul:1.25|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
+                        <p>Subtotal: {{ subtotal_price}}
+                            <br>
+                            Service Fee: ${{ service_fee }}<br>
+                            <strong style="font-size:18px;">Total: ${{ total_price }}</strong>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+<script charset="utf-8" type="text/javascript">
+
+$(function(){
+    $(document).ready(function(){
+        $("#id_card_number").attr("class", "form-control");
+        $("#id_expiration_0").attr("class", "btn btn-default dropdown-toggle");
+        $("#id_expiration_1").attr("class", "btn btn-default dropdown-toggle");
+        $("#id_cvv").attr("class", "form-control");
+        $("#id_first_name").attr("class", "form-control");
+        $("#id_last_name").attr("class", "form-control");
+        $("#id_street1").attr("class", "form-control");
+        $("#id_street2").attr("class", "form-control");
+        $("#id_city").attr("class", "form-control");
+        $("#id_state").attr("class", "form-control");
+        $("#id_state").attr("size", "4");
+        $("#id_postcode").attr("class", "form-control");
+        $("#id_postcode").attr("size", "4");
+        $("#id_phone_number").attr("class", "form-control");
+        $("#id_country").attr("class", "btn btn-default dropdown-toggle");
+
+        $("#submit_booking").bind("click", function(e) {
+            e.preventDefault();
+            if ($("input:checkbox:checked").length) {
+                $("#category_form").submit();
+            }
+            else{
+                alert("Please select the checkbox. Thank you");
+            }
+        });
+    })
+})
+</script>
+{% endblock %}

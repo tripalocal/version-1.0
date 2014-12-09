@@ -1,0 +1,260 @@
+{% extends "app/layout.html" %}
+{% load mathfilters %}
+
+{% block head %}
+   <title> {{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endif %} {% endfor %} </title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron experienceImg" style="background-image:url(		
+		{% for photo in experience.photo_set.all %}
+            {% if forloop.first %}
+				{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
+            {% endif %}
+        {% endfor %})">
+	</div>
+
+    <div class="container-fluid experience">
+	    <div class="row">
+		    <div class="fixCenter">
+                <div class="bookingBox">
+                    <div class="profile-lg">
+                        <img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240">
+                    </div>
+                    Reservation with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endif %} {% endfor %}
+                    <br><br>
+                    <span>${{ experience.price|mul:1.25|floatformat:"0" }}</span> per person<br>for {{ experience.duration }} hours<br>
+
+                    <form id="experience_booking_form" method="post" action="">
+                        {% csrf_token %}
+                        
+                        {% for field in form.hidden_fields %}
+                            {{ field }}
+                        {% endfor %}
+
+
+                        <div class="row">
+                            <div class="col" id="date">
+                                <div class="icon"></div>Date
+                                {% for op in available_options %} 
+                                    <p id="date_string_{{forloop.counter0}}" style="display:none"> {{op.date_string}} </p> 
+                                {% endfor %}
+                                <p>{{form.date}}</p>
+                            </div>
+                            <div class="col" id="time">
+                                <div class="icon"></div>Time
+                                {% for op in available_options %} 
+                                    <p id="time_string_{{forloop.counter0}}" style="display:none"> {{op.time_string}} </p> 
+                                {% endfor %}
+                                <p>{{form.time}}</p>
+                            </div>
+                            <div class="col" id="people">
+                                <div class="icon"></div>People
+                                {% for op in available_options %} 
+                                    <p id="seat_left_{{forloop.counter0}}" style="display:none"> {{op.available_seat}} </p>
+                                {% endfor %}
+                                <p>{{form.guest_number}}</p>
+                            </div>
+                        </div>
+
+                        {% if user.is_authenticated %}
+                            <input type="submit" class="btn btn-primary btn-lg" value="Request to Book" />  
+                        {% else %}
+                            <input type="button" class="btn btn-primary btn-lg" value="Request to Book" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
+                        {% endif %}
+                    </form> 
+                </div>
+            
+        	    <div class="desBox">
+                    <h1>{{ experience.title }} with {% for h in experience.hosts.all %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endfor %}</h1>
+                    <p> {{ experience.location }} </p>
+                    <p> {{ experience.description }} </p>
+                    <p><a href="#">Contact Host</a></p>
+                    <p><img src="{% for photo in experience.photo_set.all %}
+                                    {% if forloop.counter == 2 %}
+				                        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
+                                    {% endif %}
+                                 {% endfor %}" 
+                        width="600" height="375"></p>
+                    <p> {{ experience.activity }} </p>
+                    <p> {{ experience.interaction }} </p>
+                    <p> {{ experience.dress }} </p>
+                    <h2>What's included</h2>
+                    <ul>
+                    {% for w in experience.whatsincluded_set.all %}
+                        <li id="{{w.item.lower}}" class="{%if w.included%}included{%else%}notincluded{%endif%}"><div class="icon"></div>{{w.item}}: {{w.details}}</li>
+                    {% endfor %}
+                    </ul>
+                    <p><img src="{% for photo in experience.photo_set.all %}
+                                    {% if forloop.last %}
+				                        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
+                                    {% endif %}
+                                 {% endfor %}"
+                         width="600" height="375"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid review">
+        <div class="row">
+    		<div class="fixCenter">
+                <div class="reviewBox">
+                    <h2>{{ experience.review_set.count }} Reviews</h2>
+                    <div class="rating"><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span></div>
+                
+                {% for review in experience.review_set.all %}
+                {% if forloop.last == Flase %}
+                    <div class="reviewList">
+                {% else %}
+                     <div class="reviewList last">
+                {% endif %}
+                        <div class="profile-md"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
+                        <div class="reviewText">{{review.comment}}
+                            <div class="reviewDate">{{review.datetime|date:'d-m-Y'}}</div>
+                        </div>
+                    </div>
+                {% endfor%}
+               
+                </div>
+    		</div>
+		</div>
+    </div>
+
+    <div class="container-fluid bio">
+        <div class="row">
+            <div class="fixCenter">
+                <div class="bioBox">
+                	<h2>Host Profile - {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endif %} {% endfor %}</h2>
+                    <div class="profile-lg"><img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240"></div>
+                    <div class="bioText">
+                        <p>{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.bio }} {% endif %} {% endfor %}</p>
+                        <a class="btn btn-primary btn-sm" role="button">Contact Host</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+
+    <div class="container-fluid also"  style="display:none">
+    	<div class="row">
+        <div class="fixCenter">
+        <div class="expBox">
+                <h2>People also bought these experiences in Melbourne</h2>
+                
+                <div class="expList">
+                	<div class="listingImg" style="background-image:url({{ MEDIA_URL }}hosts/2/host2_2_BenK_bg.jpg)">
+                    	<div class="priceBox">
+                        $<span>40</span> AUD
+                        </div>
+                    </div>
+                  <h3>Melbourne's Historical Architecture Walk ...</h3>
+                    <div class="profile-sm"><img src="{% for review in experience.review_set.all %}{% if forloop.first %}{{ MEDIA_URL }}{{review.user.registereduser.image_url}}{% endif %}{% endfor %}" width="240" height="240"></div>
+                  <p>Through this experience, you will uncover the past of the city, much of which is hidden in plain sight. It would be a pleasure to show others the place I call home.</p>
+                    <div class="listingFooter"><a href="#">4 reviews</a> 2 hrs Up to 4 people</div>
+                </div>
+                <div class="expList">
+                	<div class="listingImg" style="background-image:url({{ MEDIA_URL }}hosts/2/host2_2_BenK_bg.jpg)">
+                    	<div class="priceBox">
+                        $<span>40</span> AUD
+                        </div>
+                    </div>
+                  <h3>Melbourne's Historical Architecture Walk ...</h3>
+                    <div class="profile-sm"><img src="{% for review in experience.review_set.all %}{% if forloop.first %}{{ MEDIA_URL }}{{review.user.registereduser.image_url}}{% endif %}{% endfor %}" width="240" height="240"></div>
+                  <p>Through this experience, you will uncover the past of the city, much of which is hidden in plain sight. It would be a pleasure to show others the place I call home.</p>
+                    <div class="listingFooter"><a href="#">4 reviews</a> 2 hrs Up to 4 people</div>
+                </div>
+                <div class="expList">
+                	<div class="listingImg" style="background-image:url({{ MEDIA_URL }}hosts/2/host2_2_BenK_bg.jpg)">
+                    	<div class="priceBox">
+                        $<span>40</span> AUD
+                        </div>
+                    </div>
+                  <h3>Melbourne's Historical Architecture Walk ...</h3>
+                    <div class="profile-sm"><img src="{% for review in experience.review_set.all %}{% if forloop.first %}{{ MEDIA_URL }}{{review.user.registereduser.image_url}}{% endif %}{% endfor %}" width="240" height="240"></div>
+                  <p>Through this experience, you will uncover the past of the city, much of which is hidden in plain sight. It would be a pleasure to show others the place I call home.</p>
+                    <div class="listingFooter"><a href="#">4 reviews</a> 2 hrs Up to 4 people</div>
+                </div>
+        </div>
+    </div>  
+{% endblock %} 
+
+{% block scripts %}
+
+<script charset="utf-8" type="text/javascript">
+
+$(function(){
+    $(document).ready(function(){
+        var i=0;
+        for(; $("#id_date option").eq(i).length; i++)
+        {
+            var parts = $("#id_date option").eq(i).text().trim().split("/");
+            var date = new Date(parseInt(parts[2], 10),
+                              parseInt(parts[1], 10) - 1,
+                              parseInt(parts[0], 10));
+            $("#id_date option").eq(i).val(date.getFullYear() + '-' + (date.getMonth()+1) + '-' +  date.getDate());
+        }
+
+        first_date = $("#date_string_0").text().trim()
+
+        for(var i=0; $("#date_string_"+i).text().trim() == first_date; i++)
+        {
+            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+        }
+
+        seat_left = parseInt($("#seat_left_0").text());
+
+        $("#id_guest_number").html('');
+        for(var i=1;i<=seat_left;i++)
+        {
+            $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
+        }
+    })
+})
+
+$(function(){
+    $("#id_date").change(function(){
+        selected_date = $("#id_date option:selected").text().trim();     
+
+        $("#id_time").html('');
+
+        var i=0;
+        for(; $("#date_string_"+i).text().trim() != selected_date; i++)
+        {
+        }
+
+        for(; $("#date_string_"+i).text().trim() == selected_date; i++)
+        {
+            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+        }
+
+        $("#id_time").change();
+    })
+})
+
+$(function(){
+    $("#id_time").change(function(){
+        selected_date = $("#id_date option:selected").text().trim();
+        selected_time = $("#id_time option:selected").text().trim();
+
+        var i=0;
+        for(; $("#date_string_"+i).text().trim() != selected_date; i++)
+        {
+        }
+
+        for(; $("#time_string_"+i).text().trim() != selected_time; i++)
+        {
+        }
+
+        seat_left = parseInt($("#seat_left_"+i).text());
+
+        $("#id_guest_number").html('');
+        for(var i=1;i<=seat_left;i++)
+        {
+            $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
+        }
+    })
+})
+</script>
+{% endblock %}

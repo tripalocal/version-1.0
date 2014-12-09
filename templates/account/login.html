@@ -1,0 +1,54 @@
+
+{% block head %}
+    {% load i18n %}
+    {% load account %}
+    {% load url from future %}
+
+    {% load staticfiles %}
+    <script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
+    <link href="{% static 'app/content/tripalocal.min.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/tripalocal.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/modal.css' %}" rel="stylesheet">
+    {% if form %}
+        {{ form.media }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<section class="modal--fade is-active" id="modal-fade" tabindex="-1" role="dialog" aria-labelledby="label-fade" aria-hidden="true">
+    <div class="modal-inner">
+        <div class="modal-content">
+            {% if socialaccount.providers  %}
+            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+            <p style="color:#CCC;">---------------------- or -----------------------</p>
+            {% include "socialaccount/snippets/login_extra.html" %}
+            {% endif %}
+
+            <form class="login" method="POST" action="{% url 'account_login' %}">
+                {% csrf_token %}
+                <p>{{ form.login }}</p>
+                <p>{{ form.password }}</p>
+                <p>{{ form.remember }} Remember me</p>
+                {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                {% endif %}
+                <p><button class="btn btn-primary btn-lg" type="submit">{% trans "Log In" %}</button></p>
+                <p>{% blocktrans %}Don't have an account? <a href="{{ signup_url }}">Sign up</a>{% endblocktrans %}</p>
+                <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script charset="utf-8" type="text/javascript">
+$(function(){
+    $(document).ready(function(){
+        $("#id_Facebook").attr("class", "btn btn-primary btn-lg btn-facebook");
+        $("#id_Facebook").attr("role", "button");
+    })
+})
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+
+{% block head %}
+    {% load i18n %}
+    {% load account %}
+    {% load url from future %}
+
+    {% load staticfiles %}
+    <script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
+    <link href="{% static 'app/content/tripalocal.min.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/tripalocal.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/modal.css' %}" rel="stylesheet">
+    {% if form %}
+        {{ form.media }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="modal--fade is-active" id="modal-fade" tabindex="-1" role="dialog" aria-labelledby="label-fade" aria-hidden="true">
+    <div class="modal-inner">
+        <div class="signup_box">
+        {% if socialaccount.providers  %}
+        {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+        <p style="color:#CCC;">---------------------- or -----------------------</p>
+        {% include "socialaccount/snippets/login_extra.html" %}
+        {% endif %}
+
+        <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            <!--<p>{{ form.username }}</p>-->
+            <p>{{ form.email }}</p>
+            <p>{{ form.password1 }}</p>
+            <p>{{ form.first_name }}</p>
+            <p>{{ form.last_name }}</p>
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+            <p class="help-message">By signing up, I agree to Tripalocal's <a href="#">Terms of Service</a>, <a href="#">Privacy Policy</a>, <a href="#">Guest Refund Policy</a></p>
+            <button class="btn btn-primary btn-lg" type="submit">Sign up</button>
+        </form>
+        <p>{% blocktrans %}Already a Tripalocal member? <a href="{{ login_url }}">Log in</a>{% endblocktrans %}</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script charset="utf-8" type="text/javascript">
+$(function(){
+    $(document).ready(function(){
+        $("#id_Facebook").attr("class", "btn btn-primary btn-lg btn-facebook");
+        $("#id_Facebook").attr("role", "button");
+    })
+})
+</script>
+{% endblock %}

@@ -1,0 +1,122 @@
+.starter-template {  padding: 40px 15px;  text-align: center;}
+
+.navBox {height:50px;}
+.header{padding-top:10px;}
+.brand{float:left; margin-left:10px;}
+.menu{margin-top:6px; margin-right:10px;}
+.menu li{float:right; margin-left:10px; list-style:none;}
+.menu li a{ color:#999;}
+
+.experienceImg { background-size: cover; background-position:center; height:400px; background-color:#CCC;}
+.experience {background-color:#f7f7f7; border-bottom:#CCC 1px solid;}
+.fixCenter {width:960px; margin:auto;}
+.bookingBox {background-color:#fff;border:#CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 5px;border-radius: 5px; width:300px; float:left; padding:20px; text-align:center;}
+.bookingBox .profile-lg {margin-top: -140px;}
+.bookingBox .profile-lg img{margin-left:1px;}
+.bookingBox span{float: left;font-size: 36px;font-weight: bold;line-height: 1;left: 50px;position: relative;}
+.bookingBox .row{text-align:center; margin:20px 0px;}
+
+.checkoutBox {width:560px; background-color:#FFF; border:#CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 5px;border-radius: 5px; padding:20px;}
+.checkoutBox .row{border-top:#CCC 1px solid; padding:20px;}
+
+.icon{width:27px; height:27px; background-image:url(../images/icons.gif); background-size: 135px 135px;}
+.bookingBox .icon{ margin:auto; margin:auto;}
+.col{text-align:center; float:left;}
+#people{width:47px;}
+#date{width:110px;}
+#time{width:100px;}
+#people .icon{background-position:0px 0px;}
+#date .icon{background-position:-27px 0px;}
+#time .icon{background-position:-54px 0px;}
+
+.desBox .icon{float:left; margin-right:15px;}
+#food .icon{background-position:0px -81px;}
+#transport .icon{background-position:-27px -81px;}
+#ticket .icon{background-position:-54px -81px;}
+.desBox li{line-height:27px; padding-bottom:10px; list-style:none;}
+.desBox ul{ margin-left:-40px;}
+.desBox img{margin:15px 0px;width: 100%;height: auto;}
+
+.reviewBox h2{float:left; margin-right:20px;}
+.rating{color:#FC0; margin-top:12px; margin-bottom:20px;}
+.reviewList{border-bottom:#CCC 1px solid; padding:20px 0px;overflow: hidden;	width: 100%;}
+.reviewText {float:right; width:480px;}
+.reviewDate{color:#999; margin-top:12px;}
+
+.bio{background-color:#f7f7f7; border-bottom:#CCC 1px solid; border-top:#CCC 1px solid; margin-top:20px;}
+.bioText{float: right;width: 400px;margin-top: 32px;}
+.bioBox .profile-lg {float:left;}
+
+.profile-lg {width: 150px;height: 150px;margin: 30px auto 10px auto;}
+.profile-lg img{margin-top: 5px; margin-left:5px;width: 140px;height: 140px;}
+.profile-md {width: 98px;height: 98px; float:left;}
+.profile-md img{margin-top: 4px; margin-left:4px; width: 90px;height: 90px;}
+.profile-sm {width: 80px;height: 80px; float:right;}
+.profile-sm img{margin-top: 5px; margin-left:5px;width: 70px;height: 70px;}
+.profile-xs {width:35px;height:35px; float:left; margin-right:20px; margin-top:-7px;}
+.profile-xs img{width:35px;height:35px;}
+.profile-lg, .profile-md, .profile-sm, .profile-xs{background-color: #FFF;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border-radius: 100px;}
+.profile-lg img, .profile-md img, .profile-sm img, .profile-xs img{border-radius: 100px;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border: #CCC solid 1px;}
+
+.desBox, .reviewBox, .bioBox {width:600px; float:right;}
+.last{border-bottom:none;}
+.btn-lg, .btn-group-lg>.btn { font-weight:bold; font-size: 14px;line-height: 1.33;border-radius: 3px; width:100%;}
+.experience, .review, .bio, .also {padding:30px 0px}
+
+.expList{float:left; width:300px; height:350px; margin:20px 20px 20px 0px;}
+.expList p{font-size:12px;}
+.listingImg{height:200px; background-position:center; background-size: cover;}
+.priceBox{background-color:rgba(10,10,10,0.8); height:40px; margin-top:150px; position:absolute; color:#FFF; padding:0px 20px; padding-top:5px; }
+.priceBox span{font-size:28px; padding:5px; margin-top:10px; font-weight:bold;vertical-align: text-top; line-height:23px;}
+.listingFooter{border-top: #CCC solid 1px; font-size:12px; padding:5px 0px 20px 0px; color:#999;}
+
+@media only screen and (max-device-width: 768px) {
+	.experienceImg {height:150px;}
+	.fixCenter{width:100%;}
+	.bookingBox{float:none; margin:auto;}
+	.desBox, .reviewBox{float:none; margin:auto; width:80%;}
+	.desBox img {width: 100%;height: 100%;}
+	.desBox li {padding-bottom: 0px}
+	.desBox h1{margin-top:20px;}
+	.reviewBox h2{margin-top:-2px;}
+	.reviewList .profile-md{float:none;margin:auto;}
+	.reviewText{width:90%; float:none; margin:auto; text-align:center;}
+	.bioBox {float:none; width:85%; margin:auto;}
+	.bioBox .profile-lg{float:none; margin:auto;}
+	.bioText{float:none; width:100%;}
+	.expBox{margin:auto;width:85%;}
+	.expList{width:100%;}
+	}
+	
+
+.modal-content {border:none;border-radius:0px;}
+.btn-facebook, .btn-facebook:hover {background-color: #3B5998;}
+.input-group {margin-bottom:5px;}
+.form-control {border-radius:3px; width:100%;}
+.modal-content p{margin-top:10px;}
+.checkout-profile{margin-top:-30px; margin-left:100px;}
+
+.help-message{font-size:10px;}
+.checkoutBox{float:left;}
+.checkoutDetails{float:right;}
+
+.navbar-form{padding:0px 15px 0px 0px;}
+.dropdown{padding-right:10px;}
+
+input[type=checkbox] { margin: 4px 10px 0 0; float: left;}
+
+.signup_box {
+	max-height: 400px;
+	max-height: 80vh;
+	overflow-x: hidden;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	-webkit-box-sizing: border-box;
+	margin-top: 20px;
+	margin-bottom: 10px;
+	margin-left: 15px;
+	margin-right: 15px;
+
+}
+.searchresult{background-color:#f7f7f7; border-top:#CCC 1px solid;}
+.searchbar{background-color:#f7f7f7; border-top:#CCC 1px solid; padding:10px 0px}

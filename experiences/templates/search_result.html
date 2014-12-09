@@ -1,0 +1,95 @@
+﻿{% extends "app/layout.html" %}
+{% load staticfiles %}
+
+{%block head %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="http://tripalocal.com/stage1css/favicon.ico">
+
+    <title>Discover {{ city }}</title>
+
+    <!-- Bootstrap core CSS -->
+    <!-- <link href="http://tripalocal.com/stage1css/css/tripalocal.min.css" rel="stylesheet"> -->
+
+    <!-- Custom styles for this template -->
+    <!-- <link href="http://tripalocal.com/stage1css/css/tripalocal.css" rel="stylesheet"> -->
+
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <!--<script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/ie-emulation-modes-warning.js"></script><style type="text/css"></style>-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+{%endblock%}
+
+{% block content %}    
+    <div class="container-fluid searchbar">
+    	<div class="row">
+        <div class="fixCenter">
+    <div class="dropdown">Where are you going?
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+    {{ city }}
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+
+    {% if sydneySelected %}
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/melbourne">melbourne</a></li>
+    {% else %}
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/sydney">sydney</a></li>
+    {% endif %}
+  </ul>
+</div>
+    </div></div></div>
+    
+    <div class="container-fluid searchresult">
+    	<div class="row">
+        <div class="fixCenter">
+        <div class="expBox">
+
+          <!-- Each Individual Experiene Listing -->
+          {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
+          <div class="expList">
+          <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}">
+              <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
+                  <div class="priceBox">
+                    $<span>{{ experience.price }}</span> AUD
+                  </div>
+              </div>
+          </a>
+          <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
+            <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
+          
+          <p>{{ experience.description }}</p>
+            <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#">{{ review }} reviews</a> · {{ experience.duration }} hrs · Up to {{ experience.guest_number_max }} people</div>
+           </div>
+          {% endfor %}
+
+
+
+        </div>       
+        </div>
+      </div>
+    </div>
+    <!-- /.container -->
+
+{% endblock %}
+
+{% block scripts %}
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/jquery.min.js"></script>
+    <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/ie10-viewport-bug-workaround.js"></script>
+  
+{% endblock %}

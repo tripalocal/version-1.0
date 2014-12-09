@@ -1,0 +1,171 @@
+{% extends "app/layout.html" %}
+
+{% block head %}
+    {% load staticfiles%}
+    <link href="{% static 'app/content/prelaunch.css' %}" rel="stylesheet">
+    <title>Tripalocal | Experience it like a local</title>
+    <!-- H1 google font -->
+    <link href='http://fonts.googleapis.com/css?family=Cutive' rel='stylesheet' type='text/css'>
+
+    <style id="clearly_highlighting_css" type="text/css">
+    /* selection */ 
+    html.clearly_highlighting_enabled ::-moz-selection { background: rgba(246, 238, 150, 0.99); } 
+    html.clearly_highlighting_enabled ::selection { background: rgba(246, 238, 150, 0.99); } 
+    /* cursor */ 
+    html.clearly_highlighting_enabled {    
+    /* cursor and hot-spot position -- requires a default cursor, after the URL one */    
+    cursor: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--cursor.png") 14 16, text; 
+    } 
+    /* highlight tag */ 
+    em.clearly_highlight_element {    
+    font-style: inherit !important; 
+    font-weight: inherit !important;    
+    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow.png");    
+    background-repeat: repeat-x; background-position: top left; background-size: 100% 100%; 
+    } 
+    /* the delete-buttons are positioned relative to this */ 
+    em.clearly_highlight_element.clearly_highlight_first { position: relative; } 
+    /* delete buttons */ 
+    em.clearly_highlight_element a.clearly_highlight_delete_element {    
+    display: none; 
+    cursor: pointer;    
+    padding: 0; 
+    margin: 0; 
+    line-height: 0;    
+    position: absolute; 
+    width: 34px; 
+    height: 34px; 
+    left: -17px; 
+    top: -17px;    
+    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite.png"); 
+    background-repeat: no-repeat; 
+    background-position: 0px 0px; 
+    } 
+    em.clearly_highlight_element a.clearly_highlight_delete_element:hover { background-position: -34px 0px; } 
+    /* retina */ 
+    @media (min--moz-device-pixel-ratio: 2), (-webkit-min-device-pixel-ratio: 2), (min-device-pixel-ratio: 2) {    
+    em.clearly_highlight_element { 
+    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow@2x.png"); 
+    }    
+    em.clearly_highlight_element a.clearly_highlight_delete_element { 
+    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite@2x.png"); background-size: 68px 34px; } } 
+</style>
+<style>
+    [touch-action="none"]
+    { -ms-touch-action: none; touch-action: none; }
+    [touch-action="pan-x"]
+    { -ms-touch-action: pan-x; touch-action: pan-x; }
+    [touch-action="pan-y"]
+    { -ms-touch-action: pan-y; touch-action: pan-y; }
+    [touch-action="scroll"],[touch-action="pan-x pan-y"],[touch-action="pan-y pan-x"]
+    { -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; }
+</style>
+  
+<!-- start Mixpanel -->
+<script type="text/javascript">(function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}
+var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};
+i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
+for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
+mixpanel.init("f94e94414c9de0cc38874706d853c400");
+</script>
+<!-- end Mixpanel -->
+{% endblock %}
+
+{% block content %}
+<!--
+{% if messages %}  
+    {% for message in messages %}
+    <p id="id_message_{{forloop.counter0}}" style="display:none">{{ message }}</p>
+    {% endfor %}  
+{% endif %}
+-->
+    <div id="StayFocusd-infobar" style="display:none;">
+        <img src="chrome-extension://laankejkbhbdhmipfmgcngdelahlfoji/common/img/eye_19x19_red.png">
+        <span id="StayFocusd-infobar-msg"></span>
+        <span id="StayFocusd-infobar-links">
+            <a id="StayFocusd-infobar-never-show">hide forever</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a id="StayFocusd-infobar-hide">hide once</a>
+        </span>
+    </div>
+
+    <div class="jumbotron" style="background-image:url({{ MEDIA_URL }}beijing.jpg)">
+        <div class="container">
+            <img src="{% static 'app/images/tripalocal_Logo.png' %}" width="294" height="101" alt="Tripalocal">
+            <h1>Connecting travellers with locals<br>Experience the local lifestyle</h1>
+            <p>Sign up now to get early access to our initial launch</p>
+            <form action="" method="post">
+                {% csrf_token %}
+                {{form.email}} <input id="email-submit" type="submit" value="Get Early Access" name="subscribe" class="btn btn-primary " style="font-size:18px; border-radius: 3px;">
+            </form>
+        </div>
+    </div> 
+
+    <div class="exp-tease">
+        <div class="container" style="background-image:url({{ MEDIA_URL }}teaseBg.jpg)">
+            <h1>Step into the shoes of locals</h1>
+            <p style="font-size:16px;">Discover their world</p>
+            <!-- Example row of columns -->
+            <div style="margin:auto; max-width:720px;">
+                <div class="tease">        	
+                    <div class="profile"><img src="{{ MEDIA_URL }}hosts/6/host6_1_rowena.png"></div>
+                    <p><strong>Rowena G.</strong><br><em>Fashion Editor</em></p>
+                    <p class="teasebox" style="background-image:url({{ MEDIA_URL }}fashion.jpg);">Spend 3 hours with Rowena and discover her favourite independent shopping locations in Sydney</p>
+                </div>
+                <div class="tease">        	
+                    <div class="profile"><img src="{{ MEDIA_URL }}hosts/7/host7_1_stephB.jpg"></div>
+                    <p><strong>Stephen B.</strong><br><em>Street Photographer</em></p>
+                    <p class="teasebox" style="background-image:url({{ MEDIA_URL }}streetart.jpg);">Step into Melbourne's hidden laneways for 2 hours with Stephen and see Australia's cultural capital from the eyes of a street photographer</p>
+                </div>
+                <div class="tease">        	
+                    <div class="profile"><img src="{{ MEDIA_URL }}hosts/5/host5_1_nancyZ.jpg"></div>
+                    <p><strong>Nancy Z.</strong><br><em>Foodie</em></p>
+                    <p class="teasebox" style="background-image:url({{ MEDIA_URL }}food.jpg);">Cook a meal with Nancy and experience home dining in the suburbs of Brisbane</p>
+                </div>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+        
+    <div class="book-tease" style="background-image:url({{MEDIA_URL}}nighlights.jpg);">
+        <div class="container">
+             <h1>Get rewarded for your local insights</h1>
+             <p>Host your own experiences when you want with a reward you decide. <br>Be a true entrepreneur.</p>
+             <div style="max-width:628px; height:424px; margin:auto; background-image:url({{ MEDIA_URL }}bookTease.png); background-size: 628px 424px; background-position:center;"></div>
+         </div>
+    </div>
+        
+      
+	<div class="footer">
+        <div class="container">
+            <h1>See it, feel it, experience it<br>like a local</h1>
+            <img src="{% static 'app/images/tripalocal_Logo.png' %}" width="294" height="101" alt="Tripalocal">
+            <p><a href="mailto:enquiries@tripalocal.com">enquiries@tripalocal.com<br></a>COPYRIGHT @ TRIPALOCAL 2014 | <a href="/disclaimer" target="_blank">DISCLAIMER</a></p>
+            <p><a class="btn btn-default" role="button" id="twitter" href="http://twitter.com/tripalocal" target="_blank"><span style="background-image:url({{MEDIA_URL}}icons.png); background-position: 0 -30px;"></span></a>
+                <a class="btn btn-default" role="button" id="facebook" href="http://facebook.com/tripalocal" target="_blank"><span style="background-image:url({{MEDIA_URL}}icons.png);background-position: -30px -30px;"></span></a>
+                <a class="btn btn-default" role="button" id="linkedin" href="http://www.linkedin.com/company/tripalocal" target="_blank"><span style="background-image:url({{MEDIA_URL}}icons.png);background-position: -90px -30px;"></span></a>        
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+<script charset="utf-8" type="text/javascript">
+
+$(function(){
+    $(document).ready(function(){
+        $("#id_email").attr("placeholder","Your Email Address");
+        $("#id_email").attr("type","email");
+        $("#id_email").attr("size","30");
+        $("#id_email").attr("class","input-lg");
+        if($("#id_message_0").length)
+        {
+            alert($("#id_message_0").text());
+        }
+        //temporary hide "login" "signup" on homepage
+        $(".menu").attr("style","display:none");
+    })
+})
+
+</script>
+{% endblock %}
