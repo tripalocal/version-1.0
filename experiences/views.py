@@ -561,7 +561,7 @@ def ByCityExperienceListView(request, city):
         sydneySelected = True
 
     context = RequestContext(request, {
-        'city' : city,
+        'city' : city.title(),
         'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
         'sydneySelected' : sydneySelected,
         })

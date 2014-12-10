@@ -1,5 +1,6 @@
 ﻿{% extends "app/layout.html" %}
 {% load staticfiles %}
+{% load mathfilters %}
 
 {%block head %}
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -34,17 +35,17 @@
     <div class="container-fluid searchbar">
     	<div class="row">
         <div class="fixCenter">
-    <div class="dropdown">Where are you going?
+    <div class="dropdown" style="text-align:center;">Where are you going?
   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
     {{ city }}
     <span class="caret"></span>
   </button>
-  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+  <ul class="dropdown-menu" style="margin-left: 50%;" role="menu" aria-labelledby="dropdownMenu1">
 
     {% if sydneySelected %}
-      <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/melbourne">melbourne</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/melbourne">Melbourne</a></li>
     {% else %}
-      <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/sydney">sydney</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/sydney">Sydney</a></li>
     {% endif %}
   </ul>
 </div>
@@ -61,14 +62,14 @@
           <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}">
               <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
                   <div class="priceBox">
-                    $<span>{{ experience.price }}</span> AUD
+                    $<span>{{ experience.price|mul:1.25|floatformat:"0" }}</span> AUD
                   </div>
               </div>
           </a>
           <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
             <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
           
-          <p>{{ experience.description }}</p>
+          <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
             <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#">{{ review }} reviews</a> · {{ experience.duration }} hrs · Up to {{ experience.guest_number_max }} people</div>
            </div>
           {% endfor %}
