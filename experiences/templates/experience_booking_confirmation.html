@@ -161,7 +161,7 @@
                     </div>
                     <h3>{{ experience.title }}</h3>
                     <p>{{ experience.city }}</p>
-                    <form action="/experience/{{eid}}/" method="get">
+                    <form action="/experience/{{experience.id}}/" method="get">
                         <p>Reservation for <strong>{{ guest_number }} person(s)</strong><br>
                             on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> (<input type="submit" value="Change" name="change" style="border:none;background:none;color:#3cc"/>)
                         </p>
