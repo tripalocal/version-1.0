@@ -81,12 +81,33 @@
                     <p> {{ experience.activity }} </p>
                     <p> {{ experience.interaction }} </p>
                     <p> {{ experience.dress }} </p>
+                    <!--
                     <h2>What's included</h2>
                     <ul>
                     {% for w in experience.whatsincluded_set.all %}
                         <li id="{{w.item.lower}}" class="{%if w.included%}included{%else%}notincluded{%endif%}"><div class="icon"></div>{{w.item}}: {{w.details}}</li>
                     {% endfor %}
                     </ul>
+                    -->
+
+                    {% if included_list %}
+                        <h2>What's included</h2>
+                        <ul>
+                        {% for i in included_list %}
+                            <li id="{{i.item.lower}}"><div class="icon"></div>{{i.item}}: {{i.details}}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if not_included_list %}
+                    <h2>Optional Additional Expenses</h2>
+                    <ul>
+                    {% for i in not_included_list %}
+                        <li id="{{i.item.lower}}"><div class="icon"></div>{{i.item}}: {{i.details}}</li>
+                    {% endfor %}
+                    </ul>
+                    {% endif %}
+
                     <p><img src="{% for photo in experience.photo_set.all %}
                                     {% if forloop.last %}
 				                        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  

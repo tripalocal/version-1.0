@@ -125,6 +125,13 @@ class ExperienceDetailView(DetailView):
 
         context['available_options'] = available_options
         context['form'] = BookingForm(available_date, experience.id)
+
+        WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
+        included_list = WhatsIncludedList.filter(included=True)
+        not_included_list = WhatsIncludedList.filter(included=False)
+        context['included_list'] = included_list
+        context['not_included_list'] = not_included_list
+
         return context
 
 class ExperienceWizard(SessionWizardView):
