@@ -544,7 +544,7 @@ def ByCityExperienceListView(request, city):
             else:
                 BGImageURLList.append("default_experience_background.jpg")
             # Fetch profileImageURL
-            profileImageURL = RegisteredUser.objects.get(id=experience.hosts.all()[0].id).image_url
+            profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
             if (profileImageURL):
                 profileImageURLList.append(profileImageURL)
             else:
