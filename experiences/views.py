@@ -51,7 +51,7 @@ class ExperienceDetailView(DetailView):
             form.data['user_id'] = request.user.id;
             experience = Experience.objects.get(id=form.data['experience_id'])
             return render(request, 'experience_booking_confirmation.html', 
-                          {'form': form, 'eid':self.object.id, 
+                          {'form': form, #'eid':self.object.id, 
                            'experience': experience, 
                            'guest_number':form.data['guest_number'],
                            'date':form.data['date'],
@@ -113,7 +113,7 @@ class ExperienceDetailView(DetailView):
                                              sdt_local.strftime("%d/%m/%Y")),)
                             available_date += new_date
                             last_sdt = sdt
-
+            
             if experience.repeat_cycle == "Hourly" :
                 sdt += timedelta(hours=experience.repeat_frequency)
             elif experience.repeat_cycle == "Daily" :
@@ -131,7 +131,7 @@ class ExperienceDetailView(DetailView):
         not_included_list = WhatsIncludedList.filter(included=False)
         context['included_list'] = included_list
         context['not_included_list'] = not_included_list
-
+        
         return context
 
 class ExperienceWizard(SessionWizardView):
@@ -217,7 +217,7 @@ def experience_booking_confirmation(request):
 
     # Bad form (or form details), no form supplied...
     # Render the form with error messages (if any).
-    return render_to_response('experience_booking_confirmation.html', {'form': form, 'display_error':display_error,}, context)
+    # return render_to_response('experience_booking_confirmation.html', {'form': form, 'display_error':display_error,}, context)
 
 def create_experience(request, id=None):
     context = RequestContext(request)
@@ -578,3 +578,6 @@ def experiences_pre(request):
 
 def experiences_ch_pre(request):
     return render(request,'experiences_ch_pre.html')
+
+def experiences_sydney_pre(request):
+    return render(request,'experiences_sydney_pre.html')
