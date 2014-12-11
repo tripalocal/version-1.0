@@ -125,6 +125,13 @@ class ExperienceDetailView(DetailView):
 
         context['available_options'] = available_options
         context['form'] = BookingForm(available_date, experience.id)
+
+        WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
+        included_list = WhatsIncludedList.filter(included=True)
+        not_included_list = WhatsIncludedList.filter(included=False)
+        context['included_list'] = included_list
+        context['not_included_list'] = not_included_list
+
         return context
 
 class ExperienceWizard(SessionWizardView):
@@ -537,7 +544,7 @@ def ByCityExperienceListView(request, city):
             else:
                 BGImageURLList.append("default_experience_background.jpg")
             # Fetch profileImageURL
-            profileImageURL = RegisteredUser.objects.get(id=experience.hosts.all()[0].id).image_url
+            profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
             if (profileImageURL):
                 profileImageURLList.append(profileImageURL)
             else:

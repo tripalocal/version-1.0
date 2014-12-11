@@ -308,8 +308,8 @@ class UserSignupForm(forms.Form):
         new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
         new_alias.save()
 
-        with open('canonical', 'a') as f:
+        with open('/etc/postfix/canonical', 'a') as f:
             f.write(user.email + " " + new_email.id + "\n")
             f.close()
 
-        #subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
