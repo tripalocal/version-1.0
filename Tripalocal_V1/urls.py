@@ -67,4 +67,5 @@ urlpatterns = patterns('',
     url(r'^PreLaunch/livesite/experiences.html$', 'experiences.views.experiences_pre', name='experiences_pre'),
     url(r'^PreLaunch/livesite/experiences_ch.html$', 'experiences.views.experiences_ch_pre', name='experiences_ch_pre'),
     url(r'^PreLaunch/livesite/experiences_sydney.html$', 'experiences.views.experiences_sydney_pre', name='experiences_sydney_pre'),
+    url(r'^freesim/$', 'experiences.views.freeSimPromo', name='freeSimPromo'),
 )

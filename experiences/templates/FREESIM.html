@@ -1,0 +1,134 @@
+{% block content %}
+<hr style="margin-bottom:10px;">
+<p>{{coupon.description}}</p>
+<div style="background-color:lightgreen; border-color:lightgrey;">
+<p> :-) You complimentary mobile number is saved in our database</p>
+</div>
+<div id="coupon_extra_information_div">
+    <table width="0" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <p>Destination Check-in date</p>
+                <div class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input id="id_checkin_time" type="text" class="form-control" placeholder="YYYY-MM-DD">
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <table width="0" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <p>Destination address</p>
+                <div class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input id="id_des_address_1" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input id="id_des_address_2" type="text" class="form-control">
+                    </div>
+                </div>
+            </td>       
+        </tr>
+    </table>
+    <table width="0" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td>
+                <p>City</p>
+                <div class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input id="id_des_city" type="text" class="form-control">
+                    </div>
+                </div>
+            </td>
+            <td>
+                <p>State</p>
+                <div class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input id="id_des_state" type="text" class="form-control" size="4">
+                    </div>
+                </div>
+            </td>
+            <td>
+                <p>Postcode</p>
+                <div class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input id="id_des_postcode" type="text" class="form-control" size="4">
+                    </div>
+                </div>
+            </td>
+            <td>
+                <p>Country</p>
+                <div class="dropdown">
+                    <select id="id_des_country" name="des_country" class="btn btn-default dropdown-toggle">
+                        <option value="Australia">Australia</option>
+                        <option value="United State">United State</option>
+                        <option value="China">China</option>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <hr style="margin-bottom:10px;">
+    <input id="extra_fee" type="checkbox" /><p class="help-message">Optional $10 for your Prepaid sim.</p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script charset="utf-8" type="text/javascript">
+$(function(){
+    $(document).ready(function(){
+        $("#coupon_extra_information_div").keyup(function()
+        {
+            if ($("#extra_fee").is(':checked')) {
+                extra_fee = 10.00;
+            }
+            else{
+                extra_fee = 0.00;
+            }
+
+            var coupon_extra_information = {extra_fee:extra_fee,
+                                            checkin_date:$("#id_checkin_time").val(),
+                                            des_address_1:$("#id_des_address_1").val(),
+                                            des_address_2:$("#id_des_address_2").val(),
+                                            des_city:$("#id_des_city").val(),
+                                            des_state:$("#id_des_state").val(),
+                                            des_postcode:$("#id_des_postcode").val(),
+                                            des_country:$("#id_des_country").val()};
+            $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
+        });
+
+        $('#extra_fee').click(function () {
+            if ($("#extra_fee").is(':checked')) {
+                $("#id_total").text(parseFloat($("#id_sub_total").text())+12.40);
+                $("#id_coupon_extra_fee").text("$10 recharge for Prepaid sim");
+                var coupon_extra_information = { extra_fee:10.00,
+                                            checkin_date:$("#id_checkin_time").val(),
+                                            des_address_1:$("#id_des_address_1").val(),
+                                            des_address_2:$("#id_des_address_2").val(),
+                                            des_city:$("#id_des_city").val(),
+                                            des_state:$("#id_des_state").val(),
+                                            des_postcode:$("#id_des_postcode").val(),
+                                            des_country:$("#id_des_country").val()};
+                $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
+            }
+            else{
+                $("#id_total").text(parseFloat($("#id_sub_total").text())+2.40);
+                $("#id_coupon_extra_fee").text("");
+                var coupon_extra_information = { extra_fee:0.00,
+                                            checkin_date:$("#id_checkin_time").val(),
+                                            des_address_1:$("#id_des_address_1").val(),
+                                            des_address_2:$("#id_des_address_2").val(),
+                                            des_city:$("#id_des_city").val(),
+                                            des_state:$("#id_des_state").val(),
+                                            des_postcode:$("#id_des_postcode").val(),
+                                            des_country:$("#id_des_country").val()};
+                $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
+            }
+        })
+    })
+})
+</script>
+{% endblock %}

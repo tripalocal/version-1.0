@@ -593,3 +593,80 @@ def experiences_ch_pre(request):
 
 def experiences_sydney_pre(request):
     return render(request,'experiences_sydney_pre.html')
+
+def freeSimPromo(request):
+
+    template = loader.get_template('christmas_2014_promo.html')
+
+    # Add all experiences that belong to the specified city to a new list
+    # alongside a list with all the number of reviews
+    experienceList = Experience.objects.all()
+
+    mcityExperienceList = []
+    mcityExperienceReviewList = []
+    mformattedTitleList = []
+    mBGImageURLList = []
+    mprofileImageURLList = []
+
+    scityExperienceList = []
+    scityExperienceReviewList = []
+    sformattedTitleList = []
+    sBGImageURLList = []
+    sprofileImageURLList = []
+
+    i = 0
+    while i < len(experienceList):
+        experience = experienceList[i]
+        # Melbourne
+        if (experience.city.lower() == "melbourne"):
+            mcityExperienceList.append(experience)
+            mcityExperienceReviewList.append(getNReviews(experience.id))
+            # Fetch BGImageURL
+            BGImageURL = getBGImageURL(experience.id)
+            if (BGImageURL):
+                mBGImageURLList.append(BGImageURL)
+            else:
+                mBGImageURLList.append("default_experience_background.jpg")
+            # Fetch profileImageURL
+            profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+            if (profileImageURL):
+                mprofileImageURLList.append(profileImageURL)
+            else:
+                mprofileImageURLList.append("profile_default.jpg")
+            # Format title & Description
+            if (len(experience.title) > 50):
+                mformattedTitleList.append(experience.title[:47] + "...")
+            else:
+                mformattedTitleList.append(experience.title)
+
+        # Sydney
+        if (experience.city.lower() == "sydney"):
+            scityExperienceList.append(experience)
+            scityExperienceReviewList.append(getNReviews(experience.id))
+            # Fetch BGImageURL
+            BGImageURL = getBGImageURL(experience.id)
+            if (BGImageURL):
+                sBGImageURLList.append(BGImageURL)
+            else:
+                sBGImageURLList.append("default_experience_background.jpg")
+            # Fetch profileImageURL
+            profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+            if (profileImageURL):
+                sprofileImageURLList.append(profileImageURL)
+            else:
+                sprofileImageURLList.append("profile_default.jpg")
+            # Format title & Description
+            if (len(experience.title) > 50):
+                sformattedTitleList.append(experience.title[:47] + "...")
+            else:
+                sformattedTitleList.append(experience.title)
+        i += 1
+
+
+    context = RequestContext(request, {
+
+    'mcityExperienceList' : zip(mcityExperienceList, mcityExperienceReviewList, mformattedTitleList, mBGImageURLList, mprofileImageURLList),
+    'scityExperienceList' : zip(scityExperienceList, scityExperienceReviewList, sformattedTitleList, sBGImageURLList, sprofileImageURLList),
+
+    })
+    return HttpResponse(template.render(context))
