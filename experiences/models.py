@@ -17,8 +17,8 @@ class RegisteredUser(models.Model):
     bio = models.TextField()
     rate = models.DecimalField(max_digits=2, decimal_places=1)
 
-    def __str__(self):
-        return self.user.username
+    #def __str__(self):
+    #    return self.username
 
 class Experience(models.Model):
     type = models.CharField(max_length=50)
@@ -81,15 +81,25 @@ class Review(models.Model):
     rate = models.IntegerField()
     datetime = models.DateTimeField()
 
+class Coupon(models.Model):
+    promo_code = models.CharField(max_length=10)
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    rules = models.TextField()
+    title = models.CharField(max_length=50)
+    description = models.TextField()
+
 class Booking(models.Model):
     user = models.ForeignKey(User)
+    coupon = models.ForeignKey(Coupon)
+    coupon_extra_information = models.TextField()
     guest_number = models.IntegerField()
     experience = models.ForeignKey(Experience)
     datetime = models.DateTimeField()
     status = models.CharField(max_length=50)
     submitted_datetime = models.DateTimeField()
     payment = models.ForeignKey("Payment", related_name="payment")
-    refund_id = models.CharField(max_length=50)
+    refund_id = models.CharField(max_length=50)   
 
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):
@@ -169,3 +179,6 @@ class Payment(models.Model):
         except Exception as e:
             return False, e
         return True, re
+
+
+    

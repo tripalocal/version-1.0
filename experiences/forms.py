@@ -4,12 +4,13 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 from datetime import date, datetime
 from calendar import monthrange 
-from experiences.models import Payment, Booking, Experience, RegisteredUser
+from experiences.models import Payment, Booking, Experience, RegisteredUser, Coupon
 from Tripalocal_V1 import settings
 import pytz, string, subprocess
 from django.core.mail import send_mail
 from django.template import loader
 from tripalocal_messages.models import Aliases, Users
+import json
 
 Type = (('SEE', 'See'),('DO', 'Do'),('EAT', 'Eat'),)
 
@@ -156,6 +157,7 @@ class BookingConfirmationForm(forms.Form):
     time = forms.TimeField()
     guest_number = forms.IntegerField(label="People")
     status = forms.CharField(initial="Requested")
+    promo_code = forms.CharField(required=False)
 
     card_number = CreditCardField(required=True, label="Card Number")
     expiration = CCExpField(required=True, label="Expiration")
@@ -172,6 +174,8 @@ class BookingConfirmationForm(forms.Form):
     postcode = forms.CharField(max_length=4)
     phone_number = forms.CharField(max_length=15)
 
+    coupon_extra_information = forms.CharField(max_length=500, required=False)
+
     def __init__(self, *args, **kwargs):
         super(BookingConfirmationForm, self).__init__(*args, **kwargs)
         self.fields['experience_id'].widget.attrs['readonly'] = True
@@ -186,6 +190,7 @@ class BookingConfirmationForm(forms.Form):
         self.fields['time'].widget = forms.HiddenInput()
         self.fields['guest_number'].widget = forms.HiddenInput()
         self.fields['status'].widget = forms.HiddenInput()
+        self.fields['coupon_extra_information'].widget = forms.HiddenInput()
 
     def clean(self):
         """
@@ -201,7 +206,16 @@ class BookingConfirmationForm(forms.Form):
             exp_year = self.cleaned_data["expiration"].year
             cvv = self.cleaned_data["cvv"]
             experience = Experience.objects.get(id=self.cleaned_data['experience_id'])
-            price = float(self.cleaned_data["guest_number"])*float(experience.price)*1.25 + 2.40
+            
+            
+            extra_fee = 0.00
+
+            if len(self.cleaned_data["coupon_extra_information"]) > 0:
+                extra = json.loads(self.cleaned_data["coupon_extra_information"])
+                if type(extra["extra_fee"]) == int or type(extra["extra_fee"]) == float:
+                    extra_fee = extra["extra_fee"]
+
+            price = float(self.cleaned_data["guest_number"])*float(experience.price)*1.25 + 2.40 + extra_fee
  
             payment = Payment()
             #change price into cent
@@ -218,7 +232,9 @@ class BookingConfirmationForm(forms.Form):
                 local_timezone = pytz.timezone(settings.TIME_ZONE)
                 booking = Booking(user = user, experience= experience, guest_number = self.cleaned_data['guest_number'], 
                                   datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
-                                  submitted_datetime = datetime.utcnow(), status="paid")
+                                  submitted_datetime = datetime.utcnow(), status="paid", 
+                                  coupon_extra_information=self.cleaned_data['coupon_extra_information'],
+                                  coupon=Coupon.objects.get(promo_code = self.cleaned_data['promo_code']))
                 booking.save()
                 #add the user to the guest list
                 if user not in experience.guests.all():

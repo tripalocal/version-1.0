@@ -20,7 +20,7 @@ from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile, File
 from django.contrib import messages
 from tripalocal_messages.models import Aliases
-from experiences.models import Review, Photo, RegisteredUser
+from experiences.models import Review, Photo, RegisteredUser, Coupon
 from app.forms import SubscriptionForm
 
 class ExperienceListView(ListView):
@@ -50,6 +50,7 @@ class ExperienceDetailView(DetailView):
             form.data = form.data.copy()
             form.data['user_id'] = request.user.id;
             experience = Experience.objects.get(id=form.data['experience_id'])
+            
             return render(request, 'experience_booking_confirmation.html', 
                           {'form': form, #'eid':self.object.id, 
                            'experience': experience, 
@@ -172,44 +173,55 @@ def experience_booking_confirmation(request):
     # A HTTP POST?
     if request.method == 'POST':
         form = BookingConfirmationForm(request.POST)
-        display_error = True
 
-        # Have we been provided with a valid form?
-        if form.is_valid():
-            return experience_booking_successful(request, 
-                                                 Experience.objects.get(id=form.data['experience_id']), 
-                                                 int(form.data['guest_number']),
-                                                 datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"))
-            # Save to the database.
-            #user = User.objects.get(id=form.data['user_id'])
-            #experience = Experience.objects.get(id=form.data['experience_id'])
-            #booking = Booking(user = user, experience= experience, guest_number = form.data['guest_number'], 
-            #                    datetime=datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"), 
-            #                    submitted_datetime = datetime.utcnow(), status=form.data['status'])
-            #booking.save()
-            ##add the user to the guest list
-            #if user not in experience.guests.all():
-            #    experience.guests.add(user)
-            
-            ##redirect to payment page
-            #form = ExperiencePaymentForm()
-            #form.data = form.data.copy()
-            #form.data['booking_id'] = booking.id
-            #form.fields['booking_id'].initial = booking.id
-            #form.fields['price'].initial = experience.price
-            #return render(request, 'payment.html', {'form': form})
-            #{'experience_id':form.data['experience_id'], 'guest_number':form.data['guest_number'], 'date':form.data['date'], 'time':form.data['time']})
-        else:
+        if 'refresh' in request.POST:
+            #get coupon information
+            wrong_promo_code = False
+            code = form.data['promo_code']
+            coupons = Coupon.objects.filter(promo_code = code,
+                                            end_datetime__gt = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                                            start_datetime__lt = datetime.utcnow().replace(tzinfo=pytz.UTC))
+            if not len(coupons):
+                coupon = Coupon()
+                wrong_promo_code = True
+            else:
+                coupon = coupons[0]
+
+            #prevent the form from being submitted
+            form.add_error("coupon_extra_information","coupon_extra_information")
+
             experience = Experience.objects.get(id=form.data['experience_id'])
             return render_to_response('experience_booking_confirmation.html', {'form': form, 
-                                                                       'display_error':display_error,
-                                                                       'experience': experience, 
-                                                                       'guest_number':form.data['guest_number'],
-                                                                       'date':form.data['date'],
-                                                                       'time':form.data['time'],
-                                                                       'subtotal_price':float(experience.price)*float(form.data['guest_number'])*1.25,
-                                                                       'service_fee':2.40,
-                                                                       'total_price':float(experience.price)*float(form.data['guest_number'])*1.25 + 2.40}, context)
+                                                                           'wrong_promo_code':wrong_promo_code,
+                                                                           'coupon':coupon,
+                                                                           'experience': experience, 
+                                                                           'guest_number':form.data['guest_number'],
+                                                                           'date':form.data['date'],
+                                                                           'time':form.data['time'],
+                                                                           'subtotal_price':float(experience.price)*float(form.data['guest_number'])*1.25,
+                                                                           'service_fee':2.40,
+                                                                           'total_price':float(experience.price)*float(form.data['guest_number'])*1.25 + 2.40}, context)
+
+        else:
+            #submit the form
+            display_error = True
+            if form.is_valid():
+                return experience_booking_successful(request, 
+                                                     Experience.objects.get(id=form.data['experience_id']), 
+                                                     int(form.data['guest_number']),
+                                                     datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"))
+            
+            else:
+                experience = Experience.objects.get(id=form.data['experience_id'])
+                return render_to_response('experience_booking_confirmation.html', {'form': form, 
+                                                                           'display_error':display_error,
+                                                                           'experience': experience, 
+                                                                           'guest_number':form.data['guest_number'],
+                                                                           'date':form.data['date'],
+                                                                           'time':form.data['time'],
+                                                                           'subtotal_price':float(experience.price)*float(form.data['guest_number'])*1.25,
+                                                                           'service_fee':2.40,
+                                                                           'total_price':float(experience.price)*float(form.data['guest_number'])*1.25 + 2.40}, context)
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()
