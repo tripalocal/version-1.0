@@ -166,10 +166,13 @@ class Payment(models.Model):
  
         return True, response
 
-    def refund(self, charge_id):
+    def refund(self, charge_id, amount):
         try:
             ch = self.stripe.Charge.retrieve(charge_id)
-            re = ch.refund() # ch.refunds.create() 
+            if amount != None:
+                re = ch.refund(amount = amount) # ch.refunds.create() 
+            else:
+                re = ch.refund() # ch.refunds.create() 
             booking = Booking.objects.get(payment_id = Payment.objects.get(charge_id = ch.id).id)
             booking.status = "rejected"
             booking.refund_id = re.id

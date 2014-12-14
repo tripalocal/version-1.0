@@ -157,14 +157,14 @@
                                     </td>
                                 </tr>
                             </table>
-                            <p>Destination Mobile Number (optional)</p>
+                            <p style="padding-top:10px;">Destination Mobile Number (optional)</p>
                             <div class="navbar-form" role="search">
                                 <div class="form-group">
                                     {{ form.phone_number }}
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" style="display:none">
                             <input id="isAgreementSelected" type="checkbox" /><p class="help-message">By booking this listing, you agree to pay the total amount shown including the Processing Fee and agree to Tripalocal's Terms and Conditions.
                             </p>
                         </div>
@@ -228,7 +228,7 @@ $(function(){
         $("#id_postcode").attr("size", "4");
         $("#id_phone_number").attr("class", "form-control");
         $("#id_country").attr("class", "btn btn-default dropdown-toggle");
-
+/*
         $("#submit_booking").bind("click", function(e) {
             e.preventDefault();
             if ($("#isAgreementSelected").is(':checked')) {
@@ -239,7 +239,7 @@ $(function(){
                 alert("Please select the checkbox. Thank you");
             }
         });
-        
+ */       
         if($('#wrong_promo_code').length)
         {
             $("#id_promo_code").attr("value", "Invalid promo code");

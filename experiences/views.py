@@ -14,7 +14,7 @@ from django.template import RequestContext, loader
 from experiences.models import Experience, Booking, Payment
 from django.contrib.auth.models import User
 from Tripalocal_V1 import settings
-import os
+import os, json
 from decimal import Decimal
 from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile, File
@@ -167,7 +167,7 @@ def experience_booking_successful(request, experience, guest_number, booking_dat
                                                                     'guest_number':guest_number,
                                                                     'booking_datetime':booking_datetime,
                                                                     'user':request.user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)})
+                                                                    'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id)})
 def experience_booking_confirmation(request):
     # Get the context from the request.
     context = RequestContext(request)
@@ -465,12 +465,24 @@ def booking_accepted(request, id=None):
                           {'experience': experience,
                             'booking':booking,
                             'user':user,
-                            'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                            'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                             'webpage':True})
         
         elif accepted == "no":         
             payment = Payment.objects.get(booking_id=booking.id)
-            success, response = payment.refund(payment.charge_id)
+
+            extra_fee = 0.00
+            if len(booking.coupon_extra_information) > 0:
+                extra = json.loads(booking.coupon_extra_information)
+                if type(extra["extra_fee"]) == int or type(extra["extra_fee"]) == float:
+                    extra_fee = extra["extra_fee"]
+            
+            refund_amount = float(experience.price)*float(booking.guest_number)*(1+settings.COMMISSION_PERCENT)
+
+            if extra_fee < 0:
+                refund_amount = refund_amount + extra_fee
+
+            success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
             if success:
                 booking.status = "rejected"
                 #send an email to the traveller
@@ -497,7 +509,7 @@ def booking_accepted(request, id=None):
                                {'experience': experience,
                                 'booking':booking,
                                 'user':user,
-                                'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                'experience_url': 'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                 'webpage':True})
             #else:
                 #TODO

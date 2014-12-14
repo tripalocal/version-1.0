@@ -48,7 +48,14 @@ Suburbs = (('Abbotsford','Abbotsford'),('Aberfeldie','Aberfeldie'),('Airport Wes
 ('Rosebery','Rosebery'),('Roseville','Roseville'),('Rozelle','Rozelle'),('Rydalmere','Rydalmere'),('Ryde','Ryde'),('Sans Souci','Sans Souci'),('Seaforth','Seaforth'),('Seven Hills','Seven Hills'),('Silverdale','Silverdale'),('Silverwater','Silverwater'),('Smithfield/W.Park','Smithfield/W.Park'),('St Ives','St Ives'),('St Johns Park','St Johns Park'),('St Marys','St Marys'),('St Peters','St Peters'),('Stanmore','Stanmore'),('Strathfield','Strathfield'),('Summer Hill','Summer Hill'),('Surry Hills','Surry Hills'),('Sutherland','Sutherland'),('Sydney City','Sydney City'),('Sydney Markets','Sydney Markets'),('Sylvania','Sylvania'),('Telopea','Telopea'),('Terrey Hills','Terrey Hills'),('Toongabbie','Toongabbie'),('Turramurra','Turramurra'),('Ultimo','Ultimo'),('Vaucluse','Vaucluse'),('Villawood','Villawood'),('W. Pennant Hills','W. Pennant Hills'),('Wahroona','Wahroona'),('Warriewood','Warriewood'),('Waterloo','Waterloo'),('Waverley','Waverley'),('Wentworthville','Wentworthville'),('Willoughby','Willoughby'),('Windsor','Windsor'),('Woollahra','Woollahra'),('Yagoona','Yagoona'),('Yennora','Yennora'),
 )
 
-Country = (('Australia', 'Australia'),('China', 'China'),('United State','United State'))
+Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghanistan'),('Albania', 'Albania'),('Algeria', 'Algeria'),('Andorra', 'Andorra'),('Angola', 'Angola'),('Antigua and Barbuda', 'Antigua and Barbuda'),('Argentina', 'Argentina'),('Armenia', 'Armenia'),('Aruba', 'Aruba'),('Austria', 'Austria'),('Azerbaijan', 'Azerbaijan'),('Bahamas', 'Bahamas'),('Bahrain', 'Bahrain'),('Bangladesh', 'Bangladesh'),('Barbados', 'Barbados'),('Belarus', 'Belarus'),('Belgium', 'Belgium'),('Belize', 'Belize'),('Benin', 'Benin'),('Bhutan', 'Bhutan'),('Bolivia', 'Bolivia'),('Bosnia and Herzegovina', 'Bosnia and Herzegovina'),('Botswana', 'Botswana'),('Brazil', 'Brazil'),('Brunei ', 'Brunei '),('Bulgaria', 'Bulgaria'),('Burkina Faso', 'Burkina Faso'),
+('Burma', 'Burma'),('Burundi', 'Burundi'),('Cambodia', 'Cambodia'),('Cameroon', 'Cameroon'),('Canada', 'Canada'),('Cape Verde', 'Cape Verde'),('Central African Republic', 'Central African Republic'),('Chad', 'Chad'),('Chile', 'Chile'),('Colombia', 'Colombia'),('Comoros', 'Comoros'),('Congo, Democratic Republic of the', 'Congo, Democratic Republic of the'),('Congo, Republic of the', 'Congo, Republic of the'),('Costa Rica', 'Costa Rica'),('Cote dIvoire', 'Cote dIvoire'),('Croatia', 'Croatia'),('Cuba', 'Cuba'),('Curacao', 'Curacao'),('Cyprus', 'Cyprus'),('Czech Republic', 'Czech Republic'),('Denmark', 'Denmark'),('Djibouti', 'Djibouti'),('Dominica', 'Dominica'),('Dominican Republic', 'Dominican Republic'),
+('East Timor', 'East Timor'),('Ecuador', 'Ecuador'),('Egypt', 'Egypt'),('El Salvador', 'El Salvador'),('Equatorial Guinea', 'Equatorial Guinea'),('Eritrea', 'Eritrea'),('Estonia', 'Estonia'),('Ethiopia', 'Ethiopia'),('Fiji', 'Fiji'),('Finland', 'Finland'),('France', 'France'),('Gabon', 'Gabon'),('Gambia', 'Gambia'),('Georgia', 'Georgia'),('Germany', 'Germany'),('Ghana', 'Ghana'),('Greece', 'Greece'),('Grenada', 'Grenada'),('Guatemala', 'Guatemala'),('Guinea', 'Guinea'),('Guinea-Bissau', 'Guinea-Bissau'),('Guyana', 'Guyana'),('Haiti', 'Haiti'),('Holy See', 'Holy See'),('Honduras', 'Honduras'),('Hong Kong, China', 'Hong Kong, China'),('Hungary', 'Hungary'),('Iceland', 'Iceland'),('India', 'India'),('Indonesia', 'Indonesia'),
+('Iran', 'Iran'),('Iraq', 'Iraq'),('Ireland', 'Ireland'),('Israel', 'Israel'),('Italy', 'Italy'),('Jamaica', 'Jamaica'),('Japan', 'Japan'),('Jordan', 'Jordan'),('Kazakhstan', 'Kazakhstan'),('Kenya', 'Kenya'),('Kiribati', 'Kiribati'),('Korea, North', 'Korea, North'),('Korea, South', 'Korea, South'),('Kosovo', 'Kosovo'),('Kuwait', 'Kuwait'),('Kyrgyzstan', 'Kyrgyzstan'),('Laos', 'Laos'),('Latvia', 'Latvia'),('Lebanon', 'Lebanon'),('Lesotho', 'Lesotho'),('Liberia', 'Liberia'),('Libya', 'Libya'),('Liechtenstein', 'Liechtenstein'),('Lithuania', 'Lithuania'),('Luxembourg', 'Luxembourg'),('Macau, China', 'Macau, China'),('Macedonia', 'Macedonia'),('Madagascar', 'Madagascar'),('Malawi', 'Malawi'),('Malaysia', 'Malaysia'),
+('Maldives', 'Maldives'),('Mali', 'Mali'),('Malta', 'Malta'),('Marshall Islands', 'Marshall Islands'),('Mauritania', 'Mauritania'),('Mauritius', 'Mauritius'),('Mexico', 'Mexico'),('Micronesia', 'Micronesia'),('Moldova', 'Moldova'),('Monaco', 'Monaco'),('Mongolia', 'Mongolia'),('Montenegro', 'Montenegro'),('Morocco', 'Morocco'),('Mozambique', 'Mozambique'),('Namibia', 'Namibia'),('Nauru', 'Nauru'),('Nepal', 'Nepal'),('Netherlands', 'Netherlands'),('Netherlands Antilles', 'Netherlands Antilles'),('New Zealand', 'New Zealand'),('Nicaragua', 'Nicaragua'),('Niger', 'Niger'),('Nigeria', 'Nigeria'),('North Korea', 'North Korea'),('Norway', 'Norway'),('Oman', 'Oman'),('Pakistan', 'Pakistan'),('Palau', 'Palau'),
+('Palestinian Territories', 'Palestinian Territories'),('Panama', 'Panama'),('Papua New Guinea', 'Papua New Guinea'),('Paraguay', 'Paraguay'),('Peru', 'Peru'),('Philippines', 'Philippines'),('Poland', 'Poland'),('Portugal', 'Portugal'),('Qatar', 'Qatar'),('Romania', 'Romania'),('Russia', 'Russia'),('Rwanda', 'Rwanda'),('Saint Kitts and Nevis', 'Saint Kitts and Nevis'),('Saint Lucia', 'Saint Lucia'),('Saint Vincent and the Grenadines', 'Saint Vincent and the Grenadines'),('Samoa ', 'Samoa '),('San Marino', 'San Marino'),('Sao Tome and Principe', 'Sao Tome and Principe'),('Saudi Arabia', 'Saudi Arabia'),('Senegal', 'Senegal'),('Serbia', 'Serbia'),('Seychelles', 'Seychelles'),('Sierra Leone', 'Sierra Leone'),('Singapore', 'Singapore'),
+('Sint Maarten', 'Sint Maarten'),('Slovakia', 'Slovakia'),('Slovenia', 'Slovenia'),('Solomon Islands', 'Solomon Islands'),('Somalia', 'Somalia'),('South Africa', 'South Africa'),('South Korea', 'South Korea'),('South Sudan', 'South Sudan'),('Spain ', 'Spain '),('Sri Lanka', 'Sri Lanka'),('Sudan', 'Sudan'),('Suriname', 'Suriname'),('Swaziland ', 'Swaziland '),('Sweden', 'Sweden'),('Switzerland', 'Switzerland'),('Syria', 'Syria'),('Taiwan, China', 'Taiwan, China'),('Tajikistan', 'Tajikistan'),('Tanzania', 'Tanzania'),('Thailand ', 'Thailand '),('Timor-Leste', 'Timor-Leste'),('Togo', 'Togo'),('Tonga', 'Tonga'),('Trinidad and Tobago', 'Trinidad and Tobago'),('Tunisia', 'Tunisia'),('Turkey', 'Turkey'),('Turkmenistan', 'Turkmenistan'),
+('Tuvalu', 'Tuvalu'),('Uganda', 'Uganda'),('Ukraine', 'Ukraine'),('United Arab Emirates', 'United Arab Emirates'),('United Kingdom', 'United Kingdom'),('Uruguay', 'Uruguay'),('Uzbekistan', 'Uzbekistan'),('Vanuatu', 'Vanuatu'),('Venezuela', 'Venezuela'),('Vietnam', 'Vietnam'),('Yemen', 'Yemen'),('Zambia', 'Zambia'),('Zimbabwe ', 'Zimbabwe '),)
 
 #from http://stackoverflow.com/questions/16773579/customize-radio-buttons-in-django
 class HorizRadioRenderer(forms.RadioSelect.renderer):
@@ -172,7 +179,7 @@ class BookingConfirmationForm(forms.Form):
     state = forms.CharField(max_length=10)
     country = forms.ChoiceField(choices=Country, required=True)
     postcode = forms.CharField(max_length=4)
-    phone_number = forms.CharField(max_length=15)
+    phone_number = forms.CharField(max_length=15, required=False)
 
     coupon_extra_information = forms.CharField(max_length=500, required=False)
 
@@ -206,11 +213,12 @@ class BookingConfirmationForm(forms.Form):
             exp_year = self.cleaned_data["expiration"].year
             cvv = self.cleaned_data["cvv"]
             experience = Experience.objects.get(id=self.cleaned_data['experience_id'])
-            
-            
+
             extra_fee = 0.00
 
-            if len(self.cleaned_data["coupon_extra_information"]) > 0:
+            cp = Coupon.objects.filter(promo_code = self.cleaned_data['promo_code'])
+
+            if len(cp)>0 and len(self.cleaned_data["coupon_extra_information"]) > 0:
                 extra = json.loads(self.cleaned_data["coupon_extra_information"])
                 if type(extra["extra_fee"]) == int or type(extra["extra_fee"]) == float:
                     extra_fee = extra["extra_fee"]
@@ -230,11 +238,16 @@ class BookingConfirmationForm(forms.Form):
                 date = self.cleaned_data['date']
                 time = self.cleaned_data['time']
                 local_timezone = pytz.timezone(settings.TIME_ZONE)
-                booking = Booking(user = user, experience= experience, guest_number = self.cleaned_data['guest_number'], 
-                                  datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
-                                  submitted_datetime = datetime.utcnow(), status="paid", 
-                                  coupon_extra_information=self.cleaned_data['coupon_extra_information'],
-                                  coupon=Coupon.objects.get(promo_code = self.cleaned_data['promo_code']))
+                if len(cp) > 0:
+                    booking = Booking(user = user, experience= experience, guest_number = self.cleaned_data['guest_number'], 
+                                      datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
+                                      submitted_datetime = datetime.utcnow(), status="paid", 
+                                      coupon_extra_information=self.cleaned_data['coupon_extra_information'],
+                                      coupon=Coupon.objects.get(promo_code = self.cleaned_data['promo_code']))
+                else:
+                    booking = Booking(user = user, experience= experience, guest_number = self.cleaned_data['guest_number'], 
+                                      datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
+                                      submitted_datetime = datetime.utcnow(), status="paid")
                 booking.save()
                 #add the user to the guest list
                 if user not in experience.guests.all():
