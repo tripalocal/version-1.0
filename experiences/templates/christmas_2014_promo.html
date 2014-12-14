@@ -30,7 +30,7 @@
 
 {% block content %}
 
-    <div class="container-fluid promobanner">
+    <div class="container-fluid promobanner" style="background-color:#3cc;">
         <div class="row">
             <div class="fixCenter">
                 <img src="{{MEDIA_URL}}christmas_2014_promo/christmas_top.jpg" width="1020" height="497">
@@ -45,69 +45,76 @@
             </div>
         </div>
     </div>
-        
-    <div class="container-fluid searchresult">
+    <div class="container-fluid searchbar">
         <div class="row">
             <div class="fixCenter">
-                <img src="{{MEDIA_URL}}christmas_2014_promo/christmas_melbourne.jpg" width="1020" height="142">
+                <div class="dropdown" style="text-align:center;">Where are you going?
+                    <select name="d" class="btn btn-default dropdown-toggle" id="changeCity">
+                        <option value="melbourne">Melbourne</option>
+                        <option value="sydney">Sydney</option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="fixCenter">
-                <div class="expBox">
+    </div>
 
-                    <!-- Each Individual Experiene Listing -->
-                    {% for experience, review, formattedTitle, BGImageURL, profileImageURL in mcityExperienceList %}
-                        <div class="expList">
-                        <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}">
-                            <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
-                                <div class="priceBox">
-                                    $<span>{{ experience.price|mul:1.25|floatformat:"0" }}</span> AUD
+
+    <div class="container-fluid searchresult">
+        <div id="melbourneSection">
+            <div class="row">
+                <div class="fixCenter">
+                    <div class="expBox">
+
+                        <!-- Each Individual Experiene Listing -->
+                        {% for experience, review, formattedTitle, BGImageURL, profileImageURL in mcityExperienceList %}
+                            <div class="expList">
+                            <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}">
+                                <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
+                                    <div class="priceBox">
+                                        $<span>{{ experience.price|mul:1.25|floatformat:"0" }}</span> AUD
+                                    </div>
                                 </div>
+                            </a>
+                            <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
+                            <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
+                          
+                            <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
+                            <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#">{{ review }} reviews</a> · {{ experience.duration }} hrs · Up to {{ experience.guest_number_max }} people</div>
                             </div>
-                        </a>
-                        <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
-                        <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
-                      
-                        <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
-                        <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#">{{ review }} reviews</a> · {{ experience.duration }} hrs · Up to {{ experience.guest_number_max }} people</div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
 
-                </div> 
+                    </div> 
+                </div>
             </div>
         </div>
     </div>
         
     <div class="container-fluid searchresult">
-        <div class="row">
-            <div class="fixCenter">
-                <img src="{{MEDIA_URL}}christmas_2014_promo/christmas_sydney.jpg" width="1020" height="117">
-            </div>
-        </div>
-        <div class="row">
-            <div class="fixCenter">
-                <div class="expBox">
+        <div id="sydneySection">
+            <div class="row">
+                <div class="fixCenter">
+                    <div class="expBox">
 
-                    <!-- Each Individual Experiene Listing -->
-                    {% for experience, review, formattedTitle, BGImageURL, profileImageURL in scityExperienceList %}
-                        <div class="expList">
-                        <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}">
-                            <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
-                                <div class="priceBox">
-                                    $<span>{{ experience.price|mul:1.25|floatformat:"0" }}</span> AUD
+                        <!-- Each Individual Experiene Listing -->
+                        {% for experience, review, formattedTitle, BGImageURL, profileImageURL in scityExperienceList %}
+                            <div class="expList">
+                            <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}">
+                                <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
+                                    <div class="priceBox">
+                                        $<span>{{ experience.price|mul:1.25|floatformat:"0" }}</span> AUD
+                                    </div>
                                 </div>
+                            </a>
+                            <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
+                            <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
+                          
+                            <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
+                            <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#">{{ review }} reviews</a> · {{ experience.duration }} hrs · Up to {{ experience.guest_number_max }} people</div>
                             </div>
-                        </a>
-                        <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
-                        <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
-                      
-                        <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
-                        <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#">{{ review }} reviews</a> · {{ experience.duration }} hrs · Up to {{ experience.guest_number_max }} people</div>
-                        </div>
-                    {% endfor %}
-        
-                </div>       
+                        {% endfor %}
+            
+                    </div>       
+                </div>
             </div>
         </div>
     </div>
@@ -124,7 +131,23 @@ $(function(){
     $(document).ready(function(){
         //temporary hide "login" "signup" on homepage
         $(".navBox").attr("style","display:none");
+
+        $("#changeCity").change(function(){
+            if($("#changeCity option:selected").text().trim().toLowerCase() == "melbourne")
+            {
+                $("#sydneySection").attr("style","display:none");
+                $("#melbourneSection").attr("style","");                
+            }
+            else
+            {
+                $("#melbourneSection").attr("style","display:none");
+                $("#sydneySection").attr("style","");
+            }
+        })
     })
+
 })
+
 </script>
 {% endblock %}
+
