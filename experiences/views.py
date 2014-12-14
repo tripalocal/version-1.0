@@ -23,6 +23,12 @@ from tripalocal_messages.models import Aliases
 from experiences.models import Review, Photo, RegisteredUser, Coupon
 from app.forms import SubscriptionForm
 
+def experience_fee_calculator(price):
+    if type(price)==int or type(price) == float:
+        return round(price*(1.00+settings.COMMISSION_PERCENT)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2)
+
+    return price
+
 class ExperienceListView(ListView):
     template_name = 'experience_list.html'
     #paginate_by = 9
@@ -57,9 +63,9 @@ class ExperienceDetailView(DetailView):
                            'guest_number':form.data['guest_number'],
                            'date':form.data['date'],
                            'time':form.data['time'],
-                           'subtotal_price':float(experience.price)*float(form.data['guest_number'])*1.25,
-                           'service_fee':2.40,
-                           'total_price':float(experience.price)*float(form.data['guest_number'])*1.25 + 2.40
+                           'subtotal_price':round(float(experience.price)*float(form.data['guest_number'])*(1.00+settings.COMMISSION_PERCENT),2),
+                           'service_fee':round(float(experience.price)*float(form.data['guest_number'])*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
+                           'total_price': experience_fee_calculator(float(experience.price)*float(form.data['guest_number']))
                            })
 
     def get_context_data(self, **kwargs):
@@ -174,7 +180,7 @@ def experience_booking_confirmation(request):
     if request.method == 'POST':
         form = BookingConfirmationForm(request.POST)
 
-        if 'refresh' in request.POST:
+        if 'Refresh' in request.POST:
             #get coupon information
             wrong_promo_code = False
             code = form.data['promo_code']
@@ -198,9 +204,9 @@ def experience_booking_confirmation(request):
                                                                            'guest_number':form.data['guest_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
-                                                                           'subtotal_price':float(experience.price)*float(form.data['guest_number'])*1.25,
-                                                                           'service_fee':2.40,
-                                                                           'total_price':float(experience.price)*float(form.data['guest_number'])*1.25 + 2.40}, context)
+                                                                           'subtotal_price':round(float(experience.price)*float(form.data['guest_number'])*(1.00+settings.COMMISSION_PERCENT),2),
+                                                                           'service_fee':round(float(experience.price)*float(form.data['guest_number'])*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
+                                                                           'total_price': experience_fee_calculator(float(experience.price)*float(form.data['guest_number']))}, context)
 
         else:
             #submit the form
@@ -219,9 +225,9 @@ def experience_booking_confirmation(request):
                                                                            'guest_number':form.data['guest_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
-                                                                           'subtotal_price':float(experience.price)*float(form.data['guest_number'])*1.25,
-                                                                           'service_fee':2.40,
-                                                                           'total_price':float(experience.price)*float(form.data['guest_number'])*1.25 + 2.40}, context)
+                                                                           'subtotal_price':round(float(experience.price)*float(form.data['guest_number'])*(1.00+settings.COMMISSION_PERCENT),2),
+                                                                           'service_fee':round(float(experience.price)*float(form.data['guest_number'])*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
+                                                                           'total_price': experience_fee_calculator(float(experience.price)*float(form.data['guest_number']))}, context)
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()
@@ -289,7 +295,7 @@ def create_experience(request, id=None):
             "guest_number_min":experience.guest_number_min,
             "guest_number_max":experience.guest_number_max,
             "price":experience.price,
-            "price_with_booking_fee":experience.price*Decimal.from_float(1.25),
+            "price_with_booking_fee":experience.price*Decimal.from_float(1.00+settings.COMMISSION_PERCENT),
             "duration":experience.duration,
             "included_food":included_food,
             "included_food_detail":include_food_detail,

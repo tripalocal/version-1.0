@@ -2,13 +2,13 @@
 <hr style="margin-bottom:10px;">
 <p>{{coupon.description}}</p>
 <div style="background-color:lightgreen; border-color:lightgrey;">
-<p> :-) You complimentary mobile number is saved in our database</p>
+<p style="display:none"> :-) Your complimentary mobile number is saved in our database</p>
 </div>
 <div id="coupon_extra_information_div">
     <table width="0" border="0" cellspacing="0" cellpadding="0">
         <tr>
             <td>
-                <p>Destination Check-in date</p>
+                <p>Arrival Date</p>
                 <div class="navbar-form navbar-left" role="search">
                     <div class="form-group">
                         <input id="id_checkin_time" type="text" class="form-control" placeholder="YYYY-MM-DD">
@@ -20,7 +20,7 @@
     <table width="0" border="0" cellspacing="0" cellpadding="0">
         <tr>
             <td>
-                <p>Destination address</p>
+                <p>Arrival Address</p>
                 <div class="navbar-form navbar-left" role="search">
                     <div class="form-group">
                         <input id="id_des_address_1" type="text" class="form-control">
@@ -28,7 +28,7 @@
                 </div>
                 <div class="navbar-form navbar-left" role="search">
                     <div class="form-group">
-                        <input id="id_des_address_2" type="text" class="form-control">
+                        <input id="id_des_address_2" type="text" class="form-control" style="display:none">
                     </div>
                 </div>
             </td>       
@@ -73,7 +73,7 @@
         </tr>
     </table>
     <hr style="margin-bottom:10px;">
-    <input id="extra_fee" type="checkbox" /><p class="help-message">Optional $10 for your Prepaid sim.</p>
+    <input id="extra_fee" type="checkbox" /><p class="help-message" style="font-size:14px">Optional $10 for your Prepaid sim.</p>
 </div>
 {% endblock %}
 {% block scripts %}
@@ -102,7 +102,8 @@ $(function(){
 
         $('#extra_fee').click(function () {
             if ($("#extra_fee").is(':checked')) {
-                $("#id_total").text(parseFloat($("#id_sub_total").text())+12.40);
+                $("#id_total").text(((parseFloat($("#id_sub_total").text())+10.00)*1.029+0.3).toFixed(2));
+                $("#id_service_fee").text(((parseFloat($("#id_sub_total").text())+10.00)*0.029+0.3).toFixed(2));
                 $("#id_coupon_extra_fee").text("$10 recharge for Prepaid sim");
                 var coupon_extra_information = { extra_fee:10.00,
                                             checkin_date:$("#id_checkin_time").val(),
@@ -115,7 +116,8 @@ $(function(){
                 $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
             }
             else{
-                $("#id_total").text(parseFloat($("#id_sub_total").text())+2.40);
+                $("#id_total").text((parseFloat($("#id_sub_total").text())*1.029+0.3).toFixed(2));
+                $("#id_service_fee").text((parseFloat($("#id_sub_total").text())*0.029+0.3).toFixed(2));
                 $("#id_coupon_extra_fee").text("");
                 var coupon_extra_information = { extra_fee:0.00,
                                             checkin_date:$("#id_checkin_time").val(),

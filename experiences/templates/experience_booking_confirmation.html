@@ -35,7 +35,7 @@
 
                         <div class="row">
 				            <div class="">
-                                <p style="color:#858585; margin-top: 0px;">Promo code</p>
+                                <p style="color:#858585; margin-top: 0px;">Promo Code</p>
                             </div>
                             <div class="navbar-form " role="search">
                                 <div class="form-group" style="width:200px; display:inline-block;">
@@ -45,8 +45,11 @@
                                     {%endif%}
                                 </div>
                 
-               	                <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="refresh" value="refresh" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6; margin-left:20px;"/> 
+               	                <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="Refresh" value="Refresh" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6; margin-left:20px;"/> 
                             </div>
+                            {% if coupon and not wrong_promo_code %}
+                            {% include coupon.promo_code|add:".html" %}
+                            {%endif%}
                         </div>
 
                         <div class="row">
@@ -60,7 +63,7 @@
                             <table width="0" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td>
-                                        <p>Expires On</p>
+                                        <p>Expires on</p>
                                         <div class="dropdown">
                                             {{ form.expiration }}
                                         </div>
@@ -74,7 +77,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <p class="help-message">Booking requests require host to accept the request within 24 hours. We will authorize your card for the full amount, but you will not be charged until the host accepts.</p>
+                                <!--<p class="help-message">Booking requests require host to accept the request within 24 hours. We will authorize your card for the full amount, but you will not be charged until the host accepts.</p>-->
                             </table>
                         </div>
                         <div class="row">
@@ -101,14 +104,14 @@
                             <table width="0" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td>
-                                        <p>Street Address</p>
+                                        <p>Billing Address</p>
                                         <div class="navbar-form navbar-left" role="search">
                                             <div class="form-group">
                                                 {{ form.street1 }}
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td style="display:none">
                                         <p>Street Address 2</p>
                                         <div class="navbar-form navbar-left" role="search">
                                             <div class="form-group">
@@ -152,19 +155,15 @@
                                     </td>
                                 </tr>
                             </table>
-                            <p>Destination Mobile Number</p>
+                            <p>Destination Mobile Number (optional)</p>
                             <div class="navbar-form" role="search">
                                 <div class="form-group">
                                     {{ form.phone_number }}
                                 </div>
                             </div>
-                            
-                            {% if coupon and not wrong_promo_code %}
-                            {% include coupon.promo_code|add:".html" %}
-                            {%endif%}
                         </div>
                         <div class="row">
-                            <input id="isAgreementSelected" type="checkbox" /><p class="help-message">By booking this listing, you agree to pay the total amount shown including the Service Fees and agree to Tripalocal's Terms and Conditions.
+                            <input id="isAgreementSelected" type="checkbox" /><p class="help-message">By booking this listing, you agree to pay the total amount shown including the Processing Fee and agree to Tripalocal's Terms and Conditions.
                             </p>
                         </div>
                         <input type="submit" id="submit_booking" name="Request to Book" value="Request to Book" class="btn btn-primary btn-lg" style="max-width:100%" />
@@ -190,15 +189,14 @@
                             <p>Reservation for <strong>{{ guest_number }} person(s)</strong><br>
                                 on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> (<input type="submit" value="Change" name="change" style="border:none;background:none;color:#3cc"/>)
                             </p>
-                            <p>Rate: ${{ experience.price|mul:1.25|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
+                            <p>Rate: ${{ 1.25|mul:experience.price|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
                             <hr style="margin-bottom:10px;">
                             Subtotal: $<div id="id_sub_total" style="display:inline"> {{ subtotal_price}} </div>
                             <br>
-                            Service Fee: ${{ service_fee }}<br>
-                            <p id="id_coupon_extra_fee"></p>
+                            <p id="id_coupon_extra_fee" style="font-size:14px;"></p>
+                            Processing Fee: $<div id="id_service_fee" style="display:inline">{{ service_fee }}</div><br>
                             <strong style="font-size:18px;">Total: $<div id="id_total" style="display:inline">{{ total_price }}</div></strong>
-                        </form>
-                                             
+                        </form>                     
                     </div>
                 </div>
             </div>

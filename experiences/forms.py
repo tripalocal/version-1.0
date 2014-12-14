@@ -215,7 +215,7 @@ class BookingConfirmationForm(forms.Form):
                 if type(extra["extra_fee"]) == int or type(extra["extra_fee"]) == float:
                     extra_fee = extra["extra_fee"]
 
-            price = float(self.cleaned_data["guest_number"])*float(experience.price)*1.25 + 2.40 + extra_fee
+            price = round(float(self.cleaned_data["guest_number"])*float(experience.price)*(1.00+settings.COMMISSION_PERCENT),2) + extra_fee
  
             payment = Payment()
             #change price into cent
