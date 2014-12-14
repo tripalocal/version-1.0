@@ -256,8 +256,8 @@ class BookingConfirmationForm(forms.Form):
 
                 # send an email to the host
                 send_mail('[Tripalocal] ' + user.first_name + ' has requested your experience', '', 
-                          Aliases.objects.get(destination__startswith=user.email).mail,
-                            [Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail], fail_silently=False,
+                          Aliases.objects.filter(destination__startswith=user.email)[0].mail,
+                            [Aliases.objects.filter(destination__startswith=experience.hosts.all()[0].email)[0].mail], fail_silently=False,
                             html_message=loader.render_to_string('email_booking_requested_host.html', 
                                                                  {'experience': experience,
                                                                   'booking':booking,
@@ -267,8 +267,8 @@ class BookingConfirmationForm(forms.Form):
                                                                   'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))
                 # send an email to the traveler
                 send_mail('[Tripalocal] You booking request is sent to the host', '', 
-                          Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail,
-                            [Aliases.objects.get(destination__startswith=user.email).mail], fail_silently=False, 
+                          Aliases.objects.filter(destination__startswith=experience.hosts.all()[0].email)[0].mail,
+                            [Aliases.objects.filter(destination__startswith=user.email)[0].mail], fail_silently=False, 
                             html_message=loader.render_to_string('email_booking_requested_traveler.html',
                                                                  {'experience': experience, 
                                                                   'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),

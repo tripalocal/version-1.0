@@ -442,8 +442,8 @@ def booking_accepted(request, id=None):
             booking.save()
             #send an email to the traveller
             send_mail('[Tripalocal] Booking confirmed', '', 
-                      Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail,
-                        [Aliases.objects.get(destination__startswith=User.objects.get(id=booking.user_id).email).mail], 
+                      Aliases.objects.filter(destination__startswith=experience.hosts.all()[0].email)[0].mail,
+                        [Aliases.objects.filter(destination__startswith=User.objects.get(id=booking.user_id).email)[0].mail], 
                         fail_silently=False, 
                         html_message=loader.render_to_string('email_booking_confirmed_traveler.html',
                                                                 {'experience': experience,
@@ -453,8 +453,8 @@ def booking_accepted(request, id=None):
             
             #send an email to the host
             send_mail('[Tripalocal] Booking confirmed', '', 
-                      Aliases.objects.get(destination__startswith=User.objects.get(id=booking.user_id).email).mail,
-                        [Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail], 
+                      Aliases.objects.filter(destination__startswith=User.objects.get(id=booking.user_id).email)[0].mail,
+                        [Aliases.objects.filter(destination__startswith=experience.hosts.all()[0].email)[0].mail], 
                         fail_silently=False, 
                         html_message=loader.render_to_string('email_booking_confirmed_host.html',
                                                                 {'experience': experience,
@@ -475,8 +475,8 @@ def booking_accepted(request, id=None):
                 booking.status = "rejected"
                 #send an email to the traveller
                 send_mail('[Tripalocal] Your experience is cancelled', '', 
-                          Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail,
-                            [Aliases.objects.get(destination__startswith=User.objects.get(id=booking.user_id).email).mail],
+                          Aliases.objects.filter(destination__startswith=experience.hosts.all()[0].email)[0].mail,
+                            [Aliases.objects.filter(destination__startswith=User.objects.get(id=booking.user_id).email)[0].mail],
                             fail_silently=False, 
                             html_message=loader.render_to_string('email_booking_cancelled_traveler.html',
                                                                  {'experience': experience,
@@ -485,8 +485,8 @@ def booking_accepted(request, id=None):
                                                                   'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
                 #send an email to the host
                 send_mail('[Tripalocal] Cancellation confirmed', '', 
-                          Aliases.objects.get(destination__startswith=User.objects.get(id=booking.user_id).email).mail,
-                            [Aliases.objects.get(destination__startswith=experience.hosts.all()[0].email).mail], 
+                          Aliases.objects.filter(destination__startswith=User.objects.get(id=booking.user_id).email)[0].mail,
+                            [Aliases.objects.filter(destination__startswith=experience.hosts.all()[0].email)[0].mail], 
                             fail_silently=False, 
                             html_message=loader.render_to_string('email_booking_cancelled_host.html',
                                                                 {'experience': experience,
