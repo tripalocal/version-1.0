@@ -41,11 +41,11 @@ def home(request):
                     #send an email to the referal
                     counter = len(Subscription.objects.filter(ref_by = ref_by.email))
                     if counter%5 < 4:
-                        send_mail('[Tripalocal] Someone has signed up because of you!', '', 'enquiries@tripalocal.com',
+                        send_mail('[Tripalocal] Someone has signed up because of you!', '', 'Tripalocal <enquiries@tripalocal.com>',
                                     [ref_by.email], fail_silently=False, 
                                     html_message=loader.render_to_string('app/email_new_referral.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link, 'counter':counter%5+1, 'left':5-1-counter%5}))
                     else:
-                        send_mail('[Tripalocal] Free experience!', '', 'enquiries@tripalocal.com',
+                        send_mail('[Tripalocal] Free experience!', '', 'Tripalocal <enquiries@tripalocal.com>',
                                     [ref_by.email], fail_silently=False, 
                                     html_message=loader.render_to_string('app/email_free_experience.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link}))
                 except Subscription.DoesNotExist:
@@ -53,7 +53,7 @@ def home(request):
                 finally:    
                     new_sub.save()
                     #send an email to the new subscriber
-                    send_mail('[Tripalocal] Welcome', '', 'enquiries@tripalocal.com',
+                    send_mail('[Tripalocal] Welcome', '', 'Tripalocal <enquiries@tripalocal.com>',
                                 [form.data['email']], fail_silently=False, html_message=loader.render_to_string('app/email_welcome.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_link}))
                     #messages.add_message(request, messages.INFO, 'Thank you for subscribing.')
                     return render_to_response('app/welcome.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_link}, context)
@@ -108,7 +108,7 @@ def registration_successful(request):
 
     if request.user.is_authenticated():
         #send an email
-        send_mail('[Tripalocal] Successfully registered', '', 'enquiries@tripalocal.com',
+        send_mail('[Tripalocal] Successfully registered', '', 'Tripalocal <enquiries@tripalocal.com>',
                     [request.user.email], fail_silently=False, html_message=loader.render_to_string('app/email_registration_successful.html'))
         return render(
             request,

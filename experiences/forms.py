@@ -6,11 +6,10 @@ from datetime import date, datetime
 from calendar import monthrange 
 from experiences.models import Payment, Booking, Experience, RegisteredUser, Coupon
 from Tripalocal_V1 import settings
-import pytz, string, subprocess
+import pytz, string, subprocess, json, random
 from django.core.mail import send_mail
 from django.template import loader
 from tripalocal_messages.models import Aliases, Users
-import json
 
 Type = (('SEE', 'See'),('DO', 'Do'),('EAT', 'Eat'),)
 
@@ -269,8 +268,8 @@ class BookingConfirmationForm(forms.Form):
 
                 # send an email to the host
                 send_mail('[Tripalocal] ' + user.first_name + ' has requested your experience', '', 
-                          Aliases.objects.filter(destination__startswith=user.email)[0].mail,
-                            [Aliases.objects.filter(destination__startswith=experience.hosts.all()[0].email)[0].mail], fail_silently=False,
+                          'Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+                            [Aliases.objects.filter(destination__contains=experience.hosts.all()[0].email)[0].mail], fail_silently=False,
                             html_message=loader.render_to_string('email_booking_requested_host.html', 
                                                                  {'experience': experience,
                                                                   'booking':booking,
@@ -280,8 +279,8 @@ class BookingConfirmationForm(forms.Form):
                                                                   'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))
                 # send an email to the traveler
                 send_mail('[Tripalocal] You booking request is sent to the host', '', 
-                          Aliases.objects.filter(destination__startswith=experience.hosts.all()[0].email)[0].mail,
-                            [Aliases.objects.filter(destination__startswith=user.email)[0].mail], fail_silently=False, 
+                          'Tripalocal <' + Aliases.objects.filter(destination__contains=experience.hosts.all()[0].email)[0].mail + '>',
+                            [Aliases.objects.filter(destination__contains=user.email)[0].mail], fail_silently=False, 
                             html_message=loader.render_to_string('email_booking_requested_traveler.html',
                                                                  {'experience': experience, 
                                                                   'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
@@ -319,6 +318,9 @@ class CreateExperienceForm(forms.Form):
     experience_photo_4 = forms.ImageField(required = False)
     experience_photo_5 = forms.ImageField(required = False)
 
+def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
 class UserSignupForm(forms.Form):
     def signup(self, request, user):
         user.first_name = self.cleaned_data['first_name']
@@ -329,7 +331,7 @@ class UserSignupForm(forms.Form):
 
         username = user.username
 
-        new_email = Users(id = username + "@" + settings.DOMAIN_NAME,
+        new_email = Users(id = email_account_generator() + ".user" + "@" + settings.DOMAIN_NAME,
                           name = username,
                           maildir = username + "/")
         new_email.save()
