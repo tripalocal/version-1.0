@@ -277,6 +277,7 @@
         </tr>
     </table>
     <hr style="margin-bottom:10px;">
+    <input id="id_coupon_agreement" type="checkbox" style="margin-bottom:20px;"/><p class="help-message">By booking this listing during the Free Sim Campaign period, you agree to pay the total amount shown. In the event of a cancellation, you will be able to keep your free sim and the total experience fee will be returned in the form of Tripalocal credit which you can use when you next use Tripalocal in any location.</p>
     <p class="help-message" style="font-size:14px">Optional $10 for your prepaid sim. Please select your sim type:</p>
     <input id="extra_fee_nano" type="checkbox" />Nano<br>
     <input id="extra_fee_micro" type="checkbox" />Micro
@@ -306,13 +307,13 @@ $(function(){
 
             var coupon_extra_information = {extra_fee:extra_fee,
                                             sim_type:sim_type,
-                                            checkin_date:$("#id_checkin_time").val(),
-                                            des_address_1:$("#id_des_address_1").val(),
-                                            des_address_2:$("#id_des_address_2").val(),
-                                            des_city:$("#id_des_city").val(),
-                                            des_state:$("#id_des_state").val(),
-                                            des_postcode:$("#id_des_postcode").val(),
-                                            des_country:$("#id_des_country").val()};
+                                            checkin_date:$("#id_checkin_time").val().replace(/[^-0-9]/gi,''),
+                                            des_address_1:$("#id_des_address_1").val().replace(/[^ a-z0-9]/gi,''),
+                                            des_address_2:$("#id_des_address_2").val().replace(/[^ a-z0-9]/gi,''),
+                                            des_city:$("#id_des_city").val().replace(/[^ a-z]/gi,''),
+                                            des_state:$("#id_des_state").val().replace(/[^a-z]/gi,''),
+                                            des_postcode:$("#id_des_postcode").val().replace(/[^0-9]/gi,''),
+                                            des_country:$("#id_des_country").val().replace(/[^ a-z]/gi,'')};
             $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
         });
 
@@ -325,13 +326,13 @@ $(function(){
                 $("#id_coupon_extra_fee").text("$10 recharge for Prepaid sim");
                 var coupon_extra_information = { extra_fee:10.00,
                                             sim_type:"nano",
-                                            checkin_date:$("#id_checkin_time").val(),
-                                            des_address_1:$("#id_des_address_1").val(),
-                                            des_address_2:$("#id_des_address_2").val(),
-                                            des_city:$("#id_des_city").val(),
-                                            des_state:$("#id_des_state").val(),
-                                            des_postcode:$("#id_des_postcode").val(),
-                                            des_country:$("#id_des_country").val()};
+                                            checkin_date:$("#id_checkin_time").val().replace(/[^-0-9]/gi,''),
+                                            des_address_1:$("#id_des_address_1").val().replace(/[^ a-z0-9]/gi,''),
+                                            des_address_2:$("#id_des_address_2").val().replace(/[^ a-z0-9]/gi,''),
+                                            des_city:$("#id_des_city").val().replace(/[^ a-z]/gi,''),
+                                            des_state:$("#id_des_state").val().replace(/[^a-z]/gi,''),
+                                            des_postcode:$("#id_des_postcode").val().replace(/[^0-9]/gi,''),
+                                            des_country:$("#id_des_country").val().replace(/[^ a-z]/gi,'')};
                 $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
             }
             else{
@@ -339,13 +340,13 @@ $(function(){
                 $("#id_service_fee").text((parseFloat($("#id_sub_total").text())*0.029+0.3).toFixed(2));
                 $("#id_coupon_extra_fee").text("");
                 var coupon_extra_information = { extra_fee:0.00,
-                                            checkin_date:$("#id_checkin_time").val(),
-                                            des_address_1:$("#id_des_address_1").val(),
-                                            des_address_2:$("#id_des_address_2").val(),
-                                            des_city:$("#id_des_city").val(),
-                                            des_state:$("#id_des_state").val(),
-                                            des_postcode:$("#id_des_postcode").val(),
-                                            des_country:$("#id_des_country").val()};
+                                            checkin_date:$("#id_checkin_time").val().replace(/[^-0-9]/gi,''),
+                                            des_address_1:$("#id_des_address_1").val().replace(/[^ a-z0-9]/gi,''),
+                                            des_address_2:$("#id_des_address_2").val().replace(/[^ a-z0-9]/gi,''),
+                                            des_city:$("#id_des_city").val().replace(/[^ a-z]/gi,''),
+                                            des_state:$("#id_des_state").val().replace(/[^a-z]/gi,''),
+                                            des_postcode:$("#id_des_postcode").val().replace(/[^0-9]/gi,''),
+                                            des_country:$("#id_des_country").val().replace(/[^ a-z]/gi,'')};
                 $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
             }
         })
@@ -359,13 +360,13 @@ $(function(){
                 $("#id_coupon_extra_fee").text("$10 recharge for Prepaid sim");
                 var coupon_extra_information = { extra_fee:10.00,
                                             sim_type:"micro",
-                                            checkin_date:$("#id_checkin_time").val(),
-                                            des_address_1:$("#id_des_address_1").val(),
-                                            des_address_2:$("#id_des_address_2").val(),
-                                            des_city:$("#id_des_city").val(),
-                                            des_state:$("#id_des_state").val(),
-                                            des_postcode:$("#id_des_postcode").val(),
-                                            des_country:$("#id_des_country").val()};
+                                            checkin_date:$("#id_checkin_time").val().replace(/[^-0-9]/gi,''),
+                                            des_address_1:$("#id_des_address_1").val().replace(/[^ a-z0-9]/gi,''),
+                                            des_address_2:$("#id_des_address_2").val().replace(/[^ a-z0-9]/gi,''),
+                                            des_city:$("#id_des_city").val().replace(/[^ a-z]/gi,''),
+                                            des_state:$("#id_des_state").val().replace(/[^a-z]/gi,''),
+                                            des_postcode:$("#id_des_postcode").val().replace(/[^0-9]/gi,''),
+                                            des_country:$("#id_des_country").val().replace(/[^ a-z]/gi,'')};
                 $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
             }
             else{
@@ -373,13 +374,13 @@ $(function(){
                 $("#id_service_fee").text((parseFloat($("#id_sub_total").text())*0.029+0.3).toFixed(2));
                 $("#id_coupon_extra_fee").text("");
                 var coupon_extra_information = { extra_fee:0.00,
-                                            checkin_date:$("#id_checkin_time").val(),
-                                            des_address_1:$("#id_des_address_1").val(),
-                                            des_address_2:$("#id_des_address_2").val(),
-                                            des_city:$("#id_des_city").val(),
-                                            des_state:$("#id_des_state").val(),
-                                            des_postcode:$("#id_des_postcode").val(),
-                                            des_country:$("#id_des_country").val()};
+                                            checkin_date:$("#id_checkin_time").val().replace(/[^-0-9]/gi,''),
+                                            des_address_1:$("#id_des_address_1").val().replace(/[^ a-z0-9]/gi,''),
+                                            des_address_2:$("#id_des_address_2").val().replace(/[^ a-z0-9]/gi,''),
+                                            des_city:$("#id_des_city").val().replace(/[^ a-z]/gi,''),
+                                            des_state:$("#id_des_state").val().replace(/[^a-z]/gi,''),
+                                            des_postcode:$("#id_des_postcode").val().replace(/[^0-9]/gi,''),
+                                            des_country:$("#id_des_country").val().replace(/[^ a-z]/gi,'')};
                 $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
             }
         })

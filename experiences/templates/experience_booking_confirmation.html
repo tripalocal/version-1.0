@@ -164,7 +164,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row" style="display:none">
+                        <div class="row">
                             <input id="isAgreementSelected" type="checkbox" /><p class="help-message">By booking this listing, you agree to pay the total amount shown including the Processing Fee and agree to Tripalocal's Terms and Conditions.
                             </p>
                         </div>
@@ -228,18 +228,27 @@ $(function(){
         $("#id_postcode").attr("size", "4");
         $("#id_phone_number").attr("class", "form-control");
         $("#id_country").attr("class", "btn btn-default dropdown-toggle");
-/*
+
         $("#submit_booking").bind("click", function(e) {
             e.preventDefault();
-            if ($("#isAgreementSelected").is(':checked')) {
-                
-                $("#category_form").submit();
+            if ($("#isAgreementSelected").is(':checked')) {  
+                if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked')) {
+                    $("#category_form").submit();
+                }
+                else{
+                    alert("Please tick the coupon agreement box. Thank you");
+                }
             }
             else{
-                alert("Please select the checkbox. Thank you");
+                alert("Please tick the agreement box. Thank you");
             }
         });
- */       
+
+        $("#submit_booking").bind("click", function(e) {
+            e.preventDefault();
+            
+        });
+        
         if($('#wrong_promo_code').length)
         {
             $("#id_promo_code").attr("value", "Invalid promo code");
