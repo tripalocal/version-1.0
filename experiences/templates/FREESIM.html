@@ -277,7 +277,9 @@
         </tr>
     </table>
     <hr style="margin-bottom:10px;">
-    <input id="extra_fee" type="checkbox" /><p class="help-message" style="font-size:14px">Optional $10 for your Prepaid sim.</p>
+    <p class="help-message" style="font-size:14px">Optional $10 for your prepaid sim. Please select your sim type:</p>
+    <input id="extra_fee_nano" type="checkbox" />Nano<br>
+    <input id="extra_fee_micro" type="checkbox" />Micro
 </div>
 {% endblock %}
 {% block scripts %}
@@ -286,14 +288,24 @@ $(function(){
     $(document).ready(function(){
         $("#coupon_extra_information_div").keyup(function()
         {
-            if ($("#extra_fee").is(':checked')) {
+            if ($("#extra_fee_nano").is(':checked') || $("#extra_fee_micro").is(':checked')) {
                 extra_fee = 10.00;
+                if ($("#extra_fee_nano").is(':checked'))
+                {
+                    sim_type="nano";
+                }
+                else
+                {
+                    sim_type="micro";
+                }
             }
             else{
                 extra_fee = 0.00;
+                sim_type="";
             }
 
             var coupon_extra_information = {extra_fee:extra_fee,
+                                            sim_type:sim_type,
                                             checkin_date:$("#id_checkin_time").val(),
                                             des_address_1:$("#id_des_address_1").val(),
                                             des_address_2:$("#id_des_address_2").val(),
@@ -304,12 +316,49 @@ $(function(){
             $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
         });
 
-        $('#extra_fee').click(function () {
-            if ($("#extra_fee").is(':checked')) {
+        $('#extra_fee_nano').click(function () {
+            if ($("#extra_fee_nano").is(':checked')) {
+                $('#extra_fee_micro').attr('checked', false);
+
                 $("#id_total").text(((parseFloat($("#id_sub_total").text())+10.00)*1.029+0.3).toFixed(2));
                 $("#id_service_fee").text(((parseFloat($("#id_sub_total").text())+10.00)*0.029+0.3).toFixed(2));
                 $("#id_coupon_extra_fee").text("$10 recharge for Prepaid sim");
                 var coupon_extra_information = { extra_fee:10.00,
+                                            sim_type:"nano",
+                                            checkin_date:$("#id_checkin_time").val(),
+                                            des_address_1:$("#id_des_address_1").val(),
+                                            des_address_2:$("#id_des_address_2").val(),
+                                            des_city:$("#id_des_city").val(),
+                                            des_state:$("#id_des_state").val(),
+                                            des_postcode:$("#id_des_postcode").val(),
+                                            des_country:$("#id_des_country").val()};
+                $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
+            }
+            else{
+                $("#id_total").text((parseFloat($("#id_sub_total").text())*1.029+0.3).toFixed(2));
+                $("#id_service_fee").text((parseFloat($("#id_sub_total").text())*0.029+0.3).toFixed(2));
+                $("#id_coupon_extra_fee").text("");
+                var coupon_extra_information = { extra_fee:0.00,
+                                            checkin_date:$("#id_checkin_time").val(),
+                                            des_address_1:$("#id_des_address_1").val(),
+                                            des_address_2:$("#id_des_address_2").val(),
+                                            des_city:$("#id_des_city").val(),
+                                            des_state:$("#id_des_state").val(),
+                                            des_postcode:$("#id_des_postcode").val(),
+                                            des_country:$("#id_des_country").val()};
+                $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
+            }
+        })
+
+        $('#extra_fee_micro').click(function () {
+            if ($("#extra_fee_micro").is(':checked')) {
+                $('#extra_fee_nano').attr('checked', false);
+
+                $("#id_total").text(((parseFloat($("#id_sub_total").text())+10.00)*1.029+0.3).toFixed(2));
+                $("#id_service_fee").text(((parseFloat($("#id_sub_total").text())+10.00)*0.029+0.3).toFixed(2));
+                $("#id_coupon_extra_fee").text("$10 recharge for Prepaid sim");
+                var coupon_extra_information = { extra_fee:10.00,
+                                            sim_type:"micro",
                                             checkin_date:$("#id_checkin_time").val(),
                                             des_address_1:$("#id_des_address_1").val(),
                                             des_address_2:$("#id_des_address_2").val(),
