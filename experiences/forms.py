@@ -10,6 +10,8 @@ import pytz, string, subprocess, json, random
 from django.core.mail import send_mail
 from django.template import loader
 from tripalocal_messages.models import Aliases, Users
+from allauth.account.signals import user_signed_up
+from django.dispatch import receiver
 
 Type = (('SEE', 'See'),('DO', 'Do'),('EAT', 'Eat'),)
 
@@ -326,21 +328,31 @@ class UserSignupForm(forms.Form):
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.save()
-        new_registereduser = RegisteredUser(user_id = user.id)
-        new_registereduser.save()
+        
+@receiver(user_signed_up)
+def handle_user_signed_up(request, **kwargs):
+    user = kwargs['user']
 
-        username = user.username
+    new_registereduser = RegisteredUser(user_id = user.id)
+    new_registereduser.save()
 
-        new_email = Users(id = email_account_generator() + ".user" + "@" + settings.DOMAIN_NAME,
-                          name = username,
-                          maildir = username + "/")
-        new_email.save()
+    username = user.username
 
-        new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
-        new_alias.save()
+    new_email = Users(id = email_account_generator() + ".user" + "@" + settings.DOMAIN_NAME,
+                        name = username,
+                        maildir = username + "/")
+    new_email.save()
 
-        with open('/etc/postfix/canonical', 'a') as f:
-            f.write(user.email + " " + new_email.id + "\n")
-            f.close()
+    new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
+    new_alias.save()
 
-        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    with open('/etc/postfix/canonical', 'a') as f:
+        f.write(user.email + " " + new_email.id + "\n")
+        f.close()
+
+    subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    
+    with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+        f.write(new_email.id + "\n")
+        f.close()
+
