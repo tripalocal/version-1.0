@@ -60,15 +60,7 @@
     [touch-action="scroll"],[touch-action="pan-x pan-y"],[touch-action="pan-y pan-x"]
     { -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; }
 </style>
-  
-<!-- start Mixpanel -->
-<script type="text/javascript">(function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}
-var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};
-i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
-for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
-mixpanel.init("f94e94414c9de0cc38874706d853c400");
-</script>
-<!-- end Mixpanel -->
+
 {% endblock %}
 
 {% block content %}
@@ -93,7 +85,7 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");
             <img src="{% static 'app/images/tripalocal_Logo.png' %}" width="294" height="101" alt="Tripalocal">
             <h1>Connecting travellers with locals<br>Experience the local lifestyle</h1>
             <p>Sign up now to get early access to our initial launch</p>
-            <form action="" method="post">
+            <form id="subscription_form" action="" method="post">
                 {% csrf_token %}
                 {{form.email}} <input id="email-submit" type="submit" value="Get Early Access" name="subscribe" class="btn btn-primary " style="font-size:18px; border-radius: 3px;">
             </form>
@@ -149,9 +141,7 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");
 {% endblock %}
 
 {% block scripts %}
-
 <script charset="utf-8" type="text/javascript">
-
 $(function(){
     $(document).ready(function(){
         $("#id_email").attr("placeholder","Your Email Address");
@@ -164,8 +154,19 @@ $(function(){
         }
         //temporary hide "login" "signup" on homepage
         $(".navBox").attr("style","display:none");
-    })
-})
+    });
 
+    mixpanel.track("Visited prelaunch homepage");
+
+    $("#email-submit").bind("click", function(e) {
+        e.preventDefault();
+/* moved to views.py
+        mixpanel.identify($("#id_email").val());
+        mixpanel.people.set({"email": $("#id_email").val()});
+        mixpanel.track("Entered email address at prelaunch",{"distinct_id":$("#id_email").val()});   
+*/  
+        $("#subscription_form").submit();
+    });
+})
 </script>
 {% endblock %}

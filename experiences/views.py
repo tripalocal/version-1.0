@@ -22,6 +22,7 @@ from django.contrib import messages
 from tripalocal_messages.models import Aliases
 from experiences.models import Review, Photo, RegisteredUser, Coupon
 from app.forms import SubscriptionForm
+from mixpanel import Mixpanel
 
 def experience_fee_calculator(price):
     if type(price)==int or type(price) == float:
@@ -139,6 +140,11 @@ class ExperienceDetailView(DetailView):
         context['included_list'] = included_list
         context['not_included_list'] = not_included_list
         
+        #if request.user.is_authenticated():
+        #    mp.track(request.user.email,"Viewed experience page");
+        #else:
+        #    mp.track("","Viewed experience page");
+
         return context
 
 class ExperienceWizard(SessionWizardView):
@@ -163,6 +169,9 @@ def experience_booking_successful(request, experience, guest_number, booking_dat
     if not request.user.is_authenticated():
         return HttpResponseRedirect("/accounts/login/")
     
+    mp = Mixpanel(settings.MIXPANEL_TOKEN)
+    mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
+
     return render(request,'experience_booking_successful.html',{'experience': experience,
                                                                     'guest_number':guest_number,
                                                                     'booking_datetime':booking_datetime,
@@ -197,6 +206,9 @@ def experience_booking_confirmation(request):
             form.add_error("coupon_extra_information","coupon_extra_information")
 
             experience = Experience.objects.get(id=form.data['experience_id'])
+
+            mp = Mixpanel(settings.MIXPANEL_TOKEN)
+            mp.track(request.user.email, 'Clicked on "Refresh"')
             return render_to_response('experience_booking_confirmation.html', {'form': form, 
                                                                            'wrong_promo_code':wrong_promo_code,
                                                                            'coupon':coupon,
@@ -586,9 +598,15 @@ def ByCityExperienceListView(request, city):
                 formattedTitleList.append(experience.title)
         i += 1
 
+    mp = Mixpanel(settings.MIXPANEL_TOKEN)
     sydneySelected = False
     if (city == "sydney"):
         sydneySelected = True
+
+    if request.user.is_authenticated():
+        mp.track(request.user.email,"Viewed " + city.title() + " search page");
+    else:
+        mp.track("","Viewed " + city.title() + " search page");
 
     context = RequestContext(request, {
         'city' : city.title(),
@@ -598,7 +616,14 @@ def ByCityExperienceListView(request, city):
     return HttpResponse(template.render(context))
 
 def experiences(request):
-    return render(request,'experiences.html')
+    mp = Mixpanel(settings.MIXPANEL_TOKEN)
+    
+    if request.user.is_authenticated():
+        mp.track(request.user.email,"Visited prelaunch Melbourne experiences page");
+        return render(request,'experiences.html',{"user_email":request.user.email})
+    else:
+        mp.track("","Visited prelaunch Melbourne experiences page");
+        return render(request,'experiences.html',{"user_email":""})
 
 def experiences_ch(request):
     return render(request,'experiences_ch.html')

@@ -156,12 +156,14 @@ $(function(){
             if($("#changeCity option:selected").text().trim().toLowerCase() == "melbourne")
             {
                 $("#sydneySection").attr("style","display:none");
-                $("#melbourneSection").attr("style","");                
+                $("#melbourneSection").attr("style",""); 
+                mixpanel.track("Viewed free sim Melbourne");               
             }
             else
             {
                 $("#melbourneSection").attr("style","display:none");
                 $("#sydneySection").attr("style","");
+                mixpanel.track("Viewed free sim Sydney");
             }
         })
     })
@@ -170,5 +172,4 @@ $(function(){
 
 </script>
 {% endblock %}
-
 

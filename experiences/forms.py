@@ -355,4 +355,3 @@ def handle_user_signed_up(request, **kwargs):
     with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
         f.write(new_email.id + "\n")
         f.close()
-

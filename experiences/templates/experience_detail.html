@@ -60,7 +60,7 @@
                         </div>
 
                         {% if user.is_authenticated %}
-                            <input type="submit" class="btn btn-primary btn-lg" value="Request to Book" />  
+                            <input id="id_submit_request" type="submit" class="btn btn-primary btn-lg" value="Request to Book" />  
                         {% else %}
                             <input type="button" class="btn btn-primary btn-lg" value="Request to Book" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
                         {% endif %}
@@ -233,6 +233,14 @@ $(function(){
         {
             $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
         }
+
+        $("#id_submit_request").bind("click", function(e) {
+            e.preventDefault();
+            mixpanel.track("Clicked on \"Request to book\"");
+            $("#experience_booking_form").submit();
+        });
+        
+        mixpanel.track("Viewed experience page");
     })
 })
 
@@ -253,6 +261,7 @@ $(function(){
         }
 
         $("#id_time").change();
+        mixpanel.track("Changed date");
     })
 })
 
@@ -277,6 +286,14 @@ $(function(){
         {
             $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
         }
+
+        mixpanel.track("Changed time");
+    })
+})
+
+$(function(){
+    $("#id_guest_number").change(function(){
+        mixpanel.track("Changed number of people");
     })
 })
 </script>

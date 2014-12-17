@@ -165,8 +165,8 @@
                             </div>
                         </div>
                         <div class="row">
-                            <input id="isAgreementSelected" type="checkbox" /><p class="help-message">By booking this listing, you agree to pay the total amount shown including the processing fee.<!-- and agree to Tripalocal's Terms and Conditions.-->
-                            </p>
+                            <input id="isAgreementSelected" type="checkbox" /><p class="help-message">By booking this listing, you agree to pay the total amount shown including the processing fee.
+                            </p> <!-- and agree to Tripalocal's Terms and Conditions-->
                         </div>
                         <input type="submit" id="submit_booking" name="Request to Book" value="Request to Book" class="btn btn-primary btn-lg" style="max-width:100%" />
                     </form>
@@ -233,6 +233,7 @@ $(function(){
             e.preventDefault();
             if ($("#isAgreementSelected").is(':checked')) {  
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked')) {
+                    mixpanel.track("Clicked on \"Checkout\"");
                     $("#category_form").submit();
                 }
                 else{
@@ -243,7 +244,7 @@ $(function(){
                 alert("Please tick the agreement box. Thank you");
             }
         });
-        
+       
         if($('#wrong_promo_code').length)
         {
             $("#id_promo_code").attr("value", "Invalid promo code");

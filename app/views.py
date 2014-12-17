@@ -16,7 +16,9 @@ from app.forms import SubscriptionForm
 from app.models import Subscription
 from django.core.mail import send_mail
 from django.contrib import messages
-import string, random, pytz
+import string, random, pytz, base64
+from mixpanel import Mixpanel
+from Tripalocal_V1 import settings
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -28,6 +30,7 @@ def home(request):
     if request.method == 'POST':
         form = SubscriptionForm(request.POST)
         if form.is_valid():
+            mp = Mixpanel(settings.MIXPANEL_TOKEN)
             try: 
                 Subscription.objects.get(email = form.data['email'])
                 messages.add_message(request, messages.INFO, 'It seems you already subscribed. Thank you.')
@@ -40,21 +43,30 @@ def home(request):
                     new_sub = Subscription(email = form.data['email'], subscribed_datetime = datetime.utcnow().replace(tzinfo=pytz.utc), ref_by = ref_by.email, ref_link=ref_link)
                     #send an email to the referal
                     counter = len(Subscription.objects.filter(ref_by = ref_by.email))
-                    if counter%5 < 4:
-                        send_mail('[Tripalocal] Someone has signed up because of you!', '', 'Tripalocal <enquiries@tripalocal.com>',
-                                    [ref_by.email], fail_silently=False, 
-                                    html_message=loader.render_to_string('app/email_new_referral.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link, 'counter':counter%5+1, 'left':5-1-counter%5}))
-                    else:
-                        send_mail('[Tripalocal] Free experience!', '', 'Tripalocal <enquiries@tripalocal.com>',
-                                    [ref_by.email], fail_silently=False, 
-                                    html_message=loader.render_to_string('app/email_free_experience.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link}))
+                    
+                    if count <= 5:
+                        if counter%5 < 4: # i.e., (count+1)%5==0
+                            mp.track(ref_by.email, 'Referred a friend')
+                            send_mail('[Tripalocal] Someone has signed up because of you!', '', 'Tripalocal <enquiries@tripalocal.com>',
+                                        [ref_by.email], fail_silently=False, 
+                                        html_message=loader.render_to_string('app/email_new_referral.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link, 'counter':counter%5+1, 'left':5-1-counter%5}))
+                        else:
+                            mp.track(ref_by.email, 'Qualified for a free experience')
+                            send_mail('[Tripalocal] Free experience!', '', 'Tripalocal <enquiries@tripalocal.com>',
+                                        [ref_by.email], fail_silently=False, 
+                                        html_message=loader.render_to_string('app/email_free_experience.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link}))
                 except Subscription.DoesNotExist:
                     new_sub = Subscription(email = form.data['email'], subscribed_datetime = datetime.utcnow().replace(tzinfo=pytz.utc), ref_link=ref_link)
                 finally:    
                     new_sub.save()
                     #send an email to the new subscriber
+                    mp.people_set(form.data['email'], {"$email": form.data['email']})
+                    mp.track(form.data['email'], 'Entered email address at prelaunch')
+                    data = "{'event': 'Opened welcome email','properties': {'token': '" + settings.MIXPANEL_TOKEN + "', 'distinct_id': '" + form.data['email'] + "'}}"
                     send_mail('[Tripalocal] Welcome', '', 'Tripalocal <enquiries@tripalocal.com>',
-                                [form.data['email']], fail_silently=False, html_message=loader.render_to_string('app/email_welcome.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_link}))
+                                [form.data['email']], fail_silently=False, 
+                                html_message=loader.render_to_string('app/email_welcome.html', 
+                                                                     {'ref_url':'http://www.tripalocal.com?ref='+ref_link, 'data':base64.b64encode(data.encode('utf-8')).decode('utf-8')}))
                     #messages.add_message(request, messages.INFO, 'Thank you for subscribing.')
                     return render_to_response('app/welcome.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_link}, context)
     else:
