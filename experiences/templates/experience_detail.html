@@ -119,14 +119,20 @@
         </div>
     </div>
 
-    <div class="container-fluid review" style="display:none;">
+    <div class="container-fluid review">
         <div class="row">
     		<div class="fixCenter">
                 <div class="reviewBox">
                     <h2>{{ experience.review_set.count }} Reviews</h2>
-                    <div class="rating"><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span></div>
+                    <div class="rating">
+                    {% for r in "12345" %}
+                        {% if forloop.counter <= experience_rate %}
+                        <span>&#9733;</span>
+                        {%endif%}
+                    {% endfor %}
+                    </div>
                 
-                {% for review in experience.review_set.all %}
+                {% for review in experience.review_set.all|dictsortreversed:"datetime" %}
                 {% if forloop.last == Flase %}
                     <div class="reviewList">
                 {% else %}
@@ -134,7 +140,7 @@
                 {% endif %}
                         <div class="profile-md"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
                         <div class="reviewText">{{review.comment}}
-                            <div class="reviewDate">{{review.datetime|date:'d-m-Y'}}</div>
+                            <div class="reviewDate">{{review.datetime|date:'d M Y'}}</div>
                         </div>
                     </div>
                 {% endfor%}

@@ -8,13 +8,12 @@ from django.views.generic import DetailView
 from django.contrib.formtools.wizard.views import SessionWizardView
 from experiences.forms import ExperienceForm, ExperienceCalendarForm, BookingForm, BookingConfirmationForm, CreateExperienceForm
 from datetime import *
-import pytz, string
+import pytz, string, os, json, math
 from django.core.mail import send_mail
 from django.template import RequestContext, loader
 from experiences.models import Experience, Booking, Payment
 from django.contrib.auth.models import User
 from Tripalocal_V1 import settings
-import os, json
 from decimal import Decimal
 from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile, File
@@ -140,10 +139,15 @@ class ExperienceDetailView(DetailView):
         context['included_list'] = included_list
         context['not_included_list'] = not_included_list
         
-        #if request.user.is_authenticated():
-        #    mp.track(request.user.email,"Viewed experience page");
-        #else:
-        #    mp.track("","Viewed experience page");
+        rate = 0.0
+        counter = 0
+        for review in experience.review_set.all():
+            rate += review.rate
+            counter += 1
+        
+        if counter > 0:        
+            rate /= counter
+        context['experience_rate'] = math.ceil(rate)
 
         return context
 
@@ -566,7 +570,8 @@ def ByCityExperienceListView(request, city):
 
     # Add all experiences that belong to the specified city to a new list
     # alongside a list with all the number of reviews
-    experienceList = Experience.objects.all()
+    experienceList = Experience.objects.filter(city__iexact=city)
+    rateList = []
     cityExperienceList = []
     cityExperienceReviewList = []
     formattedTitleList = []
@@ -577,25 +582,49 @@ def ByCityExperienceListView(request, city):
     while i < len(experienceList):
         experience = experienceList[i]
         if (experience.city.lower() == city.lower()):
-            cityExperienceList.append(experience)
-            cityExperienceReviewList.append(getNReviews(experience.id))
+            rate = 0.0
+            counter = 0
+            for review in experience.review_set.all():
+                rate += review.rate
+                counter += 1
+            
+            if counter > 0:
+                rate /= counter
+            
+            #find the correct index to insert --> sort the list by rate
+            counter = 0
+            if len(rateList) == 0:
+                rateList.append(rate)
+                counter = 0
+            else:
+                for counter in range(0, len(rateList)):
+                    if rateList[counter] < rate:
+                        rateList.insert(counter, rate)
+                        break
+                    else:
+                        counter += 1
+                        if counter == len(rateList):
+                            rateList.append(rate)
+
+            cityExperienceList.insert(counter, experience)
+            cityExperienceReviewList.insert(counter, getNReviews(experience.id))
             # Fetch BGImageURL
             BGImageURL = getBGImageURL(experience.id)
             if (BGImageURL):
-                BGImageURLList.append(BGImageURL)
+                BGImageURLList.insert(counter, BGImageURL)
             else:
-                BGImageURLList.append("default_experience_background.jpg")
+                BGImageURLList.insert(counter, "default_experience_background.jpg")
             # Fetch profileImageURL
             profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
             if (profileImageURL):
-                profileImageURLList.append(profileImageURL)
+                profileImageURLList.insert(counter, profileImageURL)
             else:
-                profileImageURLList.append("profile_default.jpg")
+                profileImageURLList.insert(counter, "profile_default.jpg")
             # Format title & Description
             if (len(experience.title) > 50):
-                formattedTitleList.append(experience.title[:47] + "...")
+                formattedTitleList.insert(counter, experience.title[:47] + "...")
             else:
-                formattedTitleList.append(experience.title)
+                formattedTitleList.insert(counter, experience.title)
         i += 1
 
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
