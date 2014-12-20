@@ -149,6 +149,9 @@ class ExperienceDetailView(DetailView):
             rate /= counter
         context['experience_rate'] = math.ceil(rate)
 
+        if self.request.user.is_authenticated():
+            context["user_email"] = self.request.user.email
+
         return context
 
 class ExperienceWizard(SessionWizardView):
@@ -214,6 +217,7 @@ def experience_booking_confirmation(request):
             mp = Mixpanel(settings.MIXPANEL_TOKEN)
             mp.track(request.user.email, 'Clicked on "Refresh"')
             return render_to_response('experience_booking_confirmation.html', {'form': form, 
+                                                                           'user_email':request.user.email,
                                                                            'wrong_promo_code':wrong_promo_code,
                                                                            'coupon':coupon,
                                                                            'experience': experience, 
@@ -236,6 +240,7 @@ def experience_booking_confirmation(request):
             else:
                 experience = Experience.objects.get(id=form.data['experience_id'])
                 return render_to_response('experience_booking_confirmation.html', {'form': form, 
+                                                                                   'user_email':request.user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience, 
                                                                            'guest_number':form.data['guest_number'],
@@ -562,7 +567,7 @@ def getBGImageURL(experienceKey):
     BGImageURL = ""
     photoList = Photo.objects.filter(experience_id=experienceKey)
     if len(photoList):
-        BGImageURL = photoList[0].image
+        BGImageURL = 'thumbnails/experiences/'+ photoList[0].name
     return BGImageURL
 
 def ByCityExperienceListView(request, city):
@@ -742,3 +747,4 @@ def freeSimPromo(request):
 
     })
     return HttpResponse(template.render(context))
+

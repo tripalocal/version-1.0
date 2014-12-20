@@ -60,8 +60,8 @@ def home(request):
                 finally:    
                     new_sub.save()
                     #send an email to the new subscriber
-                    mp.people_set(form.data['email'], {"$email": form.data['email']})
-                    mp.track(form.data['email'], 'Entered email address at prelaunch')
+                    #mp.people_set(form.data['email'], {"$email": form.data['email']})
+                    #mp.track(form.data['email'], 'Entered email address at prelaunch')
                     data = "{'event': 'Opened welcome email','properties': {'token': '" + settings.MIXPANEL_TOKEN + "', 'distinct_id': '" + form.data['email'] + "'}}"
                     send_mail('[Tripalocal] Welcome', '', 'Tripalocal <enquiries@tripalocal.com>',
                                 [form.data['email']], fail_silently=False, 

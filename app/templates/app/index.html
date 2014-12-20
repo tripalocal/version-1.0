@@ -72,7 +72,7 @@
 {% endif %}
 -->
     <div id="StayFocusd-infobar" style="display:none;">
-        <img src="chrome-extension://laankejkbhbdhmipfmgcngdelahlfoji/common/img/eye_19x19_red.png">
+        <!--<img src="chrome-extension://laankejkbhbdhmipfmgcngdelahlfoji/common/img/eye_19x19_red.png">-->
         <span id="StayFocusd-infobar-msg"></span>
         <span id="StayFocusd-infobar-links">
             <a id="StayFocusd-infobar-never-show">hide forever</a>&nbsp;&nbsp;|&nbsp;&nbsp;
@@ -142,7 +142,6 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
-$(function(){
     $(document).ready(function(){
         $("#id_email").attr("placeholder","Your Email Address");
         $("#id_email").attr("type","email");
@@ -157,16 +156,31 @@ $(function(){
     });
 
     mixpanel.track("Visited prelaunch homepage");
+    if($("#user_email").val())
+    {
+        mixpanel.identify($("#user_email").val());
+    }
 
     $("#email-submit").bind("click", function(e) {
-        e.preventDefault();
-/* moved to views.py
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position)
+            {
+                mixpanel.people.set({"Latitude":position.coords.latitude, "Longitude":position.coords.longitude});
+                /*"$country":country, "$region":region, "$city":city, */ 
+                mixpanel.identify($("#id_email").val());   
+            });
+        }
+        var now  = new Date().toString();
+        mixpanel.people.set({"$email": $("#id_email").val(),  
+                            "$browser":navigator.appName, "$os":navigator.platform, "$initial_referrer": document.referrer,
+                            "$created":now, "$last_seen":now
+                            });
+        mixpanel.track("Entered email address at prelaunch");   
         mixpanel.identify($("#id_email").val());
-        mixpanel.people.set({"email": $("#id_email").val()});
-        mixpanel.track("Entered email address at prelaunch",{"distinct_id":$("#id_email").val()});   
-*/  
+
+        e.preventDefault();
         $("#subscription_form").submit();
     });
-})
 </script>
 {% endblock %}
+

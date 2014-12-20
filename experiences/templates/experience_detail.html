@@ -123,7 +123,7 @@
         <div class="row">
     		<div class="fixCenter">
                 <div class="reviewBox">
-                    <h2>{{ experience.review_set.count }} Reviews</h2>
+                    <h2>{{ experience.review_set.count }} Review</h2>
                     <div class="rating">
                     {% for r in "12345" %}
                         {% if forloop.counter <= experience_rate %}
@@ -243,10 +243,18 @@ $(function(){
         $("#id_submit_request").bind("click", function(e) {
             e.preventDefault();
             mixpanel.track("Clicked on \"Request to book\"");
+            if($("#user_email").val())
+            {
+                mixpanel.identify($("#user_email").val());
+            }
             $("#experience_booking_form").submit();
         });
         
         mixpanel.track("Viewed experience page");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
     })
 })
 
@@ -268,6 +276,10 @@ $(function(){
 
         $("#id_time").change();
         mixpanel.track("Changed date");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
     })
 })
 
@@ -294,12 +306,20 @@ $(function(){
         }
 
         mixpanel.track("Changed time");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
     })
 })
 
 $(function(){
     $("#id_guest_number").change(function(){
         mixpanel.track("Changed number of people");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
     })
 })
 </script>

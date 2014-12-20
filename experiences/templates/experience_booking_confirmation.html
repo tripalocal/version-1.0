@@ -234,6 +234,10 @@ $(function(){
             if ($("#isAgreementSelected").is(':checked')) {  
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked')) {
                     mixpanel.track("Clicked on \"Checkout\"");
+                    if($("#user_email").val())
+                    {
+                        mixpanel.identify($("#user_email").val());
+                    }
                     $("#category_form").submit();
                 }
                 else{

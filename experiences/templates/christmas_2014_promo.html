@@ -157,13 +157,21 @@ $(function(){
             {
                 $("#sydneySection").attr("style","display:none");
                 $("#melbourneSection").attr("style",""); 
-                mixpanel.track("Viewed free sim Melbourne");               
+                mixpanel.track("Viewed free sim Melbourne");
+                if($("#user_email").val())
+                {
+                    mixpanel.identify($("#user_email").val());
+                }               
             }
             else
             {
                 $("#melbourneSection").attr("style","display:none");
                 $("#sydneySection").attr("style","");
                 mixpanel.track("Viewed free sim Sydney");
+                if($("#user_email").val())
+                {
+                    mixpanel.identify($("#user_email").val());
+                }
             }
         })
     })
@@ -172,4 +180,3 @@ $(function(){
 
 </script>
 {% endblock %}
-
