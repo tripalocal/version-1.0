@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -6,12 +6,12 @@
     
     {% load staticfiles %}
     
-    <script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
-    <script src="{% static 'app/scripts/bootstrap.js' %}"></script>
-    <script src="{% static 'app/scripts/respond.js' %}"></script>
+    <script language="javascript" type="text/javascript"  src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
+    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/bootstrap.js' %}"></script>
+    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/respond.js' %}"></script>
     <!--<link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.min.css' %}" />-->
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
-    <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
+    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
     
     <!--<link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.css' %}" />-->
     <!--<link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap-theme.css' %}" /> -->
@@ -39,14 +39,24 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
 <body>
     <div class="navBox">
         <input type="hidden" id="user_email" value="{{user_email}}" readonly>
-        <div class="container-fluid">
-            <div class="header">
-                <a class="brand" href="#"><img src="{% static 'app/images/tripalocal_Logo.png' %}" width="115" height="39"></a>
-            </div>
-            <div class="navbar-collapse collapse">
-                {% include 'app/loginpartial.html' %}
-            </div>
-        </div>
+        <table class="container-fluid" style="width:100%;">
+            <tbody>
+                <tr>
+                    <td class="header">
+                        <a class="brand" href="#"><img src="{% static 'app/images/tripalocal_Logo.png' %}" width="115" height="39"></a>
+                    </td>
+                    <td class="navbar-collapse" style="width:100%;text-align:right;">
+                        <select id="id_language_select" class="menu">
+                            <option id="id_language_cn" value="cn">中文</option>
+                            <option id="id_language_en" value="en">English</option>
+                        </ul>
+                    </td>
+                    <td class="navbar-collapse" style="min-width:400px;">
+                        {% include 'app/loginpartial.html' %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     
@@ -61,6 +71,33 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
 
 </body>
 <script>
+    $(document).ready(function(){
+        
+        if(window.location.pathname.indexOf("/cn/") > -1)
+        {
+            $('#id_language_select').val('cn');
+        }
+        else
+        {
+            $('#id_language_select').val('en');
+        }
+    });
+
+    $('#id_language_select').change( function(){
+        var des_url = window.location.pathname;
+        if ( $(this).val() == "cn" )
+        {
+            window.location.href = "https://www.tripalocal.com/cn" + des_url;
+        }
+        else
+        {
+            des_url = des_url.substring(3);
+            window.location.href = "https://www.tripalocal.com" + des_url;
+        }
+    });
+</script>
+
+<script>
 
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -72,4 +109,3 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
 
 </script>
 </html>
-

@@ -5,7 +5,6 @@
     <link href="{% static 'app/content/prelaunch.css' %}" rel="stylesheet">
     <title>Tripalocal | Experience it like a local</title>
     <!-- H1 google font -->
-    <link href='http://fonts.googleapis.com/css?family=Cutive' rel='stylesheet' type='text/css'>
 
     <style id="clearly_highlighting_css" type="text/css">
     /* selection */ 
@@ -142,6 +141,9 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
+$(function()
+{
+    var country, region, city, ip, longitude, latitude;
     $(document).ready(function(){
         $("#id_email").attr("placeholder","Your Email Address");
         $("#id_email").attr("type","email");
@@ -153,34 +155,40 @@
         }
         //temporary hide "login" "signup" on homepage
         $(".navBox").attr("style","display:none");
+
+        $.getScript('http://www.geoplugin.net/javascript.gp', function() 
+        {
+            country = geoplugin_countryName();
+            region = geoplugin_region();
+            city = geoplugin_city();
+            ip = geoplugin_request();
+            latitude = geoplugin_latitude();
+            longitude = geoplugin_longitude();
+        });
     });
 
     mixpanel.track("Visited prelaunch homepage");
+
     if($("#user_email").val())
     {
         mixpanel.identify($("#user_email").val());
     }
 
-    $("#email-submit").bind("click", function(e) {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position)
-            {
-                mixpanel.people.set({"Latitude":position.coords.latitude, "Longitude":position.coords.longitude});
-                /*"$country":country, "$region":region, "$city":city, */ 
-                mixpanel.identify($("#id_email").val());   
-            });
-        }
-        var now  = new Date().toString();
-        mixpanel.people.set({"$email": $("#id_email").val(),  
-                            "$browser":navigator.appName, "$os":navigator.platform, "$initial_referrer": document.referrer,
-                            "$created":now, "$last_seen":now
-                            });
-        mixpanel.track("Entered email address at prelaunch");   
-        mixpanel.identify($("#id_email").val());
+    $("#email-submit").click(function() {
+        if($("#id_email").val())
+        {
+            var now  = new Date().toString();
+            mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
+            mixpanel.people.set({"$email": $("#id_email").val(),  
+                                "$browser":navigator.appName, "$os":navigator.platform, "$initial_referrer": document.referrer,
+                                "$created":now, "$last_seen":now
+                                });
+            mixpanel.track("Entered email address at prelaunch");   
+            mixpanel.identify($("#id_email").val());
 
-        e.preventDefault();
-        $("#subscription_form").submit();
+            $("#subscription_form").submit();
+        }
     });
+})
 </script>
 {% endblock %}
-

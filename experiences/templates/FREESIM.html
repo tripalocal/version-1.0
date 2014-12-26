@@ -278,6 +278,10 @@
     </table>
     <hr style="margin-bottom:10px;">
     <input id="id_coupon_agreement" type="checkbox" style="margin-bottom:20px;"/><p class="help-message">By booking this listing during the Free Sim Campaign period, you agree to pay the total amount shown. In the event of a cancellation, you will be able to keep your free sim and the total experience fee will be returned in the form of Tripalocal credit which you can use when you next use Tripalocal in any location.</p>
+    <div id="id_coupon_term_condition" class="warning-sign" style="width:480px; display:none; margin-bottom:10px;">
+        <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+        <p style="display: inline-block; position:relative; top: 6px; left: 10px;">Please accept terms and conditions</p>
+    </div>
     <p class="help-message" style="font-size:14px">Optional $10 for your prepaid sim. Please select your sim type:</p>
     <input id="extra_fee_nano" type="checkbox" />Nano<br>
     <input id="extra_fee_micro" type="checkbox" />Micro
@@ -321,8 +325,8 @@ $(function(){
             if ($("#extra_fee_nano").is(':checked')) {
                 $('#extra_fee_micro').attr('checked', false);
 
-                $("#id_total").text(((parseFloat($("#id_sub_total").text())+10.00)*1.029+0.3).toFixed(2));
-                $("#id_service_fee").text(((parseFloat($("#id_sub_total").text())+10.00)*0.029+0.3).toFixed(2));
+                $("#id_total").text(((parseFloat($("#id_sub_total").text())+10.00)*1.000+0.0).toFixed(2));
+                $("#id_service_fee").text(((parseFloat($("#id_sub_total").text())+10.00)*0.000+0.0).toFixed(2));
                 $("#id_coupon_extra_fee").text("$10 recharge for Prepaid sim");
                 var coupon_extra_information = { extra_fee:10.00,
                                             sim_type:"nano",
@@ -336,8 +340,8 @@ $(function(){
                 $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
             }
             else{
-                $("#id_total").text((parseFloat($("#id_sub_total").text())*1.029+0.3).toFixed(2));
-                $("#id_service_fee").text((parseFloat($("#id_sub_total").text())*0.029+0.3).toFixed(2));
+                $("#id_total").text((parseFloat($("#id_sub_total").text())*1.000+0.0).toFixed(2));
+                $("#id_service_fee").text((parseFloat($("#id_sub_total").text())*0.000+0.0).toFixed(2));
                 $("#id_coupon_extra_fee").text("");
                 var coupon_extra_information = { extra_fee:0.00,
                                             checkin_date:$("#id_checkin_time").val().replace(/[^-0-9]/gi,''),
@@ -355,8 +359,8 @@ $(function(){
             if ($("#extra_fee_micro").is(':checked')) {
                 $('#extra_fee_nano').attr('checked', false);
 
-                $("#id_total").text(((parseFloat($("#id_sub_total").text())+10.00)*1.029+0.3).toFixed(2));
-                $("#id_service_fee").text(((parseFloat($("#id_sub_total").text())+10.00)*0.029+0.3).toFixed(2));
+                $("#id_total").text(((parseFloat($("#id_sub_total").text())+10.00)*1.000+0.0).toFixed(2));
+                $("#id_service_fee").text(((parseFloat($("#id_sub_total").text())+10.00)*0.000+0.0).toFixed(2));
                 $("#id_coupon_extra_fee").text("$10 recharge for Prepaid sim");
                 var coupon_extra_information = { extra_fee:10.00,
                                             sim_type:"micro",
@@ -370,8 +374,8 @@ $(function(){
                 $("#id_coupon_extra_information").val(JSON.stringify(coupon_extra_information));
             }
             else{
-                $("#id_total").text((parseFloat($("#id_sub_total").text())*1.029+0.3).toFixed(2));
-                $("#id_service_fee").text((parseFloat($("#id_sub_total").text())*0.029+0.3).toFixed(2));
+                $("#id_total").text((parseFloat($("#id_sub_total").text())*1.000+0.0).toFixed(2));
+                $("#id_service_fee").text((parseFloat($("#id_sub_total").text())*0.000+0.0).toFixed(2));
                 $("#id_coupon_extra_fee").text("");
                 var coupon_extra_information = { extra_fee:0.00,
                                             checkin_date:$("#id_checkin_time").val().replace(/[^-0-9]/gi,''),

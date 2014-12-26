@@ -98,7 +98,7 @@
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
                                                                                 <br>
                                                                                 {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}'s local mobile number is <strong>{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.phone_number }}{% endif %}{% endfor %}</strong><br>
-                                                                                please feel free to contact {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} on the day.<br>
+                                                                                Please contact {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} on the day for any last minute changes.<br>
                                                                                 We have given {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} your number <strong>{{user.registereduser.phone_number }}</strong><br>
                                                                                 please send {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} a message if this number is incorrect.
                                                                             </p>

@@ -1,4 +1,4 @@
-﻿{% extends "app/layout.html" %}
+{% extends "app/layout.html" %}
 {% load staticfiles %}
 {% load mathfilters %}
 
@@ -10,25 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="http://tripalocal.com/stage1css/favicon.ico">
-
     <title>Discover {{ city }}</title>
-
-    <!-- Bootstrap core CSS -->
-    <!-- <link href="http://tripalocal.com/stage1css/css/tripalocal.min.css" rel="stylesheet"> -->
-
-    <!-- Custom styles for this template -->
-    <!-- <link href="http://tripalocal.com/stage1css/css/tripalocal.css" rel="stylesheet"> -->
-
-
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <!--<script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/ie-emulation-modes-warning.js"></script><style type="text/css"></style>-->
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
 {%endblock%}
 
 {% block content %}    
@@ -41,11 +23,11 @@
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" style="margin-left: 50%;" role="menu" aria-labelledby="dropdownMenu1">
-                    {% if sydneySelected %}
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/melbourne">Melbourne</a></li>
-                    {% else %}
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/sydney">Sydney</a></li>
+                    {% for c in cityList %}
+                    {% if city.title != c %}
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/{{c}}">{{c}}</a></li>
                     {% endif %}
+                    {% endfor %}
                     </ul>
                 </div>
             </div>
@@ -59,18 +41,18 @@
                     <!-- Each Individual Experiene Listing -->
                     {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
                     <div class="expList">
-                        <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}">
+                        <a href="/experience/{{experience.id}}">
                             <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
                                 <div class="priceBox">
                                 $<span>{{ experience.price|mul:1.25|floatformat:"0" }}</span> AUD/person
                                 </div>
                             </div>
                         </a>
-                        <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
+                        <a href="/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
                         <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
           
                         <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
-                        <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a> · {{ experience.duration }} hrs · Up to {{ experience.guest_number_max }} people</div>
+                        <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a> {{ experience.duration }} hrs Up to {{ experience.guest_number_max }} people</div>
                     </div>
                     {% endfor %}
                     <div class="expList">
@@ -86,15 +68,4 @@
     </div>
     <!-- /.container -->
 
-{% endblock %}
-
-{% block scripts %}
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/jquery.min.js"></script>
-    <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/ie10-viewport-bug-workaround.js"></script>
-  
 {% endblock %}

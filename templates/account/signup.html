@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 {% block head %}
     {% load i18n %}
     {% load account %}
@@ -33,9 +33,43 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
             {% csrf_token %}
             <!--<p>{{ form.username }}</p>-->
             <p>{{ form.email }}</p>
+            {% if 'email' in form.errors%}
+            <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
+                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.email.errors.as_text}}</p>
+            </div>
+            {%endif%}
             <p>{{ form.password1 }}</p>
+            {% if 'password1' in form.errors%}
+            <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:0px; left:5px;">
+                            </td>
+                            <td>
+                                <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.password1.errors.as_text}}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {%endif%}
             <p>{{ form.first_name }}</p>
+            {% if 'first_name' in form.errors%}
+            <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
+                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.first_name.errors.as_text}}</p>
+            </div>
+            {%endif%}
             <p>{{ form.last_name }}</p>
+            {% if 'last_name' in form.errors%}
+            <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
+                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.last_name.errors.as_text}}</p>
+            </div>
+            {%endif%}
             {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
             {% endif %}
@@ -50,9 +84,27 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
+$(function()
+{
+    var country, region, city, ip, longitude, latitude;
     $(document).ready(function(){
         $("#id_Facebook").attr("class", "btn btn-primary btn-lg btn-facebook");
         $("#id_Facebook").attr("role", "button");
+
+        $("#id_email").attr("class", "form-control");
+        $("#id_password1").attr("class", "form-control");
+        $("#id_first_name").attr("class", "form-control");
+        $("#id_last_name").attr("class", "form-control");
+
+        $.getScript('http://www.geoplugin.net/javascript.gp', function() 
+        {
+            country = geoplugin_countryName();
+            region = geoplugin_region();
+            city = geoplugin_city();
+            ip = geoplugin_request();
+            latitude = geoplugin_latitude();
+            longitude = geoplugin_longitude();
+        });
 
         $("#id_signup_submit_button").bind("click", function(e){
             e.preventDefault();
@@ -72,6 +124,7 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
                     });
                 }
                 var now  = new Date().toString();
+                mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
                 mixpanel.people.set({"$email": $("#id_email").val(),  
                                     "$browser":navigator.appName, "$os":navigator.platform, "$initial_referrer": document.referrer,
                                     "$created":now, "$last_seen":now
@@ -83,5 +136,6 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
             }
         })
     })
+})
 </script>
 {% endblock %}

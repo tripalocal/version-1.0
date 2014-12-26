@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 {% block head %}
     {% load i18n %}
     {% load account %}
@@ -32,6 +32,22 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
 
             <form id="login_form" class="login" method="POST" action="{% url 'account_login' %}">
                 {% csrf_token %}
+                {% if form.errors%}
+                <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:0px; left:5px;">
+                                </td>
+                                <td>
+                                    <p style="display: inline-block; position:relative; top: 0px; left: 10px;">Wrong email address or password</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {%endif%}
                 <p>{{ form.login }}</p>
                 <p>{{ form.password }}</p>
                 <p>{{ form.remember }} Remember me</p>
@@ -53,6 +69,9 @@ $(function(){
     $(document).ready(function(){
         $("#id_Facebook").attr("class", "btn btn-primary btn-lg btn-facebook");
         $("#id_Facebook").attr("role", "button");
+
+        $("#id_login").attr("class", "form-control");
+        $("#id_password").attr("class", "form-control");
 
         $("#login_button").bind("click", function(e){
             e.preventDefault();

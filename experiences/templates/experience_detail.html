@@ -2,7 +2,7 @@
 {% load mathfilters %}
 
 {% block head %}
-   <title> {{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endif %} {% endfor %} </title>
+   <title> {{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }}. {% endif %} {% endfor %} </title>
 {% endblock %}
 
 {% block content %}
@@ -23,7 +23,7 @@
                     <div class="profile-lg">
                         <img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240">
                     </div>
-                    Reservation with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endif %} {% endfor %}
+                    Reservation with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }}. {% endif %} {% endfor %}
                     <br><br>
                     <span>${{ 1.25|mul:experience.price|floatformat:"0" }}</span> per person<br>for {{ experience.duration }} hours<br>
 
@@ -68,7 +68,7 @@
                 </div>
             
         	    <div class="desBox">
-                    <h1>{{ experience.title }} with {% for h in experience.hosts.all %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endfor %}</h1>
+                    <h1>{{ experience.title }} with {% for h in experience.hosts.all %} {{ h.first_name }} {{ h.last_name|slice:":1" }}. {% endfor %}</h1>
                     <p> {{ experience.location }} </p>
                     <p> {{ experience.description }} </p>
                     <p style="display:none;"><a href="#">Contact Host</a></p>
@@ -154,7 +154,7 @@
         <div class="row">
             <div class="fixCenter">
                 <div class="bioBox">
-                	<h2>Host profile - {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }} {% endif %} {% endfor %}</h2>
+                	<h2>Host profile - {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }}. {% endif %} {% endfor %}</h2>
                     <div class="profile-lg"><img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240"></div>
                     <div class="bioText">
                         <p>{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.bio }} {% endif %} {% endfor %}</p>

@@ -2,7 +2,7 @@
 {% load mathfilters %}
 
 {% block content %}
-    <div>
+<!--<div>
         {% if form.errors and display_error%}
             {% if form.non_field_errors %}
                 {% for error in form.non_field_errors %}
@@ -16,7 +16,7 @@
             {% endif %}
         {% endif %}
     </div>
-    
+-->    
     <div class="container-fluid experience">
         <div class="row">
             <div class="fixCenter">
@@ -41,7 +41,10 @@
                                 <div class="form-group" style="width:200px; display:inline-block;">
                                     {{form.promo_code}}
                                     {% if wrong_promo_code %}
-                                    <p id="wrong_promo_code" style="display:none"></p>
+                                    <div class="warning-sign" style="width:181px; display:inline-block; margin-top:8px">
+                                        <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                        <p style="display: inline-block; position:relative; top: 6px; left: 10px;">Invalid promo code</p>
+                                    </div>
                                     {%endif%}
                                 </div>
                 
@@ -57,6 +60,13 @@
                             <div class="navbar-form navbar-left" style="width:100%" role="search">
                                 <div class="form-group">
                                     {{ form.card_number }}
+                                    {% if 'card_number' in form.errors and display_error%}
+                                    <br>
+                                    <div class="warning-sign" style="width:181px; display:inline-block; margin-top:8px">
+                                        <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                        <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.card_number.errors.as_text}}</p>
+                                    </div>
+                                    {%endif%}
                                 </div>
                             </div>
 
@@ -64,17 +74,41 @@
                                 <tr>
                                     <td>
                                         <p>Expires on</p>
+                                    </td>
+                                    <td>
+                                        <p>Security Code</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
                                         <div class="dropdown">
                                             {{ form.expiration }}
                                         </div>
                                     </td>
                                     <td>
-                                        <p>Security Code</p>
                                         <div class="navbar-form navbar-left" role="search">
                                             <div class="form-group">
                                                 {{ form.cvv }}
                                             </div>
                                         </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {% if 'expiration' in form.errors and display_error%}
+                                        <div class="warning-sign" style="width:150px; display:inline-block;>
+                                            <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                            <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.expiration.errors.as_text}}</p>
+                                        </div>
+                                        {%endif%}
+                                    </td>
+                                    <td>
+                                        {% if 'cvv' in form.errors and display_error%}
+                                        <div class="warning-sign" style="width:181px; display:inline-block;">
+                                            <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                            <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.cvv.errors.as_text}}</p>
+                                        </div>
+                                        {%endif%}
                                     </td>
                                 </tr>
                                 <!--<p class="help-message">Booking requests require host to accept the request within 24 hours. We will authorize your card for the full amount, but you will not be charged until the host accepts.</p>-->
@@ -88,6 +122,12 @@
                                         <div class="navbar-form navbar-left" role="search">
                                             <div class="form-group">
                                                 {{ form.first_name }}
+                                                {% if 'first_name' in form.errors and display_error%}
+                                                <div class="warning-sign" style="width:181px; display:inline-block; margin-top:8px">
+                                                    <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                    <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.first_name.errors.as_text}}</p>
+                                                </div>
+                                                {%endif%}
                                             </div>
                                         </div>
                                     </td>
@@ -96,6 +136,12 @@
                                         <div class="navbar-form navbar-left" role="search">
                                             <div class="form-group">
                                                 {{ form.last_name }}
+                                                {% if 'last_name' in form.errors and display_error%}
+                                                <div class="warning-sign" style="width:181px; display:inline-block; margin-top:8px">
+                                                    <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                    <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.last_name.errors.as_text}}</p>
+                                                </div>
+                                                {%endif%}
                                             </div>
                                         </div>
                                     </td>
@@ -108,6 +154,13 @@
                                         <div class="navbar-form navbar-left" role="search">
                                             <div class="form-group">
                                                 {{ form.street1 }}
+                                                {% if 'street1' in form.errors and display_error%}
+                                                <br>
+                                                <div class="warning-sign" style="width:181px; display:inline-block; margin-top:8px">
+                                                    <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                    <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.street1.errors.as_text}}</p>
+                                                </div>
+                                                {%endif%}
                                             </div>
                                         </div>
                                     </td>
@@ -128,6 +181,12 @@
                                         <div class="navbar-form navbar-left" role="search">
                                             <div class="form-group">
                                                 {{ form.city }}
+                                                {% if 'city' in form.errors and display_error%}
+                                                <div class="warning-sign" style="width:181px; display:inline-block; margin-top:8px">
+                                                    <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                    <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.city.errors.as_text}}</p>
+                                                </div>
+                                                {%endif%}
                                             </div>
                                         </div>
                                     </td>
@@ -136,6 +195,11 @@
                                         <div class="navbar-form navbar-left" role="search">
                                             <div class="form-group">
                                                 {{ form.state }}
+                                                {% if 'state' in form.errors and display_error%}
+                                                <div class="warning-sign" style="width:30px; height:34px; display:inline-block; margin-top:10px;">
+                                                    <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                </div>
+                                                {%endif%}
                                             </div>
                                         </div>
                                     </td>
@@ -144,6 +208,11 @@
                                         <div class="navbar-form navbar-left" role="search">
                                             <div class="form-group">
                                                 {{ form.postcode }}
+                                                {% if 'postcode' in form.errors and display_error%}
+                                                <div class="warning-sign" style="width:30px; height:34px; display:inline-block; margin-top:10px;">
+                                                    <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                </div>
+                                                {%endif%}
                                             </div>
                                         </div>
                                     </td>
@@ -167,6 +236,10 @@
                         <div class="row">
                             <input id="isAgreementSelected" type="checkbox" /><p class="help-message">By booking this listing, you agree to pay the total amount shown including the processing fee.
                             </p> <!-- and agree to Tripalocal's Terms and Conditions-->
+                            <div id="id_term_condition" class="warning-sign" style="width:480px; display:none; margin-top:10px;">
+                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                <p style="display: inline-block; position:relative; top: 6px; left: 10px;">Please accept terms and conditions</p>
+                            </div>
                         </div>
                         <input type="submit" id="submit_booking" name="Request to Book" value="Request to Book" class="btn btn-primary btn-lg" style="max-width:100%" />
                     </form>
@@ -241,18 +314,13 @@ $(function(){
                     $("#category_form").submit();
                 }
                 else{
-                    alert("Please tick the coupon agreement box. Thank you");
+                    $("#id_coupon_term_condition").attr("style","width:480px; display:inline-block; margin-bottom:10px;");
                 }
             }
             else{
-                alert("Please tick the agreement box. Thank you");
+                $("#id_term_condition").attr("style","width:480px; display:inline-block; margin-top:10px;");
             }
         });
-       
-        if($('#wrong_promo_code').length)
-        {
-            $("#id_promo_code").attr("value", "Invalid promo code");
-        }
     })
 })
 </script>

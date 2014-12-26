@@ -120,3 +120,10 @@ input[type=checkbox] { margin: 4px 10px 0 0; float: left;}
 }
 .searchresult{background-color:#f7f7f7; border-top:#CCC 1px solid;}
 .searchbar{background-color:#f7f7f7; border-top:#CCC 1px solid; padding:10px 0px}
+
+.warning-sign{
+	border: 1px #FF5E5E solid;
+	background-color:#FFC7C7;
+	border-radius:2px;
+	color:#FF5E5E;
+}

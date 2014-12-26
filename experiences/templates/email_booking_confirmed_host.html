@@ -96,11 +96,11 @@
 														                    <p style="text-align: center;">Please meet {{user.first_name}}{%if booking.guest_number > 1 %} and {{booking.guest_number|sub:1}} {%if booking.guest_number > 2 %}others{%else%}other{%endif%}{%endif%} at the meeting point<br>
                                                                                 <strong>{{experience.meetup_spot}}</strong><br>
                                                                                 on <strong>{{ booking.datetime|date:'d/m/Y' }} </strong> at <strong> {{ booking.datetime|date:'H:i' }}</strong><br>
-                                                                                to show them around about<br>
+                                                                                to take them on your experience<br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
                                                                                 <br>
                                                                                 {{user.first_name}}'s local mobile&nbsp;number is <strong>{{user.registereduser.phone_number}}</strong><br>
-                                                                                please feel free to contact {{user.first_name}}&nbsp;on the day.<br>
+                                                                                Please contact {{user.first_name}}&nbsp;on the day for any last minute changes.<br>
                                                                                 We have given {{user.first_name}} your number <strong>{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.phone_number }}{% endif %}{% endfor %}</strong><br>
                                                                                 please send {{user.first_name}} a message if this number is incorrect.
                                                                             </p>

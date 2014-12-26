@@ -19,6 +19,7 @@ from django.contrib import messages
 import string, random, pytz, base64
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
+from allauth.account.signals import email_confirmed
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -119,9 +120,6 @@ def signup(request):
 def registration_successful(request):
 
     if request.user.is_authenticated():
-        #send an email
-        send_mail('[Tripalocal] Successfully registered', '', 'Tripalocal <enquiries@tripalocal.com>',
-                    [request.user.email], fail_silently=False, html_message=loader.render_to_string('app/email_registration_successful.html'))
         return render(
             request,
             'app/registration_successful.html',
@@ -129,6 +127,12 @@ def registration_successful(request):
         )
     else:
         return HttpResponseRedirect("/accounts/login/")
+
+@receiver(email_confirmed)
+def email_confirmed(request, **kwargs):
+    #send an email
+    send_mail('[Tripalocal] Successfully registered', '', 'Tripalocal <enquiries@tripalocal.com>',
+                [request.user.email], fail_silently=False, html_message=loader.render_to_string('app/email_registration_successful.html'))
 
 @receiver(password_reset)
 def password_reset(request, user, **kwargs):
@@ -146,7 +150,3 @@ def disclaimer(request):
         'app/disclaimer.html',
         context_instance = RequestContext(request)
     )
-
-
-def ByCityExperienceListView(request, city):
-    return render_to_response('app/index.html', {'form': form, 'subscribed':"none"}, context)

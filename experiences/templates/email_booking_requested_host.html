@@ -91,7 +91,7 @@
 												                    <tr>
 													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
 													                        <h1 style="text-align: center;"><font size="5">{{user_first_name}} has requested for your experience</font></h1>
-														                    <p style="text-align: center;">Are you free on {{ booking.datetime|date:'d/m/Y' }} </strong> at <strong> {{ booking.datetime|date:'H:i' }} to show {{user_first_name}}{%if booking.guest_number > 1%} and {{booking.guest_number|sub:1}} {%if booking.guest_number > 2%}others{%else%}other{%endif%}{%endif%} around about<br>
+														                    <p style="text-align: center;">Are you free on {{ booking.datetime|date:'d/m/Y' }} </strong> at <strong> {{ booking.datetime|date:'H:i' }} to take {{user_first_name}}{%if booking.guest_number > 1%} and {{booking.guest_number|sub:1}} {%if booking.guest_number > 2%}others{%else%}other{%endif%}{%endif%} on your experience<br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a>?
                                                                             </p>
 													                    </td>
@@ -127,7 +127,7 @@
                                                                 <tbody>
 						                                            <tr>
 							                                            <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-								                                            If you are not available on the proposed date, please reply to this email above and {{user_first_name}} will receive your message. If you can't arrange an agree time, you can cancel this reservation below and {{user_first_name}} will be refunded.
+								                                            If you are not available on the proposed date, please reply to this email to {{user_first_name}} with a new date and time. If a new time cannot be arranged, you can cancel this reservation below and {{user_first_name}} will be refunded.
 							                                            </td>
 						                                            </tr>
 					                                            </tbody>

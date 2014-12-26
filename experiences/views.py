@@ -22,6 +22,7 @@ from tripalocal_messages.models import Aliases
 from experiences.models import Review, Photo, RegisteredUser, Coupon
 from app.forms import SubscriptionForm
 from mixpanel import Mixpanel
+from dateutil.relativedelta import relativedelta
 
 def experience_fee_calculator(price):
     if type(price)==int or type(price) == float:
@@ -35,10 +36,10 @@ class ExperienceListView(ListView):
     #context_object_name = 'experience_list'
 
     def get_queryset(self):
-#        if self.request.user.is_superuser:
+        if self.request.user.is_authenticated() and self.request.user.is_superuser:
             return Experience.objects.all#()
-#        else:
-#            return self.request.user.experience_hosts.all()
+        else:
+            return HttpResponseRedirect("/admin/login/?next=/experiencelist") #self.request.user.experience_hosts.all()
 
 class ExperienceDetailView(DetailView):
     model = Experience
@@ -82,8 +83,7 @@ class ExperienceDetailView(DetailView):
             context['expired'] = True
             return context
 
-        while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC)):     
-
+        while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(hours=+6)):
             if experience.repeat_cycle == "Hourly" :
                 sdt += timedelta(hours=experience.repeat_frequency)
             elif experience.repeat_cycle == "Daily" :
@@ -92,21 +92,33 @@ class ExperienceDetailView(DetailView):
                 sdt += timedelta(weeks=experience.repeat_frequency)
             #else :
                 #TODO
+    
+        blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
+        bookings = experience.booking_set.filter(experience_id=experience.id).exclude(status__iexact="rejected")
 
-        while (sdt <= experience.end_datetime):
+        while (sdt <= experience.end_datetime and sdt <= datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2) ):
             #check if the date is blocked
             blocked = False
-            for blk in experience.blockouttimeperiod_set.filter(experience_id=experience.id) :
-                if blk.start_date <= sdt.date() and sdt.date() <= blk.end_date:
-                    blocked = True
+
+            #block 10pm-7am is repeated hourly
+            sdt_local = sdt.astimezone(local_timezone)
+            if experience.repeat_cycle == "Hourly" and (sdt_local.time().hour <= 7 or sdt_local.time().hour >= 22):
+                blocked = True
+
+            if not blocked:
+                for blk in blockouts :
+                    if blk.start_date <= sdt.date() and sdt.date() <= blk.end_date:
+                        blocked = True
+                        break
 
             if not blocked:
                 i = 0
-                for bking in experience.booking_set.filter(experience_id=experience.id) :
+                for bking in bookings :
                     if bking.datetime == sdt and bking.status.lower() != "rejected":
                         i += bking.guest_number
 
-                if i < experience.guest_number_max :
+                if i == 0 : #changd to ==0  from < experience.guest_number_max :
+                    #moved to top
                     sdt_local = sdt.astimezone(local_timezone)
                     if experience.repeat_cycle != "Hourly" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                         dict = {'available_seat': experience.guest_number_max - i, 
@@ -264,44 +276,48 @@ def create_experience(request, id=None):
     photos={}
     display_error = False
 
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/")
+    if not request.user.is_authenticated() or not request.user.is_staff:
+        return HttpResponseRedirect("/admin")
 
     if id:
         experience = get_object_or_404(Experience, pk=id)
-        if len(experience.whatsincluded_set.filter(item="Food")) > 0: 
-            if experience.whatsincluded_set.filter(item="Food")[0].included:
+        list = experience.whatsincluded_set.filter(item="Food")
+        if len(list) > 0: 
+            if list[0].included:
                 included_food = "Yes" 
             else:
                 included_food = "No" 
-            include_food_detail = experience.whatsincluded_set.filter(item="Food")[0].details
+            include_food_detail = list[0].details
         else:
             included_food = "No"
             include_food_detail = None
         
-        if len(experience.whatsincluded_set.filter(item="Ticket")) >0:
-            if experience.whatsincluded_set.filter(item="Ticket")[0].included:
+        list = experience.whatsincluded_set.filter(item="Ticket")
+        if len(list) >0:
+            if list[0].included:
                 included_ticket = "Yes"
             else:
                 included_ticket = "No"
-            included_ticket_detail = experience.whatsincluded_set.filter(item="Ticket")[0].details
+            included_ticket_detail = list[0].details
         else:
             included_ticket = "No"
             included_ticket_detail = None
 
-        if len(experience.whatsincluded_set.filter(item="Transport")) >0:
-            if experience.whatsincluded_set.filter(item="Transport")[0].included:
+        list = experience.whatsincluded_set.filter(item="Transport")
+        if len(list) >0:
+            if list[0].included:
                 included_transport = "Yes"
             else:
                 included_transport = "No"
-            included_transport_detail = experience.whatsincluded_set.filter(item="Transport")[0].details
+            included_transport_detail = list[0].details
         else:
             included_transport = "No"
             included_transport_detail = None
 
         for i in range(1,6):
-            if len(experience.photo_set.filter(name__startswith='experience'+str(id)+'_'+str(i)))>0:
-                photo = experience.photo_set.filter(name__startswith='experience'+str(id)+'_'+str(i))[0]
+            list = experience.photo_set.filter(name__startswith='experience'+str(id)+'_'+str(i))
+            if len(list)>0:
+                photo = list[0]
                 photos['experience_photo_'+str(i)] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+photo.directory+photo.name, 
                                                                              File(open(settings.MEDIA_ROOT+'/'+photo.directory+photo.name, 'rb')).read())
             #else:
@@ -428,7 +444,7 @@ def create_experience(request, id=None):
                 wh.details = form.data['included_transport_detail']
                 wh.save()
 
-            return HttpResponseRedirect('/experiencelist/') 
+            return HttpResponseRedirect('/admin/experiences/experience') 
             
     else:
         form = CreateExperienceForm(data=data, files=photos)
@@ -570,7 +586,7 @@ def getBGImageURL(experienceKey):
         BGImageURL = 'thumbnails/experiences/'+ photoList[0].name
     return BGImageURL
 
-def ByCityExperienceListView(request, city):
+def ByCityExperienceListView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC)):
     template = loader.get_template('search_result.html')
 
     # Add all experiences that belong to the specified city to a new list
@@ -582,10 +598,15 @@ def ByCityExperienceListView(request, city):
     formattedTitleList = []
     BGImageURLList = []
     profileImageURLList = []
+    cityList= ['Melbourne','Sydney']
 
     i = 0
     while i < len(experienceList):
         experience = experienceList[i]
+        if experience.start_datetime > end_date or experience.end_datetime < start_date :
+            i += 1
+            continue
+
         if (experience.city.lower() == city.lower()):
             rate = 0.0
             counter = 0
@@ -633,9 +654,6 @@ def ByCityExperienceListView(request, city):
         i += 1
 
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    sydneySelected = False
-    if (city == "sydney"):
-        sydneySelected = True
 
     if request.user.is_authenticated():
         mp.track(request.user.email,"Viewed " + city.title() + " search page");
@@ -645,7 +663,7 @@ def ByCityExperienceListView(request, city):
     context = RequestContext(request, {
         'city' : city.title(),
         'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
-        'sydneySelected' : sydneySelected,
+        'cityList':cityList
         })
     return HttpResponse(template.render(context))
 

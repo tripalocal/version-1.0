@@ -102,7 +102,10 @@ class Booking(models.Model):
     status = models.CharField(max_length=50)
     submitted_datetime = models.DateTimeField()
     payment = models.ForeignKey("Payment", related_name="payment")
-    refund_id = models.CharField(max_length=50)   
+    refund_id = models.CharField(max_length=50)  
+    
+    def __str__(self):
+        return self.user.username + "--" + self.experience.title
 
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):

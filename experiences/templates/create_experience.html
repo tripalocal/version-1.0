@@ -1,16 +1,20 @@
-{% extends "app/layout.html" %}
-
-{% load i18n %}
-
-{% block head %}
+<html>
+<head>
     {% load staticfiles %}
-    <title>Create/Edit Content: Ebook Please</title>
+    <title>Create/Edit Experience</title>
+    
+    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
+    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/bootstrap.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.css' %}" />
     <link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet">
-{% endblock %}
-
-{% block content %}
-{% if user.is_authenticated %}
+    <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
+    {% if form %}
+        {{ form.media }}
+    {% endif %}
+</head>
+<body>
+{% if user.is_authenticated and user.is_staff  %}
     <div class="container">
         <div class="leftColumn">
             <div class="operation"></div>
@@ -60,7 +64,7 @@
                     <tr>
                         <td class="coRight">Pricing</td>
                         <td colspan="2">
-                            <label>Price per person ${{form.price}} + 25% booking fee = Customer pay ${{form.price_with_booking_fee}}
+                            <label>Traveler pays ${{form.price_with_booking_fee}} - fee = Host gets ${{form.price}}
                             <br />
                             </label>
                         </td>
@@ -144,12 +148,9 @@
 {% else %}
     <p> Please login first</p>
 {% endif %}
-{% endblock %}
-
-{% block scripts %}
+</body>
 
 <script charset="utf-8" type="text/javascript">
-
 $(function(){
     $(document).ready(function(){
         $("#repeat_frequency_label").text("Hours");
@@ -217,4 +218,4 @@ $(function(){
     })
 })
 </script>
-{% endblock %}
+</html>
