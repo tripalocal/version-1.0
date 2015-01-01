@@ -34,6 +34,10 @@
                 {% csrf_token %}
                 <table border="0" cellspacing="0" cellpadding="0">
                     <tr>
+                        <td class="coRight">Host</td>
+                        <td colspan="1">{{form.host}}</td>
+                    </tr>
+                    <tr>
                         <td class="coRight">Start from</td>
                         <td colspan="1">{{form.start_datetime}}</td>
                     </tr>
@@ -202,7 +206,7 @@ $(function(){
         var price = parseFloat($("#id_price").val());
         if(typeof price === 'number')
         {  
-            $("#id_price_with_booking_fee").val(price*1.25);
+            $("#id_price_with_booking_fee").val((price*1.25*1.029+0.3).toFixed(2));
         }
     })
 })
@@ -213,7 +217,7 @@ $(function(){
         var price = parseFloat($("#id_price_with_booking_fee").val());
         if(typeof price === 'number')
         {
-            $("#id_price").val(price*0.80);
+            $("#id_price").val(((price-0.3)/(1.25*1.029)).toFixed(2));
         }
     })
 })

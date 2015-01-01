@@ -47,3 +47,16 @@ class HomepageSearchForm(forms.Form):
     start_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}))
     end_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}))
 
+class UserProfileForm(forms.Form):
+    image = forms.ImageField(required = False)
+    first_name=forms.CharField()
+    last_name=forms.CharField()
+    email=forms.EmailField()
+    phone_number = forms.CharField(required = False)
+    bio = forms.CharField(widget=forms.Textarea, required = False)
+
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs['readonly'] = True
+        self.fields['last_name'].widget.attrs['readonly'] = True
+        self.fields['email'].widget.attrs['readonly'] = True

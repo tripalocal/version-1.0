@@ -180,11 +180,11 @@
                                         <p>City</p>
                                         <div class="navbar-form navbar-left" role="search">
                                             <div class="form-group">
-                                                {{ form.city }}
-                                                {% if 'city' in form.errors and display_error%}
+                                                {{ form.city_town }}
+                                                {% if 'city_town' in form.errors and display_error%}
                                                 <div class="warning-sign" style="width:181px; display:inline-block; margin-top:8px">
                                                     <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                                    <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.city.errors.as_text}}</p>
+                                                    <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.city_town.errors.as_text}}</p>
                                                 </div>
                                                 {%endif%}
                                             </div>
@@ -269,7 +269,7 @@
                             Subtotal: $<div id="id_sub_total" style="display:inline"> {{ subtotal_price}} </div>
                             <br>
                             <p id="id_coupon_extra_fee" style="font-size:14px;"></p>
-                            Processing Fee: $<div id="id_service_fee" style="display:inline">{{ service_fee }}</div><br>
+                            <div id="id_service_fee" style="display:none;"> Processing Fee: ${{ service_fee }}<br></div>
                             <strong style="font-size:18px;">Total: $<div id="id_total" style="display:inline">{{ total_price }}</div></strong>
                         </form>                     
                     </div>
@@ -294,7 +294,7 @@ $(function(){
         $("#id_last_name").attr("class", "form-control");
         $("#id_street1").attr("class", "form-control");
         $("#id_street2").attr("class", "form-control");
-        $("#id_city").attr("class", "form-control");
+        $("#id_city_town").attr("class", "form-control");
         $("#id_state").attr("class", "form-control");
         $("#id_state").attr("size", "4");
         $("#id_postcode").attr("class", "form-control");

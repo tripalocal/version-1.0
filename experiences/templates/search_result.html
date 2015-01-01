@@ -7,9 +7,6 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="http://tripalocal.com/stage1css/favicon.ico">
     <title>Discover {{ city }}</title>
 {%endblock%}
 
@@ -17,15 +14,16 @@
     <div class="container-fluid searchbar">
     	<div class="row">
             <div class="fixCenter">
-                <div class="dropdown" style="text-align:center;">Where are you going?
-                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                <div class="dropdown">
+                    <h1 style=" text-align: center;">Destination</h1>
+                    <button class="btn btn-default dropdown-toggle" type="button" id="" data-toggle="dropdown" aria-expanded="true">
                     {{ city }}
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" style="margin-left: 50%;" role="menu" aria-labelledby="dropdownMenu1">
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                     {% for c in cityList %}
                     {% if city.title != c %}
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/{{c}}">{{c}}</a></li>
+                        <li role="presentation" class="btn btn-default dropdown-toggle"><a role="menuitem" tabindex="-1" href="/s/{{c}}">{{c}}</a></li>
                     {% endif %}
                     {% endfor %}
                     </ul>
@@ -52,7 +50,7 @@
                         <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
           
                         <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
-                        <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a> {{ experience.duration }} hrs Up to {{ experience.guest_number_max }} people</div>
+                        <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a> {{ experience.duration }} hrs</div>
                     </div>
                     {% endfor %}
                     <div class="expList">

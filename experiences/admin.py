@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.conf.urls import patterns
-from experiences.models import Experience, Photo, WhatsIncluded, RegisteredUser, Review, Booking, Coupon
+from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon
 from experiences.views import create_experience
+from app.models import RegisteredUser
 
 class ExperienceAdmin(admin.ModelAdmin):
     def get_urls(self):
@@ -19,4 +20,3 @@ admin.site.register(RegisteredUser)
 admin.site.register(Review)
 admin.site.register(Booking)
 admin.site.register(Coupon)
-

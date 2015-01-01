@@ -2,139 +2,101 @@
 
 {% block head %}
     {% load staticfiles%}
-    <link href="{% static 'app/content/prelaunch.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
     <title>Tripalocal | Experience it like a local</title>
     <!-- H1 google font -->
+    <link href='http://fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>
 
-    <style id="clearly_highlighting_css" type="text/css">
-    /* selection */ 
-    html.clearly_highlighting_enabled ::-moz-selection { background: rgba(246, 238, 150, 0.99); } 
-    html.clearly_highlighting_enabled ::selection { background: rgba(246, 238, 150, 0.99); } 
-    /* cursor */ 
-    html.clearly_highlighting_enabled {    
-    /* cursor and hot-spot position -- requires a default cursor, after the URL one */    
-    cursor: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--cursor.png") 14 16, text; 
-    } 
-    /* highlight tag */ 
-    em.clearly_highlight_element {    
-    font-style: inherit !important; 
-    font-weight: inherit !important;    
-    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow.png");    
-    background-repeat: repeat-x; background-position: top left; background-size: 100% 100%; 
-    } 
-    /* the delete-buttons are positioned relative to this */ 
-    em.clearly_highlight_element.clearly_highlight_first { position: relative; } 
-    /* delete buttons */ 
-    em.clearly_highlight_element a.clearly_highlight_delete_element {    
-    display: none; 
-    cursor: pointer;    
-    padding: 0; 
-    margin: 0; 
-    line-height: 0;    
-    position: absolute; 
-    width: 34px; 
-    height: 34px; 
-    left: -17px; 
-    top: -17px;    
-    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite.png"); 
-    background-repeat: no-repeat; 
-    background-position: 0px 0px; 
-    } 
-    em.clearly_highlight_element a.clearly_highlight_delete_element:hover { background-position: -34px 0px; } 
-    /* retina */ 
-    @media (min--moz-device-pixel-ratio: 2), (-webkit-min-device-pixel-ratio: 2), (min-device-pixel-ratio: 2) {    
-    em.clearly_highlight_element { 
-    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow@2x.png"); 
-    }    
-    em.clearly_highlight_element a.clearly_highlight_delete_element { 
-    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite@2x.png"); background-size: 68px 34px; } } 
-</style>
-<style>
-    [touch-action="none"]
-    { -ms-touch-action: none; touch-action: none; }
-    [touch-action="pan-x"]
-    { -ms-touch-action: pan-x; touch-action: pan-x; }
-    [touch-action="pan-y"]
-    { -ms-touch-action: pan-y; touch-action: pan-y; }
-    [touch-action="scroll"],[touch-action="pan-x pan-y"],[touch-action="pan-y pan-x"]
-    { -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; }
-</style>
-
+	<script>
+		$(function() {
+			$("#slideshow > div:gt(0)").hide();
+			setInterval(function() { 
+			  $('#slideshow > div:first')
+			    .fadeOut(1000)
+			    .next()
+			    .fadeIn(1000)
+			    .end()
+			    .appendTo('#slideshow');
+			},  5000);
+		});
+	</script>
 {% endblock %}
 
 {% block content %}
-<!--
-{% if messages %}  
-    {% for message in messages %}
-    <p id="id_message_{{forloop.counter0}}" style="display:none">{{ message }}</p>
-    {% endfor %}  
-{% endif %}
--->
-    <div id="StayFocusd-infobar" style="display:none;">
-        <!--<img src="chrome-extension://laankejkbhbdhmipfmgcngdelahlfoji/common/img/eye_19x19_red.png">-->
-        <span id="StayFocusd-infobar-msg"></span>
-        <span id="StayFocusd-infobar-links">
-            <a id="StayFocusd-infobar-never-show">hide forever</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a id="StayFocusd-infobar-hide">hide once</a>
-        </span>
+    <div class="home-menu-bar">
+        <ul class="home-menu menu">
+        {% if user.is_authenticated %}
+            <li><a class="home-language" href="https://www.tripalocal.com/cn">中文</a></li>
+            <li><a href="/accounts/logout/">Log out</a></li>
+            <li>{{ user.first_name }}</li>
+            <li><div class="profile-xs"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></div></li>    
+        {% else %} 
+            <li><a class="home-language" href="https://www.tripalocal.com/cn">中文</a></li> 
+            <li><a href="/accounts/signup/?next={{ request.path }}">Sign up</a></li>
+            <li><a href="/accounts/login/?next={{ request.path }}">Log in</a></li>
+        {% endif %}
+        </ul>
     </div>
 
-    <div class="jumbotron" style="background-image:url({{ MEDIA_URL }}beijing.jpg)">
+    <div class="jumbotron">
         <div class="container">
-            <img src="{% static 'app/images/tripalocal_Logo.png' %}" width="294" height="101" alt="Tripalocal">
-            <h1>Connecting travellers with locals<br>Experience the local lifestyle</h1>
-            <p>Sign up now to get early access to our initial launch</p>
-            <form id="subscription_form" action="" method="post">
+            <div class="homepage-logo"></div>
+            <form id="search_form" action="" method="post">
                 {% csrf_token %}
-                {{form.email}} <input id="email-submit" type="submit" value="Get Early Access" name="subscribe" class="btn btn-primary " style="font-size:18px; border-radius: 3px;">
+                <table class="home-search">
+                    <tbody>
+                        <tr>
+                            <td class="search-location">{{form.city}}</td>
+                            <td class="search-from">{{form.start_date}}</td>
+                            <td class="search-to">{{form.end_date}}</td>
+                            <td class="home-search-button"><input id="search-submit" type="submit" value="Search" name="search" class="btn btn-primary btn-sm btn-search"></td>
+                            <td class="melbourne"><a href="https://www.tripalocal.com/s/melbourne">Melbourne</a></td>
+                            <td class="sydney"><a href="https://www.tripalocal.com/s/sydney">Sydney</a></td>
+                        </tr>
+                    </tbody>
+                </table>
             </form>
+            <div>
+                <p>Tripalocal is currently available in Melbourne and Sydney </br>
+                <a href="/accounts/signup/?next={{ request.path }}">Sign up</a> to get notified when we launch in more cities.</p>
+            </div>
         </div>
     </div> 
 
-    <div class="exp-tease">
-        <div class="container" style="background-image:url({{ MEDIA_URL }}teaseBg.jpg)">
-            <h1>Step into the shoes of locals</h1>
+    <div class="support fixCenter">
+    </div>
+
+    <div class="exp-brief">
+        <div class="container">
+            <h1 style="color:#666;">Step into the Shoes of Locals</h1>
             <p style="font-size:16px;">Discover their world</p>
             <!-- Example row of columns -->
-            <div style="margin:auto; max-width:720px;">
-                <div class="tease">        	
-                    <div class="profile"><img src="{{ MEDIA_URL }}hosts/6/host6_1_rowena.png"></div>
-                    <p><strong>Rowena G.</strong><br><em>Fashion Editor</em></p>
-                    <p class="teasebox" style="background-image:url({{ MEDIA_URL }}fashion.jpg);">Spend 3 hours with Rowena and discover her favourite independent shopping locations in Sydney</p>
-                </div>
-                <div class="tease">        	
-                    <div class="profile"><img src="{{ MEDIA_URL }}hosts/7/host7_1_stephB.jpg"></div>
-                    <p><strong>Stephen B.</strong><br><em>Street Photographer</em></p>
-                    <p class="teasebox" style="background-image:url({{ MEDIA_URL }}streetart.jpg);">Step into Melbourne's hidden laneways for 2 hours with Stephen and see Australia's cultural capital from the eyes of a street photographer</p>
-                </div>
-                <div class="tease">        	
-                    <div class="profile"><img src="{{ MEDIA_URL }}hosts/5/host5_1_nancyZ.jpg"></div>
-                    <p><strong>Nancy Z.</strong><br><em>Foodie</em></p>
-                    <p class="teasebox" style="background-image:url({{ MEDIA_URL }}food.jpg);">Cook a meal with Nancy and experience home dining in the suburbs of Brisbane</p>
+            <div class="tease-box">
+            </div>
+        </div>
+
+        <div style="clear:both;">
+        </div>
+    </div>
+        
+    <div class="testim-slides">
+        <div class="container">
+            <div class="row">
+                <div id="slideshow">
+                    <div class="rev01"></div>
+                    <div class="rev02"></div>
+                    <div class="rev03"></div>
                 </div>
             </div>
         </div>
-        <div style="clear:both;"></div>
     </div>
         
-    <div class="book-tease" style="background-image:url({{MEDIA_URL}}nighlights.jpg);">
+    <div class="book-tease">
         <div class="container">
-             <h1>Get rewarded for your local insights</h1>
-             <p>Host your own experiences when you want with a reward you decide. <br>Be a true entrepreneur.</p>
-             <div style="max-width:628px; height:424px; margin:auto; background-image:url({{ MEDIA_URL }}bookTease.png); background-size: 628px 424px; background-position:center;"></div>
-         </div>
-    </div>
-        
-      
-	<div class="footer">
-        <div class="container">
-            <h1>See it, feel it, experience it<br>like a local</h1>
-            <img src="{% static 'app/images/tripalocal_Logo.png' %}" width="294" height="101" alt="Tripalocal">
-            <p><a href="mailto:enquiries@tripalocal.com">enquiries@tripalocal.com<br></a>COPYRIGHT @ TRIPALOCAL 2014 | <a href="/disclaimer" target="_blank">DISCLAIMER</a></p>
-            <p><a class="btn btn-default" role="button" id="twitter" href="http://twitter.com/tripalocal" target="_blank"><span style="background-image:url({{MEDIA_URL}}icons.png); background-position: 0 -30px;"></span></a>
-                <a class="btn btn-default" role="button" id="facebook" href="http://facebook.com/tripalocal" target="_blank"><span style="background-image:url({{MEDIA_URL}}icons.png);background-position: -30px -30px;"></span></a>
-                <a class="btn btn-default" role="button" id="linkedin" href="http://www.linkedin.com/company/tripalocal" target="_blank"><span style="background-image:url({{MEDIA_URL}}icons.png);background-position: -90px -30px;"></span></a>        
-            </p>
+            <h1>Get Rewarded for Your Local Insights</h1>
+            <p>Host your own experiences when you want with a reward you decide. </br>Be a true entrepreneur.</p>
+            <div style="max-width:628px; height:424px; margin:auto; background-image:url(images/beahost.png); background-size: 628px 424px; background-position:center;">
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -145,15 +107,15 @@ $(function()
 {
     var country, region, city, ip, longitude, latitude;
     $(document).ready(function(){
-        $("#id_email").attr("placeholder","Your Email Address");
-        $("#id_email").attr("type","email");
-        $("#id_email").attr("size","30");
-        $("#id_email").attr("class","input-lg");
-        if($("#id_message_0").length)
-        {
-            alert($("#id_message_0").text());
-        }
-        //temporary hide "login" "signup" on homepage
+        $("#id_city").attr("class","btn btn-default dropdown-toggle");
+        $("#id_start_date").attr("class","input-sm");
+        $("#id_end_date").attr("class","input-sm");
+        $("#id_start_date").attr("style","height:40px;");
+        $("#id_end_date").attr("style","height:40px;");
+        $("#id_start_date").attr("placeholder","From");
+        $("#id_end_date").attr("placeholder","To");
+
+        //hide loginpartial on homepage
         $(".navBox").attr("style","display:none");
 
         $.getScript('http://www.geoplugin.net/javascript.gp', function() 
@@ -167,28 +129,15 @@ $(function()
         });
     });
 
-    mixpanel.track("Visited prelaunch homepage");
+    mixpanel.track("Visited homepage_en");
 
     if($("#user_email").val())
     {
+        var now  = new Date().toString();
+        mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
+        mixpanel.people.set({"$browser":navigator.appName, "$os":navigator.platform, "$initial_referrer": document.referrer,"$last_seen":now});  
         mixpanel.identify($("#user_email").val());
     }
-
-    $("#email-submit").click(function() {
-        if($("#id_email").val())
-        {
-            var now  = new Date().toString();
-            mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
-            mixpanel.people.set({"$email": $("#id_email").val(),  
-                                "$browser":navigator.appName, "$os":navigator.platform, "$initial_referrer": document.referrer,
-                                "$created":now, "$last_seen":now
-                                });
-            mixpanel.track("Entered email address at prelaunch");   
-            mixpanel.identify($("#id_email").val());
-
-            $("#subscription_form").submit();
-        }
-    });
 })
 </script>
 {% endblock %}

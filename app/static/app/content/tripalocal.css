@@ -1,11 +1,21 @@
 .starter-template {  padding: 40px 15px;  text-align: center;}
 
-.navBox {height:50px;}
+.navBox {height:50px;background-color: #fff;}
 .header{padding-top:10px;}
 .brand{float:left; margin-left:10px;}
 .menu{margin-top:6px; margin-right:10px;}
 .menu li{float:right; margin-left:10px; list-style:none;}
 .menu li a{ color:#999;}
+.home-menu-bar{height:50px; position:absolute; width:100%; background: rgba(0,0,0,0.8);
+background: -moz-linear-gradient(top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(0,0,0,0.8)), color-stop(100%, rgba(0,0,0,0)));
+background: -webkit-linear-gradient(top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+background: -o-linear-gradient(top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+background: -ms-linear-gradient(top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#000000', GradientType=0 );}
+.home-menu li a{color:#fff;}
+.content-area{width:980px;}
 
 .experienceImg { background-size: cover; background-position:center; height:400px; background-color:#CCC;}
 .experience {background-color:#f7f7f7; border-bottom:#CCC 1px solid;}
@@ -16,10 +26,10 @@
 .bookingBox span{float: left;font-size: 36px;font-weight: bold;line-height: 1;left: 50px;position: relative;}
 .bookingBox .row{text-align:center; margin:20px 0px;}
 
-.checkoutBox {width:560px; background-color:#FFF; border:#CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 5px;border-radius: 5px; padding:20px;}
+.checkoutBox {width:560px; background-color:#FFF; border:#CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 5px;border-radius: 5px; padding:15px;}
 .checkoutBox .row{border-top:#CCC 1px solid; padding:20px;}
 
-.icon{width:27px; height:27px; background-image:url(../images/icons.gif); background-size: 135px 135px;}
+.icon{width:27px; height:27px; background-size: 135px 135px;}
 .bookingBox .icon{ margin:auto; margin:auto;}
 .col{text-align:center; float:left;}
 #people{width:47px;}
@@ -43,7 +53,7 @@
 .reviewText {float:right; width:480px;}
 .reviewDate{color:#999; margin-top:12px;}
 
-.bio{background-color:#f7f7f7; border-bottom:#CCC 1px solid; border-top:#CCC 1px solid; margin-top:20px;}
+.bio{background-color:#f7f7f7; border-bottom:#CCC 1px solid; border-top:#CCC 1px solid;}
 .bioText{float: right;width: 400px;margin-top: 32px;}
 .bioBox .profile-lg {float:left;}
 
@@ -53,7 +63,7 @@
 .profile-md img{margin-top: 4px; margin-left:4px; width: 90px;height: 90px;}
 .profile-sm {width: 80px;height: 80px; float:right;}
 .profile-sm img{margin-top: 5px; margin-left:5px;width: 70px;height: 70px;}
-.profile-xs {width:35px;height:35px; float:left; margin-right:20px; margin-top:-7px;}
+.profile-xs {width:35px;height:35px; float:left; margin-top:-7px;}
 .profile-xs img{width:35px;height:35px;}
 .profile-lg, .profile-md, .profile-sm, .profile-xs{background-color: #FFF;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border-radius: 100px;}
 .profile-lg img, .profile-md img, .profile-sm img, .profile-xs img{border-radius: 100px;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border: #CCC solid 1px;}
@@ -65,10 +75,12 @@
 
 .expList{float:left; width:300px; height:350px; margin:20px 20px 20px 0px;}
 .expList p{font-size:12px;}
+.expList h3{color: #333;font-size: 15px;}
+
 .listingImg{height:200px; background-position:center; background-size: cover;}
 .priceBox{background-color:rgba(10,10,10,0.8); height:40px; margin-top:150px; position:absolute; color:#FFF; padding:0px 20px; padding-top:5px; }
 .priceBox span{font-size:28px; padding:5px; margin-top:10px; font-weight:bold;vertical-align: text-top; line-height:23px;}
-.listingFooter{border-top: #CCC solid 1px; font-size:12px; padding:5px 0px 20px 0px; color:#999;}
+.listingFooter{border-top: #CCC solid 1px; font-size:12px; padding:5px 0px 20px 0px; color:#666;}
 
 @media only screen and (max-device-width: 768px) {
 	.experienceImg {height:150px;}
@@ -86,12 +98,13 @@
 	.bioText{float:none; width:100%;}
 	.expBox{margin:auto;width:85%;}
 	.expList{width:100%;}
+	
 	}
 	
 
 .modal-content {border:none;border-radius:0px;}
-.btn-facebook, .btn-facebook:hover {background-color: #3B5998;}
-.input-group {margin-bottom:5px;}
+.btn-facebook, .btn-facebook:hover, #id_Facebook {background-color: #3B5998;} 
+.input-group {margin-bottom:0px;}
 .form-control {border-radius:3px; width:100%;}
 .modal-content p{margin-top:10px;}
 .checkout-profile{margin-top:-30px; margin-left:100px;}
@@ -118,12 +131,93 @@ input[type=checkbox] { margin: 4px 10px 0 0; float: left;}
 	margin-right: 15px;
 
 }
-.searchresult{background-color:#f7f7f7; border-top:#CCC 1px solid;}
-.searchbar{background-color:#f7f7f7; border-top:#CCC 1px solid; padding:10px 0px}
+.searchresult{background-color:#f7f7f7; border-top:#CCC 1px solid;padding-bottom: 50px;}
+.searchbar{background-color:#f7f7f7; border-top:#CCC 1px solid; padding:10px 0px 30px 0px;  background-size:cover;background-position: center;}
+.dropdown{width: 250px;margin: auto;}
 
-.warning-sign{
-	border: 1px #FF5E5E solid;
-	background-color:#FFC7C7;
-	border-radius:2px;
-	color:#FF5E5E;
+.promobanner{background-color:#3cc;}
+
+
+.jumbotron h1 {font-family: 'EXO', Helvertica, sans-serif;color:#FFF; margin-bottom:70px; font-size:32px;}
+.jumbotron p {color:#FFF; font-size:16px;}
+.jumbotron .input-lg { border:none; color:#CCC; height:44px;}
+.jumbotron .form-control {color:#333;}
+
+.home-search {margin:auto; width:580px;background-color:rgba(0,0,0,0.5);    height:55px;-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;margin-bottom: 20px; padding:5px;}
+.home-search li{float:left;}
+.home-search-button{margin-left:5px; font-size:14px;}
+.btn-primary {background-color: #3cc;}
+
+.exp-brief{padding:70px 0px;}
+
+.home-language{border:1px #fff solid; padding:5px; -webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;}
+.menu-language{border:1px #999 solid;}
+#slideshow {    margin: auto;    position: relative;      height: 200px;    padding: 10px; background-color:#fff;}
+#slideshow > div {    position: absolute;    top: 10px;    left: 10px;    right: 10px;    bottom: 10px; }
+#slideshow div{background-repeat:no-repeat; background-position:center;}
+
+.book-tease p {color:#ccc; font-size:16px; margin-bottom:30px;}
+.book-tease h1{color:#3CC;}
+
+.footer-head{float:left;width: 300px; list-style: none; text-align:left; margin-left:50px;}
+.footer-col{float:left;width: 180px; list-style: none; text-align:left;}
+.footer-line{width:980px; border-top:1px #999 solid; clear:both; margin:auto; padding:20px;}
+.footer{background-color:#333333; padding-bottom:20px; padding-top: 70px;}
+.footer h5{color:#FFF; margin-top:0px; font-size:18px;}
+.footer a{color:#858585; margin-bottom:4px; }
+.footer a:hover{color:#ccc; }
+
+@media all and (min-width: 768px) {
+.jumbotron {background-repeat:no-repeat; background-size:cover; padding:130px 0px 150px 0px; }
+.tease-box{margin:auto; width: 665px; height: 425px;background-repeat: no-repeat;background-position:center;}
+.support {height: 200px;background-repeat: no-repeat; background-position-y: 80px;background-position-x: center;background-position: center;}
+.homepage-logo{height: 240px;background-repeat: no-repeat;background-position: center;}
+.home-menu { color:#fff; margin:20px 20px 0px 0px;}
+.book-tease{  background-repeat:no-repeat; background-size:cover;}
+.footer-logo{height: 200px;width: 240px;background-position: center;background-repeat: no-repeat;}
+.melbourne, .sydney{display:none;float:left;}
 }
+@media all and (min-width:768px) and (max-width:1000px){
+	.expBox{width: 800px; margin: auto;}
+	}
+@media all and (max-width: 767px) {
+.jumbotron {background-repeat:no-repeat; background-size:cover; padding:30px 0px 40px 0px; }
+.tease-box{margin:auto; width: 100%; height: 290px;background-repeat: no-repeat;background-position:center;}
+h1 {font-size:24px;}
+.exp-brief{padding:30px 0px;}
+.jumbotron p {font-size: 12px;}
+.support {height: 191px;background-repeat: no-repeat; background-position-y: 55px;background-position-x: center;}
+.homepage-logo{height: 200px;background-repeat: no-repeat;background-position: center;}
+.home-menu { color:#fff; margin:20px 20px 0px auto;}
+.book-tease{display:none;}
+.footer{padding-top: 50px;}
+.footer-head{margin: 0 auto 30px auto;}
+.social{display:none;}
+.footer-line {width: 100%;}
+.footer-col {width: 145px;}
+.company{margin:0px 0px 30px 0px;}
+.footer-wrapper{width: 300px;margin: auto;}
+.search-from, .search-to, .home-search-button, .search-location{display:none;}
+.home-search{width: 220px; height: 98px;}
+.melbourne{color: #858585;border: 2px #000 solid;width: 210px;text-align: center;padding: 10px;border-radius: 0px;border-top-left-radius: 5px;border-top-right-radius: 5px;border-bottom: 1px #000 solid;background-color: #fff;margin: 5px 0px 0px 5px;float: left;}
+.sydney{color: #858585;border: 2px #000 solid;width: 210px;text-align: center;padding: 10px;border-radius: 0px;border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;background-color: #fff;margin: 0px 5px;float: left;}
+.melbourne a, .melbourne a:hover, .sydney a, .sydney a:hover{color:#333;}
+.menu li {margin-left: 6px;list-style: none;}
+.expList h3 {font-size: 13px;}
+.navbar-collapse {padding-right: 10px;padding-left: 0px;}
+}
+.search-location{padding-left:5px}
+.home-search-button{padding-right:5px;padding-left: 5px;}
+
+.jumbotron {margin-bottom: 0px;}
+
+.searchbar .btn{width: 250px;height: 50px;}
+.row-area{border-top: #ccc 1px solid;}
+
+.left-nav-box {margin-top: 30px;width: 220px;border: rgb(207,207,207) 1px solid;border-radius: 5px;float: left;padding-bottom: 5px;background-color:#fff;padding:20px}
+.left-nav-box a{color:#333;}
+.left-nav-box a:hover{color:#111;}
+.right-content-box {margin-top: 30px;border: rgb(207,207,207) 1px solid;border-radius: 5px;width: 720px;height: auto;padding: 0px;float: right;background-color:#fff;padding:20px;}
+
+.social-icon{width:65px;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border-radius: 100px;}
+.social-icon span {width:30px; height:30px; background-size:120px 60px; display:block; margin: 0px -5px;}

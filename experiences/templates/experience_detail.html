@@ -123,7 +123,8 @@
         <div class="row">
     		<div class="fixCenter">
                 <div class="reviewBox">
-                    <h2>{{ experience.review_set.count }} Review</h2>
+                {% if experience.review_set.count %}
+                    <h2>{{ experience.review_set.count }} Review(s) </h2>
                     <div class="rating">
                     {% for r in "12345" %}
                         {% if forloop.counter <= experience_rate %}
@@ -131,12 +132,13 @@
                         {%endif%}
                     {% endfor %}
                     </div>
-                
+                {% endif %}
+
                 {% for review in experience.review_set.all|dictsortreversed:"datetime" %}
                 {% if forloop.last == Flase %}
                     <div class="reviewList">
                 {% else %}
-                     <div class="reviewList last">
+                    <div class="reviewList last">
                 {% endif %}
                         <div class="profile-md"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
                         <div class="reviewText">{{review.comment}}
@@ -157,7 +159,7 @@
                 	<h2>Host profile - {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }}. {% endif %} {% endfor %}</h2>
                     <div class="profile-lg"><img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240"></div>
                     <div class="bioText">
-                        <p>{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.bio }} {% endif %} {% endfor %}</p>
+                        <p>{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.bio }}{% endif %}{% endfor %}</p>
                         <a class="btn btn-primary btn-sm" role="button" style="display:none;">Contact Host</a>
                     </div>
                 </div>
@@ -167,45 +169,47 @@
 
     <div class="container-fluid also"  style="display:none">
     	<div class="row">
-        <div class="fixCenter">
-        <div class="expBox">
-                <h2>People also bought these experiences in Melbourne</h2>
+            <div class="fixCenter">
+                <div class="expBox">
+                    <h2>People also bought these experiences in Melbourne</h2>
                 
-                <div class="expList">
-                	<div class="listingImg" style="background-image:url({{ MEDIA_URL }}hosts/2/host2_2_BenK_bg.jpg)">
-                    	<div class="priceBox">
-                        $<span>40</span> AUD
+                    <div class="expList">
+                	    <div class="listingImg" style="background-image:url({{ MEDIA_URL }}hosts/2/host2_2_BenK_bg.jpg)">
+                    	    <div class="priceBox">
+                            $<span>40</span> AUD
+                            </div>
                         </div>
+                        <h3>Melbourne's Historical Architecture Walk ...</h3>
+                        <div class="profile-sm"><img src="{% for review in experience.review_set.all %}{% if forloop.first %}{{ MEDIA_URL }}{{review.user.registereduser.image_url}}{% endif %}{% endfor %}" width="240" height="240"></div>
+                        <p>Through this experience, you will uncover the past of the city, much of which is hidden in plain sight. It would be a pleasure to show others the place I call home.</p>
+                        <div class="listingFooter"><a href="#">4 reviews</a> 2 hrs Up to 4 people</div>
                     </div>
-                  <h3>Melbourne's Historical Architecture Walk ...</h3>
-                    <div class="profile-sm"><img src="{% for review in experience.review_set.all %}{% if forloop.first %}{{ MEDIA_URL }}{{review.user.registereduser.image_url}}{% endif %}{% endfor %}" width="240" height="240"></div>
-                  <p>Through this experience, you will uncover the past of the city, much of which is hidden in plain sight. It would be a pleasure to show others the place I call home.</p>
-                    <div class="listingFooter"><a href="#">4 reviews</a> 2 hrs Up to 4 people</div>
-                </div>
-                <div class="expList">
-                	<div class="listingImg" style="background-image:url({{ MEDIA_URL }}hosts/2/host2_2_BenK_bg.jpg)">
-                    	<div class="priceBox">
-                        $<span>40</span> AUD
+                    <div class="expList">
+                	    <div class="listingImg" style="background-image:url({{ MEDIA_URL }}hosts/2/host2_2_BenK_bg.jpg)">
+                    	    <div class="priceBox">
+                            $<span>40</span> AUD
+                            </div>
                         </div>
+                        <h3>Melbourne's Historical Architecture Walk ...</h3>
+                        <div class="profile-sm"><img src="{% for review in experience.review_set.all %}{% if forloop.first %}{{ MEDIA_URL }}{{review.user.registereduser.image_url}}{% endif %}{% endfor %}" width="240" height="240"></div>
+                        <p>Through this experience, you will uncover the past of the city, much of which is hidden in plain sight. It would be a pleasure to show others the place I call home.</p>
+                        <div class="listingFooter"><a href="#">4 reviews</a> 2 hrs Up to 4 people</div>
                     </div>
-                  <h3>Melbourne's Historical Architecture Walk ...</h3>
-                    <div class="profile-sm"><img src="{% for review in experience.review_set.all %}{% if forloop.first %}{{ MEDIA_URL }}{{review.user.registereduser.image_url}}{% endif %}{% endfor %}" width="240" height="240"></div>
-                  <p>Through this experience, you will uncover the past of the city, much of which is hidden in plain sight. It would be a pleasure to show others the place I call home.</p>
-                    <div class="listingFooter"><a href="#">4 reviews</a> 2 hrs Up to 4 people</div>
-                </div>
-                <div class="expList">
-                	<div class="listingImg" style="background-image:url({{ MEDIA_URL }}hosts/2/host2_2_BenK_bg.jpg)">
-                    	<div class="priceBox">
-                        $<span>40</span> AUD
+                    <div class="expList">
+                	    <div class="listingImg" style="background-image:url({{ MEDIA_URL }}hosts/2/host2_2_BenK_bg.jpg)">
+                    	    <div class="priceBox">
+                            $<span>40</span> AUD
+                            </div>
                         </div>
+                        <h3>Melbourne's Historical Architecture Walk ...</h3>
+                        <div class="profile-sm"><img src="{% for review in experience.review_set.all %}{% if forloop.first %}{{ MEDIA_URL }}{{review.user.registereduser.image_url}}{% endif %}{% endfor %}" width="240" height="240"></div>
+                        <p>Through this experience, you will uncover the past of the city, much of which is hidden in plain sight. It would be a pleasure to show others the place I call home.</p>
+                        <div class="listingFooter"><a href="#">4 reviews</a> 2 hrs Up to 4 people</div>
                     </div>
-                  <h3>Melbourne's Historical Architecture Walk ...</h3>
-                    <div class="profile-sm"><img src="{% for review in experience.review_set.all %}{% if forloop.first %}{{ MEDIA_URL }}{{review.user.registereduser.image_url}}{% endif %}{% endfor %}" width="240" height="240"></div>
-                  <p>Through this experience, you will uncover the past of the city, much of which is hidden in plain sight. It would be a pleasure to show others the place I call home.</p>
-                    <div class="listingFooter"><a href="#">4 reviews</a> 2 hrs Up to 4 people</div>
                 </div>
-        </div>
-    </div>  
+            </div>
+        </div> 
+    </div> 
     {%endif%}
 {% endblock %} 
 

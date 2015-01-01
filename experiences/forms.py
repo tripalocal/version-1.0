@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 from datetime import date, datetime
 from calendar import monthrange 
-from experiences.models import Payment, Booking, Experience, RegisteredUser, Coupon
+from experiences.models import Payment, Booking, Experience, Coupon
 from Tripalocal_V1 import settings
 import pytz, string, subprocess, json, random
 from django.core.mail import send_mail
@@ -12,6 +12,8 @@ from django.template import loader
 from tripalocal_messages.models import Aliases, Users
 from allauth.account.signals import user_signed_up
 from django.dispatch import receiver
+from django.db import connections
+from app.models import RegisteredUser
 
 Type = (('SEE', 'See'),('DO', 'Do'),('EAT', 'Eat'),)
 
@@ -162,7 +164,7 @@ class BookingConfirmationForm(forms.Form):
     last_name = forms.CharField(max_length=50)
     street1 = forms.CharField(max_length=50)
     street2 = forms.CharField(max_length=50, required = False)
-    city = forms.CharField(max_length=20)
+    city_town = forms.CharField(max_length=20)
     state = forms.CharField(max_length=10)
     country = forms.ChoiceField(choices=Country, required=True)
     postcode = forms.CharField(max_length=4)
@@ -237,14 +239,16 @@ class BookingConfirmationForm(forms.Form):
                                       submitted_datetime = datetime.utcnow(), status="paid")
                 booking.save()
                 #add the user to the guest list
-                #if user not in experience.guests.all():
-                #    experience.guests.add(user)
+                if user not in experience.guests.all():
+                #experience.guests.add(user)
+                    cursor = connections['experiencedb'].cursor()
+                    cursor.execute("Insert into experiences_experience_guests ('experience_id','user_id') values (%s, %s)", [experience.id, user.id])
 
                 payment.charge_id = instance['id']
                 payment.booking_id = booking.id
                 payment.street1 = self.cleaned_data['street1']
                 payment.street2 = self.cleaned_data['street2']
-                payment.city = self.cleaned_data['city']
+                payment.city = self.cleaned_data['city_town']
                 payment.state = self.cleaned_data['state']
                 payment.country = self.cleaned_data['country']
                 payment.postcode = self.cleaned_data['postcode']
@@ -278,6 +282,7 @@ class BookingConfirmationForm(forms.Form):
         return cleaned
 
 class CreateExperienceForm(forms.Form):
+    host = forms.CharField()
     start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     repeat_cycle = forms.ChoiceField(choices=Repeat_Cycle)

@@ -9,6 +9,7 @@
 
 </form>-->
 <ul class="menu">
+        <li><a id="id_language_top" class="menu-language">中文</a></li>
         <li><a href="/accounts/logout/">Log out</a></li>
         <li>{{ user.first_name }}</li>
         <li>
@@ -22,6 +23,7 @@
 {% else %}
 
 <ul class="menu">
+    <li><a id="id_language_top" class="home-language">中文</a></li>
     <li><a href="/accounts/signup/?next={{ request.path }}">Sign up</a></li>
     <li><a href="/accounts/login/?next={{ request.path }}">Log in</a></li> <!---->
 </ul>

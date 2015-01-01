@@ -5,21 +5,6 @@ from allauth.socialaccount.models import SocialAccount
 import hashlib
 from Tripalocal_V1 import settings
 
-# Create your models here.
-class RegisteredUser(models.Model):
-    def upload_path(self, name):
-        return self.image_url
-
-    user = models.OneToOneField(User, related_name='registereduser')
-    image_url = models.CharField(max_length=200)
-    image = models.ImageField(upload_to=upload_path)
-    phone_number = models.CharField(max_length=15)
-    bio = models.TextField()
-    rate = models.DecimalField(max_digits=2, decimal_places=1)
-
-    def __str__(self):
-        return self.user.username
-
 class Experience(models.Model):
     type = models.CharField(max_length=50)
 

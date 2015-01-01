@@ -19,10 +19,12 @@ from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile, File
 from django.contrib import messages
 from tripalocal_messages.models import Aliases
-from experiences.models import Review, Photo, RegisteredUser, Coupon
+from experiences.models import Review, Photo, Coupon
 from app.forms import SubscriptionForm
 from mixpanel import Mixpanel
 from dateutil.relativedelta import relativedelta
+from django.db import connections
+from app.models import RegisteredUser
 
 def experience_fee_calculator(price):
     if type(price)==int or type(price) == float:
@@ -83,7 +85,8 @@ class ExperienceDetailView(DetailView):
             context['expired'] = True
             return context
 
-        while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(hours=+6)):
+        while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(hours=+6)):     
+
             if experience.repeat_cycle == "Hourly" :
                 sdt += timedelta(hours=experience.repeat_frequency)
             elif experience.repeat_cycle == "Daily" :
@@ -100,7 +103,7 @@ class ExperienceDetailView(DetailView):
             #check if the date is blocked
             blocked = False
 
-            #block 10pm-7am is repeated hourly
+            #block 10pm-7am if repeated hourly
             sdt_local = sdt.astimezone(local_timezone)
             if experience.repeat_cycle == "Hourly" and (sdt_local.time().hour <= 7 or sdt_local.time().hour >= 22):
                 blocked = True
@@ -323,7 +326,8 @@ def create_experience(request, id=None):
             #else:
             #    photos['experience'+str(id)+'_'+str(i)] = None
 
-        data = {"start_datetime":experience.start_datetime,
+        data = {"host":experience.hosts.all()[0].email,
+            "start_datetime":experience.start_datetime,
             "end_datetime":experience.end_datetime,
             "repeat_cycle":experience.repeat_cycle,
             "repeat_frequency":experience.repeat_frequency,
@@ -332,7 +336,7 @@ def create_experience(request, id=None):
             "guest_number_min":experience.guest_number_min,
             "guest_number_max":experience.guest_number_max,
             "price":experience.price,
-            "price_with_booking_fee":experience.price*Decimal.from_float(1.00+settings.COMMISSION_PERCENT),
+            "price_with_booking_fee":experience.price*Decimal.from_float(1.00+settings.COMMISSION_PERCENT)*Decimal.from_float(1.00+settings.STRIPE_PRICE_PERCENT)+Decimal.from_float(settings.STRIPE_PRICE_FIXED),
             "duration":experience.duration,
             "included_food":included_food,
             "included_food_detail":include_food_detail,
@@ -355,8 +359,16 @@ def create_experience(request, id=None):
         form = CreateExperienceForm(request.POST, request.FILES)
         display_error = True
 
-        if form.is_valid():
+        if form.is_valid():    
             if not id:
+                try:
+                    #check if the user exist
+                    user = User.objects.get(email=form.data['host'])
+                except User.DoesNotExist:
+                    form.add_error("host","host email does not exist")
+                    return render_to_response('create_experience.html', {'form': form, 'display_error':display_error}, context)
+
+                #create a new experience
                 experience = Experience(start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_datetime'], "%Y-%m-%d %H:%M")),
                                         end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_datetime'], "%Y-%m-%d %H:%M")),
                                         repeat_cycle = form.data['repeat_cycle'],
@@ -393,6 +405,11 @@ def create_experience(request, id=None):
                 experience.meetup_spot = form.data['meetup_spot']
             
             experience.save()
+            #add the user to the host list
+            if not id and user:
+                #experience.hosts.add(user)
+                cursor = connections['experiencedb'].cursor()
+                cursor.execute("Insert into experiences_experience_hosts ('experience_id','user_id') values (%s, %s)", [experience.id, user.id])
             
             #save images
             dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
@@ -415,12 +432,6 @@ def create_experience(request, id=None):
                             photo = Photo(name = filename, directory = 'experiences/' + str(experience.id) + '/', 
                                           image = 'experiences/' + str(experience.id) + '/' + filename, experience = experience)
                             photo.save()
-
-
-            #add the user to the host list
-            if not id:
-                user = User.objects.get(id=request.user.id)
-                experience.hosts.add(user)
 
             #add whatsincluded
             if not id:
@@ -765,4 +776,3 @@ def freeSimPromo(request):
 
     })
     return HttpResponse(template.render(context))
-
