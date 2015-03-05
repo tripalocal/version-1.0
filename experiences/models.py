@@ -7,17 +7,21 @@ from Tripalocal_V1 import settings
 
 class Experience(models.Model):
     type = models.CharField(max_length=50)
+    language = models.CharField(max_length=50)
 
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
+    repeat = models.BooleanField(default=False)
     repeat_cycle = models.CharField(max_length=50)
     repeat_frequency = models.IntegerField()
+    repeat_extra_information = models.CharField(max_length=50)
     allow_instant_booking = models.BooleanField(default=False)
     duration = models.IntegerField()
 
     guest_number_max = models.IntegerField()
     guest_number_min = models.IntegerField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    dynamic_price = models.CharField(max_length=100)
 
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -34,14 +38,30 @@ class Experience(models.Model):
     status = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.title
+        t = self.title if self.title != None else ''
+        return str(self.id) + '--' + t
 
     class Meta:
-        ordering = ['title']
+        ordering = ['id']
+
+class InstantBookingTimePeriod(models.Model):
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    repeat_end_date = models.DateField()
+    repeat = models.BooleanField(default=False)
+    repeat_cycle = models.CharField(max_length=50)
+    repeat_frequency = models.IntegerField()
+    repeat_extra_information = models.CharField(max_length=50)
+    experience = models.ForeignKey(Experience)
 
 class BlockOutTimePeriod(models.Model):
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    repeat_end_date = models.DateField()
+    repeat = models.BooleanField(default=False)
+    repeat_cycle = models.CharField(max_length=50)
+    repeat_frequency = models.IntegerField()
+    repeat_extra_information = models.CharField(max_length=50)
     experience = models.ForeignKey(Experience)
 
 class WhatsIncluded(models.Model):
@@ -65,9 +85,11 @@ class Review(models.Model):
     comment = models.TextField()
     rate = models.IntegerField()
     datetime = models.DateTimeField()
+    personal_comment = models.TextField()
+    operator_comment = models.TextField()
 
     def __str__(self):
-        return self.user.username + "--" + self.experience.title
+        return self.user.email + "--" + self.experience.title
 
 class Coupon(models.Model):
     promo_code = models.CharField(max_length=10)
@@ -76,6 +98,9 @@ class Coupon(models.Model):
     rules = models.TextField()
     title = models.CharField(max_length=50)
     description = models.TextField()
+
+    def __str__(self):
+        return self.title + "--" + self.promo_code
 
 class Booking(models.Model):
     user = models.ForeignKey(User)
@@ -87,10 +112,11 @@ class Booking(models.Model):
     status = models.CharField(max_length=50)
     submitted_datetime = models.DateTimeField()
     payment = models.ForeignKey("Payment", related_name="payment")
-    refund_id = models.CharField(max_length=50)  
+    refund_id = models.CharField(max_length=50)
+    booking_extra_information = models.TextField()
     
     def __str__(self):
-        return self.user.username + "--" + self.experience.title
+        return self.user.email + "--" + self.experience.title
 
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):

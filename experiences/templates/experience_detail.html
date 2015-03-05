@@ -2,12 +2,22 @@
 {% load mathfilters %}
 
 {% block head %}
-   <title> {{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }}. {% endif %} {% endfor %} </title>
+    {% load staticfiles %}
+    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
+    <title> {{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %} </title>
 {% endblock %}
 
 {% block content %}
 
-    {% if expired == None or not expired %}
+{% if expired == None and listed == None %}
+    {%if host_only_expired %}
+    <p style="postion:relative;top:50px;">The experience has expired. Only you can see it now.</p>
+    {%endif%}
+
+    {%if host_only_unlisted %}
+    <p style="postion:relative;top:50px;">The experience has not be approved. Only you can see it now.</p>
+    {%endif%}
+
     <div class="jumbotron experienceImg" style="background-image:url(		
 		{% for photo in experience.photo_set.all %}
             {% if forloop.first %}
@@ -16,59 +26,64 @@
         {% endfor %})">
 	</div>
 
-    <div class="container-fluid experience">
+    <div class="container-fluid experience stickem-container">
 	    <div class="row">
 		    <div class="fixCenter">
-                <div class="bookingBox">
-                    <div class="profile-lg">
-                        <img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240">
-                    </div>
-                    Reservation with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }}. {% endif %} {% endfor %}
-                    <br><br>
-                    <span>${{ 1.25|mul:experience.price|floatformat:"0" }}</span> per person<br>for {{ experience.duration }} hours<br>
-
-                    <form id="experience_booking_form" method="post" action="">
-                        {% csrf_token %}
-                        
-                        {% for field in form.hidden_fields %}
-                            {{ field }}
-                        {% endfor %}
-
-
-                        <div class="row">
-                            <div class="col" id="date">
-                                <div class="icon"></div>Date
-                                {% for op in available_options %} 
-                                    <p id="date_string_{{forloop.counter0}}" style="display:none"> {{op.date_string}} </p> 
-                                {% endfor %}
-                                <p>{{form.date}}</p>
-                            </div>
-                            <div class="col" id="time">
-                                <div class="icon"></div>Time
-                                {% for op in available_options %} 
-                                    <p id="time_string_{{forloop.counter0}}" style="display:none"> {{op.time_string}} </p> 
-                                {% endfor %}
-                                <p>{{form.time}}</p>
-                            </div>
-                            <div class="col" id="people">
-                                <div class="icon"></div>People
-                                {% for op in available_options %} 
-                                    <p id="seat_left_{{forloop.counter0}}" style="display:none"> {{op.available_seat}} </p>
-                                {% endfor %}
-                                <p>{{form.guest_number}}</p>
-                            </div>
+                <div class="stickem">
+                    <div class="bookingBox">
+                        <div class="profile-lg">
+                            <img src="{{ MEDIA_URL }}{{ host_image }}" width="240" height="240">
                         </div>
+                        Reservation with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
+                        <br>{%if experience.language == "english;"%}English{%elif experience.language == "english;mandarin;"%}English / 中文{%else%}English / 中文翻译{%endif%}
+                        <br><br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
+                        <span id="experience_price">${{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span> per person<br>for {{ experience.duration }} hours<br>
 
-                        {% if user.is_authenticated %}
-                            <input id="id_submit_request" type="submit" class="btn btn-primary btn-lg" value="Request to Book" />  
-                        {% else %}
-                            <input type="button" class="btn btn-primary btn-lg" value="Request to Book" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
-                        {% endif %}
-                    </form> 
+                        <form id="experience_booking_form" method="post" action="">
+                            {% csrf_token %}
+                        
+                            {% for field in form.hidden_fields %}
+                                {{ field }}
+                            {% endfor %}
+
+
+                            <div class="row">
+                                <div class="col" id="date">
+                                    <div class="icon"></div>Date
+                                    {% for op in available_options %} 
+                                        <p id="date_string_{{forloop.counter0}}" style="display:none" instant="{{op.instant_booking}}"> {{op.date_string}} </p> 
+                                    {% endfor %}
+                                    <p>{{form.date}}</p>
+                                </div>
+                                <div class="col" id="time">
+                                    <div class="icon"></div>Time
+                                    {% for op in available_options %} 
+                                        <p id="time_string_{{forloop.counter0}}" style="display:none" instant="{{op.instant_booking}}"> {{op.time_string}} </p> 
+                                    {% endfor %}
+                                    <p>{{form.time}}</p>
+                                </div>
+                                <div class="col" id="people">
+                                    <div class="icon"></div>People
+                                        <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none"/>
+                                        <input type="text" id="guest_number_max" name="{{experience.guest_number_max}}" disabled="disabled" style="display:none"/>
+                                    {% for op in available_options %} 
+                                        <p id="seat_left_{{forloop.counter0}}" style="display:none"> {{op.available_seat}} </p>
+                                    {% endfor %}
+                                    <p>{{form.guest_number}}</p>
+                                </div>
+                            </div>
+
+                            {% if user.is_authenticated %}
+                                <input id="id_submit_request" type="submit" class="btn btn-primary btn-lg" value="Request to Book" />  
+                            {% else %}
+                                <input type="button" class="btn btn-primary btn-lg" value="Request to Book" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
+                            {% endif %}
+                        </form> 
+                    </div>
                 </div>
             
         	    <div class="desBox">
-                    <h1>{{ experience.title }} with {% for h in experience.hosts.all %} {{ h.first_name }} {{ h.last_name|slice:":1" }}. {% endfor %}</h1>
+                    <h1>{{ experience.title }} with {% for h in experience.hosts.all %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endfor %}</h1>
                     <p> {{ experience.location }} </p>
                     <p> {{ experience.description }} </p>
                     <p style="display:none;"><a href="#">Contact Host</a></p>
@@ -76,7 +91,7 @@
                                     {% if forloop.counter == 2 %}
 				                        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
                                     {% endif %}
-                                 {% endfor %}" 
+                                    {% endfor %}" 
                         width="600" height="375" style="display:none"></p>
                     <p> {{ experience.activity }} </p>
                     <p> {{ experience.interaction }} </p>
@@ -112,8 +127,8 @@
                                     {% if forloop.last %}
 				                        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
                                     {% endif %}
-                                 {% endfor %}"
-                         width="600" height="375"></p>
+                                    {% endfor %}"
+                            width="600" height="375"></p>
                 </div>
             </div>
         </div>
@@ -140,7 +155,11 @@
                 {% else %}
                     <div class="reviewList last">
                 {% endif %}
+                {%if review.user.registereduser.image_url != None and review.user.registereduser.image_url != ''%}
                         <div class="profile-md"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
+                {%else%}
+                        <div class="profile-md"><img src="{{ MEDIA_URL }}profile_default.jpg" width="240" height="240"></div>
+                {%endif%}
                         <div class="reviewText">{{review.comment}}
                             <div class="reviewDate">{{review.datetime|date:'d M Y'}}</div>
                         </div>
@@ -156,8 +175,8 @@
         <div class="row">
             <div class="fixCenter">
                 <div class="bioBox">
-                	<h2>Host profile - {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|slice:":1" }}. {% endif %} {% endfor %}</h2>
-                    <div class="profile-lg"><img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240"></div>
+                	<h2>Host profile - {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</h2>
+                    <div class="profile-lg"><img src="{{ MEDIA_URL }}{{ host_image }}" width="240" height="240"></div>
                     <div class="bioText">
                         <p>{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.bio }}{% endif %}{% endfor %}</p>
                         <a class="btn btn-primary btn-sm" role="button" style="display:none;">Contact Host</a>
@@ -209,8 +228,10 @@
                 </div>
             </div>
         </div> 
-    </div> 
-    {%endif%}
+    </div>
+{%else%}
+    <p>The experience has expired, or has not been approved.</p>
+{%endif%}
 {% endblock %} 
 
 {% block scripts %}
@@ -219,6 +240,10 @@
 
 $(function(){
     $(document).ready(function(){
+        if(screen.width > 767){
+            $(document.body).stickem();
+        }
+
         var i=0;
         for(; $("#id_date option").eq(i).length; i++)
         {
@@ -233,13 +258,25 @@ $(function(){
 
         for(var i=0; first_date && $("#date_string_"+i).text().trim() == first_date; i++)
         {
-            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+            if($("#time_string_"+i).attr("instant") == "True")
+            {
+                $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' style="color:green;">' + $("#time_string_"+i).text().trim() + '</option>');
+            }
+            else
+            {
+                $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+            }
         }
 
         seat_left = parseInt($("#seat_left_0").text());
 
         $("#id_guest_number").html('');
-        for(var i=1;i<=seat_left;i++)
+        var i = parseInt($("#guest_number_min").attr("name"));
+        if(typeof i != "number" || i < 1)
+        {
+            i=1;
+        }
+        for(;i<=seat_left;i++)
         {
             $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
         }
@@ -275,7 +312,14 @@ $(function(){
 
         for(; $("#date_string_"+i).text().trim() == selected_date; i++)
         {
-            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+            if($("#time_string_"+i).attr("instant") == "True")
+            {
+                $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' style="color:green;">' + $("#time_string_"+i).text().trim() + '</option>');
+            }
+            else
+            {
+                $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+            }
         }
 
         $("#id_time").change();
@@ -302,13 +346,14 @@ $(function(){
         }
 
         seat_left = parseInt($("#seat_left_"+i).text());
-
+/*
         $("#id_guest_number").html('');
-        for(var i=1;i<=seat_left;i++)
+        var i = parseInt($("#guest_number_min").attr("name"));
+        for(;i<=seat_left;i++)
         {
             $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
         }
-
+*/
         mixpanel.track("Changed time");
         if($("#user_email").val())
         {
@@ -319,6 +364,16 @@ $(function(){
 
 $(function(){
     $("#id_guest_number").change(function(){
+        min_number = parseInt($("#guest_number_min").attr("name"));
+        max_number = parseInt($("#guest_number_max").attr("name"));
+        price = $("#experience_dynamic_price").val().split(',');
+        if(price.length == max_number - min_number + 2) // not 1
+        {
+            guest_number = parseInt($("#id_guest_number").val());
+            price = Math.round(parseFloat(price[guest_number-min_number])*1.429);
+            $("#experience_price").text('$'+price);
+        }
+
         mixpanel.track("Changed number of people");
         if($("#user_email").val())
         {

@@ -49,9 +49,9 @@ class HomepageSearchForm(forms.Form):
 
 class UserProfileForm(forms.Form):
     image = forms.ImageField(required = False)
-    first_name=forms.CharField()
-    last_name=forms.CharField()
-    email=forms.EmailField()
+    first_name=forms.CharField(required = False)
+    last_name=forms.CharField(required = False)
+    email=forms.EmailField(required = False)
     phone_number = forms.CharField(required = False)
     bio = forms.CharField(widget=forms.Textarea, required = False)
 
@@ -60,3 +60,92 @@ class UserProfileForm(forms.Form):
         self.fields['first_name'].widget.attrs['readonly'] = True
         self.fields['last_name'].widget.attrs['readonly'] = True
         self.fields['email'].widget.attrs['readonly'] = True
+
+class BookingRequestXLSForm(forms.Form):
+    file = forms.FileField()
+
+Repeat_Cycle = (('Daily', 'Daily'), ('Weekly', 'Weekly'), ('Monthly', 'Monthly'),)
+
+Repeat_Frequency = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),
+    ('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
+
+class UserCalendarForm(forms.Form):
+    blockout_start_datetime_1 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    blockout_end_datetime_1 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    blockout_repeat_1 = forms.BooleanField(required=False)
+    blockout_repeat_cycle_1 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
+    blockout_repeat_frequency_1 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
+    blockout_repeat_end_date_1 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    blockout_repeat_extra_information_1 = forms.CharField(required=False, max_length=50)
+
+    blockout_start_datetime_2 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    blockout_end_datetime_2 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    blockout_repeat_2 = forms.BooleanField(required=False)
+    blockout_repeat_cycle_2 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
+    blockout_repeat_frequency_2 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
+    blockout_repeat_end_date_2 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    blockout_repeat_extra_information_2 = forms.CharField(required=False, max_length=50)
+
+    blockout_start_datetime_3 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    blockout_end_datetime_3 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    blockout_repeat_3 = forms.BooleanField(required=False)
+    blockout_repeat_cycle_3 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
+    blockout_repeat_frequency_3 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
+    blockout_repeat_end_date_3 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    blockout_repeat_extra_information_3 = forms.CharField(required=False, max_length=50)
+
+    blockout_start_datetime_4 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    blockout_end_datetime_4 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    blockout_repeat_4 = forms.BooleanField(required=False)
+    blockout_repeat_cycle_4 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
+    blockout_repeat_frequency_4 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
+    blockout_repeat_end_date_4 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    blockout_repeat_extra_information_4 = forms.CharField(required=False, max_length=50)
+
+    blockout_start_datetime_5 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    blockout_end_datetime_5 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    blockout_repeat_5 = forms.BooleanField(required=False)
+    blockout_repeat_cycle_5 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
+    blockout_repeat_frequency_5 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
+    blockout_repeat_end_date_5 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    blockout_repeat_extra_information_5 = forms.CharField(required=False, max_length=50)
+
+    instant_booking_start_datetime_1 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    instant_booking_end_datetime_1 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    instant_booking_repeat_1 = forms.BooleanField(required=False)
+    instant_booking_repeat_cycle_1 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
+    instant_booking_repeat_frequency_1 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
+    instant_booking_repeat_end_date_1 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    instant_booking_repeat_extra_information_1 = forms.CharField(required=False, max_length=50)
+
+    instant_booking_start_datetime_2 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    instant_booking_end_datetime_2 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    instant_booking_repeat_2 = forms.BooleanField(required=False)
+    instant_booking_repeat_cycle_2 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
+    instant_booking_repeat_frequency_2 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
+    instant_booking_repeat_end_date_2 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    instant_booking_repeat_extra_information_2 = forms.CharField(required=False, max_length=50)
+
+    instant_booking_start_datetime_3 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    instant_booking_end_datetime_3 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    instant_booking_repeat_3 = forms.BooleanField(required=False)
+    instant_booking_repeat_cycle_3 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
+    instant_booking_repeat_frequency_3 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
+    instant_booking_repeat_end_date_3 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    instant_booking_repeat_extra_information_3 = forms.CharField(required=False, max_length=50)
+
+    instant_booking_start_datetime_4 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    instant_booking_end_datetime_4 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    instant_booking_repeat_4 = forms.BooleanField(required=False)
+    instant_booking_repeat_cycle_4 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
+    instant_booking_repeat_frequency_4 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
+    instant_booking_repeat_end_date_4 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    instant_booking_repeat_extra_information_4 = forms.CharField(required=False, max_length=50)
+
+    instant_booking_start_datetime_5 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    instant_booking_end_datetime_5 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    instant_booking_repeat_5 = forms.BooleanField(required=False)
+    instant_booking_repeat_cycle_5 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
+    instant_booking_repeat_frequency_5 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
+    instant_booking_repeat_end_date_5 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    instant_booking_repeat_extra_information_5 = forms.CharField(required=False, max_length=50)

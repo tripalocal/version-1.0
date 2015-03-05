@@ -13,10 +13,30 @@ class RegisteredUser(models.Model):
     rate = models.DecimalField(max_digits=2, decimal_places=1)
 
     def __str__(self):
-        return self.user.username
+        return str(self.user.id) + '--' + self.user.username + '--' + self.user.email
 
 class Subscription(models.Model):
     email = models.EmailField()
     subscribed_datetime = models.DateTimeField()
     ref_by = models.EmailField()
     ref_link = models.CharField(max_length = 20)
+
+class InstantBookingTimePeriod(models.Model):
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    repeat_end_date = models.DateField()
+    repeat = models.BooleanField(default=False)
+    repeat_cycle = models.CharField(max_length=50)
+    repeat_frequency = models.IntegerField()
+    repeat_extra_information = models.CharField(max_length=50)
+    user = models.ForeignKey(User)
+
+class BlockOutTimePeriod(models.Model):
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    repeat_end_date = models.DateField()
+    repeat = models.BooleanField(default=False)
+    repeat_cycle = models.CharField(max_length=50)
+    repeat_frequency = models.IntegerField()
+    repeat_extra_information = models.CharField(max_length=50)
+    user = models.ForeignKey(User)

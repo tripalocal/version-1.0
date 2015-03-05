@@ -26,12 +26,12 @@
     <div class="home-menu-bar">
         <ul class="home-menu menu">
         {% if user.is_authenticated %}
-            <li><a class="home-language" href="https://www.tripalocal.com/cn">中文</a></li>
+            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com/cn">中文</a></li>
             <li><a href="/accounts/logout/">Log out</a></li>
             <li>{{ user.first_name }}</li>
-            <li><div class="profile-xs"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></div></li>    
+            <li><div class="profile-xs"><a href="/myprofile"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>    
         {% else %} 
-            <li><a class="home-language" href="https://www.tripalocal.com/cn">中文</a></li> 
+            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com/cn">中文</a></li> 
             <li><a href="/accounts/signup/?next={{ request.path }}">Sign up</a></li>
             <li><a href="/accounts/login/?next={{ request.path }}">Log in</a></li>
         {% endif %}
@@ -127,6 +127,15 @@ $(function()
             latitude = geoplugin_latitude();
             longitude = geoplugin_longitude();
         });
+
+        $("#language_switch_topbar").click(function(){
+            mixpanel.track("switched language from top bar");
+
+            if($("#user_email").val())
+            {
+                mixpanel.identify($("#user_email").val());
+            }
+        });
     });
 
     mixpanel.track("Visited homepage_en");
@@ -135,7 +144,7 @@ $(function()
     {
         var now  = new Date().toString();
         mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
-        mixpanel.people.set({"$browser":navigator.appName, "$os":navigator.platform, "$initial_referrer": document.referrer,"$last_seen":now});  
+        mixpanel.people.set({"$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,"$last_seen":now});  
         mixpanel.identify($("#user_email").val());
     }
 })

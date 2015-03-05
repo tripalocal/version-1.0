@@ -75,6 +75,7 @@ $(function(){
 
         $("#login_button").bind("click", function(e){
             e.preventDefault();
+            //mixpanel.track("has signed in via email");
             mixpanel.people.set({"$last_seen": new Date().toString()});
             mixpanel.identify($("#id_login").val());   
             $("#login_form").submit();

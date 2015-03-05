@@ -71,7 +71,7 @@
                             <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}">
                                 <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
                                     <div class="priceBox">
-                                        $<span>{{ experience.price|mul:1.25|floatformat:"0" }}</span> AUD/person
+                                        $<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> AUD/person
                                     </div>
                                 </div>
                             </a>
@@ -104,14 +104,14 @@
                         <!-- Each Individual Experiene Listing -->
                         {% for experience, review, formattedTitle, BGImageURL, profileImageURL in scityExperienceList %}
                             <div class="expList">
-                            <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}">
+                            <a href="/experience/{{experience.id}}">
                                 <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
                                     <div class="priceBox">
-                                        $<span>{{ experience.price|mul:1.25|floatformat:"0" }}</span> AUD/person
+                                        $<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> AUD/person
                                     </div>
                                 </div>
                             </a>
-                            <a href="{{DOMAIN_NAME}}/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
+                            <a href="/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
                             <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
                           
                             <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
@@ -180,3 +180,4 @@ $(function(){
 
 </script>
 {% endblock %}
+

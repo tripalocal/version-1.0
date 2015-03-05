@@ -96,6 +96,7 @@ $(function()
         $("#id_first_name").attr("class", "form-control");
         $("#id_last_name").attr("class", "form-control");
 
+        /*
         $.getScript('http://www.geoplugin.net/javascript.gp', function() 
         {
             country = geoplugin_countryName();
@@ -105,6 +106,7 @@ $(function()
             latitude = geoplugin_latitude();
             longitude = geoplugin_longitude();
         });
+        */
 
         $("#id_signup_submit_button").bind("click", function(e){
             e.preventDefault();
@@ -116,20 +118,21 @@ $(function()
             else
             {
                 if (navigator.geolocation) {
+                    /*
                     navigator.geolocation.getCurrentPosition(function(position)
                     {
                         mixpanel.people.set({"Latitude":position.coords.latitude, "Longitude":position.coords.longitude});
-                        /*"$country":country, "$region":region, "$city":city, */ 
                         mixpanel.identify($("#id_email").val());   
                     });
+                    */
                 }
                 var now  = new Date().toString();
-                mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
-                mixpanel.people.set({"$email": $("#id_email").val(),  
-                                    "$browser":navigator.appName, "$os":navigator.platform, "$initial_referrer": document.referrer,
+                //mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
+                mixpanel.people.set({"$email": $("#id_email").val(),"$first_name": $("#id_first_name").val(),"$last_name": $("#id_last_name").val(),
+                                    "$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,
                                     "$created":now, "$last_seen":now
                                     });
-                mixpanel.track("Entered email address at prelaunch");   
+                //mixpanel.track("has signed up via email");   
                 mixpanel.identify($("#id_email").val());
 
                 $("#signup_form").submit();

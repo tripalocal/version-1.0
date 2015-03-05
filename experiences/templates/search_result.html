@@ -14,7 +14,7 @@
     <div class="container-fluid searchbar">
     	<div class="row">
             <div class="fixCenter">
-                <div class="dropdown">
+                <div class="destination dropdown">
                     <h1 style=" text-align: center;">Destination</h1>
                     <button class="btn btn-default dropdown-toggle" type="button" id="" data-toggle="dropdown" aria-expanded="true">
                     {{ city }}
@@ -42,7 +42,7 @@
                         <a href="/experience/{{experience.id}}">
                             <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
                                 <div class="priceBox">
-                                $<span>{{ experience.price|mul:1.25|floatformat:"0" }}</span> AUD/person
+                                $<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> AUD/person
                                 </div>
                             </div>
                         </a>
@@ -50,7 +50,7 @@
                         <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
           
                         <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
-                        <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a> {{ experience.duration }} hrs</div>
+                        <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a> {{ experience.duration }} hrs &#8226; {%if experience.language == "english;"%}English{%elif experience.language == "english;mandarin;"%}English / 中文{%else%}English / 中文翻译{%endif%}</div>
                     </div>
                     {% endfor %}
                     <div class="expList">

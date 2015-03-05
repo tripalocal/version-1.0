@@ -7,10 +7,11 @@
 {% endblock %}
 
 {% block content %}
-    <p>Experience confirmation</p>
-    {% for form in form_list %}
-        <table>
-            {{ form.as_table }}
-        </table>
-    {% endfor %}  
+{% if add %}
+    <p>Experience submitted</p>
+    Your experience has been submitted. We will notify you once it is approved.
+{% else %}
+    <p>Experience updated</p>
+    Your changes have been saved.
+{% endif %}
 {% endblock %}  
