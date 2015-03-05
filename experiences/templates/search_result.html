@@ -10,9 +10,10 @@
     <title>Discover {{ city }}</title>
 {%endblock%}
 
-{% block content %}    
+{% block content %}
     <div class="container-fluid searchbar">
     	<div class="row">
+<<<<<<< HEAD
             <div class="fixCenter">
                 <div class="destination dropdown">
                     <h1 style=" text-align: center;">Destination</h1>
@@ -62,8 +63,65 @@
                     </div>
                 </div>       
             </div>
+=======
+        <div class="fixCenter">
+    <div class="dropdown">Where are you going?
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+    {{ city }}
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+
+    {% if sydneySelected %}
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/melbourne">melbourne</a></li>
+    {% else %}
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="/s/sydney">sydney</a></li>
+    {% endif %}
+  </ul>
+</div>
+    </div></div></div>
+
+    <div class="container-fluid searchresult">
+    	<div class="row">
+        <div class="fixCenter">
+        <div class="expBox">
+
+          <!-- Each Individual Experiene Listing -->
+          {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
+          <div class="expList">
+          <a href="/experience/{{experience.id}}"><div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
+              <div class="priceBox">
+                $<span>{{ experience.price }}</span> AUD
+                </div>
+            </div></a>
+          <a href="/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
+            <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
+
+          <p>{{ experience.description }}</p>
+            <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#">{{ review }} reviews</a> · {{ experience.duration }} hrs · Up to {{ experience.guest_number_max }} people</div>
+           </div>
+          {% endfor %}
+
+
+
+        </div>
+>>>>>>> 35d82b2097a46c5c659ae49ee2f5e183958f0ee3
         </div>
     </div>
     <!-- /.container -->
 
 {% endblock %}
+<<<<<<< HEAD
+=======
+
+{% block scripts %}
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/jquery.min.js"></script>
+    <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="./Discover Melbourne's Street Art Laneways with Felicity O._files/ie10-viewport-bug-workaround.js"></script>
+
+{% endblock %}
+>>>>>>> 35d82b2097a46c5c659ae49ee2f5e183958f0ee3
