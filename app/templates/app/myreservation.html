@@ -1,0 +1,143 @@
+{% extends "app/layout.html" %}
+{% load staticfiles %}
+
+{% block head %}
+	<title>My Reservations</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="tab_area">
+        <div class="fixCenter">
+            <div class="tab_item">
+                <a href="#" class="firstTabItem" id="active-tab">My Listing</a>
+                <a href="/mytrip">My Trip</a>
+                <a href="/myprofile">My Profile</a>
+                <a href="/accounts/password/change/">My Account</a>
+            </div>
+        </div>
+    </div>
+
+	<div class="row row-area">
+    	<div class="content-area fixCenter">
+    		<div class="left-nav-box">
+    		    <p>
+                    <a href="/mylisting">Managing Listing</a>
+                </p>
+                <p>
+                    <a href="#" id="active-tab">Your Reservation</a>
+                </p>
+            </div>
+
+			<div class="right-content-box" style="padding:0px;">
+		        <div class="right-content-box-header">
+                    <p class="right-content-box-heading">Your Reservations</p>
+                </div>
+
+		        {% for reservation in current_reservations %}
+                <div class="listedItem flexHeight">
+                    <div class="line">
+                        <div class="icon-group">
+                            <div id="date">
+                                <div class="icon"></div>
+                                <p>{{reservation.booking_datetime|date:'d-M-Y'}}</p>
+                            </div>
+                        </div>
+                        <div class="icon-group">
+                            <div id="time">
+                                <div class="icon"></div>
+                                <p>{{reservation.booking_datetime|date:'H:i'}}</p>
+                            </div>
+                        </div>
+                        <div class="icon-group">
+                            <div id="people">
+                                <div class="icon"></div>
+                                <p>{{reservation.booking_guest_number}}</p>
+                            </div>
+                        </div>
+
+                        <img class="thumbnail" src="{{ MEDIA_URL }}thumbnails/experiences/experience{{reservation.experience_id}}_1.jpg">
+                        <div class="reservation-info">
+                            {% if reservation.booking_status|title == "Accepted" %}
+                            <div class="reservation-status" id="booked">
+                                <p>Booked</p>
+                            </div>
+                            {% elif reservation.booking_status|title == "Paid" %}
+                            <div>
+                                <p class="reservation-status" id="pending">Pending</p>
+                                <p class="pending-reminder">-Please check your email</p>
+                            </div>
+                            {% elif reservation.booking_status|title == "Rejected" %}
+                            <div class="reservation-status" id="canceled">
+                                <p>Cancelled</p>
+                            </div>
+                            {% endif %}
+                            <p class="reservation-info-position" style="max-width:200px;">
+                                <span id="highlighted">{{reservation.experience_title}}</span><br>
+                                with <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span><br>
+                                from {{reservation.payment_city}}, {{reservation.payment_country}}
+                            </p>
+                        </div>
+                        <div class="add-note" style="display:none;">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="+ Add a note">
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+		    	{% endfor %}
+    		</div>
+
+            <div class="right-content-box" id="completed-reservation">
+		        <div class="right-content-box-header">
+                    <p class="right-content-box-heading">Past Reservations</p>
+                </div>
+
+		        {% for reservation in past_reservations %}
+                <div class="listedItem flexHeight">
+                    <div class="line">
+                        <div class="icon-group">
+                            <div id="date">
+                                <div class="icon"></div>
+                                <p>{{reservation.booking_datetime|date:'d-M-Y'}}</p>
+                            </div>
+                        </div>
+                        <div class="icon-group">
+                            <div id="time">
+                                <div class="icon"></div>
+                                <p>{{reservation.booking_datetime|date:'H:i'}}</p>
+                            </div>
+                        </div>
+                        <div class="icon-group">
+                            <div id="people">
+                                <div class="icon"></div>
+                                <p>{{reservation.booking_guest_number}}</p>
+                            </div>
+                        </div>
+
+                        <img class="thumbnail" src="{{ MEDIA_URL }}thumbnails/experiences/experience{{reservation.experience_id}}_1.jpg">
+                        <div class="reservation-info">
+                            {% if reservation.booking_status|title == "Accepted" %}
+                            <div class="reservation-status" id="completed">
+                                <p>Completed</p>
+                            </div>
+                            {% else %}
+                            <div class="reservation-status" id="canceled">
+                                <p>Cancelled</p>
+                            </div>
+                            {% endif %}
+                        
+                            <p class="reservation-info-position">
+                                <span id="highlighted">{{reservation.experience_title}}</span></br>
+                                with 
+                                <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span>
+                                in {{reservation.experience_city}}
+                            </p>
+                        </div>
+                    </div>
+                </div> 
+		    	{% endfor %}
+    		</div>
+    	</div>
+    </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+.icon{background-image:url(/images/icons.gif);}
+.searchbar{background-image:url(/images/searchbar.jpg);}
+
+@media all and (min-width: 768px) {
+.jumbotron {background-image:url(/images/melbourne.jpg);}
+.tease-box{background-image:url(/images/exps_l.jpg);}
+.support {background-image: url(/images/support_logos_l.jpg);}
+.homepage-logo{background-image:url(/images/tripalocal_hompage_logo.png);}
+.book-tease{ background-image:url(/images/stars.jpg);}
+.footer-logo{background-image: url(/images/footer_logo.png);}
+.rev01{background-image:url(/images/rev01.jpg)}
+.rev02{background-image:url(/images/rev02.jpg)}
+.rev03{background-image:url(/images/rev03.jpg)}
+}
+@media all and (max-width: 767px) {
+.jumbotron {background-image:url(/images/melbourne_s.jpg);}
+.tease-box{background-image:url(/images/exps_s.jpg);}
+.support {background-image: url(/images/support_logos_s.jpg);}
+.homepage-logo{background-image:url(/images/tripalocal_hompage_logo_s.png);}
+.rev01{background-image:url(/images/rev01_s.jpg)}
+.rev02{background-image:url(/images/rev02_s.jpg)}
+.rev03{background-image:url(/images/rev03_s.jpg)}
+}
+
+#twitter span { background-image:url(/images/icons_social.png); background-position: 0px -30px;}
+#facebook span{ background-image:url(/images/icons_social.png); background-position: -30px -30px;}
+#linkedin span{ background-image:url(/images/icons_social.png); background-position: -90px -30px;}

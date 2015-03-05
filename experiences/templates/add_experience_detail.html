@@ -1,0 +1,323 @@
+{% extends "app/layout.html" %}
+
+{% load i18n %}
+
+{% block head %}
+    {{ wizard.form.media }}
+    <title>Add a new experience -- Detail</title>
+{% endblock %}
+
+{% block content %}
+<form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+{{ wizard.management_form }}
+{{ wizard.form.id }}
+{{ wizard.form.changed_steps }}
+    <div class="back_button">
+        <button name="wizard_save_exit_detail" type="submit" val="">Save and Exit</button>
+    </div>
+{%if not edit%}
+    <!-- left-side menu -->
+    <div class="left-side-bar">
+    <!-- Essential -->
+   	    <p class="list-menu">Essential</p>
+	
+   	    <p class="list-tab"><strong>Calender</strong></p>
+        <p><img src="/images/done.jpg" alt="" class="modify-icon"></p>
+   	    <p class="list-tab"><strong>Pricing</strong></p>
+   	    <p><img src="/images/done.jpg" alt="" class="modify-icon"></p>
+    
+        <!-- description -->
+   	    <p class="list-menu">Description</p>
+   	    <p class="list-tab"><strong>Overview</strong></p>
+	    <p><img src="/images/done.jpg" alt="" class="modify-icon"></p>
+	    <p class="list-tab" id="active-tab"><strong>Details</strong></p>
+	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon"></p>
+	    <p class="list-tab" ><strong>Photos</strong></p>
+	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon"></p>
+	    <p class="list-tab" ><strong>Location</strong></p>
+	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon"></p>
+
+        <!-- Steps Remaining -->
+        <p id="steps-remaining">3 more steps<br>until publish!</p>
+    </div>
+    <!-- left-side menu ends -->
+{%else%}
+    <!-- left-side menu -->
+    <div class="left-side-bar">
+    <!-- Essential -->
+   	    <p class="list-menu">Essential</p>
+	
+   	    <button name="wizard_next_step" type="submit" value="calendar" class="list-tab-button"><strong>Calender</strong></button>
+   	    <button name="wizard_next_step" type="submit" value="price" class="list-tab-button"><strong>Pricing</strong></button>
+    
+        <!-- description -->
+   	    <p class="list-menu">Description</p>
+   	    <button name="wizard_next_step" type="submit" value="overview" class="list-tab-button"><strong>Overview</strong></button>
+	    <p class="list-tab" id="active-tab"><strong>Details</strong></p>
+	    <button name="wizard_next_step" type="submit" value="photo" class="list-tab-button"><strong>Photos</strong></button>
+	    <button name="wizard_next_step" type="submit" value="location" class="list-tab-button"><strong>Location</strong></button>
+    </div>
+    <!-- left-side menu ends -->
+{%endif%}
+    <div class="calendar">
+        <ul id="myTab" class="nav nav-tabs">
+            {%if language == "cn" %}
+            <li class="active"><a id="detail_tab" role="button" data-toggle="tab">中文（简体）</a></li>
+            <li><a id="detail_other_tab" role="button" data-toggle="tab">English</a></li>
+            {%else%}
+            <li class="active"><a id="detail_tab" role="button" data-toggle="tab">English</a></li>
+            <li><a id="detail_other_tab" role="button" data-toggle="tab">中文（简体）</a></li>
+            {%endif%}
+        </ul>
+
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade in active" id="english">
+                <div class="section" id="section-details">
+                    <div id="location">  
+                        <p id="photo-heading"><strong>Details</strong></p><br><br><br>
+                        <p id="location-details">
+                            <span>Descriptions of your</span><br>
+                            <span>experience displayed</span><br>
+                            <span>on your public listing</span><br>
+                            <span>page.</span><br>
+                        </p>
+                    </div>
+        
+                    <div id="activity_div" class="activity-instruction">
+                        <p id="meet-up-heading">Activity</p>
+                        {{ wizard.form.activity }}<br>
+                        <p id="characters-left"><label id="id_detail_activity_limit"></label></p>
+                    </div> 
+
+                    <div id="other_activity_div" class="activity-instruction" style="display:none;">
+                        <p id="meet-up-heading">Activity</p>
+                        {{ wizard.form.activity_other }}<br>
+                        <p id="characters-left"><label id="id_detail_activity_limit_other"></label></p>
+                    </div> 
+
+                    <div id="interaction_div" class="drop-off-instruction">
+                        <p id="drop-off-heading">Interaction</p>
+                        {{ wizard.form.interaction }}<br>
+                        <p id="characters-left"><label id="id_detail_interaction_limit"></label></p>
+                    </div>
+
+                    <div id="other_interaction_div" class="drop-off-instruction" style="display:none;">
+                        <p id="drop-off-heading">Interaction</p>
+                        {{ wizard.form.interaction_other }}<br>
+                        <p id="characters-left"><label id="id_detail_interaction_limit_other"></label></p>
+                    </div>
+
+                    <div id="dress_div" class="drop-off-instruction">
+                        <p id="drop-off-heading">Appropriate Dress</p>
+                        {{ wizard.form.dress_code }}<br>
+                        <p id="characters-left"><label id="id_detail_dress_limit"></label></p>
+                    </div>
+
+                    <div id="other_dress_div" class="drop-off-instruction" style="display:none;">
+                        <p id="drop-off-heading">Appropriate Dress</p>
+                        {{ wizard.form.dress_code_other }}<br>
+                        <p id="characters-left"><label id="id_detail_dress_limit_other"></label></p>
+                    </div>
+                </div>
+
+                <div class="section" id="section-included">
+                    <div id="location">  
+                        <p id="photo-heading"><strong>What's included</strong></p><br><br><br>
+                        <p id="location-details">
+                            <span>Please specify what</span><br>
+                            <span>exactly you are offer-</span><br>
+                            <span>ing, if no, please</span><br>
+                            <span>specify how much it</span><br>
+                            <span>will roughly cost for</span><br>
+                            <span>your guest</span><br>
+                        </p>
+                    </div>
+
+                    <div id="yes-no-check">
+                        <p style="padding-left:115px;">&nbsp;</p>
+                        <p id="yes-no-detail">Yes</p>
+                        <p id="yes-no-detail">No</p>
+                        <p id="yes-no-detail">Detail</p>
+                    </div>
+                    <br><br><br>
+                    <div id="included-check">
+                        <p>Food</p>
+                        {{wizard.form.included_food_detail}}
+                        {{wizard.form.included_food_detail_other}}<br>
+                        {{wizard.form.included_food}}
+                    </div>
+                    <br><br>
+                    <div id="included-check">
+                        <p>Transport</p>
+                        {{wizard.form.included_transport_detail}}
+                        {{wizard.form.included_transport_detail_other}}<br>
+                        {{wizard.form.included_transport}}
+                    </div>
+                    <br><br><br><br><br><br>
+                    <div id="included-check">
+                        <p>Ticket</p>
+                        {{wizard.form.included_ticket_detail}}
+                        {{wizard.form.included_ticket_detail_other}}<br>
+                        {{wizard.form.included_ticket}}
+                    </div>
+                </div>
+                <div class="section" style="text-align:right;">
+                    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" id="last-step">Last Step</button>
+                    <button name="wizard_save_exit_detail" type="submit" value="" id="save-and-exit">Save and Exit</button>
+                    <input type="submit" value="Next Step" id="next-step" />
+                </div>
+            </div> 
+        </div>
+    </div>
+
+    <!-- Info bar -->
+    <div class="info-bar" style="width:300px;">
+        <img src="/images/bubble-icon.png" alt="">
+        <div id="hint-msgs">
+            <p>
+                <span><strong>Activity</strong></span><br>
+                <span>This is where you write</span><br>
+                <span>of your experience.</span><br>
+                <span>Where would you take your</span><br>
+                <span>guests to?</span><br>
+                <span>What would you do with</span><br>
+                <span>your guests?</span><br>
+                <span>Please write as first person.</span><br>
+            </p>
+        </div>
+        <img src="/images/bubble-icon.png" alt="">
+        <div id="hint-msgs">
+            <p>
+                <span><strong>Interaction</strong></span><br>
+                <span>How much would you inter-</span><br>
+                <span>act with your guests?</span><br>
+                <span>What's your communication</span><br>
+                <span>style?</span><br>
+                <span>Please write as a paragraph.</span><br>
+            </p>
+        </div>
+        <img src="/images/bubble-icon.png" alt="">
+        <div id="hint-msgs">
+            <p>
+                <span><strong>Appropriate dress</strong></span><br>
+                <span>What will the weather be</span><br>
+                <span>like?</span><br>
+                <span>Will there be a lot of walking</span><br>
+                <span>involved?</span><br>
+                <span>What will the locals wear?</span><br>
+                <span>your guests?</span><br>
+                <span>Please write as a paragraph.</span><br>
+            </p>
+        </div>
+        <img src="/images/bubble-icon.png" alt="">
+        <div id="hint-msgs">
+            <p>
+                <span><strong>What's included</strong></span><br>
+                <span>If a cost is included, simply</span><br>
+                <span>describe what is it. If a cost</span><br>
+                <span>is not included, please give</span><br>
+                <span>a best estimate to how</span><br>
+                <span>much it may cost, or if it's</span><br>
+                <span>not required.</span><br>
+            </p>
+        </div>
+        <br>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script charset="utf-8" type="text/javascript">
+    function countChar(object, limit, hint) {
+        var len = object.val().length;
+        if (len >= limit) {
+          object.val(object.val().substring(0, limit));
+        } else {
+          hint.text(limit - len + ' characters left');
+        }
+    };
+
+    $(document).ready(function(){
+        $('body').attr('id','background-white');
+        $("#id_detail-changed_steps").val($("#id_detail-changed_steps").val()+'detail,');
+        item = ["food","transport","ticket"];
+        $("#id_detail-included_ticket_detail_other").attr("style","display:none;");
+        $("#id_detail-included_transport_detail_other").attr("style","display:none;");
+        $("#id_detail-included_food_detail_other").attr("style","display:none;");
+
+        $("label[for='id_detail-included_food_0']").attr("style","padding-left:45px;");
+        $("label[for='id_detail-included_transport_0']").attr("style","padding-left:16px;");
+        $("label[for='id_detail-included_ticket_0']").attr("style","padding-left:40px;");
+
+        for(i=0;i<item.length;i++)
+        {
+            for(j=0;j<2;j++)
+            {
+                str = $("label[for='id_detail-included_"+item[i]+"_"+j+"']")[0].innerHTML;
+                str = str.substring(0, str.indexOf('>')+1);
+                $("label[for='id_detail-included_"+item[i]+"_"+j+"']")[0].innerHTML=str;
+            }
+        }
+    })
+
+    $("#detail_tab").click(function(e) {
+        $("#activity_div").attr("style","");
+        $("#interaction_div").attr("style","");
+        $("#dress_div").attr("style","");
+
+        $("#other_activity_div").attr("style","display:none;");
+        $("#other_interaction_div").attr("style","display:none;");
+        $("#other_dress_div").attr("style","display:none;");
+
+        $("#id_detail-included_ticket_detail").attr("style","");
+        $("#id_detail-included_transport_detail").attr("style","");
+        $("#id_detail-included_food_detail").attr("style","");
+
+        $("#id_detail-included_ticket_detail_other").attr("style","display:none;");
+        $("#id_detail-included_transport_detail_other").attr("style","display:none;");
+        $("#id_detail-included_food_detail_other").attr("style","display:none;");
+    })
+
+    $("#detail_other_tab").click(function(e) {
+        $("#activity_div").attr("style","display:none;");
+        $("#interaction_div").attr("style","display:none;");
+        $("#dress_div").attr("style","display:none;");
+
+        $("#other_activity_div").attr("style","");
+        $("#other_interaction_div").attr("style","");
+        $("#other_dress_div").attr("style","");
+
+        $("#id_detail-included_ticket_detail").attr("style","display:none;");
+        $("#id_detail-included_transport_detail").attr("style","display:none;");
+        $("#id_detail-included_food_detail").attr("style","display:none;");
+
+        $("#id_detail-included_ticket_detail_other").attr("style","");
+        $("#id_detail-included_transport_detail_other").attr("style","");
+        $("#id_detail-included_food_detail_other").attr("style","");
+    })
+
+    $("#id_detail-activity").keyup(function() {
+        countChar($("#id_detail-activity"), 500, $("#id_detail_activity_limit"));
+    });
+
+    $("#id_detail-activity_other").keyup(function() {
+        countChar($("#id_detail-activity_other"), 500, $("#id_detail_activity_limit_other"));
+    });
+
+    $("#id_detail-interaction").keyup(function() {
+        countChar($("#id_detail-interaction"), 500, $("#id_detail_interaction_limit"));
+    });
+
+    $("#id_detail-interaction_other").keyup(function() {
+        countChar($("#id_detail-interaction_other"), 500, $("#id_detail_interaction_limit_other"));
+    });
+
+    $("#id_detail-dress_code").keyup(function() {
+        countChar($("#id_detail-dress_code"), 500, $("#id_detail_dress_limit"));
+    });
+
+    $("#id_detail-dress_code_other").keyup(function() {
+        countChar($("#id_detail-dress_code_other"), 500, $("#id_detail_dress_limit_other"));
+    });
+</script> 
+{% endblock %}

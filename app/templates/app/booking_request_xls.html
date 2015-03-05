@@ -1,0 +1,14 @@
+{% extends "app/layout.html" %}
+{% load staticfiles %}
+
+{% block head %}
+	<title>Save Booking Request from XLS</title>
+{% endblock %}
+
+{% block content %}
+    <form id="my_profile_form" method="post" action="" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input id="id_submit" type="submit" class="btn btn-primary btn-sm" value="Submit" />
+    </form>
+{% endblock %}

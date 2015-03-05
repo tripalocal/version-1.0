@@ -1,0 +1,108 @@
+{% extends "app/layout.html" %}
+{% load staticfiles %}
+
+{% block head %}
+	<title>My Trips</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="tab_area">
+        <div class="fixCenter">
+            <div class="tab_item">
+                <a href="/mylisting">My Listing</a>
+                <a href="#" id="active-tab">My Trip</a>
+                <a href="/myprofile">My Profile</a>
+                <a href="/accounts/password/change/">My Account</a>
+            </div>
+        </div>
+    </div>
+
+	<div class="row row-area">
+    	<div class="content-area fixCenter">
+    		<div class="leftsubMenu">
+    			<p>My Trip</p>    
+    		</div>
+
+			<div class="rightInterface">
+		        <p id="right_box">My Trip</p>
+
+		        <hr><!--Initial Linebreak for trips page TAKE OUT IF NO BOOKING-->
+		        <!-- FIRST DATE -->
+		        {% for bookings_on_date in bookings_all %}
+			        <!-- IF NOT firstIndex: <div style="margin-top:15px;"></div> -->
+			        {% for booking in bookings_on_date %}
+				        <table>
+				        	<tbody>
+				          		<tr>
+                                    <div style="margin-top:15px;">
+				          			    <td>
+				            			    <div id="date" style="margin-left:28px; margin-right:0px; color:#858585;"><div class="icon" style="margin-left:22px;"></div>{{booking.datetime|date:'d-M-Y'}}<!--local date--></div>
+				            		    </td>
+				            		    <td>
+				            			    <div id="time" style="margin-left:0px; color:#858585;"><div class="icon" style="margin-left:5px;"></div>{{booking.datetime|date:'H:i'}}<!--local time of event--></div>
+				            		    </td> 
+				            		    <td>
+				             			    <div id="people" style="margin-left:0px; color:#858585;"><div class="icon" style="margin-left:-10px;"></div>{{booking.guest_number}}<!--number of tickets--></div>
+				            		    </td>
+				            		    <td>
+				              			    <div id="img1"><img src="{{ MEDIA_URL }}thumbnails/experiences/experience{{booking.experience.id}}_1.jpg" width="100" height="60"></div><!--link to photo-->
+				            		    </td>
+				            		    <td>
+				            			    <div>
+                                                {% if booking.status|lower == "accepted" %}
+					               			    <div class="confirm"><div style="margin-left:5px;">Confirmed</div></div>
+                                                {% elif booking.status|lower == "rejected" %}
+                                                <div class="cancel"><div style="margin-left:5px;">Cancelled</div></div>
+                                                {% else %}
+                                                <div class="request"><div style="margin-left:5px;">Requested</div></div>
+                                                {% endif %}
+					               			    <div class="confirm_topic" style="color:#2BC7CD;margin-top:5px;"><a href="/experience/{{booking.experience.id}}">{{ booking.experience.title }}</a></div>
+					               			    <div class="confirm_topic">with <span style="color:#2BC7CD;">{% for h in booking.experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</span> in {{ booking.experience.city }}</div>
+					            		    </div>
+				        			    </td>
+                                    </div>
+				        		</tr>
+				        	</tbody>
+				     	</table>
+
+				        <table>
+					        <tbody>
+					         	<tr>
+                                    <div style="margin-top:15px;">
+							            <td>
+							               <div>
+							             	    <div class="map_box" style="margin-top:15px; margin_bottom:15px;">
+								                    Meet up location: {{booking.experience.meetup_spot}}
+								                    <button id="map_button" class="map_button" name="{{booking.experience.meetup_spot}} {{booking.experience.city}}"> Map </button>
+							             	    </div>
+							               </div>
+							            </td>
+                                    </div>
+					        	</tr>
+					        </tbody>
+				    	</table>
+			    	{% endfor %}
+                {% empty %}
+                <p style="width:200px;">You have not booked any trips.</p>   
+		    	{% endfor %}
+    		</div>
+    	</div>
+    </div>
+{% endblock %}
+
+{%block scripts %}
+<script charset="utf-8" type="text/javascript">
+    $(".map_button").click(function(e){
+        s = e.target.name.split(" ");
+        url = "https://maps.google.com?q=";
+        for(i=0;i<s.length;i++)
+        {
+            url += s[i] + "+";
+        }
+        url = url.substring(0,url.length-1);
+
+        window.open(url);
+    })
+</script>
+{%endblock%}

@@ -1,0 +1,304 @@
+from experiences.models import Booking, Experience, Payment
+from rest_framework import status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponseRedirect, HttpResponse, Http404
+import json, pytz, xlrd, re, os, subprocess
+from django.contrib.auth.models import User
+from datetime import *
+from app.models import RegisteredUser
+from post_office import mail
+from Tripalocal_V1 import settings
+from tripalocal_messages.models import Aliases, Users
+from experiences.forms import email_account_generator, ExperienceForm
+from django.db import connections
+from django.template import loader, RequestContext, Context
+from django.template.loader import get_template
+from app.forms import BookingRequestXLSForm
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext
+
+def isLegalInput(inputs):
+    for input in inputs:
+        if not re.match("^[\(\)\w\d\.\s:@_-]*$", input):
+            return False
+
+    return True
+
+def saveBookingRequest(booking_request):
+    first_name = booking_request['first_name']
+    last_name = booking_request['last_name']
+    email = booking_request['email']
+    city = booking_request['city']
+    country = booking_request['country']
+    phone = booking_request['phone']
+    experience_id = booking_request['experience_id']
+    guest_number = booking_request['guest_number']
+    booking_datetime = booking_request['booking_datetime']
+    booking_extra_information = booking_request['booking_extra_information']
+
+    if not isLegalInput([first_name,last_name,email,city,country,phone,experience_id,guest_number,booking_datetime,booking_extra_information]):
+        raise Exception("Illegal input")
+
+    experience = Experience.objects.get(id=experience_id)
+
+    #create a new account if the user does not exist
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        count = len(User.objects.filter(first_name__iexact=first_name))
+        if count > 0 :
+            user = User(first_name = first_name, last_name = last_name, email = email,
+                        username = first_name+str(count+1),
+                        date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                        last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
+        else:
+            user = User(first_name = first_name, last_name = last_name, email = email,
+                        username = first_name,
+                        date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                        last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
+        user.save()
+        password = User.objects.make_random_password()
+        user.set_password(password)
+        user.save()
+        profile = RegisteredUser(user = user, phone_number = phone)
+        profile.save()
+
+        cursor = connections['default'].cursor()
+        cursor.execute("Insert into account_emailaddress ('user_id','email','verified','primary') values (%s, %s, %s, %s)", 
+                       [user.id, email, 1, 1])
+
+        #copy to the chinese website database
+        cursor = connections['cndb'].cursor()
+        cursor.execute("Insert into auth_user ('id','first_name','last_name','email') values (%s, %s, %s, %s)", 
+                        [user.id,user.first_name, user.last_name, user.email])
+        cursor.execute("Insert into app_registereduser ('user_id') values (%s)", [user.id])
+
+        username = user.username
+
+        new_email = Users(id = email_account_generator() + ".user@tripalocal.com",
+                            name = username,
+                            maildir = username + "/")
+        new_email.save()
+
+        new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
+        new_alias.save()
+
+        with open('/etc/postfix/canonical', 'a') as f:
+            f.write(user.email + " " + new_email.id + "\n")
+            f.close()
+
+        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    
+        with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+            f.write(new_email.id + "\n")
+            f.close()
+                    
+        #send a welcome email
+        mail.send(subject='[Tripalocal] Successfully registered', message='', sender='Tripalocal <enquiries@tripalocal.com>',
+                      recipients = [email], priority='now', html_message=loader.render_to_string('app/email_auto_registration.html',
+                                                                                                 {'email':user.email, 'password':password, 'url':'https://www.tripalocal.com/accounts/login?next=/accounts/password/change'}))
+
+    #record the booking request
+    local_timezone = pytz.timezone(settings.TIME_ZONE)
+    booking = Booking(user = user, experience = experience, guest_number = guest_number, 
+                        datetime = local_timezone.localize(datetime.strptime(booking_datetime, '%Y-%m-%d %H:%M')).astimezone(pytz.timezone("UTC")),
+                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="accepted", booking_extra_information=booking_extra_information)
+    booking.save()
+
+    payment = Payment(booking = booking, city = city, country = country, phone_number = phone)
+    payment.save()
+
+    booking.payment_id = payment.id
+    booking.save()
+
+    #add the user to the guest list
+    if user not in experience.guests.all():
+        #experience.guests.add(user)
+        cursor = connections['experiencedb'].cursor()
+        cursor.execute("Insert into experiences_experience_guests ('experience_id','user_id') values (%s, %s)", [experience_id, user.id])
+
+    ## send an email to the host
+    #mail.send(subject='[Tripalocal] ' + user.first_name + ' has requested your experience', message='',
+    #            sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+    #            recipients = [Aliases.objects.filter(destination__contains=experience.hosts.all()[0].email)[0].mail], #fail_silently=False,
+    #            priority='now',
+    #            html_message=loader.render_to_string('email_booking_requested_host.html', 
+    #                                                    {'experience': experience,
+    #                                                    'booking':booking,
+    #                                                    'user_first_name':user.first_name,
+    #                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+    #                                                    'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
+    #                                                    'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))
+    ## send an email to the traveler
+    #mail.send(subject='[Tripalocal] You booking request is sent to the host',  message='', 
+    #            sender='Tripalocal <' + Aliases.objects.filter(destination__contains=experience.hosts.all()[0].email)[0].mail + '>',
+    #            recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], #fail_silently=False,
+    #            priority='now', 
+    #            html_message=loader.render_to_string('email_booking_requested_traveler.html',
+    #                                                    {'experience': experience, 
+    #                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+    #                                                    'booking':booking}))
+
+    host = experience.hosts.all()[0]
+    #send an email to the traveller
+    mail.send(subject='[Tripalocal] Booking confirmed', message='', 
+                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
+                priority='now',  #fail_silently=False, 
+                html_message=loader.render_to_string('email_booking_confirmed_traveler.html',
+                                                    {'experience': experience,
+                                                    'booking':booking,
+                                                    'user':user, #not host --> need "my" phone number
+                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+            
+    #schedule an email for reviewing the experience
+    mail.send(subject='[Tripalocal] How was your experience?', message='', 
+                sender='Tripalocal <enquiries@tripalocal.com>',
+                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
+                priority='high',  scheduled_time = booking.datetime + timedelta(days=1), 
+                html_message=loader.render_to_string('email_review_traveler.html',
+                                                    {'experience': experience,
+                                                    'booking':booking,
+                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                    'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id)}))
+
+    #send an email to the host
+    mail.send(subject='[Tripalocal] Booking confirmed', message='', 
+                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+                priority='now',  #fail_silently=False, 
+                html_message=loader.render_to_string('email_booking_confirmed_host.html',
+                                                    {'experience': experience,
+                                                    'booking':booking,
+                                                    'user':user, # guest here
+                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+
+    #schedule an email to the traveller one day before the experience
+    mail.send(subject='[Tripalocal] Booking reminder', message='', 
+                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
+                priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
+                html_message=loader.render_to_string('email_reminder_traveler.html',
+                                                    {'experience': experience,
+                                                    'booking':booking,
+                                                    'user':user, #not host --> need "my" phone number
+                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+            
+    #schedule an email to the host one day before the experience
+    mail.send(subject='[Tripalocal] Booking reminder', message='', 
+                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+                priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
+                html_message=loader.render_to_string('email_reminder_host.html',
+                                                    {'experience': experience,
+                                                    'booking':booking,
+                                                    'user':user,
+                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+
+def saveBookingRequestsFromXLS(request):
+    if not (request.user.is_authenticated() and request.user.is_superuser):
+        return HttpResponseRedirect("/accounts/login/?next=/booking_request_xls")
+
+    context = RequestContext(request)
+    if request.method == 'POST':
+        form = BookingRequestXLSForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                file = request.FILES['file']
+                name, extension = os.path.splitext(file.name)
+                extension = extension.lower();
+                if extension in ('.xls', '.xlsx') :
+                    for chunk in file.chunks():
+                        destination = open(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name), 'wb+')               
+                        destination.write(chunk)
+                        destination.close()
+
+                workbook = xlrd.open_workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name))
+            except OSError:
+                #TODO
+                raise
+
+            worksheet = workbook.sheet_by_name('English')
+            num_rows = worksheet.nrows - 1
+            num_cells = worksheet.ncols - 1
+            curr_row = 0
+            col_names= []
+            legal_names= ['first_name','last_name','email','city','country','phone','experience_id','guest_number','booking_datetime','booking_extra_information']
+
+            curr_cell = -1
+            while curr_cell < num_cells:
+                curr_cell += 1
+                # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                cell_type = worksheet.cell_type(curr_row, curr_cell)
+                cell_value = worksheet.cell_value(curr_row, curr_cell)
+                if cell_type == 1 and cell_value in legal_names:
+                    col_names.append(cell_value)
+                else:
+                    raise Exception("Type error: column name, " + str(curr_cell))
+
+            while curr_row < num_rows:
+                curr_row += 1
+                row = worksheet.row(curr_row)
+
+                curr_cell = -1
+                booking_request={}
+                while curr_cell < num_cells:
+                    curr_cell += 1
+                    # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                    cell_type = worksheet.cell_type(curr_row, curr_cell)
+
+                    if cell_type == 1 or cell_type == 0:
+                        booking_request[col_names[curr_cell]] = worksheet.cell_value(curr_row, curr_cell)
+                    else:
+                        raise Exception("Type error: row " + str(curr_row) + ", col " + str(curr_cell))
+
+                if booking_request:
+                    saveBookingRequest(booking_request)
+    else:
+        form = BookingRequestXLSForm()
+
+    return render_to_response('app/booking_request_xls.html', {'form': form}, context)
+
+#request.data should contain a list of (first_name, last_name, email, country, destination phone number, experience_id, guest_number, booking_datetime, booking_extra_information)
+#e.g.,  "[{\"first_name\": \"test\", \"last_name\": \"test\", \"email\":\"123@123.com\", \"city\":\"Beijing\", \"country\":\"China\", \"phone\":\"121221\", \"experience_id\": \"23\", \"guest_number\": \"2\", \"booking_datetime\":\"2015-01-05 00:00\", \"booking_extra_information\":\"Need Chinese translation\"}]"
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def booking_request(request, format=None):
+    if request.user.is_authenticated() and request.user.is_superuser:
+        try:
+            # a list of requests
+            booking_requests = json.loads(request.data)
+            for booking_request in booking_requests:
+                saveBookingRequest(booking_request)
+
+            return Response("Booking request recorded", status=status.HTTP_201_CREATED)
+        except TypeError as err:
+            #TODO
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return HttpResponseRedirect("/accounts/login/?next=/booking_request")
+
+#https://djangosnippets.org/snippets/2172/
+def ajax_view(request):
+    template = "add_experience_experience.html"
+
+    if request.is_ajax() and request.user.is_authenticated():
+        if request.method == 'POST':
+            request.POST['duration'] = request.POST['experience-duration']
+            request.POST['location'] = request.POST['experience-location']
+            request.POST['title'] = request.POST['experience-title']
+            experience_form = ExperienceForm(request.POST)
+            if experience_form.is_valid():
+                #experience_form.save(commit=True)
+                response={'status':True}
+            else:
+                response={'status':False}
+            return HttpResponse(json.dumps(response, ensure_ascii=False))
+        else:
+            return render_to_response(template, {'form':ExperienceForm()}, context_instance=RequestContext(request))
+    else:
+        raise Http404

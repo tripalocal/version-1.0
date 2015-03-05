@@ -1,0 +1,31 @@
+{% block content %}
+<hr style="margin-bottom:10px;">
+<p>{{coupon.description}}</p>
+
+<div id="coupon_extra_information_div">    
+    {% if guest_number|divisibleby:2 %}
+    <input type="hidden" id="coupon_guest_number" value="{{guest_number}}" readonly>
+    <input id="id_coupon_agreement" type="checkbox" style="margin-bottom:20px;"/><p class="help-message">By booking this listing, you accept Tripalocal terms and conditions, and agree to pay the total amount shown on the right.</p>
+    <div id="id_coupon_term_condition" class="warning-sign" style="width:480px; display:none; margin-bottom:10px;">
+        <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+        <p style="display: inline-block; position:relative; top: 6px; left: 10px;">Please accept terms and conditions</p>
+    </div>
+    {%else%}
+    Sorry, but this promo code is for two-people groups only.
+    {%endif%}
+</div>
+{% endblock %}
+{% block scripts %}
+<script charset="utf-8" type="text/javascript">
+$(function(){
+    $(document).ready(function(){
+        if($("#coupon_guest_number").length && $("#coupon_guest_number").val()%2 == 0)
+        {
+            $("#id_total").text(((parseFloat($("#id_sub_total").text())*0.5)*1.000+0.0).toFixed(2));
+            $("#id_service_fee").text(((parseFloat($("#id_sub_total").text())*0.5)*0.000+0.0).toFixed(2));
+            $("#id_coupon_extra_fee").text("Promo code successfully applied");
+        }
+    })
+})
+</script>
+{% endblock %}

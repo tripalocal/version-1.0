@@ -1,0 +1,203 @@
+{% extends "app/layout.html" %}
+{% load staticfiles %}
+
+{%block head %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Review</title>
+{%endblock%}
+
+{%block content %}
+    {% if not hasBookedExperience %}
+    <div class="container-fluid experience">
+        <div class="row">
+            <div class="fixCenter">
+                <div class="checkoutBox">
+                    You did not book this experience.
+                </div>
+        	</div>
+        </div>
+    </div>
+	{% elif hasLeftReview %}
+    <div class="container-fluid experience">
+        <div class="row">
+            <div class="fixCenter">
+                <div class="checkoutBox">
+		            You left a review for this experience already.
+                </div>
+        	</div>
+        </div>
+    </div>
+	{% else %}
+    <!--
+    <ul>
+		{% for error in form.errors %}
+		<li>{{ error }}</li>
+		{% endfor %}
+	</ul>
+    -->
+    <div class="container-fluid experience">
+        <div class="row">
+            <div class="fixCenter">
+                <div class="checkoutBox">
+                    <form action="" method="post">
+                    {% csrf_token %}
+                        <div class="reviewHeaderPosition">
+                            <h2>How did you go with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}?</h2>
+                        </div>
+                        <div class="row">
+				            <div><p>How did you feel about the overall experience?</p>
+                            </div>
+                            <!-- Star Rating Start-->
+                            <div class="rating_review" align="left">
+                            {% for r in "54321" %}
+                                <span id="rate_star_{{r}}">&#9734;</span>
+                            {% endfor %}
+                            </div>
+                            {{form.rate.as_hidden}}
+                            <div id="rate_result_div" class="rateResult" style="display:none;">
+                                <p id="rate_result" style="display:none;"></p>
+                            </div>
+                            {% if 'rate' in form.errors%}
+                            <p>{{form.rate.errors.as_text}}</p>
+                            {% endif %}
+                            <!-- Star Rating End-->
+                        </div>
+
+                        <div class="row ">
+                            <p>Please leave a review for this experience for the host's public profile</p>
+                            <div class="input-group">  
+                                {{form.comment}}
+                            </div>
+                        </div>
+
+                        <div class="row ">
+                            <p>Is there anything you'd like to tell {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %} personally?</p>
+                            <div class="input-group">
+                                {{form.personal_comment}}
+                            </div>
+                        </div>
+
+                        <div class="row ">
+                            <p>Anything we should know about? (Only Tripalocal team will see this section)
+                                <img src="/images/lock.jpg">
+                            </p>
+                            <div class="input-group">
+                                {{form.operator_comment}}
+                            </div>
+                            <input type="submit" class="btn btn-primary btn-sm submitButton" style="color:#FFFFFF;" value="Submit"/>
+                        </div>
+                    </form>
+                </div>
+	
+                <div class="expList checkoutDetails">
+                	<div class="listingImg" style="background-image:url(		
+		            {% for photo in experience.photo_set.all %}
+                        {% if forloop.first %}
+				            {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
+                        {% endif %}
+                    {% endfor %})">
+                        <div class="profile-md checkout-profile">
+                            <img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240">
+                        </div>
+                    </div>
+
+                    <div class="checkoutBox">
+                        <p>On <strong>{{booking.datetime|date:'d M Y'}}</strong> at <strong>{{booking.datetime|date:'H:i'}}</strong><br>You have experienced </p>
+                        <h3>{{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</h3>
+                        <p>{{ experience.city }}</p>
+                    </div>
+                </div>
+        	</div>
+        </div>
+    </div>
+	{% endif %}
+{%endblock%}
+
+{% block scripts %}
+<script>
+    $(document).ready(function(){
+        $("#id_comment").attr("class","textbox reviewInput");
+        $("#id_comment").attr("cols","");
+        $("#id_comment").attr("rows","");
+        $("#id_personal_comment").attr("class","textbox reviewInput");
+        $("#id_personal_comment").attr("cols","");
+        $("#id_personal_comment").attr("rows","");
+        $("#id_operator_comment").attr("class","textbox reviewInput");
+        $("#id_operator_comment").attr("cols","");
+        $("#id_operator_comment").attr("rows","");
+    })
+
+    $("#rate_star_1").click(function(){
+        $("#id_rate").val(1);
+
+        $("#rate_star_1").html("&#9733;");
+        $("#rate_star_2").html("&#9734;");
+        $("#rate_star_3").html("&#9734;");
+        $("#rate_star_4").html("&#9734;");
+        $("#rate_star_5").html("&#9734;");
+
+        $("#rate_result").attr("style","display:inline-block;");
+        $("#rate_result").html("1 - Not satisfied");
+        $("#rate_result_div").attr("style","display:inline-block;");
+    })
+
+    $("#rate_star_2").click(function(){
+        $("#id_rate").val(2);
+
+        $("#rate_star_1").html("&#9733;");
+        $("#rate_star_2").html("&#9733;");
+        $("#rate_star_3").html("&#9734;");
+        $("#rate_star_4").html("&#9734;");
+        $("#rate_star_5").html("&#9734;");
+
+        $("#rate_result").attr("style","display:inline-block;");
+        $("#rate_result").html("2 - A little disappointed");
+        $("#rate_result_div").attr("style","display:inline-block;");
+    })
+
+    $("#rate_star_3").click(function(){
+        $("#id_rate").val(3);
+
+        $("#rate_star_1").html("&#9733;");
+        $("#rate_star_2").html("&#9733;");
+        $("#rate_star_3").html("&#9733;");
+        $("#rate_star_4").html("&#9734;");
+        $("#rate_star_5").html("&#9734;");
+
+        $("#rate_result").attr("style","display:inline-block;");
+        $("#rate_result").html("3 - It was ok");
+        $("#rate_result_div").attr("style","display:inline-block;");
+    })
+
+    $("#rate_star_4").click(function(){
+        $("#id_rate").val(4);
+
+        $("#rate_star_1").html("&#9733;");
+        $("#rate_star_2").html("&#9733;");
+        $("#rate_star_3").html("&#9733;");
+        $("#rate_star_4").html("&#9733;");
+        $("#rate_star_5").html("&#9734;");
+
+        $("#rate_result").attr("style","display:inline-block;");
+        $("#rate_result").html("4 - It was pleasant");
+        $("#rate_result_div").attr("style","display:inline-block;");
+    })
+    $("#rate_star_5").click(function(){
+        $("#id_rate").val(5);
+
+        $("#rate_star_1").html("&#9733;");
+        $("#rate_star_2").html("&#9733;");
+        $("#rate_star_3").html("&#9733;");
+        $("#rate_star_4").html("&#9733;");
+        $("#rate_star_5").html("&#9733;");
+
+        $("#rate_result").attr("style","display:inline-block;");
+        $("#rate_result").html("5 - It couldn't be better");
+        $("#rate_result_div").attr("style","display:inline-block;");
+    })
+
+</script>
+{% endblock %}
