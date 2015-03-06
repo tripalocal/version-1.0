@@ -78,7 +78,6 @@ urlpatterns = patterns('',
     url(r'^registration_successful', 'app.views.registration_successful', name='registration_successful'),
     url(r'^disclaimer$', 'app.views.disclaimer', name='disclaimer'),
     url(r'^booking/(?P<id>\d+)/$', booking_accepted, name='booking_accepted'),
-<<<<<<< HEAD
     url(r'^s/(?P<city>\S+)/$', ByCityExperienceListView, name='ByCityExperienceListView'),  
     url(r'^freesim/$', 'experiences.views.freeSimPromo', name='freeSimPromo'),
     url(r'^mytrip/$', 'app.views.mytrip'),
@@ -92,13 +91,4 @@ urlpatterns = patterns('',
     url(r'^booking_request_xls/$', 'experiences.resource.saveBookingRequestsFromXLS'),
     #url(r'^experience_autosave$', ajax_view, name="ajax_view"),
     url(r'^experience_availability/$', experience_availability, name='experience_availability'),
-=======
-    url(r'^s/(?P<city>\S+)/$', ByCityExperienceListView, name='ByCityExperienceListView'),
-    url(r'^experiences$', 'experiences.views.experiences', name='experiences'),
-    url(r'^experiences_ch$', 'experiences.views.experiences_ch', name='experiences_ch'),
-    url(r'^prelaunch/livesite/experiences$', 'experiences.views.experiences_pre', name='experiences_pre'),
-    url(r'^prelaunch/livesite/experiences_ch$', 'experiences.views.experiences_ch_pre', name='experiences_ch_pre'),
-
-    url(r'^s/(?P<city>\S+)/$', ByCityExperienceListView, name='ByCityExperienceListView'),
->>>>>>> 35d82b2097a46c5c659ae49ee2f5e183958f0ee3
 )
