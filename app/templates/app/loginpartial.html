@@ -9,18 +9,38 @@
 
 </form>-->
 <ul class="menu">
-        <li><a id="id_language_top" class="menu-language">中文</a></li>
-        <li><a href="/accounts/logout/">Log out</a></li>
-        <li>{{ user.first_name }}</li>
-        <li>
-            <div class="profile-xs">
-                <a href="/myprofile">
-                    <img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/>
-                </a>
-            </div>
-        </li>    
-    </ul>
+    <li><a id="id_language_top" class="menu-language">中文</a></li>
+    <li><a href="/accounts/logout/">Log out</a></li>
+    <li>{{ user.first_name }}</li>
+    <li>
+        <div class="profile-xs" id="id_profile_div">
+            <!--<a href="/myprofile"></a>-->
+            <img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/>
+        </div>
+    </li>    
+</ul>
 
+<div class = "menu-host" id="id_menu" hide="true" style="display:none;">
+    <div class = "menuhost-top">
+        <ul>
+            <li><a href="/mylisting">My Listing</a></li>
+            <li><a href="/myreservation">My Reservations</a></li>
+        </ul>
+    </div>
+    <div class = "menuhost-middle">
+        <ul>
+            <li><span class = "menutrip-logo"></span></li>
+            <li><a href="/mytrip">My Trip</a></li>
+        </ul>
+    </div>
+    <div class = "menuhost-bottom">
+        <ul>
+            <li><a href="/myprofile">Edit Profile</a></li>
+            <li><a href="/accounts/password/change/">Account Settings</a></li>
+            <li><a href="/accounts/logout/">Log out</a></li>
+        </ul>
+    </div>
+ </div>
 
 {% else %}
 

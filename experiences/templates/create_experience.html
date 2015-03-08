@@ -221,6 +221,56 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_5}}
                             </div>
+                            <br>
+                            {%if form.files.experience_photo_6%}
+                            <input id="uploadImage_6" placeholder="{{form.files.experience_photo_6.name}}" class="uploadImage" disabled="disabled" />
+                            {%else%}
+                            <input id="uploadImage_6" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.experience_photo_6}}
+                            </div>
+                            <br>
+                            {%if form.files.experience_photo_7%}
+                            <input id="uploadImage_7" placeholder="{{form.files.experience_photo_7.name}}" class="uploadImage" disabled="disabled" />
+                            {%else%}
+                            <input id="uploadImage_7" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.experience_photo_7}}
+                            </div>
+                            <br>
+                            {%if form.files.experience_photo_8%}
+                            <input id="uploadImage_8" placeholder="{{form.files.experience_photo_8.name}}" class="uploadImage" disabled="disabled" />
+                            {%else%}
+                            <input id="uploadImage_8" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.experience_photo_8}}
+                            </div>
+                            <br>
+                            {%if form.files.experience_photo_9%}
+                            <input id="uploadImage_9" placeholder="{{form.files.experience_photo_9.name}}" class="uploadImage" disabled="disabled" />
+                            {%else%}
+                            <input id="uploadImage_9" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.experience_photo_9}}
+                            </div>
+                            <br>
+                            {%if form.files.experience_photo_10%}
+                            <input id="uploadImage_10" placeholder="{{form.files.experience_photo_10.name}}" class="uploadImage" disabled="disabled" />
+                            {%else%}
+                            <input id="uploadImage_10" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.experience_photo_10}}
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -260,72 +310,23 @@
         $("#id_interaction").attr("rows", 5);
         $("#id_dress_code").attr("rows", 3);
         $("#id_meetup_spot").attr("rows", 5);
-        $("#id_experience_photo_1").attr("class", "upload");
-        $("#id_experience_photo_2").attr("class", "upload");
-        $("#id_experience_photo_3").attr("class", "upload");
-        $("#id_experience_photo_4").attr("class", "upload");
-        $("#id_experience_photo_5").attr("class", "upload");
-    })
 
-
-    $("#id_experience_photo_1").change(function(){
-        string = $("#id_experience_photo_1").val();
-        index=-1;
-        index = string.lastIndexOf("\\");
-        if(index==-1)
+        for(i=1;i<11;i++)
         {
-            index = string.lastIndexOf("/");
+            $("#id_experience_photo_"+i).attr("class", "upload");
+
+            $("#id_experience_photo_"+i).change(function(){
+                string = $("#id_experience_photo_"+i).val();
+                index=-1;
+                index = string.lastIndexOf("\\");
+                if(index==-1)
+                {
+                    index = string.lastIndexOf("/");
+                }
+
+                $("#uploadImage_"+i).val(string.substring(index+1));
+            })
         }
-
-        $("#uploadImage_1").val(string.substring(index+1));
-    })
-
-    $("#id_experience_photo_2").change(function(){
-        string = $("#id_experience_photo_2").val();
-        index=-1;
-        index = string.lastIndexOf("\\");
-        if(index==-1)
-        {
-            index = string.lastIndexOf("/");
-        }
-
-        $("#uploadImage_2").val(string.substring(index+1));
-    })
-
-    $("#id_experience_photo_3").change(function(){
-        string = $("#id_experience_photo_3").val();
-        index=-1;
-        index = string.lastIndexOf("\\");
-        if(index==-1)
-        {
-            index = string.lastIndexOf("/");
-        }
-
-        $("#uploadImage_3").val(string.substring(index+1));
-    })
-
-    $("#id_experience_photo_4").change(function(){
-        string = $("#id_experience_photo_4").val();
-        index=-1;
-        index = string.lastIndexOf("\\");
-        if(index==-1)
-        {
-            index = string.lastIndexOf("/");
-        }
-
-        $("#uploadImage_4").val(string.substring(index+1));
-    })
-
-    $("#id_experience_photo_5").change(function(){
-        string = $("#id_experience_photo_5").val();
-        index=-1;
-        index = string.lastIndexOf("\\");
-        if(index==-1)
-        {
-            index = string.lastIndexOf("/");
-        }
-
-        $("#uploadImage_5").val(string.substring(index+1));
     })
 
 /*

@@ -32,6 +32,8 @@ from django.utils.translation import ugettext_lazy as _
 from post_office import mail
 from collections import OrderedDict
 
+MaxPhotoNumber=10
+
 def experience_fee_calculator(price):
     if type(price)==int or type(price) == float:
         return round(price*(1.00+settings.COMMISSION_PERCENT)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2)
@@ -184,17 +186,23 @@ def experience_availability(request):
                 instantbooking_i=0
                 while (sdt <= end_datetime):
                     sdt_local = sdt.astimezone(local_timezone)
-                    if sdt.astimezone(local_timezone).date() != last_sdt.astimezone(local_timezone).date():
+                    if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):#daylight saving
+                        if not sdt_local.dst() != timedelta(0):# not daylight saving
+                            sdt_local = sdt_local + relativedelta(hours=1)
+                    elif sdt_local.dst() != timedelta(0):
+                        sdt_local = sdt_local - relativedelta(hours=1)
+
+                    if sdt_local.date() != last_sdt.date():
                         new_date = sdt_local.strftime("%Y/%m/%d")
                         experience_avail['dates'][new_date] = []
-                        last_sdt = sdt
+                        last_sdt = sdt_local
             
                     #check if the date is blocked
                     blocked = False
 
                     #block 10pm-7am if repeated hourly
-                    if experience.repeat_cycle == "Hourly" and (sdt_local.time().hour <= 7 or sdt_local.time().hour >= 22):
-                        blocked = True
+                    #if experience.repeat_cycle == "Hourly" and (sdt_local.time().hour <= 7 or sdt_local.time().hour >= 22):
+                    #    blocked = True
 
                     if not blocked:
                         #blockout_start, blockout_end are sorted, sdt keeps increasing
@@ -217,10 +225,8 @@ def experience_availability(request):
                             if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
                                 i += experience.guest_number_max #change from bking.guest_number to experience.guest_number_max
 
-                        if i < experience.guest_number_max :
-                            #moved to top
-                            sdt_local = sdt.astimezone(local_timezone)
-                            if experience.repeat_cycle != "Hourly" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
+                        if i==0: #< experience.guest_number_max :
+                            if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                                 istant_booking = False
                                 #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
                                 #instantbooking_i: skip the periods already checked
@@ -319,7 +325,7 @@ class ExperienceDetailView(DetailView):
                     subtotal_price = float(experience.price)*float(form.data['guest_number'])
             else:
                 subtotal_price = float(experience.price)*float(form.data['guest_number'])
-            
+
             return render(request, 'experience_booking_confirmation.html', 
                           {'form': form, #'eid':self.object.id, 
                            'experience': experience,
@@ -434,8 +440,13 @@ class ExperienceDetailView(DetailView):
 
             #block 10pm-7am if repeated hourly
             sdt_local = sdt.astimezone(local_timezone)
-            if experience.repeat_cycle == "Hourly" and (sdt_local.time().hour <= 7 or sdt_local.time().hour >= 22):
-                blocked = True
+            if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):#daylight saving
+                if not sdt_local.dst() != timedelta(0):# not daylight saving
+                    sdt_local = sdt_local + relativedelta(hours=1)
+            elif sdt_local.dst() != timedelta(0):
+                sdt_local = sdt_local - relativedelta(hours=1)
+            #if experience.repeat_cycle == "Hourly" and (sdt_local.time().hour <= 7 or sdt_local.time().hour >= 22):
+            #    blocked = True
 
             if not blocked:
                 #blockout_start, blockout_end are sorted, sdt keeps increasing
@@ -459,9 +470,7 @@ class ExperienceDetailView(DetailView):
                         i += experience.guest_number_max #change from bking.guest_number to experience.guest_number_max
 
                 if i == 0: #< experience.guest_number_max :
-                    #moved to top
-                    sdt_local = sdt.astimezone(local_timezone)
-                    if experience.repeat_cycle != "Hourly" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
+                    if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                         istant_booking = False
                         #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
                         #instantbooking_i: skip the periods already checked
@@ -482,11 +491,11 @@ class ExperienceDetailView(DetailView):
                                 'instant_booking': istant_booking}
                         available_options.append(dict)
 
-                        if sdt.astimezone(local_timezone).date() != last_sdt.astimezone(local_timezone).date():
+                        if sdt_local.date() != last_sdt.date():
                             new_date = ((sdt_local.strftime("%d/%m/%Y"),
                                              sdt_local.strftime("%d/%m/%Y")),)
                             available_date += new_date
-                            last_sdt = sdt
+                            last_sdt = sdt_local
             
             #requirement change: all timeslots are considered available unless being explicitly blocked    
             sdt += timedelta(hours=1)
@@ -732,7 +741,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             if id:
                 experience = get_object_or_404(Experience, pk=id)
                 if not experience.hosts.all()[0] == self.request.user and not self.request.user.is_superuser:
-                    #the user is not the host nor a superuser
+                    #the user is neither the host nor a superuser
                     return HttpResponseRedirect("/")
 
                 #if kwargs['step'] != "experience":
@@ -870,7 +879,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             data = {}
             prev_files = self.storage.get_step_files('photo')
             if prev_files:
-                for i in range(1,6):
+                for i in range(1,MaxPhotoNumber+1):
                     if 'photo-experience_photo_' + str(i) in prev_files:
                         data['experience_photo_' + str(i)] = prev_files['photo-experience_photo_' + str(i)]
                         self.initial_dict['experience_photo_' + str(i)] = prev_files['photo-experience_photo_' + str(i)]
@@ -1093,7 +1102,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             experience = get_object_or_404(Experience, pk=self.initial_dict['id'])
             #experience.start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(start_datetime, "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')).replace(minute=0)
             #experience.end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(end_datetime, "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')).replace(minute=0)
-            experience.title = title 
+            experience.title = title
             experience.description = summary
             experience.guest_number_min = min_guest_number
             experience.guest_number_max = max_guest_number
@@ -1235,7 +1244,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
 
         thumbnail_created = False
         if prev_files:
-            for index in range(1,6):
+            for index in range(1,MaxPhotoNumber+1):
                 if 'photo-experience_photo_' + str(index) in prev_files:
                     content = prev_files['photo-experience_photo_'+str(index)]
                     content_type = content.content_type.split('/')[0]
@@ -1292,7 +1301,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
         for form in form_list:
             #if type(form) != ExperienceSummaryForm:
             f.append(form)
-        
+
         kwargs['form_dict']['experience'] = ExperienceForm()
         kwargs['form_dict']['calendar'] = ExperienceCalendarForm()
         kwargs['form_dict']['price'] = ExperiencePriceForm()
@@ -1353,7 +1362,7 @@ def experience_booking_confirmation(request):
         else:
             subtotal_price = float(experience.price)*float(form.data['guest_number'])
 
-        if 'Refresh' in request.POST:          
+        if 'Refresh' in request.POST:
             #get coupon information
             wrong_promo_code = False
             code = form.data['promo_code']
@@ -1489,7 +1498,7 @@ def create_experience(request, id=None):
             "status":experience.status
         }
 
-        for i in range(1,6):
+        for i in range(1,MaxPhotoNumber+1):
             list = experience.photo_set.filter(name__startswith='experience'+str(id)+'_'+str(i))
             if len(list)>0:
                 photo = list[0]
@@ -1507,7 +1516,7 @@ def create_experience(request, id=None):
         form = CreateExperienceForm(request.POST, request.FILES)
         display_error = True
 
-        if form.is_valid():    
+        if form.is_valid():
             if not id:
                 try:
                     #check if the user exist
@@ -1571,7 +1580,7 @@ def create_experience(request, id=None):
 
             count = 0
             thumbnail_created = False
-            for index in range (1,6):
+            for index in range (1,MaxPhotoNumber+1):
                 if 'experience_photo_'+str(index) in request.FILES:
                     content = request.FILES['experience_photo_'+str(index)]
                     content_type = content.content_type.split('/')[0]
@@ -1705,7 +1714,7 @@ def booking_accepted(request, id=None):
                                                             'booking':booking,
                                                             'user':guest,
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-                        
+                  
             #schedule an email for reviewing the experience
             mail.send(subject='[Tripalocal] How was your experience?', message='', 
                       sender='Tripalocal <enquiries@tripalocal.com>',

@@ -538,7 +538,7 @@ a {color:#6CC;} a:hover{color:#699;}
 .checkoutBox{padding: 0px; width: 550px;}
 .experience{background-color: rgb(245,245,245); border-top: 1px solid rgb(197,197,197)}
 .expList .checkoutBox{padding: 10px; width: 300px;}
-.tab_item .firstTabItem{margin-left: 30px;}
+.tab_item .firstTabItem{margin-left: 20px;}
 .thumbnail{width: 99px; height: 60px; padding: 0px; margin-right: 0px; float: left; }
 .non-thumbnail{width: 99px; height: 60px; background-color: #C5C5C5; float: left; border-radius: 3px;}
 .right-content-box-header{background-color: transparent;}
@@ -819,7 +819,7 @@ body {
 /*Toggle*/
 
 /*list-photo.html*/
-#section-add-photo{height: 400px;}
+#section-add-photo{height: 680px;}
 #photo-heading{color: #666666; padding-top: 30px; padding-left: 30px; float: left;}
 #photo-size-reminder{color: #999999; padding-left: 85px; padding-top: 30px; float: left;}
 #photo-detail-info{color: #999999; padding-left: 30px; float: left;}
@@ -947,3 +947,5 @@ body {
 #dynamic_price_heading{padding-top: 90px;}
 #dynamic_price_div_1, #dynamic_price_div_2,#dynamic_price_div_3,#dynamic_price_div_4,#dynamic_price_div_5,#dynamic_price_div_6,#dynamic_price_div_7,#dynamic_price_div_8{padding-left: 163px;}
 #dynamic_price_div_9{padding-left:155px; }
+
+#your-reservation{padding-left: 6px; padding-right: 6px;}

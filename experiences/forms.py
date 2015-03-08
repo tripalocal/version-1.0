@@ -246,6 +246,11 @@ class ExperiencePhotoForm(forms.Form):
     experience_photo_3 = forms.ImageField(required = False)
     experience_photo_4 = forms.ImageField(required = False)
     experience_photo_5 = forms.ImageField(required = False)
+    experience_photo_6 = forms.ImageField(required = False)
+    experience_photo_7 = forms.ImageField(required = False)
+    experience_photo_8 = forms.ImageField(required = False)
+    experience_photo_9 = forms.ImageField(required = False)
+    experience_photo_10 = forms.ImageField(required = False)
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePhotoForm, self).__init__(*args, **kwargs)
@@ -758,6 +763,11 @@ class CreateExperienceForm(forms.Form):
     experience_photo_3 = forms.ImageField(required = False)
     experience_photo_4 = forms.ImageField(required = False)
     experience_photo_5 = forms.ImageField(required = False)
+    experience_photo_6 = forms.ImageField(required = False)
+    experience_photo_7 = forms.ImageField(required = False)
+    experience_photo_8 = forms.ImageField(required = False)
+    experience_photo_9 = forms.ImageField(required = False)
+    experience_photo_10 = forms.ImageField(required = False)
 
 def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))

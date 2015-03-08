@@ -18,6 +18,7 @@
     <link href="{% static 'app/content/tripalocal.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/tripalocal_en.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/tripalocal_xs.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/tripalocal_jx.css' %}" rel="stylesheet">
     
     {% if form %}
         {{ form.media }}
@@ -163,6 +164,20 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
         {
             des_url = des_url.substring(3);
             window.location.href = "https://www.tripalocal.com" + des_url;
+        }
+    });
+
+    $('#id_profile_div').click(function(){
+        hide = $('#id_menu').attr('hide');
+        if(hide == 'true')
+        {
+            $('#id_menu').attr('style','');
+            $('#id_menu').attr('hide','false');
+        }
+        else
+        {
+            $('#id_menu').attr('style','display:none;');
+            $('#id_menu').attr('hide','true');
         }
     });
 </script>

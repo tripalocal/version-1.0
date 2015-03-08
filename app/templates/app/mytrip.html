@@ -74,7 +74,7 @@
 							               <div>
 							             	    <div class="map_box" style="margin-top:15px; margin_bottom:15px;">
 								                    Meet up location: {{booking.experience.meetup_spot}}
-								                    <button id="map_button" class="map_button" name="{{booking.experience.meetup_spot}} {{booking.experience.city}}"> Map </button>
+								                    <!--<button id="map_button" class="map_button" name="{{booking.experience.meetup_spot}} {{booking.experience.city}}"> Map </button>-->
 							             	    </div>
 							               </div>
 							            </td>
@@ -93,6 +93,7 @@
 
 {%block scripts %}
 <script charset="utf-8" type="text/javascript">
+/*
     $(".map_button").click(function(e){
         s = e.target.name.split(" ");
         url = "https://maps.google.com?q=";
@@ -104,5 +105,6 @@
 
         window.open(url);
     })
+*/
 </script>
 {%endblock%}

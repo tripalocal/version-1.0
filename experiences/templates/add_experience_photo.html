@@ -141,6 +141,71 @@
                     {{wizard.form.experience_photo_5}}
                 </div>
             </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_6%}
+                <input id="uploadImage_6" placeholder="{{wizard.form.initial.experience_photo_6.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_6" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_6}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_7%}
+                <input id="uploadImage_7" placeholder="{{wizard.form.initial.experience_photo_7.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_7" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_7}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_8%}
+                <input id="uploadImage_8" placeholder="{{wizard.form.initial.experience_photo_8.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_8" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_8}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_9%}
+                <input id="uploadImage_9" placeholder="{{wizard.form.initial.experience_photo_9.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_9" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_9}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_10%}
+                <input id="uploadImage_10" placeholder="{{wizard.form.initial.experience_photo_10.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_10" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_10}}
+                </div>
+            </div>
         </div>  
         <div class="section" style="text-align:right;">
             <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" id="last-step">Last Step</button>
@@ -187,19 +252,13 @@
         $('body').attr('id','background-white');
         $("#id_photo-changed_steps").val($("#id_photo-changed_steps").val()+'photo,');
 
-        $("#id_photo-experience_photo_1").attr("class", "upload");
-        $("#id_photo-experience_photo_2").attr("class", "upload");
-        $("#id_photo-experience_photo_3").attr("class", "upload");
-        $("#id_photo-experience_photo_4").attr("class", "upload");
-        $("#id_photo-experience_photo_5").attr("class", "upload");
-
         $("#id_next").bind("click", function(e){
             e.preventDefault();
             var input, file;
             var valid = true;
 
             if (window.FileReader) {
-                for(i=1;i<6;i++)
+                for(i=1;i<11;i++)
                 {
                     input = document.getElementById('id_photo-experience_photo_'+i);
                     if (input && input.files && input.files[0]) 
@@ -225,6 +284,23 @@
                 $("form").submit();
             }
         })
+
+        for(i=1;i<11;i++)
+        {
+            $("#id_photo-experience_photo_"+i).attr("class", "upload");
+            $("#id_photo-experience_photo_"+i).change(function(e){
+                i = e.target.id.substr(-1,1);
+                string = $("#id_photo-experience_photo_"+i).val();
+                index=-1;
+                index = string.lastIndexOf("\\");
+                if(index==-1)
+                {
+                    index = string.lastIndexOf("/");
+                }
+
+                $("#uploadImage_"+i).val(string.substring(index+1));
+            })
+        }
     })
 
     function bodyAppend(tagName, innerHTML) {
@@ -234,65 +310,6 @@
         elm.innerHTML = innerHTML;
         document.body.appendChild(elm);
     }
-
-    $("#id_photo-experience_photo_1").change(function(){
-        string = $("#id_photo-experience_photo_1").val();
-        index=-1;
-        index = string.lastIndexOf("\\");
-        if(index==-1)
-        {
-            index = string.lastIndexOf("/");
-        }
-
-        $("#uploadImage_1").val(string.substring(index+1));
-    })
-
-    $("#id_photo-experience_photo_2").change(function(){
-        string = $("#id_photo-experience_photo_2").val();
-        index=-1;
-        index = string.lastIndexOf("\\");
-        if(index==-1)
-        {
-            index = string.lastIndexOf("/");
-        }
-
-        $("#uploadImage_2").val(string.substring(index+1));
-    })
-
-    $("#id_photo-experience_photo_3").change(function(){
-        string = $("#id_photo-experience_photo_3").val();
-        index=-1;
-        index = string.lastIndexOf("\\");
-        if(index==-1)
-        {
-            index = string.lastIndexOf("/");
-        }
-
-        $("#uploadImage_3").val(string.substring(index+1));
-    })
-
-    $("#id_photo-experience_photo_4").change(function(){
-        string = $("#id_photo-experience_photo_4").val();
-        index=-1;
-        index = string.lastIndexOf("\\");
-        if(index==-1)
-        {
-            index = string.lastIndexOf("/");
-        }
-
-        $("#uploadImage_4").val(string.substring(index+1));
-    })
-
-    $("#id_photo-experience_photo_5").change(function(){
-        string = $("#id_photo-experience_photo_5").val();
-        index=-1;
-        index = string.lastIndexOf("\\");
-        if(index==-1)
-        {
-            index = string.lastIndexOf("/");
-        }
-
-        $("#uploadImage_5").val(string.substring(index+1));
-    })
+   
 </script>
 {%endblock%}

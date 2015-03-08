@@ -1,33 +1,36 @@
-<!DOCTYPE html>
+{% extends "app/layout.html" %}
+
 {% block head %}
     {% load i18n %}
     {% load account %}
     {% load url from future %}
-
-    {% load staticfiles %}
-    <script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
-    <link href="{% static 'app/content/tripalocal.min.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/tripalocal.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/modal.css' %}" rel="stylesheet">
-    {% if form %}
-        {{ form.media }}
-    {% endif %}
-
-<!-- start Mixpanel --><script type="text/javascript">(function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
-for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
-mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
-
 {% endblock %}
 
 {% block content %}
 
 <section class="modal--fade is-active" id="modal-fade" tabindex="-1" role="dialog" aria-labelledby="label-fade" aria-hidden="true">
-    <div class="modal-inner">
-        <div class="modal-content">
+    <div class="inner">
+        <div class="content">
             {% if socialaccount.providers  %}
-            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-            <p style="color:#CCC;">---------------------- or -----------------------</p>
-            {% include "socialaccount/snippets/login_extra.html" %}
+                {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                <canvas id="myCanvasOne"></canvas>
+                <div class = "loginOption"><p>or</p></div>
+                <canvas id="myCanvasTwo"></canvas>
+                <script>
+                  var canvasOne = document.getElementById('myCanvasOne');
+                  var context = canvasOne.getContext('2d');
+                  context.beginPath();
+                  context.moveTo(0,50);
+                  context.lineTo(1000,50);
+                  context.stroke();
+                  var canvasTwo = document.getElementById('myCanvasTwo');
+                  var contextTwo = canvasTwo.getContext('2d');
+                  contextTwo.beginPath();
+                  contextTwo.moveTo(0,50);
+                  contextTwo.lineTo(1000,50);
+                  contextTwo.stroke();
+                </script>
+                {% include "socialaccount/snippets/login_extra.html" %}
             {% endif %}
 
             <form id="login_form" class="login" method="POST" action="{% url 'account_login' %}">
@@ -50,13 +53,12 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
                 {%endif%}
                 <p>{{ form.login }}</p>
                 <p>{{ form.password }}</p>
-                <p>{{ form.remember }} Remember me</p>
+                <p>{{ form.remember }} Remember me<a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a></p>
                 {% if redirect_field_value %}
                 <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                 {% endif %}
                 <p><button id="login_button" class="btn btn-primary btn-lg" type="submit">{% trans "Log In" %}</button></p>
                 <p>{% blocktrans %}Don't have an account? <a href="{{ signup_url }}">Sign up</a>{% endblocktrans %}</p>
-                <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
             </form>
         </div>
     </div>
@@ -67,12 +69,13 @@ mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
 <script charset="utf-8" type="text/javascript">
 $(function(){
     $(document).ready(function(){
-        $("#id_Facebook").attr("class", "btn btn-primary btn-lg btn-facebook");
+        $("#id_Facebook").attr("class", "socialaccount_provider facebook");
         $("#id_Facebook").attr("role", "button");
 
-        $("#id_login").attr("class", "form-control");
-        $("#id_password").attr("class", "form-control");
-
+        //$("#id_login").attr("class", "form-control");
+        $("#id_login").attr("autofocus", "autofocus");
+        //$("#id_password").attr("class", "form-control");
+        
         $("#login_button").bind("click", function(e){
             e.preventDefault();
             //mixpanel.track("has signed in via email");
