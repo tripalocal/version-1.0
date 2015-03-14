@@ -33,8 +33,4 @@ stripe==1.20.2
 suds-jurko==0.6
 virtualenv==12.0.7
 virtualenv-clone==0.2.5
-<<<<<<< HEAD
 xlrd==0.9.3
-=======
-xlrd==0.9.3
->>>>>>> 1b9bae6669e66bcd1ad03627b1a146e3b3748c93
