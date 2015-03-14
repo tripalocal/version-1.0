@@ -829,6 +829,15 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             if self.request.GET and 'id' in self.request.GET and 'id' in self.initial_dict and self.request.GET['id'] != str(self.initial_dict['id']):
                 data = None
         elif self.request.path.find('addexperience') > 0:
+            if self.kwargs['step'] == 'experience':
+                self.initial_dict.clear()
+                if 'calendar' in self.storage.data['step_data']:
+                    self.storage.data['step_data'].clear()
+                    self.storage.data['extra_data'].clear()
+                    self.storage.data['step_files'].clear()
+                    if data:
+                        data.clear()
+
             if self.kwargs['step'] != 'done' and data and self.kwargs['step']+'-id' in data and data[self.kwargs['step']+'-id']:
                 data = None
 
@@ -861,21 +870,28 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                 initializeExperience(experience, self.initial_dict)
                 
         #override the initial values with inputs from previous steps
-        if step == 'price':
+        if step == 'calendar':
+            self.initial_dict['changed_steps'] = 'experience,'
+        elif step == 'price':
+            self.initial_dict['changed_steps'] = 'experience,calendar,'
             prev_data = self.storage.get_step_data('experience')
             if prev_data:
                 duration = prev_data.get('experience-duration','')
                 self.initial_dict['duration'] = duration
-                if self.request.resolver_match.url_name.startswith('experience_add'):
-                    return self.initial_dict.get(step, {'duration': duration})
+                #if self.request.resolver_match.url_name.startswith('experience_add'):
+                #    return self.initial_dict.get(step, {'duration': duration})
         elif step == 'overview':
+            self.initial_dict['changed_steps'] = 'experience,calendar,price,'
             prev_data = self.storage.get_step_data('experience')
             if prev_data:
                 title = prev_data.get('experience-title','')
                 self.initial_dict['title'] = title
-                if self.request.resolver_match.url_name.startswith('experience_add'):
-                    return self.initial_dict.get(step, {'title': title})
+                #if self.request.resolver_match.url_name.startswith('experience_add'):
+                #    return self.initial_dict.get(step, {'title': title})
+        elif step == 'detail':
+            self.initial_dict['changed_steps'] = 'experience,calendar,price,overview,'
         elif step == 'photo':
+            self.initial_dict['changed_steps'] = 'experience,calendar,price,overview,detail,'
             data = {}
             prev_files = self.storage.get_step_files('photo')
             if prev_files:
@@ -883,24 +899,26 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                     if 'photo-experience_photo_' + str(i) in prev_files:
                         data['experience_photo_' + str(i)] = prev_files['photo-experience_photo_' + str(i)]
                         self.initial_dict['experience_photo_' + str(i)] = prev_files['photo-experience_photo_' + str(i)]
-            if self.request.resolver_match.url_name.startswith('experience_add'):
-                return self.initial_dict.get(step, data)
+            #if self.request.resolver_match.url_name.startswith('experience_add'):
+            #    return self.initial_dict.get(step, data)
         elif step == 'location':
+            self.initial_dict['changed_steps'] = 'experience,calendar,price,overview,photo,'
             prev_data = self.storage.get_step_data('experience')
             if prev_data:
                 suburb = prev_data.get('experience-location','')
                 self.initial_dict['suburb'] = suburb
-                if self.request.resolver_match.url_name.startswith('experience_add'):
-                    return self.initial_dict.get(step, {'suburb': suburb})
+                #if self.request.resolver_match.url_name.startswith('experience_add'):
+                #    return self.initial_dict.get(step, {'suburb': suburb})
         
-        visited_steps = ''
-        for step_name in ['experience','calendar','price','overview','detail','photo','location']:
-            prev_data = self.storage.get_step_data(step_name)
-            steps = prev_data.get(step_name+'-changed_steps','') if prev_data != None else None
-            if steps != None and len(steps)>len(visited_steps):
-                visited_steps = steps
+        if self.request.resolver_match.url_name.startswith('experience_edit'):
+            visited_steps = ''
+            for step_name in ['experience','calendar','price','overview','detail','photo','location']:
+                prev_data = self.storage.get_step_data(step_name)
+                steps = prev_data.get(step_name+'-changed_steps','') if prev_data != None else None
+                if steps != None and len(steps)>len(visited_steps):
+                    visited_steps = steps
 
-        self.initial_dict['changed_steps']=visited_steps
+            self.initial_dict['changed_steps']=visited_steps
 
         return self.initial_dict #self.initial_dict.get(step, {})
 
