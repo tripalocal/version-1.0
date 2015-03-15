@@ -840,9 +840,11 @@ body {
 #location-city select{
 	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; width: 110px; background-position: 85px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px;}
 /*list-pricing.html*/
+#section-add-price {height:350px;}
 #group-size-section{float: right;width: 450px; padding-top: 30px;}
 #group-size-section p{float: left; color: #999999; }
-#group-size-section input[type=number]{float: left; width: 100px; height:35px; border: 1px solid #AAAAAA; border-radius: 3px; background-color: #FFF; margin-top: 10px; padding-left: 15px; color: #999999;}
+#group-size-section select{
+	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; background-position: 75px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px; margin-top:5px;}
 #group-size-heading{margin-bottom: 0px;}
 #group-size-min{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
 #group-size-max{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
@@ -876,8 +878,9 @@ body {
 #experience-title input[type=text]{width: 100%; max-width:500px; height: 60px; border-radius: 5px; border: 1px solid #CCCCCC; margin-left: 20px;}
 #experience-title input[value]{padding-left: 30px; color: #5E5E5E; font-size: 20px;}
 #experience-title p{padding-left: 350px; padding-top: 15px;}
-#experience-duration input[type=number]{width: 100px; height: 60px; border-radius: 5px; border: 1px solid #CCCCCC; margin-left: 20px; margin-right: 20px; float: left;}
-#experience-duration input[value]{padding-left: 30px; color: #5E5E5E; font-size: 20px;}
+#experience-duration select{
+	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; height: 60px; background-position: 60px 17px; border: 1px solid #CCCCCC; background-color: #FFF; border-radius: 5px; padding: 5px; color: #5E5E5E; font-size: 20px; padding-left: 30px; margin-left: 20px;}
+#experience-duration option{color: #5E5E5E; font-size: 20px;}
 #experience-duration p{padding-left: 237px; padding-top: 15px;}
 #experience-city select{
 	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 200px; height: 60px; background-position: 160px 17px; border: 1px solid #CCCCCC; background-color: #FFF; border-radius: 5px; padding: 5px; color: #5E5E5E; font-size: 20px; padding-left: 30px; margin-left: 20px;}

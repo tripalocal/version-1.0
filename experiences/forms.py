@@ -31,10 +31,9 @@ Repeat_Cycle = (('Daily', 'Daily'), ('Weekly', 'Weekly'), ('Monthly', 'Monthly')
 Repeat_Frequency = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),
     ('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
-Guest_Number_Min = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),)
+Guest_Number_Min = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
-Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),
-    ('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
+Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
 Duration = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
 ('11', '11'),('12', '12'),('13', '13'),('14', '14'),('15', '15'),('16', '16'),('17', '17'),('18', '18'),('19', '19'),('20', '20'),
@@ -68,7 +67,7 @@ class ExperienceForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)
     type = forms.ChoiceField(choices=Type, required=False)
     title = forms.CharField(max_length=100, required=False)
-    duration = forms.IntegerField(required=False)
+    duration = forms.ChoiceField(choices=Duration, required=False)
     location = forms.ChoiceField(choices=Location, required=False)
     changed_steps = forms.CharField(max_length=100, required=False)
 
@@ -178,8 +177,8 @@ class ExperiencePriceForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)
     changed_steps = forms.CharField(max_length=100, required=False)
     duration = forms.ChoiceField(required=False, choices=Duration)
-    min_guest_number = forms.IntegerField(required=False, min_value=1, max_value=10)
-    max_guest_number = forms.IntegerField(required=False, min_value=1, max_value=10)
+    min_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Min)
+    max_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Max)
     price = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     price_with_booking_fee = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     dynamic_price = forms.CharField(max_length=100, required=False)
