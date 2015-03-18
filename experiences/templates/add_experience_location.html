@@ -13,7 +13,7 @@
 {{ wizard.form.id }}
 {{ wizard.form.changed_steps }}
     <div class="back_button">
-        
+        <button name="" val="" id="save-and-exit-top" disabled></button>
     </div>
 {%if not edit%}
     <!-- left-side menu -->
@@ -71,7 +71,7 @@
             {%endif%}
         </ul>
 
-        <div class="section" id="section-add-photo">
+        <div class="section" id="section-add-location">
             <div id="location">  
                 <p id="photo-heading"><strong>Location</strong></p><br><br><br>
                 <p id="location-details">
@@ -94,7 +94,7 @@
         </div>
         <div class="section" style="text-align:right;">
             <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" id="last-step">Last Step</button>
-            <input name="wizard_save_exit_location" type="submit" value="Submit" id="save-and-exit" />
+            <input name="wizard_save_exit_location" type="submit" value="Submit" id="save-and-exit" style="margin-right:10px;"/>
         </div>
         <!-- creating spare space  -->
         <div class="creating-slot-button-active create-slot-detail">

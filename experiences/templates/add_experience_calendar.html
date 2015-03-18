@@ -34,12 +34,12 @@
 {% endblock %}
 
 {% block content %}
-<form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+<form id="form_calendar" action="" method="post" enctype="multipart/form-data">{% csrf_token %}
 {{ wizard.management_form }}
 {{ wizard.form.id }}
 {{ wizard.form.changed_steps }}
 <div class="back_button">
-    <button name="wizard_save_exit_calendar" type="submit" val="">Save and Exit</button>
+    <button name="wizard_save_exit_calendar" type="submit" val="" id="save-and-exit-top">Save and Exit</button>
 </div>
 <div>
 {% if not edit %}
@@ -1430,5 +1430,15 @@
             }
         }
     });
+/*
+    $(window).bind('beforeunload', function(e){
+        if(document.activeElement.type!="submit")
+        {
+            $("#form_calendar").trigger('submit');
+            $("#form_calendar").submit();
+            return '';
+        }
+    });
+*/
 </script>
 {%endblock%}

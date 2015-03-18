@@ -93,7 +93,7 @@
                 <div class="float-left">   
                     <p id="commission">Commission</p>
                     <span id="dollar-sign-4">$</span>
-                    <p id="commission-price"></p>
+                    <p id="commission-price" class="commission-price"></p>
                 </div>
                 <p class="float-left math-symbol">=</p>
                 <div class="float-left">
@@ -138,7 +138,7 @@
                 <p class="float-left math-symbol-2">-</p>
                 <div class="float-left">
                   <span id="dollar-sign-4">$</span>
-                  <p id="commission-price-2"></p>
+                  <p id="commission-price-1" class="commission-price-2"></p>
                 </div>
                 <p class="float-left math-symbol-3">=</p>
                 <span id="dollar-sign-3" class="float-left">$</span>
@@ -152,7 +152,7 @@
                 <p class="float-left math-symbol-2">-</p>
                 <div class="float-left">
                   <span id="dollar-sign-4">$</span>
-                  <p id="commission-price-2"></p>
+                  <p id="commission-price-2" class="commission-price-2"></p>
                 </div>
                 <p class="float-left math-symbol-3">=</p>
                 <span id="dollar-sign-3" class="float-left">$</span>
@@ -166,7 +166,7 @@
                 <p class="float-left math-symbol-2">-</p>
                 <div class="float-left">
                   <span id="dollar-sign-4">$</span>
-                  <p id="commission-price-2"></p>
+                  <p id="commission-price-3" class="commission-price-2"></p>
                 </div>
                 <p class="float-left math-symbol-3">=</p>
                 <span id="dollar-sign-3" class="float-left">$</span>
@@ -180,7 +180,7 @@
                 <p class="float-left math-symbol-2">-</p>
                 <div class="float-left">
                   <span id="dollar-sign-4">$</span>
-                  <p id="commission-price-2"></p>
+                  <p id="commission-price-4" class="commission-price-2"></p>
                 </div>
                 <p class="float-left math-symbol-3">=</p>
                 <span id="dollar-sign-3" class="float-left">$</span>
@@ -195,7 +195,7 @@
                 <p class="float-left math-symbol-2">-</p>
                 <div class="float-left">
                   <span id="dollar-sign-4">$</span>
-                  <p id="commission-price-2"></p>
+                  <p id="commission-price-5" class="commission-price-2"></p>
                 </div>
                 <p class="float-left math-symbol-3">=</p>
                 <span id="dollar-sign-3" class="float-left">$</span>
@@ -209,7 +209,7 @@
                 <p class="float-left math-symbol-2">-</p>
                 <div class="float-left">
                   <span id="dollar-sign-4">$</span>
-                  <p id="commission-price-2"></p>
+                  <p id="commission-price-6" class="commission-price-2"></p>
                 </div>
                 <p class="float-left math-symbol-3">=</p>
                 <span id="dollar-sign-3" class="float-left">$</span>
@@ -223,7 +223,7 @@
                 <p class="float-left math-symbol-2">-</p>
                 <div class="float-left">
                   <span id="dollar-sign-4">$</span>
-                  <p id="commission-price-2"></p>
+                  <p id="commission-price-7" class="commission-price-2"></p>
                 </div>
                 <p class="float-left math-symbol-3">=</p>
                 <span id="dollar-sign-3" class="float-left">$</span>
@@ -237,7 +237,7 @@
                 <p class="float-left math-symbol-2">-</p>
                 <div class="float-left">
                   <span id="dollar-sign-4">$</span>
-                  <p id="commission-price-2"></p>
+                  <p id="commission-price-8" class="commission-price-2"></p>
                 </div>
                 <p class="float-left math-symbol-3">=</p>
                 <span id="dollar-sign-3" class="float-left">$</span>
@@ -251,7 +251,7 @@
                 <p class="float-left math-symbol-2">-</p>
                 <div class="float-left">
                   <span id="dollar-sign-4">$</span>
-                  <p id="commission-price-2"></p>
+                  <p id="commission-price-9" class="commission-price-2"></p>
                 </div>
                 <p class="float-left math-symbol-3">=</p>
                 <span id="dollar-sign-3" class="float-left">$</span>
@@ -293,6 +293,33 @@
 
 {%block scripts%}
 <script charset="utf-8" type="text/javascript">
+
+    function isValidEmailAddress(emailAddress) {
+        var pattern = new RegExp( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i);
+        return pattern.test(emailAddress);
+    }
+
+    function isValidNumber(feeNumber){
+        var numPattern = new RegExp(/^(?!(?:0|0\.0|0\.00)$)[+]?\d+(\.\d|\.\d[0-9])?$/);
+        return numPattern.test(feeNumber);
+    }
+
+    //guest size validation
+    $("#id_price-min_guest_number").change(function(){
+        min_guest=$("#id_price-min_guest_number");
+        max_guest=$("#id_price-max_guest_number");
+        if(min_guest.val()>max_guest.val()){
+            max_guest.val(min_guest.val()+"");
+        }
+    });
+  
+    $("#id_price-max_guest_number").change(function(){
+        min_guest=$("#id_price-min_guest_number");
+        max_guest=$("#id_price-max_guest_number");
+        if(min_guest.val()>max_guest.val()){
+            min_guest.val(max_guest.val()+"");
+        }
+    });
 
     function updateprice()
     {
@@ -379,9 +406,16 @@
             {
                 i = e.target.id.substr(-1,1);
                 var price = parseFloat($("#dynamic_price_input_"+i).val());
-                if(typeof price === 'number')
+                if(typeof price === 'number' && isValidNumber(price))
                 {  
                     $("#dynamic_price_with_fee_input_"+i).val((price*1.429*1.000+0.0).toFixed(2));
+                    $("#commission-price-"+i).text((price*1.429*1.000+0.0 - price).toFixed(2));
+                }
+                else
+                {
+                    $("#dynamic_price_with_fee_input_"+i).val("0");
+                    $("#commission-price-"+i).text("0");
+                    $("#dynamic_price_input_"+i).val("0");
                 }
             })
 
@@ -389,9 +423,16 @@
             {
                 i = e.target.id.substr(-1,1);
                 var price = parseFloat($("#dynamic_price_with_fee_input_"+i).val());
-                if(typeof price === 'number')
+                if(typeof price === 'number' && isValidNumber(price))
                 {
                     $("#dynamic_price_input_"+i).val(((price-0.0)/(1.429*1.000)).toFixed(2));
+                    $("#commission-price-"+i).text((price-(price-0.0)/(1.429*1.000)).toFixed(2));
+                }
+                else
+                {
+                    $("#dynamic_price_with_fee_input_"+i).val("0");
+                    $("#commission-price-"+i).text("0");
+                    $("#dynamic_price_input_"+i).val("0");
                 }
             })
         }
@@ -400,22 +441,32 @@
     $("#id_price-price").keyup(function()
     {
         var price = parseFloat($("#id_price-price").val());
-        if(typeof price === 'number')
+        if(typeof price === 'number' && isValidNumber(price))
         {  
             $("#id_price-price_with_booking_fee").val((price*1.429*1.000+0.0).toFixed(2));
             $("#commission-price").text((price*1.429*1.000+0.0 - price).toFixed(2));
-            $("#commission-price-2").text((price*1.429*1.000+0.0 - price).toFixed(2));
+        }
+        else
+        {
+            $("#id_price-price").val("0");
+            $("#commission-price").text("0");
+            $("#id_price-price_with_booking_fee").val("0");
         }
     })
 
     $("#id_price-price_with_booking_fee").keyup(function()
     {
         var price = parseFloat($("#id_price-price_with_booking_fee").val());
-        if(typeof price === 'number')
+        if(typeof price === 'number' && isValidNumber(price))
         {
             $("#id_price-price").val(((price-0.0)/(1.429*1.000)).toFixed(2));
             $("#commission-price").text((price-(price-0.0)/(1.429*1.000)).toFixed(2));
-            $("#commission-price-2").text((price-(price-0.0)/(1.429*1.000)).toFixed(2));
+        }
+        else
+        {
+            $("#id_price-price").val("0");
+            $("#commission-price").text("0");
+            $("#id_price-price_with_booking_fee").val("0");
         }
     })
 

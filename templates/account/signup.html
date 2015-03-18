@@ -36,6 +36,8 @@
             {% csrf_token %}
             <!--<p>{{ form.username }}</p>-->
             <p>{{ form.email }}</p>
+            <p id="id_email_error"></p>
+
             {% if 'email' in form.errors%}
             <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
                 <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
@@ -43,6 +45,8 @@
             </div>
             {%endif%}
             <p>{{ form.password1 }}</p>
+            <p id="id_password1_error"></p>
+
             {% if 'password1' in form.errors%}
             <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
                 <table>
@@ -60,6 +64,8 @@
             </div>
             {%endif%}
             <p>{{ form.first_name }}</p>
+            <p id="first_name_error"></p>
+
             {% if 'first_name' in form.errors%}
             <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
                 <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
@@ -67,6 +73,8 @@
             </div>
             {%endif%}
             <p>{{ form.last_name }}</p>
+            <p id="last_name_error"></p>
+
             {% if 'last_name' in form.errors%}
             <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
                 <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
@@ -88,6 +96,60 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
+//signup validation
+function isValidEmailAddress(emailAddress) {
+    var pattern = new RegExp( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i);
+    return pattern.test(emailAddress);
+};
+
+function checkEmail()
+{
+    email=$('#id_email').val().trim();
+    if(email==""){
+        $("#id_email_error").text("This can not be empty");
+        return false;
+    }else if(!isValidEmailAddress(email)){
+        $("#id_email_error").text("Please enter a valid email");
+        return false;
+    }
+    else{
+        $("#id_email_error").text("");
+        return true;
+    }
+}
+
+function checkInput(id_put, id_error)
+{
+    input = $('#'+id_put).val().trim();
+    if(input==""){
+        $("#"+id_error).text("This can not be empty");
+        return false;
+    }else{
+        $("#"+id_error).text("");
+        return true;
+    }
+}
+
+//validate email
+    $("#id_email").blur(function(){
+        checkEmail();
+    });
+    
+//validate password
+    $("#id_password1").blur(function(){
+        checkInput("id_password1", "id_password1_error");   
+    });
+
+//validation firstname
+    $("#id_first_name").blur(function(){
+        checkInput("id_first_name", "first_name_error"); 
+    });
+    
+//validate last name 
+   $("#id_last_name").blur(function(){
+        checkInput("id_last_name", "last_name_error"); 
+    });
+
 $(function()
 {
     var country, region, city, ip, longitude, latitude;
@@ -115,31 +177,36 @@ $(function()
         $("#id_signup_submit_button").bind("click", function(e){
             e.preventDefault();
 
-            if($("#id_email").val().trim().toLowerCase().indexOf("@tripalocal.com") >= 0)
+            if(checkEmail() && checkInput("id_password1", "id_password1_error") 
+                && checkInput("id_first_name", "first_name_error")
+                && checkInput("id_last_name", "last_name_error"))
             {
-                alert("Please use a different email account. Thank you.");
-            }
-            else
-            {
-                if (navigator.geolocation) {
-                    /*
-                    navigator.geolocation.getCurrentPosition(function(position)
-                    {
-                        mixpanel.people.set({"Latitude":position.coords.latitude, "Longitude":position.coords.longitude});
-                        mixpanel.identify($("#id_email").val());   
-                    });
-                    */
+                if($("#id_email").val().trim().toLowerCase().indexOf("@tripalocal.com") >= 0)
+                {
+                    alert("Please use a different email account. Thank you.");
                 }
-                var now  = new Date().toString();
-                //mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
-                mixpanel.people.set({"$email": $("#id_email").val(),"$first_name": $("#id_first_name").val(),"$last_name": $("#id_last_name").val(),
-                                    "$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,
-                                    "$created":now, "$last_seen":now
-                                    });
-                //mixpanel.track("has signed up via email");   
-                mixpanel.identify($("#id_email").val());
+                else
+                {
+                    if (navigator.geolocation) {
+                        /*
+                        navigator.geolocation.getCurrentPosition(function(position)
+                        {
+                            mixpanel.people.set({"Latitude":position.coords.latitude, "Longitude":position.coords.longitude});
+                            mixpanel.identify($("#id_email").val());   
+                        });
+                        */
+                    }
+                    var now  = new Date().toString();
+                    //mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
+                    mixpanel.people.set({"$email": $("#id_email").val(),"$first_name": $("#id_first_name").val(),"$last_name": $("#id_last_name").val(),
+                                        "$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,
+                                        "$created":now, "$last_seen":now
+                                        });
+                    //mixpanel.track("has signed up via email");   
+                    mixpanel.identify($("#id_email").val());
 
-                $("#signup_form").submit();
+                    $("#signup_form").submit();
+                }
             }
         })
     })

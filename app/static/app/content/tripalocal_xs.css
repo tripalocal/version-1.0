@@ -852,9 +852,9 @@ body {
 #price-section input[type=number]{float: left; width: 100px; height:35px; border: 1px solid #AAAAAA; border-radius: 3px; background-color: #FFF; margin-top: 10px; padding-left: 25px; color: #999999; position: relative; top: -17px; z-index: 0;}
 #customers-pay{color: #999999;}
 #commission{color: #999999;}
-#commission-price,#commission-price-2{color: #999999; padding-top: 20px; padding-left: 30px; position: relative; top: -18px; z-index: 0;}
-#commission-price{padding-top: 0px;}
-#commission-price-2{padding-left: 50px;}
+.commission-price,.commission-price-2{color: #999999; padding-top: 20px; padding-left: 30px; position: relative; top: -18px; z-index: 0;}
+.commission-price{padding-top: 0px;}
+.commission-price-2{padding-left: 50px;}
 #price-per-person{color: #999999;}
 .float-left{float: left;}
 .math-symbol, .math-symbol-2, .math-symbol-3{color: #999999; padding-top: 30px; padding-left: 20px; padding-right: 20px;}
@@ -952,3 +952,7 @@ body {
 #dynamic_price_div_9{padding-left:155px; }
 
 #your-reservation{padding-left: 6px; padding-right: 6px;}
+
+#save-and-exit-top{background:none;border:none;color:white;}
+
+#section-add-location{height:400px;}

@@ -52,7 +52,11 @@
                 </div>
                 {%endif%}
                 <p>{{ form.login }}</p>
+                <p id="id_login_error"></p>
+
                 <p>{{ form.password }}</p>
+                <p id="id_password_error"></p>
+
                 <p>{{ form.remember }} Remember me<a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a></p>
                 {% if redirect_field_value %}
                 <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
@@ -67,6 +71,49 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
+function isValidEmailAddress(emailAddress) {
+    var pattern = new RegExp( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i);
+    return pattern.test(emailAddress);
+};
+
+function checkEmail()
+{
+    email=$('#id_login').val().trim();
+    if(email==""){
+        $("#id_login_error").text("This can not be empty");
+        return false;
+    }else if(!isValidEmailAddress(email)){
+        $("#id_login_error").text("Please enter a valid email");
+        return false;
+    }
+    else{
+        $("#id_email_error").text("");
+        return true;
+    }
+}
+
+function checkInput(id_put, id_error)
+{
+    input = $('#'+id_put).val().trim();
+    if(input==""){
+        $("#"+id_error).text("This can not be empty");
+        return false;
+    }else{
+        $("#"+id_error).text("");
+        return true;
+    }
+}
+
+//validate email
+    $("#id_login").blur(function(){
+        checkEmail();
+    });
+    
+//validate password
+    $("#id_password").blur(function(){
+        checkInput("id_password", "id_password_error");   
+    });
+
 $(function(){
     $(document).ready(function(){
         $("#id_Facebook").attr("class", "socialaccount_provider facebook");
@@ -78,10 +125,14 @@ $(function(){
         
         $("#login_button").bind("click", function(e){
             e.preventDefault();
-            //mixpanel.track("has signed in via email");
-            mixpanel.people.set({"$last_seen": new Date().toString()});
-            mixpanel.identify($("#id_login").val());   
-            $("#login_form").submit();
+
+            if(checkEmail() && checkInput("id_password", "id_password_error"))
+            {
+                //mixpanel.track("has signed in via email");
+                mixpanel.people.set({"$last_seen": new Date().toString()});
+                mixpanel.identify($("#id_login").val());   
+                $("#login_form").submit();
+            }
         })
     })
 })
