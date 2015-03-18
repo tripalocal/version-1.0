@@ -385,6 +385,13 @@
         $('body').attr('id','background-white');
         $("#id_price-changed_steps").val($("#id_price-changed_steps").val()+'price,');
 
+        var price = parseFloat($("#id_price-price").val());
+        if(typeof price === 'number' && isValidNumber(price))
+        {  
+            $("#id_price-price_with_booking_fee").val((price*1.429*1.000+0.0).toFixed(2));
+            $("#commission-price").text((price*1.429*1.000+0.0 - price).toFixed(2));
+        }
+
         if($("#id_price-dynamic_price").val().length > 0)
         {
             min = parseInt($("#id_price-min_guest_number").val());
@@ -392,6 +399,7 @@
             for(i=1;i<price.length;i++)
             {
                 $("#dynamic_price_input_"+(i+min-1)).val(price[i]);
+                $("#commission-price-"+(i+min-1)).text((parseFloat(price[i])*1.429*1.000+0.0 - price[i]).toFixed(2));
                 $("#dynamic_price_with_fee_input_"+(i+min-1)).val((parseFloat(price[i])*1.429*1.000+0.0).toFixed(2));
             }
             $("#add_dynamic_price").attr("style","display:none;");
