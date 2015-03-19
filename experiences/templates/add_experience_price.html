@@ -308,7 +308,7 @@
     $("#id_price-min_guest_number").change(function(){
         min_guest=$("#id_price-min_guest_number");
         max_guest=$("#id_price-max_guest_number");
-        if(min_guest.val()>max_guest.val()){
+        if(parseInt(min_guest.val())>parseInt(max_guest.val())){
             max_guest.val(min_guest.val()+"");
         }
     });
@@ -316,7 +316,7 @@
     $("#id_price-max_guest_number").change(function(){
         min_guest=$("#id_price-min_guest_number");
         max_guest=$("#id_price-max_guest_number");
-        if(min_guest.val()>max_guest.val()){
+        if(parseInt(min_guest.val())>parseInt(max_guest.val())){
             min_guest.val(max_guest.val()+"");
         }
     });
