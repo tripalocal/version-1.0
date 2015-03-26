@@ -58,7 +58,7 @@
                                                 <div class="request"><div style="margin-left:5px;">Requested</div></div>
                                                 {% endif %}
 					               			    <div class="confirm_topic" style="color:#2BC7CD;margin-top:5px;"><a href="/experience/{{booking.experience.id}}">{{ booking.experience.title }}</a></div>
-					               			    <div class="confirm_topic">with <span style="color:#2BC7CD;">{% for h in booking.experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</span> in {{ booking.experience.city }}</div>
+					               			    <div class="confirm_topic">with <span style="color:#2BC7CD;">{% for h in booking.experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. <span style="color:black;">({{ h.registereduser.phone_number }})</span>{% endif %} {% endfor %}</span></div>
 					            		    </div>
 				        			    </td>
                                     </div>

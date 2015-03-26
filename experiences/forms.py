@@ -22,7 +22,7 @@ from post_office import mail
 
 Type = (('SEE', 'See'),('DO', 'Do'),('EAT', 'Eat'),)
 
-Location = (('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Brisbane', 'Brisbane'),('Adelaide', 'Adelaide'),)
+Location = (('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Brisbane', 'Brisbane'),('Adelaide', 'Adelaide'),('Tasmania','Tasmania'),)
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),('english;translation','English+Chinese translation'),)
 
@@ -41,7 +41,7 @@ Duration = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('
 
 Included = (('Yes', ''),('No', ''),)
 
-Suburbs = (('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Brisbane', 'Brisbane'),('Adelaide', 'Adelaide'),)
+Suburbs = (('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Brisbane', 'Brisbane'),('Adelaide', 'Adelaide'),('Tasmania','Tasmania'),)
 
 Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghanistan'),('Albania', 'Albania'),('Algeria', 'Algeria'),('Andorra', 'Andorra'),('Angola', 'Angola'),('Antigua and Barbuda', 'Antigua and Barbuda'),('Argentina', 'Argentina'),('Armenia', 'Armenia'),('Aruba', 'Aruba'),('Austria', 'Austria'),('Azerbaijan', 'Azerbaijan'),('Bahamas', 'Bahamas'),('Bahrain', 'Bahrain'),('Bangladesh', 'Bangladesh'),('Barbados', 'Barbados'),('Belarus', 'Belarus'),('Belgium', 'Belgium'),('Belize', 'Belize'),('Benin', 'Benin'),('Bhutan', 'Bhutan'),('Bolivia', 'Bolivia'),('Bosnia and Herzegovina', 'Bosnia and Herzegovina'),('Botswana', 'Botswana'),('Brazil', 'Brazil'),('Brunei ', 'Brunei '),('Bulgaria', 'Bulgaria'),('Burkina Faso', 'Burkina Faso'),
 ('Burma', 'Burma'),('Burundi', 'Burundi'),('Cambodia', 'Cambodia'),('Cameroon', 'Cameroon'),('Canada', 'Canada'),('Cape Verde', 'Cape Verde'),('Central African Republic', 'Central African Republic'),('Chad', 'Chad'),('Chile', 'Chile'),('Colombia', 'Colombia'),('Comoros', 'Comoros'),('Congo, Democratic Republic of the', 'Congo, Democratic Republic of the'),('Congo, Republic of the', 'Congo, Republic of the'),('Costa Rica', 'Costa Rica'),('Cote dIvoire', 'Cote dIvoire'),('Croatia', 'Croatia'),('Cuba', 'Cuba'),('Curacao', 'Curacao'),('Cyprus', 'Cyprus'),('Czech Republic', 'Czech Republic'),('Denmark', 'Denmark'),('Djibouti', 'Djibouti'),('Dominica', 'Dominica'),('Dominican Republic', 'Dominican Republic'),
@@ -92,7 +92,7 @@ class ExperienceCalendarForm(forms.Form):
     blockout_repeat_cycle_1 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
     blockout_repeat_frequency_1 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     blockout_repeat_end_date_1 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    blockout_repeat_extra_information_1 = forms.CharField(required=False, max_length=50)
+    blockout_repeat_extra_information_1 = forms.CharField(required=False, max_length=70)
 
     blockout_start_datetime_2 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     blockout_end_datetime_2 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
@@ -100,7 +100,7 @@ class ExperienceCalendarForm(forms.Form):
     blockout_repeat_cycle_2 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
     blockout_repeat_frequency_2 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     blockout_repeat_end_date_2 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    blockout_repeat_extra_information_2 = forms.CharField(required=False, max_length=50)
+    blockout_repeat_extra_information_2 = forms.CharField(required=False, max_length=70)
 
     blockout_start_datetime_3 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     blockout_end_datetime_3 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
@@ -108,7 +108,7 @@ class ExperienceCalendarForm(forms.Form):
     blockout_repeat_cycle_3 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
     blockout_repeat_frequency_3 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     blockout_repeat_end_date_3 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    blockout_repeat_extra_information_3 = forms.CharField(required=False, max_length=50)
+    blockout_repeat_extra_information_3 = forms.CharField(required=False, max_length=70)
 
     blockout_start_datetime_4 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     blockout_end_datetime_4 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
@@ -116,7 +116,7 @@ class ExperienceCalendarForm(forms.Form):
     blockout_repeat_cycle_4 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
     blockout_repeat_frequency_4 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     blockout_repeat_end_date_4 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    blockout_repeat_extra_information_4 = forms.CharField(required=False, max_length=50)
+    blockout_repeat_extra_information_4 = forms.CharField(required=False, max_length=70)
 
     blockout_start_datetime_5 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     blockout_end_datetime_5 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
@@ -124,7 +124,7 @@ class ExperienceCalendarForm(forms.Form):
     blockout_repeat_cycle_5 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
     blockout_repeat_frequency_5 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     blockout_repeat_end_date_5 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    blockout_repeat_extra_information_5 = forms.CharField(required=False, max_length=50)
+    blockout_repeat_extra_information_5 = forms.CharField(required=False, max_length=70)
 
     instant_booking_start_datetime_1 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     instant_booking_end_datetime_1 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
@@ -132,7 +132,7 @@ class ExperienceCalendarForm(forms.Form):
     instant_booking_repeat_cycle_1 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
     instant_booking_repeat_frequency_1 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     instant_booking_repeat_end_date_1 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    instant_booking_repeat_extra_information_1 = forms.CharField(required=False, max_length=50)
+    instant_booking_repeat_extra_information_1 = forms.CharField(required=False, max_length=70)
 
     instant_booking_start_datetime_2 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     instant_booking_end_datetime_2 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
@@ -140,7 +140,7 @@ class ExperienceCalendarForm(forms.Form):
     instant_booking_repeat_cycle_2 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
     instant_booking_repeat_frequency_2 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     instant_booking_repeat_end_date_2 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    instant_booking_repeat_extra_information_2 = forms.CharField(required=False, max_length=50)
+    instant_booking_repeat_extra_information_2 = forms.CharField(required=False, max_length=70)
 
     instant_booking_start_datetime_3 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     instant_booking_end_datetime_3 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
@@ -148,7 +148,7 @@ class ExperienceCalendarForm(forms.Form):
     instant_booking_repeat_cycle_3 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
     instant_booking_repeat_frequency_3 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     instant_booking_repeat_end_date_3 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    instant_booking_repeat_extra_information_3 = forms.CharField(required=False, max_length=50)
+    instant_booking_repeat_extra_information_3 = forms.CharField(required=False, max_length=70)
 
     instant_booking_start_datetime_4 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     instant_booking_end_datetime_4 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
@@ -156,7 +156,7 @@ class ExperienceCalendarForm(forms.Form):
     instant_booking_repeat_cycle_4 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
     instant_booking_repeat_frequency_4 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     instant_booking_repeat_end_date_4 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    instant_booking_repeat_extra_information_4 = forms.CharField(required=False, max_length=50)
+    instant_booking_repeat_extra_information_4 = forms.CharField(required=False, max_length=70)
 
     instant_booking_start_datetime_5 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     instant_booking_end_datetime_5 = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
@@ -164,7 +164,7 @@ class ExperienceCalendarForm(forms.Form):
     instant_booking_repeat_cycle_5 = forms.ChoiceField(required=False, choices=Repeat_Cycle)
     instant_booking_repeat_frequency_5 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     instant_booking_repeat_end_date_5 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    instant_booking_repeat_extra_information_5 = forms.CharField(required=False, max_length=50)
+    instant_booking_repeat_extra_information_5 = forms.CharField(required=False, max_length=70)
 
     def __init__(self, *args, **kwargs):
         super(ExperienceCalendarForm, self).__init__(*args, **kwargs)

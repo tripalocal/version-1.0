@@ -16,21 +16,20 @@ from app.forms import SubscriptionForm, HomepageSearchForm, UserProfileForm, Use
 from app.models import Subscription, RegisteredUser, InstantBookingTimePeriod, BlockOutTimePeriod
 from django.core.mail import send_mail
 from django.contrib import messages
-import string, random, pytz, base64, subprocess
+import string, random, pytz, base64, subprocess, os, geoip2.database
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import ByCityExperienceListView
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment
 from django.core.files.uploadedfile import SimpleUploadedFile, File
-import os
 from django.db import connections
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as _
 from post_office import mail
 from django.contrib.auth.models import User
-import geoip2.database
 from os import path
+from PIL import Image
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
@@ -285,10 +284,11 @@ def myreservation(request):
         experience = Experience.objects.get(id=booking.experience_id)
         payment = Payment.objects.get(id=booking.payment_id) if booking.payment_id != None else Payment()
         guest = User.objects.get(id=booking.user_id)
+        phone_number = payment.phone_number if payment.phone_number != None and len(payment.phone_number) else guest.registereduser.phone_number
         reservation = {"booking_datetime":booking.datetime, "booking_status":booking.status,"booking_guest_number":booking.guest_number,
                        "experience_id":experience.id,"experience_title":experience.title, 
                        "payment_city":payment.city, "payment_country":payment.country,
-                       "guest_first_name":guest.first_name, "guest_last_name":guest.last_name}
+                       "guest_first_name":guest.first_name, "guest_last_name":guest.last_name, "guest_phone_number":phone_number}
 
         if datetime.utcnow().replace(tzinfo=pytz.utc) > booking.datetime + timedelta(hours=48):
             past_reservations.append(reservation)
@@ -460,12 +460,20 @@ def myprofile(request):
                 extension = extension.lower();
                 if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                     filename = 'host' + str(request.user.id) + '_1_' + request.user.first_name.title() + request.user.last_name[:1].title() + extension
-                    for chunk in request.FILES['image'].chunks():
-                        destination = open(dirname + filename, 'wb+')               
+                    destination = open(dirname + filename, 'wb+')
+                    for chunk in request.FILES['image'].chunks():              
                         destination.write(chunk)
-                        destination.close()
+                    destination.close()
                     profile.image_url = "hosts/" + str(request.user.id) + '/host' + str(request.user.id) + '_1_' + request.user.first_name.title() + request.user.last_name[:1].title() + extension
                     profile.image = profile.image_url
+
+                    #crop the image
+                    im = Image.open(dirname + filename)
+                    w, h = im.size
+                    if w > h:
+                        im.crop((int((w-h)/2), 0, int(w-(w-h)/2), h)).save(dirname + filename)
+                    else:
+                        im = im.crop((0, int((h-w)/2), w, int(h-(h-w)/2))).save(dirname + filename)
             
                     #copy to the chinese website -- folder+file
                     dirname_cn = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts/' + str(request.user.id) + '/'

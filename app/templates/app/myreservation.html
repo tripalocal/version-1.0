@@ -74,7 +74,7 @@
                             {% endif %}
                             <p class="reservation-info-position" style="max-width:200px;">
                                 <span id="highlighted">{{reservation.experience_title}}</span><br>
-                                with <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span><br>
+                                with <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span><span> ({{reservation.guest_phone_number}})</span><br>
                                 from {{reservation.payment_city}}, {{reservation.payment_country}}
                             </p>
                         </div>

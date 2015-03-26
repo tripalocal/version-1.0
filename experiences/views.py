@@ -8,7 +8,7 @@ from django.views.generic import DetailView
 from django.contrib.formtools.wizard.views import SessionWizardView, NamedUrlSessionWizardView
 from experiences.forms import *
 from datetime import *
-import pytz, string, os, json, math, PIL, xlsxwriter
+import pytz, string, os, json, math, PIL, xlsxwriter, time, sys
 from django.template import RequestContext, loader
 from experiences.models import Experience, Booking, Payment
 from django.contrib.auth.models import User
@@ -1260,7 +1260,6 @@ class ExperienceWizard(NamedUrlSessionWizardView):
 
         prev_files = self.storage.get_step_files('photo')
 
-        thumbnail_created = False
         if prev_files:
             for index in range(1,MaxPhotoNumber+1):
                 if 'photo-experience_photo_' + str(index) in prev_files:
@@ -1277,10 +1276,10 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                         extension = '.jpg'
                         filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-                        for chunk in content.chunks():
-                            destination = open(dirname + filename, 'wb+')               
+                        destination = open(dirname + filename, 'wb+')
+                        for chunk in content.chunks():             
                             destination.write(chunk)
-                            destination.close()
+                        destination.close()
 
                         #copy to the chinese website -- folder+file
                         dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/experiences/' + str(experience.id) + '/'
@@ -1288,23 +1287,6 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                             os.mkdir(dirname_other)
 
                         subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
-
-                        #create the corresponding thumbnail (force .jpg)
-                        if not thumbnail_created:
-                            thumbnail_created = True
-                            basewidth = 400
-                            img = Image.open(dirname + filename)
-                            wpercent = (basewidth/float(img.size[0]))
-                            hsize = int((float(img.size[1])*float(wpercent)))
-                            img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-                            img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_1.jpg')
-
-                            #copy to the chinese website -- folder+file
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
-                            if not os.path.isdir(dirname_other):
-                                os.mkdir(dirname_other)
-
-                            subprocess.Popen(['cp',settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_1.jpg', dirname_other + 'experience' + str(experience.id) + '_1.jpg'])
 
                         if not len(experience.photo_set.filter(name__startswith=filename))>0:
                             photo = Photo(name = filename, directory = 'experiences/' + str(experience.id) + '/', 
@@ -1336,6 +1318,28 @@ class ExperienceWizard(NamedUrlSessionWizardView):
         #    return render_to_response('experience_confirmation.html', { 'experience':experience, 'add':False
         #        #'form_list': f, #'form_data': [form.cleaned_data for form in form_list],
         #    })
+
+        if prev_files and 'photo-experience_photo_1' in prev_files:
+            #create the corresponding thumbnail (force .jpg)
+            basewidth = 400
+            #all images are changed to .jpg
+            filename = 'experience' + str(experience.id) + '_1.jpg'
+            try:
+                img = Image.open(dirname + filename)
+                wpercent = (basewidth/float(img.size[0]))
+                hsize = int((float(img.size[1])*float(wpercent)))
+                img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+                img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_1.jpg')
+
+                #copy to the chinese website -- folder+file
+                dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
+                if not os.path.isdir(dirname_other):
+                    os.mkdir(dirname_other)
+
+                subprocess.Popen(['cp',settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_1.jpg', dirname_other + 'experience' + str(experience.id) + '_1.jpg'])
+            except (OSError, IOError):
+                raise
+
         return HttpResponseRedirect("/mylisting")
 
 def experience_booking_successful(request, experience, guest_number, booking_datetime):
@@ -1613,10 +1617,10 @@ def create_experience(request, id=None):
                     extension = extension.lower();
                     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                         filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-                        for chunk in request.FILES['experience_photo_'+str(index)].chunks():
-                            destination = open(dirname + filename, 'wb+')               
+                        destination = open(dirname + filename, 'wb+') 
+                        for chunk in request.FILES['experience_photo_'+str(index)].chunks():            
                             destination.write(chunk)
-                            destination.close()
+                        destination.close()
 
                         #create the corresponding thumbnail (force .jpg)
                         if not thumbnail_created:
@@ -1888,11 +1892,19 @@ def ByCityExperienceListView(request, city, start_date=datetime.utcnow().replace
     i = 0
     while i < len(experienceList):
         experience = experienceList[i]
+
+        if experience.dynamic_price and len(experience.dynamic_price) > 0 and experience.guest_number_min < 4:
+            dp = experience.dynamic_price.split(',')
+            if experience.guest_number_max < 4:
+                experience.price = dp[len(dp)-1]
+            else:
+                experience.price = dp[4-experience.guest_number_min]
+
         if experience.start_datetime > end_date or experience.end_datetime < start_date :
             i += 1
             continue
 
-        if (experience.city.lower() == city.lower()):
+        if (experience.city.lower() == city.lower()):#dup
             rate = 0.0
             counter = 0
             for review in experience.review_set.all():
@@ -1912,10 +1924,43 @@ def ByCityExperienceListView(request, city, start_date=datetime.utcnow().replace
                     if rateList[counter] < rate:
                         rateList.insert(counter, rate)
                         break
-                    else:
+                    elif rateList[counter] > rate:
                         counter += 1
                         if counter == len(rateList):
                             rateList.append(rate)
+                            break
+                    else:
+                        # == --> check instant booking time, unavailable time
+                        if len(experience.instantbookingtimeperiod_set.all()) > 0:
+                            #the exp has set instant booking
+                            while counter < len(rateList) and rateList[counter] == rate and len(cityExperienceList[counter].instantbookingtimeperiod_set.all()) > 0:
+                                counter += 1
+                            if counter == len(rateList):
+                                rateList.append(rate)
+                            else:
+                                rateList.insert(counter, rate)
+                            break
+                        elif not len(experience.blockouttimeperiod_set.all()) > 0:
+                            #the exp has neither set instant booking nor blockout time
+                            while counter < len(rateList) and rateList[counter] == rate:
+                                counter += 1
+                            if counter == len(rateList):
+                                rateList.append(rate)
+                            else:
+                                rateList.insert(counter, rate)
+                            break
+                        else:
+                            #the exp has set blockout time
+                            while counter < len(rateList) and rateList[counter] == rate:
+                                if len(cityExperienceList[counter].instantbookingtimeperiod_set.all()) > 0 or len(cityExperienceList[counter].blockouttimeperiod_set.all()) > 0:
+                                    counter += 1
+                                else:
+                                    break
+                            if counter == len(rateList):
+                                rateList.append(rate)
+                            else:
+                                rateList.insert(counter, rate)
+                            break
 
             cityExperienceList.insert(counter, experience)
             cityExperienceReviewList.insert(counter, getNReviews(experience.id))

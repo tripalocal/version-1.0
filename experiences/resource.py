@@ -210,11 +210,11 @@ def saveBookingRequestsFromXLS(request):
                 file = request.FILES['file']
                 name, extension = os.path.splitext(file.name)
                 extension = extension.lower();
-                if extension in ('.xls', '.xlsx') :
-                    for chunk in file.chunks():
-                        destination = open(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name), 'wb+')               
+                if extension in ('.xls', '.xlsx'):
+                    destination = open(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name), 'wb+')
+                    for chunk in file.chunks():             
                         destination.write(chunk)
-                        destination.close()
+                    destination.close()
 
                 workbook = xlrd.open_workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name))
             except OSError:

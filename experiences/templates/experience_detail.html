@@ -4,7 +4,7 @@
 {% block head %}
     {% load staticfiles %}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
-    <title> {{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %} </title>
+    <title> {{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %} </title>
 {% endblock %}
 
 {% block content %}
@@ -34,7 +34,7 @@
                         <div class="profile-lg">
                             <img src="{{ MEDIA_URL }}{{ host_image }}" width="240" height="240">
                         </div>
-                        Reservation with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
+                        Reservation with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
                         <br>{%if experience.language == "english;"%}English{%elif experience.language == "english;mandarin;"%}English / 中文{%else%}English / 中文翻译{%endif%}
                         <br><br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
                         <span id="experience_price">${{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span> per person<br>for {{ experience.duration }} hours<br>
@@ -83,7 +83,7 @@
                 </div>
             
         	    <div class="desBox">
-                    <h1>{{ experience.title }} with {% for h in experience.hosts.all %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endfor %}</h1>
+                    <h1>{{ experience.title }} with {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}</h1>
                     <p> {{ experience.location }} </p>
                     <p> {{ experience.description }} </p>
                     <p style="display:none;"><a href="#">Contact Host</a></p>
@@ -175,10 +175,10 @@
         <div class="row">
             <div class="fixCenter">
                 <div class="bioBox">
-                	<h2>Host profile - {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</h2>
+                	<h2>Host profile - {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</h2>
                     <div class="profile-lg"><img src="{{ MEDIA_URL }}{{ host_image }}" width="240" height="240"></div>
                     <div class="bioText">
-                        <p>{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.bio }}{% endif %}{% endfor %}</p>
+                        <p id="host_bio_p">{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.bio }}{% endif %}{% endfor %}</p>
                         <a class="btn btn-primary btn-sm" role="button" style="display:none;">Contact Host</a>
                     </div>
                 </div>
@@ -243,6 +243,10 @@ $(function(){
         if(screen.width > 767){
             $(document.body).stickem();
         }
+
+        bio = $("#host_bio_p").html();
+        bio = bio.replace(/(?:\r\n|\r|\n)/g, '<br />');
+        $("#host_bio_p").html(bio);
 
         var i=0;
         for(; $("#id_date option").eq(i).length; i++)
