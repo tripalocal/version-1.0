@@ -840,10 +840,11 @@ body {
 #location-city select{
 	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; width: 110px; background-position: 85px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px;}
 /*list-pricing.html*/
-
+#section-add-price {height:350px;}
 #group-size-section{float: right;width: 450px; padding-top: 30px;}
 #group-size-section p{float: left; color: #999999; }
-#group-size-section input[type=number]{float: left; width: 100px; height:35px; border: 1px solid #AAAAAA; border-radius: 3px; background-color: #FFF; margin-top: 10px; padding-left: 15px; color: #999999;}
+#group-size-section select{
+	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; background-position: 75px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px; margin-top:5px;}
 #group-size-heading{margin-bottom: 0px;}
 #group-size-min{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
 #group-size-max{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
@@ -851,9 +852,9 @@ body {
 #price-section input[type=number]{float: left; width: 100px; height:35px; border: 1px solid #AAAAAA; border-radius: 3px; background-color: #FFF; margin-top: 10px; padding-left: 25px; color: #999999; position: relative; top: -17px; z-index: 0;}
 #customers-pay{color: #999999;}
 #commission{color: #999999;}
-#commission-price,#commission-price-2{color: #999999; padding-top: 20px; padding-left: 30px; position: relative; top: -18px; z-index: 0;}
-#commission-price{padding-top: 0px;}
-#commission-price-2{padding-left: 50px;}
+.commission-price,.commission-price-2{color: #999999; padding-top: 3px; padding-left: 15px; position: relative; top: -18px; z-index: 0;}
+/*.commission-price{padding-top: 0px;}
+.commission-price-2{padding-left: 50px;}*/
 #price-per-person{color: #999999;}
 .float-left{float: left;}
 .math-symbol, .math-symbol-2, .math-symbol-3{color: #999999; padding-top: 30px; padding-left: 20px; padding-right: 20px;}
@@ -877,8 +878,9 @@ body {
 #experience-title input[type=text]{width: 100%; max-width:500px; height: 60px; border-radius: 5px; border: 1px solid #CCCCCC; margin-left: 20px;}
 #experience-title input[value]{padding-left: 30px; color: #5E5E5E; font-size: 20px;}
 #experience-title p{padding-left: 350px; padding-top: 15px;}
-#experience-duration input[type=number]{width: 100px; height: 60px; border-radius: 5px; border: 1px solid #CCCCCC; margin-left: 20px; margin-right: 20px; float: left;}
-#experience-duration input[value]{padding-left: 30px; color: #5E5E5E; font-size: 20px;}
+#experience-duration select{
+	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; height: 60px; background-position: 60px 17px; border: 1px solid #CCCCCC; background-color: #FFF; border-radius: 5px; padding: 5px; color: #5E5E5E; font-size: 20px; padding-left: 30px; margin-left: 20px;}
+#experience-duration option{color: #5E5E5E; font-size: 20px;}
 #experience-duration p{padding-left: 237px; padding-top: 15px;}
 #experience-city select{
 	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 200px; height: 60px; background-position: 160px 17px; border: 1px solid #CCCCCC; background-color: #FFF; border-radius: 5px; padding: 5px; color: #5E5E5E; font-size: 20px; padding-left: 30px; margin-left: 20px;}
@@ -951,6 +953,9 @@ body {
 
 #your-reservation{padding-left: 6px; padding-right: 6px;}
 
+#save-and-exit-top{background:none;border:none;color:white;}
+
+#section-add-location{height:400px;}
 
 #id_email_error, #id_password1_error, #first_name_error, #last_name_error{color: #FB716E; border: 1px solid #FB716E; background-color: #FECCCC; padding-left: 30px; padding-top: 2px; background-image: url(/images/error_icon.png); background-repeat: no-repeat; background-position: left top;}
 
@@ -958,10 +963,47 @@ body {
 
 /*fix bug on about us page*/
 .support_about_us{width: 100%;}
-@media (max-width: 767px)
+@media (max-width: 767px){
 .support_about_us{background-image: url(/images/support_logos_s.jpg); height: 191px; background-repeat: no-repeat; background-position-y: 55px; background-position-x:center;}
-@meida (min-width: 768px)
+}
+
+@media (min-width: 768px){
 .support_about_us{background-image: url(/images/support_logos_l.jpg); height: 200px; background-repeat: no-repeat; background-position-y: 80px; background-position:0px;}
+}
+
 /*fix calendar background color*/
 .fc-future{background-color: white;}
+/*optimize mobile page for my_trip*/
+.icon-text{margin-right:0px; color:#858585; display: inline-block; margin-top: 15px; float: left;}
 
+.rigthInterface img{float: left; margin-top: 10px;}
+#booking-detail{float: left;}
+
+@media (max-width: 768px){
+.menu .menu-language{display: none;}
+.menu #id_profile_div{display: none;}
+.tab_area{display: none;}
+.leftsubMenu{display: none;}
+.rightInterface{padding: 0px; width: auto; float: none; margin-left:20px; margin-right: 20px; }
+.rightInterface p{padding-top: 10px; padding-left: 20px;}
+.tab_area{display: none;}
+.rightInterface hr{margin-top: 0px; margin-bottom: 0px;}
+.rightInterface img{margin-left: 15px; margin-top: 20px; float: left;}
+#booking-detail{width: 160px; margin-top: 10px;}
+.map_box{float: left; left: 0px; margin-left: 15px; width: 260px; margin-bottom: 20px;}
+#date{margin-left: 15px;}
+}
+@media (max-width: 992px){
+.menu .menu-language{display: none;}
+.menu #id_profile_div{display: none;}
+.tab_area{display: none;}
+.leftsubMenu{display: none;}
+.rightInterface{padding: 0px; width: auto; float: none; margin-left:20px; margin-right: 20px; }
+.rightInterface p{padding-top: 10px; padding-left: 20px;}
+.tab_area{display: none;}
+.rightInterface hr{margin-top: 0px; margin-bottom: 0px;}
+.rightInterface img{margin-left: 15px; margin-top: 20px; float: left;}
+#booking-detail{width: 320px; margin-top: 10px;}
+.map_box{float: left; left: 0px; margin-left: 15px; width: 260px; margin-bottom: 20px;}
+#date{margin-left: 15px;}
+}

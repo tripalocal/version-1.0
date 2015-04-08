@@ -295,6 +295,22 @@ $(function(){
             $("#experience_booking_form").submit();
         });
         
+        min_number = parseInt($("#guest_number_min").attr("name"));
+        max_number = parseInt($("#guest_number_max").attr("name"));
+        if(min_number < 4)
+        {
+            if(max_number >= 4)
+            {
+                $("#id_guest_number").val(4);
+                $("#id_guest_number").change();
+            }
+            else
+            {
+                $("#id_guest_number").val(max_number);
+                $("#id_guest_number").change();
+            }
+        }
+        
         mixpanel.track("Viewed experience page");
         if($("#user_email").val())
         {

@@ -25,13 +25,13 @@
                     <a href="/mylisting">Managing Listing</a>
                 </p>
                 <p>
-                    <a href="#" id="active-tab">Your Reservation</a>
+                    <a href="#" id="active-tab">My Reservation</a>
                 </p>
             </div>
 
 			<div class="right-content-box" style="padding:0px;">
 		        <div class="right-content-box-header">
-                    <p class="right-content-box-heading">Your Reservations</p>
+                    <p class="right-content-box-heading">My Reservation</p>
                 </div>
 
 		        {% for reservation in current_reservations %}
@@ -90,7 +90,7 @@
 
             <div class="right-content-box" id="completed-reservation">
 		        <div class="right-content-box-header">
-                    <p class="right-content-box-heading">Past Reservations</p>
+                    <p class="right-content-box-heading">Past Reservation</p>
                 </div>
 
 		        {% for reservation in past_reservations %}

@@ -71,7 +71,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', end
 .profile-sm {width: 80px;height: 80px; float:right;}
 .profile-sm img{margin-top: 5px; margin-left:5px;width: 70px;height: 70px;}
 .profile-xs {width:35px;height:35px; float:left; margin-top:-7px;}
-.profile-xs img{width:35px;height:35px;}
+.profile-xs img{width:35px;height:35px;background-size:cover;}
 .profile-lg, .profile-md, .profile-sm, .profile-xs{background-color: #FFF;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border-radius: 100px;}
 .profile-lg img, .profile-md img, .profile-sm img, .profile-xs img{border-radius: 100px;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border: #CCC solid 1px;}
 

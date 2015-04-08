@@ -88,7 +88,9 @@
 
     <!-- right-side calendar -->
 {% if edit %}
+    <input type="hidden" id="edit" value="true" readonly>
     <div class="calendar">
+        <input type="hidden" id="saved" value="false" readonly>
         {{wizard.form.start_datetime}}
         {{wizard.form.end_datetime}}
 
@@ -108,7 +110,7 @@
             {{wizard.form.blockout_repeat_1}} Repeat <br>
             <div id="blockout_repeat_1">
                 Repeats:{{wizard.form.blockout_repeat_cycle_1}}
-                Repeat every: {{wizard.form.blockout_repeat_frequency_1}} <label id="blockout_repeat_frequency_label_1">Days</label>
+                Repeat every: {{wizard.form.blockout_repeat_frequency_1}} <label id="blockout_repeat_frequency_label_1">Weeks</label>
                 <div id="blockout_repeat_on_1">
                     Repeat on:  <div><input id="blockout_repeat_on_sunday_1" type="checkbox">S</div>
                                 <div><input id="blockout_repeat_on_monday_1" type="checkbox">M</div>
@@ -141,7 +143,7 @@
             {{wizard.form.blockout_repeat_2}} Repeat <br>
             <div id="blockout_repeat_2">
                 Repeats:{{wizard.form.blockout_repeat_cycle_2}}
-                Repeat every: {{wizard.form.blockout_repeat_frequency_2}} <label id="blockout_repeat_frequency_label_2">Days</label>
+                Repeat every: {{wizard.form.blockout_repeat_frequency_2}} <label id="blockout_repeat_frequency_label_2">Weeks</label>
                 <div id="blockout_repeat_on_2">
                     Repeat on:  <div><input id="blockout_repeat_on_sunday_2" type="checkbox">S</div>
                                 <div><input id="blockout_repeat_on_monday_2" type="checkbox">M</div>
@@ -174,7 +176,7 @@
             {{wizard.form.blockout_repeat_3}} Repeat <br>
             <div id="blockout_repeat_3">
                 Repeats:{{wizard.form.blockout_repeat_cycle_3}}
-                Repeat every: {{wizard.form.blockout_repeat_frequency_3}} <label id="blockout_repeat_frequency_label_3">Days</label>
+                Repeat every: {{wizard.form.blockout_repeat_frequency_3}} <label id="blockout_repeat_frequency_label_3">Weeks</label>
                 <div id="blockout_repeat_on_3">
                     Repeat on:  <div><input id="blockout_repeat_on_sunday_3" type="checkbox">S</div>
                                 <div><input id="blockout_repeat_on_monday_3" type="checkbox">M</div>
@@ -207,7 +209,7 @@
             {{wizard.form.blockout_repeat_4}} Repeat <br>
             <div id="blockout_repeat_4">
                 Repeats:{{wizard.form.blockout_repeat_cycle_4}}
-                Repeat every: {{wizard.form.blockout_repeat_frequency_4}} <label id="blockout_repeat_frequency_label_4">Days</label>
+                Repeat every: {{wizard.form.blockout_repeat_frequency_4}} <label id="blockout_repeat_frequency_label_4">Weeks</label>
                 <div id="blockout_repeat_on_4">
                     Repeat on:  <div><input id="blockout_repeat_on_sunday_4" type="checkbox">S</div>
                                 <div><input id="blockout_repeat_on_monday_4" type="checkbox">M</div>
@@ -258,7 +260,7 @@
                 </div>
                 <div class="repeat-every">
                     <p>Repeat every</p>
-                    {{wizard.form.blockout_repeat_frequency_5}} <label id="blockout_repeat_frequency_label_5">Days</label>
+                    {{wizard.form.blockout_repeat_frequency_5}} <label id="blockout_repeat_frequency_label_5">Weeks</label>
                 </div>
                 <div id="blockout_repeat_on_5" class="repeats-on">
                     <p>Repeat on</p>  
@@ -297,7 +299,7 @@
             {{wizard.form.instant_booking_repeat_1}} Repeat <br>
             <div id="instant_booking_repeat_1">
                 Repeats:{{wizard.form.instant_booking_repeat_cycle_1}}
-                Repeat every: {{wizard.form.instant_booking_repeat_frequency_1}} <label id="instant_booking_repeat_frequency_label_1">Days</label>
+                Repeat every: {{wizard.form.instant_booking_repeat_frequency_1}} <label id="instant_booking_repeat_frequency_label_1">Weeks</label>
                 <div id="instant_booking_repeat_on_1">
                     Repeat on:  <div><input id="instant_booking_repeat_on_sunday_1" type="checkbox">S</div>
                                 <div><input id="instant_booking_repeat_on_monday_1" type="checkbox">M</div>
@@ -330,7 +332,7 @@
             {{wizard.form.instant_booking_repeat_2}} Repeat <br>
             <div id="instant_booking_repeat_2">
                 Repeats:{{wizard.form.instant_booking_repeat_cycle_2}}
-                Repeat every: {{wizard.form.instant_booking_repeat_frequency_2}} <label id="instant_booking_repeat_frequency_label_2">Days</label>
+                Repeat every: {{wizard.form.instant_booking_repeat_frequency_2}} <label id="instant_booking_repeat_frequency_label_2">Weeks</label>
                 <div id="instant_booking_repeat_on_2">
                     Repeat on:  <div><input id="instant_booking_repeat_on_sunday_2" type="checkbox">S</div>
                                 <div><input id="instant_booking_repeat_on_monday_2" type="checkbox">M</div>
@@ -363,7 +365,7 @@
             {{wizard.form.instant_booking_repeat_3}} Repeat <br>
             <div id="instant_booking_repeat_3">
                 Repeats:{{wizard.form.instant_booking_repeat_cycle_3}}
-                Repeat every: {{wizard.form.instant_booking_repeat_frequency_3}} <label id="instant_booking_repeat_frequency_label_3">Days</label>
+                Repeat every: {{wizard.form.instant_booking_repeat_frequency_3}} <label id="instant_booking_repeat_frequency_label_3">Weeks</label>
                 <div id="instant_booking_repeat_on_3">
                     Repeat on:  <div><input id="instant_booking_repeat_on_sunday_3" type="checkbox">S</div>
                                 <div><input id="instant_booking_repeat_on_monday_3" type="checkbox">M</div>
@@ -396,7 +398,7 @@
             {{wizard.form.instant_booking_repeat_4}} Repeat <br>
             <div id="instant_booking_repeat_4">
                 Repeats:{{wizard.form.instant_booking_repeat_cycle_4}}
-                Repeat every: {{wizard.form.instant_booking_repeat_frequency_4}} <label id="instant_booking_repeat_frequency_label_4">Days</label>
+                Repeat every: {{wizard.form.instant_booking_repeat_frequency_4}} <label id="instant_booking_repeat_frequency_label_4">Weeks</label>
                 <div id="instant_booking_repeat_on_4">
                     Repeat on:  <div><input id="instant_booking_repeat_on_sunday_4" type="checkbox">S</div>
                                 <div><input id="instant_booking_repeat_on_monday_4" type="checkbox">M</div>
@@ -447,7 +449,7 @@
                 </div>
                 <div class="repeat-every">
                     <p>Repeat every</p>
-                    {{wizard.form.instant_booking_repeat_frequency_5}} <label id="instant_booking_repeat_frequency_label_5">Days</label>
+                    {{wizard.form.instant_booking_repeat_frequency_5}} <label id="instant_booking_repeat_frequency_label_5">Weeks</label>
                 </div>
                 <div id="instant_booking_repeat_on_5" class="repeats-on">
                     <p>Repeat on</p>  
@@ -478,6 +480,7 @@
         </div>
     </div>
 {%else%}
+    <input type="hidden" id="edit" value="false" readonly>
     <div class="calendar">
         <p id="calendarIcon"><img src="/images/calendarIcon.jpg"></p>
         <p id="calendarText">Once you have submitted your experience, <br>you can manage your calendar here.</p>
@@ -520,7 +523,7 @@
 <script charset="utf-8" type="text/javascript">
     function hideblockout_repeat(i) {
         $("#blockout_repeat_"+i).attr("style", "display:none;");
-        $("#blockout_repeat_on_"+i).attr("style", "display:none;");
+        //$("#blockout_repeat_on_"+i).attr("style", "display:none;");
         $("#blockout_repeat_by_"+i).attr("style", "display:none;");
         $("#id_calendar-blockout_repeat_cycle_"+i).attr("style", "display:none;");
         $("#id_calendar-blockout_repeat_frequency_"+i).attr("style", "display:none;");
@@ -535,6 +538,11 @@
         $("#id_calendar-blockout_repeat_frequency_"+i).attr("style", "");
         $("#id_calendar-blockout_repeat_end_date_"+i).attr("style", "");
         $("#id_calendar-blockout_repeat_end_date_"+i+"_picker").attr("style", "");
+
+        if($("#id_calendar-blockout_repeat_cycle_"+i).val().trim()=="Monthly")
+        {
+            $("#blockout_repeat_by_"+i).attr("style", "");
+        }
     }
 
     function hideblockout(i) {
@@ -879,7 +887,7 @@
 
     function hideinstantbooking_repeat(i) {
         $("#instant_booking_repeat_"+i).attr("style", "display:none;");
-        $("#instant_booking_repeat_on_"+i).attr("style", "display:none;");
+        //$("#instant_booking_repeat_on_"+i).attr("style", "display:none;");
         $("#instant_booking_repeat_by_"+i).attr("style", "display:none;");
         $("#id_calendar-instant_booking_repeat_cycle_"+i).attr("style", "display:none;");
         $("#id_calendar-instant_booking_repeat_frequency_"+i).attr("style", "display:none;");
@@ -894,6 +902,11 @@
         $("#id_calendar-instant_booking_repeat_frequency_"+i).attr("style", "");
         $("#id_calendar-instant_booking_repeat_end_date_"+i).attr("style", "");
         $("#id_calendar-instant_booking_repeat_end_date_"+i+"_picker").attr("style", "");
+
+        if($("#id_calendar-instant_booking_repeat_cycle_"+i).val().trim()=="Monthly")
+        {
+            $("#instant_booking_repeat_by_"+i).attr("style", "");
+        }
     }
 
     function hideinstantbooking(i) {
@@ -1148,6 +1161,21 @@
                 hideinstantbooking(i);
             }
         });
+    }
+
+    function saveandexit()
+    {
+        for(i=1;i<=5;i++)
+        {
+            if($("#blockout_"+i).attr("style")!="display:none;")
+            {
+                $("#id_add_blockout_"+i).click();
+            }
+            if($("#instant_booking_"+i).attr("style")!="display:none;")
+            {
+                $("#id_add_instant_booking_"+i).click();
+            }
+        }
     }
 
     $(document).ready(function(){
@@ -1429,16 +1457,41 @@
                 $("#blockout_title_"+i).attr("style","");
             }
         }
+
+        $("#save-and-exit").click(function(e){
+            saveandexit();
+            $("#saved").val("true");
+        });
+
+        $("#save-and-exit-top").click(function(e){
+            saveandexit();
+            $("#saved").val("true");
+        });
+
+        $("#next-step").click(function(e){
+            saveandexit();
+            $("#saved").val("true");
+        });
+
+        $("#last-step").click(function(e){
+            $("#saved").val("true");
+        });
     });
-/*
+
     $(window).bind('beforeunload', function(e){
+/*      
         if(document.activeElement.type!="submit")
         {
-            $("#form_calendar").trigger('submit');
-            $("#form_calendar").submit();
-            return '';
+            return 'You have unsaved changes.';
+        }
+*/
+        if($("#saved").val()!="true" && $("#edit").val()=="true")
+        {
+            //$("#form_calendar").trigger('submit');
+            //$("#form_calendar").submit();
+            return 'You are about to leave this page.';
         }
     });
-*/
+
 </script>
 {%endblock%}

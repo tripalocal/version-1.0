@@ -40,11 +40,12 @@ def experience_fee_calculator(price):
 
     return price
 
-def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, current_datetime):
+def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, current_datetime, daylightsaving):
+    #daylightsaving: whether it was in daylightsaving when this blockout/instant booking record was created
     current_datetime_local = current_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
 
-    if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):#daylight saving
-        if not current_datetime_local.dst() != timedelta(0):# not daylight saving
+    if daylightsaving:#daylight saving
+        if current_datetime_local.dst() == timedelta(0):# not daylight saving
             current_datetime_local = current_datetime_local + relativedelta(hours=1)
     elif current_datetime_local.dst() != timedelta(0):
         current_datetime_local = current_datetime_local - relativedelta(hours=1)
@@ -99,6 +100,182 @@ def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, cur
     else:
         raise Exception("func next_time_slot, illegal repeat_cycle")
 
+def get_available_experiences(start_datetime, end_datetime, guest_number=None, city=None, keywords=None): #keywords should be a list
+    local_timezone = pytz.timezone(settings.TIME_ZONE)
+    available_options = []
+    if city is not None:
+        experiences = Experience.objects.filter(status='Listed', city__iexact=city)
+    else:
+        experiences = Experience.objects.filter(status='Listed')
+
+    for experience in experiences:
+        if guest_number is not None and (experience.guest_number_max < int(guest_number)):
+            continue
+
+        if keywords is not None:
+            experience_tags = experience.tags.split(";") if experience.tags is not None else ''
+            match = False
+            for tag in keywords:
+                if tag in experience_tags:
+                    match = True
+                    break
+            if not match:
+                continue
+
+        sdt = start_datetime
+        last_sdt = pytz.timezone('UTC').localize(datetime.min)
+
+        #calculate rate
+        rate = 0.0
+        counter = 0
+        for review in experience.review_set.all():
+            rate += review.rate
+            counter += 1
+            
+        if counter > 0:
+            rate /= counter
+
+        #check if calendar updated
+        calendar_updated = False
+        if len(experience.instantbookingtimeperiod_set.all()) > 0 or len(experience.blockouttimeperiod_set.all()) > 0:
+            calendar_updated = True
+
+        host = experience.hosts.all()[0]
+        experience_avail = {'id':experience.id, 'title': experience.title, 'meetup_spot':experience.meetup_spot, 'rate': rate, 'duration':experience.duration,
+                            'host':host.first_name + ' ' + host.last_name, 'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated, 'price':experience.price, 'dates':{}}
+
+        blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
+        blockout_start = []
+        blockout_end = []
+        blockout_index=0
+            
+        #calculate all the blockout time periods
+        for blk in blockouts:
+            if blk.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+                daylightsaving = True
+            else:
+                daylightsaving = False
+
+            if blk.repeat:
+                b_l =  blk.end_datetime - blk.start_datetime
+                if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
+                    blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+                while blk.start_datetime.date() <= blk.repeat_end_date:
+                    blockout_index += 1
+                    blockout_start.append(blk.start_datetime)
+                    blockout_end.append(blk.start_datetime + b_l)
+
+                    blk.start_datetime = next_time_slot(blk.repeat_cycle, blk.repeat_frequency, blk.repeat_extra_information, blk.start_datetime,daylightsaving)
+
+            else:
+                blockout_index += 1
+                blockout_start.append(blk.start_datetime)
+                blockout_end.append(blk.end_datetime)
+
+        blockout_start.sort()
+        blockout_end.sort()
+
+        instantbookings = experience.instantbookingtimeperiod_set.filter(experience_id=experience.id)
+        instantbooking_start = []
+        instantbooking_end = []
+        instantbooking_index=0
+
+        #calculate all the instant booking time periods
+        for ib in instantbookings :
+            if ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+                daylightsaving = True
+            else:
+                daylightsaving = False
+
+            if ib.repeat:
+                ib_l =  ib.end_datetime - ib.start_datetime
+                if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
+                    ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+                while ib.start_datetime.date() <= ib.repeat_end_date:
+                    instantbooking_index += 1
+                    instantbooking_start.append(ib.start_datetime)
+                    instantbooking_end.append(ib.start_datetime + ib_l)
+
+                    ib.start_datetime = next_time_slot(ib.repeat_cycle, ib.repeat_frequency, ib.repeat_extra_information, ib.start_datetime, daylightsaving)
+
+            else:
+                instantbooking_index += 1
+                instantbooking_start.append(ib.start_datetime)
+                instantbooking_end.append(ib.end_datetime)
+
+        instantbooking_start.sort()
+        instantbooking_end.sort()
+
+        bookings = experience.booking_set.filter(experience_id=experience.id).exclude(status__iexact="rejected")
+
+        block_i=0
+        instantbooking_i=0
+        while (sdt <= end_datetime):
+            sdt_local = sdt.astimezone(local_timezone)
+            if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):#daylight saving
+                if not sdt_local.dst() != timedelta(0):# not daylight saving
+                    sdt_local = sdt_local + relativedelta(hours=1)
+            elif sdt_local.dst() != timedelta(0):
+                sdt_local = sdt_local - relativedelta(hours=1)
+
+            if sdt_local.date() != last_sdt.date():
+                new_date = sdt_local.strftime("%Y/%m/%d")
+                experience_avail['dates'][new_date] = []
+                last_sdt = sdt_local
+            
+            #check if the date is blocked
+            blocked = False
+
+            #block 10pm-7am if repeated hourly
+            #if experience.repeat_cycle == "Hourly" and (sdt_local.time().hour <= 7 or sdt_local.time().hour >= 22):
+            #    blocked = True
+
+            if not blocked:
+                #blockout_start, blockout_end are sorted, sdt keeps increasing
+                #block_i: skip the periods already checked
+                for b_i in range(block_i, blockout_index):
+                    if (blockout_start[b_i] <= sdt and sdt <= blockout_end[b_i]) or (blockout_start[b_i] <= sdt+relativedelta(hours=+experience.duration) and sdt+relativedelta(hours=+experience.duration) <= blockout_end[b_i]):
+                        blocked = True
+                        break
+                    if sdt+relativedelta(hours=+experience.duration) < blockout_start[b_i]:
+                        #no need to check further slots after the current one
+                        break 
+                    block_i += 1
+
+            if not blocked:
+                i = 0
+                for bking in bookings :
+                    if bking.datetime == sdt and bking.status.lower() != "rejected":
+                        i += bking.guest_number
+                    #if someone book a 2pm experience, and the experience last 3 hours, the system should automatically wipe out the 3pm, 4pm and 5pm sessions 
+                    if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
+                        i += experience.guest_number_max #change from bking.guest_number to experience.guest_number_max
+
+                if i==0: #< experience.guest_number_max :
+                    if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
+                        istant_booking = False
+                        #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
+                        #instantbooking_i: skip the periods already checked
+                        for ib_i in range(instantbooking_i, instantbooking_index):
+                            if (instantbooking_start[ib_i] <= sdt and sdt <= instantbooking_end[ib_i]): # and (instantbooking_start[ib_i] <= sdt+relativedelta(hours=+experience.duration) and sdt+relativedelta(hours=+experience.duration) <= instantbooking_end[ib_i]):
+                                istant_booking = True
+                                break
+                            if sdt+relativedelta(hours=+experience.duration) < instantbooking_start[ib_i]:
+                                #no need to check further slots after the current one
+                                break 
+                            if sdt > instantbooking_start[ib_i]:
+                                instantbooking_i += 1
+
+                        dict = {'available_seat': experience.guest_number_max - i, 
+                                'time_string': sdt_local.strftime("%H").lstrip('0') if sdt_local.strftime("%H")!="00" else "0", 
+                                'instant_booking': istant_booking}
+                        experience_avail['dates'][sdt_local.strftime("%Y/%m/%d")].append(dict)
+
+            sdt += timedelta(hours=1)
+        experience_avail['dates'] = OrderedDict(sorted(experience_avail['dates'].items(), key=lambda t: t[0]))
+        available_options.append(experience_avail)
+    return available_options
+
 def experience_availability(request):
     if not request.user.is_authenticated() or not request.user.is_staff:
         return HttpResponseRedirect("/")
@@ -110,168 +287,45 @@ def experience_availability(request):
         form = ExperienceAvailabilityForm(request.POST)
 
         if form.is_valid():   
+            start_datetime = form.cleaned_data['start_datetime'] if 'start_datetime' in form.cleaned_data and form.cleaned_data['start_datetime'] != None else pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime('2015-04-01 00:00', "%Y-%m-%d %H:%M"))
             end_datetime = form.cleaned_data['end_datetime'] if 'end_datetime' in form.cleaned_data and form.cleaned_data['end_datetime'] != None else pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime('2015-04-06 00:00', "%Y-%m-%d %H:%M"))
             local_timezone = pytz.timezone(settings.TIME_ZONE)
             available_options = []
+
+            available_options = get_available_experiences(start_datetime, end_datetime)
+
             #add title
             dict = {'id':'Id', 'title':'Title', 'host':'Host', 'dates':{}}
-            sdt = form.cleaned_data['start_datetime'] if 'start_datetime' in form.cleaned_data and form.cleaned_data['start_datetime'] != None else pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime('2015-03-06 00:00', "%Y-%m-%d %H:%M"))
+            sdt = start_datetime
             while (sdt <= end_datetime):
                 dict['dates'][sdt.astimezone(local_timezone).strftime("%Y/%m/%d")] = [{'time_string':sdt.astimezone(local_timezone).strftime("%m/%d")}]
                 sdt += relativedelta(days=1)
             dict['dates'] = OrderedDict(sorted(dict['dates'].items(), key=lambda t: t[0]))
-            available_options.append(dict)
+            available_options.insert(0,dict)
 
-            experiences = Experience.objects.filter(status='Listed')
-            for experience in experiences:
-                sdt = form.cleaned_data['start_datetime'] if 'start_datetime' in form.cleaned_data and form.cleaned_data['start_datetime'] != None else pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime('2015-03-06 00:00', "%Y-%m-%d %H:%M"))
-                last_sdt = pytz.timezone('UTC').localize(datetime.min)
+            #workbook = xlsxwriter.Workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), 'Experience availability.xlsx'))
+            #worksheet = workbook.add_worksheet()
 
-                host = experience.hosts.all()[0]
-                experience_avail = {'id':experience.id, 'title': experience.title, 'host':host.first_name + ' ' + host.last_name, 'dates':{}}
-
-                blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
-                blockout_start = []
-                blockout_end = []
-                blockout_index=0
-                #calculate all the blockout time periods
-                for blk in blockouts :
-                    if blk.repeat:
-                        b_l =  blk.end_datetime - blk.start_datetime
-                        if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                            blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
-                        while blk.start_datetime.date() <= blk.repeat_end_date:
-                            blockout_index += 1
-                            blockout_start.append(blk.start_datetime)
-                            blockout_end.append(blk.start_datetime + b_l)
-
-                            blk.start_datetime = next_time_slot(blk.repeat_cycle, blk.repeat_frequency, blk.repeat_extra_information, blk.start_datetime)
-
-                    else:
-                        blockout_index += 1
-                        blockout_start.append(blk.start_datetime)
-                        blockout_end.append(blk.end_datetime)
-
-                blockout_start.sort()
-                blockout_end.sort()
-
-                instantbookings = experience.instantbookingtimeperiod_set.filter(experience_id=experience.id)
-                instantbooking_start = []
-                instantbooking_end = []
-                instantbooking_index=0
-                #calculate all the instant booking time periods
-                for ib in instantbookings :
-                    if ib.repeat:
-                        ib_l =  ib.end_datetime - ib.start_datetime
-                        if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                            ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
-                        while ib.start_datetime.date() <= ib.repeat_end_date:
-                            instantbooking_index += 1
-                            instantbooking_start.append(ib.start_datetime)
-                            instantbooking_end.append(ib.start_datetime + ib_l)
-
-                            ib.start_datetime = next_time_slot(ib.repeat_cycle, ib.repeat_frequency, ib.repeat_extra_information, ib.start_datetime)
-
-                    else:
-                        instantbooking_index += 1
-                        instantbooking_start.append(ib.start_datetime)
-                        instantbooking_end.append(ib.end_datetime)
-
-                instantbooking_start.sort()
-                instantbooking_end.sort()
-
-                bookings = experience.booking_set.filter(experience_id=experience.id).exclude(status__iexact="rejected")
-
-                block_i=0
-                instantbooking_i=0
-                while (sdt <= end_datetime):
-                    sdt_local = sdt.astimezone(local_timezone)
-                    if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):#daylight saving
-                        if not sdt_local.dst() != timedelta(0):# not daylight saving
-                            sdt_local = sdt_local + relativedelta(hours=1)
-                    elif sdt_local.dst() != timedelta(0):
-                        sdt_local = sdt_local - relativedelta(hours=1)
-
-                    if sdt_local.date() != last_sdt.date():
-                        new_date = sdt_local.strftime("%Y/%m/%d")
-                        experience_avail['dates'][new_date] = []
-                        last_sdt = sdt_local
-            
-                    #check if the date is blocked
-                    blocked = False
-
-                    #block 10pm-7am if repeated hourly
-                    #if experience.repeat_cycle == "Hourly" and (sdt_local.time().hour <= 7 or sdt_local.time().hour >= 22):
-                    #    blocked = True
-
-                    if not blocked:
-                        #blockout_start, blockout_end are sorted, sdt keeps increasing
-                        #block_i: skip the periods already checked
-                        for b_i in range(block_i, blockout_index):
-                            if (blockout_start[b_i] <= sdt and sdt <= blockout_end[b_i]) or (blockout_start[b_i] <= sdt+relativedelta(hours=+experience.duration) and sdt+relativedelta(hours=+experience.duration) <= blockout_end[b_i]):
-                                blocked = True
-                                break
-                            if sdt+relativedelta(hours=+experience.duration) < blockout_start[b_i]:
-                                #no need to check further slots after the current one
-                                break 
-                            block_i += 1
-
-                    if not blocked:
-                        i = 0
-                        for bking in bookings :
-                            if bking.datetime == sdt and bking.status.lower() != "rejected":
-                                i += bking.guest_number
-                            #if someone book a 2pm experience, and the experience last 3 hours, the system should automatically wipe out the 3pm, 4pm and 5pm sessions 
-                            if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
-                                i += experience.guest_number_max #change from bking.guest_number to experience.guest_number_max
-
-                        if i==0: #< experience.guest_number_max :
-                            if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
-                                istant_booking = False
-                                #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
-                                #instantbooking_i: skip the periods already checked
-                                for ib_i in range(instantbooking_i, instantbooking_index):
-                                    if (instantbooking_start[ib_i] <= sdt and sdt <= instantbooking_end[ib_i]): # and (instantbooking_start[ib_i] <= sdt+relativedelta(hours=+experience.duration) and sdt+relativedelta(hours=+experience.duration) <= instantbooking_end[ib_i]):
-                                        istant_booking = True
-                                        break
-                                    if sdt+relativedelta(hours=+experience.duration) < instantbooking_start[ib_i]:
-                                        #no need to check further slots after the current one
-                                        break 
-                                    if sdt > instantbooking_start[ib_i]:
-                                        instantbooking_i += 1
-
-                                dict = {'available_seat': experience.guest_number_max - i, 
-                                        'time_string': sdt_local.strftime("%H"), 
-                                        'instant_booking': istant_booking}
-                                experience_avail['dates'][sdt_local.strftime("%Y/%m/%d")].append(dict)
-
-                    sdt += timedelta(hours=1)
-                experience_avail['dates'] = OrderedDict(sorted(experience_avail['dates'].items(), key=lambda t: t[0]))
-                available_options.append(experience_avail)
-
-            workbook = xlsxwriter.Workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), 'Experience availability.xlsx'))
-            worksheet = workbook.add_worksheet()
-
-            row = 0
-            for experience in available_options:
-                col = 0
-                worksheet.write(row, col, experience['id'])
-                col += 1
-                worksheet.write(row, col, experience['title'])
-                col += 1
-                worksheet.write(row, col, experience['host'])
-                col += 1
-                for date, slots in experience['dates'].items():
-                    str=''
-                    for slot in slots:
-                        str += slot['time_string']
-                        if 'instant_booking' in slot and slot['instant_booking']:
-                            str += '(I)'
-                        str += ' '
-                    worksheet.write(row, col, str)
-                    col += 1
-                row += 1
-            workbook.close()
+            #row = 0
+            #for experience in available_options:
+            #    col = 0
+            #    worksheet.write(row, col, experience['id'])
+            #    col += 1
+            #    worksheet.write(row, col, experience['title'])
+            #    col += 1
+            #    worksheet.write(row, col, experience['host'])
+            #    col += 1
+            #    for date, slots in experience['dates'].items():
+            #        str=''
+            #        for slot in slots:
+            #            str += slot['time_string']
+            #            if 'instant_booking' in slot and slot['instant_booking']:
+            #                str += '(I)'
+            #            str += ' '
+            #        worksheet.write(row, col, str)
+            #        col += 1
+            #    row += 1
+            #workbook.close()
 
             return render_to_response('experience_availability.html', {'form':form,'available_options':available_options}, context)
 
@@ -384,8 +438,14 @@ class ExperienceDetailView(DetailView):
         blockout_start = []
         blockout_end = []
         blockout_index=0
+
         #calculate all the blockout time periods
         for blk in blockouts :
+            if blk.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+                daylightsaving = True
+            else:
+                daylightsaving = False
+
             if blk.repeat:
                 b_l =  blk.end_datetime - blk.start_datetime
                 if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
@@ -395,7 +455,7 @@ class ExperienceDetailView(DetailView):
                     blockout_start.append(blk.start_datetime)
                     blockout_end.append(blk.start_datetime + b_l)
 
-                    blk.start_datetime = next_time_slot(blk.repeat_cycle, blk.repeat_frequency, blk.repeat_extra_information, blk.start_datetime)
+                    blk.start_datetime = next_time_slot(blk.repeat_cycle, blk.repeat_frequency, blk.repeat_extra_information, blk.start_datetime, daylightsaving)
 
             else:
                 blockout_index += 1
@@ -409,8 +469,14 @@ class ExperienceDetailView(DetailView):
         instantbooking_start = []
         instantbooking_end = []
         instantbooking_index=0
+
         #calculate all the instant booking time periods
         for ib in instantbookings :
+            if ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+                daylightsaving = True
+            else:
+                daylightsaving = False
+
             if ib.repeat:
                 ib_l =  ib.end_datetime - ib.start_datetime
                 if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
@@ -420,7 +486,7 @@ class ExperienceDetailView(DetailView):
                     instantbooking_start.append(ib.start_datetime)
                     instantbooking_end.append(ib.start_datetime + ib_l)
 
-                    ib.start_datetime = next_time_slot(ib.repeat_cycle, ib.repeat_frequency, ib.repeat_extra_information, ib.start_datetime)
+                    ib.start_datetime = next_time_slot(ib.repeat_cycle, ib.repeat_frequency, ib.repeat_extra_information, ib.start_datetime, daylightsaving)
 
             else:
                 instantbooking_index += 1
@@ -925,22 +991,25 @@ class ExperienceWizard(NamedUrlSessionWizardView):
     def done(self, form_list, **kwargs):
         f=[]
 
-        type= self.initial_dict['type'] if 'type' in self.initial_dict else None
-        title= self.initial_dict['title'] if 'title' in self.initial_dict else None
-        duration= self.initial_dict['duration'] if 'duration' in self.initial_dict else None
-        suburb= self.initial_dict['suburb'] if 'suburb' in self.initial_dict else None
+        type= None #self.initial_dict['type'] if 'type' in self.initial_dict else None
+        title= None #self.initial_dict['title'] if 'title' in self.initial_dict else None
+        duration= None #self.initial_dict['duration'] if 'duration' in self.initial_dict else None
+        suburb= None #self.initial_dict['suburb'] if 'suburb' in self.initial_dict else None
+        id=None #
         if 'experience' in kwargs['form_dict']:
             prev_data = kwargs['form_dict']['experience'].cleaned_data
             type = prev_data.get('type', None)
             title = prev_data.get('title', None)
             duration = prev_data.get('duration', None)
             suburb = prev_data.get('location', None)
+            id=prev_data.get('id', None)
 
         blockout = {}
         instant_booking = {}
         if self.request.resolver_match.url_name.startswith('experience_edit'):
             #calendar is skipped when adding experience
             prev_data = kwargs['form_dict']['calendar'].cleaned_data
+            id=prev_data.get('id', None)
             start_datetime = prev_data['start_datetime']
             end_datetime = prev_data['end_datetime']
             for i in range(1,6):
@@ -985,11 +1054,11 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                         elif not days[instant_booking['instant_booking_start_datetime_'+str(i)].weekday()] in instant_booking['instant_booking_repeat_extra_information_'+str(i)].split(';'):
                             instant_booking['instant_booking_repeat_extra_information_'+str(i)] += days[instant_booking['instant_booking_start_datetime_'+str(i)].weekday()]+';'
 
-        min_guest_number = self.initial_dict['min_guest_number'] if 'min_guest_number' in self.initial_dict else 1
-        max_guest_number = self.initial_dict['max_guest_number'] if 'max_guest_number' in self.initial_dict else 10
-        price = self.initial_dict['price'] if 'price' in self.initial_dict else 0
-        price_with_booking_fee = self.initial_dict['price_with_booking_fee'] if 'price_with_booking_fee' in self.initial_dict else 0
-        dynamic_price = self.initial_dict['dynamic_price'] if 'dynamic_price' in self.initial_dict else None
+        min_guest_number = 1 #self.initial_dict['min_guest_number'] if 'min_guest_number' in self.initial_dict else 1
+        max_guest_number = 10 #self.initial_dict['max_guest_number'] if 'max_guest_number' in self.initial_dict else 10
+        price = 0 #self.initial_dict['price'] if 'price' in self.initial_dict else 0
+        price_with_booking_fee = 0 #self.initial_dict['price_with_booking_fee'] if 'price_with_booking_fee' in self.initial_dict else 0
+        dynamic_price = None #self.initial_dict['dynamic_price'] if 'dynamic_price' in self.initial_dict else None
         if 'price' in kwargs['form_dict']:
             prev_data = kwargs['form_dict']['price'].cleaned_data
             duration = prev_data['duration']
@@ -1002,13 +1071,15 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             price = prev_data['price']
             price_with_booking_fee = prev_data['price_with_booking_fee']
             dynamic_price = prev_data['dynamic_price']
+            id=prev_data.get('id', None)
 
-        summary = self.initial_dict['summary'] if 'summary' in self.initial_dict else None
-        language = self.initial_dict['language'] if 'language' in self.initial_dict else None
-        title_other = self.initial_dict['title_other'] if 'title_other' in self.initial_dict else None
-        summary_other = self.initial_dict['summary_other'] if 'summary_other' in self.initial_dict else None
+        summary = None #self.initial_dict['summary'] if 'summary' in self.initial_dict else None
+        language = None #self.initial_dict['language'] if 'language' in self.initial_dict else None
+        title_other = None #self.initial_dict['title_other'] if 'title_other' in self.initial_dict else None
+        summary_other = None #self.initial_dict['summary_other'] if 'summary_other' in self.initial_dict else None
         if 'overview' in kwargs['form_dict']:
             prev_data = kwargs['form_dict']['overview'].cleaned_data
+            id=prev_data.get('id', None)
             title = prev_data['title']
             summary = prev_data['summary']
             language = prev_data['language']
@@ -1019,23 +1090,24 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             if not summary_other:
                 summary_other = summary
 
-        activity = self.initial_dict['activity'] if 'activity' in self.initial_dict else None
-        interaction = self.initial_dict['interaction'] if 'interaction' in self.initial_dict else None
-        dress_code = self.initial_dict['dress_code'] if 'dress_code' in self.initial_dict else None
-        included_food = self.initial_dict['included_food'] if 'included_food' in self.initial_dict else None
-        included_food_detail = self.initial_dict['included_food_detail'] if 'included_food_detail' in self.initial_dict else None
-        included_transport = self.initial_dict['included_transport'] if 'included_transport' in self.initial_dict else None
-        included_transport_detail = self.initial_dict['included_transport_detail'] if 'included_transport_detail' in self.initial_dict else None
-        included_ticket = self.initial_dict['included_ticket'] if 'included_ticket' in self.initial_dict else None
-        included_ticket_detail = self.initial_dict['included_ticket_detail'] if 'included_ticket_detail' in self.initial_dict else None
-        activity_other = self.initial_dict['activity_other'] if 'activity_other' in self.initial_dict else None
-        interaction_other = self.initial_dict['interaction_other'] if 'interaction_other' in self.initial_dict else None
-        dress_code_other = self.initial_dict['dress_code_other'] if 'dress_code_other' in self.initial_dict else None
-        included_food_detail_other = self.initial_dict['included_food_detail_other'] if 'included_food_detail_other' in self.initial_dict else None
-        included_transport_detail_other =  self.initial_dict['included_transport_detail_other'] if 'included_transport_detail_other' in self.initial_dict else None
-        included_ticket_detail_other = self.initial_dict['included_ticket_detail_other'] if 'included_ticket_detail_other' in self.initial_dict else None
+        activity = None #self.initial_dict['activity'] if 'activity' in self.initial_dict else None
+        interaction = None #self.initial_dict['interaction'] if 'interaction' in self.initial_dict else None
+        dress_code = None #self.initial_dict['dress_code'] if 'dress_code' in self.initial_dict else None
+        included_food = None #self.initial_dict['included_food'] if 'included_food' in self.initial_dict else None
+        included_food_detail = None #self.initial_dict['included_food_detail'] if 'included_food_detail' in self.initial_dict else None
+        included_transport = None #self.initial_dict['included_transport'] if 'included_transport' in self.initial_dict else None
+        included_transport_detail = None #self.initial_dict['included_transport_detail'] if 'included_transport_detail' in self.initial_dict else None
+        included_ticket = None #self.initial_dict['included_ticket'] if 'included_ticket' in self.initial_dict else None
+        included_ticket_detail = None #self.initial_dict['included_ticket_detail'] if 'included_ticket_detail' in self.initial_dict else None
+        activity_other = None #self.initial_dict['activity_other'] if 'activity_other' in self.initial_dict else None
+        interaction_other = None #self.initial_dict['interaction_other'] if 'interaction_other' in self.initial_dict else None
+        dress_code_other = None #self.initial_dict['dress_code_other'] if 'dress_code_other' in self.initial_dict else None
+        included_food_detail_other = None #self.initial_dict['included_food_detail_other'] if 'included_food_detail_other' in self.initial_dict else None
+        included_transport_detail_other =  None #self.initial_dict['included_transport_detail_other'] if 'included_transport_detail_other' in self.initial_dict else None
+        included_ticket_detail_other = None #self.initial_dict['included_ticket_detail_other'] if 'included_ticket_detail_other' in self.initial_dict else None
         if 'detail' in kwargs['form_dict']:
             prev_data = kwargs['form_dict']['detail'].cleaned_data
+            id=prev_data.get('id', None)
             activity = prev_data['activity']
             interaction = prev_data['interaction']
             dress_code = prev_data['dress_code']
@@ -1064,10 +1136,11 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             if not included_ticket_detail_other:
                 included_ticket_detail_other = included_ticket_detail
 
-        meetup_spot = self.initial_dict['meetup_spot'] if 'meetup_spot' in self.initial_dict else None
-        meetup_spot_other = self.initial_dict['meetup_spot_other'] if 'meetup_spot_other' in self.initial_dict else None
+        meetup_spot = None #self.initial_dict['meetup_spot'] if 'meetup_spot' in self.initial_dict else None
+        meetup_spot_other = None #self.initial_dict['meetup_spot_other'] if 'meetup_spot_other' in self.initial_dict else None
         if 'location' in kwargs['form_dict']:
             prev_data = kwargs['form_dict']['location'].cleaned_data
+            id=prev_data.get('id', None)
             suburb = prev_data['suburb']
             meetup_spot = prev_data['meetup_spot']
             meetup_spot_other = prev_data['meetup_spot_other']
@@ -1117,33 +1190,62 @@ class ExperienceWizard(NamedUrlSessionWizardView):
 
         else:
             #if edit
-            experience = get_object_or_404(Experience, pk=self.initial_dict['id'])
+            experience = get_object_or_404(Experience, pk=id)
+            if experience.hosts.all()[0].id!=self.request.user.id and not self.request.user.is_superuser:
+                raise Exception("experience id contaminated")
             #experience.start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(start_datetime, "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')).replace(minute=0)
             #experience.end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(end_datetime, "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')).replace(minute=0)
-            experience.title = title
-            experience.description = summary
-            experience.guest_number_min = min_guest_number
-            experience.guest_number_max = max_guest_number
-            experience.price = price
-            experience.dynamic_price = dynamic_price
-            experience.duration = duration
-            experience.activity = activity
-            experience.interaction = interaction
-            experience.dress = dress_code
-            experience.city = suburb
-            experience.meetup_spot = meetup_spot
-            experience.type=type
-            experience.language = language
+            experience.title = title if not title is None else experience.title
+            experience.description = summary if not summary is None else experience.description
+            experience.guest_number_min = min_guest_number if min_guest_number!=1 else experience.guest_number_min
+            experience.guest_number_max = max_guest_number if max_guest_number!=10 else experience.guest_number_max
+            experience.price = price if price!=0 else experience.price
+            experience.dynamic_price = dynamic_price if not title is None else experience.dynamic_price
+            experience.duration = duration if not duration is None else experience.duration
+            experience.activity = activity if not activity is None else experience.activity
+            experience.interaction = interaction if not interaction is None else experience.interaction
+            experience.dress = dress_code if not dress_code is None else experience.dress
+            experience.city = suburb if not suburb is None else experience.city
+            experience.meetup_spot = meetup_spot if not meetup_spot is None else experience.meetup_spot
+            experience.type=type if not title is type else experience.type
+            experience.language = language if not language is None else experience.language
 
             experience.save()
 
             #copy to the chinese database
             cursor = connections['cndb'].cursor()
-            cursor.execute("update experiences_experience set title=%s, description=%s, guest_number_min=%s, guest_number_max=%s," 
-                           + "price=%s, dynamic_price=%s, duration=%s, activity=%s, interaction=%s, "
-                           + "dress=%s, city=%s, meetup_spot=%s, type=%s, language=%s where id = %s", 
-                           [title_other, summary_other, experience.guest_number_min, experience.guest_number_max, experience.price, experience.dynamic_price, experience.duration, activity_other, interaction_other,
-                            dress_code_other, experience.city, meetup_spot_other, experience.type, experience.language, experience.id])
+            command = "update experiences_experience set guest_number_min=%s, guest_number_max=%s, price=%s, dynamic_price=%s, duration=%s, city=%s, type=%s, language=%s"
+            parameters = [experience.guest_number_min, experience.guest_number_max, experience.price, experience.dynamic_price, experience.duration, experience.city, experience.type, experience.language]
+            if title_other!= None:
+                command += ", title=%s"
+                parameters.append(title_other)
+            if summary_other != None:
+                command += ", description=%s"
+                parameters.append(summary_other)
+            if activity_other!= None:
+                command += ", activity=%s"
+                parameters.append(activity_other)
+
+            if interaction_other!= None:
+                command += ", interaction=%s"
+                parameters.append(interaction_other)
+
+            if dress_code_other!= None:
+                command += ", dress=%s"
+                parameters.append(dress_code_other)
+
+            if meetup_spot_other!= None:
+                command += ", meetup_spot=%s"
+                parameters.append(meetup_spot_other)
+
+            command += " where id = %s"
+            parameters.append(experience.id)
+            cursor.execute(command, parameters)
+            #cursor.execute("update experiences_experience set title=%s, description=%s, guest_number_min=%s, guest_number_max=%s," 
+            #               + "price=%s, dynamic_price=%s, duration=%s, activity=%s, interaction=%s, "
+            #               + "dress=%s, city=%s, meetup_spot=%s, type=%s, language=%s where id = %s", 
+            #               [title_other, summary_other, experience.guest_number_min, experience.guest_number_max, experience.price, experience.dynamic_price, experience.duration, activity_other, interaction_other,
+            #                dress_code_other, experience.city, meetup_spot_other, experience.type, experience.language, experience.id])
 
             #delete old whatsincluded records
             cursor = connections['cndb'].cursor()
@@ -1666,35 +1768,25 @@ def create_experience(request, id=None):
 
     return render_to_response('create_experience.html', {'form': form, 'display_error':display_error}, context)
 
-def booking_accepted(request, id=None):
-    #TODO
-    # respond within 48 hours?
-
-    accepted = request.GET.get('accept')
-
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/?next=/booking/" + str(id) + "?accept="+accepted)
-
-    form = SubscriptionForm()
-
+def update_booking(id, accepted, user):
     if id and accepted:
         booking = get_object_or_404(Booking, pk=id)
         if booking.status.lower() == "accepted":
             # the host already accepted the booking
-            messages.add_message(request, messages.INFO, 'The booking request has already been accepted.')
+            #messages.add_message(request, messages.INFO, 'The booking request has already been accepted.')
             return HttpResponseRedirect('/')
 
         if booking.status.lower() == "rejected":
             # the host/guest already rejected/cancelled the booking
-            messages.add_message(request, messages.INFO, 'The booking request has already been rejected.')
+            #messages.add_message(request, messages.INFO, 'The booking request has already been rejected.')
             return HttpResponseRedirect('/')
 
         experience = Experience.objects.get(id=booking.experience_id)
-        if not experience.hosts.all()[0].id == request.user.id:
+        if not experience.hosts.all()[0].id == user.id:
             return HttpResponseRedirect("/")
 
         guest = User.objects.get(id = booking.user_id)
-        host = request.user
+        host = user
 
         if accepted == "yes":
             booking.status = "accepted"
@@ -1758,12 +1850,14 @@ def booking_accepted(request, id=None):
                                                             'booking':booking,
                                                             'user':guest,
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-            return render(request, 'email_booking_confirmed_host.html',
-                          {'experience': experience,
-                            'booking':booking,
-                            'user':guest,
-                            'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                            'webpage':True})
+            email_template = 'email_booking_confirmed_host.html'
+            booking_success = True
+            #return render(request, 'email_booking_confirmed_host.html',
+            #              {'experience': experience,
+            #                'booking':booking,
+            #                'user':guest,
+            #                'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+            #                'webpage':True})
         
         elif accepted == "no":
 
@@ -1831,20 +1925,59 @@ def booking_accepted(request, id=None):
                                                                  'booking':booking,
                                                                  'user':guest,
                                                                  'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-                return render(request, 'email_booking_cancelled_host.html',
-                               {'experience': experience,
-                                'booking':booking,
-                                'user':guest,
-                                'experience_url': 'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                'webpage':True})
-            #else:
+                email_template = 'email_booking_cancelled_host.html'
+                booking_success = True
+
+                #return render(request, 'email_booking_cancelled_host.html',
+                #               {'experience': experience,
+                #                'booking':booking,
+                #                'user':guest,
+                #                'experience_url': 'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                #                'webpage':True})
+            else:
                 #TODO
                 #ask the host to try again, or contact us
-                messages.add_message(request, messages.INFO, 'Please try to cancel the request later. Contact us if this happens again. Sorry for the inconvenience.')
-                return HttpResponseRedirect('/')
-
+                #messages.add_message(request, messages.INFO, 'Please try to cancel the request later. Contact us if this happens again. Sorry for the inconvenience.')
+                #return HttpResponseRedirect('/')
+                booking_success = False
+        result={'booking_success':booking_success,'email_template':email_template if booking_success else '', 
+                'experience': experience, 'booking':booking, 'guest':guest,}
     #wrong format
-    return HttpResponseRedirect('/') 
+    else:
+        booking_success = False
+        result={'booking_success':booking_success}
+
+    return result
+
+def booking_accepted(request, id=None):
+    #TODO
+    # respond within 48 hours?
+
+    accepted = request.GET.get('accept')
+
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/accounts/login/?next=/booking/" + str(id) + "?accept="+accepted)
+
+    form = SubscriptionForm()
+    user = request.user
+
+    result = update_booking(id, accepted, user)
+    booking_success = result['booking_success']
+
+    if booking_success:
+        email_template = result['email_template']
+        booking = result['booking']
+        experience = result['experience']
+        guest = result['guest']
+
+        return render(request, email_template,
+                        {'experience': experience,
+                        'booking':booking,
+                        'user':guest,
+                        'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                        'webpage':True})
+    else:
+        return HttpResponseRedirect('/')
 
 #def charge(request):
 #    if request.method == "POST":
@@ -1907,9 +2040,15 @@ def ByCityExperienceListView(request, city, start_date=datetime.utcnow().replace
         if (experience.city.lower() == city.lower()):#dup
             rate = 0.0
             counter = 0
-            for review in experience.review_set.all():
-                rate += review.rate
-                counter += 1
+
+            photoset = experience.photo_set.all()
+            image_url = experience.hosts.all()[0].registereduser.image_url
+            if photoset!= None and len(photoset) > 0 and image_url != None and len(image_url) > 0:
+                for review in experience.review_set.all():
+                    rate += review.rate
+                    counter += 1
+            else:
+                rate = -1
             
             if counter > 0:
                 rate /= counter
@@ -2161,3 +2300,76 @@ def review_experience (request, id=None):
         return render_to_response('review_experience.html', {'form': form}, context)
     else:
         return HttpResponseRedirect('/')
+
+def get_itinerary(start_datetime, end_datetime, guest_number, city, keywords=None):
+
+    available_options = get_available_experiences(start_datetime, end_datetime, guest_number, city, keywords)
+    itinerary = []
+    dt = start_datetime
+
+    while dt <= end_datetime:
+        dt_string = dt.strftime("%Y/%m/%d")
+        day_dict = {'date':dt_string, 'experiences':[]}
+        for experience in available_options:
+            if dt_string in experience['dates'] and len(experience['dates'][dt_string]) > 0:               
+                #check instant booking
+                instant_booking = False
+                for timeslot in experience['dates'][dt_string]:
+                    if timeslot['instant_booking']:
+                        instant_booking = True
+                        break
+                counter = 0
+                insert = False
+                exp_dict = {'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'],
+                            'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'timeslots':experience['dates'][dt_string]}
+                while counter < len(day_dict['experiences']):
+                    if experience['rate'] > day_dict['experiences'][counter]['rate']:
+                        day_dict['experiences'].insert(counter, experience['dates'][dt_string])
+                        insert = True
+                        break
+                    elif experience['rate'] == day_dict['experiences'][counter]['rate']:
+                        if instant_booking:
+                            day_dict['experiences'].insert(counter, exp_dict)
+                        else:
+                            while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate']:
+                                counter += 1
+                            if counter < len(day_dict['experiences']):
+                                day_dict['experiences'].insert(counter, exp_dict)
+                                insert = True
+                                break
+                            else:
+                                day_dict['experiences'].append(exp_dict)
+                                insert = True
+                                break
+                    else:
+                        counter += 1
+                if not insert:
+                    day_dict['experiences'].append(exp_dict)
+
+        itinerary.append(day_dict)
+        dt += timedelta(days=1)
+
+    return itinerary
+
+def custom_itinerary(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/accounts/login/?next=/itinerary")
+
+    context = RequestContext(request)
+    form = CustomItineraryForm()
+
+    if request.method == 'POST':
+        form = CustomItineraryForm(request.POST)
+
+        if form.is_valid():   
+            start_datetime = form.cleaned_data['start_datetime']
+            end_datetime = form.cleaned_data['end_datetime']
+            guest_number = form.cleaned_data['guest_number']
+            city = form.cleaned_data['city']
+            tags = form.cleaned_data['tags']
+
+            itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, tags)
+            
+            return render_to_response('custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
+
+    return render_to_response('custom_itinerary.html', {'form':form}, context)

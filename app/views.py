@@ -16,7 +16,7 @@ from app.forms import SubscriptionForm, HomepageSearchForm, UserProfileForm, Use
 from app.models import Subscription, RegisteredUser, InstantBookingTimePeriod, BlockOutTimePeriod
 from django.core.mail import send_mail
 from django.contrib import messages
-import string, random, pytz, base64, subprocess, os, geoip2.database
+import string, random, pytz, base64, subprocess, os, geoip2.database, PIL
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import ByCityExperienceListView
@@ -32,6 +32,8 @@ from os import path
 from PIL import Image
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
+
+PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -254,16 +256,12 @@ def mylisting(request):
 
     return render_to_response('app/mylisting.html', {}, context)
 
-def myreservation(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/?next=/myreservation")
-
-    context = RequestContext(request)
-    bookings = Booking.objects.raw('select * from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime', [request.user.id])
+def getreservation(user):
+    bookings = Booking.objects.raw('select * from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime', [user.id])
     
     cursor = connections['cndb'].cursor()
     rows = cursor.execute('select datetime, status, guest_number, user_id, experience_id, payment_id from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime',
-                         [request.user.id]).fetchall()
+                         [user.id]).fetchall()
     
     bookings_cn = []
     if rows:
@@ -279,13 +277,15 @@ def myreservation(request):
 
     current_reservations = []
     past_reservations = []
+    local_timezone = pytz.timezone(settings.TIME_ZONE)
 
     for booking in bookings:
         experience = Experience.objects.get(id=booking.experience_id)
         payment = Payment.objects.get(id=booking.payment_id) if booking.payment_id != None else Payment()
         guest = User.objects.get(id=booking.user_id)
         phone_number = payment.phone_number if payment.phone_number != None and len(payment.phone_number) else guest.registereduser.phone_number
-        reservation = {"booking_datetime":booking.datetime, "booking_status":booking.status,"booking_guest_number":booking.guest_number,
+        reservation = {"booking_datetime":booking.datetime.astimezone(local_timezone), "booking_status":booking.status,
+                       "booking_guest_number":booking.guest_number,"booking_id":booking.id,
                        "experience_id":experience.id,"experience_title":experience.title, 
                        "payment_city":payment.city, "payment_country":payment.country,
                        "guest_first_name":guest.first_name, "guest_last_name":guest.last_name, "guest_phone_number":phone_number}
@@ -315,18 +315,28 @@ def myreservation(request):
             guest.first_name = row[0]
             guest.last_name = row[1]
 
-        reservation = {"booking_datetime":booking.datetime, "booking_status":booking.status,"booking_guest_number":booking.guest_number,
+        reservation = {"booking_datetime":booking.datetime.astimezone(local_timezone), "booking_status":booking.status,"booking_guest_number":booking.guest_number,
                        "experience_id":experience.id,"experience_title":experience.title, 
                        "payment_city":payment.city, "payment_country":payment.country,
                        "guest_first_name":guest.first_name, "guest_last_name":guest.last_name}
 
-        if datetime.utcnow().replace(tzinfo=pytz.utc) > booking.datetime + timedelta(hours=48):
+        if datetime.utcnow().replace(tzinfo=local_timezone) > booking.datetime + timedelta(hours=48):
             past_reservations.append(reservation)
         else:
             current_reservations.append(reservation)
 
-    context['current_reservations'] = current_reservations
-    context['past_reservations'] = past_reservations
+    return {'past_reservations':past_reservations, 'current_reservations':current_reservations}
+
+def myreservation(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/accounts/login/?next=/myreservation")
+
+    context = RequestContext(request)
+    
+    reservations = getreservation(request.user)
+
+    context['current_reservations'] = reservations['current_reservations']
+    context['past_reservations'] = reservations['past_reservations']
 
     return render_to_response('app/myreservation.html', {}, context)
 
@@ -470,11 +480,16 @@ def myprofile(request):
                     #crop the image
                     im = Image.open(dirname + filename)
                     w, h = im.size
-                    if w > h:
-                        im.crop((int((w-h)/2), 0, int(w-(w-h)/2), h)).save(dirname + filename)
-                    else:
-                        im = im.crop((0, int((h-w)/2), w, int(h-(h-w)/2))).save(dirname + filename)
-            
+                    #if w > h:
+                    #    im.crop((int((w-h)/2), 0, int(w-(w-h)/2), h)).save(dirname + filename)
+                    #else:
+                    #    im = im.crop((0, int((h-w)/2), w, int(h-(h-w)/2))).save(dirname + filename)
+                    if w > 1200:
+                        basewidth = 1200
+                        wpercent = (basewidth/float(w))
+                        hsize = int((float(h)*float(wpercent)))
+                        im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS).save(dirname + filename)
+
                     #copy to the chinese website -- folder+file
                     dirname_cn = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts/' + str(request.user.id) + '/'
                     if not os.path.isdir(dirname_cn):

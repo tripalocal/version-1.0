@@ -26,7 +26,7 @@ Location = (('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Brisbane', 'Brisba
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),('english;translation','English+Chinese translation'),)
 
-Repeat_Cycle = (('Daily', 'Daily'), ('Weekly', 'Weekly'), ('Monthly', 'Monthly'),)
+Repeat_Cycle = (('Weekly', 'Weekly'), ('Daily', 'Daily'), ('Monthly', 'Monthly'),)
 
 Repeat_Frequency = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),
     ('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
@@ -53,6 +53,10 @@ Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghan
 ('Tuvalu', 'Tuvalu'),('Uganda', 'Uganda'),('Ukraine', 'Ukraine'),('United Arab Emirates', 'United Arab Emirates'),('United Kingdom', 'United Kingdom'),('Uruguay', 'Uruguay'),('Uzbekistan', 'Uzbekistan'),('Vanuatu', 'Vanuatu'),('Venezuela', 'Venezuela'),('Vietnam', 'Vietnam'),('Yemen', 'Yemen'),('Zambia', 'Zambia'),('Zimbabwe ', 'Zimbabwe '),)
 
 Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted'))
+
+PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
+
+Tags = (('Food','Food'), ('Sports','Sports'), ('Arts','Arts'),)
 
 #from http://stackoverflow.com/questions/16773579/customize-radio-buttons-in-django
 class HorizRadioRenderer(forms.RadioSelect.renderer):
@@ -250,6 +254,7 @@ class ExperiencePhotoForm(forms.Form):
     experience_photo_8 = forms.ImageField(required = False)
     experience_photo_9 = forms.ImageField(required = False)
     experience_photo_10 = forms.ImageField(required = False)
+    delete_photo = forms.CharField(max_length=50, required=False)
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePhotoForm, self).__init__(*args, **kwargs)
@@ -257,6 +262,8 @@ class ExperiencePhotoForm(forms.Form):
         self.fields['id'].widget = forms.HiddenInput()
         self.fields['changed_steps'].widget.attrs['readonly'] = True
         self.fields['changed_steps'].widget = forms.HiddenInput()
+        self.fields['delete_photo'].widget.attrs['readonly'] = True
+        self.fields['delete_photo'].widget = forms.HiddenInput()
 
 class ExperienceLocationForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)
@@ -949,3 +956,10 @@ class ReviewForm(forms.ModelForm):
 class ExperienceAvailabilityForm(forms.Form):
     start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+
+class CustomItineraryForm(forms.Form):
+    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    guest_number = forms.ChoiceField(choices=Guest_Number_Min, required=True)
+    city = forms.ChoiceField(choices=Location, required=True)
+    tags = forms.MultipleChoiceField(choices=Tags, required=True)

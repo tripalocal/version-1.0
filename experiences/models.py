@@ -37,6 +37,8 @@ class Experience(models.Model):
     guests = models.ManyToManyField(User, related_name='experience_guests')
     status = models.CharField(max_length=50)
 
+    tags = models.CharField(max_length=500)
+
     def __str__(self):
         t = self.title if self.title != None else ''
         return str(self.id) + '--' + t
@@ -100,7 +102,7 @@ class Coupon(models.Model):
     description = models.TextField()
 
     def __str__(self):
-        return self.title + "--" + self.promo_code
+        return self.promo_code
 
 class Booking(models.Model):
     user = models.ForeignKey(User)
@@ -116,7 +118,7 @@ class Booking(models.Model):
     booking_extra_information = models.TextField()
     
     def __str__(self):
-        return self.user.email + "--" + self.experience.title
+        return self.user.username + "--" + self.experience.title
 
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):
@@ -199,6 +201,3 @@ class Payment(models.Model):
         except Exception as e:
             return False, e
         return True, re
-
-
-    

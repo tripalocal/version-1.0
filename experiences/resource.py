@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 import json, pytz, xlrd, re, os, subprocess
 from django.contrib.auth.models import User
@@ -19,6 +19,8 @@ from django.template.loader import get_template
 from app.forms import BookingRequestXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
+from experiences.views import get_available_experiences, get_itinerary, update_booking
+from app.views import getreservation
 
 def isLegalInput(inputs):
     for input in inputs:
@@ -266,21 +268,18 @@ def saveBookingRequestsFromXLS(request):
 #e.g.,  "[{\"first_name\": \"test\", \"last_name\": \"test\", \"email\":\"123@123.com\", \"city\":\"Beijing\", \"country\":\"China\", \"phone\":\"121221\", \"experience_id\": \"23\", \"guest_number\": \"2\", \"booking_datetime\":\"2015-01-05 00:00\", \"booking_extra_information\":\"Need Chinese translation\"}]"
 @api_view(['POST'])
 @authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
-@permission_classes((IsAuthenticated,))
+@permission_classes((IsAuthenticated,IsAdminUser))
 def booking_request(request, format=None):
-    if request.user.is_authenticated() and request.user.is_superuser:
-        try:
-            # a list of requests
-            booking_requests = json.loads(request.data)
-            for booking_request in booking_requests:
-                saveBookingRequest(booking_request)
+    try:
+        # a list of requests
+        #booking_requests = json.loads(request.data)
+        #for booking_request in booking_requests:
+        #    saveBookingRequest(booking_request)
 
-            return Response("Booking request recorded", status=status.HTTP_201_CREATED)
-        except TypeError as err:
-            #TODO
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return HttpResponseRedirect("/accounts/login/?next=/booking_request")
+        return Response("Booking request recorded", status=status.HTTP_201_CREATED)
+    except TypeError as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 #https://djangosnippets.org/snippets/2172/
 def ajax_view(request):
@@ -302,3 +301,119 @@ def ajax_view(request):
             return render_to_response(template, {'form':ExperienceForm()}, context_instance=RequestContext(request))
     else:
         raise Http404
+
+#{\"start_datetime\":\"2015-05-05 00:00\", \"end_datetime\":\"2015-05-08 00:00\", \"city\":\"melbourne\", \"guest_number\":\"2\", \"keywords\":[\"sports\",\"arts\",\"food\"]}
+@api_view(['GET'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_search(request, format=None):
+    try:
+        criteria = json.loads(request.query_params['data'])
+        start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['start_datetime'], "%Y-%m-%d %H:%M"))
+        end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['end_datetime'], "%Y-%m-%d %H:%M"))
+        city = criteria['city']
+        guest_number = criteria['guest_number']
+        keywords = criteria['keywords']
+
+        itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, keywords)
+
+        return Response(json.dumps(itinerary, ensure_ascii=False), status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_mytrip(request, format=None):
+    try:
+        user = request.user
+        b = Booking.objects.filter(user=user)
+        cursor = connections['cndb'].cursor()
+        rows = cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s order by datetime',
+                                [request.user.id]).fetchall()
+
+        bookings = []
+        for booking in b:
+            bookings.append(booking)
+
+        if rows:
+            for index in range(len(rows)):
+                bk = Booking()
+                bk.datetime = rows[index][0]
+                bk.status = rows[index][1]
+                bk.guest_number = rows[index][2]
+                exp = Experience()
+                row = cursor.execute('select meetup_spot, title from experiences_experience where id = %s',
+                                [rows[index][3]]).fetchone()
+                exp.id = rows[index][3]
+                exp.meetup_spot = row[0]
+                exp.title = row[1]
+                #row = cursor.execute('select first_name, last_name from auth_user where id in (select user_id from experiences_experience_hosts where experience_id = %s)',
+                #             [rows[index][3]]).fetchone()
+                #host = User()
+                #host.first_name = row[0]
+                #host.last_name = row[1]
+                #exp.hosts.
+                bk.experience = exp
+                bookings.append(bk)
+
+        bookings = sorted(bookings, key=lambda booking: booking.datetime, reverse=True)
+
+        # Convert timezone
+        local_timezone = pytz.timezone(settings.TIME_ZONE)
+
+        bks = []
+        for booking in bookings:
+            payment = booking.payment if booking.payment_id != None else Payment()
+            host = booking.experience.hosts.all()[0]
+            phone_number = host.registereduser.phone_number
+            
+            bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status, 'guest_number':booking.guest_number, 
+                  'experience_title':booking.experience.title, 'meetup_spot':booking.experience.meetup_spot,
+                  'host_name':host.first_name + ' ' + host.last_name, 'host_phone_number':phone_number}
+
+            bks.append(bk)
+
+        return Response(json.dumps(bks, ensure_ascii=False), status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_myreservation(request, format=None):
+    try:
+        user = request.user
+        reservations = getreservation(user)
+        for reservation in reservations['current_reservations']:
+            reservation['booking_datetime'] = reservation['booking_datetime'].isoformat()
+
+        for reservation in reservations['past_reservations']:
+            reservation['booking_datetime'] = reservation['booking_datetime'].isoformat()
+
+        return Response(json.dumps(reservations, ensure_ascii=False), status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+#"{\"id\":58,\"accept\":\"yes\"}"
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_acceptreservation(request, format=None):
+    try:
+        user = request.user
+        data = json.loads(request.data)
+        id = data['id']
+        accepted = data['accept']
+
+        result = update_booking(id, accepted, user)
+
+        r={'success':result['booking_success']}
+
+        return Response(json.dumps(r, ensure_ascii=False), status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
