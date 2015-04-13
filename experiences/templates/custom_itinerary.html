@@ -5,68 +5,109 @@
     {% load staticfiles %}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
     <title></title>
+    <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
 <div>
     <form id="itinerary_form" action="" method="post">
         {% csrf_token %}
-        <table class="">
-            <tbody>
-                <tr>
-                    <td class="">{{form.start_datetime}}</td>
-                    <td class="">{{form.end_datetime}}</td>
-                    <td class="">{{form.guest_number}}</td>
-                    <td class="">{{form.city}}</td>
-                    <td class="">{{form.tags}}</td>
-                    <td class=""><input id="itinerary-search" type="submit" value="Search" name="Search" class="btn btn-primary btn-sm btn-search"></td>
-                </tr>
-            </tbody>
-        </table>
-        {{form.itinerary_string}}
+
+        <div id="criteria_div">
+            <div id="date_destination_div" style="float:left;width:700px;">
+                <button id="add_day_button" type="button" style="float:left;width:75px;">Add</button>
+                <div id="add_day_1_div">
+                    <select id="destination_city_1" style="display:inline-block;float:left;">
+                        <option value="Melbourne">Melbourne</option>
+                        <option value="Sydney">Sydney</option>
+                        <option value="Brisbane">Brisbane</option>
+                        <option value="Adelaide">Adelaide</option>
+                        <option value="Tasmania">Tasmania</option>
+                    </select>
+                    <div class="input-group date" id="id_start_datetime_picker_day_1" style="float:left;width:250px;">
+                        <input class="form-control" id="id_start_datetime_day_1" name="start_datetime" type="text" value="">
+                        <span class="input-group-addon">
+                            <span class="glyphicon-calendar glyphicon"></span>
+                        </span>
+                    </div>
+                    <script>
+                        $(function() {
+                            $("#id_start_datetime_picker_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
+                        });
+                    </script>
+                    <div class="input-group date" id="id_end_datetime_picker_day_1" style="float:left;width:250px;">
+                        <input class="form-control" id="id_end_datetime_day_1" name="end_datetime" type="text" value="">
+                        <span class="input-group-addon">
+                            <span class="glyphicon-calendar glyphicon"></span>
+                        </span>
+                    </div>
+                    <script>
+                        $(function() {
+                            $("#id_end_datetime_picker_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
+                        });
+                    </script>
+                </div>
+                {{form.start_datetime}}
+                {{form.end_datetime}}
+                {{form.city}}
+            </div>
+
+            <div id="guest_number_div" style="float:left;width:150px;">
+                {{form.guest_number}}
+            </div>
+
+            <div id="tags_div" style="float:left;width:300px;">
+                {{form.tags}}
+                {{form.all_tags}}
+            </div>
+
+            <div id="search_div" style="float:left;width:100px;">
+                <input id="itinerary-search" type="submit" value="Search" name="Search" class="btn btn-primary btn-sm btn-search">
+            </div>
+
+            {{form.itinerary_string}}
+        </div>
 
         {% if itinerary %}
         <div id="itinerary_div">
-            <table id="itinerary_table" style="border:1px solid; margin:20px;">
+            <table id="itinerary_table" style="width:800px; border:1px solid; margin:20px;">
                 <tbody>
                 {%for day in itinerary%}
                     <tr style="border:1px solid;">
-                        <td style="border:1px solid;">{{day.date}}</td>
+                        <td style="display:inline-block;">{{day.date}}</td>
                         {% for experience in day.experiences %}
                         {% if forloop.counter <= 3 %}
-                        <td style="border:1px solid;width:400px;height:100px;">
+                        <td style="height:100px;display:inline-block;">
                         {% else %}
-                        <td style="border:1px solid;width:400px;height:100px;display:none;">
+                        <td style="height:100px;display:none;">
                         {% endif %}
-                            <div style="width: 100%; overflow: hidden; height:50px;">
-                                <div style="width: 100px; float: left;">
+                            <div style="width: 700px; overflow: hidden; height:100px; float: left;">
+                                <div style="width: 140px; float: left;">
                                     <p style="display:none;">{{experience.id}}</p>
                                     <p style="display:none;">{{experience.duration}}</p>
                                     <p style="display:none;">{{experience.host}}</p>
                                     <p style="display:none;">{{experience.host_image}}</p>
-                                    <p style="display:none;">{{experience.price}}</p>
+                                    <input type="radio" value="yes">
                                     <a href="/experience/{{experience.id}}" target="_blank">
-                                        <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" height="50" width="100"/>
+                                        <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" height="80" width="120"/>
                                     </a>
                                 </div>
-                                <div style="margin-left: 110px;">
-                                    <a href="/experience/{{experience.id}}" target="_blank"><p>{{experience.title}}</p></a>
-                                    <select>
+                                <div style="margin-left: 150px;">
+                                    <a href="/experience/{{experience.id}}" target="_blank"><p style="width:250px;display:inline-block;">{{experience.title}}</p></a>
+                                    <select style="display:inline-block; position:absolute; left:400px;">
                                         <option value="None">Please select time</option>
                                     {% for slot in experience.timeslots%}
                                         <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00{%if slot.instant_booking%}(I){%else%}{%endif%}</option>
                                     {%endfor%}
                                     </select>
-                                </div>
-                            </div>
-                            <div style="width:400px;height:50px;">
-                                <div>
+                                    <p style="display:inline-block; position:absolute; left:550px;">{{experience.price}}</p>
                                     <p>{{experience.meetup_spot}}</p>
                                 </div>
-                                <div style="">
-                                    <input type="radio" value="yes">Yes
-                                    <input type="radio" value="no">No
-                                </div>
+                            </div>
+                            <div style="height:100px; margin-left: 700px;">
+                                <input type="radio" value="no">Remove
                             </div>
                         </td>
                         {%endfor%}
@@ -105,37 +146,112 @@
         }
         if($("#day_"+i+"_exp_"+j).length)
         {
-            $("#day_"+i+"_exp_"+j).show();
+            //$("#day_"+i+"_exp_"+j).show();
+            $("#day_"+i+"_exp_"+j).css('display', 'inline');
         }
     }
 
+    function addNewDay(id)
+    {
+        new_div="<div id=\"add_day_" + id + "_div\">"+
+                    "<button id=\"delete_day_button_" + id + "\" type=\"button\" style=\"float:left;width:75px;\">Delete</button>"+
+                    "<select id=\"destination_city_" + id + "\" style=\"display:inline-block;float:left;\">"+
+                        "<option value=\"Melbourne\">Melbourne</option>"+
+                        "<option value=\"Sydney\">Sydney</option>"+
+                        "<option value=\"Brisbane\">Brisbane</option>"+
+                        "<option value=\"Adelaide\">Adelaide</option>"+
+                        "<option value=\"Tasmania\">Tasmania</option>"+
+                    "</select>"+
+                    "<div class=\"input-group date\" id=\"id_start_datetime_picker_day_" + id + "\" style=\"float:left;width:250px;\">"+
+                        "<input class=\"form-control\" id=\"id_start_datetime_day_" + id + "\" name=\"start_datetime\" type=\"text\" value=\"\">"+
+                        "<span class=\"input-group-addon\">"+
+                            "<span class=\"glyphicon-calendar glyphicon\"></span>"+
+                        "</span>"+
+                    "</div>"+
+                    "<script>"+
+                        "$(function() {"+
+                            "$(\"#id_start_datetime_picker_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
+                        "});"+
+                    "<\/script>"+
+                    "<div class=\"input-group date\" id=\"id_end_datetime_picker_day_" + id + "\" style=\"float:left;width:250px;\">"+
+                        "<input class=\"form-control\" id=\"id_end_datetime_day_" + id + "\" name=\"end_datetime\" type=\"text\" value=\"\">"+
+                        "<span class=\"input-group-addon\">"+
+                            "<span class=\"glyphicon-calendar glyphicon\"></span>"+
+                        "</span>"+
+                    "</div>"+
+                    "<script>"+
+                        "$(function() {"+
+                            "$(\"#id_end_datetime_picker_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
+                        "});"+
+                    "<\/script>"+
+                "</div>";
+        $(new_div).insertAfter("#add_day_" + (id-1) + "_div");
+    }
+
     $(document).ready(function(){
+
+        city = $("#id_city").val().split(",");
+        if(city.length>0)
+        {
+            distinct_city = 1;
+            $("#id_start_datetime_day_1").val($("#id_start_datetime").val());
+            start = new Date(Date.parse($("#id_start_datetime").val(),"YYYY-MM-DD"));
+        }
+        for(i=1;i<city.length && city[i]!="";i++)//i starts from 1
+        {
+            if(city[i]!=city[i-1])
+            {
+                distinct_city++;
+                addNewDay(distinct_city);
+                $("#delete_day_button_"+(distinct_city)).click(function(e){
+                    $(this).parent().remove();
+                });
+                $("#destination_city_"+distinct_city).val(city[i]);
+
+                $("#id_end_datetime_day_"+(distinct_city-1)).val((new Date(start.getTime() + (i-1)*24*60*60*1000)).toISOString().substring(0, 10));
+
+                $("#id_start_datetime_day_"+distinct_city).val((new Date(start.getTime() + i*24*60*60*1000)).toISOString().substring(0, 10));
+            }
+        }
+        if(city.length>0)
+        {
+            $("#id_end_datetime_day_"+distinct_city).val($("#id_end_datetime").val());
+        }
+
+        all_tags = $("#id_all_tags").val().split(",");
+        tags = $("#id_tags").val().split(",");
+        for(i=0;i<all_tags.length>0;i++)
+        {
+            if($.inArray(all_tags[i], tags)<0)
+            {
+                new_tag = "<label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\">V</button>";
+            }
+            else
+            {
+                new_tag = "<label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\">X</button>";
+            }
+
+            $("#tags_div").append(new_tag);
+
+            $("#tag_button_"+(i+1)).click(function(e){
+                id = e.target.id.split("_")[2];
+                if($("#tag_"+id).attr("class") == "tag-selected")
+                {
+                    $("#tag_button_"+id).text("V");
+                    $("#tag_"+id).attr("class", "tag-non-selected");
+                }
+                else
+                {
+                    $("#tag_button_"+id).text("X");
+                    $("#tag_"+id).attr("class", "tag-selected");
+                }
+            });
+        }
 
         var table = $("#itinerary_table")[0];
 
         if(table)
         {
-/*
-            $("#itinerary_table").each(function () {
-                var $this = $(this);
-                var newrows = [];
-                $this.find("tr").each(function () {
-                    var i = 0;
-                    $(this).find("td,th").each(function () {
-                        i++;
-                        if (newrows[i] === undefined) {
-                            newrows[i] = $("<tr></tr>");
-                        }
-                        newrows[i].append($(this));
-                    });
-                });
-                $this.find("tr").remove();
-                $.each(newrows, function () {
-                    $this.append(this);
-                });
-            });
-*/
-
             for (var i = 0, row; row = table.rows[i]; i++) {
                 for (var j = 0, col; col = row.cells[j]; j++) {
                     if(j==0)//i==0
@@ -152,43 +268,17 @@
                         $($($(col).children()[0]).children()[0]).children()[1].id="day_"+day_index+"_exp_"+exp_index+"_duration";
                         $($($(col).children()[0]).children()[0]).children()[2].id="day_"+day_index+"_exp_"+exp_index+"_host";
                         $($($(col).children()[0]).children()[0]).children()[3].id="day_"+day_index+"_exp_"+exp_index+"_host_image";
-                        $($($(col).children()[0]).children()[0]).children()[4].id="day_"+day_index+"_exp_"+exp_index+"_price";
-                        $($($(col).children()[0]).children()[1]).children()[1].id="day_"+day_index+"_exp_"+exp_index+"_timeslot";
+                        $($($(col).children()[0]).children()[0]).children()[4].id="day_"+day_index+"_exp_"+exp_index+"_choice_yes";
+                        $($($(col).children()[0]).children()[0]).children()[4].name="day_"+day_index+"_exp_"+exp_index+"_radio";
+
                         $($($(col).children()[0]).children()[1]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_title";
-                        $($(col).children()[1]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_meetup_spot";
-                        $($(col).children()[1]).children()[1].id="day_"+day_index+"_exp_"+exp_index+"_choice";
-                        $($($(col).children()[1]).children()[1]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_choice_yes";
-                        $($($(col).children()[1]).children()[1]).children()[1].id="day_"+day_index+"_exp_"+exp_index+"_choice_no";
-                        $($($(col).children()[1]).children()[1]).children()[0].name="day_"+day_index+"_exp_"+exp_index+"_radio";
-                        $($($(col).children()[1]).children()[1]).children()[1].name="day_"+day_index+"_exp_"+exp_index+"_radio";
-/*
-                        $("#day_"+day_index+"_exp_"+exp_index).mouseover(
-                            function(e){
-                                target = $(e.target);
-                                while(target[0].id.indexOf("day_") < 0)
-                                {
-                                    target=target.parent();
-                                }
-                                i = target[0].id.split('_')[1];
-                                j = target[0].id.split('_')[3];
-                                $("#day_"+i+"_exp_"+j+"_meetup_spot").attr("style","display:none;");
-                                $("#day_"+i+"_exp_"+j+"_choice").attr("style","");
-                            }
-                        );
-                        $("#day_"+day_index+"_exp_"+exp_index).mouseout(
-                            function(e){
-                                target = $(e.target);
-                                while(target[0].id.indexOf("day_") < 0)
-                                {
-                                    target=target.parent();
-                                }
-                                i = target[0].id.split('_')[1];
-                                j = target[0].id.split('_')[3];
-                                $("#day_"+i+"_exp_"+j+"_meetup_spot").attr("style","");
-                                $("#day_"+i+"_exp_"+j+"_choice").attr("style","display:none;");
-                            }            
-                        );
-*/
+                        $($($(col).children()[0]).children()[1]).children()[1].id="day_"+day_index+"_exp_"+exp_index+"_timeslot";
+                        $($($(col).children()[0]).children()[1]).children()[2].id="day_"+day_index+"_exp_"+exp_index+"_price";
+                        $($($(col).children()[0]).children()[1]).children()[3].id="day_"+day_index+"_exp_"+exp_index+"_meetup_spot";
+
+                        $($(col).children()[1]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_choice_no";
+                        $($(col).children()[1]).children()[0].name="day_"+day_index+"_exp_"+exp_index+"_radio";
+
                         $("#day_"+day_index+"_exp_"+exp_index+"_choice_yes").click(function(e){
                             i = e.target.id.split('_')[1];
                             j = e.target.id.split('_')[3];
@@ -213,6 +303,14 @@
                 }  
             }
         }
+    });
+
+    $("#add_day_button").click(function(e){
+        id = $("#date_destination_div").children().length-4;
+        addNewDay(id+1);
+        $("#delete_day_button_"+(id+1)).click(function(e){
+            $(this).parent().remove();
+        });
     });
 
     $("#itinerary-preview").click(function(e){
@@ -277,6 +375,43 @@
         $("#itinerary_div").css('opacity', '1.0');
         $("#preview_content").empty();
         $("#preview_div").hide();
+    });
+
+    $("#itinerary-search").click(function(e){
+        //e.preventDefault();
+        $("#id_start_datetime").val($("#id_start_datetime_day_1").val());
+        $("#id_city").val("");
+        for(i=1;$("#destination_city_"+i).length>0;i++)
+        {
+            city = $("#destination_city_"+i+" option:selected").text();
+            start = new Date(Date.parse($("#id_start_datetime_day_"+i).val(),"YYYY-MM-DD"));
+            end = new Date(Date.parse($("#id_end_datetime_day_"+i).val(),"YYYY-MM-DD"));
+
+            days = Math.round((end-start)/(1000*60*60*24))+1;
+            for(j=0;j<days;j++)
+            {
+                $("#id_city").val($("#id_city").val()+city+",");
+            }
+        }
+        $("#id_end_datetime").val($("#id_end_datetime_day_"+(i-1)).val());
+
+        city = $("#id_city").val();
+        city = city.substring(0,city.length-1);
+        $("#id_city").val(city);
+
+        $("#id_tags").val("");
+        for(i=1;$("#tag_"+i).length>0;i++)
+        {
+            if($("#tag_"+i).attr("class") == "tag-selected")
+            {
+                $("#id_tags").val($("#id_tags").val() + $("#tag_"+i).text() + ",");
+            }
+        }
+        tags = $("#id_tags").val();
+        tags = tags.substring(0,city.length-1);
+        $("#id_tags").val(tags);
+
+        //$("#itinerary_form").submit();
     });
 </script>
 {% endblock %}

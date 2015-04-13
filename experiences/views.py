@@ -100,11 +100,17 @@ def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, cur
     else:
         raise Exception("func next_time_slot, illegal repeat_cycle")
 
-def get_available_experiences(start_datetime, end_datetime, guest_number=None, city=None, keywords=None):#keywords is a string like A,B,C,
+def get_available_experiences(start_datetime, end_datetime, guest_number=None, city=None, keywords=None):#city/keywords is a string like A,B,C,
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     available_options = []
+
     if city is not None:
-        experiences = Experience.objects.filter(status='Listed', city__iexact=city)
+        city = str(city).lower().split(",")
+
+        if len(city) > 1 and (end_datetime-start_datetime).days+1 != len(city):
+            raise TypeError("Wrong format: city, incorrect length")
+
+        experiences = Experience.objects.filter(status='Listed', city__iregex=r'(' + '|'.join(city) + ')') #like __iin
     else:
         experiences = Experience.objects.filter(status='Listed')
 
@@ -142,7 +148,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
             calendar_updated = True
 
         host = experience.hosts.all()[0]
-        experience_avail = {'id':experience.id, 'title': experience.title, 'meetup_spot':experience.meetup_spot, 'rate': rate, 'duration':experience.duration,
+        experience_avail = {'id':experience.id, 'title': experience.title, 'meetup_spot':experience.meetup_spot, 'rate': rate, 'duration':experience.duration, 'city':experience.city,
                             'host':host.first_name + ' ' + host.last_name, 'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated, 'price':experience.price, 'dates':{}}
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
@@ -288,8 +294,8 @@ def experience_availability(request):
         form = ExperienceAvailabilityForm(request.POST)
 
         if form.is_valid():   
-            start_datetime = form.cleaned_data['start_datetime'] if 'start_datetime' in form.cleaned_data and form.cleaned_data['start_datetime'] != None else pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime('2015-04-01 00:00', "%Y-%m-%d %H:%M"))
-            end_datetime = form.cleaned_data['end_datetime'] if 'end_datetime' in form.cleaned_data and form.cleaned_data['end_datetime'] != None else pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime('2015-04-06 00:00', "%Y-%m-%d %H:%M"))
+            start_datetime = form.cleaned_data['start_datetime'] if 'start_datetime' in form.cleaned_data and form.cleaned_data['start_datetime'] != None else pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE))
+            end_datetime = form.cleaned_data['end_datetime'] if 'end_datetime' in form.cleaned_data and form.cleaned_data['end_datetime'] != None else pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)) + timedelta(days=1)
             local_timezone = pytz.timezone(settings.TIME_ZONE)
             available_options = []
 
@@ -2308,10 +2314,18 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, keywords=Non
     itinerary = []
     dt = start_datetime
 
+    city = city.lower().split(",")
+    day_counter = 0
+
+    #available_options: per experience --> itinerary: per day
     while dt <= end_datetime:
         dt_string = dt.strftime("%Y/%m/%d")
-        day_dict = {'date':dt_string, 'experiences':[]}
+        day_dict = {'date':dt_string, 'city':city[day_counter], 'experiences':[]}
+
         for experience in available_options:
+            if experience['city'].lower() != city[day_counter]:
+                continue
+
             if dt_string in experience['dates'] and len(experience['dates'][dt_string]) > 0:               
                 #check instant booking
                 instant_booking = False
@@ -2323,14 +2337,16 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, keywords=Non
                 insert = False
                 exp_dict = {'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'],
                             'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'timeslots':experience['dates'][dt_string]}
-                while counter < len(day_dict['experiences']):
+                while counter < len(day_dict['experiences']):#find the corrent rank
                     if experience['rate'] > day_dict['experiences'][counter]['rate']:
-                        day_dict['experiences'].insert(counter, experience['dates'][dt_string])
+                        day_dict['experiences'].insert(counter, exp_dict)
                         insert = True
                         break
                     elif experience['rate'] == day_dict['experiences'][counter]['rate']:
                         if instant_booking:
                             day_dict['experiences'].insert(counter, exp_dict)
+                            insert = True
+                            break
                         else:
                             while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate']:
                                 counter += 1
@@ -2349,6 +2365,7 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, keywords=Non
 
         itinerary.append(day_dict)
         dt += timedelta(days=1)
+        day_counter += (1 if len(city) > 1 else 0)
 
     return itinerary
 

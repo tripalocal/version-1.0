@@ -56,7 +56,7 @@ Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
-Tags = (('Food','Food'), ('Sports','Sports'), ('Arts','Arts'),)
+Tags = "Food,Sports,Arts"
 
 #from http://stackoverflow.com/questions/16773579/customize-radio-buttons-in-django
 class HorizRadioRenderer(forms.RadioSelect.renderer):
@@ -956,21 +956,32 @@ class ReviewForm(forms.ModelForm):
         fields=('rate','comment','personal_comment','operator_comment',)
 
 class ExperienceAvailabilityForm(forms.Form):
-    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
-    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
 
 class CustomItineraryForm(forms.Form):
-    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
-    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     guest_number = forms.ChoiceField(choices=Guest_Number_Min, required=True)
-    city = forms.ChoiceField(choices=Location, required=True)
-    tags = forms.MultipleChoiceField(choices=Tags, required=True)
+    city = forms.CharField(widget=forms.Textarea,  required=True)
+    tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
+    all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     itinerary_string = forms.CharField(widget=forms.Textarea, required=False)
 
     def __init__(self, *args, **kwargs):
         super(CustomItineraryForm, self).__init__(*args, **kwargs)
+        self.fields['start_datetime'].widget.attrs['readonly'] = True
+        self.fields['start_datetime'].widget = forms.HiddenInput()
+        self.fields['end_datetime'].widget.attrs['readonly'] = True
+        self.fields['end_datetime'].widget = forms.HiddenInput()
         self.fields['itinerary_string'].widget.attrs['readonly'] = True
         self.fields['itinerary_string'].widget = forms.HiddenInput()
+        self.fields['city'].widget.attrs['readonly'] = True
+        self.fields['city'].widget = forms.HiddenInput()
+        self.fields['tags'].widget.attrs['readonly'] = True
+        self.fields['tags'].widget = forms.HiddenInput()
+        self.fields['all_tags'].widget.attrs['readonly'] = True
+        self.fields['all_tags'].widget = forms.HiddenInput()
 
 #TODO: merge it with BookingConfirmationForm
 class ItineraryBookingForm(forms.Form):
