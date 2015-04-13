@@ -23,67 +23,69 @@
                 </tr>
             </tbody>
         </table>
-    </form>
-    {% if itinerary %}
-    <div id="itinerary_div">
-        <table id="itinerary_table" style="border:1px solid; margin:20px;">
-            <tbody>
-            {%for day in itinerary%}
-                <tr style="border:1px solid;">
-                    <td style="border:1px solid;">{{day.date}}</td>
-                    {% for experience in day.experiences %}
-                    {% if forloop.counter <= 3 %}
-                    <td style="border:1px solid;width:400px;height:100px;">
-                    {% else %}
-                    <td style="border:1px solid;width:400px;height:100px;display:none;">
-                    {% endif %}
-                        <div style="width: 100%; overflow: hidden; height:50px;">
-                            <div style="width: 100px; float: left;">
-                                <p style="display:none;">{{experience.id}}</p>
-                                <p style="display:none;">{{experience.duration}}</p>
-                                <p style="display:none;">{{experience.host}}</p>
-                                <p style="display:none;">{{experience.host_image}}</p>
-                                <p style="display:none;">{{experience.price}}</p>
-                                <a href="/experience/{{experience.id}}" target="_blank">
-                                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" height="50" width="100"/>
-                                </a>
-                            </div>
-                            <div style="margin-left: 110px;">
-                                <a href="/experience/{{experience.id}}" target="_blank"><p>{{experience.title}}</p></a>
-                                <select>
-                                    <option value="None">Please select time</option>
-                                {% for slot in experience.timeslots%}
-                                    <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00{%if slot.instant_booking%}(I){%else%}{%endif%}</option>
-                                {%endfor%}
-                                </select>
-                            </div>
-                        </div>
-                        <div style="width:400px;height:50px;">
-                            <div>
-                                <p>{{experience.meetup_spot}}</p>
-                            </div>
-                            <div style="">
-                                <input type="radio" value="yes">Yes
-                                <input type="radio" value="no">No
-                            </div>
-                        </div>
-                    </td>
-                    {%endfor%}
-                </tr>
-            {%endfor%}
-            </tbody>
-        </table>
-        <input id="itinerary-preview" type="button" value="Preview" name="Preview" class="btn btn-primary btn-sm btn-search">
-    </div>
+        {{form.itinerary_string}}
 
-    <div id="preview_div" style="display:none;position:absolute;top:150px;left:100px;margin-right:100px;z-index=1000;background-color:rgba(255,255,255,0.5);">
-        <div id="preview_content"></div>
-        <div>
-            <button id="preview_change">Change</button>
-            <button id="preview_confirm">Confirm</button>
+        {% if itinerary %}
+        <div id="itinerary_div">
+            <table id="itinerary_table" style="border:1px solid; margin:20px;">
+                <tbody>
+                {%for day in itinerary%}
+                    <tr style="border:1px solid;">
+                        <td style="border:1px solid;">{{day.date}}</td>
+                        {% for experience in day.experiences %}
+                        {% if forloop.counter <= 3 %}
+                        <td style="border:1px solid;width:400px;height:100px;">
+                        {% else %}
+                        <td style="border:1px solid;width:400px;height:100px;display:none;">
+                        {% endif %}
+                            <div style="width: 100%; overflow: hidden; height:50px;">
+                                <div style="width: 100px; float: left;">
+                                    <p style="display:none;">{{experience.id}}</p>
+                                    <p style="display:none;">{{experience.duration}}</p>
+                                    <p style="display:none;">{{experience.host}}</p>
+                                    <p style="display:none;">{{experience.host_image}}</p>
+                                    <p style="display:none;">{{experience.price}}</p>
+                                    <a href="/experience/{{experience.id}}" target="_blank">
+                                        <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" height="50" width="100"/>
+                                    </a>
+                                </div>
+                                <div style="margin-left: 110px;">
+                                    <a href="/experience/{{experience.id}}" target="_blank"><p>{{experience.title}}</p></a>
+                                    <select>
+                                        <option value="None">Please select time</option>
+                                    {% for slot in experience.timeslots%}
+                                        <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00{%if slot.instant_booking%}(I){%else%}{%endif%}</option>
+                                    {%endfor%}
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="width:400px;height:50px;">
+                                <div>
+                                    <p>{{experience.meetup_spot}}</p>
+                                </div>
+                                <div style="">
+                                    <input type="radio" value="yes">Yes
+                                    <input type="radio" value="no">No
+                                </div>
+                            </div>
+                        </td>
+                        {%endfor%}
+                    </tr>
+                {%endfor%}
+                </tbody>
+            </table>
+            <input id="itinerary-preview" type="button" value="Preview" name="Preview" class="btn btn-primary btn-sm btn-search">
         </div>
-    </div>
-    {%endif%}
+
+        <div id="preview_div" style="display:none;position:absolute;top:150px;left:100px;margin-right:100px;z-index=1000;background-color:rgba(255,255,255,0.5);">
+            <div id="preview_content"></div>
+            <div>
+                <button id="preview_change">Change</button>
+                <input type="submit" value="Confirm" id="preview_confirm"/>
+            </div>
+        </div>
+        {%endif%}
+    </form>
 </div>
 {% endblock %}
 
@@ -259,7 +261,7 @@
         }
         else
         {
-            //alert(JSON.stringify(itinerary));
+            $("#id_itinerary_string").val(JSON.stringify(itinerary));
         }
     });
 

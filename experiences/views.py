@@ -100,7 +100,7 @@ def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, cur
     else:
         raise Exception("func next_time_slot, illegal repeat_cycle")
 
-def get_available_experiences(start_datetime, end_datetime, guest_number=None, city=None, keywords=None): #keywords should be a list
+def get_available_experiences(start_datetime, end_datetime, guest_number=None, city=None, keywords=None):#keywords is a string like A,B,C,
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     available_options = []
     if city is not None:
@@ -113,9 +113,10 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
             continue
 
         if keywords is not None:
-            experience_tags = experience.tags.split(";") if experience.tags is not None else ''
+            experience_tags = experience.tags.split(",") if experience.tags is not None else ''
+            tags = keywords.split(",")
             match = False
-            for tag in keywords:
+            for tag in tags:
                 if tag in experience_tags:
                     match = True
                     break
@@ -2361,15 +2362,110 @@ def custom_itinerary(request):
     if request.method == 'POST':
         form = CustomItineraryForm(request.POST)
 
-        if form.is_valid():   
-            start_datetime = form.cleaned_data['start_datetime']
-            end_datetime = form.cleaned_data['end_datetime']
-            guest_number = form.cleaned_data['guest_number']
-            city = form.cleaned_data['city']
-            tags = form.cleaned_data['tags']
+        if 'Search' in request.POST:
+            if form.is_valid():   
+                start_datetime = form.cleaned_data['start_datetime']
+                end_datetime = form.cleaned_data['end_datetime']
+                guest_number = form.cleaned_data['guest_number']
+                city = form.cleaned_data['city']
+                tags = form.cleaned_data['tags']
 
-            itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, tags)
+                if isinstance(tags, list):
+                    tags = ','.join(tags)
+                elif not isinstance(tags,str):
+                    raise TypeError("Wrong format: keywords. String or list expected.")
+
+                itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, tags)
             
-            return render_to_response('custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
+                return render_to_response('custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
+            else:
+                return render_to_response('custom_itinerary.html', {'form':form}, context)
+        else:
+            #submit bookings
+            if form.is_valid():
+                itinerary = json.loads(form.cleaned_data['itinerary_string'])
+                booking_form = ItineraryBookingForm(request.POST)
+                booking_form.data = booking_form.data.copy()
+                booking_form.data['user_id'] = request.user.id
+                booking_form.data['experience_id'] = ""
+                booking_form.data['date'] = ""
+                booking_form.data['time'] = ""
+                booking_form.data['status'] = "Requested"
+                
+                for item in itinerary:
+                    booking_form.data['experience_id'] += str(item['id']) + ";"
+                    booking_form.data['date'] += str(item['date']) + ";"
+                    booking_form.data['time'] += str(item['time']) + ";"
+                    booking_form.data['guest_number'] = item['guest_number']
+
+                return render(request, 'itinerary_booking_confirmation.html', 
+                          {'form': booking_form,})
 
     return render_to_response('custom_itinerary.html', {'form':form}, context)
+
+def itinerary_booking_confirmation(request):
+    context = RequestContext(request)
+    display_error = False
+
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/accounts/login/")
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = ItineraryBookingForm(request.POST)
+        #experience = Experience.objects.get(id=form.data['experience_id'])
+
+        #guest_number = int(form.data['guest_number'])
+        #subtotal_price = 0.0
+        #if experience.dynamic_price and type(experience.dynamic_price) == str:
+        #    price = experience.dynamic_price.split(',')
+        #    if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
+        #    #these is comma in the end, so the length is max-min+2
+        #        if guest_number <= experience.guest_number_min:
+        #            subtotal_price = float(experience.price) * float(experience.guest_number_min)
+        #        else:
+        #            subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
+        #    else:
+        #        #wrong dynamic settings
+        #        subtotal_price = float(experience.price)*float(form.data['guest_number'])
+        #else:
+        #    subtotal_price = float(experience.price)*float(form.data['guest_number'])
+
+        if 'Refresh' in request.POST:
+            #get coupon information
+            wrong_promo_code = False
+            code = form.data['promo_code']
+            coupons = Coupon.objects.filter(promo_code__iexact = code,
+                                            end_datetime__gt = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                                            start_datetime__lt = datetime.utcnow().replace(tzinfo=pytz.UTC))
+            if not len(coupons):
+                coupon = Coupon()
+                wrong_promo_code = True
+            else:
+                #TODO
+                wrong_promo_code = False
+
+            #mp = Mixpanel(settings.MIXPANEL_TOKEN)
+            #mp.track(request.user.email, 'Clicked on "Refresh"')
+
+            return render_to_response('itinerary_booking_confirmation.html', {'form': form,}, context)
+
+        else:
+            #submit the form
+            display_error = True
+            if form.is_valid():
+                return itinerary_booking_successful(request)
+            
+            else:
+                return render_to_response('itinerary_booking_confirmation.html', {'form': form, 
+                                                                           'display_error':display_error,}, context)
+    else:
+        # If the request was not a POST
+        #form = BookingConfirmationForm()
+        return HttpResponseRedirect("/")
+
+def itinerary_booking_successful(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/accounts/login/")
+    
+    return render(request,'itinerary_booking_successful.html',{})

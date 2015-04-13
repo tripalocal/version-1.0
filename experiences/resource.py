@@ -21,6 +21,14 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from experiences.views import get_available_experiences, get_itinerary, update_booking
 from app.views import getreservation
+from django.contrib.auth import authenticate, login, logout
+from rest_framework.authtoken.models import Token
+from allauth.account.utils import user_username, user_email, user_field
+from allauth.account.signals import user_signed_up, user_logged_in
+from allauth.socialaccount import providers
+from allauth.socialaccount.models import SocialLogin, SocialToken, SocialApp
+from allauth.socialaccount.providers.facebook.views import fb_complete_login
+from allauth.socialaccount.helpers import complete_social_login
 
 def isLegalInput(inputs):
     for input in inputs:
@@ -302,13 +310,114 @@ def ajax_view(request):
     else:
         raise Http404
 
+@api_view(['POST'])
+def service_login(request):
+    try:
+        data = request.data #request.query_params['data']
+
+        if "email" not in data or "password" not in data:
+            result = {"error":"Wrong username/password"} 
+            return Response(result, status=status.HTTP_401_UNAUTHORIZED)
+
+        email = data['email']
+        password = data['password']
+        username = User.objects.get(email=email).username
+
+        user = authenticate(username=username, password=password)
+        if user is not None: # and user.is_active:
+            login(request, user)
+            new_token = Token.objects.get_or_create(user=user)
+            result = {'user_id':user.id, 'token':new_token[0].key}
+            return Response(result, status=status.HTTP_200_OK)
+        else:
+            result = {"error":"User not existing"}
+            return Response(result, status=status.HTTP_404_NOT_FOUND)
+
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def service_signup(request):
+    try:
+        data = request.data #request.query_params['data']
+
+        if "email" not in data or "password" not in data or "first_name" not in data or "last_name" not in data:
+            result = {"error":"Incomplete information"} 
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+
+        email = data['email']
+        password = data['password']
+        first_name = data['first_name']
+        last_name = data['last_name']
+        username = first_name.lower()
+
+        u = User.objects.filter(username = username)
+        counter = len(u) if u is not None else 0
+        counter += 1
+        username = username + str(counter) if counter > 1 else username 
+
+        user = User(first_name = first_name, last_name = last_name, email = email,username = username,
+                    date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                    last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
+        user.save()
+
+        user.set_password(password)
+        user.save()
+
+        user_signed_up.send(sender=user.__class__, request=request, user=user)
+        user = authenticate(username=username, password=password)
+        login(request, user)
+        new_token = Token.objects.get_or_create(user=user)
+        result = {'user_id':user.id, 'token':new_token[0].key}
+
+        return Response(result, status=status.HTTP_200_OK)
+
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_logout(request):
+    logout(request)
+    return Response({"result":"Logged out"}, status=status.HTTP_200_OK)
+
+# http://bytefilia.com/titanium-mobile-facebook-application-django-allauth-sign-sign/
+# http://stackoverflow.com/questions/16381732/how-to-create-new-user-and-new-django-allauth-social-account-when-given-access-t
+@api_view(['POST'])
+def service_facebook_login(request):
+    data = request.data #self.deserialize(request, request.raw_post_data, format=request.META.get('CONTENT_TYPE', 'application/json'))
+
+    access_token = data.get('access_token', '')
+
+    try:
+        app = SocialApp.objects.get(provider="facebook")
+        token = SocialToken(app=app, token=access_token)
+
+        # check token against facebook 
+        login = fb_complete_login(request, app, token) #updated
+        login.token = token
+        login.state = SocialLogin.state_from_request(request)
+
+        # add or update the user into users table
+        ret = complete_social_login(request._request, login)
+
+        new_token = Token.objects.get_or_create(user=login.account.user)
+        #if we get here we've succeeded
+        return Response({'user_id': login.account.user.id, "token":new_token[0].key}, status = status.HTTP_200_OK) 
+    except Exception as err:
+        # FIXME: Catch only what is needed
+        return Response({'reason': "Bad Access Token"}, status = status.HTTP_401_UNAUTHORIZED)
+
 #{\"start_datetime\":\"2015-05-05 00:00\", \"end_datetime\":\"2015-05-08 00:00\", \"city\":\"melbourne\", \"guest_number\":\"2\", \"keywords\":[\"sports\",\"arts\",\"food\"]}
-@api_view(['GET'])
-@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_search(request, format=None):
     try:
-        criteria = json.loads(request.query_params['data'])
+        criteria = request.data #request.query_params['data']
         start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['start_datetime'], "%Y-%m-%d %H:%M"))
         end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['end_datetime'], "%Y-%m-%d %H:%M"))
         city = criteria['city']
@@ -317,13 +426,13 @@ def service_search(request, format=None):
 
         itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, keywords)
 
-        return Response(json.dumps(itinerary, ensure_ascii=False), status=status.HTTP_200_OK)
+        return Response(itinerary, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_mytrip(request, format=None):
     try:
@@ -375,13 +484,13 @@ def service_mytrip(request, format=None):
 
             bks.append(bk)
 
-        return Response(json.dumps(bks, ensure_ascii=False), status=status.HTTP_200_OK)
+        return Response(bks, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_myreservation(request, format=None):
     try:
@@ -393,19 +502,19 @@ def service_myreservation(request, format=None):
         for reservation in reservations['past_reservations']:
             reservation['booking_datetime'] = reservation['booking_datetime'].isoformat()
 
-        return Response(json.dumps(reservations, ensure_ascii=False), status=status.HTTP_200_OK)
+        return Response(reservations, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 #"{\"id\":58,\"accept\":\"yes\"}"
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_acceptreservation(request, format=None):
     try:
         user = request.user
-        data = json.loads(request.data)
+        data = request.data
         id = data['id']
         accepted = data['accept']
 
@@ -413,7 +522,7 @@ def service_acceptreservation(request, format=None):
 
         r={'success':result['booking_success']}
 
-        return Response(json.dumps(r, ensure_ascii=False), status=status.HTTP_200_OK)
+        return Response(r, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
