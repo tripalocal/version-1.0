@@ -71,12 +71,25 @@
         </div>
 
         {% if itinerary %}
+        <div id="price_div">
+            <table id="price_table" style="width:800px; border:1px solid; margin:20px;">
+                <tbody>
+                    <tr>
+                        <td><label id="id_item_selected">0</label> Items Selected</td>
+                        <td>$ <label id="id_price_per_person">0</label> Per Person</td>
+                        <td>$ <label id="id_total_price">0</label> Selected Total</td>
+                        <td><input id="itinerary-preview" type="button" value="Preview" name="Preview" class="btn btn-primary btn-sm btn-search"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
         <div id="itinerary_div">
             <table id="itinerary_table" style="width:800px; border:1px solid; margin:20px;">
                 <tbody>
                 {%for day in itinerary%}
                     <tr style="border:1px solid;">
-                        <td style="display:inline-block;">{{day.date}}</td>
+                        <td style="display:inline-block;">Day {{forloop.counter}} {{day.date}}</td>
                         {% for experience in day.experiences %}
                         {% if forloop.counter <= 3 %}
                         <td style="height:100px;display:inline-block;">
@@ -115,13 +128,12 @@
                 {%endfor%}
                 </tbody>
             </table>
-            <input id="itinerary-preview" type="button" value="Preview" name="Preview" class="btn btn-primary btn-sm btn-search">
         </div>
 
         <div id="preview_div" style="display:none;position:absolute;top:150px;left:100px;margin-right:100px;z-index=1000;background-color:rgba(255,255,255,0.5);">
             <div id="preview_content"></div>
             <div>
-                <button id="preview_change">Change</button>
+                <button type="button" id="preview_change">Change</button>
                 <input type="submit" value="Confirm" id="preview_confirm"/>
             </div>
         </div>
@@ -186,6 +198,27 @@
                     "<\/script>"+
                 "</div>";
         $(new_div).insertAfter("#add_day_" + (id-1) + "_div");
+    }
+
+    function updatePrice()
+    {
+        var table = $("#itinerary_table")[0];
+        items = 0;
+        total_price = 0;
+        guest_number = parseInt($("#id_guest_number option:selected").text());
+        for (var i = 0, row; row = table.rows[i]; i++) {
+            for (var j = 0, col; col = row.cells[j]; j++) {
+                if($("#day_"+(i+1)+"_exp_"+j+"_choice_yes").length && $("#day_"+(i+1)+"_exp_"+j+"_choice_yes").is(':checked'))
+                {
+                    items++;
+                    price = parseFloat($("#day_"+(i+1)+"_exp_"+j+"_price").text());
+                    total_price += price;
+                }
+            }
+        }
+        $("#id_item_selected").text(items);
+        $("#id_price_per_person").text(total_price.toFixed(2));
+        $("#id_total_price").text(total_price*guest_number.toFixed(2));
     }
 
     $(document).ready(function(){
@@ -291,6 +324,7 @@
                             {
                                 //hideexperience(i, j);
                                 $("#day_"+i+"_exp_"+j).css('background-color', 'grey');
+                                updatePrice();
                             }
                         });
 
@@ -298,6 +332,7 @@
                             i = e.target.id.split('_')[1];
                             j = e.target.id.split('_')[3];
                             hideexperience(i, j);
+                            updatePrice();
                         });
                     }
                 }  
