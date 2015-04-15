@@ -71,7 +71,7 @@
         </div>
 
         {% if itinerary %}
-        <div id="price_div">
+        <div id="price_div" style="float:left;">
             <table id="price_table" style="width:800px; border:1px solid; margin:20px;">
                 <tbody>
                     <tr>
@@ -84,7 +84,7 @@
             </table>
         </div>
 
-        <div id="itinerary_div">
+        <div id="itinerary_div" style="float:left;">
             <table id="itinerary_table" style="width:800px; border:1px solid; margin:20px;">
                 <tbody>
                 {%for day in itinerary%}
@@ -357,6 +357,9 @@
                 {
                     dict={"id":$("#day_"+(i+1)+"_exp_"+j+"_id").text(),"title":$("#day_"+(i+1)+"_exp_"+j+"_title").text(),
                           "date":$("#day_"+(i+1)).text(),"time":$("#day_"+(i+1)+"_exp_"+j+"_timeslot option:selected").text(),
+                          "price":$("#day_"+(i+1)+"_exp_"+j+"_price").text(),"host":$("#day_"+(i+1)+"_exp_"+j+"_host").text(),
+                          "host_image":$("#day_"+(i+1)+"_exp_"+j+"_host_image").text(),
+                          "duration":$("#day_"+(i+1)+"_exp_"+j+"_duration").text(),
                           "guest_number":$("#id_guest_number option:selected").text()};
                     itinerary.push(dict);
 

@@ -990,6 +990,7 @@ class ItineraryBookingForm(forms.Form):
     date = forms.CharField(widget=forms.Textarea)
     time = forms.CharField(widget=forms.Textarea)
     guest_number = forms.IntegerField(label="People")
+    itinerary_string = forms.CharField(widget=forms.Textarea, required=False)
     status = forms.CharField(initial="Requested")
     promo_code = forms.CharField(required=False)
 
@@ -1026,6 +1027,8 @@ class ItineraryBookingForm(forms.Form):
         self.fields['guest_number'].widget = forms.HiddenInput()
         self.fields['status'].widget = forms.HiddenInput()
         self.fields['coupon_extra_information'].widget = forms.HiddenInput()
+        self.fields['itinerary_string'].widget.attrs['readonly'] = True
+        self.fields['itinerary_string'].widget = forms.HiddenInput()
 
     def clean(self):
         """

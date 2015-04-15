@@ -2416,7 +2416,7 @@ def custom_itinerary(request):
                     booking_form.data['guest_number'] = item['guest_number']
 
                 return render(request, 'itinerary_booking_confirmation.html', 
-                          {'form': booking_form,})
+                          {'form': booking_form,'itinerary':itinerary})
 
     return render_to_response('custom_itinerary.html', {'form':form}, context)
 

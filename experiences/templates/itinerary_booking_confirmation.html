@@ -258,6 +258,27 @@
                 </form>
             </div>
 
+            <div class="expList checkoutDetails">
+            {% for experience in itinerary%}
+                <div id="itinerary_experience_{{forloop.counter}}" style="height:450px;">
+                    <div class="listingImg" style="background-image:url({{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg)">
+                        <div class="profile-md checkout-profile">
+                            <img src="{{MEDIA_URL}}{{experience.host_image}}" width="240" height="240">
+                        </div>
+                    </div>
+                    <div class="checkoutBox checkoutInfo">
+                        <h3>{{ experience.title }}</h3>
+                        <hr style="margin-bottom:10px;">
+                            <p>Reservation for <strong>{{ experience.guest_number }} person(s)</strong><br>
+                                on <strong>{{ experience.date }}</strong> from <strong>{{ experience.time }}</strong><br>
+                            </p>
+                            <p>Rate: ${{ experience.price|mul:1.429|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
+                            <hr style="margin-bottom:10px;">
+                            Subtotal: $<div id="id_sub_total" style="display:inline"> {{ experience.price|mul:1.429|mul:experience.guest_number|floatformat:"0"}} </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock %}
