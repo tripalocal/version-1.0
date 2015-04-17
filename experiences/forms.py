@@ -964,6 +964,7 @@ class CustomItineraryForm(forms.Form):
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     guest_number = forms.ChoiceField(choices=Guest_Number_Min, required=True)
     city = forms.CharField(widget=forms.Textarea,  required=True)
+    language = forms.CharField(widget=forms.Textarea,  required=True, initial="English,Chinese")
     tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     itinerary_string = forms.CharField(widget=forms.Textarea, required=False)
@@ -982,6 +983,8 @@ class CustomItineraryForm(forms.Form):
         self.fields['tags'].widget = forms.HiddenInput()
         self.fields['all_tags'].widget.attrs['readonly'] = True
         self.fields['all_tags'].widget = forms.HiddenInput()
+        self.fields['language'].widget.attrs['readonly'] = True
+        self.fields['language'].widget = forms.HiddenInput()
 
 #TODO: merge it with BookingConfirmationForm
 class ItineraryBookingForm(forms.Form):
@@ -1064,11 +1067,12 @@ class ItineraryBookingForm(forms.Form):
                 #TODO
 
             user = User.objects.get(id=self.cleaned_data['user_id'])
+            guest_number = int(self.cleaned_data["guest_number"])
+
             for i in range(len(ids)):
                 experience = Experience.objects.get(id=ids[i])
-  
+
                 if not free:
-                    guest_number = int(self.cleaned_data["guest_number"])
                     subtotal_price = 0.0
                     if experience.dynamic_price and type(experience.dynamic_price) == str:
                         price = experience.dynamic_price.split(',')
@@ -1080,9 +1084,9 @@ class ItineraryBookingForm(forms.Form):
                                 subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
                         else:
                             #wrong dynamic settings
-                            subtotal_price = float(experience.price)*float(self.cleaned_data["guest_number"])
+                            subtotal_price = float(experience.price)*float(guest_number)
                     else:
-                        subtotal_price = float(experience.price)*float(self.cleaned_data["guest_number"])
+                        subtotal_price = float(experience.price)*float(guest_number)
 
                     if extra_fee >= 1.00 or extra_fee <= -1.00:
                         #absolute value

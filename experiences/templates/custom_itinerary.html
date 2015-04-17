@@ -4,7 +4,7 @@
 {% block head %}
     {% load staticfiles %}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
-    <title></title>
+    <title>Custom Itinerary</title>
     <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
@@ -15,18 +15,18 @@
     <form id="itinerary_form" action="" method="post">
         {% csrf_token %}
 
-        <div id="criteria_div">
-            <div id="date_destination_div" style="float:left;width:700px;">
+        <div id="criteria_div" style="display:inline-block;">
+            <div id="date_destination_div" style="float:left;width:500px;">
                 <button id="add_day_button" type="button" style="float:left;width:75px;">Add</button>
                 <div id="add_day_1_div">
                     <select id="destination_city_1" style="display:inline-block;float:left;">
                         <option value="Melbourne">Melbourne</option>
                         <option value="Sydney">Sydney</option>
-                        <option value="Brisbane">Brisbane</option>
+                        <!--<option value="Brisbane">Brisbane</option>
                         <option value="Adelaide">Adelaide</option>
-                        <option value="Tasmania">Tasmania</option>
+                        <option value="Tasmania">Tasmania</option>-->
                     </select>
-                    <div class="input-group date" id="id_start_datetime_picker_day_1" style="float:left;width:250px;">
+                    <div class="input-group date" id="id_start_datetime_picker_day_1" style="float:left;width:150px;">
                         <input class="form-control" id="id_start_datetime_day_1" name="start_datetime" type="text" value="">
                         <span class="input-group-addon">
                             <span class="glyphicon-calendar glyphicon"></span>
@@ -37,7 +37,7 @@
                             $("#id_start_datetime_picker_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
                         });
                     </script>
-                    <div class="input-group date" id="id_end_datetime_picker_day_1" style="float:left;width:250px;">
+                    <div class="input-group date" id="id_end_datetime_picker_day_1" style="float:left;width:150px;">
                         <input class="form-control" id="id_end_datetime_day_1" name="end_datetime" type="text" value="">
                         <span class="input-group-addon">
                             <span class="glyphicon-calendar glyphicon"></span>
@@ -58,6 +58,12 @@
                 {{form.guest_number}}
             </div>
 
+            <div id="language_div" style="float:left;width:150px;">
+                {{form.language}}
+                <input id="language_English" type="checkbox" value="English">English <br>
+                <input id="language_Chinese" type="checkbox" value="Chinese">中文
+            </div>
+
             <div id="tags_div" style="float:left;width:300px;">
                 {{form.tags}}
                 {{form.all_tags}}
@@ -71,63 +77,65 @@
         </div>
 
         {% if itinerary %}
-        <div id="price_div" style="float:left;">
-            <table id="price_table" style="width:800px; border:1px solid; margin:20px;">
-                <tbody>
-                    <tr>
-                        <td><label id="id_item_selected">0</label> Items Selected</td>
-                        <td>$ <label id="id_price_per_person">0</label> Per Person</td>
-                        <td>$ <label id="id_total_price">0</label> Selected Total</td>
-                        <td><input id="itinerary-preview" type="button" value="Preview" name="Preview" class="btn btn-primary btn-sm btn-search"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <div id="result_div" style="display:inline-block;">
+            <div id="price_div">
+                <table id="price_table" style="width:800px; border:1px solid; margin:20px;">
+                    <tbody>
+                        <tr>
+                            <td><label id="id_item_selected">0</label> Items Selected</td>
+                            <td>$ <label id="id_price_per_person">0</label> Per Person</td>
+                            <td>$ <label id="id_total_price">0</label> Selected Total</td>
+                            <td><input id="itinerary-preview" type="button" value="Preview" name="Preview" class="btn btn-primary btn-sm btn-search"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div id="itinerary_div" style="float:left;">
-            <table id="itinerary_table" style="width:800px; border:1px solid; margin:20px;">
-                <tbody>
-                {%for day in itinerary%}
-                    <tr style="border:1px solid;">
-                        <td style="display:inline-block;">Day {{forloop.counter}} {{day.date}}</td>
-                        {% for experience in day.experiences %}
-                        {% if forloop.counter <= 3 %}
-                        <td style="height:100px;display:inline-block;">
-                        {% else %}
-                        <td style="height:100px;display:none;">
-                        {% endif %}
-                            <div style="width: 700px; overflow: hidden; height:100px; float: left;">
-                                <div style="width: 140px; float: left;">
-                                    <p style="display:none;">{{experience.id}}</p>
-                                    <p style="display:none;">{{experience.duration}}</p>
-                                    <p style="display:none;">{{experience.host}}</p>
-                                    <p style="display:none;">{{experience.host_image}}</p>
-                                    <input type="radio" value="yes">
-                                    <a href="/experience/{{experience.id}}" target="_blank">
-                                        <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" height="80" width="120"/>
-                                    </a>
+            <div id="itinerary_div">
+                <table id="itinerary_table" style="width:800px; border:1px solid; margin:20px;">
+                    <tbody>
+                    {%for day in itinerary%}
+                        <tr style="border:1px solid;">
+                            <td style="display:inline-block;">Day {{forloop.counter}} {{day.date}}</td>
+                            {% for experience in day.experiences %}
+                            {% if forloop.counter <= 3 %}
+                            <td style="height:100px;display:inline-block;">
+                            {% else %}
+                            <td style="height:100px;display:none;">
+                            {% endif %}
+                                <div style="width: 700px; overflow: hidden; height:100px; float: left;">
+                                    <div style="width: 140px; float: left;">
+                                        <p style="display:none;">{{experience.id}}</p>
+                                        <p style="display:none;">{{experience.duration}}</p>
+                                        <p style="display:none;">{{experience.host}}</p>
+                                        <p style="display:none;">{{experience.host_image}}</p>
+                                        <input type="radio" value="yes">
+                                        <a href="/experience/{{experience.id}}" target="_blank">
+                                            <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" height="80" width="120"/>
+                                        </a>
+                                    </div>
+                                    <div style="margin-left: 150px;">
+                                        <a href="/experience/{{experience.id}}" target="_blank"><p style="width:250px;display:inline-block;">{{experience.title}}</p></a>
+                                        <select style="display:inline-block; position:absolute; left:400px;">
+                                            <option value="None">Please select time</option>
+                                        {% for slot in experience.timeslots%}
+                                            <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00{%if slot.instant_booking%}(I){%else%}{%endif%}</option>
+                                        {%endfor%}
+                                        </select>
+                                        <p style="display:inline-block; position:absolute; left:550px;">{{experience.price}}</p>
+                                        <p>{{experience.meetup_spot}}</p>
+                                    </div>
                                 </div>
-                                <div style="margin-left: 150px;">
-                                    <a href="/experience/{{experience.id}}" target="_blank"><p style="width:250px;display:inline-block;">{{experience.title}}</p></a>
-                                    <select style="display:inline-block; position:absolute; left:400px;">
-                                        <option value="None">Please select time</option>
-                                    {% for slot in experience.timeslots%}
-                                        <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00{%if slot.instant_booking%}(I){%else%}{%endif%}</option>
-                                    {%endfor%}
-                                    </select>
-                                    <p style="display:inline-block; position:absolute; left:550px;">{{experience.price}}</p>
-                                    <p>{{experience.meetup_spot}}</p>
+                                <div style="height:100px; margin-left: 700px;">
+                                    <input type="radio" value="no">Remove
                                 </div>
-                            </div>
-                            <div style="height:100px; margin-left: 700px;">
-                                <input type="radio" value="no">Remove
-                            </div>
-                        </td>
-                        {%endfor%}
-                    </tr>
-                {%endfor%}
-                </tbody>
-            </table>
+                            </td>
+                            {%endfor%}
+                        </tr>
+                    {%endfor%}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div id="preview_div" style="display:none;position:absolute;top:150px;left:100px;margin-right:100px;z-index=1000;background-color:rgba(255,255,255,0.5);">
@@ -170,11 +178,11 @@
                     "<select id=\"destination_city_" + id + "\" style=\"display:inline-block;float:left;\">"+
                         "<option value=\"Melbourne\">Melbourne</option>"+
                         "<option value=\"Sydney\">Sydney</option>"+
-                        "<option value=\"Brisbane\">Brisbane</option>"+
-                        "<option value=\"Adelaide\">Adelaide</option>"+
-                        "<option value=\"Tasmania\">Tasmania</option>"+
+                        //"<option value=\"Brisbane\">Brisbane</option>"+
+                        //"<option value=\"Adelaide\">Adelaide</option>"+
+                        //"<option value=\"Tasmania\">Tasmania</option>"+
                     "</select>"+
-                    "<div class=\"input-group date\" id=\"id_start_datetime_picker_day_" + id + "\" style=\"float:left;width:250px;\">"+
+                    "<div class=\"input-group date\" id=\"id_start_datetime_picker_day_" + id + "\" style=\"float:left;width:150px;\">"+
                         "<input class=\"form-control\" id=\"id_start_datetime_day_" + id + "\" name=\"start_datetime\" type=\"text\" value=\"\">"+
                         "<span class=\"input-group-addon\">"+
                             "<span class=\"glyphicon-calendar glyphicon\"></span>"+
@@ -185,7 +193,7 @@
                             "$(\"#id_start_datetime_picker_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
                         "});"+
                     "<\/script>"+
-                    "<div class=\"input-group date\" id=\"id_end_datetime_picker_day_" + id + "\" style=\"float:left;width:250px;\">"+
+                    "<div class=\"input-group date\" id=\"id_end_datetime_picker_day_" + id + "\" style=\"float:left;width:150px;\">"+
                         "<input class=\"form-control\" id=\"id_end_datetime_day_" + id + "\" name=\"end_datetime\" type=\"text\" value=\"\">"+
                         "<span class=\"input-group-addon\">"+
                             "<span class=\"glyphicon-calendar glyphicon\"></span>"+
@@ -218,7 +226,7 @@
         }
         $("#id_item_selected").text(items);
         $("#id_price_per_person").text(total_price.toFixed(2));
-        $("#id_total_price").text(total_price*guest_number.toFixed(2));
+        $("#id_total_price").text((total_price*guest_number).toFixed(2));
     }
 
     $(document).ready(function(){
@@ -230,6 +238,7 @@
             $("#id_start_datetime_day_1").val($("#id_start_datetime").val());
             start = new Date(Date.parse($("#id_start_datetime").val(),"YYYY-MM-DD"));
         }
+
         for(i=1;i<city.length && city[i]!="";i++)//i starts from 1
         {
             if(city[i]!=city[i-1])
@@ -249,6 +258,12 @@
         if(city.length>0)
         {
             $("#id_end_datetime_day_"+distinct_city).val($("#id_end_datetime").val());
+        }
+
+        language = $("#id_language").val().split(",");
+        for(i=0;i<language.length;i++)
+        {
+            $("#language_"+language[i]).prop('checked','true');
         }
 
         all_tags = $("#id_all_tags").val().split(",");
@@ -365,7 +380,7 @@
 
                     host = $("#day_"+(i+1)+"_exp_"+j+"_host").text();
                     host_image = "/images/" + $("#day_"+(i+1)+"_exp_"+j+"_host_image").text();
-                    price = (parseFloat($("#day_"+(i+1)+"_exp_"+j+"_price").text())*1.429).toFixed(2);
+                    price = (parseFloat($("#day_"+(i+1)+"_exp_"+j+"_price").text())).toFixed(2);
                     sub_total = price * parseInt(dict['guest_number']);
                     duration = $("#day_"+(i+1)+"_exp_"+j+"_duration").text();
 
@@ -448,6 +463,20 @@
         tags = $("#id_tags").val();
         tags = tags.substring(0,tags.length-1);
         $("#id_tags").val(tags);
+
+        $("#id_language").val("");
+
+        language = ['Chinese','English'];
+        for(i=0;i<language.length;i++)
+        {
+            if($("#language_"+language[i]).prop('checked') == true)
+            {
+                $("#id_language").val($("#id_language").val() + language[i] + ",");
+            }
+        }
+        l = $("#id_language").val();
+        l = l.substring(0,l.length-1);
+        $("#id_language").val(l);
 
         //$("#itinerary_form").submit();
     });

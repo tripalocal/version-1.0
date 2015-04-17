@@ -100,9 +100,10 @@ def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, cur
     else:
         raise Exception("func next_time_slot, illegal repeat_cycle")
 
-def get_available_experiences(start_datetime, end_datetime, guest_number=None, city=None, keywords=None):#city/keywords is a string like A,B,C,
+def get_available_experiences(start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None):#city/keywords is a string like A,B,C,
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     available_options = []
+    end_datetime = end_datetime.replace(hour=23)
 
     if city is not None:
         city = str(city).lower().split(",")
@@ -129,6 +130,18 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
             if not match:
                 continue
 
+        if language is not None:
+            experience_language = experience.language.split(";") if experience.language is not None else ''
+            experience_language = [x.lower() for x in experience_language]
+            languages = language.split(",")
+            match = False
+            for l in languages:
+                if l.lower() in experience_language:
+                    match = True
+                    break
+            if not match:
+                continue
+
         sdt = start_datetime
         last_sdt = pytz.timezone('UTC').localize(datetime.min)
 
@@ -148,8 +161,12 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
             calendar_updated = True
 
         host = experience.hosts.all()[0]
+        exp_price = float(experience.price)
+        if experience.dynamic_price != None and len(experience.dynamic_price) > 0 :
+            exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-1])
+
         experience_avail = {'id':experience.id, 'title': experience.title, 'meetup_spot':experience.meetup_spot, 'rate': rate, 'duration':experience.duration, 'city':experience.city,
-                            'host':host.first_name + ' ' + host.last_name, 'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated, 'price':experience.price, 'dates':{}}
+                            'host':host.first_name + ' ' + host.last_name, 'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated, 'price':experience_fee_calculator(exp_price), 'dates':{}}
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []
@@ -2308,9 +2325,9 @@ def review_experience (request, id=None):
     else:
         return HttpResponseRedirect('/')
 
-def get_itinerary(start_datetime, end_datetime, guest_number, city, keywords=None):
+def get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords=None):
 
-    available_options = get_available_experiences(start_datetime, end_datetime, guest_number, city, keywords)
+    available_options = get_available_experiences(start_datetime, end_datetime, guest_number, city, language, keywords)
     itinerary = []
     dt = start_datetime
 
@@ -2385,6 +2402,7 @@ def custom_itinerary(request):
                 end_datetime = form.cleaned_data['end_datetime']
                 guest_number = form.cleaned_data['guest_number']
                 city = form.cleaned_data['city']
+                language = form.cleaned_data['language']
                 tags = form.cleaned_data['tags']
 
                 if isinstance(tags, list):
@@ -2392,7 +2410,7 @@ def custom_itinerary(request):
                 elif not isinstance(tags,str):
                     raise TypeError("Wrong format: keywords. String or list expected.")
 
-                itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, tags)
+                itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, tags)
             
                 return render_to_response('custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
             else:
