@@ -2352,7 +2352,7 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
                         break
                 counter = 0
                 insert = False
-                exp_dict = {'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'],
+                exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'],
                             'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'timeslots':experience['dates'][dt_string]}
                 while counter < len(day_dict['experiences']):#find the corrent rank
                     if experience['rate'] > day_dict['experiences'][counter]['rate']:
@@ -2361,20 +2361,30 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
                         break
                     elif experience['rate'] == day_dict['experiences'][counter]['rate']:
                         if instant_booking:
-                            day_dict['experiences'].insert(counter, exp_dict)
-                            insert = True
-                            break
+                            #same rate, instant booking
+                            index1 = counter
+                            while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate'] and day_dict['experiences'][counter]['instant_booking']:
+                                counter += 1
+                            index2 = counter
+
                         else:
+                            #same rate, instant booking
+                            while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate'] and day_dict['experiences'][counter]['instant_booking']:
+                                counter += 1
+                            index1 = counter
+                            #same rate, non instant booking
                             while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate']:
                                 counter += 1
-                            if counter < len(day_dict['experiences']):
-                                day_dict['experiences'].insert(counter, exp_dict)
-                                insert = True
-                                break
-                            else:
-                                day_dict['experiences'].append(exp_dict)
-                                insert = True
-                                break
+                            index2 = counter
+
+                        counter = int((index2-index1)*random.uniform(0,1) + index1)
+
+                        if counter < len(day_dict['experiences']):
+                            day_dict['experiences'].insert(counter, exp_dict)
+                        else:
+                            day_dict['experiences'].append(exp_dict)
+                        insert = True
+                        break
                     else:
                         counter += 1
                 if not insert:
