@@ -12,14 +12,14 @@ from app.models import RegisteredUser
 from post_office import mail
 from Tripalocal_V1 import settings
 from tripalocal_messages.models import Aliases, Users
-from experiences.forms import email_account_generator, ExperienceForm
+from experiences.forms import email_account_generator, ExperienceForm, ItineraryBookingForm
 from django.db import connections
 from django.template import loader, RequestContext, Context
 from django.template.loader import get_template
 from app.forms import BookingRequestXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from experiences.views import get_available_experiences, get_itinerary, update_booking
+from experiences.views import get_itinerary, update_booking
 from app.views import getreservation
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
@@ -523,6 +523,41 @@ def service_acceptreservation(request, format=None):
         r={'success':result['booking_success']}
 
         return Response(r, status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+#{"itinerary_string":[{"id":"1","date":"2015/04/17","time":"4:00 - 6:00","guest_number":"2"},{"id":"20","date":"2015/04/17","time":"17:00 - 20:00","guest_number":"2"}],"card_number":"4242424242424242","expiration_month":10,"expiration_year":2015,"cvv":123}
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_booking(request, format=None):
+    try:
+        data = request.data
+        itinerary = data['itinerary_string']
+
+        booking_data = {}
+        booking_data['user'] = request.user
+
+        booking_data['experience_id'] = []
+        booking_data['date'] = []
+        booking_data['time'] = []
+                
+        for item in itinerary:
+            booking_data['experience_id'].append(str(item['id']))
+            booking_data['date'].append(str(item['date']))
+            booking_data['time'].append(str(item['time']))
+            booking_data['guest_number'] = item['guest_number']
+
+        booking_data["card_number"] = data["card_number"]
+        booking_data["exp_month"] = data["expiration_month"]
+        booking_data["exp_year"] = data["expiration_year"]
+        booking_data["cvv"] = data["cvv"]
+
+        ItineraryBookingForm.booking(ItineraryBookingForm(),booking_data['experience_id'],booking_data['date'],booking_data['time'],booking_data['user'],booking_data['guest_number'],
+                                     booking_data['card_number'],booking_data['exp_month'],booking_data['exp_year'],booking_data['cvv'])
+        return Response("Success", status=status.HTTP_200_OK)
+
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
