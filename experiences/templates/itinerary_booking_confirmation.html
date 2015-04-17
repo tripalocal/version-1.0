@@ -272,9 +272,9 @@
                             <p>Reservation for <strong>{{ experience.guest_number }} person(s)</strong><br>
                                 on <strong>{{ experience.date }}</strong> from <strong>{{ experience.time }}</strong><br>
                             </p>
-                            <p>Rate: ${{ experience.price|mul:1.429|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
+                            <p>Rate: ${{ experience.price|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
                             <hr style="margin-bottom:10px;">
-                            Subtotal: $<div id="id_sub_total" style="display:inline"> {{ experience.price|mul:1.429|mul:experience.guest_number|floatformat:"0"}} </div>
+                            Subtotal: $<div id="id_sub_total" style="display:inline"> {{ experience.price|mul:experience.guest_number|floatformat:"0"}} </div>
                     </div>
                 </div>
             {% endfor %}
