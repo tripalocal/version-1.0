@@ -957,7 +957,7 @@ body {
 
 #section-add-location{height:400px;}
 
-#id_email_error, #id_password1_error, #first_name_error, #last_name_error{color: #FB716E; border: 1px solid #FB716E; background-color: #FECCCC; padding-left: 30px; padding-top: 2px; background-image: url(/images/error_icon.png); background-repeat: no-repeat; background-position: left top;}
+#id_email_error, #id_password1_error, #first_name_error, #last_name_error{color: #FB716E;  padding-left: 30px; padding-top: 2px; background-image: url(/images/error_icon.png); background-repeat: no-repeat; background-position: left top;}
 
 .secondaryAction{padding-left: 5px;}
 

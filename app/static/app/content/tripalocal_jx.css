@@ -672,6 +672,14 @@ a{
     background-position: -28px -85px;
     display: block;
 }
+
+.menubus-log{
+ 	width: 25px;
+    height:25px; 
+    background-image:url(/images/bus.gif);
+    background-position: -28px -85px;
+    display: block;
+}
 .menuhost-bottom{
     width: 100%;
     height: 130px;
