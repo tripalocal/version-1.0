@@ -411,20 +411,21 @@ def service_facebook_login(request):
         # FIXME: Catch only what is needed
         return Response({'reason': "Bad Access Token"}, status = status.HTTP_401_UNAUTHORIZED)
 
-#{\"start_datetime\":\"2015-05-05 00:00\", \"end_datetime\":\"2015-05-08 00:00\", \"city\":\"melbourne\", \"guest_number\":\"2\", \"keywords\":[\"sports\",\"arts\",\"food\"]}
+#{"start_datetime":"2015-05-05", "end_datetime":"2015-05-08", "city":"melbourne", "guest_number":"2", "keywords":"Sports,Arts,Food"}
 @api_view(['POST'])
 @authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_search(request, format=None):
     try:
         criteria = request.data #request.query_params['data']
-        start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['start_datetime'], "%Y-%m-%d %H:%M"))
-        end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['end_datetime'], "%Y-%m-%d %H:%M"))
+        start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['start_datetime'], "%Y-%m-%d"))
+        end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['end_datetime'], "%Y-%m-%d"))
         city = criteria['city']
         guest_number = criteria['guest_number']
         keywords = criteria['keywords']
+        language = "Chinese,English"
 
-        itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, keywords)
+        itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords)
 
         return Response(itinerary, status=status.HTTP_200_OK)
     except Exception as err:
@@ -507,7 +508,7 @@ def service_myreservation(request, format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-#"{\"id\":58,\"accept\":\"yes\"}"
+#"{"id":58,"accept":"yes"}"
 @api_view(['POST'])
 @authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
