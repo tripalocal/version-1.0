@@ -14,15 +14,17 @@
 <div>
     <form id="itinerary_form" action="" method="post">
         {% csrf_token %}
-
-        <div id="criteria_div" style="display:inline-block;">
+        <div class="itinerary-back-button">
+                    <button class="itinerary-return-button">← Australia 5 day trip</button>
+        </div>
+        <div id="criteria_div" style="display:inline-block; width:100%;">
+            
             <div id="date_destination_div" style="float:left;width:500px;">
                 <!-- <button id="add_day_button" type="button" style="float:left;width:75px;">Add</button> -->
-
+                
                 <div id="add_day_1_div">
-                    <div class="date">
-                        <img src="">
-                        <span>Dates</span>
+                    <div class="data-icon">
+                        <p class="date-exp">Dates</p>
                     </div>
                     <select id="destination_city_1" style="display:inline-block;float:left;">
                         <option value="Melbourne">Melbourne</option>
@@ -60,18 +62,16 @@
             </div>
 
             <div id="guest_number_div" style="float:left;width:150px;">
-                <div class="guest">
-                    <img src="">
-                    <span>People</span>
-                    <span>We offer private group only</span>
+                <div class="people">
+                    <p class="people-exp">People</p>
+                    <p class="people-descri">We offer private group only</p>
                 </div>
                 {{form.guest_number}}
             </div>
 
             <div id="language_div" style="float:left;width:150px;">
-                <div class="language">
-                    <img src="">
-                    <span>Language</span>
+                <div class="language-icon">
+                    <p class="language-exp">Language</p>
                 </div>
                 {{form.language}}
                 <input id="language_English" type="checkbox" value="English">English <br>
@@ -79,11 +79,11 @@
             </div>
 
             <div id="share-link-button">
-                <button value="Share Link"></button>
+                <button>Share Link</button>
             </div>
             <div id="save-itinerary-button">
-                <button value="Save Itinerary"></button> 
-            </div>
+                <button>Save Itinerary</button> 
+            </div><br><br>
             <div id="checkout-bar">
                 <div id="more-filters-button">
                     <button value="More Filters"></button>
@@ -180,6 +180,7 @@
                 <input type="submit" value="Confirm" id="preview_confirm"/>
             </div>
         </div>
+    </div>
         {%endif%}
     </form>
 </div>
