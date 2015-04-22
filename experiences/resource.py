@@ -414,7 +414,7 @@ def service_facebook_login(request):
 #{"start_datetime":"2015-05-05", "end_datetime":"2015-05-08", "city":"melbourne", "guest_number":"2", "keywords":"Sports,Arts,Food"}
 @api_view(['POST'])
 @authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
-@permission_classes((IsAuthenticated,))
+#@permission_classes((IsAuthenticated,))
 def service_search(request, format=None):
     try:
         criteria = request.data #request.query_params['data']

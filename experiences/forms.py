@@ -918,7 +918,7 @@ def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
 
         mp.track(user.email, "has signed in via email")
         mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "Postcode":postcode, 
-                                   "Latitude":latitude, "Longitude":longitude}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
+                                   "Latitude":latitude, "Longitude":longitude, "Language":"English"}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
         reader.close()
     except Exception:
         reader.close()

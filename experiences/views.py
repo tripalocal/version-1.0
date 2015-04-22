@@ -1092,7 +1092,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                 temp = max_guest_number
                 max_guest_number = min_guest_number
                 min_guest_number = temp
-            price = prev_data['price']
+            price = prev_data['price'] if prev_data['price'] is not None else 0
             price_with_booking_fee = prev_data['price_with_booking_fee']
             dynamic_price = prev_data['dynamic_price']
             id=prev_data.get('id', None)
@@ -1617,6 +1617,9 @@ def create_experience(request, id=None):
         else:
             included_transport = "No"
             included_transport_detail = None
+
+        if experience.price is None:
+            experience.price = Decimal.from_float(0.0)
 
         data = {"id":experience.id,
             "host":experience.hosts.all()[0].email,

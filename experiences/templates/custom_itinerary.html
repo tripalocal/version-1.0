@@ -138,7 +138,7 @@
             </div>
         </div>
 
-        <div id="preview_div" style="display:none;position:absolute;top:150px;left:100px;margin-right:100px;z-index=1000;background-color:rgba(255,255,255,0.5);">
+        <div id="preview_div" style="display:none;">
             <div id="preview_content"></div>
             <div>
                 <button type="button" id="preview_change">Change</button>
@@ -155,6 +155,7 @@
     function hideexperience(i, j)
     {
         $("#day_"+i+"_exp_"+j).hide();
+        $("#day_"+i+"_exp_"+j).attr("not-interested","yes");
         //$($(experience.children()[0]).children()[0]).hide();
         //$($($(experience.children()[0]).children()[1]).children()[1]).hide();
         //$(experience.children()[1]).hide();
@@ -377,7 +378,7 @@
                           "duration":$("#day_"+(i+1)+"_exp_"+j+"_duration").text(),
                           "guest_number":$("#id_guest_number option:selected").text()};
                     itinerary.push(dict);
-
+/*
                     host = $("#day_"+(i+1)+"_exp_"+j+"_host").text();
                     host_image = "/images/" + $("#day_"+(i+1)+"_exp_"+j+"_host_image").text();
                     price = (parseFloat($("#day_"+(i+1)+"_exp_"+j+"_price").text())).toFixed(2);
@@ -403,6 +404,11 @@
                     $("#itinerary_div *").prop("disabled", true);
                     $("#itinerary_div").css('opacity', '0.1');
                     $("#preview_div").show();
+*/
+                }
+                else
+                {
+                    $("#day_"+(i+1)+"_exp_"+j).css('display','none');
                 }
             }
         }
@@ -413,20 +419,43 @@
         else
         {
             $("#id_itinerary_string").val(JSON.stringify(itinerary));
+            $("#itinerary_div *").prop("disabled", true);
+            $("#preview_div").show();
         }
     });
 
     $("#preview_change").click(function(e){
-        $("#itinerary_div *").prop("disabled", false);
+/*
         $("#itinerary_div").css('opacity', '1.0');
         $("#preview_content").empty();
+*/
+        $("#itinerary_div *").prop("disabled", false);
         $("#preview_div").hide();
+
+        var table = $("#itinerary_table")[0];
+        var itinerary = [];
+        for (var i = 0, row; row = table.rows[i]; i++) {
+            counter = 0;
+            for (var j = 0, col; col = row.cells[j]; j++) {
+                if(counter<4 && $("#day_"+(i+1)+"_exp_"+j).attr("not-interested")!="yes") //4 instead of 3: the title takes up one
+                {
+                    $("#day_"+(i+1)+"_exp_"+j).css('display','inline-block');
+                    counter++;
+                }
+                if(counter>4)
+                {
+                    break;
+                }
+            }
+        }
     });
 
     $("#preview_confirm").click(function(e){
+/*
         $("#itinerary_div *").prop("disabled", false);
         $("#itinerary_div").css('opacity', '1.0');
         $("#preview_content").empty();
+*/
         $("#preview_div").hide();
     });
 
