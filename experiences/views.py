@@ -1775,18 +1775,32 @@ def create_experience(request, id=None):
                 ticket.save()
                 transport.save()
             else:
-                wh = WhatsIncluded.objects.get(id=experience.whatsincluded_set.filter(item="Food")[0].id)
-                wh.included = (form.data['included_food']=='Yes')
-                wh.details = form.data['included_food_detail']
-                wh.save()
-                wh = WhatsIncluded.objects.get(id=experience.whatsincluded_set.filter(item="Ticket")[0].id)
-                wh.included = (form.data['included_ticket']=='Yes')
-                wh.details = form.data['included_ticket_detail']
-                wh.save()
-                wh = WhatsIncluded.objects.get(id=experience.whatsincluded_set.filter(item="Transport")[0].id)
-                wh.included = (form.data['included_transport']=='Yes')
-                wh.details = form.data['included_transport_detail']
-                wh.save()
+                if len(experience.whatsincluded_set.filter(item="Food"))>0:
+                    wh = WhatsIncluded.objects.get(id=experience.whatsincluded_set.filter(item="Food")[0].id)
+                    wh.included = (form.data['included_food']=='Yes')
+                    wh.details = form.data['included_food_detail']
+                    wh.save()
+                else:
+                    food = WhatsIncluded(item='Food', included = (form.data['included_food']=='Yes'), details = form.data['included_food_detail'], experience = experience)
+                    food.save()
+
+                if len(experience.whatsincluded_set.filter(item="Ticket"))>0:
+                    wh = WhatsIncluded.objects.get(id=experience.whatsincluded_set.filter(item="Ticket")[0].id)
+                    wh.included = (form.data['included_ticket']=='Yes')
+                    wh.details = form.data['included_ticket_detail']
+                    wh.save()
+                else:
+                    ticket = WhatsIncluded(item='Ticket', included = (form.data['included_ticket']=='Yes'), details = form.data['included_ticket_detail'], experience = experience)
+                    ticket.save()
+
+                if len(experience.whatsincluded_set.filter(item="Transport"))>0:
+                    wh = WhatsIncluded.objects.get(id=experience.whatsincluded_set.filter(item="Transport")[0].id)
+                    wh.included = (form.data['included_transport']=='Yes')
+                    wh.details = form.data['included_transport_detail']
+                    wh.save()
+                else:
+                    transport = WhatsIncluded(item='Transport', included = (form.data['included_transport']=='Yes'), details = form.data['included_transport_detail'], experience = experience)
+                    transport.save()
 
             return HttpResponseRedirect('/admin/experiences/experience') 
             
