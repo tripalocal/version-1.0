@@ -69,46 +69,55 @@
                 {{form.guest_number}}
             </div>
 
-            <div id="language_div" style="float:left;width:150px;">
+            <div id="language_div" style="float:left;">
                 <div class="language-icon">
                     <p class="language-exp">Language</p>
                 </div>
-                {{form.language}}
-                <input id="language_English" type="checkbox" value="English">English <br>
-                <input id="language_Chinese" type="checkbox" value="Chinese">中文
             </div>
+                <div class="language-choice-checkbox">
+                	{{form.language}}
+                	<input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">English</label>
+					
+                	<br>
+                	<input id="language_Chinese" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label for="checkbox-cn" name="checkbox2_lbl" class="css-label lite-cyan-check">中文</label>
+                </div>
+                
 
-            <div id="share-link-button">
-                <button>Share Link</button>
+            <div id="itinerary-search-button">
+                <button>Search</button>
+                {{form.itinerary_string}}
             </div>
-            <div id="save-itinerary-button">
-                <button>Save Itinerary</button> 
-            </div><br><br>
+            <br><br>
             <div id="checkout-bar">
-                <div id="more-filters-button">
-                    <button value="More Filters"></button>
-                </div>
-                <span class="large-cyan-font">6</span>
-                <span>Items selected</span>
-                <span class="large-cyan-font">$63</span>
-                <span>Per Person</span>
-                <span class="large-cyan-font">$252</span>
-                <span>Selected Total</span>
-                <div id="checkout-button">
-                <button value="Checkout"></button>
-                </div>
+              
+                <button id="more-filters-button" value="More Filters">More Filters</button>
+                <p class="checkout-info">
+	                <span class="large-cyan-font">6</span>
+	                <span class="normal-font">Items selected</span>
+	                <span class="large-cyan-font">$63</span>
+	                <span class="normal-font">Per Person</span>
+	                <span class="large-cyan-font" id="sum-of-itinerary">$252</span>
+                	<span class="normal-font">Selected Total</span>
+                </p>
+                <button value="Checkout" id="checkout-button">Checkout</button>
             </div>
+            
                 <!-- Show div on action click("#more-filter-button") -->
             <div id="tags_div" style="float:left;width:300px;">
+            	<img src="/images/interest_icon.png">
+            	<p id="interest-exp">Interests</p>
                 {{form.tags}}
                 {{form.all_tags}}
+            </div>
+            <div id="less-filter-button">
+				<button id="more-filters-button">Less Filters</button>
             </div>
             
             <!-- <div id="search_div" style="float:left;width:100px;">
                 <input id="itinerary-search" type="submit" value="Search" name="Search" class="btn btn-primary btn-sm btn-search">
             </div>
     
-            {{form.itinerary_string}} -->
+             -->
         
 
         {% if itinerary %}
@@ -517,4 +526,12 @@
         //$("#itinerary_form").submit();
     });
 </script>
+//
+<script>
+            	$(document).ready(function(){
+    			$("#more-filters-button").click(function(){
+       			$("#tags_div").toggle();
+       			$("#less-filter-button").toggle();
+   				 });
+            </script>	
 {% endblock %}
