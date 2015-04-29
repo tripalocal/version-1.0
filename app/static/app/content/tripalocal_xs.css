@@ -1131,3 +1131,6 @@ body {
 #itinerary_table{margin-left: auto; margin-right: auto;}
 #itinerary_table tr{border: 0px;}
 #itinerary_table td{border: 1px solid: #CDCDCD; padding: 10px;}
+.itinerary-list select{display:inline-block; position:absolute; left: -90px;display: inline-block;border: solid 1px #676767;border-radius: 2px;position: relative;text-align: center;}
+.itinerary-remove-button{background-color: white; border:1px solid #CDCDCD; border-radius: 5px;}
+
