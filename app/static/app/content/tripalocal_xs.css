@@ -1127,3 +1127,7 @@ body {
 #select-all-checkbox{float: left; width: 100px; margin-left: 50px;}
 #fix-interface-itinerary{margin-left: 600px; margin-top: 20px;}
 #fix-interface-itinerary span{padding-left: 40px;}
+
+#itinerary_table{margin-left: auto; margin-right: auto;}
+#itinerary_table tr{border: 0px;}
+#itinerary_table td{border: 1px solid: #CDCDCD; padding: 10px;}

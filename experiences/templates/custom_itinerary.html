@@ -157,31 +157,38 @@
                             {% else %}
                             <td style="height:100px;display:none;">
                             {% endif %}
-                                <div style="width: 700px; overflow: hidden; height:100px; float: left;">
-                                    <div style="width: 140px; float: left;">
-                                        <p style="display:none;">{{experience.id}}</p>
-                                        <p style="display:none;">{{experience.duration}}</p>
-                                        <p style="display:none;">{{experience.host}}</p>
-                                        <p style="display:none;">{{experience.host_image}}</p>
-                                        <input type="radio" value="yes">
+                                <div style="width: 700px; overflow: hidden; height:100px; float: left;" class="itinerary-list">
+                                    <div style="width: 140px; float: left; margin-left:10px;">
                                         <a href="/experience/{{experience.id}}" target="_blank">
                                             <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" height="80" width="120"/>
                                         </a>
-                                    </div>
-                                    <div style="margin-left: 150px;">
                                         <a href="/experience/{{experience.id}}" target="_blank"><p style="width:250px;display:inline-block;">{{experience.title}}</p></a>
-                                        <select style="display:inline-block; position:absolute; left:400px;">
+                                        <p style="display:none;">{{experience.id}}</p>
+                                       
+                                        <p style="display:none;">{{experience.host}}</p>
+                                        <p style="">{{experience.host_image}}</p>
+                                        <input type="radio" value="yes">
+                                        
+                                        <select style="display:inline-block; position:absolute; left:550px;">
                                             <option value="None">Please select time</option>
                                         {% for slot in experience.timeslots%}
                                             <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00{%if slot.instant_booking%}(I){%else%}{%endif%}</option>
                                         {%endfor%}
                                         </select>
                                         <p style="display:inline-block; position:absolute; left:550px;">{{experience.price}}</p>
-                                        <p>{{experience.meetup_spot}}</p>
+                                        <p id="group-size">4</p>
+                                        <p id="subtotal">263</p>
+                                        <!-- <p>{{experience.meetup_spot}}</p> -->
                                     </div>
                                 </div>
                                 <div style="height:100px; margin-left: 700px;">
-                                    <input type="radio" value="no">Remove
+                                <button id="itinerary-remove-button">Remove/Change Date</button>
+                                 <p style="display:none;">{{experience.duration}}</p>
+                                 <p style="">{{experience.language}}</p>
+                                 <p id="meet-up-location-itinerary">Melbourne CBD</p>
+                                 <a href="#" class="view-map-itinerary">View Map</a>
+                                 <img id="question-mark" src="">
+                                 <p>Why is it selected?</p>
                                 </div>
                             </td>
                             {%endfor%}
