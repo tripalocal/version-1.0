@@ -306,7 +306,7 @@ a{
 
 }
 .data-icon{
-    background-image: url(../images/icons.gif);
+    background-image: url(/images/icons.gif);
     width: 27px;
     height: 27px;
     background-size: 135px 135px;
@@ -342,7 +342,7 @@ a{
     border: 1px solid #cccccc;
 }
 .time-icon{
-    background-image: url(../images/icons.gif);
+    background-image: url(/images/icons.gif);
     width: 27px;
     height: 27px;
     background-size: 135px 135px;
@@ -352,7 +352,7 @@ a{
     margin-bottom:-10px;
 }
 .people{
-    background-image: url(../images/icons.gif);
+    background-image: url(/images/icons.gif);
     width: 27px;
     height: 27px;
     background-size: 135px 135px;
@@ -574,15 +574,15 @@ a{
     background-size: 120px 60px;
 }
 .facebooklogo{
-    background-image:url(../images/icons_social.png);
+    background-image:url(/images/icons_social.png);
     background-position: -30px 0px;
 }
 .instagramlogo{
-    background-image:url(../images/icons_social.png);
+    background-image:url(/images/icons_social.png);
     background-position: -90px 0px;
 }
 .mobilelogo{
-    background-image:url(../images/icons_social.png);
+    background-image:url(/images/icons_social.png);
     background-position: -30px 0px;
 }
 .host-socialmedia .followerNumber,.host-socialmedia .contactNumber{
@@ -673,11 +673,11 @@ a{
     display: block;
 }
 
-.menubus-log{
+.menubus-logo{
  	width: 25px;
     height:25px; 
     background-image:url(/images/bus.gif);
-    background-position: -28px -85px;
+    background-position: -4px;
     display: block;
 }
 .menuhost-bottom{

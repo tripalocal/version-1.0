@@ -103,7 +103,7 @@ def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, cur
 def get_available_experiences(start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None):#city/keywords is a string like A,B,C,
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     available_options = []
-    end_datetime = end_datetime.replace(hour=23)
+    end_datetime = end_datetime.replace(hour=22)
 
     if city is not None:
         city = str(city).lower().split(",")
