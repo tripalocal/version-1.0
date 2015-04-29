@@ -20,79 +20,83 @@
         </div> 
 
         <div id="criteria_div">
-            <div id="date_destination_div" style="float:left;width:500px;">
-                <!--<button id="add_day_button" type="button" style="float:left;width:75px;">Add</button>-->
-                <div id="add_day_1_div">
-                    <div class="data-icon"> 
-                        <p class="date-exp">Dates</p>
+            <div id="mandatory_criteria_div">
+                <div id="date_destination_div" style="float:left;width:500px;">
+                    <!--<button id="add_day_button" type="button" style="float:left;width:75px;">Add</button>-->
+                    <div id="add_day_1_div">
+                        <div class="data-icon"> 
+                            <p class="date-exp">Dates</p>
+                        </div>
+                        <select id="destination_city_1" style="display:inline-block;float:left;">
+                            <option value="Melbourne">Melbourne</option>
+                            <option value="Sydney">Sydney</option>
+                            <!--<option value="Brisbane">Brisbane</option>
+                            <option value="Adelaide">Adelaide</option>
+                            <option value="Tasmania">Tasmania</option>-->
+                        </select>
+                        <div class="input-group date" id="id_start_datetime_picker_day_1" style="float:left;width:150px;">
+                            <input class="form-control" id="id_start_datetime_day_1" name="start_datetime" type="text" value="">
+                            <span class="input-group-addon">
+                                <span class="glyphicon-calendar glyphicon"></span>
+                            </span>
+                        </div>
+                        <script>
+                            $(function() {
+                                $("#id_start_datetime_picker_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
+                            });
+                        </script>
+                        <div class="input-group date" id="id_end_datetime_picker_day_1" style="float:left;width:150px;">
+                            <input class="form-control" id="id_end_datetime_day_1" name="end_datetime" type="text" value="">
+                            <span class="input-group-addon">
+                                <span class="glyphicon-calendar glyphicon"></span>
+                            </span>
+                        </div>
+                        <script>
+                            $(function() {
+                                $("#id_end_datetime_picker_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
+                            });
+                        </script>
                     </div>
-                    <select id="destination_city_1" style="display:inline-block;float:left;">
-                        <option value="Melbourne">Melbourne</option>
-                        <option value="Sydney">Sydney</option>
-                        <!--<option value="Brisbane">Brisbane</option>
-                        <option value="Adelaide">Adelaide</option>
-                        <option value="Tasmania">Tasmania</option>-->
-                    </select>
-                    <div class="input-group date" id="id_start_datetime_picker_day_1" style="float:left;width:150px;">
-                        <input class="form-control" id="id_start_datetime_day_1" name="start_datetime" type="text" value="">
-                        <span class="input-group-addon">
-                            <span class="glyphicon-calendar glyphicon"></span>
-                        </span>
-                    </div>
-                    <script>
-                        $(function() {
-                            $("#id_start_datetime_picker_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
-                        });
-                    </script>
-                    <div class="input-group date" id="id_end_datetime_picker_day_1" style="float:left;width:150px;">
-                        <input class="form-control" id="id_end_datetime_day_1" name="end_datetime" type="text" value="">
-                        <span class="input-group-addon">
-                            <span class="glyphicon-calendar glyphicon"></span>
-                        </span>
-                    </div>
-                    <script>
-                        $(function() {
-                            $("#id_end_datetime_picker_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
-                        });
-                    </script>
+                    {{form.start_datetime}}
+                    {{form.end_datetime}}
+                    {{form.city}}
                 </div>
-                {{form.start_datetime}}
-                {{form.end_datetime}}
-                {{form.city}}
-            </div>
 
-            <div id="guest_number_div" style="float:left;width:150px;">
-                <div class="people"> 
-                    <p class="people-exp">People</p>
-                    <p class="people-descri">We offer private group only</p>
+                <div id="guest_number_div" style="float:left;width:150px;">
+                    <div class="people"> 
+                        <p class="people-exp">People</p>
+                        <p class="people-descri">We offer private group only</p>
+                    </div>
+                    {{form.guest_number}}
                 </div>
-                {{form.guest_number}}
+
+                <div id="language_div" style="float:left;">
+                    <div class="language-icon">
+                        <p class="language-exp">Language</p>
+                    </div> 
+                </div>
+                <div class="language-choice-checkbox"> 
+                    {{form.language}} 
+                    <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">English</label>
+                    <br> 
+                    <input id="language_Chinese" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label for="checkbox-cn" name="checkbox2_lbl" class="css-label lite-cyan-check">中文</label> 
+                </div>
+            </div>
+            <div id="optional_criteria_div">
+                <div id="more-filters-button">
+                    <button id="more_filters" type="button" value="More Filters">More Filters</button> 
+                </div>
+
+                <div id="tags_div" style="display:none;">
+                    {{form.tags}}
+                    {{form.all_tags}}
+                </div>
+
+                <div id="itinerary-search-button">
+                    <input id="itinerary-search" type="submit" value="Search" name="Search">
+                </div>
             </div>
 
-            <div id="language_div" style="float:left;">
-                <div class="language-icon">
-                    <p class="language-exp">Language</p>
-                </div> 
-            </div>
-            <div class="language-choice-checkbox"> 
-                {{form.language}} 
-                <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">English</label>
-                <br> 
-                <input id="language_Chinese" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label for="checkbox-cn" name="checkbox2_lbl" class="css-label lite-cyan-check">中文</label> 
-            </div>
-
-            <div id="more-filters-button">
-                <button id="more_filters" type="button" value="More Filters">More Filters</button> 
-            </div>
-
-            <div id="tags_div" style="display:none;">
-                {{form.tags}}
-                {{form.all_tags}}
-            </div>
-
-            <div id="itinerary-search-button">
-                <input id="itinerary-search" type="submit" value="Search" name="Search">
-            </div>
 <!--
             <div id="share-link-button">
                 <button>Share Link</button>
@@ -109,11 +113,11 @@
         {% if itinerary %}
         <div id="checkout-bar">
             <p class="checkout-info">
-	            <span id="id_item_selected" class="large-cyan-font"></span>
+	            <span id="id_item_selected" class="large-cyan-font">0</span>
 	            <span class="normal-font">Items selected</span>
-	            <span id="id_price_per_person" class="large-cyan-font"></span>
+	            <span id="id_price_per_person" class="large-cyan-font">$0</span>
 	            <span class="normal-font">Per Person</span>
-	            <span id="id_total_price" class="large-cyan-font" id="sum-of-itinerary"></span>
+	            <span id="id_total_price" class="large-cyan-font" id="sum-of-itinerary">$0</span>
                 <span class="normal-font">Selected Total</span>
                 <input id="itinerary-preview" type="button" value="Preview" name="Preview" class="checkout-button">
             </p>
@@ -132,42 +136,47 @@
 
 
         <div id="itinerary_div">
-            <table id="itinerary_table" style="width:800px; border:1px solid; margin:20px;">
+            <table id="itinerary_table" style="width:1200px; margin:20px;">
                 <tbody>
                 {%for day in itinerary%}
-                    <tr style="border:1px solid;">
-                        <td style="display:inline-block;">Day {{forloop.counter}} {{day.date}}</td>
+                    <tr>
+                        <td style="display:inline-block; border:none;">Day {{forloop.counter}} {{day.date}}</td>
                         {% for experience in day.experiences %}
                         {% if forloop.counter <= 3 %}
                         <td style="height:100px;display:inline-block;">
                         {% else %}
                         <td style="height:100px;display:none;">
                         {% endif %}
-                            <div style="width: 700px; overflow: hidden; height:100px; float: left;">
-                                <div style="width: 140px; float: left;">
+                            <div style="width: 1000px; overflow: hidden; height:100px; float: left;" class="itinerary-list">
+                                <div style="width: 200px; float: left; margin-left:10px;">
                                     <p style="display:none;">{{experience.id}}</p>
                                     <p style="display:none;">{{experience.duration}}</p>
                                     <p style="display:none;">{{experience.host}}</p>
                                     <p style="display:none;">{{experience.host_image}}</p>
-                                    <input type="radio" value="yes">
+                                    <input type="checkbox" value="yes">
                                     <a href="/experience/{{experience.id}}" target="_blank">
-                                        <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" height="80" width="120"/>
+                                        <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" class="itinerary-experience-image"/>
                                     </a>
+                                    <img src="{{MEDIA_URL}}{{experience.host_image}}" class="itinerary-host-image"/>
                                 </div>
-                                <div style="margin-left: 150px;">
-                                    <a href="/experience/{{experience.id}}" target="_blank"><p style="width:250px;display:inline-block;">{{experience.title}}</p></a>
-                                    <select style="display:inline-block; position:absolute; left:400px;">
+                                <div style="margin-left: 200px;">
+                                    <a href="/experience/{{experience.id}}" target="_blank"><p style="width:350px;display:inline-block;">{{experience.title}}</p></a>
+                                    <select style="display:inline-block; position:absolute; left:550px;">
                                         <option value="None">Please select time</option>
                                     {% for slot in experience.timeslots%}
-                                        <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00{%if slot.instant_booking%}(I){%else%}{%endif%}</option>
+                                        <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{%if slot.instant_booking%}<img src="{{MEDIA_URL}}instant.png"/>{%else%}{%endif%} {{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00</option>
                                     {%endfor%}
                                     </select>
-                                    <p style="display:inline-block; position:absolute; left:550px;">{{experience.price}}</p>
+                                    <p style="display:inline-block; position:absolute; left:700px;">{{experience.price}}</p>
+                                    <p style="display:inline-block; position:absolute; left:800px;"></p> 
+                                    <p style="display:inline-block; position:absolute; left:900px;"></p> 
+                                </div>
+                                <div style="margin-top:30px;">
                                     <p>{{experience.meetup_spot}}</p>
                                 </div>
                             </div>
-                            <div style="height:100px; margin-left: 700px;">
-                                <input type="radio" value="no">Remove
+                            <div style="height:100px; margin-left: 1000px;">
+                                <input type="button" value="Remove" class="itinerary-remove-button">
                             </div>
                         </td>
                         {%endfor%}
@@ -207,7 +216,7 @@
         if($("#day_"+i+"_exp_"+j).length)
         {
             //$("#day_"+i+"_exp_"+j).show();
-            $("#day_"+i+"_exp_"+j).css('display', 'inline');
+            $("#day_"+i+"_exp_"+j).css('display', 'inline-block');
         }
     }
 
@@ -357,15 +366,23 @@
                         $($($(col).children()[0]).children()[0]).children()[2].id="day_"+day_index+"_exp_"+exp_index+"_host";
                         $($($(col).children()[0]).children()[0]).children()[3].id="day_"+day_index+"_exp_"+exp_index+"_host_image";
                         $($($(col).children()[0]).children()[0]).children()[4].id="day_"+day_index+"_exp_"+exp_index+"_choice_yes";
-                        $($($(col).children()[0]).children()[0]).children()[4].name="day_"+day_index+"_exp_"+exp_index+"_radio";
+                        //$($($(col).children()[0]).children()[0]).children()[4].name="day_"+day_index+"_exp_"+exp_index+"_radio";
 
                         $($($(col).children()[0]).children()[1]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_title";
                         $($($(col).children()[0]).children()[1]).children()[1].id="day_"+day_index+"_exp_"+exp_index+"_timeslot";
                         $($($(col).children()[0]).children()[1]).children()[2].id="day_"+day_index+"_exp_"+exp_index+"_price";
-                        $($($(col).children()[0]).children()[1]).children()[3].id="day_"+day_index+"_exp_"+exp_index+"_meetup_spot";
+                        $($($(col).children()[0]).children()[1]).children()[3].id="day_"+day_index+"_exp_"+exp_index+"_guest_number";
+                        $($($(col).children()[0]).children()[1]).children()[4].id="day_"+day_index+"_exp_"+exp_index+"_subtotal";
+
+                        $($($(col).children()[0]).children()[2]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_meetup_spot";
+
+                        number = parseFloat($("#id_guest_number option:selected").text());
+                        p = parseFloat($("#day_"+day_index+"_exp_"+exp_index+"_price").text());
+                        $("#day_"+day_index+"_exp_"+exp_index+"_guest_number").text(number);
+                        $("#day_"+day_index+"_exp_"+exp_index+"_subtotal").text("$"+(number*p).toFixed(2));
 
                         $($(col).children()[1]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_choice_no";
-                        $($(col).children()[1]).children()[0].name="day_"+day_index+"_exp_"+exp_index+"_radio";
+                        //$($(col).children()[1]).children()[0].name="day_"+day_index+"_exp_"+exp_index+"_radio";
 
                         $("#day_"+day_index+"_exp_"+exp_index+"_choice_yes").click(function(e){
                             i = e.target.id.split('_')[1];
