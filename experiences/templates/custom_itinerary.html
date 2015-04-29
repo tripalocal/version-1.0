@@ -90,7 +90,7 @@
             <br><br>
             <div id="checkout-bar">
               
-                <button id="more-filters-button" value="More Filters">More Filters</button>
+                <button id="more-filters-button">More Filters</button>
                 <p class="checkout-info">
 	                <span class="large-cyan-font">6</span>
 	                <span class="normal-font">Items selected</span>
@@ -104,7 +104,7 @@
             
                 <!-- Show div on action click("#more-filter-button") -->
             <div id="tags_div" style="float:left;width:300px;">
-            	<img src="/images/interest_icon.png">
+            	<img src="/images/interest_icon.png" id="interest-icon">
             	<p id="interest-exp">Interests</p>
                 {{form.tags}}
                 {{form.all_tags}}
@@ -116,11 +116,21 @@
             <!-- <div id="search_div" style="float:left;width:100px;">
                 <input id="itinerary-search" type="submit" value="Search" name="Search" class="btn btn-primary btn-sm btn-search">
             </div>
-    
+    		
              -->
-        
+        	<div id="select-all-bar">
+        	  <div id="select-all-checkbox">
+        		<input id="select-all" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">Select all</label>
+        	</div>
+        		<p id="fix-interface-itinerary">
+        			<span>Price PP</span>
+        			<span>Group Size</span>
+        			<span>Subtotal</span>
+        		</p>
+        	</div>
 
         {% if itinerary %}
+        <!-- move to the "#more-filter-bar" -->
         <div id="result_div" style="display:inline-block;">
             <div id="price_div">
                 <table id="price_table" style="width:800px; border:1px solid; margin:20px;">
@@ -526,12 +536,16 @@
         //$("#itinerary_form").submit();
     });
 </script>
-//
-<script>
+<!-- more filter button -->
+<script type="text/jquery">
             	$(document).ready(function(){
     			$("#more-filters-button").click(function(){
-       			$("#tags_div").toggle();
-       			$("#less-filter-button").toggle();
+       			$("#tags_div img").toggle();
+       			$("#tags_div p").toggle();
+       			$("#tags_div input").toggle();
+       			$("tags_div button").toggle();
+       			$("tags_div label").toggle();
+       			$("#less-filter-button button").toggle();
    				 });
             </script>	
 {% endblock %}

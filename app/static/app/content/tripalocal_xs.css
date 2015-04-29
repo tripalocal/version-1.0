@@ -1120,4 +1120,10 @@ body {
 				-ms-user-select: none;
 				user-select: none;
 			}*/
+#tags_div{display: none;}
 #less-filter-button{display: none;}
+#interest-icon{margin-left: 45px;}
+#interest-exp{margin-left: 40px;}
+#select-all-checkbox{float: left; width: 100px; margin-left: 50px;}
+#fix-interface-itinerary{margin-left: 600px; margin-top: 20px;}
+#fix-interface-itinerary span{padding-left: 40px;}
