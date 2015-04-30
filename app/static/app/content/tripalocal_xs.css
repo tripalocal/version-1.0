@@ -1019,6 +1019,7 @@ body {
 #guest_number_div .people{margin-top: 30px;}
 #guest_number_div .people-exp{color: #676767; margin-left: -5px; padding-top: 30px;}
 #guest_number_div select{margin-left: 70px; border: 1px #676767 solid;top: -15px;position: relative;}
+#id_guest_number{width:40px;}
 .people-descri{width: 150px; font-size: 10px;margin-left: 60px;top: -30px;position: relative;}
 #language_div{margin-left:60px;}
 #language_div .language-exp{color: #676767; margin-left: -5px; padding-top: 35px;}
@@ -1076,13 +1077,14 @@ body {
 #checkout-bar{
     background-color: white;
     height: 75px;
+    min-width:1200px;
     border-top: 1px solid #D3D3D3;
     border-bottom: 1px solid #D3D3D3;
 }
 .checkout-button{
-	margin-top: 15px;
-    margin-right: 50px;
-    float:right;
+	margin-top: 5px;
+    position:absolute;
+    left:1030px;
     background-color: #3ECBCC;
     color: white;
     padding: 10px 25px 10px 25px;
@@ -1129,16 +1131,9 @@ body {
 #fix-interface-itinerary{margin-left: 700px; margin-top: 20px;}
 #fix-interface-itinerary span{display:inline-block;width:100px;}
 
-#itinerary_table{margin-left: auto; margin-right: auto;}  
 #itinerary_table tr{border: 0px;}  
-#itinerary_table td{border: 1px solid #CDCDCD; padding: 10px; margin:10px;}  
-
-#criteria_div {display:inline-block; width:100%;padding-bottom:10px;}
-#tags_div {float:left;margin-top:35px;margin-left:30px}
-.tag-non-selected {color:lightgray;text-decoration:line-through;text-decoration-color:black;}
-.tag-button {border-width:1px;border-radius:20px;border-color:black;margin-left:5px;margin-right:10px;}
-#optional_criteria_div{margin-top:100px;}
-#itinerary-search-button{float:right;margin-right:50px;}
+#itinerary_table td{border: 1px solid #CDCDCD; padding: 10px; margin:10px;} 
+#itinerary_table{width:1200px;margin-left:20px;margin-right:20px;}
 #itinerary_table input[type=checkbox] {
   /* All browsers except webkit*/
   transform: scale(2);
@@ -1148,6 +1143,13 @@ body {
 
   float:none;
 }
+
+#criteria_div {display:inline-block; width:100%;padding-bottom:10px;width:1200px;}
+#tags_div {float:left;margin-top:35px;margin-left:30px}
+.tag-non-selected {color:lightgray;text-decoration:line-through;text-decoration-color:black;}
+.tag-button {border-width:1px;border-radius:20px;border-color:black;margin-left:5px;margin-right:10px;}
+#optional_criteria_div{margin-top:100px;}
+#itinerary-search-button{float:right;margin-right:50px;}
 
 .itinerary-remove-button {
     background: white;
@@ -1160,3 +1162,21 @@ body {
 
 .itinerary-host-image {position:relative;bottom:70px;left:40px;width:60px;height:60px;border-radius:50px;}
 .itinerary-experience-image{height:80px; width:120px; margin-left:40px;}
+
+.itinerary-list{width: 1000px; overflow: hidden; height:100px; float: left;}
+.itinerary-list select{display:inline-block; position:absolute; left: -90px;display: inline-block;border: solid 1px #676767;border-radius: 2px;position: relative;text-align: center;}
+#preview_div{width:1200px;}
+.confirmation-button {
+    margin-top: 5px;
+    margin-bottom:5px;
+    float:right;
+    margin-right:50px;
+    background-color: #3ECBCC;
+    color: white;
+    padding: 10px 25px 10px 25px;
+    border: 0px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    width: 120px;
+}

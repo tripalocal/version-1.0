@@ -136,7 +136,7 @@
 
 
         <div id="itinerary_div">
-            <table id="itinerary_table" style="width:1200px; margin:20px;">
+            <table id="itinerary_table">
                 <tbody>
                 {%for day in itinerary%}
                     <tr>
@@ -147,7 +147,7 @@
                         {% else %}
                         <td style="height:100px;display:none;">
                         {% endif %}
-                            <div style="width: 1000px; overflow: hidden; height:100px; float: left;" class="itinerary-list">
+                            <div class="itinerary-list">
                                 <div style="width: 200px; float: left; margin-left:10px;">
                                     <p style="display:none;">{{experience.id}}</p>
                                     <p style="display:none;">{{experience.duration}}</p>
@@ -164,7 +164,7 @@
                                     <select style="display:inline-block; position:absolute; left:550px;">
                                         <option value="None">Please select time</option>
                                     {% for slot in experience.timeslots%}
-                                        <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{%if not slot.instant_booking%}&#x26A1;{%else%}{%endif%} {{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00</option>
+                                        <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{%if slot.instant_booking%}&#x26A1;{%else%}{%endif%} {{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00</option>
                                     {%endfor%}
                                     </select>
                                     <p style="display:inline-block; position:absolute; left:700px;">{{experience.price}}</p>
@@ -189,8 +189,8 @@
         <div id="preview_div" style="display:none;">
             <div id="preview_content"></div>
             <div>
-                <button type="button" id="preview_change" class="checkout-button">Change</button>
-                <input type="submit" value="Confirm" id="preview_confirm" class="checkout-button"/>
+                <button type="button" id="preview_change" class="confirmation-button">Change</button>
+                <input type="submit" value="Confirm" id="preview_confirm" class="confirmation-button"/>
             </div>
         </div>
         {%endif%}
