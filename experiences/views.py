@@ -116,7 +116,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         experiences = Experience.objects.filter(status='Listed')
 
     for experience in experiences:
-        if guest_number is not None and (experience.guest_number_max < int(guest_number)):
+        if guest_number is not None and (experience.guest_number_max < int(guest_number) or experience.guest_number_min > int(guest_number)):
             continue
 
         if keywords is not None:
@@ -163,7 +163,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         host = experience.hosts.all()[0]
         exp_price = float(experience.price)
         if experience.dynamic_price != None and len(experience.dynamic_price) > 0 :
-            exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-1])
+            exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
 
         experience_avail = {'id':experience.id, 'title': experience.title, 'meetup_spot':experience.meetup_spot, 'rate': rate, 'duration':experience.duration, 'city':experience.city,
                             'host':host.first_name + ' ' + host.last_name, 'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated, 'price':experience_fee_calculator(exp_price), 'dates':{}}

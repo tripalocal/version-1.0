@@ -480,8 +480,8 @@ def service_mytrip(request, format=None):
             phone_number = host.registereduser.phone_number
             
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status, 'guest_number':booking.guest_number, 
-                  'experience_title':booking.experience.title, 'meetup_spot':booking.experience.meetup_spot,
-                  'host_name':host.first_name + ' ' + host.last_name, 'host_phone_number':phone_number}
+                  'experience_title':booking.experience.title, 'meetup_spot':booking.experience.meetup_spot, 'experience_id':booking.experience.id,
+                  'host_name':host.first_name + ' ' + host.last_name, 'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
 
             bks.append(bk)
 

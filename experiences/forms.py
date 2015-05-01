@@ -56,7 +56,7 @@ Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
-Tags = "Food,Sports,Arts"
+Tags = "Food&Wine,Education,History&Culture,Architecture,For Couples,Photography Worthy,Liveability Research,Kids Friendly,Outdoor&Nature,Shopping,Sports&Leisure,Host with Car,Extreme Fun,Events,Health&Beauty"
 
 #from http://stackoverflow.com/questions/16773579/customize-radio-buttons-in-django
 class HorizRadioRenderer(forms.RadioSelect.renderer):
