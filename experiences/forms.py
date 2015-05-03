@@ -740,6 +740,8 @@ class BookingConfirmationForm(forms.Form):
 class CreateExperienceForm(forms.Form):
     id=forms.IntegerField()
     host = forms.CharField()
+    host_first_name = forms.CharField()
+    host_last_name = forms.CharField()
     language = forms.ChoiceField(choices=Language)
     start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))

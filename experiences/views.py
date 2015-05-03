@@ -1631,6 +1631,8 @@ def create_experience(request, id=None):
 
         data = {"id":experience.id,
             "host":experience.hosts.all()[0].email,
+            "host_first_name":experience.hosts.all()[0].first_name,
+            "host_last_name":experience.hosts.all()[0].last_name, 
             "language":experience.language,
             "start_datetime":experience.start_datetime,
             "end_datetime":experience.end_datetime,
@@ -1731,7 +1733,16 @@ def create_experience(request, id=None):
                 #experience.hosts.add(user)
                 cursor = connections['experiencedb'].cursor()
                 cursor.execute("Insert into experiences_experience_hosts ('experience_id','user_id') values (%s, %s)", [experience.id, user.id])
-            
+
+            #update host information
+            user = User.objects.get(email=form.data['host'])
+            user.first_name = form.data['host_first_name']
+            user.last_name = form.data['host_last_name']
+            user.save()
+            #copy to chinese db
+            cursor = connections['cndb'].cursor()
+            cursor.execute("Update auth_user set first_name=%s, last_name=%s where id=%s", [user.first_name, user.last_name, user.id])
+
             #save images
             dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
             if not os.path.isdir(dirname):
@@ -1810,7 +1821,7 @@ def create_experience(request, id=None):
                     transport = WhatsIncluded(item='Transport', included = (form.data['included_transport']=='Yes'), details = form.data['included_transport_detail'], experience = experience)
                     transport.save()
 
-            return HttpResponseRedirect('/admin/experiences/experience') 
+            return HttpResponseRedirect('/admin/experiences/experience/'+experience.id) 
             
     else:
         form = CreateExperienceForm(data, files)
