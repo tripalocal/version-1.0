@@ -366,6 +366,165 @@ class ExperienceListView(ListView):
         else:
             return HttpResponseRedirect("/admin/login/?next=/experiencelist") #self.request.user.experience_hosts.all()
 
+def getAvailableOptions(experience, available_options, available_date):
+
+    last_sdt = pytz.timezone('UTC').localize(datetime.min)
+    local_timezone = pytz.timezone(settings.TIME_ZONE)
+
+    #requirement change: all timeslots are considered available unless being explicitly blocked   
+    #while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(hours=+6)): 
+        #if experience.repeat_cycle == "Hourly" :
+        #    sdt += timedelta(hours=experience.repeat_frequency)
+        #elif experience.repeat_cycle == "Daily" :
+        #    sdt += timedelta(days=experience.repeat_frequency)
+        #elif experience.repeat_cycle == "Weekly" :
+        #    sdt += timedelta(weeks=experience.repeat_frequency)
+        #else :
+            #TODO
+    #set the start time to 6 hours later
+    sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+6)
+
+    blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
+    blockout_start = []
+    blockout_end = []
+    blockout_index=0
+
+    #calculate all the blockout time periods
+    for blk in blockouts :
+        if blk.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+            daylightsaving = True
+        else:
+            daylightsaving = False
+
+        if blk.repeat:
+            b_l =  blk.end_datetime - blk.start_datetime
+            if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
+                blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+            while blk.start_datetime.date() <= blk.repeat_end_date:
+                blockout_index += 1
+                blockout_start.append(blk.start_datetime)
+                blockout_end.append(blk.start_datetime + b_l)
+
+                blk.start_datetime = next_time_slot(blk.repeat_cycle, blk.repeat_frequency, blk.repeat_extra_information, blk.start_datetime, daylightsaving)
+
+        else:
+            blockout_index += 1
+            blockout_start.append(blk.start_datetime)
+            blockout_end.append(blk.end_datetime)
+
+    blockout_start.sort()
+    blockout_end.sort()
+
+    instantbookings = experience.instantbookingtimeperiod_set.filter(experience_id=experience.id)
+    instantbooking_start = []
+    instantbooking_end = []
+    instantbooking_index=0
+
+    #calculate all the instant booking time periods
+    for ib in instantbookings :
+        if ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+            daylightsaving = True
+        else:
+            daylightsaving = False
+
+        if ib.repeat:
+            ib_l =  ib.end_datetime - ib.start_datetime
+            if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
+                ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+            while ib.start_datetime.date() <= ib.repeat_end_date:
+                instantbooking_index += 1
+                instantbooking_start.append(ib.start_datetime)
+                instantbooking_end.append(ib.start_datetime + ib_l)
+
+                ib.start_datetime = next_time_slot(ib.repeat_cycle, ib.repeat_frequency, ib.repeat_extra_information, ib.start_datetime, daylightsaving)
+
+        else:
+            instantbooking_index += 1
+            instantbooking_start.append(ib.start_datetime)
+            instantbooking_end.append(ib.end_datetime)
+
+    instantbooking_start.sort()
+    instantbooking_end.sort()
+
+    bookings = experience.booking_set.filter(experience_id=experience.id).exclude(status__iexact="rejected")
+
+    block_i=0
+    instantbooking_i=0
+    while (sdt <= experience.end_datetime and sdt <= datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2) ):
+        #check if the date is blocked
+        blocked = False
+
+        #block 10pm-7am if repeated hourly
+        sdt_local = sdt.astimezone(local_timezone)
+        if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):#daylight saving
+            if not sdt_local.dst() != timedelta(0):# not daylight saving
+                sdt_local = sdt_local + relativedelta(hours=1)
+        elif sdt_local.dst() != timedelta(0):
+            sdt_local = sdt_local - relativedelta(hours=1)
+        #if experience.repeat_cycle == "Hourly" and (sdt_local.time().hour <= 7 or sdt_local.time().hour >= 22):
+        #    blocked = True
+
+        if not blocked:
+            #blockout_start, blockout_end are sorted, sdt keeps increasing
+            #block_i: skip the periods already checked
+            for b_i in range(block_i, blockout_index):
+                if (blockout_start[b_i] <= sdt and sdt <= blockout_end[b_i]) or (blockout_start[b_i] <= sdt+relativedelta(hours=+experience.duration) and sdt+relativedelta(hours=+experience.duration) <= blockout_end[b_i]):
+                    blocked = True
+                    break
+                if sdt+relativedelta(hours=+experience.duration) < blockout_start[b_i]:
+                    #no need to check further slots after the current one
+                    break 
+                block_i += 1
+
+        if not blocked:
+            i = 0
+            for bking in bookings :
+                if bking.datetime == sdt and bking.status.lower() != "rejected":
+                    i += bking.guest_number
+                #if someone book a 2pm experience, and the experience last 3 hours, the system should automatically wipe out the 3pm, 4pm and 5pm sessions 
+                if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
+                    i += experience.guest_number_max #change from bking.guest_number to experience.guest_number_max
+
+            if i == 0: #< experience.guest_number_max :
+                if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
+                    istant_booking = False
+                    #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
+                    #instantbooking_i: skip the periods already checked
+                    for ib_i in range(instantbooking_i, instantbooking_index):
+                        if (instantbooking_start[ib_i] <= sdt and sdt <= instantbooking_end[ib_i]):# and (instantbooking_start[ib_i] <= sdt+relativedelta(hours=+experience.duration) and sdt+relativedelta(hours=+experience.duration) <= instantbooking_end[ib_i]):
+                            istant_booking = True
+                            break
+                        if sdt+relativedelta(hours=+experience.duration) < instantbooking_start[ib_i]:
+                            #no need to check further slots after the current one
+                            break 
+                        if sdt > instantbooking_start[ib_i]:
+                            instantbooking_i += 1
+
+                    dict = {'available_seat': experience.guest_number_max - i, 
+                            'date_string': sdt_local.strftime("%d/%m/%Y"), 
+                            'time_string': sdt_local.strftime("%H:%M"), 
+                            'datetime': sdt_local,
+                            'instant_booking': istant_booking}
+                    available_options.append(dict)
+
+                    if sdt_local.date() != last_sdt.date():
+                        new_date = ((sdt_local.strftime("%d/%m/%Y"),
+                                            sdt_local.strftime("%d/%m/%Y")),)
+                        available_date += new_date
+                        last_sdt = sdt_local
+            
+        #requirement change: all timeslots are considered available unless being explicitly blocked    
+        sdt += timedelta(hours=1)
+        #if experience.repeat_cycle == "Hourly" :
+        #    sdt += timedelta(hours=experience.repeat_frequency)
+        #elif experience.repeat_cycle == "Daily" :
+        #    sdt += timedelta(days=experience.repeat_frequency)
+        #elif experience.repeat_cycle == "Weekly" :
+        #    sdt += timedelta(weeks=experience.repeat_frequency)
+        #else :
+            #TODO
+    return available_date
+
 class ExperienceDetailView(DetailView):
     model = Experience
     template_name = 'experience_detail.html'
@@ -445,158 +604,7 @@ class ExperienceDetailView(DetailView):
                 context['host_only_unlisted'] = True
                 return context
 
-        #requirement change: all timeslots are considered available unless being explicitly blocked   
-        #while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(hours=+6)): 
-            #if experience.repeat_cycle == "Hourly" :
-            #    sdt += timedelta(hours=experience.repeat_frequency)
-            #elif experience.repeat_cycle == "Daily" :
-            #    sdt += timedelta(days=experience.repeat_frequency)
-            #elif experience.repeat_cycle == "Weekly" :
-            #    sdt += timedelta(weeks=experience.repeat_frequency)
-            #else :
-                #TODO
-        #set the start time to 6 hours later
-        sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+6)
-
-        blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
-        blockout_start = []
-        blockout_end = []
-        blockout_index=0
-
-        #calculate all the blockout time periods
-        for blk in blockouts :
-            if blk.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
-                daylightsaving = True
-            else:
-                daylightsaving = False
-
-            if blk.repeat:
-                b_l =  blk.end_datetime - blk.start_datetime
-                if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                    blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
-                while blk.start_datetime.date() <= blk.repeat_end_date:
-                    blockout_index += 1
-                    blockout_start.append(blk.start_datetime)
-                    blockout_end.append(blk.start_datetime + b_l)
-
-                    blk.start_datetime = next_time_slot(blk.repeat_cycle, blk.repeat_frequency, blk.repeat_extra_information, blk.start_datetime, daylightsaving)
-
-            else:
-                blockout_index += 1
-                blockout_start.append(blk.start_datetime)
-                blockout_end.append(blk.end_datetime)
-
-        blockout_start.sort()
-        blockout_end.sort()
-
-        instantbookings = experience.instantbookingtimeperiod_set.filter(experience_id=experience.id)
-        instantbooking_start = []
-        instantbooking_end = []
-        instantbooking_index=0
-
-        #calculate all the instant booking time periods
-        for ib in instantbookings :
-            if ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
-                daylightsaving = True
-            else:
-                daylightsaving = False
-
-            if ib.repeat:
-                ib_l =  ib.end_datetime - ib.start_datetime
-                if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                    ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
-                while ib.start_datetime.date() <= ib.repeat_end_date:
-                    instantbooking_index += 1
-                    instantbooking_start.append(ib.start_datetime)
-                    instantbooking_end.append(ib.start_datetime + ib_l)
-
-                    ib.start_datetime = next_time_slot(ib.repeat_cycle, ib.repeat_frequency, ib.repeat_extra_information, ib.start_datetime, daylightsaving)
-
-            else:
-                instantbooking_index += 1
-                instantbooking_start.append(ib.start_datetime)
-                instantbooking_end.append(ib.end_datetime)
-
-        instantbooking_start.sort()
-        instantbooking_end.sort()
-
-        bookings = experience.booking_set.filter(experience_id=experience.id).exclude(status__iexact="rejected")
-
-        block_i=0
-        instantbooking_i=0
-        while (sdt <= experience.end_datetime and sdt <= datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2) ):
-            #check if the date is blocked
-            blocked = False
-
-            #block 10pm-7am if repeated hourly
-            sdt_local = sdt.astimezone(local_timezone)
-            if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):#daylight saving
-                if not sdt_local.dst() != timedelta(0):# not daylight saving
-                    sdt_local = sdt_local + relativedelta(hours=1)
-            elif sdt_local.dst() != timedelta(0):
-                sdt_local = sdt_local - relativedelta(hours=1)
-            #if experience.repeat_cycle == "Hourly" and (sdt_local.time().hour <= 7 or sdt_local.time().hour >= 22):
-            #    blocked = True
-
-            if not blocked:
-                #blockout_start, blockout_end are sorted, sdt keeps increasing
-                #block_i: skip the periods already checked
-                for b_i in range(block_i, blockout_index):
-                    if (blockout_start[b_i] <= sdt and sdt <= blockout_end[b_i]) or (blockout_start[b_i] <= sdt+relativedelta(hours=+experience.duration) and sdt+relativedelta(hours=+experience.duration) <= blockout_end[b_i]):
-                        blocked = True
-                        break
-                    if sdt+relativedelta(hours=+experience.duration) < blockout_start[b_i]:
-                        #no need to check further slots after the current one
-                        break 
-                    block_i += 1
-
-            if not blocked:
-                i = 0
-                for bking in bookings :
-                    if bking.datetime == sdt and bking.status.lower() != "rejected":
-                        i += bking.guest_number
-                    #if someone book a 2pm experience, and the experience last 3 hours, the system should automatically wipe out the 3pm, 4pm and 5pm sessions 
-                    if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
-                        i += experience.guest_number_max #change from bking.guest_number to experience.guest_number_max
-
-                if i == 0: #< experience.guest_number_max :
-                    if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
-                        istant_booking = False
-                        #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
-                        #instantbooking_i: skip the periods already checked
-                        for ib_i in range(instantbooking_i, instantbooking_index):
-                            if (instantbooking_start[ib_i] <= sdt and sdt <= instantbooking_end[ib_i]):# and (instantbooking_start[ib_i] <= sdt+relativedelta(hours=+experience.duration) and sdt+relativedelta(hours=+experience.duration) <= instantbooking_end[ib_i]):
-                                istant_booking = True
-                                break
-                            if sdt+relativedelta(hours=+experience.duration) < instantbooking_start[ib_i]:
-                                #no need to check further slots after the current one
-                                break 
-                            if sdt > instantbooking_start[ib_i]:
-                                instantbooking_i += 1
-
-                        dict = {'available_seat': experience.guest_number_max - i, 
-                                'date_string': sdt_local.strftime("%d/%m/%Y"), 
-                                'time_string': sdt_local.strftime("%H:%M"), 
-                                'datetime': sdt_local,
-                                'instant_booking': istant_booking}
-                        available_options.append(dict)
-
-                        if sdt_local.date() != last_sdt.date():
-                            new_date = ((sdt_local.strftime("%d/%m/%Y"),
-                                             sdt_local.strftime("%d/%m/%Y")),)
-                            available_date += new_date
-                            last_sdt = sdt_local
-            
-            #requirement change: all timeslots are considered available unless being explicitly blocked    
-            sdt += timedelta(hours=1)
-            #if experience.repeat_cycle == "Hourly" :
-            #    sdt += timedelta(hours=experience.repeat_frequency)
-            #elif experience.repeat_cycle == "Daily" :
-            #    sdt += timedelta(days=experience.repeat_frequency)
-            #elif experience.repeat_cycle == "Weekly" :
-            #    sdt += timedelta(weeks=experience.repeat_frequency)
-            #else :
-                #TODO
+        available_date = getAvailableOptions(experience, available_options, available_date)
 
         context['available_options'] = available_options
         context['form'] = BookingForm(available_date, experience.id)

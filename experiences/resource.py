@@ -1,11 +1,11 @@
-from experiences.models import Booking, Experience, Payment
+from experiences.models import Booking, Experience, Payment, WhatsIncluded
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-import json, pytz, xlrd, re, os, subprocess
+import json, pytz, xlrd, re, os, subprocess, math
 from django.contrib.auth.models import User
 from datetime import *
 from app.models import RegisteredUser
@@ -19,7 +19,7 @@ from django.template.loader import get_template
 from app.forms import BookingRequestXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from experiences.views import get_itinerary, update_booking
+from experiences.views import get_itinerary, update_booking, getAvailableOptions
 from app.views import getreservation
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
@@ -558,6 +558,77 @@ def service_booking(request, format=None):
         ItineraryBookingForm.booking(ItineraryBookingForm(),booking_data['experience_id'],booking_data['date'],booking_data['time'],booking_data['user'],booking_data['guest_number'],
                                      booking_data['card_number'],booking_data['exp_month'],booking_data['exp_year'],booking_data['cvv'])
         return Response("Success", status=status.HTTP_200_OK)
+
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def service_experience(request, format=None):
+    try:
+        data = request.data
+        exp_id = data['experience_id']
+        experience = Experience.objects.get(id=exp_id)
+        available_options = []
+        available_date = ()
+
+        available_date = getAvailableOptions(experience, available_options, available_date)
+
+        WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
+        included_food = WhatsIncludedList.filter(item='Food')[0]
+        included_ticket = WhatsIncludedList.filter(item='Ticket')[0]
+        included_transport = WhatsIncludedList.filter(item='Transport')[0]
+
+        host = experience.hosts.all()[0]
+        host_image = host.registereduser.image_url
+        host_bio = host.registereduser.bio
+
+        rate = 0.0
+        counter = 0
+        experience_reviews = []
+        for review in experience.review_set.all():
+            reviewer = User.objects.get(id=review.user_id)
+            dict={'reviewer_firstname':reviewer.first_name,
+                  'reviewer_lastname':reviewer.last_name,
+                  'reviewer_image':reviewer.registereduser.image_url,
+                  'review_comment':review.comment,}
+            experience_reviews.append(dict)
+            rate += review.rate
+            counter += 1
+        
+        if counter > 0:        
+            rate /= counter
+        
+
+        return Response({'experience_title':experience.title,
+                         'experience_duration':experience.duration,
+                         'experience_description':experience.description,
+                         'experience_activity':experience.activity,
+                         'experience_interaction':experience.interaction,
+                         'experience_dress':experience.dress,
+                         'experience_meetup_spot':experience.meetup_spot,
+                         'experience_price':experience.price,
+                         'experience_dynamic_price':experience.dynamic_price,
+
+                         'available_options':available_options,
+                         'available_date':available_date,
+
+                         'included_food':included_food.included,
+                         'included_food_detail':included_food.details,
+                         'included_ticket':included_ticket.included,
+                         'included_ticket_detail':included_ticket.details,
+                         'included_transport':included_transport.included,
+                         'included_transport_detail':included_transport.details,
+
+                         'host_firstname': host.first_name,
+                         'host_lastname': host.last_name,
+                         'host_image':host_image,
+                         'host_bio':host_bio,
+
+                         'experience_rate':math.ceil(rate),
+                         'experience_reviews':experience_reviews,
+
+                         }, status=status.HTTP_200_OK)
 
     except Exception as err:
         #TODO
