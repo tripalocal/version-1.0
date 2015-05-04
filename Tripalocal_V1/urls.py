@@ -104,4 +104,5 @@ urlpatterns = patterns('',
     url(r'^itinerary_booking_confirmation/$', itinerary_booking_confirmation, name='itinerary_booking_confirmation'),
     url(r'^itinerary_booking_successful/$', itinerary_booking_successful, name='itinerary_booking_successful'),
     url(r'^service_experience/$', 'experiences.resource.service_experience', name='service_experience'),
+    url(r'^service_myprofile/$', 'experiences.resource.service_myprofile', name='service_myprofile'),
 )

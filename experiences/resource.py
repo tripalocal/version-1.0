@@ -481,7 +481,7 @@ def service_mytrip(request, format=None):
             
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status, 'guest_number':booking.guest_number, 
                   'experience_title':booking.experience.title, 'meetup_spot':booking.experience.meetup_spot, 'experience_id':booking.experience.id,
-                  'host_name':host.first_name + ' ' + host.last_name, 'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
+                  'host_name':host.first_name + ' ' + host.last_name[:1] + '.', 'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
 
             bks.append(bk)
 
@@ -630,6 +630,20 @@ def service_experience(request, format=None):
 
                          }, status=status.HTTP_200_OK)
 
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_myprofile(request, format=None):
+    try:
+        user = request.user
+        profile = user.registereduser
+        result={'id':user.id, 'first_name':user.first_name, 'last_name':user.last_name, 'email':user.email,
+                 'image':user.registereduser.image_url,'phone_number':profile.phone_number,'bio':profile.bio,'rate':profile.rate}
+        return Response(result, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
