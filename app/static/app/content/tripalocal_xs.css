@@ -1020,8 +1020,8 @@ body {
 #guest_number_div .people-exp{color: #676767; margin-left: -5px; padding-top: 30px;}
 #guest_number_div select{margin-left: 70px; border: 1px #676767 solid;top: -15px;position: relative;}
 #id_guest_number{width:40px;}
-.people-descri{width: 150px; font-size: 10px;margin-left: 60px;top: -30px;position: relative;}
-#language_div{margin-left:60px;}
+.people-descri{width: 150px; font-size: 10px;margin-left: 60px;top: -30px;position: relative; padding-top: 10px;}
+#language_div{}
 #language_div .language-exp{color: #676767; margin-left: -5px; padding-top: 35px;}
 #checkout{float: left;}
 .language-icon{background-image: url(/images/language_icon.png); background-repeat: no-repeat; margin-top: 25px; margin-left: 20px; height: auto;}
@@ -1063,16 +1063,23 @@ body {
     font-size: 36px;
     color: #35CAC8;
     padding: 10px;
-    margin-left: 50px;
+    margin-left: 40px;
 }
 .normal-font{
-    font-weight: bold;
+    /*font-weight: bold;*/
     font-size: 16px;
     position: relative;
-    top: -5px;
+    top: -10px;
+    color:grey;
 }
-#sum-of-itinerary{
-	margin-left: 50px;
+.items-font{
+    font-size: 26px;
+    color: black;
+    /*padding: 10px;*/
+    /*margin-left: 40px;*/
+}
+#id_total_price{
+	margin-left: 0px;
 }
 #checkout-bar{
     background-color: white;
@@ -1080,11 +1087,13 @@ body {
     min-width:1200px;
     border-top: 1px solid #D3D3D3;
     border-bottom: 1px solid #D3D3D3;
+    width: 100%;
+    z-index:100;
 }
 .checkout-button{
 	margin-top: 5px;
     position:absolute;
-    left:1030px;
+    left:930px;
     background-color: #3ECBCC;
     color: white;
     padding: 10px 25px 10px 25px;
@@ -1092,7 +1101,6 @@ body {
     border-radius: 5px;
     font-weight: bold;
     font-size: 16px;
-    width: 120px;
 }
 /*input[type=checkbox].css-checkbox {
 							position:absolute; z-index:-1000; left:-1000px; overflow: hidden; clip: rect(0 0 0 0); height:1px; width:1px; margin:-1px; padding:0; border:0;
@@ -1123,7 +1131,6 @@ body {
 				-ms-user-select: none;
 				user-select: none;
 			}*/
-#tags_div{display: none;}
 #less-filter-button{display: none;}
 #interest-icon{margin-left: 45px;}
 #interest-exp{margin-left: 40px;}
@@ -1144,11 +1151,11 @@ body {
   float:none;
 }
 
-#criteria_div {display:inline-block; width:100%;padding-bottom:10px;width:1200px;}
-#tags_div {float:left;margin-top:35px;margin-left:30px}
+#criteria_div {display:inline-block; width:100%;padding-bottom:10px;border-top: 1px solid #D3D3D3;}
+#tags_div {float:left;margin-top:35px;margin-left:30px;width:1050px;}
 .tag-non-selected {color:lightgray;text-decoration:line-through;text-decoration-color:black;}
-.tag-button {border-width:1px;border-radius:20px;border-color:black;margin-left:5px;margin-right:10px;}
-#optional_criteria_div{margin-top:100px;}
+.tag-button {border:0px; background-color:transparent; margin-left:5px;margin-right:10px;}
+#optional_criteria_div{/*margin-top:120px; */ border-top: 1px solid #D3D3D3; margin-top: 30px; width: 100%;} 
 #itinerary-search-button{float:right;margin-right:50px;}
 
 .itinerary-remove-button {
@@ -1180,3 +1187,47 @@ body {
     font-size: 16px;
     width: 120px;
 }
+
+.items-selected-box{
+    width: 120px;
+    float: left;
+    margin-left: 30px;
+    margin-top: 5px;
+}
+.normal-font-1{
+    /*font-weight: bold;*/
+    font-size: 16px;
+    /*position: relative;
+    top: -10px;*/
+    color:grey;
+}
+.vertical-bar{width: 10px; height:80px; margin-top: 20px; border-left:1px solid #D3D3D3; float:left}
+.floatingHeader {
+  position: fixed;
+  top: 0;
+  visibility: hidden;
+  width: 100%;
+}
+.tag-box{
+    float: left;
+    border: 1px solid #CDCDCD;
+    padding-left: 20px;
+    padding-top: 5px;
+    border-radius: 5px;
+    background-color: white;
+    margin-right: 30px;
+}
+#interests{
+    width: 70px;
+    float: left;
+    margin-left: 50px;
+    margin-top: 10px;
+}
+.profile-itinerary img{
+	 width: 55px;
+ 	 height: 55px;
+  	background-size: cover;
+    border: #CCC solid 1px;
+}
+#date_destination_div select{-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 180px;  background-position: 140px 5px; border: 1px solid #D3D3D3; background-color: #FFF; border-radius: 5px; padding: 5px; color: #5E5E5E; padding-left: 20px; margin-left: 120px;}
+#guest_number_div select{-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 70px;  background-position: 40px 5px; border: 1px solid #D3D3D3; background-color: #FFF; border-radius: 5px; padding: 5px; color: #5E5E5E; padding-left: 20px; margin-left: 75px; margin-bottom: 10px;}

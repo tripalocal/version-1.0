@@ -15,9 +15,9 @@
     <form id="itinerary_form" action="" method="post">
         {% csrf_token %}
 
-        <div class="itinerary-back-button"> 
+        <!--<div class="itinerary-back-button"> 
             <button type="button" class="itinerary-return-button"></button> 
-        </div> 
+        </div>-->
 
         <div id="criteria_div">
             <div id="mandatory_criteria_div">
@@ -61,7 +61,7 @@
                     {{form.end_datetime}}
                     {{form.city}}
                 </div>
-
+                <div class="vertical-bar"></div>
                 <div id="guest_number_div" style="float:left;width:150px;">
                     <div class="people"> 
                         <p class="people-exp">People</p>
@@ -69,7 +69,7 @@
                     </div>
                     {{form.guest_number}}
                 </div>
-
+                <div class="vertical-bar" style="margin-left:70px;"></div>
                 <div id="language_div" style="float:left;">
                     <div class="language-icon">
                         <p class="language-exp">Language</p>
@@ -81,22 +81,24 @@
                     <br> 
                     <input id="language_Chinese" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label for="checkbox-cn" name="checkbox2_lbl" class="css-label lite-cyan-check">中文</label> 
                 </div>
-            </div>
-            <div id="optional_criteria_div">
                 <div id="more-filters-button">
-                    <button id="more_filters" type="button" value="More Filters">More Filters</button> 
+                    <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters">More Filters</button>
+                    <input class="btn-block btn btn-default" id="itinerary-search" type="submit" value="Search" name="Search">
+                </div>
+                <div id="itinerary-search-button">
+                </div>
+            </div>
+            <div id="optional_criteria_div" style="display:none;">
+                <div id="interests">
+                    <img src="/images/interest_icon.png">
+                    <p>Interests</p>
                 </div>
 
-                <div id="tags_div" style="display:none;">
+                <div id="tags_div">
                     {{form.tags}}
                     {{form.all_tags}}
                 </div>
-
-                <div id="itinerary-search-button">
-                    <input id="itinerary-search" type="submit" value="Search" name="Search">
-                </div>
             </div>
-
 <!--
             <div id="share-link-button">
                 <button>Share Link</button>
@@ -106,34 +108,67 @@
                 <button>Save Itinerary</button>
             </div>
 -->
-
             {{form.itinerary_string}}
         </div>
 
         {% if itinerary %}
         <div id="checkout-bar">
+        <!-- change something here, make the the checkout bar stick on the top .@song -->
             <p class="checkout-info">
-	            <span id="id_item_selected" class="large-cyan-font">0</span>
-	            <span class="normal-font">Items selected</span>
-	            <span id="id_price_per_person" class="large-cyan-font">$0</span>
-	            <span class="normal-font">Per Person</span>
-	            <span id="id_total_price" class="large-cyan-font" id="sum-of-itinerary">$0</span>
-                <span class="normal-font">Selected Total</span>
-                <input id="itinerary-preview" type="button" value="Preview" name="Preview" class="checkout-button">
+                <div id="total-hours_div" style="margin-left:45px">
+                    <div style="float:left;">
+                        <div class="data-icon">
+                        </div>
+                    </div>
+                    <div class="items-selected-box" style="padding-left:10px">
+                        <span class="normal-font-1">Hours planned</span>
+                        <span  id="id_total_hours" class="items-font">0</span>
+                    </div>
+                </div>
+                <div id="items_selected_div" style="margin-left:250px">
+                    <div style="float:left;"> 
+                        <div class="data-icon"> 
+                        </div>  
+                    </div> 
+                    <div class="items-selected-box" style="padding-left:10px">
+                        <span class="normal-font-1">Items selected</span>
+                        <span id="id_item_selected" name="id_item_selected" class="items-font">0</span>
+                    </div>
+                </div>
+                <div id="per_person_div" style="margin-left:450px">
+                    <div  style="float:left;"> 
+                        <div class="data-icon"> 
+                        </div>  
+                    </div> 
+                    <div class="items-selected-box" style="padding-left:10px"> 
+	                    <span class="normal-font-1">Per Person</span>
+	                    <span id="id_price_per_person" name="id_price_per_person" class="items-font">$0</span>
+	                </div>
+                </div>
+                <div id="total-amount_div" style="margin-left:650px"> 
+                    <div style="float:left;">
+                        <div class="data-icon">
+                        </div>
+                    </div> 
+                    <div class="items-selected-box" style="padding-left:10px">
+                        <span class="normal-font-1">Selected Total</span>
+	                    <span id="id_total_price" class="items-font">$0</span>
+                    </div>
+                </div>
+                <input id="itinerary-preview" type="button" value="Proceed to Checkout" name="Preview" class="checkout-button">
             </p>
         </div>
 
-        <div id="select-all-bar"> 
-            <div id="select-all-checkbox" style="display:none;"> 
+        <div id="select-all-bar">
+            <div id="select-all-checkbox" style="display:none;">
          		<input id="select-all" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">Select all</label> 
-         	</div> 
+         	</div>
          	<p id="fix-interface-itinerary"> 
-         		<span>Price PP</span> 
-        		<span>Group Size</span> 
-        		<span>Subtotal</span> 
-         	</p> 
-        </div> 
-
+         		<span>Price PP</span>
+        		<span>Group Size</span>
+        		<span>Subtotal</span>
+         	</p>
+        </div>
 
         <div id="itinerary_div">
             <table id="itinerary_table">
@@ -157,7 +192,9 @@
                                     <a href="/experience/{{experience.id}}" target="_blank">
                                         <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" class="itinerary-experience-image"/>
                                     </a>
-                                    <img src="{{MEDIA_URL}}{{experience.host_image}}" class="itinerary-host-image"/>
+                                    <div class="profile-itinerary">
+                                        <img src="{{MEDIA_URL}}{{experience.host_image}}" class="itinerary-host-image"/>
+                                    </div>
                                 </div>
                                 <div style="margin-left: 200px;">
                                     <a href="/experience/{{experience.id}}" target="_blank"><p style="width:350px;display:inline-block;">{{experience.title}}</p></a>
@@ -167,9 +204,9 @@
                                         <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{%if slot.instant_booking%}&#x26A1;{%else%}{%endif%} {{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00</option>
                                     {%endfor%}
                                     </select>
-                                    <p style="display:inline-block; position:absolute; left:700px;">{{experience.price}}</p>
-                                    <p style="display:inline-block; position:absolute; left:800px;"></p> 
-                                    <p style="display:inline-block; position:absolute; left:900px;"></p> 
+                                    <p style="display:inline-block; position:absolute; left:715px;">{{experience.price}}</p>
+                                    <p style="display:inline-block; position:absolute; left:835px;"></p> 
+                                    <p style="display:inline-block; position:absolute; left:910px;"></p> 
                                 </div>
                                 <div style="margin-top:30px;">
                                     <p>{{experience.meetup_spot}}</p>
@@ -262,17 +299,20 @@
         var table = $("#itinerary_table")[0];
         items = 0;
         total_price = 0;
+        hours = 0;
         guest_number = parseInt($("#id_guest_number option:selected").text());
         for (var i = 0, row; row = table.rows[i]; i++) {
             for (var j = 0, col; col = row.cells[j]; j++) {
                 if($("#day_"+(i+1)+"_exp_"+j+"_choice_yes").length && $("#day_"+(i+1)+"_exp_"+j+"_choice_yes").is(':checked'))
                 {
+                    hours += parseFloat($("#day_"+(i+1)+"_exp_"+j+"_duration").text());//future: half hour 
                     items++;
                     price = parseFloat($("#day_"+(i+1)+"_exp_"+j+"_price").text());
                     total_price += price;
                 }
             }
         }
+        $("#id_total_hours").text(hours.toFixed(0));
         $("#id_item_selected").text(items);
         $("#id_price_per_person").text("$"+total_price.toFixed(2));
         $("#id_total_price").text("$"+(total_price*guest_number).toFixed(2));
@@ -321,11 +361,11 @@
         {
             if($.inArray(all_tags[i], tags)<0)
             {
-                new_tag = "<label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10003</button>";
+                new_tag = "<div class=\"tag-box\"><label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10003</button></div>";
             }
             else
             {
-                new_tag = "<label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10007</button>";
+                new_tag = "<div class=\"tag-box\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10007</button></div>";
             }
 
             $("#tags_div").append(new_tag);
@@ -567,7 +607,7 @@
     });
 
     $("#more_filters").click(function(e){
-        tags_div = $("#tags_div");
+        tags_div = $("#optional_criteria_div");
         if(tags_div.css("display")=="none")
         {
             tags_div.css("display", "inline-block");
@@ -580,4 +620,46 @@
         }
     });
 </script>
+<script>
+/*
+    function UpdateTableHeaders() {
+        $("#itinerary_form").each(function() {
+            var el             = $(this),
+            offset         = el.offset(),
+            scrollTop      = $(window).scrollTop()-130,
+            floatingHeader = $(".floatingHeader", this)
+       
+            if ((scrollTop > offset.top) && (scrollTop < offset.top + el.height())) {
+                floatingHeader.css({
+                    "visibility": "visible"
+                });
+            } 
+            else {
+                floatingHeader.css({
+                    "visibility": "hidden"
+                });      
+            };
+        });
+    }
+
+// DOM Ready      
+$(function() {
+
+   var clonedHeaderRow;
+
+   $("#itinerary_form").each(function() {
+        clonedHeaderRow = $("#checkout-bar", this);
+        clonedHeaderRow
+            .before(clonedHeaderRow.clone())
+            .css("width", clonedHeaderRow.width())
+            .addClass("floatingHeader");
+    });
+   
+    $(window)
+    .scroll(UpdateTableHeaders)
+    .trigger("scroll");
+});
+*/
+</script>
+
 {% endblock %}
