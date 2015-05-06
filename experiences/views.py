@@ -166,7 +166,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
 
         experience_avail = {'id':experience.id, 'title': experience.title, 'meetup_spot':experience.meetup_spot, 'rate': rate, 'duration':experience.duration, 'city':experience.city, 'description':experience.description,
-                            'host':host.first_name + ' ' + host.last_name, 'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated, 'price':experience_fee_calculator(exp_price), 'dates':{}}
+                            'language':experience.language, 'host':host.first_name + ' ' + host.last_name, 'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated, 'price':experience_fee_calculator(exp_price), 'dates':{}}
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []
@@ -2389,7 +2389,7 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
                 counter = 0
                 insert = False
                 exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
-                            'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'timeslots':experience['dates'][dt_string]}
+                            'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'timeslots':experience['dates'][dt_string]}
                 while counter < len(day_dict['experiences']):#find the corrent rank
                     if experience['rate'] > day_dict['experiences'][counter]['rate']:
                         day_dict['experiences'].insert(counter, exp_dict)

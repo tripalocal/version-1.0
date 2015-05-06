@@ -305,7 +305,7 @@ a{
     position: relative;
 
 }
-.data-icon{
+/*.data-icon{
     background-image: url(/images/icons.gif);
     width: 27px;
     height: 27px;
@@ -314,7 +314,7 @@ a{
     position: relative;
     left:21px;
     margin-bottom:-10px;
-}
+}*/
 .time-list{
     background-color:#006666;
     width:80px;
@@ -351,7 +351,7 @@ a{
     left:42px;
     margin-bottom:-10px;
 }
-.people{
+/*.people{
     background-image: url(/images/icons.gif);
     width: 27px;
     height: 27px;
@@ -360,7 +360,7 @@ a{
     position: relative;
     left:15px;
     margin-bottom:-10px;
-}
+}*/
 .bookingform-box{
     width: 250px;
     height: 100px;

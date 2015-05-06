@@ -966,7 +966,7 @@ class CustomItineraryForm(forms.Form):
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     guest_number = forms.ChoiceField(choices=Guest_Number_Min, required=True)
     city = forms.CharField(widget=forms.Textarea,  required=True)
-    language = forms.CharField(widget=forms.Textarea,  required=True, initial="English,Chinese")
+    language = forms.CharField(widget=forms.Textarea,  required=True, initial="English,Mandarin")
     tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     itinerary_string = forms.CharField(widget=forms.Textarea, required=False)

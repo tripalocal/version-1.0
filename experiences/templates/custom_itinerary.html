@@ -21,7 +21,7 @@
 
         <div id="criteria_div">
             <div id="mandatory_criteria_div">
-                <div id="date_destination_div" style="float:left;width:500px;">
+                <div id="date_destination_div" style="float:left;width:390px;">
                     <!--<button id="add_day_button" type="button" style="float:left;width:75px;">Add</button>-->
                     <div id="add_day_1_div">
                         <div class="data-icon"> 
@@ -77,10 +77,11 @@
                 </div>
                 <div class="language-choice-checkbox"> 
                     {{form.language}} 
-                    <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">English</label>
+                    <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
                     <br> 
-                    <input id="language_Chinese" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label for="checkbox-cn" name="checkbox2_lbl" class="css-label lite-cyan-check">中文</label> 
+                    <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan">中文</label> 
                 </div>
+                <div class="vertical-bar"></div>
                 <div id="more-filters-button">
                     <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters">More Filters</button>
                     <input class="btn-block btn btn-default" id="itinerary-search" type="submit" value="Search" name="Search">
@@ -89,14 +90,15 @@
                 </div>
             </div>
             <div id="optional_criteria_div" style="display:none;">
-                <div id="interests">
-                    <img src="/images/interest_icon.png">
-                    <p>Interests</p>
-                </div>
+                <div id="optional_criteria_container">
+                    <div class="interests-icon" style="float:left;margin-top: 20px;margin-right: 25px;">
+                        <p class="interests-exp">Interests</p>
+                    </div>
 
-                <div id="tags_div">
-                    {{form.tags}}
-                    {{form.all_tags}}
+                    <div id="tags_div">
+                        {{form.tags}}
+                        {{form.all_tags}}
+                    </div>
                 </div>
             </div>
 <!--
@@ -114,63 +116,67 @@
         {% if itinerary %}
         <div id="checkout-bar">
         <!-- change something here, make the the checkout bar stick on the top .@song -->
-            <p class="checkout-info">
-                <div id="total-hours_div" style="margin-left:45px">
-                    <div style="float:left;">
-                        <div class="data-icon">
+            <div id="checkout-bar-container">
+                <p class="checkout-info">
+                    <div id="total-hours_div" style="margin-left:0px">
+                        <div style="float:left;margin-top:13px;">
+                            <div class="hour-icon">
+                            </div>
+                        </div>
+                        <div class="items-selected-box" style="padding-left:10px">
+                            <span class="normal-font-1">Hours planned</span>
+                            <span id="id_total_hours" class="items-font">0</span>
                         </div>
                     </div>
-                    <div class="items-selected-box" style="padding-left:10px">
-                        <span class="normal-font-1">Hours planned</span>
-                        <span  id="id_total_hours" class="items-font">0</span>
-                    </div>
-                </div>
-                <div id="items_selected_div" style="margin-left:250px">
-                    <div style="float:left;"> 
-                        <div class="data-icon"> 
-                        </div>  
-                    </div> 
-                    <div class="items-selected-box" style="padding-left:10px">
-                        <span class="normal-font-1">Items selected</span>
-                        <span id="id_item_selected" name="id_item_selected" class="items-font">0</span>
-                    </div>
-                </div>
-                <div id="per_person_div" style="margin-left:450px">
-                    <div  style="float:left;"> 
-                        <div class="data-icon"> 
-                        </div>  
-                    </div> 
-                    <div class="items-selected-box" style="padding-left:10px"> 
-	                    <span class="normal-font-1">Per Person</span>
-	                    <span id="id_price_per_person" name="id_price_per_person" class="items-font">$0</span>
-	                </div>
-                </div>
-                <div id="total-amount_div" style="margin-left:650px"> 
-                    <div style="float:left;">
-                        <div class="data-icon">
+                    <div id="items_selected_div" style="margin-left:150px">
+                        <div style="float:left;margin-top:13px;"> 
+                            <div class="interests-icon"> 
+                            </div>
                         </div>
-                    </div> 
-                    <div class="items-selected-box" style="padding-left:10px">
-                        <span class="normal-font-1">Selected Total</span>
-	                    <span id="id_total_price" class="items-font">$0</span>
+                        <div class="items-selected-box" style="padding-left:15px">
+                            <span class="normal-font-1">Items selected</span>
+                            <span id="id_item_selected" name="id_item_selected" class="items-font">0</span>
+                        </div>
                     </div>
-                </div>
-                <input id="itinerary-preview" type="button" value="Proceed to Checkout" name="Preview" class="checkout-button">
-            </p>
+                    <div id="per_person_div" style="margin-left:300px">
+                        <div  style="float:left;margin-top:13px;"> 
+                            <div class="people"> 
+                            </div>  
+                        </div> 
+                        <div class="items-selected-box" style="padding-left:10px"> 
+	                        <span class="normal-font-1">Per Person</span><br>
+	                        <span id="id_price_per_person" name="id_price_per_person" class="items-font">$0</span>
+	                    </div>
+                    </div>
+                    <div id="total-amount_div" style="margin-left:150px"> 
+                        <div style="float:left;margin-top:13px;">
+                            <div class="money-icon">
+                            </div>
+                        </div>
+                        <div class="items-selected-box" style="padding-left:10px">
+                            <span class="normal-font-1">Selected Total</span>
+	                        <span id="id_total_price" class="items-font">$0</span>
+                        </div>
+                    </div>
+                    <div id="btn_div" style="margin-left:775px">
+                        <input id="itinerary-preview" type="button" value="Proceed to Checkout" name="Preview" class="checkout-button">
+                    </div>
+                </p>
+            </div>
         </div>
 
         <div id="select-all-bar">
             <div id="select-all-checkbox" style="display:none;">
          		<input id="select-all" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">Select all</label> 
          	</div>
-         	<p id="fix-interface-itinerary"> 
-         		<span>Price PP</span>
+         	<p id="fix-interface-itinerary" style="margin-left:550px"> 
+         		<span style="width:60px;">Price PP</span>
         		<span>Group Size</span>
         		<span>Subtotal</span>
          	</p>
         </div>
 
-        <div id="itinerary_div">
+        <div id="itinerary_div" style="margin-left:-20px">
             <table id="itinerary_table">
                 <tbody>
                 {%for day in itinerary%}
@@ -178,12 +184,12 @@
                         <td style="display:inline-block; border:none;">Day {{forloop.counter}} {{day.date}}</td>
                         {% for experience in day.experiences %}
                         {% if forloop.counter <= 3 %}
-                        <td style="height:100px;display:inline-block;">
+                        <td style="height:100px;display:inline-block;background-color:#EAEAEA;">
                         {% else %}
                         <td style="height:100px;display:none;">
                         {% endif %}
-                            <div class="itinerary-list">
-                                <div style="width: 200px; float: left; margin-left:10px;">
+                            <div class="itinerary-list" style="padding-top:10px;margin-left:20px">
+                                <div style="width:180px;float:left;margin-left:10px;">
                                     <p style="display:none;">{{experience.id}}</p>
                                     <p style="display:none;">{{experience.duration}}</p>
                                     <p style="display:none;">{{experience.host}}</p>
@@ -196,24 +202,22 @@
                                         <img src="{{MEDIA_URL}}{{experience.host_image}}" class="itinerary-host-image"/>
                                     </div>
                                 </div>
-                                <div style="margin-left: 200px;">
-                                    <a href="/experience/{{experience.id}}" target="_blank"><p style="width:350px;display:inline-block;">{{experience.title}}</p></a>
-                                    <select style="display:inline-block; position:absolute; left:550px;">
+                                <div style="margin-left: 100px;">
+                                    <a href="/experience/{{experience.id}}" target="_blank"><p style="width:150px;display:inline-block;font-size:12px;float:left;color:#333;">{{experience.title}}</p></a>
+                                    <select style="display:inline-block;margin-left:90px;">
                                         <option value="None">Please select time</option>
                                     {% for slot in experience.timeslots%}
                                         <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{%if slot.instant_booking%}&#x26A1;{%else%}{%endif%} {{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00</option>
                                     {%endfor%}
                                     </select>
-                                    <p style="display:inline-block; position:absolute; left:715px;">{{experience.price}}</p>
-                                    <p style="display:inline-block; position:absolute; left:835px;"></p> 
-                                    <p style="display:inline-block; position:absolute; left:910px;"></p> 
+                                    <p style="display:inline-block;margin-left:-60px;width:52px;">{{experience.price}}</p>
+                                    <p style="display:inline-block;margin-left:40px;width:16px;"></p> 
+                                    <p style="display:inline-block;margin-left:50px;width:52px;"></p>
+                                    <input type="button" value="Remove" class="btn-default btn btn-default" style="display:inline-block;margin-left:35px;height:40px;">
                                 </div>
-                                <div style="margin-top:30px;">
-                                    <p>{{experience.meetup_spot}}</p>
+                                <div style="margin-top:10px;">
+                                    <p style="font-size:12px;">{{experience.duration}} hr(s) &#8226; {%if experience.language == "english;"%}English{%elif experience.language == "english;mandarin;"%}English / 中文{%else%}English / 中文翻译{%endif%}</p>
                                 </div>
-                            </div>
-                            <div style="height:100px; margin-left: 1000px;">
-                                <input type="button" value="Remove" class="itinerary-remove-button">
                             </div>
                         </td>
                         {%endfor%}
@@ -352,7 +356,26 @@
         language = $("#id_language").val().split(",");
         for(i=0;i<language.length;i++)
         {
-            $("#language_"+language[i]).prop('checked','true');
+            $("#language_"+language[i]).prop('checked',true);
+            $("#language_"+language[i]+"_label").attr("class","css-label lite-cyan-check");
+        }
+
+        language=['English','Mandarin'];
+        for(i=0;i<language.length;i++)
+        {
+            $("#language_"+language[i]+"_label").click(function(e){
+                id = "language_"+this.id.split("_")[1];
+                if($("#"+id).prop('checked'))
+                {
+                    $("#"+id).prop('checked',false);
+                    $(this).attr("class","css-label lite-x-cyan");
+                }
+                else
+                {
+                    $("#"+id).prop('checked',true);
+                    $(this).attr("class","css-label lite-cyan-check");
+                }
+            });
         }
 
         all_tags = $("#id_all_tags").val().split(",");
@@ -413,16 +436,15 @@
                         $($($(col).children()[0]).children()[1]).children()[2].id="day_"+day_index+"_exp_"+exp_index+"_price";
                         $($($(col).children()[0]).children()[1]).children()[3].id="day_"+day_index+"_exp_"+exp_index+"_guest_number";
                         $($($(col).children()[0]).children()[1]).children()[4].id="day_"+day_index+"_exp_"+exp_index+"_subtotal";
+                        $($($(col).children()[0]).children()[1]).children()[5].id="day_"+day_index+"_exp_"+exp_index+"_choice_no";
+                        //$($($(col).children()[0]).children()[1]).children()[5].name="day_"+day_index+"_exp_"+exp_index+"_radio";
 
-                        $($($(col).children()[0]).children()[2]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_meetup_spot";
+                        //$($($(col).children()[0]).children()[2]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_meetup_spot";
 
                         number = parseFloat($("#id_guest_number option:selected").text());
                         p = parseFloat($("#day_"+day_index+"_exp_"+exp_index+"_price").text());
                         $("#day_"+day_index+"_exp_"+exp_index+"_guest_number").text(number);
                         $("#day_"+day_index+"_exp_"+exp_index+"_subtotal").text("$"+(number*p).toFixed(2));
-
-                        $($(col).children()[1]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_choice_no";
-                        //$($(col).children()[1]).children()[0].name="day_"+day_index+"_exp_"+exp_index+"_radio";
 
                         $("#day_"+day_index+"_exp_"+exp_index+"_choice_yes").click(function(e){
                             i = e.target.id.split('_')[1];
@@ -435,7 +457,14 @@
                             else
                             {
                                 //hideexperience(i, j);
-                                $("#day_"+i+"_exp_"+j).css('background-color', 'white');
+                                if($(this).prop('checked'))
+                                {
+                                    $("#day_"+i+"_exp_"+j).css('background-color', 'white');
+                                }
+                                else
+                                {
+                                    $("#day_"+i+"_exp_"+j).css('background-color', '#EAEAEA');
+                                }
                                 updatePrice();
                             }
                         });
@@ -591,7 +620,7 @@
 
         $("#id_language").val("");
 
-        language = ['Chinese','English'];
+        language = ['Mandarin','English'];
         for(i=0;i<language.length;i++)
         {
             if($("#language_"+language[i]).prop('checked') == true)

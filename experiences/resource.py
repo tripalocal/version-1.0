@@ -423,7 +423,7 @@ def service_search(request, format=None):
         city = criteria['city']
         guest_number = criteria['guest_number']
         keywords = criteria['keywords']
-        language = "Chinese,English"
+        language = "Mandarin,English"
 
         itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords)
 
