@@ -31,6 +31,7 @@
         <div id="experience-title">
             <p>Experience title</p>
             {{wizard.form.title}}
+            <label id="id_experience_title_limit"></label>
         </div>
         <br>
         <div id="experience-duration">
@@ -58,8 +59,21 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
+
+    function countChar(object, limit, hint) {
+        var len = object.val().length;
+        if (len >= limit) {
+          object.val(object.val().substring(0, limit));
+        } else {
+          hint.text(limit - len + ' characters left');
+        }
+    }
+
     $(document).ready(function(){
         $("#id_experience-changed_steps").val($("#id_experience-changed_steps").val()+'experience,');
+        $("#id_experience-title").keyup(function() {
+            countChar($("#id_experience-title"), 40, $("#id_experience_title_limit"));
+        });
         //$('#id_experience-title').attr("name","title");
         //$('#id_experience-duration').attr("name","duration");
 /*

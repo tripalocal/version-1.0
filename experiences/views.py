@@ -1176,6 +1176,8 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             suburb = prev_data['suburb']
             meetup_spot = prev_data['meetup_spot']
             meetup_spot_other = prev_data['meetup_spot_other']
+            if not meetup_spot_other:
+                meetup_spot_other = meetup_spot
 
         if self.request.resolver_match.url_name.startswith('experience_add'):
             #if add
@@ -1432,6 +1434,26 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                                + " values (%s, %s, %s, %s)", 
                                [experience.id, photo.name, photo.directory, photo.image.name])
 
+                        #create the corresponding thumbnail (force .jpg)
+                        basewidth = 400
+                        #all images are changed to .jpg
+                        filename = 'experience' + str(experience.id) + '_' + str(index) + '.jpg'
+                        try:
+                            img = Image.open(dirname + filename)
+                            wpercent = (basewidth/float(img.size[0]))
+                            hsize = int((float(img.size[1])*float(wpercent)))
+                            img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+                            img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
+
+                            #copy to the chinese website -- folder+file
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
+                            if not os.path.isdir(dirname_other):
+                                os.mkdir(dirname_other)
+
+                            subprocess.Popen(['cp',settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg', dirname_other + 'experience' + str(experience.id) + '_' + str(index) + '.jpg'])
+                        except (OSError, IOError):
+                            raise
+
         for form in form_list:
             #if type(form) != ExperienceSummaryForm:
             f.append(form)
@@ -1452,27 +1474,6 @@ class ExperienceWizard(NamedUrlSessionWizardView):
         #    return render_to_response('experience_confirmation.html', { 'experience':experience, 'add':False
         #        #'form_list': f, #'form_data': [form.cleaned_data for form in form_list],
         #    })
-
-        if prev_files and 'photo-experience_photo_1' in prev_files:
-            #create the corresponding thumbnail (force .jpg)
-            basewidth = 400
-            #all images are changed to .jpg
-            filename = 'experience' + str(experience.id) + '_1.jpg'
-            try:
-                img = Image.open(dirname + filename)
-                wpercent = (basewidth/float(img.size[0]))
-                hsize = int((float(img.size[1])*float(wpercent)))
-                img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-                img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_1.jpg')
-
-                #copy to the chinese website -- folder+file
-                dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
-                if not os.path.isdir(dirname_other):
-                    os.mkdir(dirname_other)
-
-                subprocess.Popen(['cp',settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_1.jpg', dirname_other + 'experience' + str(experience.id) + '_1.jpg'])
-            except (OSError, IOError):
-                raise
 
         return HttpResponseRedirect("/mylisting")
 
@@ -1749,7 +1750,6 @@ def create_experience(request, id=None):
                 os.mkdir(dirname)
 
             count = 0
-            thumbnail_created = False
             for index in range (1,MaxPhotoNumber+1):
                 if 'experience_photo_'+str(index) in request.FILES:
                     content = request.FILES['experience_photo_'+str(index)]
@@ -1771,14 +1771,12 @@ def create_experience(request, id=None):
                         destination.close()
 
                         #create the corresponding thumbnail (force .jpg)
-                        if not thumbnail_created:
-                            thumbnail_created = True
-                            basewidth = 400
-                            img = Image.open(dirname + filename)
-                            wpercent = (basewidth/float(img.size[0]))
-                            hsize = int((float(img.size[1])*float(wpercent)))
-                            img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-                            img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_1.jpg')
+                        basewidth = 400
+                        img = Image.open(dirname + filename)
+                        wpercent = (basewidth/float(img.size[0]))
+                        hsize = int((float(img.size[1])*float(wpercent)))
+                        img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+                        img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
 
                         if not len(experience.photo_set.filter(name__startswith=filename))>0:
                             photo = Photo(name = filename, directory = 'experiences/' + str(experience.id) + '/', 

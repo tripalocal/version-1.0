@@ -250,43 +250,57 @@
 {%block scripts%}
 <script charset="utf-8" type="text/javascript">
 
+    function verifyImages()
+    {
+        var input, file;
+        var valid = true;
+
+        if (window.FileReader) {
+            for(i=1;i<11;i++)
+            {
+                input = document.getElementById('id_photo-experience_photo_'+i);
+                if (input && input.files && input.files[0]) 
+                {
+                    file = input.files[0];
+                    if(file.size > 2097152)
+                    {
+                        valid = false;
+                        return valid;
+                    }
+                    str = file.name.split(".");
+                    if(['jpg', 'jpeg', 'png', 'bmp'].indexOf(str[str.length-1]) < 0)
+                    {
+                        valid = false;
+                        return valid;
+                    }
+                }
+            }
+        }
+        return valid;
+    }
+
     $(document).ready(function(){
         $('body').attr('id','background-white');
         $("#id_photo-changed_steps").val($("#id_photo-changed_steps").val()+'photo,');
 
-        $("#id_next").bind("click", function(e){
+        $("#next-step").bind("click", function(e){
             e.preventDefault();
-            var input, file;
-            var valid = true;
 
-            if (window.FileReader) {
-                for(i=1;i<11;i++)
-                {
-                    input = document.getElementById('id_photo-experience_photo_'+i);
-                    if (input && input.files && input.files[0]) 
-                    {
-                        file = input.files[0];
-                        if(file.size > 2097152)
-                        {
-                            valid = false;
-                            break;
-                        }
-                        str = file.name.split(".");
-                        if(['jpg', 'jpeg', 'png', 'bmp'].indexOf(str[str.length-1]) < 0)
-                        {
-                            valid = false;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if(valid) 
+            if(verifyImages()) 
             {
                 $("form").submit();
             }
         })
 
+        $("#save-and-exit").bind("click", function(e){
+            e.preventDefault();
+
+            if(verifyImages()) 
+            {
+                $("form").submit();
+            }
+        })
+ 
         for(i=1;i<11;i++)
         {
             $("#id_photo-experience_photo_"+i).attr("class", "upload");
