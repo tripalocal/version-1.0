@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 from datetime import *
 from calendar import monthrange 
-from experiences.models import Payment, Booking, Experience, Coupon, Review
+from experiences.models import Payment, Booking, Experience, Coupon, Review, Itinerary
 from Tripalocal_V1 import settings
 import pytz, string, subprocess, json, random
 from django.core.mail import send_mail
@@ -742,6 +742,9 @@ class CreateExperienceForm(forms.Form):
     host = forms.CharField()
     host_first_name = forms.CharField()
     host_last_name = forms.CharField()
+    host_image_url = forms.CharField(required = False)
+    host_image = forms.ImageField(required = False)
+    host_bio = forms.CharField(widget=forms.Textarea, required = False)
     language = forms.ChoiceField(choices=Language)
     start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))

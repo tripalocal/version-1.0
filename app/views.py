@@ -19,7 +19,7 @@ from django.contrib import messages
 import string, random, pytz, base64, subprocess, os, geoip2.database, PIL
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
-from experiences.views import ByCityExperienceListView
+from experiences.views import ByCityExperienceListView, saveProfileImage
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment
 from django.core.files.uploadedfile import SimpleUploadedFile, File
@@ -451,53 +451,12 @@ def myprofile(request):
         if form.is_valid():
             profile.phone_number = form.cleaned_data['phone_number']
             profile.bio = form.cleaned_data['bio']
+            profile.save()
 
             #save the profile image
             if 'image' in request.FILES:
-                content = request.FILES['image']
-                content_type = content.content_type.split('/')[0]
-                if content_type == "image":
-                    if content._size > PROFILE_IMAGE_SIZE_LIMIT:
-                        raise forms.ValidationError(_('Please keep filesize under %s. Current filesize %s') % (filesizeformat(str(PROFILE_IMAGE_SIZE_LIMIT)), filesizeformat(str(content._size))))
-                else:
-                    raise forms.ValidationError(_('File type is not supported'))
+                saveProfileImage(request.user, profile, request.FILES['image'])
 
-                dirname = settings.MEDIA_ROOT + '/hosts/' + str(request.user.id) + '/'
-                if not os.path.isdir(dirname):
-                    os.mkdir(dirname)
-
-                name, extension = os.path.splitext(request.FILES['image'].name)
-                extension = extension.lower();
-                if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
-                    filename = 'host' + str(request.user.id) + '_1_' + request.user.first_name.title() + request.user.last_name[:1].title() + extension
-                    destination = open(dirname + filename, 'wb+')
-                    for chunk in request.FILES['image'].chunks():              
-                        destination.write(chunk)
-                    destination.close()
-                    profile.image_url = "hosts/" + str(request.user.id) + '/host' + str(request.user.id) + '_1_' + request.user.first_name.title() + request.user.last_name[:1].title() + extension
-                    profile.image = profile.image_url
-
-                    #crop the image
-                    im = Image.open(dirname + filename)
-                    w, h = im.size
-                    #if w > h:
-                    #    im.crop((int((w-h)/2), 0, int(w-(w-h)/2), h)).save(dirname + filename)
-                    #else:
-                    #    im = im.crop((0, int((h-w)/2), w, int(h-(h-w)/2))).save(dirname + filename)
-                    if w > 1200:
-                        basewidth = 1200
-                        wpercent = (basewidth/float(w))
-                        hsize = int((float(h)*float(wpercent)))
-                        im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS).save(dirname + filename)
-
-                    #copy to the chinese website -- folder+file
-                    dirname_cn = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts/' + str(request.user.id) + '/'
-                    if not os.path.isdir(dirname_cn):
-                        os.mkdir(dirname_cn)
-
-                    subprocess.Popen(['cp',dirname + filename, dirname_cn + filename])
-            profile.save()
-                
             #copy to the chinese website -- database
             cursor = connections['cndb'].cursor()
             cursor.execute("update app_registereduser set phone_number=%s, image_url=%s, bio=%s, image=%s where id=%s", 

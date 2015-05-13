@@ -33,6 +33,7 @@ from post_office import mail
 from collections import OrderedDict
 
 MaxPhotoNumber=10
+PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
 def experience_fee_calculator(price):
     if type(price)==int or type(price) == float:
@@ -1583,6 +1584,55 @@ def experience_booking_confirmation(request):
     # Render the form with error messages (if any).
     # return render_to_response('experience_booking_confirmation.html', {'form': form, 'display_error':display_error,}, context)
 
+def saveProfileImage(user, profile, image_file):
+    content_type = image_file.content_type.split('/')[0]
+    if content_type == "image":
+        if image_file._size > PROFILE_IMAGE_SIZE_LIMIT:
+            raise forms.ValidationError(_('Please keep filesize under %s. Current filesize %s') % (filesizeformat(str(PROFILE_IMAGE_SIZE_LIMIT)), filesizeformat(str(image_file._size))))
+    else:
+        raise forms.ValidationError(_('File type is not supported'))
+
+    dirname = settings.MEDIA_ROOT + '/hosts/' + str(user.id) + '/'
+    if not os.path.isdir(dirname):
+        os.mkdir(dirname)
+
+    name, extension = os.path.splitext(image_file.name)
+    extension = extension.lower();
+    if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
+        filename = 'host' + str(user.id) + '_1_' + user.first_name.title() + user.last_name[:1].title() + extension
+        destination = open(dirname + filename, 'wb+')
+        for chunk in image_file.chunks():              
+            destination.write(chunk)
+        destination.close()
+        profile.image_url = "hosts/" + str(user.id) + '/host' + str(user.id) + '_1_' + user.first_name.title() + user.last_name[:1].title() + extension
+        profile.image = profile.image_url
+        profile.save()
+
+        #crop the image
+        im = Image.open(dirname + filename)
+        w, h = im.size
+        #if w > h:
+        #    im.crop((int((w-h)/2), 0, int(w-(w-h)/2), h)).save(dirname + filename)
+        #else:
+        #    im = im.crop((0, int((h-w)/2), w, int(h-(h-w)/2))).save(dirname + filename)
+        if w > 1200:
+            basewidth = 1200
+            wpercent = (basewidth/float(w))
+            hsize = int((float(h)*float(wpercent)))
+            im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS).save(dirname + filename)
+
+        #copy to the chinese website -- folder+file
+        dirname_cn = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts/' + str(user.id) + '/'
+        if not os.path.isdir(dirname_cn):
+            os.mkdir(dirname_cn)
+
+        subprocess.Popen(['cp',dirname + filename, dirname_cn + filename])
+
+        #copy to the chinese website -- database
+        cursor = connections['cndb'].cursor()
+        cursor.execute("update app_registereduser set image_url=%s, image=%s where id=%s", 
+                        [profile.image_url, profile.image_url, profile.id])
+
 def create_experience(request, id=None):
     context = RequestContext(request)
     data={}
@@ -1594,6 +1644,7 @@ def create_experience(request, id=None):
 
     if id:
         experience = get_object_or_404(Experience, pk=id)
+        registerUser = get_object_or_404(RegisteredUser,pk=experience.hosts.all()[0].id) 
         list = experience.whatsincluded_set.filter(item="Food")
         if len(list) > 0: 
             if list[0].included:
@@ -1633,7 +1684,10 @@ def create_experience(request, id=None):
         data = {"id":experience.id,
             "host":experience.hosts.all()[0].email,
             "host_first_name":experience.hosts.all()[0].first_name,
-            "host_last_name":experience.hosts.all()[0].last_name, 
+            "host_last_name":experience.hosts.all()[0].last_name,
+            "host_bio":registerUser.bio,
+            "host_image":registerUser.image,
+            "host_image_url":registerUser.image_url,
             "language":experience.language,
             "start_datetime":experience.start_datetime,
             "end_datetime":experience.end_datetime,
@@ -1669,6 +1723,11 @@ def create_experience(request, id=None):
                 data['experience_photo_'+str(i)] = photo.image
             #else:
             #    photos['experience'+str(id)+'_'+str(i)] = None
+
+        photo = registerUser.image
+        files['host_image'] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+photo.name, 
+                                                 File(open(settings.MEDIA_ROOT+'/'+photo.name, 'rb')).read())
+        data['host_image'] = photo
         #if experience.hosts.all()[0] != request.user:
         #    return HttpResponseForbidden()
     else:
@@ -1740,9 +1799,12 @@ def create_experience(request, id=None):
             user.first_name = form.data['host_first_name']
             user.last_name = form.data['host_last_name']
             user.save()
+            user.registereduser.bio = form.data['host_bio']
+            user.registereduser.save()
             #copy to chinese db
             cursor = connections['cndb'].cursor()
             cursor.execute("Update auth_user set first_name=%s, last_name=%s where id=%s", [user.first_name, user.last_name, user.id])
+            cursor.execute("Update app_registereduser set bio=%s where user_id=%s", [user.registereduser.bio, user.id])
 
             #save images
             dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
@@ -1782,6 +1844,10 @@ def create_experience(request, id=None):
                             photo = Photo(name = filename, directory = 'experiences/' + str(experience.id) + '/', 
                                           image = 'experiences/' + str(experience.id) + '/' + filename, experience = experience)
                             photo.save()
+
+            #save profile image
+            if 'host_image' in request.FILES:
+                saveProfileImage(user, user.registereduser, request.FILES['host_image'])
 
             #add whatsincluded
             if not id:

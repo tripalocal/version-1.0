@@ -35,6 +35,7 @@ class Experience(models.Model):
     
     hosts = models.ManyToManyField(User, related_name='experience_hosts')
     guests = models.ManyToManyField(User, related_name='experience_guests')
+    wishlist = models.ManyToManyField(User, related_name='experience_wishlist')
     status = models.CharField(max_length=50)
 
     tags = models.CharField(max_length=500)
@@ -201,3 +202,16 @@ class Payment(models.Model):
         except Exception as e:
             return False, e
         return True, re
+
+class Itinerary(models.Model):
+    user = models.ForeignKey(User)
+    name = models.CharField(max_length=50)
+    start_datettime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    group_size = models.IntegerField()
+    city=models.TextField()
+    bookings = models.ManyToManyField(Booking, related_name='itinerary_bookings')
+
+    def __str__(self):
+        t = self.name if self.name != None else ''
+        return str(self.id) + '--' + str(self.user.id) + '--' + t

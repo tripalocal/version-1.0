@@ -45,7 +45,8 @@
         <div class="leftColumn">
             <div class="operation"></div>
             <ul class="subMenu">
-                <li>Add new experience</li>
+                <li><a href="/admin/experiences/experience/{{form.id.value}}">Add new experience</a></li>
+                <li><a href="/cn/admin/experiences/experience/{{form.id.value}}">体验管理</a></li> 
             </ul>
             <div class="clear"></div>
             <div>
@@ -70,12 +71,30 @@
                         <td colspan="0">{{form.host_first_name}}</td>
                         <td colspan="0">{{form.host_last_name}}</td>
                     </tr>
-<!--
+
                     <tr>
-                        <td class="coRight">Status</td>
-                        <td colspan="1">{{form.status}}</td>
+                        <td class="coRight">Profile</td>
+                        <td colspan="2">
+                            {%if form.files.host_image%}
+                            <input id="profileImage" placeholder="{{form.files.host_image.name}}" class="uploadImage" disabled="disabled"/>
+                            {%else%}
+                            <input id="profileImage" placeholder="No file chosen" class="uploadImage" disabled="disabled"/>
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.host_image}}
+                            </div>
+                        </td>
+                        <td>
+                            <img src="{{MEDIA_URL}}{{form.host_image_url.value}}" class="img-circle"  width="80" height="80">
+                        </td>
                     </tr>
--->
+
+                    <tr>
+                        <td class="coRight">Bio</td>
+                        <td colspan="0">{{form.host_bio}}</td>
+                    </tr>
+
                     <tr>
                         <td class="coRight">Language</td>
                         <td colspan="1">{{form.language}}</td>
@@ -176,7 +195,7 @@
                     </tr>
                     <tr>
                         <td class="coRight">Experience photo</td>
-                        <td colspan="2">
+                        <td colspan="3">
                             {%if form.files.experience_photo_1%}
                             <input id="uploadImage_1" placeholder="{{form.files.experience_photo_1.name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
@@ -186,6 +205,10 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_1}}
                             </div>
+                            {%if form.files.experience_photo_1%}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_1.name}}" width="100" height="100">
+                            {%endif%}
+                            <br>
                             <br>
                             {%if form.files.experience_photo_2%}
                             <input id="uploadImage_2" placeholder="{{form.files.experience_photo_2.name}}" class="uploadImage" disabled="disabled" />
@@ -196,6 +219,10 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_2}}
                             </div>
+                            {%if form.files.experience_photo_2%}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_2.name}}" width="100" height="100">
+                            {%endif%}
+                            <br>
                             <br>
                             {%if form.files.experience_photo_3%}
                             <input id="uploadImage_3" placeholder="{{form.files.experience_photo_3.name}}" class="uploadImage" disabled="disabled" />
@@ -206,6 +233,10 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_3}}
                             </div>
+                            {%if form.files.experience_photo_3%}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_3.name}}" width="100" height="100">
+                            {%endif%}
+                            <br>
                             <br>
                             {%if form.files.experience_photo_4%}
                             <input id="uploadImage_4" placeholder="{{form.files.experience_photo_4.name}}" class="uploadImage" disabled="disabled" />
@@ -216,6 +247,10 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_4}}
                             </div>
+                            {%if form.files.experience_photo_4%}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_4.name}}" width="100" height="100">
+                            {%endif%}
+                            <br>
                             <br>
                             {%if form.files.experience_photo_5%}
                             <input id="uploadImage_5" placeholder="{{form.files.experience_photo_5.name}}" class="uploadImage" disabled="disabled" />
@@ -226,6 +261,10 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_5}}
                             </div>
+                            {%if form.files.experience_photo_5%}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_5.name}}" width="100" height="100">
+                            {%endif%}
+                            <br>
                             <br>
                             {%if form.files.experience_photo_6%}
                             <input id="uploadImage_6" placeholder="{{form.files.experience_photo_6.name}}" class="uploadImage" disabled="disabled" />
@@ -236,6 +275,10 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_6}}
                             </div>
+                            {%if form.files.experience_photo_6%}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_6.name}}" width="100" height="100">
+                            {%endif%}
+                            <br>
                             <br>
                             {%if form.files.experience_photo_7%}
                             <input id="uploadImage_7" placeholder="{{form.files.experience_photo_7.name}}" class="uploadImage" disabled="disabled" />
@@ -246,6 +289,10 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_7}}
                             </div>
+                            {%if form.files.experience_photo_7%}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_7.name}}" width="100" height="100">
+                            {%endif%}
+                            <br>
                             <br>
                             {%if form.files.experience_photo_8%}
                             <input id="uploadImage_8" placeholder="{{form.files.experience_photo_8.name}}" class="uploadImage" disabled="disabled" />
@@ -256,6 +303,10 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_8}}
                             </div>
+                            {%if form.files.experience_photo_8%}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_8.name}}" width="100" height="100">
+                            {%endif%}
+                            <br>
                             <br>
                             {%if form.files.experience_photo_9%}
                             <input id="uploadImage_9" placeholder="{{form.files.experience_photo_9.name}}" class="uploadImage" disabled="disabled" />
@@ -266,6 +317,10 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_9}}
                             </div>
+                            {%if form.files.experience_photo_9%}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_9.name}}" width="100" height="100">
+                            {%endif%}
+                            <br>
                             <br>
                             {%if form.files.experience_photo_10%}
                             <input id="uploadImage_10" placeholder="{{form.files.experience_photo_10.name}}" class="uploadImage" disabled="disabled" />
@@ -276,6 +331,9 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_10}}
                             </div>
+                            {%if form.files.experience_photo_10%}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_10.name}}" width="100" height="100">
+                            {%endif%}
                         </td>
                     </tr>
                     <tr>
@@ -332,6 +390,8 @@
                 $("#uploadImage_"+i).val(string.substring(index+1));
             })
         }
+
+        $("#id_host_image").attr("class", "upload");
     })
 
 /*
