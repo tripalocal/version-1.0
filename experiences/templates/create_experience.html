@@ -86,7 +86,11 @@
                             </div>
                         </td>
                         <td>
+                            {%if form.files.host_image%}
                             <img src="{{MEDIA_URL}}{{form.host_image_url.value}}" class="img-circle"  width="80" height="80">
+                            {%else%}
+                            <img src="{{MEDIA_URL}}profile_default.jpg" class="img-circle"  width="80" height="80">
+                            {%endif%}
                         </td>
                     </tr>
 

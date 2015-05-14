@@ -1644,7 +1644,7 @@ def create_experience(request, id=None):
 
     if id:
         experience = get_object_or_404(Experience, pk=id)
-        registerUser = get_object_or_404(RegisteredUser,pk=experience.hosts.all()[0].id) 
+        registerUser = experience.hosts.all()[0].registereduser
         list = experience.whatsincluded_set.filter(item="Food")
         if len(list) > 0: 
             if list[0].included:
@@ -1725,9 +1725,10 @@ def create_experience(request, id=None):
             #    photos['experience'+str(id)+'_'+str(i)] = None
 
         photo = registerUser.image
-        files['host_image'] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+photo.name, 
-                                                 File(open(settings.MEDIA_ROOT+'/'+photo.name, 'rb')).read())
-        data['host_image'] = photo
+        if photo:
+            files['host_image'] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+photo.name, 
+                                                     File(open(settings.MEDIA_ROOT+'/'+photo.name, 'rb')).read())
+            data['host_image'] = photo
         #if experience.hosts.all()[0] != request.user:
         #    return HttpResponseForbidden()
     else:
