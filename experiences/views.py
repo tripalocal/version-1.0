@@ -1235,14 +1235,14 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             experience.guest_number_min = min_guest_number if min_guest_number!=1 else experience.guest_number_min
             experience.guest_number_max = max_guest_number if max_guest_number!=10 else experience.guest_number_max
             experience.price = price if price!=0 else experience.price
-            experience.dynamic_price = dynamic_price if not title is None else experience.dynamic_price
+            experience.dynamic_price = dynamic_price if not dynamic_price is None else experience.dynamic_price
             experience.duration = duration if not duration is None else experience.duration
             experience.activity = activity if not activity is None else experience.activity
             experience.interaction = interaction if not interaction is None else experience.interaction
             experience.dress = dress_code if not dress_code is None else experience.dress
             experience.city = suburb if not suburb is None else experience.city
             experience.meetup_spot = meetup_spot if not meetup_spot is None else experience.meetup_spot
-            experience.type=type if not title is type else experience.type
+            experience.type=type if not type is None else experience.type
             experience.language = language if not language is None else experience.language
 
             experience.save()
@@ -1644,7 +1644,7 @@ def create_experience(request, id=None):
 
     if id:
         experience = get_object_or_404(Experience, pk=id)
-        registerUser = experience.hosts.all()[0].registereduser
+        registerUser = experience.hosts.all()[0].registereduser 
         list = experience.whatsincluded_set.filter(item="Food")
         if len(list) > 0: 
             if list[0].included:

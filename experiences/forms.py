@@ -22,7 +22,7 @@ from post_office import mail
 
 Type = (('SEE', 'See'),('DO', 'Do'),('EAT', 'Eat'),)
 
-Location = (('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Brisbane', 'Brisbane'),('Adelaide', 'Adelaide'),('Tasmania','Tasmania'),)
+Location = (('Melbourne', 'Melbourne - VIC'),('Sydney', 'Sydney - NSW'),('Brisbane', 'Brisbane - QLD'),('Cairns','Cairns - QLD'),('Gold coast','Gold coast - QLD'),('Hobart','Hobart - TAS'),) #('Adelaide', 'Adelaide - WA'),
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),('english;translation','English+Chinese translation'),)
 
@@ -41,7 +41,7 @@ Duration = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('
 
 Included = (('Yes', ''),('No', ''),)
 
-Suburbs = (('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Brisbane', 'Brisbane'),('Adelaide', 'Adelaide'),('Tasmania','Tasmania'),)
+Suburbs = (('Melbourne', 'Melbourne - VIC'),('Sydney', 'Sydney - NSW'),('Brisbane', 'Brisbane - QLD'),('Cairns','Cairns - QLD'),('Gold coast','Gold coast - QLD'),('Hobart','Hobart - TAS'),) #('Adelaide', 'Adelaide - WA'),
 
 Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghanistan'),('Albania', 'Albania'),('Algeria', 'Algeria'),('Andorra', 'Andorra'),('Angola', 'Angola'),('Antigua and Barbuda', 'Antigua and Barbuda'),('Argentina', 'Argentina'),('Armenia', 'Armenia'),('Aruba', 'Aruba'),('Austria', 'Austria'),('Azerbaijan', 'Azerbaijan'),('Bahamas', 'Bahamas'),('Bahrain', 'Bahrain'),('Bangladesh', 'Bangladesh'),('Barbados', 'Barbados'),('Belarus', 'Belarus'),('Belgium', 'Belgium'),('Belize', 'Belize'),('Benin', 'Benin'),('Bhutan', 'Bhutan'),('Bolivia', 'Bolivia'),('Bosnia and Herzegovina', 'Bosnia and Herzegovina'),('Botswana', 'Botswana'),('Brazil', 'Brazil'),('Brunei ', 'Brunei '),('Bulgaria', 'Bulgaria'),('Burkina Faso', 'Burkina Faso'),
 ('Burma', 'Burma'),('Burundi', 'Burundi'),('Cambodia', 'Cambodia'),('Cameroon', 'Cameroon'),('Canada', 'Canada'),('Cape Verde', 'Cape Verde'),('Central African Republic', 'Central African Republic'),('Chad', 'Chad'),('Chile', 'Chile'),('Colombia', 'Colombia'),('Comoros', 'Comoros'),('Congo, Democratic Republic of the', 'Congo, Democratic Republic of the'),('Congo, Republic of the', 'Congo, Republic of the'),('Costa Rica', 'Costa Rica'),('Cote dIvoire', 'Cote dIvoire'),('Croatia', 'Croatia'),('Cuba', 'Cuba'),('Curacao', 'Curacao'),('Cyprus', 'Cyprus'),('Czech Republic', 'Czech Republic'),('Denmark', 'Denmark'),('Djibouti', 'Djibouti'),('Dominica', 'Dominica'),('Dominican Republic', 'Dominican Republic'),
