@@ -29,11 +29,11 @@
                 </p>
             </div>
 
-			<div class="right-content-box" style="padding:0px;">
+			<div class="right-content-box">
 		        <div class="right-content-box-header">
-                    <p class="right-content-box-heading">All listings</p>
+                    <p>All listings</p>
                 </div>
-
+                <hr>
 		        {% for experience in experiences %}
                 <div class="listedItem edit-draft">
                     <div><img class="thumbnail" src="{{ MEDIA_URL }}thumbnails/experiences/experience{{experience.id}}_1.jpg"></div>
@@ -50,9 +50,9 @@
                     {% elif experience.status|title == "Listed" %}
                     <a class="btn btn-primary btn-sm" role="button" id="update-listing" href="/editexperience/calendar?id={{experience.id}}">Update listing</a>
                     {% endif %}
-                </div> 
+                </div>
                 {% empty %}
-                <p style="width:400px;">You have not hosted any experience.</p>   
+                <p style="width:400px;">You have not hosted any experience.</p> 
 		    	{% endfor %}
     		</div>
     	</div>

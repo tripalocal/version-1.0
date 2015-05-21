@@ -61,16 +61,6 @@ a{
     border-radius: 3px;
 }
 
-#id_login,#id_password,#id_email,#id_password1,#id_first_name,#id_last_name{
-    width:25vw;
-    height:5vh;
-    border: 1px solid #cccccc;
-    border-radius: 3px;
-    padding-left: 2vw;
-    display: inline;
-    font-size: 14px;
-}
-
 #id_Facebook{
     width: auto;
     height: 100%;
@@ -80,7 +70,7 @@ a{
     vertical-align:middle;
     width: auto;
     display: block;
-} 
+}
 .content p:nth-child(4) {
     color: #636363;
     font-size: 14px;

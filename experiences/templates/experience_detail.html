@@ -32,7 +32,7 @@
                 <div class="stickem">
                     <div class="bookingBox">
                         <div class="profile-lg">
-                            <img src="{{ MEDIA_URL }}{{ host_image }}" width="240" height="240">
+                            <div style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
                         </div>
                         Reservation with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
                         <br>{%if experience.language == "english;"%}English{%elif experience.language == "english;mandarin;"%}English / 中文{%else%}English / 中文翻译{%endif%}
