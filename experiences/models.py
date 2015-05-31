@@ -35,14 +35,14 @@ class Experience(models.Model):
     
     hosts = models.ManyToManyField(User, related_name='experience_hosts')
     guests = models.ManyToManyField(User, related_name='experience_guests')
-    wishlist = models.ManyToManyField(User, related_name='experience_wishlist')
     status = models.CharField(max_length=50)
 
     tags = models.CharField(max_length=500)
 
     def __str__(self):
         t = self.title if self.title != None else ''
-        return str(self.id) + '--' + t
+        s = self.status if self.status != None else ''
+        return str(self.id) + '--' + t + '--' + s
 
     class Meta:
         ordering = ['id']
@@ -210,7 +210,7 @@ class Itinerary(models.Model):
     end_datetime = models.DateTimeField()
     group_size = models.IntegerField()
     city=models.TextField()
-    bookings = models.ManyToManyField(Booking, related_name='itinerary_bookings')
+    #bookings = models.ManyToManyField(Booking, related_name='itinerary_bookings')
 
     def __str__(self):
         t = self.name if self.name != None else ''

@@ -196,7 +196,6 @@ a{
 .experience-pic{
     width: auto;
     height: 52.08vh;
-    background-image:url(https://www.tripalocal.com/images/experiences/1/experience1_1.jpg);
     background-repeat: no-repeat;
     background-size:100%;
     background-position:50%;
@@ -237,7 +236,6 @@ a{
     position: relative;
     top:5px;
     left:5px;
-    background-image:url(https://www.tripalocal.com/images/hosts/10/host10_1_MartinP.jpg);
     background-repeat: no-repeat;
     background-size:100%;
     background-position:50%;
@@ -306,7 +304,7 @@ a{
     margin-bottom:-10px;
 }*/
 .time-list{
-    background-color:#006666;
+    /*background-color:#006666;*/
     width:80px;
     height:30px;
     display: block;
@@ -314,17 +312,22 @@ a{
     margin-left: 10px;
 }
 .timebtn span{
-    color: white;
-    font-size: 12px;
+    /*color: white;
     position: relative;
-    bottom: 2px;
+    bottom: 2px;*/
+    font-size: 12px;
+    font-weight: 100;
+    float:none;
+    position:relative;
+    left:0px;
+    top:5px;
 }
 .timebtn img{
     width: 20px;
     height: 20px;
     position: relative;
     top: 5px;
-    left: -5px;
+    /*left: -5px;*/
 }
 .people-list select{
     width: 100%;
@@ -351,6 +354,34 @@ a{
     left:15px;
     margin-bottom:-10px;
 }*/
+#save_to_wishlist_icon {
+    position:relative;
+    float:left;
+    left:30px;
+    top:0px;
+    background-image:url(/images/icons.png);
+    height:54px;
+    width:54px;
+}
+.save_to_wishlist_not_added {
+    background-position: -216px 0px;
+}
+.save_to_wishlist_added {
+    background-position: -216px -54px;
+}
+#save_to_wishlist_description {
+    position:relative;
+    float:left;
+    left:50px;
+    top:10px;
+}
+#wishlist_head {
+    margin:0px;
+    text-align:justify;
+}
+#wishlist_p {
+    font-size:12px;
+}
 .bookingform-box{
     width: 250px;
     height: 100px;
@@ -437,8 +468,8 @@ a{
     margin-right:1vw;
 }
 .experinence-host{
-    width: 44.68vw;
-    height: 50vh;
+    width: 58.68vw;
+    height: 55vh;
     background: white;
     border: 1px solid #cccccc;
     border-radius: 3px;
@@ -454,7 +485,7 @@ a{
     font-weight: bold;
 }
 .experience-hostintro{
-    width: 38.68vw;
+    width: 48.68vw;
     height: 45%;
     margin-top: 3vh;
     margin-left: 3vw;
@@ -498,7 +529,6 @@ a{
 .experience-hostpic{
     width: 10vw;
     height: 10vw;
-    background-image:url(https://www.tripalocal.com/images/hosts/10/host10_1_MartinP.jpg);
     background-repeat: no-repeat;
     background-size:100%;
     background-position:50%;
@@ -507,8 +537,9 @@ a{
     border-bottom: 1px solid #cccccc;
 }
 .experience-hostinterests{
-    width:25vw;
-    height: 100%;
+    width:35vw;
+    height: 80%;
+    position:relative;
     float: right;
     overflow: hidden;
     font-weight: normal;
@@ -521,81 +552,109 @@ a{
     font-style: none;
     line-height: 24px;
 }
+#bio_show_more {
+    position:relative;
+    top:90%;
+    left:50px;
+    color:#3cc;
+}
 .host-socialmedia{
-    width: 44.68vw;
-    height: 10vh;
-    padding-top: 3vh;
-    padding-left: 10vw;
+    padding-top: 10px;
+    padding-left: 40px;
+}
+.host-trust {
+    position:relative;
+    float:left;
+    margin-right:130px;
 }
 .host-socialmedia span{
     display: block;
     float: left;
     color: #666666;
 }
-.host-facebook,.host-instagram,.host-mobile{
-    width: 85px;
-    height: 40px;
+.host-facebook,.host-instagram,.host-mobile,.host-review{
+    width: 180px;
+    height: 100px;
     float: left;
     border-radius: 3px;
     margin: 0;
 }
 
-.host-facebook,.host-instagram,.host-mobile{
+.host-facebook,.host-instagram,.host-mobile,.host-review{
     margin-left: 1vw;
     padding-top: 5px;
     padding-left: 5px;
 }
 .host-facebook{
-    background-color: #3a57a1;
+    
 }
 .host-instagram{
-    background-color: #0084b0;
+    
 }
 .host-mobile{
-    background-color: #99cc33;
+    
 }
-.facebooklogo,.instagramlogo,.mobilelogo{
-    width: 30px;
-    height:30px;
+.facebooklogo,.instagramlogo,.mobilelogo, .reviewlogo{
+    width: 90px;
+    height:90px;
     margin: 0;
     padding: 0;
     float: left;
     margin-right: 4px;
-    background-size: 120px 60px;
 }
 .facebooklogo{
-    background-image:url(/images/icons_social.png);
-    background-position: -30px 0px;
-}
-.instagramlogo{
-    background-image:url(/images/icons_social.png);
-    background-position: -90px 0px;
+    background-image:url(/images/icons.png);
+    background-position: -270px 0px;
 }
 .mobilelogo{
-    background-image:url(/images/icons_social.png);
-    background-position: -30px 0px;
+    background-image:url(/images/icons.png);
+    background-position: -270px -270px;
+}
+.reviewlogo {
+    background-image:url(/images/icons.png);
+    background-position: -270px -90px;
+}
+.review-number {
+    font-size:16px;
+    margin-left:2px;
 }
 .host-socialmedia .followerNumber,.host-socialmedia .contactNumber{
-    color:white;
+    /*color:white;*/
     font-size: 14px;
-    margin-top: 2px;
+    /*margin-top: 2px;*/
 }
-.host-socialmedia .Mobile{
-    color:white;
-    font-size: 10px;
-    margin-top: 4px;
-    margin-bottom: 2px;
+.host-socialmedia .Mobile, .review-title{ 
+    /*color:white;*/
+    font-size: 14px;
+    /*margin-top: 4px;
+    margin-bottom: 2px;*/
 }
 .host-facebook .host-friend,.host-instagram .host-contact,.host-mobile .host-verfied{
     display: block;
-    font-size: 10px;
-    color: white;
+    font-size: 14px;
+    /*color: white;*/
     float: left;
-    margin-top: 2px;
+    /*margin-top: 2px;*/
 }
 .reviewBox h2{
     top: -8px;
     position: relative;
+}
+.saved_to_wishlist_related {
+    position:relative;
+    float:left;
+    width:36px;
+    height:36px;
+    background-image:url(/images/icons.png);
+    background-position:-36px -234px;
+}
+.save_to_wishlist_related {
+    position:relative;
+    float:left;
+    width:36px;
+    height:36px;
+    background-image:url(/images/icons.png);
+    background-position:-72px -234px;
 }
  /*menu host section and traveler menu section */
 

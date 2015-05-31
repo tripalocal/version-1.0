@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden
 import json, pytz, xlrd, re, os, subprocess, math
 from django.contrib.auth.models import User
 from datetime import *
@@ -304,11 +304,63 @@ def ajax_view(request):
                 response={'status':True}
             else:
                 response={'status':False}
-            return HttpResponse(json.dumps(response, ensure_ascii=False))
+            return HttpResponse(json.dumps(response))
         else:
             return render_to_response(template, {'form':ExperienceForm()}, context_instance=RequestContext(request))
     else:
         raise Http404
+
+def service_wishlist(request):
+    if request.is_ajax() and request.method == 'POST':
+        try:
+            user_id = int(request.POST['user_id'])
+            experience_id = int(request.POST['experience_id'])
+            added = request.POST['added']
+
+            user = User.objects.get(id=user_id)
+            experience = Experience.objects.get(id=experience_id)
+            if added == "False":
+                try:
+                    #user.registereduser.wishlist.add(experience)
+                    cursor = connections['default'].cursor()
+                    wl = cursor.execute("select id from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id]).fetchone()
+                    if wl is not None and len(wl)>0:
+                        response={'success':False, 'error':'already added'}
+                        return HttpResponse(json.dumps(response),content_type="application/json")
+
+                    cursor.execute("Insert into app_registereduser_wishlist ('experience_id','registereduser_id') values (%s, %s)", [experience.id, user.registereduser.id])
+                    
+                    cursor = connections['cndb'].cursor()
+                    profile_id = cursor.execute("Select id from app_registereduser where user_id=%s",[user_id]).fetchone()
+                    cursor.execute("Insert into app_registereduser_wishlist ('experience_id','registereduser_id') values (%s, %s)", [experience.id, profile_id[0]])
+                    response={'success':True, 'added':True}
+                except BaseException:
+                    response={'success':False, 'error':'fail to add'}
+                    return HttpResponse(json.dumps(response),content_type="application/json")
+            else:
+                try:
+                    #user.registereduser.wishlist.remove(experience)
+                    cursor = connections['default'].cursor()
+                    cursor.execute("delete from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id])
+                    
+                    cursor = connections['cndb'].cursor()
+                    profile_id = cursor.execute("Select id from app_registereduser where user_id=%s",[user_id]).fetchone()
+                    cursor.execute("delete from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, profile_id[0]])
+                    response={'success':True, 'removed':True}
+                except BaseException:
+                    response={'success':False, 'error':'fail to remove'}
+                    return HttpResponse(json.dumps(response),content_type="application/json")
+
+            return HttpResponse(json.dumps(response),content_type="application/json")
+        except User.DoesNotExist:
+            response={'success':False, 'error':'user does not exist'}
+            return HttpResponse(json.dumps(response),content_type="application/json")
+        except Experience.DoesNotExist:
+            response={'success':False, 'error':'experience does not exist'}
+            return HttpResponse(json.dumps(response),content_type="application/json")
+
+    else:
+        raise HttpResponseForbidden
 
 @api_view(['POST'])
 def service_login(request):
@@ -388,7 +440,7 @@ def service_logout(request):
 # http://stackoverflow.com/questions/16381732/how-to-create-new-user-and-new-django-allauth-social-account-when-given-access-t
 @api_view(['POST'])
 def service_facebook_login(request):
-    data = request.data #self.deserialize(request, request.raw_post_data, format=request.META.get('CONTENT_TYPE', 'application/json'))
+    data = request.data #self.deserialize(request, request.raw_post_data, format=request.META.get('content_type', 'application/json'))
 
     access_token = data.get('access_token', '')
 

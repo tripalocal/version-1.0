@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from experiences.models import Experience
 
 class RegisteredUser(models.Model):
     def upload_path(self, name):
@@ -11,9 +12,10 @@ class RegisteredUser(models.Model):
     phone_number = models.CharField(max_length=15)
     bio = models.TextField()
     rate = models.DecimalField(max_digits=2, decimal_places=1)
+    wishlist = models.ManyToManyField(Experience, related_name='user_wishlist')
 
     def __str__(self):
-        return str(self.user.id) + '--' + self.user.username + '--' + self.user.email
+        return str(self.user.id) + '--' + self.user.email
 
 class Subscription(models.Model):
     email = models.EmailField()

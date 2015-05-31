@@ -278,12 +278,12 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
 
                 if i==0: #< experience.guest_number_max :
                     if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
-                        istant_booking = False
+                        instant_booking = False
                         #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
                         #instantbooking_i: skip the periods already checked
                         for ib_i in range(instantbooking_i, instantbooking_index):
                             if (instantbooking_start[ib_i] <= sdt and sdt <= instantbooking_end[ib_i]): # and (instantbooking_start[ib_i] <= sdt+relativedelta(hours=+experience.duration) and sdt+relativedelta(hours=+experience.duration) <= instantbooking_end[ib_i]):
-                                istant_booking = True
+                                instant_booking = True
                                 break
                             if sdt+relativedelta(hours=+experience.duration) < instantbooking_start[ib_i]:
                                 #no need to check further slots after the current one
@@ -293,7 +293,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
 
                         dict = {'available_seat': experience.guest_number_max - i, 
                                 'time_string': sdt_local.strftime("%H").lstrip('0') if sdt_local.strftime("%H")!="00" else "0", 
-                                'instant_booking': istant_booking}
+                                'instant_booking': instant_booking}
                         experience_avail['dates'][sdt_local.strftime("%Y/%m/%d")].append(dict)
 
             sdt += timedelta(hours=1)
@@ -368,6 +368,8 @@ class ExperienceListView(ListView):
             return HttpResponseRedirect("/admin/login/?next=/experiencelist") #self.request.user.experience_hosts.all()
 
 def getAvailableOptions(experience, available_options, available_date):
+
+    top_instant_bookings = -1
 
     last_sdt = pytz.timezone('UTC').localize(datetime.min)
     local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -488,12 +490,12 @@ def getAvailableOptions(experience, available_options, available_date):
 
             if i == 0: #< experience.guest_number_max :
                 if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
-                    istant_booking = False
+                    instant_booking = False
                     #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
                     #instantbooking_i: skip the periods already checked
                     for ib_i in range(instantbooking_i, instantbooking_index):
                         if (instantbooking_start[ib_i] <= sdt and sdt <= instantbooking_end[ib_i]):# and (instantbooking_start[ib_i] <= sdt+relativedelta(hours=+experience.duration) and sdt+relativedelta(hours=+experience.duration) <= instantbooking_end[ib_i]):
-                            istant_booking = True
+                            instant_booking = True
                             break
                         if sdt+relativedelta(hours=+experience.duration) < instantbooking_start[ib_i]:
                             #no need to check further slots after the current one
@@ -505,8 +507,15 @@ def getAvailableOptions(experience, available_options, available_date):
                             'date_string': sdt_local.strftime("%d/%m/%Y"), 
                             'time_string': sdt_local.strftime("%H:%M"), 
                             'datetime': sdt_local,
-                            'instant_booking': istant_booking}
-                    available_options.append(dict)
+                            'instant_booking': instant_booking}
+
+                    if instant_booking:
+                        top_instant_bookings += 1
+
+                    if top_instant_bookings < 3:
+                        available_options.insert(top_instant_bookings, dict)
+                    else:
+                        available_options.append(dict)
 
                     if sdt_local.date() != last_sdt.date():
                         new_date = ((sdt_local.strftime("%d/%m/%Y"),
@@ -605,16 +614,20 @@ class ExperienceDetailView(DetailView):
                 context['host_only_unlisted'] = True
                 return context
 
+        cities = {'melbourne':'Melbourne','sydney':'Sydney','cairns':'Cairns','goldcoast':'Gold coast','brisbane':'Brisbane','hobart':'Hobart'}
+        context['experience_city'] = cities.get(experience.city.lower())
+
         available_date = getAvailableOptions(experience, available_options, available_date)
 
         context['available_options'] = available_options
-        context['form'] = BookingForm(available_date, experience.id)
+        uid = self.request.user.id if self.request.user.is_authenticated() else None
+        context['form'] = BookingForm(available_date, experience.id, uid)
 
-        WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
-        included_list = WhatsIncludedList.filter(included=True)
-        not_included_list = WhatsIncludedList.filter(included=False)
-        context['included_list'] = included_list
-        context['not_included_list'] = not_included_list
+        #WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
+        #included_list = WhatsIncludedList.filter(included=True)
+        #not_included_list = WhatsIncludedList.filter(included=False)
+        #context['included_list'] = included_list
+        #context['not_included_list'] = not_included_list
         
         rate = 0.0
         counter = 0
@@ -634,6 +647,53 @@ class ExperienceDetailView(DetailView):
             context['host_image'] = 'profile_default.jpg'
         else:
             context['host_image'] = host_image
+
+        context['in_wishlist'] = False
+        wishlist = self.request.user.registereduser.wishlist.all() if self.request.user.is_authenticated() else None
+        if wishlist and len(wishlist) > 0:
+            for i in range(len(wishlist)):
+                if wishlist[i].id == experience.id:
+                    context['in_wishlist'] = True
+                    break
+
+        related_experiences = []
+        cursor = connections['experiencedb'].cursor()
+        ids = cursor.execute("select experience_id from experiences_experience_guests where experience_id != %s and user_id in (select user_id from experiences_experience_guests where experience_id=%s)",
+                             [experience.id, experience.id]).fetchall()
+        if ids and len(ids)>0:
+            for id in ids:
+                related_experiences.append(id[0])
+            related_experiences = list(Experience.objects.filter(id__in=related_experiences).filter(city__iexact=experience.city))
+        if len(related_experiences)<3:
+            tags = cursor.execute("select tags from experiences_experience where id = %s",
+                             [experience.id]).fetchone()
+            tags = tags[0].split(",")
+            queryset = Experience.objects.filter(city__iexact=experience.city).exclude(id=experience.id)
+            for tag in tags:
+                tmp = queryset.filter(tags__icontains=tag)
+                if tmp and len(tmp)>=3:
+                    queryset = tmp
+                else:
+                    break
+            for exp in queryset:
+                if not any(x.id == exp.id for x in related_experiences):
+                    related_experiences.append(exp)
+
+        related_experiences_added_to_wishlist = []
+        
+        if self.request.user.is_authenticated():
+            for r in related_experiences:
+                wl = cursor.execute("select id from app_registereduser_wishlist where experience_id = %s and registereduser_id=%s",
+                             [r.id,self.request.user.registereduser.id]).fetchone()
+                if wl and len(wl)>0:
+                    related_experiences_added_to_wishlist.append(True)
+                else:
+                    related_experiences_added_to_wishlist.append(False)
+        else:
+            for r in related_experiences:
+                related_experiences_added_to_wishlist.append(False)
+
+        context['related_experiences'] = zip(related_experiences, related_experiences_added_to_wishlist)
 
         return context
 
@@ -1095,8 +1155,8 @@ class ExperienceWizard(NamedUrlSessionWizardView):
         if 'price' in kwargs['form_dict']:
             prev_data = kwargs['form_dict']['price'].cleaned_data
             duration = prev_data['duration']
-            min_guest_number = prev_data['min_guest_number']
-            max_guest_number = prev_data['max_guest_number']
+            min_guest_number = int(prev_data['min_guest_number'])
+            max_guest_number = int(prev_data['max_guest_number'])
             if min_guest_number!=None and max_guest_number!=None and min_guest_number > max_guest_number:
                 temp = max_guest_number
                 max_guest_number = min_guest_number
@@ -1630,8 +1690,8 @@ def saveProfileImage(user, profile, image_file):
 
         #copy to the chinese website -- database
         cursor = connections['cndb'].cursor()
-        cursor.execute("update app_registereduser set image_url=%s, image=%s where id=%s", 
-                        [profile.image_url, profile.image_url, profile.id])
+        cursor.execute("update app_registereduser set image_url=%s, image=%s where user_id=%s", 
+                        [profile.image_url, profile.image_url, user.id])
 
 def create_experience(request, id=None):
     context = RequestContext(request)
@@ -2130,7 +2190,7 @@ def getBGImageURL(experienceKey):
     BGImageURL = ""
     photoList = Photo.objects.filter(experience_id=experienceKey)
     if len(photoList):
-        BGImageURL = 'thumbnails/experiences/'+ photoList[0].name
+        BGImageURL = 'thumbnails/experiences/'+ photoList[0].name.split('.')[0] + '.jpg'
     return BGImageURL
 
 def ByCityExperienceListView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC)):
@@ -2153,9 +2213,9 @@ def ByCityExperienceListView(request, city, start_date=datetime.utcnow().replace
 
         if experience.dynamic_price and len(experience.dynamic_price) > 0 and experience.guest_number_min < 4:
             dp = experience.dynamic_price.split(',')
-            if experience.guest_number_max < 4:
-                experience.price = dp[len(dp)-1]
-            else:
+            if experience.guest_number_max < 4 or experience.guest_number_max - experience.guest_number_min < 4:
+                experience.price = dp[len(dp)-2]#the string ends with ",", so the last one is ''
+            elif experience.guest_number_min <= 4:
                 experience.price = dp[4-experience.guest_number_min]
 
         if experience.start_datetime > end_date or experience.end_datetime < start_date :

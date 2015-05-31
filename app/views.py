@@ -459,8 +459,8 @@ def myprofile(request):
 
             #copy to the chinese website -- database
             cursor = connections['cndb'].cursor()
-            cursor.execute("update app_registereduser set phone_number=%s, image_url=%s, bio=%s, image=%s where id=%s", 
-                           [profile.phone_number, profile.image_url, profile.bio, profile.image_url, profile.id])
+            cursor.execute("update app_registereduser set phone_number=%s, image_url=%s, bio=%s, image=%s where user_id=%s", 
+                           [profile.phone_number, profile.image_url, profile.bio, profile.image_url, request.user.id])
 
     #display the original/updated data
     data={"first_name":request.user.first_name, "last_name":request.user.last_name, "email":request.user.email}

@@ -22,7 +22,7 @@ from post_office import mail
 
 Type = (('SEE', 'See'),('DO', 'Do'),('EAT', 'Eat'),)
 
-Location = (('Melbourne', 'Melbourne - VIC'),('Sydney', 'Sydney - NSW'),('Brisbane', 'Brisbane - QLD'),('Cairns','Cairns - QLD'),('Gold coast','Gold coast - QLD'),('Hobart','Hobart - TAS'),) #('Adelaide', 'Adelaide - WA'),
+Location = (('Melbourne', 'Melbourne - VIC'),('Sydney', 'Sydney - NSW'),('Brisbane', 'Brisbane - QLD'),('Cairns','Cairns - QLD'),('Goldcoast','Gold coast - QLD'),('Hobart','Hobart - TAS'),) #('Adelaide', 'Adelaide - WA'),
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),('english;translation','English+Chinese translation'),)
 
@@ -37,11 +37,11 @@ Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6',
 
 Duration = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
 ('11', '11'),('12', '12'),('13', '13'),('14', '14'),('15', '15'),('16', '16'),('17', '17'),('18', '18'),('19', '19'),('20', '20'),
-('21', '21'),('22', '22'),('23', '23'),('24', '24'),('25', '25'),('26', '26'),('27', '27'),('28', '28'),('29', '29'),('30', '30'),)
+('21', '21'),('22', '22'),('23', '23'),('24', '24'),('36', '36'),('48', '48'),('60', '60'),('72', '72'),('84', '84'),('96', '96'),)
 
 Included = (('Yes', ''),('No', ''),)
 
-Suburbs = (('Melbourne', 'Melbourne - VIC'),('Sydney', 'Sydney - NSW'),('Brisbane', 'Brisbane - QLD'),('Cairns','Cairns - QLD'),('Gold coast','Gold coast - QLD'),('Hobart','Hobart - TAS'),) #('Adelaide', 'Adelaide - WA'),
+Suburbs = (('Melbourne', 'Melbourne - VIC'),('Sydney', 'Sydney - NSW'),('Brisbane', 'Brisbane - QLD'),('Cairns','Cairns - QLD'),('Goldcoast','Gold coast - QLD'),('Hobart','Hobart - TAS'),) #('Adelaide', 'Adelaide - WA'),
 
 Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghanistan'),('Albania', 'Albania'),('Algeria', 'Algeria'),('Andorra', 'Andorra'),('Angola', 'Angola'),('Antigua and Barbuda', 'Antigua and Barbuda'),('Argentina', 'Argentina'),('Armenia', 'Armenia'),('Aruba', 'Aruba'),('Austria', 'Austria'),('Azerbaijan', 'Azerbaijan'),('Bahamas', 'Bahamas'),('Bahrain', 'Bahrain'),('Bangladesh', 'Bangladesh'),('Barbados', 'Barbados'),('Belarus', 'Belarus'),('Belgium', 'Belgium'),('Belize', 'Belize'),('Benin', 'Benin'),('Bhutan', 'Bhutan'),('Bolivia', 'Bolivia'),('Bosnia and Herzegovina', 'Bosnia and Herzegovina'),('Botswana', 'Botswana'),('Brazil', 'Brazil'),('Brunei ', 'Brunei '),('Bulgaria', 'Bulgaria'),('Burkina Faso', 'Burkina Faso'),
 ('Burma', 'Burma'),('Burundi', 'Burundi'),('Cambodia', 'Cambodia'),('Cameroon', 'Cameroon'),('Canada', 'Canada'),('Cape Verde', 'Cape Verde'),('Central African Republic', 'Central African Republic'),('Chad', 'Chad'),('Chile', 'Chile'),('Colombia', 'Colombia'),('Comoros', 'Comoros'),('Congo, Democratic Republic of the', 'Congo, Democratic Republic of the'),('Congo, Republic of the', 'Congo, Republic of the'),('Costa Rica', 'Costa Rica'),('Cote dIvoire', 'Cote dIvoire'),('Croatia', 'Croatia'),('Cuba', 'Cuba'),('Curacao', 'Curacao'),('Cyprus', 'Cyprus'),('Czech Republic', 'Czech Republic'),('Denmark', 'Denmark'),('Djibouti', 'Djibouti'),('Dominica', 'Dominica'),('Dominican Republic', 'Dominican Republic'),
@@ -371,12 +371,13 @@ class BookingForm(forms.Form):
     guest_number = forms.ChoiceField(label="")
     status = forms.CharField(initial="Requested")
 
-    def __init__(self, available_date, experience_id, *args, **kwargs):
+    def __init__(self, available_date, experience_id, user_id, *args, **kwargs):
         super(BookingForm, self).__init__(*args, **kwargs)
         self.fields['date'] = forms.ChoiceField(choices = available_date)
         self.fields['experience_id'] = forms.CharField(initial=experience_id)
         self.fields['experience_id'].widget.attrs['readonly'] = True
         self.fields['experience_id'].widget = forms.HiddenInput()
+        self.fields['user_id'] = forms.CharField(initial=user_id)
         self.fields['user_id'].widget.attrs['readonly'] = True
         self.fields['user_id'].widget = forms.HiddenInput()
         self.fields['status'].widget.attrs['readonly'] = True

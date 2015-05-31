@@ -388,7 +388,7 @@
         var price = parseFloat($("#id_price-price").val());
         if(typeof price === 'number' && isValidNumber(price))
         {  
-            $("#id_price-price_with_booking_fee").val((price*1.429*1.000+0.0).toFixed(2));
+            $("#id_price-price_with_booking_fee").val(Math.round(price*1.429*1.000+0.0));
             $("#commission-price").text((price*1.429*1.000+0.0 - price).toFixed(2));
         }
 
@@ -400,7 +400,7 @@
             {
                 $("#dynamic_price_input_"+(i+min-1)).val(price[i]);
                 $("#commission-price-"+(i+min-1)).text((parseFloat(price[i])*1.429*1.000+0.0 - price[i]).toFixed(2));
-                $("#dynamic_price_with_fee_input_"+(i+min-1)).val((parseFloat(price[i])*1.429*1.000+0.0).toFixed(2));
+                $("#dynamic_price_with_fee_input_"+(i+min-1)).val(Math.round(parseFloat(price[i])*1.429*1.000+0.0));
             }
             $("#add_dynamic_price").attr("style","display:none;");
             $("#cancel_dynamic_price").attr("style","");
