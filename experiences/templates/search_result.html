@@ -1,6 +1,7 @@
 {% extends "app/layout.html" %}
 {% load staticfiles %}
 {% load mathfilters %}
+{% load i18n %}
 
 {%block head %}
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -10,31 +11,77 @@
     <title>Discover {{ city }}</title>
 {%endblock%}
 
-{% block content %}    
-    <div class="container-fluid searchbar">
-    	<div class="row">
-            <div class="fixCenter">
-                <div class="destination dropdown">
-                    <h1 style=" text-align: center;">Destination</h1>
-                    <button class="btn btn-default dropdown-toggle" type="button" id="" data-toggle="dropdown" aria-expanded="true">
-                    {{ city }}
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                    {% for c in cityList %}
-                    {% if city.title != c %}
-                        <li role="presentation" class="btn btn-default dropdown-toggle"><a role="menuitem" tabindex="-1" href="/s/{{c}}">{{c}}</a></li>
-                    {% endif %}
-                    {% endfor %}
-                    </ul>
+{% block content %}   
+    <div class="">
+        <form id="search_form" action="/s/melbourne/" method="post">
+            {% csrf_token %}
+
+            <div id="criteria_div">
+                <div id="mandatory_criteria_div">
+                    <div id="date_destination_div" style="float:left;width:390px;">
+                        <div id="add_day_1_div">
+                            <div class="data-icon"> 
+                                <p class="date-exp">Dates</p>
+                            </div>
+                            {{form.city}}
+                            <div class="input-group date" id="id_start_datetime_picker_day_1" style="float:left;width:150px;">
+                                {{form.start_date}}
+                            </div>
+                            <div class="input-group date" id="id_end_datetime_picker_day_1" style="float:left;width:150px;">
+                                {{form.end_date}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vertical-bar"></div>
+                    <div id="guest_number_div" style="float:left;width:150px;">
+                        <div class="people"> 
+                            <p class="people-exp">People</p>
+                            <p class="people-descri">We offer private group</p>
+                        </div>
+                        {{form.guest_number}}
+                    </div>
+                    <div class="vertical-bar" style="margin-left:70px;"></div>
+                    <div id="language_div" style="float:left;">
+                        <div class="language-icon">
+                            <p class="language-exp">Language</p>
+                        </div> 
+                    </div>
+                    <div class="language-choice-checkbox"> 
+                        {{form.language}} 
+                        <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
+                        <br> 
+                        <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan">中文</label> 
+                    </div>
+                    <div class="vertical-bar"></div>
+                    <div id="more-filters-button">
+                        <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters">More Filters</button>
+                        <input class="btn-block btn btn-default" id="itinerary-search" type="submit" value="Search" name="Search">
+                    </div>
+                    <div id="itinerary-search-button">
+                    </div>
+                </div>
+                <div id="optional_criteria_div" style="display:none;">
+                    <div id="optional_criteria_container">
+                        <div class="interests-icon" style="float:left;margin-top: 20px;margin-right: 25px;">
+                            <p class="interests-exp">Interests</p>
+                        </div>
+
+                        <div id="tags_div">
+                            {{form.tags}}
+                            {{form.all_tags}}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
-    
+
     <div class="container-fluid searchresult">
     	<div class="row">
             <div class="fixCenter">
+                <div style="margin-top:10px;padding-right:20px;text-align:right;width:100%;">
+                {{length}} Experiences &#8226; {{city}}
+                </div>
                 <div class="expBox">
                     <!-- Each Individual Experiene Listing -->
                     {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
@@ -66,4 +113,116 @@
     </div>
     <!-- /.container -->
 
+{% endblock %}
+
+{% block scripts %}
+<script charset="utf-8" type="text/javascript">
+    $(document).ready(function(){
+        $("#id_city").addClass("destination_city");
+        $("#id_city").val("{{city}}");
+
+        language = $("#id_language").val().split(",");
+        for(i=0;i<language.length;i++)
+        {
+            $("#language_"+language[i]).prop('checked',true);
+            $("#language_"+language[i]+"_label").attr("class","css-label lite-cyan-check");
+        }
+
+        language=['English','Mandarin'];
+        for(i=0;i<language.length;i++)
+        {
+            $("#language_"+language[i]+"_label").click(function(e){
+                id = "language_"+this.id.split("_")[1];
+                if($("#"+id).prop('checked'))
+                {
+                    $("#"+id).prop('checked',false);
+                    $(this).attr("class","css-label lite-x-cyan");
+                }
+                else
+                {
+                    $("#"+id).prop('checked',true);
+                    $(this).attr("class","css-label lite-cyan-check");
+                }
+            });
+        }
+
+        all_tags = $("#id_all_tags").val().split(",");
+        tags = $("#id_tags").val().split(",");
+        for(i=0;i<all_tags.length>0;i++)
+        {
+            if($.inArray(all_tags[i], tags)<0)
+            {
+                new_tag = "<div class=\"tag-box\"><label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10003</button></div>";
+            }
+            else
+            {
+                new_tag = "<div class=\"tag-box\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10007</button></div>";
+            }
+
+            $("#tags_div").append(new_tag);
+
+            $("#tag_button_"+(i+1)).click(function(e){
+                id = e.target.id.split("_")[2];
+                if($("#tag_"+id).attr("class") == "tag-selected")
+                {
+                    $("#tag_button_"+id).html("&#10003");
+                    $("#tag_"+id).attr("class", "tag-non-selected");
+                }
+                else
+                {
+                    $("#tag_button_"+id).html("&#10007");
+                    $("#tag_"+id).attr("class", "tag-selected");
+                }
+            });
+        }
+    });
+
+    $("#id_city").change(function(e){
+        $("#search_form")[0].action = "/s/" + $("#id_city").val() + "/";
+    });
+
+    $("#itinerary-search").click(function(e){
+        $("#id_city").change();
+        $("#id_tags").val("");
+        for(i=1;$("#tag_"+i).length>0;i++)
+        {
+            if($("#tag_"+i).attr("class") == "tag-selected")
+            {
+                $("#id_tags").val($("#id_tags").val() + $("#tag_"+i).text() + ",");
+            }
+        }
+        tags = $("#id_tags").val();
+        tags = tags.substring(0,tags.length-1);
+        $("#id_tags").val(tags);
+
+        $("#id_language").val("");
+
+        language = ['Mandarin','English'];
+        for(i=0;i<language.length;i++)
+        {
+            if($("#language_"+language[i]).prop('checked') == true)
+            {
+                $("#id_language").val($("#id_language").val() + language[i] + ",");
+            }
+        }
+        l = $("#id_language").val();
+        l = l.substring(0,l.length-1);
+        $("#id_language").val(l);
+
+    });
+
+    $("#more_filters").click(function(e){
+        tags_div = $("#optional_criteria_div");
+        if(tags_div.css("display")=="none")
+        {
+            tags_div.css("display", "inline-block");
+            $("#more_filters").text("Less Filters");
+        }
+        else
+        {
+            tags_div.css("display", "none");
+            $("#more_filters").text("More Filters");
+        }
+    });
+</script>
 {% endblock %}

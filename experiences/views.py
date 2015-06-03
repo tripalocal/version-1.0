@@ -667,8 +667,8 @@ class ExperienceDetailView(DetailView):
         if len(related_experiences)<3:
             tags = cursor.execute("select tags from experiences_experience where id = %s",
                              [experience.id]).fetchone()
-            tags = tags[0].split(",")
-            queryset = Experience.objects.filter(city__iexact=experience.city).exclude(id=experience.id)
+            tags = tags[0].split(",") if tags[0] is not None else ''
+            queryset = Experience.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").exclude(id=experience.id)
             for tag in tags:
                 tmp = queryset.filter(tags__icontains=tag)
                 if tmp and len(tmp)>=3:
@@ -1084,14 +1084,12 @@ class ExperienceWizard(NamedUrlSessionWizardView):
     def done(self, form_list, **kwargs):
         f=[]
 
-        type= None #self.initial_dict['type'] if 'type' in self.initial_dict else None
         title= None #self.initial_dict['title'] if 'title' in self.initial_dict else None
         duration= None #self.initial_dict['duration'] if 'duration' in self.initial_dict else None
         suburb= None #self.initial_dict['suburb'] if 'suburb' in self.initial_dict else None
         id=None #
         if 'experience' in kwargs['form_dict']:
             prev_data = kwargs['form_dict']['experience'].cleaned_data
-            type = prev_data.get('type', None)
             title = prev_data.get('title', None)
             duration = prev_data.get('duration', None)
             suburb = prev_data.get('location', None)
@@ -1147,6 +1145,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                         elif not days[instant_booking['instant_booking_start_datetime_'+str(i)].weekday()] in instant_booking['instant_booking_repeat_extra_information_'+str(i)].split(';'):
                             instant_booking['instant_booking_repeat_extra_information_'+str(i)] += days[instant_booking['instant_booking_start_datetime_'+str(i)].weekday()]+';'
 
+        type = None #self.initial_dict['type'] if 'type' in self.initial_dict else None
         min_guest_number = 1 #self.initial_dict['min_guest_number'] if 'min_guest_number' in self.initial_dict else 1
         max_guest_number = 10 #self.initial_dict['max_guest_number'] if 'max_guest_number' in self.initial_dict else 10
         price = 0 #self.initial_dict['price'] if 'price' in self.initial_dict else 0
@@ -1161,6 +1160,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                 temp = max_guest_number
                 max_guest_number = min_guest_number
                 min_guest_number = temp
+            type = prev_data.get('type', None)
             price = prev_data['price'] if prev_data['price'] is not None else 0
             price_with_booking_fee = prev_data['price_with_booking_fee']
             dynamic_price = prev_data['dynamic_price']
@@ -2193,8 +2193,31 @@ def getBGImageURL(experienceKey):
         BGImageURL = 'thumbnails/experiences/'+ photoList[0].name.split('.')[0] + '.jpg'
     return BGImageURL
 
-def ByCityExperienceListView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC)):
-    template = loader.get_template('search_result.html')
+def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None):
+    
+    form = SearchForm()
+    form.data = form.data.copy()
+    form.data['city'] = city.title()
+    form.data['all_tags'] = Tags
+    if 'language' not in form.data:
+        form.data['language'] = "English,Mandarin" if language is None else language
+
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        form.data = form.data.copy()
+        form.data['all_tags'] = Tags
+        if 'language' not in form.data:
+            form.data['language'] = "English,Mandarin" if language is None else language
+
+        if form.is_valid():
+            city = form.cleaned_data['city']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+            guest_number = form.cleaned_data['guest_number']
+            language = form.cleaned_data['language']
+            keywords = form.cleaned_data['tags']
+
+    #template = loader.get_template('search_result.html')
 
     # Add all experiences that belong to the specified city to a new list
     # alongside a list with all the number of reviews
@@ -2205,7 +2228,9 @@ def ByCityExperienceListView(request, city, start_date=datetime.utcnow().replace
     formattedTitleList = []
     BGImageURLList = []
     profileImageURLList = []
-    cityList= ['Melbourne','Sydney']
+    cityList= [('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
+            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),('GRSA', 'Greater region, SA'),
+            ('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD')]
 
     i = 0
     while i < len(experienceList):
@@ -2218,9 +2243,42 @@ def ByCityExperienceListView(request, city, start_date=datetime.utcnow().replace
             elif experience.guest_number_min <= 4:
                 experience.price = dp[4-experience.guest_number_min]
 
-        if experience.start_datetime > end_date or experience.end_datetime < start_date :
+        if start_date is not None and experience.end_datetime < start_date :
             i += 1
             continue
+
+        if end_date is not None and experience.start_datetime > end_date:
+            i += 1
+            continue
+
+        if guest_number is not None and len(guest_number) > 0 and experience.guest_number_max < int(guest_number):
+            i += 1
+            continue
+
+        if keywords is not None:
+            experience_tags = experience.tags.split(",") if experience.tags is not None else ''
+            tags = keywords.split(",")
+            match = False
+            for tag in tags:
+                if tag in experience_tags:
+                    match = True
+                    break
+            if not match:
+                i += 1
+                continue
+
+        if language is not None:
+            experience_language = experience.language.split(";") if experience.language is not None else ''
+            experience_language = [x.lower() for x in experience_language]
+            languages = language.split(",")
+            match = False
+            for l in languages:
+                if l.lower() in experience_language:
+                    match = True
+                    break
+            if not match:
+                i += 1
+                continue
 
         if (experience.city.lower() == city.lower()):#dup
             rate = 0.0
@@ -2316,10 +2374,11 @@ def ByCityExperienceListView(request, city, start_date=datetime.utcnow().replace
 
     context = RequestContext(request, {
         'city' : city.title(),
+        'length':len(cityExperienceList),
         'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
         'cityList':cityList
         })
-    return HttpResponse(template.render(context))
+    return render_to_response('search_result.html', {'form': form}, context)
 
 def experiences(request):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)

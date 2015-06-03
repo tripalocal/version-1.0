@@ -301,7 +301,13 @@
                             </div>
                         </a>
                         <a href="/experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
-                        <div class="profile-sm"><img src="{% for h in related_experience.hosts.all %}{% if forloop.first %}{{ MEDIA_URL }}{{h.registereduser.image_url}}{% endif %}{% endfor %}" width="240" height="240"></div>
+                        <div class="profile-sm">
+							<img src="{% for h in related_experience.hosts.all %}
+							{% if forloop.first %}
+							{{ MEDIA_URL }}{% if h.registereduser.image_url %}{{h.registereduser.image_url}}{%else%}profile_default.jpg{% endif %}
+							{% endif %}
+							{% endfor %}" width="240" height="240">
+						</div>
           
                         <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
                         <div class="listingFooter">

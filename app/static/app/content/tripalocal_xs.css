@@ -1014,7 +1014,7 @@ body {
 .itinerary-return-button{color: white; background-color: transparent; border: 0px; padding-top: 10px; padding-bottom: 10px; padding-left: 30px;}
 #add_day_1_div .data-icon{margin-top: 25px; margin-left: 0px;}
 #add_day_1_div .date-exp{color: #676767; margin-left: -5px; padding-top: 30px;}
-#destination_city_1{display:inline-block;float:left;margin-left: 60px;border: solid 1px #676767;border-radius: 2px;top: -15px;position: relative;width: 300px;text-align: center;}
+.destination_city{display:inline-block;float:left;margin-left: 60px;border: solid 1px #676767;border-radius: 2px;top: -15px;position: relative;width: 300px;text-align: center;}
 #id_start_datetime_picker_day_1{float:left;width:150px;margin-left: 80px;padding-right: 10px;}
 #guest_number_div .people{margin-top: 30px;}
 #guest_number_div .people-exp{color: #676767; margin-left: -5px; padding-top: 30px;}
@@ -1240,7 +1240,7 @@ body {
     background-image: url(/images/icons.png);
     width: 27px;
     height: 27px;
-    background-size: 135px 135px;
+    background-size: 210px 210px;
     background-position: -27px 0px;
     position: relative;
     left:21px;
@@ -1250,7 +1250,7 @@ body {
     background-image: url(/images/icons.png);
     width: 27px;
     height: 27px;
-    background-size: 135px 135px;
+    background-size: 210px 210px;
     background-position: 0px 0px;
     position: relative;
     left:15px;
@@ -1260,7 +1260,7 @@ body {
 	background-image: url(/images/icons.png);
     width: 27px;
     height: 27px;
-    background-size: 135px 135px;
+    background-size: 210px 210px;
     background-position: -81px -27px;
     position: relative;
     left:15px;
@@ -1270,7 +1270,7 @@ body {
 	background-image: url(/images/icons.png);
     width: 27px;
     height: 27px;
-    background-size: 135px 135px;
+    background-size: 210px 210px;
     background-position: 0px -27px;
     position: relative;
     left:15px;
@@ -1279,7 +1279,7 @@ body {
 .money-icon{background-image: url(/images/icons.png);
     width: 27px;
     height: 27px;
-    background-size: 135px 135px;
+    background-size: 210px 210px;
     background-position: -27px -27px;
     position: relative;
     left:15px;
@@ -1287,7 +1287,7 @@ body {
 .hour-icon{background-image: url(/images/icons.png);
     width: 27px;
     height: 27px;
-    background-size: 135px 135px;
+    background-size: 210px 210px;
     background-position: -54px 0px;
     position: relative;
     left:15px;

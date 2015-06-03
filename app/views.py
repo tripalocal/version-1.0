@@ -19,7 +19,7 @@ from django.contrib import messages
 import string, random, pytz, base64, subprocess, os, geoip2.database, PIL
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
-from experiences.views import ByCityExperienceListView, saveProfileImage
+from experiences.views import SearchView, saveProfileImage
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment
 from django.core.files.uploadedfile import SimpleUploadedFile, File
@@ -47,18 +47,18 @@ def home(request):
         if form.is_valid():
             if len(form.data['start_date']):
                 if len(form.data['end_date']):
-                    return ByCityExperienceListView(request, form.data['city'], 
+                    return SearchView(request, form.data['city'], 
                                              start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")), 
                                              end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
                 else:
-                    return ByCityExperienceListView(request, form.data['city'], 
+                    return SearchView(request, form.data['city'], 
                                              start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")))    
 
             if len(form.data['end_date']):       
-                return ByCityExperienceListView(request, form.data['city'], 
+                return SearchView(request, form.data['city'], 
                                              end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
             else:
-                return ByCityExperienceListView(request, form.data['city'])
+                return SearchView(request, form.data['city'])
 
             #mp = Mixpanel(settings.MIXPANEL_TOKEN)
             #try: 

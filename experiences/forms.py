@@ -20,11 +20,13 @@ import geoip2.database
 from os import path
 from post_office import mail
 
-Type = (('SEE', 'See'),('DO', 'Do'),('EAT', 'Eat'),)
+Type = (('PRIVATE', 'Private'),('NONPRIVATE', 'NonPrivate'),('RECOMMENDED', 'Recommended'),)
 
-Location = (('Melbourne', 'Melbourne - VIC'),('Sydney', 'Sydney - NSW'),('Brisbane', 'Brisbane - QLD'),('Cairns','Cairns - QLD'),('Goldcoast','Gold coast - QLD'),('Hobart','Hobart - TAS'),) #('Adelaide', 'Adelaide - WA'),
+Location = (('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
+            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),('GRSA', 'Greater region, SA'),
+            ('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD'),)
 
-Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),('english;translation','English+Chinese translation'),)
+Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),)#('english;translation','English+Chinese translation'),
 
 Repeat_Cycle = (('Weekly', 'Weekly'), ('Daily', 'Daily'), ('Monthly', 'Monthly'),)
 
@@ -41,7 +43,9 @@ Duration = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('
 
 Included = (('Yes', ''),('No', ''),)
 
-Suburbs = (('Melbourne', 'Melbourne - VIC'),('Sydney', 'Sydney - NSW'),('Brisbane', 'Brisbane - QLD'),('Cairns','Cairns - QLD'),('Goldcoast','Gold coast - QLD'),('Hobart','Hobart - TAS'),) #('Adelaide', 'Adelaide - WA'),
+Suburbs = (('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
+            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),('GRSA', 'Greater region, SA'),
+            ('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD'),)
 
 Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghanistan'),('Albania', 'Albania'),('Algeria', 'Algeria'),('Andorra', 'Andorra'),('Angola', 'Angola'),('Antigua and Barbuda', 'Antigua and Barbuda'),('Argentina', 'Argentina'),('Armenia', 'Armenia'),('Aruba', 'Aruba'),('Austria', 'Austria'),('Azerbaijan', 'Azerbaijan'),('Bahamas', 'Bahamas'),('Bahrain', 'Bahrain'),('Bangladesh', 'Bangladesh'),('Barbados', 'Barbados'),('Belarus', 'Belarus'),('Belgium', 'Belgium'),('Belize', 'Belize'),('Benin', 'Benin'),('Bhutan', 'Bhutan'),('Bolivia', 'Bolivia'),('Bosnia and Herzegovina', 'Bosnia and Herzegovina'),('Botswana', 'Botswana'),('Brazil', 'Brazil'),('Brunei ', 'Brunei '),('Bulgaria', 'Bulgaria'),('Burkina Faso', 'Burkina Faso'),
 ('Burma', 'Burma'),('Burundi', 'Burundi'),('Cambodia', 'Cambodia'),('Cameroon', 'Cameroon'),('Canada', 'Canada'),('Cape Verde', 'Cape Verde'),('Central African Republic', 'Central African Republic'),('Chad', 'Chad'),('Chile', 'Chile'),('Colombia', 'Colombia'),('Comoros', 'Comoros'),('Congo, Democratic Republic of the', 'Congo, Democratic Republic of the'),('Congo, Republic of the', 'Congo, Republic of the'),('Costa Rica', 'Costa Rica'),('Cote dIvoire', 'Cote dIvoire'),('Croatia', 'Croatia'),('Cuba', 'Cuba'),('Curacao', 'Curacao'),('Cyprus', 'Cyprus'),('Czech Republic', 'Czech Republic'),('Denmark', 'Denmark'),('Djibouti', 'Djibouti'),('Dominica', 'Dominica'),('Dominican Republic', 'Dominican Republic'),
@@ -69,7 +73,6 @@ class HorizRadioRenderer(forms.RadioSelect.renderer):
 
 class ExperienceForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)
-    type = forms.ChoiceField(choices=Type, required=False)
     title = forms.CharField(max_length=100, required=False)
     duration = forms.ChoiceField(choices=Duration, required=False)
     location = forms.ChoiceField(choices=Location, required=False)
@@ -79,8 +82,6 @@ class ExperienceForm(forms.Form):
         super(ExperienceForm, self).__init__(*args, **kwargs)
         self.fields['id'].widget.attrs['readonly'] = True
         self.fields['id'].widget = forms.HiddenInput()
-        self.fields['type'].widget.attrs['readonly'] = True
-        self.fields['type'].widget = forms.HiddenInput()
         self.fields['changed_steps'].widget.attrs['readonly'] = True
         self.fields['changed_steps'].widget = forms.HiddenInput()
 
@@ -183,6 +184,7 @@ class ExperiencePriceForm(forms.Form):
     duration = forms.ChoiceField(required=False, choices=Duration)
     min_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Min)
     max_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Max)
+    type = forms.ChoiceField(choices=Type, required=False)
     price = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     price_with_booking_fee = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     dynamic_price = forms.CharField(max_length=100, required=False)
@@ -191,6 +193,8 @@ class ExperiencePriceForm(forms.Form):
         super(ExperiencePriceForm, self).__init__(*args, **kwargs)
         self.fields['id'].widget.attrs['readonly'] = True
         self.fields['id'].widget = forms.HiddenInput()
+        self.fields['type'].widget.attrs['readonly'] = True
+        self.fields['type'].widget = forms.HiddenInput()
         self.fields['dynamic_price'].widget.attrs['readonly'] = True
         self.fields['dynamic_price'].widget = forms.HiddenInput()
         self.fields['changed_steps'].widget.attrs['readonly'] = True
@@ -1307,3 +1311,21 @@ class ItineraryBookingForm(forms.Form):
                          payment_street1,payment_street2,payment_city,payment_state,payment_country,payment_postcode,payment_phone_number)
 
         return cleaned
+
+class SearchForm(forms.Form):
+    start_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    end_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    guest_number = forms.ChoiceField(choices=Guest_Number_Min, required=False)
+    city = forms.ChoiceField(choices=Location,  required=True)
+    language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")
+    tags = forms.CharField(widget=forms.Textarea, required=False, initial=Tags)
+    all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
+
+    def __init__(self, *args, **kwargs):
+        super(SearchForm, self).__init__(*args, **kwargs)
+        self.fields['tags'].widget.attrs['readonly'] = True
+        self.fields['tags'].widget = forms.HiddenInput()
+        self.fields['all_tags'].widget.attrs['readonly'] = True
+        self.fields['all_tags'].widget = forms.HiddenInput()
+        self.fields['language'].widget.attrs['readonly'] = True
+        self.fields['language'].widget = forms.HiddenInput()

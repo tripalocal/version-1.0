@@ -27,12 +27,18 @@
                         <div class="data-icon"> 
                             <p class="date-exp">Dates</p>
                         </div>
-                        <select id="destination_city_1" style="display:inline-block;float:left;">
-                            <option value="Melbourne">Melbourne</option>
-                            <option value="Sydney">Sydney</option>
-                            <!--<option value="Brisbane">Brisbane</option>
-                            <option value="Adelaide">Adelaide</option>
-                            <option value="Tasmania">Tasmania</option>-->
+                        <select id="destination_city_1" class="destination_city">
+                            <option value="Melbourne">Melbourne, VIC</option>
+                            <option value="Sydney">Sydney, NSW</option>
+                            <option value="Brisbane">Brisbane, QLD</option>
+                            <option value="Cairns">Cairns, QLD</option>
+                            <option value="Goldcoast">Goldcoast, QLD</option>
+                            <option value="Adelaide">Adelaide, SA</option>
+                            <option value="Hobart">Hobart, TAS</option>
+                            <option value="GRVIC">Greater region, VIC</option>
+                            <option value="GRNSW">Greater region, NSW</option>
+                            <option value="GRQLD">Greater region, QLD</option>
+                            <option value="GRSA">Greater region, SA</option>
                         </select>
                         <div class="input-group date" id="id_start_datetime_picker_day_1" style="float:left;width:150px;">
                             <input class="form-control" id="id_start_datetime_day_1" name="start_datetime" type="text" value="">
@@ -65,7 +71,7 @@
                 <div id="guest_number_div" style="float:left;width:150px;">
                     <div class="people"> 
                         <p class="people-exp">People</p>
-                        <p class="people-descri">We offer private group only</p>
+                        <p class="people-descri">We offer private group</p>
                     </div>
                     {{form.guest_number}}
                 </div>
@@ -266,11 +272,17 @@
         new_div="<div id=\"add_day_" + id + "_div\">"+
                     "<button id=\"delete_day_button_" + id + "\" type=\"button\" style=\"float:left;width:75px;\">Delete</button>"+
                     "<select id=\"destination_city_" + id + "\" style=\"display:inline-block;float:left;\">"+
-                        "<option value=\"Melbourne\">Melbourne</option>"+
-                        "<option value=\"Sydney\">Sydney</option>"+
-                        //"<option value=\"Brisbane\">Brisbane</option>"+
-                        //"<option value=\"Adelaide\">Adelaide</option>"+
-                        //"<option value=\"Tasmania\">Tasmania</option>"+
+                        "<option value=\"Melbourne\">Melbourne, VIC</option>"+
+                        "<option value=\"Sydney\">Sydney, NSW</option>"+
+                        "<option value=\"Brisbane\">Brisbane, QLD</option>"+
+                        "<option value=\"Cairns\">Cairns, QLD</option>"+
+                        "<option value=\"Goldcoast\">Goldcoast, QLD</option>"+
+                        "<option value=\"Adelaide\">Adelaide, SA</option>"+
+                        "<option value=\"Hobart\">Hobart, TAS</option>"+
+                        "<option value=\"GRVIC\">Greater region, VIC</option>"+
+                        "<option value=\"GRNSW\">Greater region, NSW</option>"+
+                        "<option value=\"GRQLD\">Greater region, QLD</option>"+
+                        "<option value=\"GRSA\">Greater region, SA</option>"+
                     "</select>"+
                     "<div class=\"input-group date\" id=\"id_start_datetime_picker_day_" + id + "\" style=\"float:left;width:150px;\">"+
                         "<input class=\"form-control\" id=\"id_start_datetime_day_" + id + "\" name=\"start_datetime\" type=\"text\" value=\"\">"+
@@ -590,7 +602,7 @@
         $("#id_city").val("");
         for(i=1;$("#destination_city_"+i).length>0;i++)
         {
-            city = $("#destination_city_"+i+" option:selected").text();
+            city = $("#destination_city_"+i+" option:selected").val();
             start = new Date(Date.parse($("#id_start_datetime_day_"+i).val(),"YYYY-MM-DD"));
             end = new Date(Date.parse($("#id_end_datetime_day_"+i).val(),"YYYY-MM-DD"));
 

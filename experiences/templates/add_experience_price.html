@@ -81,8 +81,17 @@
                 <p id="group-size-min">Min</p>
                 {{ wizard.form.max_guest_number }}
                 <p id="group-size-max">Max</p>
+                <br><br><br>
+                <div style="color:#999999;">
+                    {{wizard.form.type}}
+                    {% if wizard.form.type.0.value != "NONPRIVATE"%}
+                    <input type="checkbox" id="experience_type" value="PRIVATE">This is a non-private tour
+                    {% else %}
+                    <input type="checkbox" id="experience_type" value="NONPRIVATE" checked>This is a non-private tour
+                    {% endif %}
+                </div>
             </div>
-            <br><br><br><br>
+            <br><br><br>
             <div id="price-section">
                 <div class="float-left"> 
                     <p id="customers-pay">Customers pay</p>
@@ -519,6 +528,7 @@
         e.preventDefault();
         if(updateprice())
         {
+            $("#id_price-type").val($("#experience_type").val());
             $("#add_experience_price_form").submit();
         }
     })
@@ -527,6 +537,7 @@
     {
         if(updateprice())
         {
+            $("#id_price-type").val($("#experience_type").val());
             $("#add_experience_price_form").submit();
         }
         else
@@ -539,6 +550,7 @@
     {
         if(updateprice())
         {
+            $("#id_price-type").val($("#experience_type").val());
             $("#add_experience_price_form").submit();
         }
         else
@@ -546,6 +558,18 @@
             e.preventDefault();
         }
     })
-
+    $("#experience_type").click(function(e)
+    {
+        if($("#experience_type").val() != "PRIVATE")
+        {
+            $("#experience_type").val("PRIVATE");
+            $("#id_price-type").val("PRIVATE");
+        }
+        else
+        {
+            $("#experience_type").val("NONPRIVATE");
+            $("#id_price-type").val("NONPRIVATE");
+        }
+    })
 </script>
 {%endblock%}
