@@ -60,7 +60,7 @@
                                     <td class="time-exp"><strong>Time</strong></td>
                                     <td class="people-exp"></td>
                                 </tr>
-                                <hr/>
+                                <hr style="border-top:1px solid #FFF;">
 
                                 {% for op in available_options %}
                                     <p id="date_string_{{forloop.counter0}}" style="display:none" instant="{{op.instant_booking}}"> {{op.date_string}} </p> 
@@ -110,55 +110,61 @@
                                     </td>
                                 </tr>
                             </table>
-                            {% if user.is_authenticated %}
-                            <div style="border:1px solid grey;color:grey; margin-top:30px; height:60px;">
-                            {% if not in_wishlist %} 
+                            
+                            <div class="save_to_wishlist_button">
+                            {% if not in_wishlist %}
+                                {% if user.is_authenticated %}
                                 <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_not_added"></div>
+                                {% else %}
+                                <div id="save_to_wishlist_icon" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';" class="save_to_wishlist_not_added"></div>
+                                {%endif%}
                                 <div id="save_to_wishlist_description">
-                                    <h3 id="wishlist_head"><strong>Save to Wishlist</strong></h3>
+                                    <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;"><strong>Save to Wishlist</strong></h3>
                                     <p id="wishlist_p">Save now, plan later</p>
                                 </div>
                             {% else %}
                                 <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_added"></div>
                                 <div id="save_to_wishlist_description">
-                                    <h3 id="wishlist_head"><strong>Saved to Wishlist</strong></h3>
+                                    <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;"><strong>Saved to Wishlist</strong></h3>
                                     <p id="wishlist_p"></p>
                                 </div>
                             {% endif %}
                             </div>
-                            {% endif %}
                         </form>
                     </div>
                 </div>
             
         	    <div class="desBox">
+                    {% if experience.type == "RECOMMENDED" %}
+                    <div class="recommended-label"></div>
+                    {% endif %}
                     <h1>{{ experience.title }} with {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}
                     <br><small>{{experience.duration}} hrs &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small><hr>
                     </h1>
                     <table>
-                        <tr>
-                            <td style="width:100px;"><h3 style="color:grey">OverView<hr/></h3></td>
-                            <td style="padding-left:70px">
+                        <tr style="border-bottom:1px solid #CCCCCC;"> 
+                            <td style="width:100px;"><h3 style="color:grey">OverView</h3></td>
+                            <td class="experience-detail-table-td">
                                 {{ experience.description }}
                                 {{ experience.interaction }} 
-                               <hr/>
                             </td>
                         </tr>
-                        <tr>
-                            <td><h3 style="color:grey">Activities<hr/></h3></td>
-                            <td style="padding-left:70px">{{ experience.activity }}<hr/></td>
+                        <tr style="border-bottom:1px solid #CCCCCC;"> 
+                            <td><h3 style="color:grey">Activities</h3></td>
+                            <td class="experience-detail-table-td">{{ experience.activity }}</td>
                         </tr>
-                        <tr>
-                            <td><h3 style="color:grey">What to wear<hr/></h3></td>
-                            <td style="padding-left:70px">{{ experience.dress }}<hr/></td>
+                        <tr style="border-bottom:1px solid #CCCCCC;"> 
+                            <td><h3 style="color:grey">What to wear</h3></td>
+                            <td class="experience-detail-table-td">{{ experience.dress }}</td>
                         </tr>
 
                         {% for w in experience.whatsincluded_set.all %}
                         <tr>
                             <td id="{{w.item.lower}}"><h3 style="color:grey">{{w.item}}:</h3></td>
-                            <td style="padding-left:70px">{{w.details}}</td>  
+                            <td class="experience-detail-table-td">{{w.details}}</td>  
                         </tr>
                         {% endfor %}
+                        <tr style="border-bottom:1px solid #CCCCCC;height: 10px;"><td></td><td></td></tr>
                     </table> 
 
                     <div class="container">
@@ -204,16 +210,17 @@
         </div>
     </div>
 
-    <div class="experinence-host desBox" style="margin-right:30px;margin-top:40px">
+    {% if experience.type != "NONPRIVATE" %}
+    <div class="experinence-host desBox">
         <p>About the host, {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</p>
-        <div class="experience-hostintro">
+        <div id="experience-hostintro" class="experience-hostintro">
             <div class="experience-hostpic" style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;"></div>
-            <div class="experience-hostinterests">
+            <div id="experience-hostinterests" class="experience-hostinterests">
                 <span id="host_bio">{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.bio }} {% endif %} {% endfor %}</span>
             </div>
             {% for h in experience.hosts.all %}
-            {% if forloop.first and h.registereduser.bio|length > 100 %}
-            <div id="bio_show_more">+ More</div>
+            {% if forloop.first and h.registereduser.bio|length > 80 %}
+            <div id="bio_show_more" value="More">+ More</div>
             {% endif %}
             {% endfor %}
         </div>
@@ -245,7 +252,7 @@
             {% endfor %} 
         </div>
     </div>
-    <hr/>
+    {%endif%}
 
     <div class="container-fluid review">
         <div class="row">
@@ -284,7 +291,7 @@
 		</div>
     </div>
 
-    <div class="container-fluid also">
+    <div class="container-fluid also" style="border-top: 1px solid #CCCCCC; background-color:#FFF;">
     	<div class="row">
             <div class="fixCenter">
                 <div class="expBox">
@@ -311,10 +318,8 @@
           
                         <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
                         <div class="listingFooter">
-                            {% if user.is_authenticated %}
-                            <div id="save_to_wishlist_related_{{forloop.counter0}}" {%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
-                            {%endif%}
-                            <div>{{ related_experience.duration }} hrs &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
+                            <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
+                            <div style="padding-top: 5px; padding-left: 40px;">{{ related_experience.duration }} hrs &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
                         </div>
                     </div>
                     {% endif %}
@@ -339,8 +344,11 @@ $(function(){
         }
 
         bio = $("#host_bio").html();
-        bio = bio.replace(/(?:\r\n|\r|\n)/g, '<br />');
-        $("#host_bio").html(bio);
+        if(bio)
+        {
+            bio = bio.replace(/(?:\r\n|\r|\n)/g, '<br />');
+            $("#host_bio").html(bio);
+        }
 
         var i=0;
         for(; $("#id_date option").eq(i).length; i++)
@@ -449,7 +457,7 @@ $(function(){
                 user_id=parseInt($('#id_user_id').val());
                 experience_id=parseInt($('#related_experience_id_'+i).text());
 
-                if(typeof user_id === 'number' && typeof experience_id === 'number')
+                if(!isNaN(user_id) && typeof user_id === 'number' && !isNaN(experience_id) && typeof experience_id === 'number')
                 {
                     $.ajax({
                             type: 'POST',
@@ -582,7 +590,7 @@ $(function(){
         user_id=parseInt($('#id_user_id').val());
         experience_id=parseInt($('#id_experience_id').val());
 
-        if(typeof user_id === 'number' && typeof experience_id === 'number')
+        if(!isNaN(user_id) && typeof user_id === 'number' && !isNaN(experience_id) && typeof experience_id === 'number')
         {
             $.ajax({
                     type: 'POST',
@@ -627,6 +635,24 @@ $(function(){
                     }
             });
         }
+    });
+
+    $("#bio_show_more").click(function(){
+        if($("#bio_show_more").attr("value") == "More")
+        {
+            bio_height = $("#host_bio").height();
+            $("#bio_show_more").attr("value", "Less");
+            $("#bio_show_more").text("- Less");
+        }
+        else
+        {
+            bio_height = 110;
+            $("#bio_show_more").attr("value", "More");
+            $("#bio_show_more").text("+ More");
+        }
+        $("#experience-hostinterests").height(bio_height+10);
+        $("#experience-hostintro").height(bio_height+50);
+        $("#bio_show_more").css("top",bio_height+20+"px");
     })
 </script>
 {% endblock %}

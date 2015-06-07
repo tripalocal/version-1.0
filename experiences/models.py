@@ -42,7 +42,8 @@ class Experience(models.Model):
     def __str__(self):
         t = self.title if self.title != None else ''
         s = self.status if self.status != None else ''
-        return str(self.id) + '--' + t + '--' + s
+        c = self.city if self.city != None else ''
+        return str(self.id) + '--' + t + '--' + s + '--' + c
 
     class Meta:
         ordering = ['id']

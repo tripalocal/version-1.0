@@ -50,19 +50,18 @@
                         {{form.language}} 
                         <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
                         <br> 
-                        <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan">中文</label> 
+                        <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:10px;">中文</label> 
                     </div>
                     <div class="vertical-bar"></div>
-                    <div id="more-filters-button">
-                        <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters">More Filters</button>
-                        <input class="btn-block btn btn-default" id="itinerary-search" type="submit" value="Search" name="Search">
+                    <div id="search-search-button">
+                        <input class="btn-block btn btn-default" style="padding-bottom:25px; width:100px;" id="itinerary-search" type="submit" value="Search" name="Search">
                     </div>
                     <div id="itinerary-search-button">
                     </div>
                 </div>
                 <div id="optional_criteria_div" style="display:none;">
                     <div id="optional_criteria_container">
-                        <div class="interests-icon" style="float:left;margin-top: 20px;margin-right: 25px;">
+                        <div class="interests-icon">
                             <p class="interests-exp">Interests</p>
                         </div>
 
@@ -79,8 +78,9 @@
     <div class="container-fluid searchresult">
     	<div class="row">
             <div class="fixCenter">
-                <div style="margin-top:10px;padding-right:20px;text-align:right;width:100%;">
-                {{length}} Experiences &#8226; {{city}}
+                <div id="more-filters-div">
+                    <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:150px;float:left;">More Filters</button>
+                    <label style="float:right;">{{length}} Experiences &#8226; {{city_display_name}}</label>
                 </div>
                 <div class="expBox">
                     <!-- Each Individual Experiene Listing -->
@@ -150,7 +150,7 @@
         tags = $("#id_tags").val().split(",");
         for(i=0;i<all_tags.length>0;i++)
         {
-            if($.inArray(all_tags[i], tags)<0)
+            if($("#id_tags").val().length>0 && tags.length>0 && $.inArray(all_tags[i], tags)<0)
             {
                 new_tag = "<div class=\"tag-box\"><label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10003</button></div>";
             }

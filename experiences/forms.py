@@ -23,8 +23,8 @@ from post_office import mail
 Type = (('PRIVATE', 'Private'),('NONPRIVATE', 'NonPrivate'),('RECOMMENDED', 'Recommended'),)
 
 Location = (('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
-            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),('GRSA', 'Greater region, SA'),
-            ('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD'),)
+            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),)#('GRSA', 'Greater region, SA'),
+            #('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD'),
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),)#('english;translation','English+Chinese translation'),
 
@@ -75,7 +75,7 @@ class ExperienceForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)
     title = forms.CharField(max_length=100, required=False)
     duration = forms.ChoiceField(choices=Duration, required=False)
-    location = forms.ChoiceField(choices=Location, required=False)
+    location = forms.ChoiceField(choices=Suburbs, required=False)
     changed_steps = forms.CharField(max_length=100, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -450,6 +450,30 @@ class CCExpField(forms.MultiValueField):
             return date(year, month, day)
         return None
 
+def check_coupon(coupon, experience, guest_number):
+
+    rules = json.loads(coupon.rules)
+    if not coupon.rules or not coupon.rules.strip():
+        result = {"valid":True}
+        return result
+
+    if "ids" in rules and experience.id not in rules["ids"]:
+        result = {"valid":False,"error":"the coupon cannot be used on this experience -- id"}
+        return result
+
+    if "group_size" in rules and (guest_number % rules["group_size"] != 0):
+        result = {"valid":False,"error":"the coupon cannot be used on this experience -- group size"}
+        return result
+
+    bks = Booking.objects.filter(experience_id=experience.id, coupon_id=coupon.id).exclude(status__iexact="rejected")
+    bks_t = len(bks) if bks is not None else 0
+    if "times" in rules and bks_t >= rules["times"]:
+        result = {"valid":False,"error":"the coupon cannot be used on this experience -- times"}
+        return result
+
+    result = {"valid":True}
+    return result
+
 class BookingConfirmationForm(forms.Form):
     user_id = forms.CharField()
     experience_id = forms.CharField()
@@ -516,18 +540,15 @@ class BookingConfirmationForm(forms.Form):
                                        start_datetime__lt = datetime.utcnow().replace(tzinfo=pytz.UTC))
 
             if len(cp)>0:
-                rules = json.loads(cp[0].rules)
-                #check if the coupon can be used on this experience
-                if (not "ids" in rules) or experience.id in rules["ids"]:
-                    if (not "group_size" in rules) or (int(self.cleaned_data["guest_number"]) % rules["group_size"] == 0):
-                        if type(rules["extra_fee"]) == int or type(rules["extra_fee"]) == float:
-                            extra_fee = rules["extra_fee"]
-                        elif type(rules["extra_fee"]) == str and rules["extra_fee"]== "FREE":
-                            free = True
-                    else:
-                        raise forms.ValidationError("Error: the coupon cannot be used on this experience -- group size")
+                valid = check_coupon(cp[0], experience, self.cleaned_data['guest_number'])
+                if valid['valid']:
+                    rules = json.loads(cp[0].rules)
+                    if type(rules["extra_fee"]) == int or type(rules["extra_fee"]) == float:
+                        extra_fee = rules["extra_fee"]
+                    elif type(rules["extra_fee"]) == str and rules["extra_fee"]== "FREE":
+                        free = True
                 else:
-                    raise forms.ValidationError("Error: the coupon cannot be used on this experience -- id")
+                    raise forms.ValidationError(valid['error'])
 
             if not free:
                 guest_number = int(self.cleaned_data["guest_number"])

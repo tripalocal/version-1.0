@@ -1591,14 +1591,12 @@ def experience_booking_confirmation(request):
                 coupon = Coupon()
                 wrong_promo_code = True
             else:
-                #check if the coupon can be used on this experience
-                if not coupons[0].rules or not coupons[0].rules.strip():
-                    coupon = coupons[0]
-                elif (not "ids" in json.loads(coupons[0].rules)) or experience.id in json.loads(coupons[0].rules)["ids"]:
-                    coupon = coupons[0]
-                else:
+                valid = check_coupon(coupons[0], experience, form.data['guest_number'])
+                if not valid['valid']:
                     coupon = Coupon()
                     wrong_promo_code = True
+                else:
+                    coupon = coupons[0]
 
             mp = Mixpanel(settings.MIXPANEL_TOKEN)
             mp.track(request.user.email, 'Clicked on "Refresh"')
@@ -2229,8 +2227,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     BGImageURLList = []
     profileImageURLList = []
     cityList= [('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
-            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),('GRSA', 'Greater region, SA'),
-            ('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD')]
+            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA')]#,('GRSA', 'Greater region, SA'),
+            #('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD')
 
     i = 0
     while i < len(experienceList):
@@ -2255,8 +2253,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             i += 1
             continue
 
-        if keywords is not None:
-            experience_tags = experience.tags.split(",") if experience.tags is not None else ''
+        if keywords is not None and len(keywords) > 0 and experience.tags is not None and len(experience.tags) > 0:
+            experience_tags = experience.tags.split(",")
             tags = keywords.split(",")
             match = False
             for tag in tags:
@@ -2267,8 +2265,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 i += 1
                 continue
 
-        if language is not None:
-            experience_language = experience.language.split(";") if experience.language is not None else ''
+        if language is not None and len(language) > 0 and experience.language is not None and len(experience.language) > 0:
+            experience_language = experience.language.split(";")
             experience_language = [x.lower() for x in experience_language]
             languages = language.split(",")
             match = False
@@ -2359,8 +2357,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             else:
                 profileImageURLList.insert(counter, "profile_default.jpg")
             # Format title & Description
-            if (experience.title != None and len(experience.title) > 50):
-                formattedTitleList.insert(counter, experience.title[:47] + "...")
+            if (experience.title != None and len(experience.title) > 40):
+                formattedTitleList.insert(counter, experience.title[:37] + "...")
             else:
                 formattedTitleList.insert(counter, experience.title)
         i += 1
@@ -2372,8 +2370,13 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     else:
         mp.track("","Viewed " + city.title() + " search page");
 
+    for i in range(len(cityList)):
+        if cityList[i][0] == city.title():
+            city_display_name = cityList[i][1]
+
     context = RequestContext(request, {
         'city' : city.title(),
+        'city_display_name':city_display_name if city_display_name is not None else city.title(),
         'length':len(cityExperienceList),
         'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
         'cityList':cityList

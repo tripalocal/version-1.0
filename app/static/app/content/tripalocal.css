@@ -20,10 +20,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', end
 .experienceImg { background-size: cover; background-position:center; height:400px; background-color:#CCC;}
 .experience {background-color:#f7f7f7; border-bottom:#CCC 1px solid;}
 .fixCenter {width:960px; margin:auto;}
-.bookingBox {background-color:#fff;border:#CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 5px;border-radius: 5px; width:300px; float:left; padding:20px; text-align:center;}
+.bookingBox {background-color:#fff;border:#CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 2px;border-radius: 5px; width:300px; float:left; padding:20px; text-align:center; color: #666666;}
 .bookingBox .profile-lg {margin-top: -140px;}
 .bookingBox .profile-lg img{margin-left:1px;}
-.bookingBox span{float: left;font-size: 36px;font-weight: bold;line-height: 1;left: 50px;position: relative;}
+.bookingBox span{float: left;font-size: 36px;font-weight: bold;line-height: 1;left: 40px;position: relative;top: 3px;}
 .bookingBox .row{text-align:center; margin:20px 0px;}
 
 .checkoutBox {width:560px; background-color:#FFF; border:#CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 5px;border-radius: 5px; padding:15px;}

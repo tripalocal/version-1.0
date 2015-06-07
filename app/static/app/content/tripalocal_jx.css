@@ -284,10 +284,6 @@ a{
     color: #666666;
     font-size: 14px;
 }
-.booking-exp{
-    width: 100%;
-    height: 50px;
-}
 .booking-form tr{
     top: -10px;
     position: relative;
@@ -354,21 +350,6 @@ a{
     left:15px;
     margin-bottom:-10px;
 }*/
-#save_to_wishlist_icon {
-    position:relative;
-    float:left;
-    left:30px;
-    top:0px;
-    background-image:url(/images/icons.png);
-    height:54px;
-    width:54px;
-}
-.save_to_wishlist_not_added {
-    background-position: -216px 0px;
-}
-.save_to_wishlist_added {
-    background-position: -216px -54px;
-}
 #save_to_wishlist_description {
     position:relative;
     float:left;
@@ -378,9 +359,6 @@ a{
 #wishlist_head {
     margin:0px;
     text-align:justify;
-}
-#wishlist_p {
-    font-size:12px;
 }
 .bookingform-box{
     width: 250px;
@@ -469,10 +447,11 @@ a{
 }
 .experinence-host{
     width: 58.68vw;
-    height: 55vh;
     background: white;
     border: 1px solid #cccccc;
     border-radius: 3px;
+    margin-top:40px;
+    position:relative;
 }
 .experinence-host p {
     font-size: 20px;
@@ -486,7 +465,7 @@ a{
 }
 .experience-hostintro{
     width: 48.68vw;
-    height: 45%;
+    height: 160px;
     margin-top: 3vh;
     margin-left: 3vw;
     margin-right: 3vw;
@@ -538,7 +517,7 @@ a{
 }
 .experience-hostinterests{
     width:35vw;
-    height: 80%;
+    height: 110px;
     position:relative;
     float: right;
     overflow: hidden;
@@ -554,7 +533,7 @@ a{
 }
 #bio_show_more {
     position:relative;
-    top:90%;
+    top:130px;
     left:50px;
     color:#3cc;
 }
@@ -574,7 +553,7 @@ a{
 }
 .host-facebook,.host-instagram,.host-mobile,.host-review{
     width: 180px;
-    height: 100px;
+    height: 80px;
     float: left;
     border-radius: 3px;
     margin: 0;
@@ -593,26 +572,6 @@ a{
 }
 .host-mobile{
     
-}
-.facebooklogo,.instagramlogo,.mobilelogo, .reviewlogo{
-    width: 90px;
-    height:90px;
-    margin: 0;
-    padding: 0;
-    float: left;
-    margin-right: 4px;
-}
-.facebooklogo{
-    background-image:url(/images/icons.png);
-    background-position: -270px 0px;
-}
-.mobilelogo{
-    background-image:url(/images/icons.png);
-    background-position: -270px -270px;
-}
-.reviewlogo {
-    background-image:url(/images/icons.png);
-    background-position: -270px -90px;
 }
 .review-number {
     font-size:16px;
@@ -639,22 +598,6 @@ a{
 .reviewBox h2{
     top: -8px;
     position: relative;
-}
-.saved_to_wishlist_related {
-    position:relative;
-    float:left;
-    width:36px;
-    height:36px;
-    background-image:url(/images/icons.png);
-    background-position:-36px -234px;
-}
-.save_to_wishlist_related {
-    position:relative;
-    float:left;
-    width:36px;
-    height:36px;
-    background-image:url(/images/icons.png);
-    background-position:-72px -234px;
 }
  /*menu host section and traveler menu section */
 
