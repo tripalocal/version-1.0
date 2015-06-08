@@ -39,16 +39,16 @@
             <p id="id_email_error"></p>
 
             {% if 'email' in form.errors%}
-            <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
+            <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
                 <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
-                <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.email.errors.as_text}}</p>
+                <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.email.errors.as_text}}</p>
             </div>
             {%endif%}
             <p>{{ form.password1 }}</p>
             <p id="id_password1_error"></p>
 
             {% if 'password1' in form.errors%}
-            <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
+            <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
                 <table>
                     <tbody>
                         <tr>
@@ -56,7 +56,7 @@
                                 <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:0px; left:5px;">
                             </td>
                             <td>
-                                <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.password1.errors.as_text}}</p>
+                                <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.password1.errors.as_text}}</p>
                             </td>
                         </tr>
                     </tbody>
@@ -67,18 +67,18 @@
             <p id="first_name_error"></p>
 
             {% if 'first_name' in form.errors%}
-            <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
+            <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
                 <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
-                <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.first_name.errors.as_text}}</p>
+                <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.first_name.errors.as_text}}</p>
             </div>
             {%endif%}
             <p>{{ form.last_name }}</p>
             <p id="last_name_error"></p>
 
             {% if 'last_name' in form.errors%}
-            <div class="warning-sign" style="width:266px; display:inline-block; margin-bottom:8px">
+            <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
                 <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
-                <p style="display: inline-block; position:relative; top: 6px; left: 10px;">{{form.last_name.errors.as_text}}</p>
+                <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.last_name.errors.as_text}}</p>
             </div>
             {%endif%}
             {% if redirect_field_value %}
@@ -142,12 +142,30 @@ function checkInput(id_put, id_error)
 
 //validation firstname
     $("#id_first_name").blur(function(){
-        checkInput("id_first_name", "first_name_error"); 
+        var regexp = /^[a-zA-Z0-9-_.]+$/;
+        if($("#id_first_name").val().search(regexp) != -1)
+        {
+            checkInput("id_first_name", "first_name_error"); 
+        }
+        else
+        {
+            $("#first_name_error").text("Invalid first name");
+            return false;
+        }
     });
     
 //validate last name 
    $("#id_last_name").blur(function(){
-        checkInput("id_last_name", "last_name_error"); 
+        var regexp = /^[a-zA-Z0-9-_.]+$/;
+        if($("#id_last_name").val().search(regexp) != -1)
+        {
+            checkInput("id_last_name", "last_name_error");
+        }
+        else
+        {
+            $("#last_name_error").text("Invalid last name");
+            return false;
+        }
     });
 
 $(function()

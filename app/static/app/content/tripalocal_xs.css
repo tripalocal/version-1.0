@@ -1329,7 +1329,7 @@ body {
 	top: 5px;
 	left: 5px;
 }
-#id_login,#id_password,#id_email,#id_first_name,#id_last_name{  
+#id_login,#id_password,#id_password1,#id_email,#id_first_name,#id_last_name{  
     width:25vw;  
     height:34px;  
     border: 1px solid #cccccc;  

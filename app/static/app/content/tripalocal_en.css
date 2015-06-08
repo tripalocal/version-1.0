@@ -14,7 +14,7 @@
 }
 @media all and (max-width: 767px) {
 .jumbotron {background-image:url(/images/melbourne_s.jpg);}
-.tease-box{background-image:url(/images/exps.jpg);}
+.tease-box{background-image:url(/images/exps_s.jpg);}
 .support {background-image: url(/images/support_logos_s.jpg);}
 .homepage-logo{background-image:url(/images/tripalocal_hompage_logo_s.png);}
 .rev01{background-image:url(/images/rev01_s.jpg)}

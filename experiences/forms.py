@@ -839,15 +839,15 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
     new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
     new_alias.save()
 
-    with open('/etc/postfix/canonical', 'a') as f:
-        f.write(user.email + " " + new_email.id + "\n")
-        f.close()
+    #with open('/etc/postfix/canonical', 'a') as f:
+    #    f.write(user.email + " " + new_email.id + "\n")
+    #    f.close()
 
-    subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    #subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
     
-    with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
-        f.write(new_email.id + "\n")
-        f.close()
+    #with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+    #    f.write(new_email.id + "\n")
+    #    f.close()
 
     """get the client ip from the request
     """
@@ -869,7 +869,9 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
                 ip = proxies[0]
 
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP":ip})
+    mp.people_set(user.email, {"IP":ip, 
+                               "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
+                               })
 
     #rawdata = pygeoip.GeoIP(settings.PROJECT_ROOT + 'GeoLiteCity.dat')
     #data = rawdata.record_by_name(ip)

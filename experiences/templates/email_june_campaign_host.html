@@ -1,0 +1,41 @@
+{% block head %}
+    {% load i18n %}
+    {% load account %}
+    {% load url from future %}
+    {% load mathfilters %}
+
+    {% load staticfiles %}
+    <link href="{% static 'app/content/email.css' %}" rel="stylesheet">
+    {% if form %}
+        {{ form.media }}
+    {% endif %}
+    <title></title>
+{% endblock %}
+
+{% block content %}
+    <p>Hi {{host.first_name}},</p>
+    
+    <p>To assist in familiarising yourself with our platform prior to our upcoming campaigns in China, we are launching the following offering for the first 5 bookings you put through our platform:</p>
+
+    <p>- 10% discount off the listed price for each of the first 5 bookings in June<br>
+    - No commissions for us for those first 5 bookings in June</p>
+
+    <p>This way you can trial our platform with the greatest benefit to your bottom line. That means 10% discount and you get to keep the remain 90% all to yourself!</p>
+
+    <p>Your customers can use the coupon code <strong>greetjune</strong> to get 10% off, and you will receive the whole remaining amount for your following published experiences:</p>
+
+    <p>
+    {%for experience in experiences%}
+    {{experience}}<br>
+    {%endfor%}
+    </p>
+
+    <p>If you have other experiences you'd like to list, or if you’d like to edit existing published listings, here are some handy links for your convenience:</p>
+
+    <p>Update your profile image and bio here: https://www.tripalocal.com/myprofile/ <br>
+    Add new listing: https://www.tripalocal.com/addexperience/experience/ <br>
+    Manage your existing listings: https://www.tripalocal.com/mylisting/ </p>
+
+    <p>Cheers,<br>
+    Yiyi Wang</p>
+{% endblock %}

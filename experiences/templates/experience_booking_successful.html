@@ -178,3 +178,16 @@
         </table>
     </center>
 {% endblock %}
+
+{% block scripts %}
+<script charset="utf-8" type="text/javascript">
+
+    $(document).ready(function(){
+        mixpanel.track("Payment");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
+    })
+</script>
+{% endblock %}

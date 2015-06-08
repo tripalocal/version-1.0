@@ -118,6 +118,12 @@
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
     $(document).ready(function(){
+        mixpanel.track("Search");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
+
         $("#id_city").addClass("destination_city");
         $("#id_city").val("{{city}}");
 

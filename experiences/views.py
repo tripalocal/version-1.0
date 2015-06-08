@@ -582,7 +582,8 @@ class ExperienceDetailView(DetailView):
                            'time':form.data['time'],
                            'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),2),
                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
-                           'total_price': experience_fee_calculator(subtotal_price)
+                           'total_price': experience_fee_calculator(subtotal_price),
+                           'user_email':request.user.email
                            })
 
     def get_context_data(self, **kwargs):
@@ -1657,12 +1658,12 @@ def saveProfileImage(user, profile, image_file):
     name, extension = os.path.splitext(image_file.name)
     extension = extension.lower();
     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
-        filename = 'host' + str(user.id) + '_1_' + user.first_name.title() + user.last_name[:1].title() + extension
+        filename = 'host' + str(user.id) + '_1_' + user.first_name.title().strip() + user.last_name[:1].title() + extension
         destination = open(dirname + filename, 'wb+')
         for chunk in image_file.chunks():              
             destination.write(chunk)
         destination.close()
-        profile.image_url = "hosts/" + str(user.id) + '/host' + str(user.id) + '_1_' + user.first_name.title() + user.last_name[:1].title() + extension
+        profile.image_url = "hosts/" + str(user.id) + '/host' + str(user.id) + '_1_' + user.first_name.title().strip() + user.last_name[:1].title() + extension
         profile.image = profile.image_url
         profile.save()
 
@@ -2379,7 +2380,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         'city_display_name':city_display_name if city_display_name is not None else city.title(),
         'length':len(cityExperienceList),
         'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
-        'cityList':cityList
+        'cityList':cityList,
+        'user_email':request.user.email if request.user.is_authenticated() else None
         })
     return render_to_response('search_result.html', {'form': form}, context)
 

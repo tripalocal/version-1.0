@@ -444,7 +444,13 @@ $(function(){
             }
         }
         
-        mixpanel.track("Viewed experience page");
+        mixpanel.track("Viewed experience page_en");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
+
+        mixpanel.track("Viewed experience");
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());

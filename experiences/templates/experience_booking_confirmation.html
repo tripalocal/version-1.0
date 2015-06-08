@@ -298,6 +298,12 @@
 
 $(function(){
     $(document).ready(function(){
+        mixpanel.track("Checkout");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
+
         $("#id_promo_code").attr("class", "form-control");
         $("#id_card_number").attr("class", "form-control");
         $("#id_expiration_0").attr("class", "btn btn-default dropdown-toggle");
