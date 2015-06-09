@@ -1539,7 +1539,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
 
         return HttpResponseRedirect("/mylisting")
 
-def experience_booking_successful(request, experience, guest_number, booking_datetime):
+def experience_booking_successful(request, experience, guest_number, booking_datetime, price_paid):
     if not request.user.is_authenticated():
         return HttpResponseRedirect("/accounts/login/")
     
@@ -1547,6 +1547,7 @@ def experience_booking_successful(request, experience, guest_number, booking_dat
     mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
 
     return render(request,'experience_booking_successful.html',{'experience': experience,
+                                                                    'price_paid':price_paid,
                                                                     'guest_number':guest_number,
                                                                     'booking_datetime':booking_datetime,
                                                                     'user':request.user,
@@ -1621,7 +1622,8 @@ def experience_booking_confirmation(request):
                 return experience_booking_successful(request, 
                                                      experience, 
                                                      int(form.data['guest_number']),
-                                                     datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"))
+                                                     datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
+                                                     form.cleaned_data['price_paid'])
             
             else:
                 return render_to_response('experience_booking_confirmation.html', {'form': form, 

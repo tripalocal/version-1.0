@@ -500,6 +500,7 @@ class BookingConfirmationForm(forms.Form):
 
     coupon_extra_information = forms.CharField(max_length=500, required=False)
     booking_extra_information = forms.BooleanField(required=False)
+    price_paid = forms.DecimalField(max_digits=6, decimal_places=2, required=False)
 
     def __init__(self, *args, **kwargs):
         super(BookingConfirmationForm, self).__init__(*args, **kwargs)
@@ -534,6 +535,7 @@ class BookingConfirmationForm(forms.Form):
 
             extra_fee = 0.00
             free = False
+            self.cleaned_data['price_paid'] = 0.0
 
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
                                        end_datetime__gt = datetime.utcnow().replace(tzinfo=pytz.UTC),
@@ -578,6 +580,7 @@ class BookingConfirmationForm(forms.Form):
                     payment = Payment()
                     #change price into cent
                     success, instance = payment.charge(int(price*100), card_number, exp_month, exp_year, cvv)
+                    self.cleaned_data['price_paid'] = price
                 else:
                     success = True
                     free = True
@@ -839,15 +842,15 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
     new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
     new_alias.save()
 
-    #with open('/etc/postfix/canonical', 'a') as f:
-    #    f.write(user.email + " " + new_email.id + "\n")
-    #    f.close()
+    with open('/etc/postfix/canonical', 'a') as f:
+        f.write(user.email + " " + new_email.id + "\n")
+        f.close()
 
-    #subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
     
-    #with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
-    #    f.write(new_email.id + "\n")
-    #    f.close()
+    with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+        f.write(new_email.id + "\n")
+        f.close()
 
     """get the client ip from the request
     """

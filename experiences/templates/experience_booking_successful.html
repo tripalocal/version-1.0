@@ -1,3 +1,5 @@
+{% extends "app/layout.html" %}
+
 {% block head %}
     {% load i18n %}
     {% load account %}
@@ -181,13 +183,34 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
-
     $(document).ready(function(){
+        $("#footer_div").hide();
+
         mixpanel.track("Payment");
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());
         }
+
+        id = (new Date()).toISOString()+Math.floor((Math.random() * 1000) + 1);
+        ga('require', 'ecommerce');
+        ga('ecommerce:addTransaction', {
+          'id': id,
+          'affiliation': '',
+          'revenue': '{{price_paid}}',
+          'shipping': '0',
+          'tax': '0'
+        });
+        ga('ecommerce:addItem', {
+          'id': id,
+          'name': '{{experience.title}}',
+          'sku': '{{experience.id}}',
+          'category': '',
+          'price': '{{experience.price}}-{{experience.dynamic_price}}',
+          'quantity': '{{guest_number}}'
+        });
+        ga('ecommerce:send');
+        ga('ecommerce:clear');
     })
 </script>
 {% endblock %}

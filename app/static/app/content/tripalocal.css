@@ -55,7 +55,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', end
 .desBox img{margin:15px 0px;width: 100%;height: auto;}
 
 .reviewBox h2{float:left; margin-right:20px;}
-.rating{color:#FC0; margin-top:12px; margin-bottom:20px;}
+.rating{color:#FC0; font-size:30px; margin-bottom:20px;}
 .reviewList{border-bottom:#CCC 1px solid; padding:20px 0px;overflow: hidden;	width: 100%;}
 .reviewText {float:right; width:480px;}
 .reviewDate{color:#999; margin-top:12px;}
