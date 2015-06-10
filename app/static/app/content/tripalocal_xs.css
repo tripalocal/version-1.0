@@ -1187,8 +1187,8 @@ body {
 	padding-left: 5px;
 	margin-right:5px;
 }
-/*
-#id_guest_number{
+
+.booking_form_people{
 	-webkit-appearance:none;
 	-moz-appearance:none;
 	text-align: -moz-left;
@@ -1196,7 +1196,7 @@ body {
 	background-position: 22px -1px;
 	width: 44px;
 	padding-left: 10px;
-}*/
+}
 .autosize-profile-img{
 	height: 140px;
 	width: 140px;
