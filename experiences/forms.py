@@ -33,6 +33,9 @@ Repeat_Cycle = (('Weekly', 'Weekly'), ('Daily', 'Daily'), ('Monthly', 'Monthly')
 Repeat_Frequency = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),
     ('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
+Guest_Number = (('1', '1 Guest'),('2', '2 Guests'),('3', '3 Guests'),('4', '4 Guests'),('5', '5 Guests'),
+                ('6', '6 Guests'),('7', '7 Guests'),('8', '8 Guests'),('9', '9 Guests'),('10', '10 Guests'),)
+
 Guest_Number_Min = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
 Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
@@ -1341,7 +1344,7 @@ class ItineraryBookingForm(forms.Form):
 class SearchForm(forms.Form):
     start_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     end_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    guest_number = forms.ChoiceField(choices=Guest_Number_Min, required=False)
+    guest_number = forms.ChoiceField(choices=Guest_Number, required=False)
     city = forms.ChoiceField(choices=Location,  required=True)
     language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")
     tags = forms.CharField(widget=forms.Textarea, required=False, initial=Tags)

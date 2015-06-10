@@ -8,79 +8,102 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'app/content/tripalocal_search.css' %}" rel="stylesheet">
     <title>Discover {{ city }}</title>
 {%endblock%}
 
-{% block content %}   
-    <div class="">
-        <form id="search_form" action="/s/melbourne/" method="post">
-            {% csrf_token %}
-
-            <div id="criteria_div">
-                <div id="mandatory_criteria_div">
-                    <div id="date_destination_div" style="float:left;width:390px;">
-                        <div id="add_day_1_div">
-                            <div class="data-icon"> 
-                                <p class="date-exp">Dates</p>
-                            </div>
+{% block content %} 
+    <form id="search_form" action="/s/melbourne/" method="post">
+        {% csrf_token %}
+        <div class="basicSearch">
+            <div class="row">
+                <div class="fixCenter">
+                    <div class="dates">
+                        <div class="iconHeader">
+                            <div class="iconImage" id="date"></div>
+                            <div class="iconText">Dates</div>
+                        </div> 
+                        <div class="formBoxes">
                             {{form.city}}
-                            <div class="input-group date" id="id_start_datetime_picker_day_1" style="float:left;width:150px;">
+                            <div class="input-group startDate">
                                 {{form.start_date}}
                             </div>
-                            <div class="input-group date" id="id_end_datetime_picker_day_1" style="float:left;width:150px;">
+                            <div class="input-group endDate">
                                 {{form.end_date}}
                             </div>
                         </div>
                     </div>
-                    <div class="vertical-bar"></div>
-                    <div id="guest_number_div" style="float:left;width:150px;">
-                        <div class="people"> 
-                            <p class="people-exp">People</p>
-                            <p class="people-descri">We offer private group</p>
+
+                    <div class="verticalBar">
+                    </div>
+                    <div class="people">
+                        <div class="iconHeader"> 
+                            <div class="iconImage" id="people">
+                            </div>
+                            <div class="iconText">People
+                            </div>
                         </div>
-                        {{form.guest_number}}
+                        <div class="formBoxes">{{form.guest_number}}
+                        </div>
                     </div>
-                    <div class="vertical-bar" style="margin-left:70px;"></div>
-                    <div id="language_div" style="float:left;">
-                        <div class="language-icon">
-                            <p class="language-exp">Language</p>
+
+                    <div class="verticalBar">
+                    </div>
+                
+                    <div class="language">
+                        <div class="iconHeader">
+                            <div class="iconImage" id="language">
+                            </div>
+                            <div class="iconText">Language
+                            </div>
                         </div> 
+
+                        <div class="formBoxes">
+                            {{form.language}} 
+                            <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
+                            <br> 
+                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:10px;">中文</label> 
+                        </div>
                     </div>
-                    <div class="language-choice-checkbox"> 
-                        {{form.language}} 
-                        <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
-                        <br> 
-                        <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:10px;">中文</label> 
+
+                    <div class="verticalBar">
                     </div>
-                    <div class="vertical-bar"></div>
-                    <div id="search-search-button">
+
+                    <div id="searchButton">
                         <input class="btn-block btn btn-default" style="padding-bottom:25px; width:100px;" id="itinerary-search" type="submit" value="Search" name="Search">
                     </div>
                     <div id="itinerary-search-button">
                     </div>
                 </div>
-                <div id="optional_criteria_div" style="display:none;">
-                    <div id="optional_criteria_container">
-                        <div class="interests-icon">
-                            <p class="interests-exp">Interests</p>
+            </div>
+        </div>
+        <div class="advanceSearch" id="optional_criteria_div" style="display:none;">
+            <div class="row">
+                <div class="fixCenter">
+                    <div class="interests">
+                        <div class="iconHeader">
+                            <div class="iconImage" id="interests">
+                            </div>
+                            <div class="iconText">Interests
+                            </div>
                         </div>
 
-                        <div id="tags_div">
+                        <div class="formBoxes" id="tags_div">
                             {{form.tags}}
                             {{form.all_tags}}
                         </div>
                     </div>
-                </div>
+                </div>      
             </div>
-        </form>
-    </div>
+        </div>  
+    </form>
 
     <div class="container-fluid searchresult">
     	<div class="row">
             <div class="fixCenter">
                 <div id="more-filters-div">
-                    <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:150px;float:left;">More Filters</button>
-                    <label style="float:right;">{{length}} Experiences &#8226; {{city_display_name}}</label>
+                    <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:100px;float:left;">More Filters</button>
+                    <label class="expCount">{{length}} Experiences &#8226; {{city_display_name}}</label>
                 </div>
                 <div class="expBox">
                     <!-- Each Individual Experiene Listing -->
@@ -94,7 +117,7 @@
                             </div>
                         </a>
                         <a href="/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
-                        <div class="profile-sm"><img src="{{MEDIA_URL}}{{profileImageURL}}" width="240" height="240"></div>
+                        <div class="profile-sm" style="background:url({{MEDIA_URL}}{{profileImageURL}}) no-repeat; background-size:cover; background-position:center;"></div>
           
                         <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
                         <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a> {{ experience.duration }} hrs &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
@@ -103,7 +126,7 @@
                     <div class="expList">
                         <div class="listingImg" style="background-image:url({{MEDIA_URL}}request.jpg);"></div>
                         <h3>Can't find the experience you Want?</h3>
-                        <div class="profile-sm"><img src="{{MEDIA_URL}}profile_default.jpg" width="240" height="240"></div>
+                        <div class="profile-sm" style="background:url({{MEDIA_URL}}profile_default.jpg) no-repeat; background-size:cover; background-position:center;"></div>
                         <p style="overflow-y:hidden; height:100px">Email us at <a href="mailto:enquiries@tripalocal.com">enquiries@tripalocal.com</a> with the preferred experience, the dates and times and we will get back to you within 48 hours with a customised experience just for you!</p>
                         <div class="listingFooter">We offer exclusive experiences with private groups</div>
                     </div>
@@ -124,7 +147,9 @@
             mixpanel.identify($("#user_email").val());
         }
 
-        $("#id_city").addClass("destination_city");
+        $("#id_guest_number").addClass("guestNumber");
+
+        $("#id_city").addClass("locationSelection");
         $("#id_city").val("{{city}}");
 
         language = $("#id_language").val().split(",");
@@ -158,11 +183,11 @@
         {
             if($("#id_tags").val().length>0 && tags.length>0 && $.inArray(all_tags[i], tags)<0)
             {
-                new_tag = "<div class=\"tag-box\"><label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10003</button></div>";
+                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-unselected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10003</button></div>";
             }
             else
             {
-                new_tag = "<div class=\"tag-box\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10007</button></div>";
+                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10007</button></div>";
             }
 
             $("#tags_div").append(new_tag);
@@ -173,14 +198,29 @@
                 {
                     $("#tag_button_"+id).html("&#10003");
                     $("#tag_"+id).attr("class", "tag-non-selected");
+                    $("#tag_box_"+id).removeClass("tag-box-selected");
+                    $("#tag_box_"+id).addClass("tag-box-unselected");
                 }
                 else
                 {
                     $("#tag_button_"+id).html("&#10007");
                     $("#tag_"+id).attr("class", "tag-selected");
+                    $("#tag_box_"+id).removeClass("tag-box-unselected");
+                    $("#tag_box_"+id).addClass("tag-box-selected");
                 }
             });
         }
+
+        $(".input-group-addon").attr("style","padding:0px; border:0px;");
+        $(".glyphicon-calendar").hide();
+
+        $("#id_start_date").click(function(){
+            $("#id_start_date_picker").data("DateTimePicker").show();  
+        });
+
+        $("#id_end_date").click(function(){  
+            $("#id_end_date_picker").data("DateTimePicker").show();  
+        }); 
     });
 
     $("#id_city").change(function(e){
@@ -221,12 +261,12 @@
         tags_div = $("#optional_criteria_div");
         if(tags_div.css("display")=="none")
         {
-            tags_div.css("display", "inline-block");
+            tags_div.show();
             $("#more_filters").text("Less Filters");
         }
         else
         {
-            tags_div.css("display", "none");
+            tags_div.hide();
             $("#more_filters").text("More Filters");
         }
     });

@@ -270,22 +270,36 @@
                 {% endif %}
 
                 {% for review in experience.review_set.all|dictsortreversed:"datetime" %}
-                {% if forloop.last == Flase %}
-                    <div class="reviewList">
-                {% else %}
-                    <div class="reviewList last">
+                {% if forloop.counter|mod:3 == 1 %}
+                    <div id="review_page_{{forloop.counter|div:3|add:1}}_div">
                 {% endif %}
-                {%if review.user.registereduser.image_url != None and review.user.registereduser.image_url != ''%}
-                        <div class="profile-md"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
-                {%else%}
-                        <div class="profile-md"><img src="{{ MEDIA_URL }}profile_default.jpg" width="240" height="240"></div>
-                {%endif%}
-                        <div class="reviewText">{{review.comment}}
-                            <div class="reviewDate">{{review.datetime|date:'d M Y'}}</div>
+                    {% if forloop.counter|mod:3 == 0 or forloop.last%}
+                        <div class="reviewList last">
+                    {% else %}
+                        <div class="reviewList">
+                    {% endif %}
+                        {%if review.user.registereduser.image_url != None and review.user.registereduser.image_url != ''%}
+                            <div class="profile-md"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
+                        {%else%}
+                            <div class="profile-md"><img src="{{ MEDIA_URL }}profile_default.jpg" width="240" height="240"></div>
+                        {%endif%}
+                            <div class="reviewText">{{review.comment}}
+                                <div class="reviewDate">{{review.datetime|date:'d M Y'}}</div>
+                            </div>
                         </div>
+                {% if forloop.counter|mod:3 == 0 or forloop.last%}
                     </div>
+                {% endif %}
                 {% endfor%}
-               
+                {% if experience.review_set.count > 3 %}
+                        <div class="review_paging_container">
+                {% for review in experience.review_set.all|dictsortreversed:"datetime" %}
+                    {% if forloop.counter|mod:3 == 1 %}
+                            <div id="review_page_{{forloop.counter|div:3|add:1}}" class="review_paging">{{forloop.counter|div:3|add:1}}</div>
+                    {% endif %}
+                {% endfor%}
+                        </div>
+                {% endif %}
                 </div>
     		</div>
 		</div>
@@ -505,6 +519,49 @@ $(function(){
                     });
                 }
             })
+        }
+
+        for(i=1;i<1000;i++)
+        {
+            if($("#review_page_"+i))
+            {
+                if(i!=1)
+                {
+                    $("#review_page_"+i+"_div").hide();
+                    $("#review_page_"+i).addClass("review_paging_other");
+                }
+                else
+                {
+                    $("#review_page_"+i).addClass("review_paging_current");
+                }
+                $("#review_page_"+i).click(function(e){
+                    id=e.target.id;
+                    j = id.split("_")[2];
+                    $("#review_page_"+j).removeClass("review_paging_other");
+                    $("#review_page_"+j).addClass("review_paging_current");
+                    $("#review_page_"+j+"_div").show();
+                    for(i=1;i<1000;i++)
+                    {
+                        if($("#review_page_"+i))
+                        {
+                            if(i!=j)
+                            {
+                                $("#review_page_"+i+"_div").hide();
+                                $("#review_page_"+i).removeClass("review_paging_current");
+                                $("#review_page_"+i).addClass("review_paging_other");
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                });
+            }
+            else
+            {
+                break;
+            }
         }
     })
 })

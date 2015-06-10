@@ -1,0 +1,50 @@
+﻿@charset "UTF-8";
+/* CSS Document */
+
+.navBox {border-bottom:1px #CCC solid;}
+.basicSearch {border-bottom:1px #CCC solid; color:#666;}
+.basicSearch .fixCenter{padding: 15px 0px; height:100px;}
+.advanceSearch {border-bottom:1px #CCC solid;}
+.advanceSearch .fixCenter{padding: 15px 0px; height:130px;}
+
+<!--basic search-->
+.dates {float:left;width:300px;}
+.people {float:left;width:220px}
+.language {float:left;width:220px}
+.iconHeader {float:left;width:60px;text-align: center;padding-top:10px;}
+.formBoxes {float:right}
+.dates .formBoxes{width:220px;float:left;margin-left:20px;}
+.people .formBoxes{width:140px;}
+.language .formBoxes{width:140px; padding-top:10px;}
+
+.iconImage{background-image: url(/images/icons.png);width: 27px;height: 27px;background-size: 210px 320px;margin-left:auto;margin-right:auto;}
+#date{background-position: -27px 0px; width:27px;}
+#people{background-position: -81px 0px;}
+#language{background-position: -81px -27px;}
+.iconText{margin-top:5px;}
+
+.locationSelection{color: #666;width: 210px;height: 30px;padding-left: 10px;-webkit-appearance: none;-moz-appearance: none;background: url(/images/dropdown-button.png) no-repeat;background-position: 181px 2px;  background-color: #FFF;  border-radius: 5px;float: left;
+border: solid 1px #ccc;  margin-bottom: 10px;}
+.startDate{float:left;width:100px;margin-right:10px;}
+.endDate{float:left;width:100px;}
+.guestNumber {  -webkit-appearance: none;  -moz-appearance: none;  text-align: -moz-left;  background: url(/images/dropdown-button.png) no-repeat;  background-position: 72px 3px;  width: 100px;  padding-left: 10px;  background-color: #fff;  height: 30px;  border-color: #ccc;  margin-top: 10px;
+}
+#language_English_label, #language_Mandarin_label{font-weight: normal;}
+
+.searchButton {margin-left: 15px;    margin-top: 15px;    float: left;}
+.verticalBar{width: 10px;  height: 70px;  border-left: 1px solid #ccc;  float: left;  margin-left: 10px;}
+
+<!--advance search-->
+.interests {float:left;width:720px;}
+#interests {background-position:0px -27px;}
+.interests .formBoxes {width:640px;float:left;margin-left:20px;}
+
+.tag-box {float: left; padding-left: 10px; padding-top: 3px; border-radius: 5px; margin-right: 5px; margin-bottom:5px; font-weight: normal; font-size:12px;}
+.tag-box .tag-selected{font-weight: normal;   text-transform: lowercase; }
+.tag-box .tag-non-selected{font-weight: normal;   text-transform: lowercase; }
+.tag-box-selected{border: 1px solid #ccc;background-color: white;}
+.tag-box-unselected{}
+
+<!--other stuff-->
+.bootstrap-datetimepicker-widget{  left: 320px;}
+.expCount{  float: right;  font-weight: normal;  margin-right: 20px;}

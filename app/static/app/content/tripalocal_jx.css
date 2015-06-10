@@ -502,12 +502,12 @@ a{
     margin-top: 10px;
 }
 .reviewText{
-    border-bottom: 1px solid #cccccc;
-    padding-bottom: 10px;
+/*    border-bottom: 1px solid #cccccc;
+    padding-bottom: 10px;*/
 }
 .experience-hostpic{
-    width: 10vw;
-    height: 10vw;
+    width: 140px;
+    height: 140px;
     background-repeat: no-repeat;
     background-size:100%;
     background-position:50%;
@@ -576,6 +576,28 @@ a{
 .review-number {
     font-size:16px;
     margin-left:2px;
+}
+.review_paging_container {
+    font-size:14px;
+    font-weight:bold;
+    margin-bottom:20px;
+    padding-left:120px;
+}
+.review_paging {
+    width: 30px;
+    height: 30px;
+    border: 1px #999 solid;
+    display: inline-block;
+    text-align: center;
+    padding:5px;
+    margin-right:10px;
+}
+.review_paging_other {
+    color: #3cc;
+    background:white;
+}
+.review_paging_current {
+    color: black;
 }
 .host-socialmedia .followerNumber,.host-socialmedia .contactNumber{
     /*color:white;*/

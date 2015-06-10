@@ -39,12 +39,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', end
 .icon{width:27px; height:27px; background-size: 135px 135px;}
 .bookingBox .icon{ margin:auto; margin:auto;}
 .col{text-align:center; float:left;}
-#people{width:47px;}
-#date{width:110px;}
-#time{width:100px;}
-#people .icon{background-position:0px 0px;}
-#date .icon{background-position:-27px 0px;}
-#time .icon{background-position:-54px 0px;}
+.bookingBox #people{width:47px;}
+.bookingBox #date{width:110px;}
+.bookingBox #time{width:100px;}
+.bookingBox #people .icon{background-position:0px 0px;}
+.bookingBox #date .icon{background-position:-27px 0px;}
+.bookingBox #time .icon{background-position:-54px 0px;}
 
 .desBox .icon{float:left; margin-right:15px;}
 #food .icon{background-position:0px -81px;}
@@ -107,7 +107,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', end
 input[type=checkbox] { margin: 2px 10px 0 0; float: left;}
 
 .signup_box {	max-height: 400px;	max-height: 80vh;	overflow-x: hidden;	overflow-y: auto;	-webkit-overflow-scrolling: touch;	-webkit-box-sizing: border-box;	margin-top: 20px;	margin-bottom: 10px;	margin-left: 15px;	margin-right: 15px;}
-.searchresult{background-color:#f7f7f7; border-top:#CCC 1px solid;padding-bottom: 50px;}
+.searchresult{background-color:#f7f7f7;padding-bottom: 50px;}
 .searchbar{background-color:#f7f7f7; border-top:#CCC 1px solid; padding:10px 0px 30px 0px;  background-size:cover;background-position: center;}
 .destination{width: 250px;margin: auto;}
 

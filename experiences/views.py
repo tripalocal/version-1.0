@@ -1568,6 +1568,7 @@ def experience_booking_confirmation(request):
 
         guest_number = int(form.data['guest_number'])
         subtotal_price = 0.0
+        experience_price = experience.price
         if experience.dynamic_price and type(experience.dynamic_price) == str:
             price = experience.dynamic_price.split(',')
             if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
@@ -1576,6 +1577,7 @@ def experience_booking_confirmation(request):
                     subtotal_price = float(experience.price) * float(experience.guest_number_min)
                 else:
                     subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
+                    experience_price = float(price[guest_number-experience.guest_number_min])
             else:
                 #wrong dynamic settings
                 subtotal_price = float(experience.price)*float(form.data['guest_number'])
@@ -1612,6 +1614,7 @@ def experience_booking_confirmation(request):
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),2),
+                                                                           'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': experience_fee_calculator(subtotal_price)}, context)
 
@@ -1634,6 +1637,7 @@ def experience_booking_confirmation(request):
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),2),
+                                                                           'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': experience_fee_calculator(subtotal_price)}, context)
     else:
