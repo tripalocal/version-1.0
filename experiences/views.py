@@ -163,7 +163,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
 
         host = experience.hosts.all()[0]
         exp_price = float(experience.price)
-        if experience.dynamic_price != None and len(experience.dynamic_price) > 0 :
+        if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
 
         experience_avail = {'id':experience.id, 'title': experience.title, 'meetup_spot':experience.meetup_spot, 'rate': rate, 'duration':experience.duration, 'city':experience.city, 'description':experience.description,
@@ -276,7 +276,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                     if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
                         i += experience.guest_number_max #change from bking.guest_number to experience.guest_number_max
 
-                if i==0: #< experience.guest_number_max :
+                if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
                     if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                         instant_booking = False
                         #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
@@ -486,9 +486,9 @@ def getAvailableOptions(experience, available_options, available_date):
                     i += bking.guest_number
                 #if someone book a 2pm experience, and the experience last 3 hours, the system should automatically wipe out the 3pm, 4pm and 5pm sessions 
                 if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
-                    i += experience.guest_number_max #change from bking.guest_number to experience.guest_number_max
+                    i += experience.guest_number_max
 
-            if i == 0: #< experience.guest_number_max :
+            if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
                 if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                     instant_booking = False
                     #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
@@ -1164,7 +1164,9 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             type = prev_data.get('type', None)
             price = prev_data['price'] if prev_data['price'] is not None else 0
             price_with_booking_fee = prev_data['price_with_booking_fee']
-            dynamic_price = prev_data['dynamic_price']
+            dp = prev_data['dynamic_price'].split(',') if prev_data['dynamic_price'] is not None else None
+            if dp is not None and len(dp) == max_guest_number - min_guest_number + 2:
+                dynamic_price = prev_data['dynamic_price']
             id=prev_data.get('id', None)
 
         summary = None #self.initial_dict['summary'] if 'summary' in self.initial_dict else None
@@ -1588,9 +1590,10 @@ def experience_booking_confirmation(request):
             #get coupon information
             wrong_promo_code = False
             code = form.data['promo_code']
+            bk_dt = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['date']+form.data['time'],"%Y-%m-%d%H:%M"))
             coupons = Coupon.objects.filter(promo_code__iexact = code,
-                                            end_datetime__gt = datetime.utcnow().replace(tzinfo=pytz.UTC),
-                                            start_datetime__lt = datetime.utcnow().replace(tzinfo=pytz.UTC))
+                                            end_datetime__gt = bk_dt,
+                                            start_datetime__lt = bk_dt)
             if not len(coupons):
                 coupon = Coupon()
                 wrong_promo_code = True
@@ -2241,7 +2244,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     while i < len(experienceList):
         experience = experienceList[i]
 
-        if experience.dynamic_price and len(experience.dynamic_price) > 0 and experience.guest_number_min < 4:
+        if experience.dynamic_price and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 and experience.guest_number_min < 4:
             dp = experience.dynamic_price.split(',')
             if experience.guest_number_max < 4 or experience.guest_number_max - experience.guest_number_min < 4:
                 experience.price = dp[len(dp)-2]#the string ends with ",", so the last one is ''
@@ -2377,9 +2380,11 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     else:
         mp.track("","Viewed " + city.title() + " search page");
 
+    city_display_name = None
     for i in range(len(cityList)):
         if cityList[i][0] == city.title():
             city_display_name = cityList[i][1]
+            break
 
     context = RequestContext(request, {
         'city' : city.title(),
@@ -2711,9 +2716,10 @@ def itinerary_booking_confirmation(request):
             #get coupon information
             wrong_promo_code = False
             code = form.data['promo_code']
+            bk_dt = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['date']+form.data['time'],"%Y-%m-%d%H:%M"))
             coupons = Coupon.objects.filter(promo_code__iexact = code,
-                                            end_datetime__gt = datetime.utcnow().replace(tzinfo=pytz.UTC),
-                                            start_datetime__lt = datetime.utcnow().replace(tzinfo=pytz.UTC))
+                                            end_datetime__gt = bk_dt,
+                                            start_datetime__lt = bk_dt)
             if not len(coupons):
                 coupon = Coupon()
                 wrong_promo_code = True

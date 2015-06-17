@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden
-import json, pytz, xlrd, re, os, subprocess, math
+import json, pytz, xlrd, re, os, subprocess, math, logging, ast
 from django.contrib.auth.models import User
 from datetime import *
 from app.models import RegisteredUser
@@ -310,8 +310,10 @@ def ajax_view(request):
     else:
         raise Http404
 
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
 def service_wishlist(request):
-    if request.is_ajax() and request.method == 'POST':
+    if request.method == 'POST': #request.is_ajax() and 
         try:
             user_id = int(request.POST['user_id'])
             experience_id = int(request.POST['experience_id'])
@@ -580,14 +582,17 @@ def service_acceptreservation(request, format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-#{"itinerary_string":[{"id":"1","date":"2015/04/17","time":"4:00 - 6:00","guest_number":"2"},{"id":"20","date":"2015/04/17","time":"17:00 - 20:00","guest_number":"2"}],"card_number":"4242424242424242","expiration_month":10,"expiration_year":2015,"cvv":123}
+#{"itinerary_string":[{"id":"20","date":"2015/04/17","time":"4:00 - 6:00","guest_number":2},{"id":"20","date":"2015/04/17","time":"17:00 - 20:00","guest_number":2}],"card_number":"4242424242424242","expiration_month":10,"expiration_year":2015,"cvv":123}
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication)) #
 @permission_classes((IsAuthenticated,))
 def service_booking(request, format=None):
     try:
         data = request.data
-        itinerary = data['itinerary_string']
+        if type(data) is str:
+            data = ast.literal_eval(data)
+
+        itinerary = data["itinerary_string"]
 
         booking_data = {}
         booking_data['user'] = request.user
@@ -613,7 +618,9 @@ def service_booking(request, format=None):
 
     except Exception as err:
         #TODO
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        logger = logging.getLogger("Tripalocal_V1")
+        logger.error(err.detail)
+        return Response(err.detail, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def service_experience(request, format=None):
@@ -653,6 +660,7 @@ def service_experience(request, format=None):
         
 
         return Response({'experience_title':experience.title,
+                         'experience_language':experience.language,
                          'experience_duration':experience.duration,
                          'experience_description':experience.description,
                          'experience_activity':experience.activity,
@@ -661,6 +669,8 @@ def service_experience(request, format=None):
                          'experience_meetup_spot':experience.meetup_spot,
                          'experience_price':experience.price,
                          'experience_dynamic_price':experience.dynamic_price,
+                         'experience_guest_number_min':experience.guest_number_min,
+                         'experience_guest_number_max':experience.guest_number_max,
 
                          'available_options':available_options,
                          'available_date':available_date,
@@ -722,13 +732,13 @@ def service_email(request, format=None):
         for i in range(len(hosts)):
             host = hosts[i]
             host.first_name = host.first_name.title()
-            mail.send(subject='Tripalocal - June coupon code', message='', 
-                      sender='Tripalocal <' + 'yiyi@tripalocal.com' + '>',
-                      recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                      priority='now',
-                      html_message=loader.render_to_string('email_june_campaign_host.html',
-                                                            {'experiences': exp_urls[i], 'host':host,
-                                                            }))
+            #mail.send(subject='Tripalocal - June coupon code', message='', 
+            #          sender='Tripalocal <' + 'yiyi@tripalocal.com' + '>',
+            #          recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+            #          priority='now',
+            #          html_message=loader.render_to_string('email_june_campaign_host.html',
+            #                                                {'experiences': exp_urls[i], 'host':host,
+            #                                                }))
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})

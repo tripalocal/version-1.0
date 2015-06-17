@@ -612,14 +612,17 @@ $(function(){
         }
 
         seat_left = parseInt($("#seat_left_"+i).text());
-/*
-        $("#id_guest_number").html('');
-        var i = parseInt($("#guest_number_min").attr("name"));
-        for(;i<=seat_left;i++)
+
+        if("{{experience.type}}"=="NONPRIVATE")
         {
-            $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
+            $("#id_guest_number").html('');
+            var i = parseInt($("#guest_number_min").attr("name"));
+            for(;i<=seat_left;i++)
+            {
+                $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
+            }
         }
-*/
+
         mixpanel.track("Changed time");
         if($("#user_email").val())
         {

@@ -1072,16 +1072,21 @@ class ItineraryBookingForm(forms.Form):
         self.fields['itinerary_string'].widget.attrs['readonly'] = True
         self.fields['itinerary_string'].widget = forms.HiddenInput()
 
+    #TODO
     def booking(self,ids,dates,times,user,guest_number,
                 card_number,exp_month,exp_year,cvv,
                 booking_extra_information=None,coupon_extra_information=None,coupon=None,
                 payment_street1=None,payment_street2=None,payment_city=None,
                 payment_state=None,payment_country=None,payment_postcode=None,payment_phone_number=None):
 
-        extra_fee = 0.00
-        free = False
-
         for i in range(len(ids)):
+            extra_fee = 0.00
+            free = False
+
+            if cvv == "ALIPAY":
+                free = True
+                booking_extra_information = card_number
+
             experience = Experience.objects.get(id=ids[i])
 
             if not free:
@@ -1191,13 +1196,13 @@ class ItineraryBookingForm(forms.Form):
                     instance.save()
                     payment.charge_id = instance['id']
                     payment.booking_id = booking.id
-                    payment.street1 = payment_street1
-                    payment.street2 = payment_street2
-                    payment.city = payment_city
-                    payment.state = payment_state
-                    payment.country = payment_country
-                    payment.postcode = payment_postcode
-                    payment.phone_number = payment_phone_number
+                    payment.street1 = payment_street1 if payment_street1 is not None else ""
+                    payment.street2 = payment_street2 if payment_street2 is not None else ""
+                    payment.city = payment_city if payment_city is not None else ""
+                    payment.state = payment_state if payment_state is not None else ""
+                    payment.country = payment_country if payment_country is not None else "" 
+                    payment.postcode = payment_postcode if payment_postcode is not None else ""
+                    payment.phone_number = payment_phone_number if payment_phone_number is not None else ""
                     payment.save()
 
                     booking.payment_id = payment.id
