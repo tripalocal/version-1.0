@@ -235,17 +235,33 @@
             $("#id_start_date_picker").data("DateTimePicker").show();
         });
 
+        $("#id_start_date, #id_end_date").focusout(function () {
+            if ($("#id_start_date").val() != "" && $("#id_end_date").val() != "") {
+                $("#itinerary-search").click();
+            }
+        });
+
         $("#id_end_date").click(function(){
             $("#id_end_date_picker").data("DateTimePicker").show();
         });
+
+        $("#id_guest_number").change(function () {
+            $("#itinerary-search").click()
+        });
+
+        $("#language_English_label, #language_Mandarin_label").click(function () {
+            $("#itinerary-search").click()
+        })
+
     });
 
     $("#id_city").change(function(e){
         $("#search_form")[0].action = "/s/" + $("#id_city").val() + "/";
+        $("#itinerary-search").click()
     });
 
     $("#itinerary-search").click(function(e){
-        $("#id_city").change();
+
         $("#id_tags").val("");
         for(i=1;$("#tag_"+i).length>0;i++)
         {
