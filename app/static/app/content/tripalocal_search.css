@@ -11,6 +11,7 @@
 .dates {float:left;width:300px;}
 .people {float:left;width:220px}
 .language {float:left;width:220px}
+#only_tags {float:left;width:220px}
 .iconHeader {float:left;width:60px;text-align: center;padding-top:10px;}
 .formBoxes {float:right}
 .dates .formBoxes{width:220px;float:left;margin-left:20px;}
@@ -30,6 +31,7 @@ border: solid 1px #ccc;  margin-bottom: 10px;}
 .guestNumber {  -webkit-appearance: none;  -moz-appearance: none;  text-align: -moz-left;  background: url(/images/dropdown-button.png) no-repeat;  background-position: 72px 3px;  width: 100px;  padding-left: 10px;  background-color: #fff;  height: 30px;  border-color: #ccc;  margin-top: 10px;
 }
 #language_English_label, #language_Mandarin_label{font-weight: normal;}
+.only-tag-label{font-weight: normal;}
 
 .searchButton {margin-left: 15px;    margin-top: 15px;    float: left;}
 .verticalBar{width: 10px;  height: 70px;  border-left: 1px solid #ccc;  float: left;  margin-left: 10px;}
