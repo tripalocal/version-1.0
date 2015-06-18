@@ -2201,6 +2201,13 @@ def getBGImageURL(experienceKey):
         BGImageURL = 'thumbnails/experiences/'+ photoList[0].name.split('.')[0] + '.jpg'
     return BGImageURL
 
+def getProfileImage(experience):
+    profileImage = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+    if profileImage:
+        return profileImage
+    else:
+        'profile_default.jpg'
+
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None):
     
     form = SearchForm()
