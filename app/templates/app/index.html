@@ -1,4 +1,5 @@
 {% extends "app/layout.html" %}
+{% load mathfilters %}
 
 {% block head %}
     {% load staticfiles%}
@@ -63,42 +64,44 @@
         </div>
     </div> 
 
-    <div class="support fixCenter">
-    </div>
-
-    <div class="exp-brief">
+    <div id="featured-exp">
         <div class="container">
-            <h1 style="color:#666;">Step into the Shoes of Locals</h1>
-            <p style="font-size:16px;">Discover their world</p>
-            <!-- Example row of columns -->
-            <div class="tease-box">
-            </div>
-        </div>
+            {% for experience, BGImageURL, profileImageURL in featuredExperienceList %}
+                <div class="expList">
+                    <a href="/experience/{{ experience.id }}">
+                        <div class="listingImg" style="background-image:url({{ MEDIA_URL }}{{ BGImageURL }});">
+                            <div class="priceBox">
+                                From $<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> AUD/person
+                            </div>
+                        </div>
+                    </a>
+                    <a href="/experience/{{ experience.id }}"><h3>{{ formattedTitle }}</h3></a>
 
-        <div style="clear:both;">
-        </div>
-    </div>
-        
-    <div class="testim-slides">
-        <div class="container">
-            <div class="row">
-                <div id="slideshow">
-                    <div class="rev01"></div>
-                    <div class="rev02"></div>
-                    <div class="rev03"></div>
+                    <div class="profile-sm" style="background:url(
+                            {{ MEDIA_URL }}{{ profileImageURL }}) no-repeat; background-size:cover; background-position:center;"></div>
                 </div>
-            </div>
+            {% endfor %}
+
+            {% for city, cityDisplayName in cityList %}
+                <div class="expList">
+                    <a href="{% url 'SearchView' city %}">
+                        <div class="listingImg" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                            <p>{{ cityDisplayName }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
         </div>
     </div>
-        
-    <div class="book-tease">
+
+    <div id="pitch-video">
         <div class="container">
-            <h1>Get Rewarded for Your Local Insights</h1>
-            <p>Host your own experiences when you want with a reward you decide. </br>Be a true entrepreneur.</p>
-            <div style="max-width:628px; height:424px; margin:auto; background-image:url(images/beahost.png); background-size: 628px 424px; background-position:center;">
-            </div>
+            <iframe src="https://player.vimeo.com/video/130949891?title=0&byline=0&portrait=0" width="500"
+                    height="281"
+                    frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
         </div>
     </div>
+
 {% endblock %}
 
 {% block scripts %}
