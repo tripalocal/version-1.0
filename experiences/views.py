@@ -2414,7 +2414,13 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         'cityList':cityList,
         'user_email':request.user.email if request.user.is_authenticated() else None
         })
-    return render_to_response('search_result.html', {'form': form}, context)
+
+    if request.is_ajax():
+        template = 'experience-results.html'
+    else:
+        template = 'search_result.html'
+
+    return render_to_response(template, {'form': form}, context)
 
 def experiences(request):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
