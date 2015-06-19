@@ -2201,8 +2201,16 @@ def getBGImageURL(experienceKey):
         BGImageURL = 'thumbnails/experiences/'+ photoList[0].name.split('.')[0] + '.jpg'
     return BGImageURL
 
-def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None):
-    
+
+def tagsOnly(tag, exp):
+    experience_tags = exp.tags.split(",")
+    return tag in experience_tags
+
+
+def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC),
+               end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
+               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
+
     form = SearchForm()
     form.data = form.data.copy()
     form.data['city'] = city.title()
@@ -2224,6 +2232,9 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             guest_number = form.cleaned_data['guest_number']
             language = form.cleaned_data['language']
             keywords = form.cleaned_data['tags']
+            is_kids_friendly = form.cleaned_data['is_kids_friendly']
+            is_host_with_cars = form.cleaned_data['is_host_with_cars']
+            is_private_tours = form.cleaned_data['is_private_tours']
 
     #template = loader.get_template('search_result.html')
 
@@ -2239,6 +2250,15 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     cityList= [('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
             ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA')]#,('GRSA', 'Greater region, SA'),
             #('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD')
+
+
+    if is_kids_friendly:
+        experienceList = [exp for exp in experienceList if tagsOnly("Kids Friendly", exp)]
+    if is_host_with_cars:
+        experienceList = [exp for exp in experienceList if tagsOnly("Host with Car", exp)]
+    if is_private_tours:
+        experienceList = [exp for exp in experienceList if tagsOnly("Private gourp", exp)]
+
 
     i = 0
     while i < len(experienceList):
@@ -2394,7 +2414,13 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         'cityList':cityList,
         'user_email':request.user.email if request.user.is_authenticated() else None
         })
-    return render_to_response('search_result.html', {'form': form}, context)
+
+    if request.is_ajax():
+        template = 'experience-results.html'
+    else:
+        template = 'search_result.html'
+
+    return render_to_response(template, {'form': form}, context)
 
 def experiences(request):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)

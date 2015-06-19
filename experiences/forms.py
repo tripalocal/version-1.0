@@ -1352,6 +1352,9 @@ class SearchForm(forms.Form):
     guest_number = forms.ChoiceField(choices=Guest_Number, required=False)
     city = forms.ChoiceField(choices=Location,  required=True)
     language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")
+    is_kids_friendly = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
+    is_host_with_cars = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
+    is_private_tours = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
     tags = forms.CharField(widget=forms.Textarea, required=False, initial=Tags)
     all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
 
