@@ -1,4 +1,4 @@
-from experiences.models import Booking, Experience, Payment, WhatsIncluded
+from experiences.models import Booking, Experience, Payment, WhatsIncluded, Coupon
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -12,11 +12,11 @@ from app.models import RegisteredUser
 from post_office import mail
 from Tripalocal_V1 import settings
 from tripalocal_messages.models import Aliases, Users
-from experiences.forms import email_account_generator, ExperienceForm, ItineraryBookingForm
+from experiences.forms import email_account_generator, ExperienceForm, ItineraryBookingForm, check_coupon
 from django.db import connections
 from django.template import loader, RequestContext, Context
 from django.template.loader import get_template
-from app.forms import BookingRequestXLSForm
+from app.forms import BookingRequestXLSForm, ExperienceTagsXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from experiences.views import get_itinerary, update_booking, getAvailableOptions
@@ -36,6 +36,78 @@ def isLegalInput(inputs):
             return False
 
     return True
+
+def updateExperienceTagsFromXLS(request):
+    if not (request.user.is_authenticated() and request.user.is_superuser):
+        return HttpResponseRedirect("/accounts/login/?next=/experience_tags_xls")
+
+    context = RequestContext(request)
+    if request.method == 'POST':
+        form = ExperienceTagsXLSForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                file = request.FILES['file']
+                name, extension = os.path.splitext(file.name)
+                extension = extension.lower();
+                if extension in ('.xls', '.xlsx'):
+                    destination = open(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name), 'wb+')
+                    for chunk in file.chunks():             
+                        destination.write(chunk)
+                    destination.close()
+
+                workbook = xlrd.open_workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name))
+            except OSError:
+                #TODO
+                raise
+
+            worksheet = workbook.sheet_by_name('Sheet1')
+            num_rows = worksheet.nrows - 1
+            num_cells = worksheet.ncols - 1
+            curr_row = 0
+            all_tags = []
+
+            curr_cell = -1
+            while curr_cell < num_cells:
+                curr_cell += 1
+                # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                cell_type = worksheet.cell_type(curr_row, curr_cell)
+                cell_value = worksheet.cell_value(curr_row, curr_cell)
+                if cell_type == 1 or cell_type == 0:
+                    all_tags.append(cell_value)
+                else:
+                    raise Exception("Type error: column name, " + str(curr_cell))
+            
+            curr_row = 0
+            while curr_row < num_rows:
+                curr_row += 1
+                row = worksheet.row(curr_row)
+
+                curr_cell = 0
+                exp_tags=""
+                id = row[curr_cell].value.split("--")[0]
+                id = int(id)
+                try:
+                    exp = Experience.objects.get(id=id)
+                except Experience.DoesNotExist:
+                    continue
+
+                while curr_cell < num_cells:
+                    curr_cell += 1
+                    # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                    cell_type = worksheet.cell_type(curr_row, curr_cell)
+
+                    if cell_type == 1 or cell_type == 0:
+                        if worksheet.cell_value(curr_row, curr_cell).lower() == "y":
+                            exp_tags += all_tags[curr_cell] + ","
+                    else:
+                        raise Exception("Type error: row " + str(curr_row) + ", col " + str(curr_cell))
+
+                exp.tags = exp_tags
+                exp.save()
+    else:
+        form = ExperienceTagsXLSForm()
+
+    return render_to_response('app/experience_tags_xls.html', {'form': form}, context)
 
 def saveBookingRequest(booking_request):
     first_name = booking_request['first_name']
@@ -472,8 +544,8 @@ def service_facebook_login(request):
 def service_search(request, format=None):
     try:
         criteria = request.data #request.query_params['data']
-        start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['start_datetime'], "%Y-%m-%d"))
-        end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['end_datetime'], "%Y-%m-%d"))
+        start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['start_datetime'].strip(), "%Y-%m-%d"))
+        end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['end_datetime'].strip(), "%Y-%m-%d"))
         city = criteria['city']
         guest_number = criteria['guest_number']
         keywords = criteria['keywords']
@@ -582,7 +654,7 @@ def service_acceptreservation(request, format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-#{"itinerary_string":[{"id":"20","date":"2015/04/17","time":"4:00 - 6:00","guest_number":2},{"id":"20","date":"2015/04/17","time":"17:00 - 20:00","guest_number":2}],"card_number":"4242424242424242","expiration_month":10,"expiration_year":2015,"cvv":123}
+#{"itinerary_string":[{"id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2},{"id":"20","date":"2015/06/17","time":"17:00 - 20:00","guest_number":2}],"card_number":"4242424242424242","expiration_month":10,"expiration_year":2015,"cvv":123, "coupon":"abcdefgh"}
 @api_view(['POST'])
 @authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication)) #
 @permission_classes((IsAuthenticated,))
@@ -600,7 +672,7 @@ def service_booking(request, format=None):
         booking_data['experience_id'] = []
         booking_data['date'] = []
         booking_data['time'] = []
-                
+
         for item in itinerary:
             booking_data['experience_id'].append(str(item['id']))
             booking_data['date'].append(str(item['date']))
@@ -612,15 +684,90 @@ def service_booking(request, format=None):
         booking_data["exp_year"] = data["expiration_year"]
         booking_data["cvv"] = data["cvv"]
 
-        ItineraryBookingForm.booking(ItineraryBookingForm(),booking_data['experience_id'],booking_data['date'],booking_data['time'],booking_data['user'],booking_data['guest_number'],
-                                     booking_data['card_number'],booking_data['exp_month'],booking_data['exp_year'],booking_data['cvv'])
-        return Response("Success", status=status.HTTP_200_OK)
+        coupon = data["coupon"]
+        if coupon is not None and len(coupon) > 0:
+            bk_dt = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(booking_data['date'][0].strip() + " " + booking_data['time'][0].split(":")[0].strip(),"%Y/%m/%d %H"))
+            coupons = Coupon.objects.filter(promo_code__iexact = coupon,
+                                            end_datetime__gt = bk_dt,
+                                            start_datetime__lt = bk_dt)
+        
+        if coupons is not None and len(coupons) > 0:
+            ItineraryBookingForm.booking(ItineraryBookingForm(),booking_data['experience_id'],booking_data['date'],booking_data['time'],booking_data['user'],booking_data['guest_number'],
+                                         booking_data['card_number'],booking_data['exp_month'],booking_data['exp_year'],booking_data['cvv'],coupon=coupons[0])
+        else:
+            ItineraryBookingForm.booking(ItineraryBookingForm(),booking_data['experience_id'],booking_data['date'],booking_data['time'],booking_data['user'],booking_data['guest_number'],
+                                         booking_data['card_number'],booking_data['exp_month'],booking_data['exp_year'],booking_data['cvv'])
+
+        result = {"success":"true"}
+        return Response(result, status=status.HTTP_200_OK)
 
     except Exception as err:
         #TODO
         logger = logging.getLogger("Tripalocal_V1")
         logger.error(err.detail)
-        return Response(err.detail, status=status.HTTP_400_BAD_REQUEST)
+        result = {"success":"false","error":err.detail}
+        return Response(result, status=status.HTTP_400_BAD_REQUEST)
+
+#{"coupon":"aasfsaf","id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2}
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication)) #
+@permission_classes((IsAuthenticated,))
+def service_couponverification(request, format=None):
+    try:
+        data = request.data
+        if type(data) is str:
+            data = ast.literal_eval(data)
+
+        result={"valid":"no"}
+        coupon = data["coupon"]
+        if coupon is not None and len(coupon) > 0:
+            bk_dt = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['date'].strip() + " " + data['time'].split(":")[0].strip(),"%Y/%m/%d %H"))
+            coupons = Coupon.objects.filter(promo_code__iexact = coupon,
+                                            end_datetime__gt = bk_dt,
+                                            start_datetime__lt = bk_dt)
+
+            if coupons is not None and len(coupons) > 0:
+                valid = check_coupon(coupons[0],data["id"], data["guest_number"])
+                if valid['valid']:
+                    free = False
+                    extra_fee = 0.0
+                    rules = json.loads(coupons[0].rules)
+                    if type(rules["extra_fee"]) == int or type(rules["extra_fee"]) == float:
+                        extra_fee = rules["extra_fee"]
+                    elif type(rules["extra_fee"]) == str and rules["extra_fee"]== "FREE":
+                        free = True
+                        result={"valid":"yes","new_price":0.0}
+
+                    if not free:
+                        subtotal_price = 0.0
+                        experience = Experience.objects.get(id = data["id"])
+                        if experience.dynamic_price and type(experience.dynamic_price) == str:
+                            price = experience.dynamic_price.split(',')
+                            if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
+                            #these is comma in the end, so the length is max-min+2
+                                if data["guest_number"] <= experience.guest_number_min:
+                                    subtotal_price = float(experience.price) * float(experience.guest_number_min)
+                                else:
+                                    subtotal_price = float(price[data["guest_number"]-experience.guest_number_min]) * float(data["guest_number"])
+                            else:
+                                #wrong dynamic settings
+                                subtotal_price = float(experience.price)*float(data["guest_number"])
+                        else:
+                            subtotal_price = float(experience.price)*float(data["guest_number"])
+
+                        if extra_fee >= 1.00 or extra_fee <= -1.00:
+                            #absolute value
+                            price = round((subtotal_price*(1.00+settings.COMMISSION_PERCENT)+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2) 
+                        else:
+                            #percentage, e.g., 30% discount --> percentage == -0.3
+                            price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2)
+
+                        result={"valid":"yes","new_price":price}
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(result, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def service_experience(request, format=None):
@@ -696,16 +843,25 @@ def service_experience(request, format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
+@api_view(['GET','POST'])
 @authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_myprofile(request, format=None):
     try:
         user = request.user
         profile = user.registereduser
-        result={'id':user.id, 'first_name':user.first_name, 'last_name':user.last_name, 'email':user.email,
-                 'image':user.registereduser.image_url,'phone_number':profile.phone_number,'bio':profile.bio,'rate':profile.rate}
-        return Response(result, status=status.HTTP_200_OK)
+        if request.method == "GET":
+            result={'id':user.id, 'first_name':user.first_name, 'last_name':user.last_name, 'email':user.email,
+                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,'bio':profile.bio,'rate':profile.rate}
+            return Response(result, status=status.HTTP_200_OK)
+        elif request.method == "POST":
+            data = request.data
+            phone_number = data["phone_number"]
+            profile.phone_number = phone_number
+            profile.save()
+            result={'id':user.id, 'first_name':user.first_name, 'last_name':user.last_name, 'email':user.email,
+                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,'bio':profile.bio,'rate':profile.rate}
+            return Response(result, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -716,7 +872,7 @@ def service_myprofile(request, format=None):
 def service_email(request, format=None):
     try:
         data = request.data
-        start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['start_date'], "%Y/%m/%d"))
+        start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['start_date'].strip(), "%Y/%m/%d"))
         exps = Experience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
         hosts = []
         exp_urls = []

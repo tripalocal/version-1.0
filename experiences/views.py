@@ -615,7 +615,7 @@ class ExperienceDetailView(DetailView):
                 context['host_only_unlisted'] = True
                 return context
 
-        cities = {'melbourne':'Melbourne','sydney':'Sydney','cairns':'Cairns','goldcoast':'Gold coast','brisbane':'Brisbane','hobart':'Hobart'}
+        cities = {'melbourne':'Melbourne','sydney':'Sydney','cairns':'Cairns','goldcoast':'Gold coast','brisbane':'Brisbane','hobart':'Hobart','adelaide':'Adelaide'}
         context['experience_city'] = cities.get(experience.city.lower())
 
         available_date = getAvailableOptions(experience, available_options, available_date)
@@ -1590,7 +1590,7 @@ def experience_booking_confirmation(request):
             #get coupon information
             wrong_promo_code = False
             code = form.data['promo_code']
-            bk_dt = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['date']+form.data['time'],"%Y-%m-%d%H:%M"))
+            bk_dt = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['date'].strip()+form.data['time'].strip(),"%Y-%m-%d%H:%M"))
             coupons = Coupon.objects.filter(promo_code__iexact = code,
                                             end_datetime__gt = bk_dt,
                                             start_datetime__lt = bk_dt)
@@ -1598,7 +1598,7 @@ def experience_booking_confirmation(request):
                 coupon = Coupon()
                 wrong_promo_code = True
             else:
-                valid = check_coupon(coupons[0], experience, form.data['guest_number'])
+                valid = check_coupon(coupons[0], experience.id, form.data['guest_number'])
                 if not valid['valid']:
                     coupon = Coupon()
                     wrong_promo_code = True
@@ -2201,7 +2201,19 @@ def getBGImageURL(experienceKey):
         BGImageURL = 'thumbnails/experiences/'+ photoList[0].name.split('.')[0] + '.jpg'
     return BGImageURL
 
-def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None):
+def tagsOnly(tag, exp):
+    experience_tags = exp.tags.split(",")
+    return tag in experience_tags
+
+def getProfileImage(experience):
+    profileImage = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+    if profileImage:
+        return profileImage
+    else:
+        'profile_default.jpg'
+
+def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
+               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
     
     form = SearchForm()
     form.data = form.data.copy()
@@ -2224,6 +2236,9 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             guest_number = form.cleaned_data['guest_number']
             language = form.cleaned_data['language']
             keywords = form.cleaned_data['tags']
+            is_kids_friendly = form.cleaned_data['is_kids_friendly']
+            is_host_with_cars = form.cleaned_data['is_host_with_cars']
+            is_private_tours = form.cleaned_data['is_private_tours']
 
     #template = loader.get_template('search_result.html')
 
@@ -2239,6 +2254,13 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     cityList= [('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
             ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA')]#,('GRSA', 'Greater region, SA'),
             #('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD')
+
+    if is_kids_friendly:
+        experienceList = [exp for exp in experienceList if tagsOnly("Kids Friendly", exp)]
+    if is_host_with_cars:
+        experienceList = [exp for exp in experienceList if tagsOnly("Host with Car", exp)]
+    if is_private_tours:
+        experienceList = [exp for exp in experienceList if tagsOnly("Private gourp", exp)]
 
     i = 0
     while i < len(experienceList):
@@ -2264,11 +2286,11 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             continue
 
         if keywords is not None and len(keywords) > 0 and experience.tags is not None and len(experience.tags) > 0:
-            experience_tags = experience.tags.split(",")
-            tags = keywords.split(",")
+            experience_tags = experience.tags.strip().split(",")
+            tags = keywords.strip().split(",")
             match = False
             for tag in tags:
-                if tag in experience_tags:
+                if tag.strip() in experience_tags:
                     match = True
                     break
             if not match:
@@ -2303,7 +2325,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             
             if counter > 0:
                 rate /= counter
-            
+
             #find the correct index to insert --> sort the list by rate
             counter = 0
             if len(rateList) == 0:
@@ -2394,7 +2416,13 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         'cityList':cityList,
         'user_email':request.user.email if request.user.is_authenticated() else None
         })
-    return render_to_response('search_result.html', {'form': form}, context)
+
+    if request.is_ajax():
+        template = 'experience_results.html'
+    else:
+        template = 'search_result.html'
+
+    return render_to_response(template, {'form': form}, context)
 
 def experiences(request):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
@@ -2716,10 +2744,16 @@ def itinerary_booking_confirmation(request):
             #get coupon information
             wrong_promo_code = False
             code = form.data['promo_code']
-            bk_dt = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['date']+form.data['time'],"%Y-%m-%d%H:%M"))
+            dates = form.data['date'].split(";")
+            times = form.data['time'].split(";")
+            dates = [x for x in dates if x]
+            times = [x for x in times if x]
+            date_start = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[0] + " " + times[0].split(":")[0].strip(), "%Y/%m/%d %H"))
+            date_end = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[len(dates)-1] + " " + times[len(dates)-1].split(":")[0].strip(), "%Y/%m/%d %H"))
+
             coupons = Coupon.objects.filter(promo_code__iexact = code,
-                                            end_datetime__gt = bk_dt,
-                                            start_datetime__lt = bk_dt)
+                                            end_datetime__gt = date_end,
+                                            start_datetime__lt = date_start)
             if not len(coupons):
                 coupon = Coupon()
                 wrong_promo_code = True

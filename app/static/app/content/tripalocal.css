@@ -1,5 +1,8 @@
 .starter-template {  padding: 40px 15px;  text-align: center;}
 
+.desBox th {vertical-align: top;padding:20px 0;}
+th h3{margin: 2px}
+
 .navBox {height:50px;background-color: #fff;}
 .header{padding-top:10px;}
 .brand{float:left; margin-left:10px;}
@@ -23,8 +26,14 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', end
 .bookingBox {background-color:#fff;border:#CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 2px;border-radius: 5px; width:300px; float:left; padding:20px; text-align:center; color: #666666;}
 .bookingBox .profile-lg {margin-top: -140px;}
 .bookingBox .profile-lg img{margin-left:1px;}
-.bookingBox span{float: left;font-size: 36px;font-weight: bold;line-height: 1;left: 40px;position: relative;top: 3px;}
-.bookingBox .row{text-align:center; margin:20px 0px;}
+.bookingBox #experience_price{font-size: 36px;font-weight: bold;line-height: 1;float: left;}
+.bookingBox .row{text-align:center; margin:auto}
+.bookingBox th{font-weight: normal; border-bottom:1px solid #CCCCCC;padding-left: 0}
+.bookingBox tbody tr{height: 50px}
+.bookingBox tbody td{text-align: left}
+.carousel-indicators li{width:12px;height:12px;margin:0 5px;background-color:#CCC;border-radius:15px;border-color: transparent;}
+.carousel-indicators .active{width:12px;height:12px;margin:0 5px;background-color:#3ECCCB}
+.gradientMask{background-image: url(/images/gradientMask.png);width: 100%;position: absolute;bottom:0px;height:46px;}
 
 .checkoutBox {width:560px; background-color:#FFF; border:#CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 5px;border-radius: 5px; padding:15px;}
 .checkoutBox .row{border-top:#CCC 1px solid; padding:15px 0px;}

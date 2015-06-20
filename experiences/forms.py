@@ -63,7 +63,7 @@ Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
-Tags = "Food&Wine,Education,History&Culture,Architecture,For Couples,Photography Worthy,Liveability Research,Kids Friendly,Outdoor&Nature,Shopping,Sports&Leisure,Host with Car,Extreme Fun,Events,Health&Beauty"
+Tags = "Food & wine, Education, History & culture, Architecture, For couples, Photography worthy, Livability research, Kids friendly, Outdoor & nature, Shopping, Sports & leisure, Host with car, Extreme fun, Events, Health & beauty, Private group"
 
 #from http://stackoverflow.com/questions/16773579/customize-radio-buttons-in-django
 class HorizRadioRenderer(forms.RadioSelect.renderer):
@@ -453,14 +453,14 @@ class CCExpField(forms.MultiValueField):
             return date(year, month, day)
         return None
 
-def check_coupon(coupon, experience, guest_number):
+def check_coupon(coupon, experience_id, guest_number):
 
     rules = json.loads(coupon.rules)
     if not coupon.rules or not coupon.rules.strip():
         result = {"valid":True}
         return result
 
-    if "ids" in rules and experience.id not in rules["ids"]:
+    if "ids" in rules and experience_id not in rules["ids"]:
         result = {"valid":False,"error":"the coupon cannot be used on this experience -- id"}
         return result
 
@@ -468,7 +468,7 @@ def check_coupon(coupon, experience, guest_number):
         result = {"valid":False,"error":"the coupon cannot be used on this experience -- group size"}
         return result
 
-    bks = Booking.objects.filter(experience_id=experience.id, coupon_id=coupon.id).exclude(status__iexact="rejected")
+    bks = Booking.objects.filter(experience_id=experience_id, coupon_id=coupon.id).exclude(status__iexact="rejected")
     bks_t = len(bks) if bks is not None else 0
     if "times" in rules and bks_t >= rules["times"]:
         result = {"valid":False,"error":"the coupon cannot be used on this experience -- times"}
@@ -540,12 +540,15 @@ class BookingConfirmationForm(forms.Form):
             free = False
             self.cleaned_data['price_paid'] = 0.0
 
+            date = self.cleaned_data['date']
+            time = self.cleaned_data['time']
+            bk_dt = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC"))
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
-                                       end_datetime__gt = datetime.utcnow().replace(tzinfo=pytz.UTC),
-                                       start_datetime__lt = datetime.utcnow().replace(tzinfo=pytz.UTC))
+                                       end_datetime__gt = bk_dt,
+                                       start_datetime__lt = bk_dt)
 
             if len(cp)>0:
-                valid = check_coupon(cp[0], experience, self.cleaned_data['guest_number'])
+                valid = check_coupon(cp[0], experience.id, self.cleaned_data['guest_number'])
                 if valid['valid']:
                     rules = json.loads(cp[0].rules)
                     if type(rules["extra_fee"]) == int or type(rules["extra_fee"]) == float:
@@ -1083,6 +1086,13 @@ class ItineraryBookingForm(forms.Form):
             extra_fee = 0.00
             free = False
 
+            if coupon is not None:
+                extra = json.loads(coupon.rules)
+                if type(extra["extra_fee"]) == int or type(extra["extra_fee"]) == float:
+                    extra_fee = extra["extra_fee"]
+                elif type(extra["extra_fee"]) == str and extra["extra_fee"] == "FREE":
+                    free = True
+
             if cvv == "ALIPAY":
                 free = True
                 booking_extra_information = card_number
@@ -1129,8 +1139,8 @@ class ItineraryBookingForm(forms.Form):
                 #save the booking record
                 #user = User.objects.get(id=self.cleaned_data['user_id']) #moved outside of the for loop
                 host = experience.hosts.all()[0]
-                date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i], "%Y/%m/%d"))
-                time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0], "%H"))
+                date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
+                time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
                 local_timezone = pytz.timezone(settings.TIME_ZONE)
 
                 is_instant_booking = False
@@ -1318,9 +1328,11 @@ class ItineraryBookingForm(forms.Form):
             dates.remove('')
             times.remove('')
 
+            date_start = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[0].strip() + " " + times[0].split(":")[0].strip(), "%Y/%m/%d %H"))
+            date_end = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[len(dates)-1].strip() + " " + times[len(dates)-1].split(":")[0].strip(), "%Y/%m/%d %H"))
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
-                                       end_datetime__gt = datetime.utcnow().replace(tzinfo=pytz.UTC),
-                                       start_datetime__lt = datetime.utcnow().replace(tzinfo=pytz.UTC))
+                                       end_datetime__gt = date_end,
+                                       start_datetime__lt = date_start)
 
             if len(cp)>0:
                 rules = json.loads(cp[0].rules)
@@ -1339,7 +1351,7 @@ class ItineraryBookingForm(forms.Form):
             payment_postcode = self.cleaned_data['postcode']
             payment_phone_number = self.cleaned_data['phone_number']
 
-            self.booking(ids,dates,times,users,guest_number,
+            self.booking(ids,dates,times,user,guest_number,
                          card_number,exp_month,exp_year,cvv,
                          booking_extra_information,coupon_extra_information,coupon,
                          payment_street1,payment_street2,payment_city,payment_state,payment_country,payment_postcode,payment_phone_number)
@@ -1352,6 +1364,9 @@ class SearchForm(forms.Form):
     guest_number = forms.ChoiceField(choices=Guest_Number, required=False)
     city = forms.ChoiceField(choices=Location,  required=True)
     language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")
+    is_kids_friendly = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
+    is_host_with_cars = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
+    is_private_tours = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
     tags = forms.CharField(widget=forms.Textarea, required=False, initial=Tags)
     all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
 

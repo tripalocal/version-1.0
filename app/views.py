@@ -19,7 +19,7 @@ from django.contrib import messages
 import string, random, pytz, base64, subprocess, os, geoip2.database, PIL
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
-from experiences.views import SearchView, saveProfileImage
+from experiences.views import SearchView, saveProfileImage, getBGImageURL, getProfileImage
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment
 from django.core.files.uploadedfile import SimpleUploadedFile, File
@@ -127,6 +127,19 @@ def home(request):
 
         if request.LANGUAGE_CODE.startswith("zh"):
             return HttpResponseRedirect('/cn')
+
+    experienceList = Experience.objects.filter(status__iexact="listed")
+    idxList = random.sample(range(len(experienceList)), 3)
+    featuredExperienceList = [experienceList[i] for i in idxList]
+
+    BGImages = [getBGImageURL(exp.id) for exp in featuredExperienceList]
+    profileImages = [getProfileImage(exp) for exp in featuredExperienceList]
+    cityList = [('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Cairns','Cairns'),('Goldcoast','Gold Coast'),('Adelaide','Adelaide')]
+
+    context = RequestContext(request, {
+        'featuredExperienceList': zip(featuredExperienceList, BGImages, profileImages),
+        'cityList': cityList
+    })
 
     if request.user.is_authenticated():
         return render_to_response('app/index.html', {'form': form, 'user_email':request.user.email}, context)
@@ -239,7 +252,7 @@ def mylisting(request):
 
     for experience in exps:
         experiences.append(experience)
-    
+
     #cursor = connections['cndb'].cursor()
     #rows = cursor.execute('select id, status, title from experiences_experience where id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime',
     #                     [request.user.id]).fetchall()
@@ -251,7 +264,7 @@ def mylisting(request):
     #        exp.status = rows[index][1]
     #        exp.title = rows[index][2]
     #        experiences.append(exp)
-    
+
     context['experiences'] = experiences
 
     return render_to_response('app/mylisting.html', {}, context)
@@ -332,7 +345,7 @@ def myreservation(request):
         return HttpResponseRedirect("/accounts/login/?next=/myreservation")
 
     context = RequestContext(request)
-    
+
     reservations = getreservation(request.user)
 
     context['current_reservations'] = reservations['current_reservations']

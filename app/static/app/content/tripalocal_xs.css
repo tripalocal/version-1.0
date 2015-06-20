@@ -1235,16 +1235,12 @@ body {
 
 /** changes to experience.html **/
 #save_to_wishlist_icon {
-    position:relative;
-    float:left;
-    left:30px;
-    top:0px;
     background-image:url(/images/icons.png);
     height:27px;
     width:27px;
     background-size: 210px 320px;
-    
-    margin-top: 12px;
+    float:left;
+    margin-top: 5px;
 }
 .save_to_wishlist_not_added {
     background-position: -109px 0px;
@@ -1260,14 +1256,15 @@ body {
 /*.date-exp, .time-exp{text-align: left;}*/
 
 .save_to_wishlist_button{
-	border:1px solid #CCCCCC;
-	 color:#666666; 
-	 margin-top:30px; 
-	 height:50px; 
-	 width: 234px;
-	 margin-left:auto; 
-	 margin-right:auto;
-	 border-radius: 3px;
+    border:1px solid #CCCCCC;
+    color:#666666; 
+    margin-top:30px; 
+    height:50px; 
+    width: 100%;
+    margin-left:auto; 
+    margin-right:auto;
+    border-radius: 3px;
+    padding:5px 55px;
 }
 #wishlist_p {
     font-size:12px;
@@ -1338,7 +1335,6 @@ body {
     left:-4px;
 }
 .experience-detail-table-td {
-    padding-left:70px;
-    padding-top:10px;
-    padding-bottom:10px;
+    padding-top:20px;
+    padding-bottom:20px;
 }

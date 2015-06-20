@@ -65,6 +65,9 @@ class UserProfileForm(forms.Form):
 class BookingRequestXLSForm(forms.Form):
     file = forms.FileField()
 
+class ExperienceTagsXLSForm(forms.Form):
+    file = forms.FileField()
+
 Repeat_Cycle = (('Daily', 'Daily'), ('Weekly', 'Weekly'), ('Monthly', 'Monthly'),)
 
 Repeat_Frequency = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),

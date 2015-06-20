@@ -9,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="{% static 'app/content/tripalocal_search.css' %}" rel="stylesheet">
-    <title>Discover {{ city }}</title>
+    <title>Discover {{ city_display_name }}</title>
 {%endblock%}
 
 {% block content %} 
@@ -92,6 +92,22 @@
                             {{form.tags}}
                             {{form.all_tags}}
                         </div>
+                        <div class="formBoxes" id="only_tags">
+                            {{ form.is_kids_friendly }}
+                            <label for="{{ form.is_kids_friendly.id_for_label }}"
+                                   class="css-label lite-cyan-check only-tag-label">
+                                Kids friendly only</label>
+
+                            {{ form.is_host_with_cars }}
+                            <label for="{{ form.is_host_with_cars.id_for_label }}"
+                                   class="css-label lite-cyan-check only-tag-label">
+                                Hosts with cars only</label>
+
+                            {{ form.is_private_tours }}
+                            <label for="{{ form.is_private_tours.id_for_label }}"
+                                   class="css-label lite-cyan-check only-tag-label">
+                                Private tours only</label>
+                        </div>
                     </div>
                 </div>      
             </div>
@@ -103,26 +119,11 @@
             <div class="fixCenter">
                 <div id="more-filters-div">
                     <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:100px;float:left;">More Filters</button>
-                    <label class="expCount">{{length}} Experiences &#8226; {{city_display_name}}</label>
+                    <div id="ajax-experience-count"></div>
                 </div>
-                <div class="expBox">
-                    <!-- Each Individual Experiene Listing -->
-                    {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
-                    <div class="expList">
-                        <a href="/experience/{{experience.id}}">
-                            <div class="listingImg" style="background-image:url({{MEDIA_URL}}{{BGImageURL}});">
-                                <div class="priceBox">
-                                From $<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> AUD/person
-                                </div>
-                            </div>
-                        </a>
-                        <a href="/experience/{{experience.id}}"><h3>{{ formattedTitle }}</h3></a>
-                        <div class="profile-sm" style="background:url({{MEDIA_URL}}{{profileImageURL}}) no-repeat; background-size:cover; background-position:center;"></div>
-          
-                        <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
-                        <div class="listingFooter"><a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a> {{ experience.duration }} hrs &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
-                    </div>
-                    {% endfor %}
+                <div id="experience-box" class="expBox">
+                    <div id="overlay"></div>
+                    <div id="ajax-experience-result"></div>
                     <div class="expList">
                         <div class="listingImg" style="background-image:url({{MEDIA_URL}}request.jpg);"></div>
                         <h3>Can't find the experience you Want?</h3>
@@ -218,17 +219,71 @@
             $("#id_start_date_picker").data("DateTimePicker").show();  
         });
 
-        $("#id_end_date").click(function(){  
-            $("#id_end_date_picker").data("DateTimePicker").show();  
-        }); 
+       $("#id_start_date, #id_end_date").focusout(function () {
+            if ($("#id_start_date").val() != "" && $("#id_end_date").val() != "") {
+                $("#itinerary-search").click();
+            }
+        });
+
+        $("#id_end_date").click(function(){
+            $("#id_end_date_picker").data("DateTimePicker").show();
+        });
+
+        $("#id_guest_number").change(function () {
+            $("#itinerary-search").click()
+        });
+
+        $("#language_English_label, #language_Mandarin_label").click(function () {
+            $("#itinerary-search").click()
+        });
+
+
+        $('#itinerary-search').on('click', function (event) {
+            event.preventDefault();
+
+            data = {};
+            if ($("#language_English").prop('checked')) {
+                data['checkbox-eng'] = "English";
+            }
+
+            if ($("#language_Mandarin").prop('checked')) {
+                data['checkbox-cn'] = "Chinese";
+            }
+
+            var only_tags = ['is_host_with_cars', 'is_kids_friendly', 'is_private_tours'];
+            for (var i = 0; i < only_tags.length; ++i) {
+                if ($('#id_' + only_tags[i]).prop('checked')) {
+                    data[only_tags[i]] = "on";
+                }
+            }
+
+            $.post('/s/' + $("#id_city").val() + '/', $.extend({
+                'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value,
+                'city': $("#id_city").val(),
+                'start_date': $("#id_start_date").val(),
+                'end_date': $("#id_end_date").val(),
+                'guest_number': $("#id_guest_number").val(),
+                'language': $("#id_language").val(),
+                'Search': "Search",
+                'tags': $("#id_tags").val(),
+                'all_tags': $("#id_all_tags").val()
+            }, data)).done(function (response) {
+                    $('#ajax-experience-result').html($(response).find('#experience-results'));
+                    $('#ajax-experience-count').html($(response).find('#experience-count'));
+            }).fail(function () {
+                    $('#ajax-experience-result').text("Sorry but there was an error.");
+            });
+        });
+
+        $("#itinerary-search").click();
     });
 
     $("#id_city").change(function(e){
         $("#search_form")[0].action = "/s/" + $("#id_city").val() + "/";
+        $("#itinerary-search").click() 
     });
 
     $("#itinerary-search").click(function(e){
-        $("#id_city").change();
         $("#id_tags").val("");
         for(i=1;$("#tag_"+i).length>0;i++)
         {
