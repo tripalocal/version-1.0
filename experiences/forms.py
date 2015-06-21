@@ -623,9 +623,9 @@ class BookingConfirmationForm(forms.Form):
                                 break
                         elif ib.repeat_cycle.lower() == "weekly":
                             weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-                            monday1 = (date-timedelta(days=date.weekday()))
+                            monday1 = (date.date()-timedelta(days=date.weekday()))
                             monday2 = (ib_start.date() - timedelta(days=ib_start.date().weekday()))
-                            if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7)%ib.repeat_frequency == 0:
+                            if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7).days%ib.repeat_frequency == 0:
                                 # for weekly repeated time periods, the start and end time must be in the same day
                                 if not (ib_start.hour <= time.hour and time.hour <= ib_end.hour):
                                     # not a match: hour
@@ -1159,9 +1159,9 @@ class ItineraryBookingForm(forms.Form):
                                 break
                         elif ib.repeat_cycle.lower() == "weekly":
                             weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-                            monday1 = (date-timedelta(days=date.weekday()))
+                            monday1 = (date.date()-timedelta(days=date.weekday()))
                             monday2 = (ib_start.date() - timedelta(days=ib_start.date().weekday()))
-                            if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7)%ib.repeat_frequency == 0:
+                            if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7).days%ib.repeat_frequency == 0:
                                 # for weekly repeated time periods, the start and end time must be in the same day
                                 if not (ib_start.hour <= time.hour and time.hour <= ib_end.hour):
                                     # not a match: hour

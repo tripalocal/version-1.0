@@ -120,6 +120,14 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         if guest_number is not None and (experience.guest_number_max < int(guest_number) or experience.guest_number_min > int(guest_number)):
             continue
 
+        if guest_number is None:
+            if experience.guest_number_min <= 4 and experience.guest_number_max>=4:
+                guest_number = 4
+            elif experience.guest_number_min > 4:
+                guest_number = experience.guest_number_min
+            elif experience.guest_number_max < 4:
+                guest_number = experience.guest_number_max
+
         if keywords is not None:
             experience_tags = experience.tags.split(",") if experience.tags is not None else ''
             tags = keywords.split(",")

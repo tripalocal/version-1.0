@@ -704,8 +704,9 @@ def service_booking(request, format=None):
     except Exception as err:
         #TODO
         logger = logging.getLogger("Tripalocal_V1")
-        logger.error(err.detail)
-        result = {"success":"false","error":err.detail}
+        if hasattr(err, 'detail'):
+            logger.error(err.detail)
+        result = {"success":"false"}
         return Response(result, status=status.HTTP_400_BAD_REQUEST)
 
 #{"coupon":"aasfsaf","id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2}
@@ -805,6 +806,10 @@ def service_experience(request, format=None):
         if counter > 0:        
             rate /= counter
         
+        dynamic_price = []
+        if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
+            dynamic_price = experience.dynamic_price.split(",")
+            dynamic_price = [float(x) for x in dynamic_price if x]
 
         return Response({'experience_title':experience.title,
                          'experience_language':experience.language,
@@ -815,7 +820,7 @@ def service_experience(request, format=None):
                          'experience_dress':experience.dress,
                          'experience_meetup_spot':experience.meetup_spot,
                          'experience_price':experience.price,
-                         'experience_dynamic_price':experience.dynamic_price,
+                         'experience_dynamic_price':dynamic_price,
                          'experience_guest_number_min':experience.guest_number_min,
                          'experience_guest_number_max':experience.guest_number_max,
 
