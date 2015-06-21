@@ -19,7 +19,7 @@ from django.template.loader import get_template
 from app.forms import BookingRequestXLSForm, ExperienceTagsXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from experiences.views import get_itinerary, update_booking, getAvailableOptions
+from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator
 from app.views import getreservation
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
@@ -809,7 +809,7 @@ def service_experience(request, format=None):
         dynamic_price = []
         if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             dynamic_price = experience.dynamic_price.split(",")
-            dynamic_price = [float(x) for x in dynamic_price if x]
+            dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
 
         return Response({'experience_title':experience.title,
                          'experience_language':experience.language,
@@ -819,7 +819,7 @@ def service_experience(request, format=None):
                          'experience_interaction':experience.interaction,
                          'experience_dress':experience.dress,
                          'experience_meetup_spot':experience.meetup_spot,
-                         'experience_price':experience.price,
+                         'experience_price':experience_fee_calculator(float(experience.price)),
                          'experience_dynamic_price':dynamic_price,
                          'experience_guest_number_min':experience.guest_number_min,
                          'experience_guest_number_max':experience.guest_number_max,
