@@ -551,7 +551,10 @@ def service_search(request, format=None):
         keywords = criteria['keywords']
         language = "Mandarin,English"
 
-        itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords)
+        if int(guest_number) == 0:
+            itinerary = get_itinerary(start_datetime, end_datetime, None, city, language, keywords)
+        else:
+            itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords)
 
         return Response(itinerary, status=status.HTTP_200_OK)
     except Exception as err:
