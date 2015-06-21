@@ -688,6 +688,7 @@ def service_booking(request, format=None):
         booking_data["cvv"] = data["cvv"]
 
         coupon = data["coupon"]
+        coupons = None
         if coupon is not None and len(coupon) > 0:
             bk_dt = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(booking_data['date'][0].strip() + " " + booking_data['time'][0].split(":")[0].strip(),"%Y/%m/%d %H"))
             coupons = Coupon.objects.filter(promo_code__iexact = coupon,
@@ -722,7 +723,7 @@ def service_couponverification(request, format=None):
         if type(data) is str:
             data = ast.literal_eval(data)
 
-        result={"valid":"no"}
+        result={"valid":"no","new_price":-1}
         coupon = data["coupon"]
         if coupon is not None and len(coupon) > 0:
             bk_dt = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['date'].strip() + " " + data['time'].split(":")[0].strip(),"%Y/%m/%d %H"))
