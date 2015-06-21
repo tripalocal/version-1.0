@@ -12,7 +12,7 @@
     <title>Discover {{ city_display_name }}</title>
 {%endblock%}
 
-{% block content %} 
+{% block content %}
     <form id="search_form" action="/s/melbourne/" method="post">
         {% csrf_token %}
         <div class="basicSearch">
@@ -22,7 +22,7 @@
                         <div class="iconHeader">
                             <div class="iconImage" id="date"></div>
                             <div class="iconText">Dates</div>
-                        </div> 
+                        </div>
                         <div class="formBoxes">
                             {{form.city}}
                             <div class="input-group startDate">
@@ -37,7 +37,7 @@
                     <div class="verticalBar">
                     </div>
                     <div class="people">
-                        <div class="iconHeader"> 
+                        <div class="iconHeader">
                             <div class="iconImage" id="people">
                             </div>
                             <div class="iconText">People
@@ -49,20 +49,20 @@
 
                     <div class="verticalBar">
                     </div>
-                
+
                     <div class="language">
                         <div class="iconHeader">
                             <div class="iconImage" id="language">
                             </div>
                             <div class="iconText">Language
                             </div>
-                        </div> 
+                        </div>
 
                         <div class="formBoxes">
-                            {{form.language}} 
+                            {{form.language}}
                             <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
-                            <br> 
-                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:10px;">中文</label> 
+                            <br>
+                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:10px;">中文</label>
                         </div>
                     </div>
 
@@ -109,9 +109,9 @@
                                 Private tours only</label>
                         </div>
                     </div>
-                </div>      
+                </div>
             </div>
-        </div>  
+        </div>
     </form>
 
     <div class="container-fluid searchresult">
@@ -131,7 +131,7 @@
                         <p style="overflow-y:hidden; height:100px">Email us at <a href="mailto:enquiries@tripalocal.com">enquiries@tripalocal.com</a> with the preferred experience, the dates and times and we will get back to you within 48 hours with a customised experience just for you!</p>
                         <div class="listingFooter">We offer exclusive experiences with private groups</div>
                     </div>
-                </div>       
+                </div>
             </div>
         </div>
     </div>
@@ -141,6 +141,51 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
+    function hrefToCityName(href) {
+        if (href.substr(-1) === '/') {
+            temp = href.substr(0, href.length - 1);
+        }
+
+        return temp.substr(temp.lastIndexOf("/") + 1);
+    }
+
+    function loadExperienceList(href) {
+        var data = {};
+        if ($("#language_English").prop('checked')) {
+            data['checkbox-eng'] = "English";
+        }
+
+        if ($("#language_Mandarin").prop('checked')) {
+            data['checkbox-cn'] = "Chinese";
+        }
+
+        var only_tags = ['is_host_with_cars', 'is_kids_friendly', 'is_private_tours'];
+        for (var i = 0; i < only_tags.length; ++i) {
+            if ($('#id_' + only_tags[i]).prop('checked')) {
+                data[only_tags[i]] = "on";
+            }
+        }
+
+        var city = hrefToCityName(href);
+
+        $.post(href, $.extend({
+            'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value,
+            'city': city,
+            'start_date': $("#id_start_date").val(),
+            'end_date': $("#id_end_date").val(),
+            'guest_number': $("#id_guest_number").val(),
+            'language': $("#id_language").val(),
+            'Search': "Search",
+            'tags': $("#id_tags").val(),
+            'all_tags': $("#id_all_tags").val()
+        }, data)).done(function (response) {
+            $('#ajax-experience-result').html($(response).find('#experience-results'));
+            $('#ajax-experience-count').html($(response).find('#experience-count'));
+        }).fail(function () {
+            $('#ajax-experience-result').text("Sorry but there was an error.");
+        });
+    }
+
     $(document).ready(function(){
         mixpanel.track("Search");
         if($("#user_email").val())
@@ -216,16 +261,16 @@
         $(".glyphicon-calendar").hide();
 
         $("#id_start_date").click(function(){
-            $("#id_start_date_picker").data("DateTimePicker").show();  
+            $("#id_start_date_picker").data("DateTimePicker").show();
         });
 
-       $("#id_start_date, #id_end_date").focusout(function () {
+        $("#id_start_date, #id_end_date").focusout(function () {
             if ($("#id_start_date").val() != "" && $("#id_end_date").val() != "") {
                 $("#itinerary-search").click();
             }
         });
 
-        $("#id_end_date").click(function(){
+        $("#id_end_date").click(function () {
             $("#id_end_date_picker").data("DateTimePicker").show();
         });
 
@@ -240,39 +285,17 @@
 
         $('#itinerary-search').on('click', function (event) {
             event.preventDefault();
+            var href = '/s/' + $("#id_city").val() + '/';
+            history.pushState({}, 'City', href);
+            loadExperienceList(href);
+        });
 
-            data = {};
-            if ($("#language_English").prop('checked')) {
-                data['checkbox-eng'] = "English";
+        $(window).on("popstate", function (e) {
+            if (e.originalEvent.state !== null) {
+                var city = hrefToCityName(location.href);
+                $("#id_city").val(city);
+                loadExperienceList(location.href);
             }
-
-            if ($("#language_Mandarin").prop('checked')) {
-                data['checkbox-cn'] = "Chinese";
-            }
-
-            var only_tags = ['is_host_with_cars', 'is_kids_friendly', 'is_private_tours'];
-            for (var i = 0; i < only_tags.length; ++i) {
-                if ($('#id_' + only_tags[i]).prop('checked')) {
-                    data[only_tags[i]] = "on";
-                }
-            }
-
-            $.post('/s/' + $("#id_city").val() + '/', $.extend({
-                'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value,
-                'city': $("#id_city").val(),
-                'start_date': $("#id_start_date").val(),
-                'end_date': $("#id_end_date").val(),
-                'guest_number': $("#id_guest_number").val(),
-                'language': $("#id_language").val(),
-                'Search': "Search",
-                'tags': $("#id_tags").val(),
-                'all_tags': $("#id_all_tags").val()
-            }, data)).done(function (response) {
-                    $('#ajax-experience-result').html($(response).find('#experience-results'));
-                    $('#ajax-experience-count').html($(response).find('#experience-count'));
-            }).fail(function () {
-                    $('#ajax-experience-result').text("Sorry but there was an error.");
-            });
         });
 
         $("#itinerary-search").click();
@@ -280,7 +303,7 @@
 
     $("#id_city").change(function(e){
         $("#search_form")[0].action = "/s/" + $("#id_city").val() + "/";
-        $("#itinerary-search").click() 
+        $("#itinerary-search").click()
     });
 
     $("#itinerary-search").click(function(e){
