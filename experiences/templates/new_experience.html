@@ -1,0 +1,74 @@
+{% extends "app/layout.html" %}
+
+{% load i18n %}
+
+{% block head %}
+    <title>Add a new experience</title>
+    {% load staticfiles %}
+    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.form.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="jumbotron-list-experience">
+        <div class="list-experience-header">
+            <p id="list-an-experience">
+                List an experience
+            </p>
+
+            <p id="list-an-experience-detail">
+                <span>Tripalocal lets you make money while</span><br>
+                <span>showing people around your neighbourhood.</span><br>
+            </p>
+        </div>
+    </div>
+
+    <form id="experience_form" action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="list-experience-body">
+            <div id="experience-title">
+                <p>Experience title</p>
+                {{ form.title }}
+                <label id="id_experience_title_limit"></label>
+            </div>
+            <br>
+
+            <div id="experience-duration">
+                <p>Duration of the experience</p>
+                {{ form.duration }}
+                <p style="padding-left:10px;">hours</p>
+            </div>
+            <br><br><br>
+
+            <div id="experience-city">
+                <p>City</p>
+                {{ form.location }}
+            </div>
+            <br><br><br>
+
+            <div>
+                <br><br><br><br>
+                <input type="submit" id="continue-button" value="Continue"/>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    <script charset="utf-8" type="text/javascript">
+
+        function countChar(object, limit, hint) {
+            var len = object.val().length;
+            if (len >= limit) {
+                object.val(object.val().substring(0, limit));
+            } else {
+                hint.text(limit - len + ' characters left');
+            }
+        }
+
+        $(document).ready(function () {
+            $("#id_experience-title").keyup(function () {
+                countChar($("#id_experience-title"), 40, $("#id_experience_title_limit"));
+            });
+        })
+    </script>
+{% endblock %}

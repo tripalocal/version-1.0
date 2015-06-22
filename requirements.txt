@@ -18,7 +18,7 @@ djangorestframework==3.0.4
 geoip2==2.1.0
 jsonfield==1.0.1
 maxminddb==1.1.1
-mixpanel-py==4.0.0
+mixpanel==4.1.0
 oauthlib==0.7.2
 pbr==0.10.7
 py-dateutil==2.2

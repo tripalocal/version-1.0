@@ -1,5 +1,6 @@
-from django.shortcuts import render, get_object_or_404, render_to_response
+from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_protect
 from experiences.models import Experience, WhatsIncluded, Photo, BlockOutTimePeriod, InstantBookingTimePeriod
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
@@ -1454,9 +1455,9 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                             [experience.id, 'Transport', (included_transport=='Yes'), included_transport_detail_other])
                         
         #save images
-        dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
-        if not os.path.isdir(dirname):
-            os.mkdir(dirname)
+        # dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
+        # if not os.path.isdir(dirname):
+        #     os.mkdir(dirname)
 
         prev_files = self.storage.get_step_files('photo')
 
@@ -2212,6 +2213,52 @@ def getProfileImage(experience):
     else:
         'profile_default.jpg'
 
+@csrf_protect
+def new_experience(request):
+    context = RequestContext(request)
+    form = ExperienceForm()
+
+    if request.method == 'POST':
+        form = ExperienceForm(request.POST)
+        if form.is_valid():
+            user_id = request.user.id
+            experience = Experience(start_datetime=datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0),
+                                    end_datetime=datetime.utcnow().replace(tzinfo=pytz.UTC).replace(
+                                        minute=0) + relativedelta(years=10),
+                                    title=form.cleaned_data['title'],
+                                    duration=form.cleaned_data['duration'],
+                                    city=form.cleaned_data['location']
+                                    )
+            experience.save()
+            host = User.objects.get(id=user_id)
+            experience.hosts.add(host)
+
+            #todo: add record to chinese database
+
+            return redirect('experiencedetail', experience.id)
+    else:
+        return render_to_response('new_experience.html', {'form': form}, context)
+
+
+def manage_listing(request, exp_id, step):
+    #;todo: host can only edit his/her own listing
+    context = RequestContext(request)
+
+    if request.is_ajax():
+        if request.method == 'GET':
+            if step == 'price':
+                form = ExperiencePriceForm()
+                experience = get_object_or_404(Experience, pk=exp_id)
+                form.data['min_guest_number'] = experience.guest_number_min
+                form.data['max_guest_number'] = experience.guest_number_max
+
+                render_to_response('price_form.html', {'form': form}, context)
+    return render_to_response('manage_listing.html', context)
+
+
+    # if request.method == 'POST':
+
+
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
                is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
     
@@ -2398,9 +2445,9 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
     if request.user.is_authenticated():
-        mp.track(request.user.email,"Viewed " + city.title() + " search page");
+        mp.track(request.user.email,"Viewed " + city.title() + " search page")
     else:
-        mp.track("","Viewed " + city.title() + " search page");
+        mp.track("","Viewed " + city.title() + " search page")
 
     city_display_name = None
     for i in range(len(cityList)):
