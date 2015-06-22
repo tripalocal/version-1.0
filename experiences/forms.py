@@ -42,7 +42,8 @@ Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6',
 
 Duration = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
 ('11', '11'),('12', '12'),('13', '13'),('14', '14'),('15', '15'),('16', '16'),('17', '17'),('18', '18'),('19', '19'),('20', '20'),
-('21', '21'),('22', '22'),('23', '23'),('24', '24'),('36', '36'),('48', '48'),('60', '60'),('72', '72'),('84', '84'),('96', '96'),)
+('21', '21'),('22', '22'),('23', '23'),('24', '24'),('36', '36'),('48', '48'),('60', '60'),('72', '72'),('84', '84'),('96', '96'),
+('108', '108'),('120', '120'),)
 
 Included = (('Yes', ''),('No', ''),)
 
@@ -182,8 +183,6 @@ class ExperienceCalendarForm(forms.Form):
         self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperiencePriceForm(forms.Form):
-    id = forms.CharField(max_length=10, required=False)
-    changed_steps = forms.CharField(max_length=100, required=False)
     duration = forms.ChoiceField(required=False, choices=Duration)
     min_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Min)
     max_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Max)
@@ -194,14 +193,10 @@ class ExperiencePriceForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePriceForm, self).__init__(*args, **kwargs)
-        self.fields['id'].widget.attrs['readonly'] = True
-        self.fields['id'].widget = forms.HiddenInput()
         self.fields['type'].widget.attrs['readonly'] = True
         self.fields['type'].widget = forms.HiddenInput()
         self.fields['dynamic_price'].widget.attrs['readonly'] = True
         self.fields['dynamic_price'].widget = forms.HiddenInput()
-        self.fields['changed_steps'].widget.attrs['readonly'] = True
-        self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperienceOverviewForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)
@@ -623,9 +618,9 @@ class BookingConfirmationForm(forms.Form):
                                 break
                         elif ib.repeat_cycle.lower() == "weekly":
                             weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-                            monday1 = (date-timedelta(days=date.weekday()))
+                            monday1 = (date.date()-timedelta(days=date.weekday()))
                             monday2 = (ib_start.date() - timedelta(days=ib_start.date().weekday()))
-                            if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7)%ib.repeat_frequency == 0:
+                            if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7).days%ib.repeat_frequency == 0:
                                 # for weekly repeated time periods, the start and end time must be in the same day
                                 if not (ib_start.hour <= time.hour and time.hour <= ib_end.hour):
                                     # not a match: hour
@@ -1159,9 +1154,9 @@ class ItineraryBookingForm(forms.Form):
                                 break
                         elif ib.repeat_cycle.lower() == "weekly":
                             weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-                            monday1 = (date-timedelta(days=date.weekday()))
+                            monday1 = (date.date()-timedelta(days=date.weekday()))
                             monday2 = (ib_start.date() - timedelta(days=ib_start.date().weekday()))
-                            if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7)%ib.repeat_frequency == 0:
+                            if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7).days%ib.repeat_frequency == 0:
                                 # for weekly repeated time periods, the start and end time must be in the same day
                                 if not (ib_start.hour <= time.hour and time.hour <= ib_end.hour):
                                     # not a match: hour

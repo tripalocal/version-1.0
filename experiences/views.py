@@ -121,6 +121,14 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         if guest_number is not None and (experience.guest_number_max < int(guest_number) or experience.guest_number_min > int(guest_number)):
             continue
 
+        if guest_number is None:
+            if experience.guest_number_min <= 4 and experience.guest_number_max>=4:
+                guest_number = 4
+            elif experience.guest_number_min > 4:
+                guest_number = experience.guest_number_min
+            elif experience.guest_number_max < 4:
+                guest_number = experience.guest_number_max
+
         if keywords is not None:
             experience_tags = experience.tags.split(",") if experience.tags is not None else ''
             tags = keywords.split(",")
@@ -2243,21 +2251,41 @@ def new_experience(request):
 def manage_listing(request, exp_id, step):
     #;todo: host can only edit his/her own listing
     context = RequestContext(request)
+    experience = get_object_or_404(Experience, pk=exp_id)
 
     if request.is_ajax():
         if request.method == 'GET':
             if step == 'price':
-                form = ExperiencePriceForm()
-                experience = get_object_or_404(Experience, pk=exp_id)
-                form.data['min_guest_number'] = experience.guest_number_min
-                form.data['max_guest_number'] = experience.guest_number_max
+                data = {}
+                data['min_guest_number'] = experience.guest_number_min
+                data['max_guest_number'] = experience.guest_number_max
+                data['duration'] = experience.duration
+                data['price'] = experience.price
+                if experience.price != None:
+                    data['price_with_booking_fee'] = round(float(experience.price)*(1.00+settings.COMMISSION_PERCENT),2)
+                form = ExperiencePriceForm(initial=data)
 
-                render_to_response('price_form.html', {'form': form}, context)
-    return render_to_response('manage_listing.html', context)
+                return render_to_response('price_form.html', {'form': form}, context)
+        elif request.method == 'POST':
+            if step == 'price':
+                form = ExperiencePriceForm(request.POST)
+                if form.is_valid():
+                    if form.cleaned_data['min_guest_number']:
+                        experience.guest_number_min = form.cleaned_data['min_guest_number']
+                    if form.cleaned_data['max_guest_number']:
+                        experience.guest_number_max = form.cleaned_data['max_guest_number']
+                    if form.cleaned_data['duration']:
+                        experience.duration = form.cleaned_data['duration']
+                    if form.cleaned_data['price']:
+                        experience.price = form.cleaned_data['price']
+
+                    experience.save()
+                    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+    else:
+        return render_to_response('manage_listing.html', context)
 
 
     # if request.method == 'POST':
-
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
                is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):

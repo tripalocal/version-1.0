@@ -444,7 +444,7 @@ a{
     margin-right:1vw;
 }
 .experinence-host{
-    width: 58.68vw;
+    width: 64vw;
     background: white;
     border: 1px solid #cccccc;
     border-radius: 3px;
@@ -504,14 +504,15 @@ a{
     padding-bottom: 10px;*/
 }
 .experience-hostpic{
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
     background-repeat: no-repeat;
     background-size:100%;
     background-position:50%;
     border-radius: 50%;
     float:left;
-    border-bottom: 1px solid #cccccc;
+    border: 1px solid #cccccc;
+    margin: 0;
 }
 .experience-hostinterests{
     width:35vw;

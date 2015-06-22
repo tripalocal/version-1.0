@@ -36,6 +36,7 @@
         <p id="steps-remaining">5 more steps<br>until publish!</p>
     </div>
 
+    <div id="ajax-update-singal"></div>
     <div id="ajax-price-form">
 
     </div>
@@ -55,33 +56,16 @@
         return numPattern.test(feeNumber);
     }
 
-    //guest size validation
-    $("#id_price-min_guest_number").change(function(){
-        min_guest=$("#id_price-min_guest_number");
-        max_guest=$("#id_price-max_guest_number");
-        if(parseInt(min_guest.val())>parseInt(max_guest.val())){
-            max_guest.val(min_guest.val()+"");
-        }
-    });
-
-    $("#id_price-max_guest_number").change(function(){
-        min_guest=$("#id_price-min_guest_number");
-        max_guest=$("#id_price-max_guest_number");
-        if(parseInt(min_guest.val())>parseInt(max_guest.val())){
-            min_guest.val(max_guest.val()+"");
-        }
-    });
-
     function updateprice()
     {
-        if($("#id_price-max_guest_number").val().length > 0 && $("#id_price-min_guest_number").val().length > 0)
+        if($("#id_max_guest_number").val().length > 0 && $("#id_min_guest_number").val().length > 0)
         {
-            max = parseInt($("#id_price-max_guest_number").val());
-            min = parseInt($("#id_price-min_guest_number").val());
+            max = parseInt($("#id_max_guest_number").val());
+            min = parseInt($("#id_min_guest_number").val());
 
             if(max>=min && min>=1 && min<=10 && max>=1 && max<=10)
             {
-                $("#id_price-dynamic_price").val($("#id_price-price").val()+',');
+                $("#id_dynamic_price").val($("#id_price").val()+',');
                 if(max==min)
                 {
                     return true;
@@ -91,11 +75,11 @@
                 {
                     if($("#dynamic_price_input_"+i).val().length > 0)
                     {
-                        $("#id_price-dynamic_price").val($("#id_price-dynamic_price").val()+$("#dynamic_price_input_"+i).val()+',');
+                        $("#id_dynamic_price").val($("#id_dynamic_price").val()+$("#dynamic_price_input_"+i).val()+',');
                     }
                     else
                     {
-                        $("#id_price-dynamic_price").val('');
+                        $("#id_dynamic_price").val('');
                         break;
                     }
                 }
@@ -107,228 +91,186 @@
         }
     }
 
-    function setdynamicpriceinput()
-    {
-        if($("#id_price-max_guest_number").val().length > 0 && $("#id_price-min_guest_number").val().length > 0)
-        {
-            max = parseInt($("#id_price-max_guest_number").val());
-            min = parseInt($("#id_price-min_guest_number").val());
+    function setdynamicpriceinput() {
+        if ($("#id_max_guest_number").val().length > 0 && $("#id_min_guest_number").val().length > 0) {
+            max = parseInt($("#id_max_guest_number").val());
+            min = parseInt($("#id_min_guest_number").val());
 
-            if(max>min && min>=1 && min<=10 && max>=1 && max<=10)
-            {
-                for(i=1;i<min;i++)
-                {
-                    $("#dynamic_price_div_"+i).attr("style","display:none;");
+            if (max > min && min >= 1 && min <= 10 && max >= 1 && max <= 10) {
+                for (i = 1; i < min; i++) {
+                    $("#dynamic_price_div_" + i).attr("style", "display:none;");
                 }
-                for(i=min;i<max;i++)
-                {
-                    $("#dynamic_price_div_"+i).attr("style","");
+                for (i = min; i < max; i++) {
+                    $("#dynamic_price_div_" + i).attr("style", "");
                 }
-                for(i=max;i<10;i++)
-                {
-                    $("#dynamic_price_div_"+i).attr("style","display:none;");
+                for (i = max; i < 10; i++) {
+                    $("#dynamic_price_div_" + i).attr("style", "display:none;");
                 }
             }
         }
     }
 
-    $(document).ready(function(){
-        $('body').attr('id','background-white');
+    function hrefToStepName(href) {
+        if (href.substr(-1) === '/') {
+            temp = href.substr(0, href.length - 1);
+        }
 
-        $.post('/s/' + $("#id_city").val() + '/', $.extend({
-                'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value,
-                'city': $("#id_city").val(),
-                'start_date': $("#id_start_date").val(),
-                'end_date': $("#id_end_date").val(),
-                'guest_number': $("#id_guest_number").val(),
-                'language': $("#id_language").val(),
-                'Search': "Search",
-                'tags': $("#id_tags").val(),
-                'all_tags': $("#id_all_tags").val()
-            }, data)).done(function (response) {
-                    $('#ajax-experience-result').html($(response).find('#experience-results'));
-                    $('#ajax-experience-count').html($(response).find('#experience-count'));
-            }).fail(function () {
-                    $('#ajax-experience-result').text("Sorry but there was an error.");
+        return temp.substr(temp.lastIndexOf("/") + 1);
+    }
+
+
+    function loadForm(href) {
+
+        var step = hrefToStepName(href);
+
+        function setListenerForPriceForm() {
+            $('#id_min_guest_number').change(function () {
+                postDatum(location.href, {'min_guest_number': $('#id_min_guest_number').val()})
             });
-{#        $("#id_price-changed_steps").val($("#id_price-changed_steps").val()+'price,');#}
-{##}
-{#        var price = parseFloat($("#id_price-price").val());#}
-{#        if(typeof price === 'number' && isValidNumber(price))#}
-{#        {#}
-{#            $("#id_price-price_with_booking_fee").val(Math.round(price*1.429*1.000+0.0));#}
-{#            $("#commission-price").text((price*1.429*1.000+0.0 - price).toFixed(2));#}
-{#        }#}
-{##}
-{#        if($("#id_price-dynamic_price").val().length > 0)#}
-{#        {#}
-{#            min = parseInt($("#id_price-min_guest_number").val());#}
-{#            price = $("#id_price-dynamic_price").val().split(',');#}
-{#            for(i=1;i<price.length;i++)#}
-{#            {#}
-{#                $("#dynamic_price_input_"+(i+min-1)).val(price[i]);#}
-{#                $("#commission-price-"+(i+min-1)).text((parseFloat(price[i])*1.429*1.000+0.0 - price[i]).toFixed(2));#}
-{#                $("#dynamic_price_with_fee_input_"+(i+min-1)).val(Math.round(parseFloat(price[i])*1.429*1.000+0.0));#}
-{#            }#}
-{#            $("#add_dynamic_price").attr("style","display:none;");#}
-{#            $("#cancel_dynamic_price").attr("style","");#}
-{#            $("#dynamic_price_div").attr("style","");#}
-{#            setdynamicpriceinput();#}
-{#        }#}
-{##}
-{#        for(i=1;i<10;i++)#}
-{#        {#}
-{#            $("#dynamic_price_input_"+i).keyup(function(e)#}
-{#            {#}
-{#                i = e.target.id.substr(-1,1);#}
-{#                var price = parseFloat($("#dynamic_price_input_"+i).val());#}
-{#                if(typeof price === 'number' && isValidNumber(price))#}
-{#                {#}
-{#                    $("#dynamic_price_with_fee_input_"+i).val((price*1.429*1.000+0.0).toFixed(2));#}
-{#                    $("#commission-price-"+i).text((price*1.429*1.000+0.0 - price).toFixed(2));#}
-{#                }#}
-{#                else#}
-{#                {#}
-{#                    $("#dynamic_price_with_fee_input_"+i).val("0");#}
-{#                    $("#commission-price-"+i).text("0");#}
-{#                    $("#dynamic_price_input_"+i).val("0");#}
-{#                }#}
-{#            })#}
-{##}
-{#            $("#dynamic_price_with_fee_input_"+i).keyup(function(e)#}
-{#            {#}
-{#                i = e.target.id.substr(-1,1);#}
-{#                var price = parseFloat($("#dynamic_price_with_fee_input_"+i).val());#}
-{#                if(typeof price === 'number' && isValidNumber(price))#}
-{#                {#}
-{#                    $("#dynamic_price_input_"+i).val(((price-0.0)/(1.429*1.000)).toFixed(2));#}
-{#                    $("#commission-price-"+i).text((price-(price-0.0)/(1.429*1.000)).toFixed(2));#}
-{#                }#}
-{#                else#}
-{#                {#}
-{#                    $("#dynamic_price_with_fee_input_"+i).val("0");#}
-{#                    $("#commission-price-"+i).text("0");#}
-{#                    $("#dynamic_price_input_"+i).val("0");#}
-{#                }#}
-{#            })#}
-{#        }#}
+
+            $('#id_max_guest_number').change(function () {
+                postDatum(location.href, {'max_guest_number': $('#id_max_guest_number').val()})
+            });
+
+            $("#id_min_guest_number").keyup(function () {
+                setdynamicpriceinput();
+            })
+
+            $("#id_max_guest_number").keyup(function () {
+                setdynamicpriceinput();
+            })
+
+            $('#id_duration').change(function () {
+                postDatum(location.href, {'duration': $('#id_duration').val()})
+            });
+
+            $('#id_price, #id_price_with_booking_fee').focusout(function () {
+                postDatum(location.href, {'price': $('#id_price').val()})
+            });
+
+            var price = parseFloat($("#id_price").val());
+            if (typeof price === 'number' && isValidNumber(price)) {
+                $("#id_price_with_booking_fee").val(Math.round(price * 1.429 * 1.000 + 0.0));
+                $("#commission-price").text((price * 1.429 * 1.000 + 0.0 - price).toFixed(2));
+            }
+
+            $("#id_price").keyup(function () {
+                var price = parseFloat($("#id_price").val());
+                if (typeof price === 'number' && isValidNumber(price)) {
+                    $("#id_price_with_booking_fee").val((price * 1.429 * 1.000 + 0.0).toFixed(2));
+                    $("#commission-price").text((price * 1.429 * 1.000 + 0.0 - price).toFixed(2));
+                }
+                else {
+                    $("#id_price").val("");
+                    $("#commission-price").text("0");
+                    $("#id_price_with_booking_fee").val("");
+                }
+            });
+
+            $("#id_price_with_booking_fee").keyup(function () {
+                var price = parseFloat($("#id_price_with_booking_fee").val());
+                if (typeof price === 'number' && isValidNumber(price)) {
+                    $("#id_price").val(((price - 0.0) / (1.429 * 1.000)).toFixed(2));
+                    $("#commission-price").text((price - (price - 0.0) / (1.429 * 1.000)).toFixed(2));
+                }
+                else {
+                    $("#id_price").val("");
+                    $("#commission-price").text("0");
+                    $("#id_price_with_booking_fee").val("");
+                }
+            });
+
+
+            $("#id_min_guest_number").change(function () {
+                min_guest = $("#id_min_guest_number");
+                max_guest = $("#id_max_guest_number");
+                if (parseInt(min_guest.val()) > parseInt(max_guest.val())) {
+                    max_guest.val(min_guest.val() + "");
+                }
+            });
+
+            $("#id_max_guest_number").change(function () {
+                min_guest = $("#id_min_guest_number");
+                max_guest = $("#id_max_guest_number");
+                if (parseInt(min_guest.val()) > parseInt(max_guest.val())) {
+                    min_guest.val(max_guest.val() + "");
+                }
+            });
+
+            $("#add_dynamic_price").click(function (e) {
+                $("#add_dynamic_price").attr("style", "display:none;");
+                $("#cancel_dynamic_price").attr("style", "");
+                $("#dynamic_price_div").attr("style", "");
+                setdynamicpriceinput();
+                for (i = 1; i < 10; i++) {
+                    $("#dynamic_price_input_" + i).val($("#id_price").val());
+                    $("#dynamic_price_with_fee_input_" + i).val($("#id_price_with_booking_fee").val());
+                }
+            });
+
+            $("#cancel_dynamic_price").click(function (e) {
+                $("#add_dynamic_price").attr("style", "");
+                $("#cancel_dynamic_price").attr("style", "display:none;");
+                $("#dynamic_price_div").attr("style", "display:none;");
+                for (i = 1; i < 10; i++) {
+                    $("#dynamic_price_input_" + i).val("");
+                    $("#dynamic_price_with_fee_input_" + i).val("");
+                    $("#dynamic_price_div_" + i).attr("style", "display:none;");
+                }
+            });
+
+            if ($("#id_dynamic_price").val().length > 0) {
+                min = parseInt($("#id_min_guest_number").val());
+                price = $("#id_dynamic_price").val().split(',');
+                for (i = 1; i < price.length; i++) {
+                    $("#dynamic_price_input_" + (i + min - 1)).val(price[i]);
+                    $("#commission-price-" + (i + min - 1)).text((parseFloat(price[i]) * 1.429 * 1.000 + 0.0 - price[i]).toFixed(2));
+                    $("#dynamic_price_with_fee_input_" + (i + min - 1)).val(Math.round(parseFloat(price[i]) * 1.429 * 1.000 + 0.0));
+                }
+                $("#add_dynamic_price").attr("style", "display:none;");
+                $("#cancel_dynamic_price").attr("style", "");
+                $("#dynamic_price_div").attr("style", "");
+                setdynamicpriceinput();
+            }
+        }
+
+        if (step === "price") {
+            $.get(href).done(function (response) {
+                $('#ajax-price-form').html($(response));
+            }).done(function () {
+                setListenerForPriceForm();
+            }).fail(function () {
+                $('#ajax-price-form').text("Sorry but there was an error.");
+            });
+        }
+    }
+
+    function postDatum(href, datum) {
+        var step = hrefToStepName(href);
+
+        if (step === "price") {
+            var signal = $('#ajax-update-singal');
+
+            $.post(href, $.extend({
+                'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value
+            }, datum)).done(function () {
+                signal.fadeIn("slow");
+                signal.text("Experience Updated");
+                signal.fadeOut("slow");
+            }).fail(function () {
+                signal.fadeIn("slow");
+                signal.text("Update Failed");
+                signal.fadeOut("slow");
+            });
+        }
+    }
+
+    $(document).ready(function () {
+        $('body').attr('id', 'background-white');
+
+        loadForm(location.href);
     });
 
-{#    $("#id_price-price").keyup(function()#}
-{#    {#}
-{#        var price = parseFloat($("#id_price-price").val());#}
-{#        if(typeof price === 'number' && isValidNumber(price))#}
-{#        {#}
-{#            $("#id_price-price_with_booking_fee").val((price*1.429*1.000+0.0).toFixed(2));#}
-{#            $("#commission-price").text((price*1.429*1.000+0.0 - price).toFixed(2));#}
-{#        }#}
-{#        else#}
-{#        {#}
-{#            $("#id_price-price").val("0");#}
-{#            $("#commission-price").text("0");#}
-{#            $("#id_price-price_with_booking_fee").val("0");#}
-{#        }#}
-{#    })#}
-{##}
-{#    $("#id_price-price_with_booking_fee").keyup(function()#}
-{#    {#}
-{#        var price = parseFloat($("#id_price-price_with_booking_fee").val());#}
-{#        if(typeof price === 'number' && isValidNumber(price))#}
-{#        {#}
-{#            $("#id_price-price").val(((price-0.0)/(1.429*1.000)).toFixed(2));#}
-{#            $("#commission-price").text((price-(price-0.0)/(1.429*1.000)).toFixed(2));#}
-{#        }#}
-{#        else#}
-{#        {#}
-{#            $("#id_price-price").val("0");#}
-{#            $("#commission-price").text("0");#}
-{#            $("#id_price-price_with_booking_fee").val("0");#}
-{#        }#}
-{#    })#}
-{##}
-{#    $("#id_price-min_guest_number").keyup(function()#}
-{#    {#}
-{#        setdynamicpriceinput();#}
-{#    })#}
-{##}
-{#    $("#id_price-max_guest_number").keyup(function()#}
-{#    {#}
-{#        setdynamicpriceinput();#}
-{#    })#}
-{##}
-{#    $("#add_dynamic_price").click(function(e)#}
-{#    {#}
-{#        $("#add_dynamic_price").attr("style","display:none;");#}
-{#        $("#cancel_dynamic_price").attr("style","");#}
-{#        $("#dynamic_price_div").attr("style","");#}
-{#        setdynamicpriceinput();#}
-{#        for(i=1;i<10;i++)#}
-{#        {#}
-{#            $("#dynamic_price_input_"+i).val($("#id_price-price").val());#}
-{#            $("#dynamic_price_with_fee_input_"+i).val($("#id_price-price_with_booking_fee").val());#}
-{#        }#}
-{#    })#}
-{##}
-{#    $("#cancel_dynamic_price").click(function(e)#}
-{#    {#}
-{#        $("#add_dynamic_price").attr("style","");#}
-{#        $("#cancel_dynamic_price").attr("style","display:none;");#}
-{#        $("#dynamic_price_div").attr("style","display:none;");#}
-{#        for(i=1;i<10;i++)#}
-{#        {#}
-{#            $("#dynamic_price_input_"+i).val("");#}
-{#            $("#dynamic_price_with_fee_input_"+i).val("");#}
-{#            $("#dynamic_price_div_"+i).attr("style","display:none;");#}
-{#        }#}
-{#    })#}
-{##}
-{#    $("#next-step").click(function(e)#}
-{#    {#}
-{#        e.preventDefault();#}
-{#        if(updateprice())#}
-{#        {#}
-{#            $("#id_price-type").val($("#experience_type").val());#}
-{#            $("#add_experience_price_form").submit();#}
-{#        }#}
-{#    })#}
-{##}
-{#    $("#save-and-exit").click(function(e)#}
-{#    {#}
-{#        if(updateprice())#}
-{#        {#}
-{#            $("#id_price-type").val($("#experience_type").val());#}
-{#            $("#add_experience_price_form").submit();#}
-{#        }#}
-{#        else#}
-{#        {#}
-{#            e.preventDefault();#}
-{#        }#}
-{#    })#}
-{##}
-{#    $("#save-and-exit-top").click(function(e)#}
-{#    {#}
-{#        if(updateprice())#}
-{#        {#}
-{#            $("#id_price-type").val($("#experience_type").val());#}
-{#            $("#add_experience_price_form").submit();#}
-{#        }#}
-{#        else#}
-{#        {#}
-{#            e.preventDefault();#}
-{#        }#}
-{#    })#}
-{#    $("#experience_type").click(function(e)#}
-{#    {#}
-{#        if($("#experience_type").val() != "PRIVATE")#}
-{#        {#}
-{#            $("#experience_type").val("PRIVATE");#}
-{#            $("#id_price-type").val("PRIVATE");#}
-{#        }#}
-{#        else#}
-{#        {#}
-{#            $("#experience_type").val("NONPRIVATE");#}
-{#            $("#id_price-type").val("NONPRIVATE");#}
-{#        }#}
-{#    })#}
+
 </script>
 {%endblock%}

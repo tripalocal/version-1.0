@@ -214,7 +214,7 @@
     <div class="experinence-host desBox">
         <p>About the host, {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</p>
         <div id="experience-hostintro" class="experience-hostintro">
-            <div class="experience-hostpic" style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;"></div>
+            <div class="experience-hostpic profile-lg" style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;"></div>
             <div style="width: 35vw;float:right">
                 <div id="experience-hostinterests" class="experience-hostinterests">
                     <div class="gradientMask"></div>
@@ -312,7 +312,7 @@
     	<div class="row">
             <div class="fixCenter">
                 <div class="expBox">
-                    <h2>People also booked</h2>
+                    <h2 style="font-weight:bold">People also booked</h2>
                     {% for related_experience, added_to_wishlist in related_experiences %}
                     {% if forloop.counter0 < 3 %}
                     <div class="expList">

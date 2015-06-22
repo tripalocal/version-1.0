@@ -888,7 +888,7 @@ body {
 #translation-n input[type=radio]:checked{background: url(/images/radio-button.png) no-repeat; background-position: 3.5px 3.5px;}
 
 /*fix that may cause problem*/
-.navBox{width: 100%; z-index: 10;}
+.navBox{width: 100%; z-index: 10;height:62px}
 .body{background-color: #FFF;}
 .footer{clear: both;}
 #background-white{background-color: #FFF;}
@@ -1171,7 +1171,7 @@ body {
 	-moz-appearance:none;
 	text-align: -moz-left;
 	background: url(/images/dropdown-button.png) no-repeat;
-	background-position: 78px -1px;
+	background-position: 78px 2px;
 	width: 100px;
 	padding-left: 5px;
 	margin-right:5px;
@@ -1182,7 +1182,7 @@ body {
 	-moz-appearance:none;
 	text-align: -moz-left;
 	background: url(/images/dropdown-button.png) no-repeat;
-	background-position: 43px -1px;
+	background-position: 43px 2px;
 	width: 65px;
 	padding-left: 5px;
 	margin-right:5px;
@@ -1193,7 +1193,7 @@ body {
 	-moz-appearance:none;
 	text-align: -moz-left;
 	background: url(/images/dropdown-button.png) no-repeat;
-	background-position: 22px -1px;
+	background-position: 22px 2px;
 	width: 44px;
 	padding-left: 10px;
 }

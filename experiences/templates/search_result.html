@@ -141,6 +141,51 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
+    function hrefToCityName(href) {
+        if (href.substr(-1) === '/') {
+            temp = href.substr(0, href.length - 1);
+        }
+
+        return temp.substr(temp.lastIndexOf("/") + 1);
+    }
+
+    function loadExperienceList(href) {
+        var data = {};
+        if ($("#language_English").prop('checked')) {
+            data['checkbox-eng'] = "English";
+        }
+
+        if ($("#language_Mandarin").prop('checked')) {
+            data['checkbox-cn'] = "Chinese";
+        }
+
+        var only_tags = ['is_host_with_cars', 'is_kids_friendly', 'is_private_tours'];
+        for (var i = 0; i < only_tags.length; ++i) {
+            if ($('#id_' + only_tags[i]).prop('checked')) {
+                data[only_tags[i]] = "on";
+            }
+        }
+
+        var city = hrefToCityName(href);
+
+        $.post(href, $.extend({
+            'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value,
+            'city': city,
+            'start_date': $("#id_start_date").val(),
+            'end_date': $("#id_end_date").val(),
+            'guest_number': $("#id_guest_number").val(),
+            'language': $("#id_language").val(),
+            'Search': "Search",
+            'tags': $("#id_tags").val(),
+            'all_tags': $("#id_all_tags").val()
+        }, data)).done(function (response) {
+            $('#ajax-experience-result').html($(response).find('#experience-results'));
+            $('#ajax-experience-count').html($(response).find('#experience-count'));
+        }).fail(function () {
+            $('#ajax-experience-result').text("Sorry but there was an error.");
+        });
+    }
+
     $(document).ready(function(){
         mixpanel.track("Search");
         if($("#user_email").val())
@@ -240,39 +285,17 @@
 
         $('#itinerary-search').on('click', function (event) {
             event.preventDefault();
+            var href = '/s/' + $("#id_city").val() + '/';
+            history.pushState({}, 'City', href);
+            loadExperienceList(href);
+        });
 
-            data = {};
-            if ($("#language_English").prop('checked')) {
-                data['checkbox-eng'] = "English";
+        $(window).on("popstate", function (e) {
+            if (e.originalEvent.state !== null) {
+                var city = hrefToCityName(location.href);
+                $("#id_city").val(city);
+                loadExperienceList(location.href);
             }
-
-            if ($("#language_Mandarin").prop('checked')) {
-                data['checkbox-cn'] = "Chinese";
-            }
-
-            var only_tags = ['is_host_with_cars', 'is_kids_friendly', 'is_private_tours'];
-            for (var i = 0; i < only_tags.length; ++i) {
-                if ($('#id_' + only_tags[i]).prop('checked')) {
-                    data[only_tags[i]] = "on";
-                }
-            }
-
-            $.post('/s/' + $("#id_city").val() + '/', $.extend({
-                'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value,
-                'city': $("#id_city").val(),
-                'start_date': $("#id_start_date").val(),
-                'end_date': $("#id_end_date").val(),
-                'guest_number': $("#id_guest_number").val(),
-                'language': $("#id_language").val(),
-                'Search': "Search",
-                'tags': $("#id_tags").val(),
-                'all_tags': $("#id_all_tags").val()
-            }, data)).done(function (response) {
-                    $('#ajax-experience-result').html($(response).find('#experience-results'));
-                    $('#ajax-experience-count').html($(response).find('#experience-count'));
-            }).fail(function () {
-                    $('#ajax-experience-result').text("Sorry but there was an error.");
-            });
         });
 
         $("#itinerary-search").click();
