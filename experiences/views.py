@@ -2263,10 +2263,14 @@ def manage_listing(request, exp_id, step):
                 data['price'] = experience.price
                 if experience.price != None:
                     data['price_with_booking_fee'] = round(float(experience.price)*(1.00+settings.COMMISSION_PERCENT),2)
+                data['dynamic_price'] = experience.dynamic_price
+                data['type'] = experience.type
+
                 form = ExperiencePriceForm(initial=data)
 
                 return render_to_response('price_form.html', {'form': form}, context)
         elif request.method == 'POST':
+            #todo: may need to verify data
             if step == 'price':
                 form = ExperiencePriceForm(request.POST)
                 if form.is_valid():
@@ -2278,6 +2282,11 @@ def manage_listing(request, exp_id, step):
                         experience.duration = form.cleaned_data['duration']
                     if form.cleaned_data['price']:
                         experience.price = form.cleaned_data['price']
+                    if form.cleaned_data['dynamic_price']:
+                        experience.dynamic_price = form.cleaned_data['dynamic_price']
+                    if form.cleaned_data['type']:
+                        experience.type = form.cleaned_data['type']
+
 
                     experience.save()
                     return HttpResponse(json.dumps({'success': True}), content_type='application/json')
