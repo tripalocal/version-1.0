@@ -199,8 +199,6 @@ class ExperiencePriceForm(forms.Form):
         self.fields['dynamic_price'].widget = forms.HiddenInput()
 
 class ExperienceOverviewForm(forms.Form):
-    id = forms.CharField(max_length=10, required=False)
-    changed_steps = forms.CharField(max_length=100, required=False)
     title = forms.CharField(required=False, max_length=100)
     title_other = forms.CharField(required = False, max_length=100)
     summary = forms.CharField(required=False, widget=forms.Textarea)
@@ -209,12 +207,8 @@ class ExperienceOverviewForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(ExperienceOverviewForm, self).__init__(*args, **kwargs)
-        self.fields['id'].widget.attrs['readonly'] = True
-        self.fields['id'].widget = forms.HiddenInput()
         self.fields['language'].widget.attrs['readonly'] = True
         self.fields['language'].widget = forms.HiddenInput()
-        self.fields['changed_steps'].widget.attrs['readonly'] = True
-        self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperienceDetailForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)

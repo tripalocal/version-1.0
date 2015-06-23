@@ -1,0 +1,109 @@
+
+<div id="overview-form" class="calendar">
+    <ul id="myTab" class="nav nav-tabs">
+        {%if language == "cn" %}
+        <li class="active"><a id="overview_tab" role="button" data-toggle="tab">中文（简体）</a></li>
+        <li><a id="overview_other_tab" role="button" data-toggle="tab">English</a></li>
+        {%else%}
+        <li class="active"><a id="overview_tab" role="button" data-toggle="tab">English</a></li>
+        <li><a id="overview_other_tab" role="button" data-toggle="tab">中文（简体）</a></li>
+        {%endif%}
+    </ul>
+
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade in active" id="english">
+            <div class="section" id="section-overview">
+                <div id="location">
+                    <p id="photo-heading"><strong>Overview</strong></p>
+                    <br><br><br>
+                    <p id="location-details">
+                        <span>A title and summary</span><br>
+                        <span>displayed on your</span><br>
+                        <span>public listing page.</span><br>
+                        <br>
+                        <span>This will also be vis-</span><br>
+                        <span>ible on the search</span><br>
+                        <span>page.</span><br>
+
+                    </p>
+                </div>
+                <div id="title_div" class="title-instruction">
+                    <p id="meet-up-heading">Title</p>
+                    {{ form.title }}
+                    <br>
+                    <p id="characters-left"><label id="id_overview_title_limit"></label></p>
+                </div>
+                <div id="other_title_div" class="title-instruction" style="display:none;">
+                    <p id="meet-up-heading">Title</p>
+                    {{ form.title_other }}
+                    <br>
+                    <p id="characters-left"><label id="id_overview_title_limit_other"></label></p>
+                </div>
+                <div id="summary_div" class="title-instruction">
+                    <p id="meet-up-heading">Summary</p>
+                    {{ form.summary }}
+                    <br>
+                    <p id="characters-left"><label id="id_overview_summary_limit"></label></p>
+                </div>
+                <div id="other_summary_div" class="title-instruction" style="display:none;">
+                    <p id="meet-up-heading">Summary</p>
+                    {{ form.summary_other }}
+                    <br>
+                    <p id="characters-left"><label id="id_overview_summary_limit_other"></label></p>
+                </div>
+            </div>
+
+            <div class="section" id="section-language">
+                <div id="location">
+                    <p id="photo-heading"><strong>Language</strong></p><br><br><br>
+                    <p id="location-details">
+                        <span>What language do</span><br>
+                        <span> you speak?</span><br>
+                    </p>
+                </div>
+
+                <div id="language-bar">
+                    {{form.language}}
+                    <input id="language_english" type="checkbox" class="css-checkbox" disabled><label for="language_english" name="checkbox2_lbl" class="css-label lite-cyan-check">English</label>
+                    <input id="language_mandarin" type="checkbox" class="css-checkbox"><label for="language_mandarin" name="checkbox2_lbl" class="css-label lite-cyan-check">普通话</label>
+                    <input id="language_cantonese" type="checkbox" class="css-checkbox"><label for="language_cantonese" name="checkbox2_lbl" class="css-label lite-cyan-check">粤语</label>
+                    <input id="language_japanese" type="checkbox" class="css-checkbox"><label for="language_japanese" name="checkbox2_lbl" class="css-label lite-cyan-check">日本語</label>
+                </div>
+            </div>
+
+            <div class="section" style="text-align:right;">
+                <input type="submit" value="Next Step" id="next-step" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info bar -->
+<div class="info-bar" style="width:300px;">
+    <img src="/images/bubble-icon.png" alt="">
+    <div id="hint-msgs">
+        <p>
+            <span><strong>A great title</strong></span><br>
+            <span>A great title is unique and</span><br>
+            <span>descriptive! It should high-</span><br>
+            <span>light the main attractions of</span><br>
+            <span>your experience, and it</span><br>
+            <span>should use the most relevant</span><br>
+            <span>keyword at the beginning of</span><br>
+            <span>the title.</span><br>
+        </p>
+    </div>
+    <img src="/images/bubble-icon.png" alt="">
+    <div id="hint-msgs">
+        <p>
+            <span><strong>Summary</strong></span><br>
+            <span>Travellers will see your sum-</span><br>
+            <span>mary on the search page so</span><br>
+            <span>please highlight the value</span><br>
+            <span>your offer. Think about what</span><br>
+            <span>type of travellers will appre-</span><br>
+            <span>ciate your offering.</span><br>
+        </p>
+    </div>
+    <br>
+</div>

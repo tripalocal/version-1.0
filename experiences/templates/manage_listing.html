@@ -8,10 +8,6 @@
 
 {% block content %}
 <form id="add_experience_price_form" action="" method="post" enctype="multipart/form-data">{% csrf_token %}
-    <div class="back_button">
-        <button name="wizard_save_exit_price" type="submit" val="" id="save-and-exit-top">Save and Exit</button>
-    </div>
-
     <div class="left-side-bar">
         <!-- Essential -->
    	    <p class="list-menu">Essential</p>
@@ -37,9 +33,7 @@
     </div>
 
     <div id="ajax-update-singal"></div>
-    <div id="ajax-price-form">
-
-    </div>
+    <div id="ajax-listing-form"></div>
 </form>
 {% endblock %}
 
@@ -84,7 +78,7 @@
         }
     }
 
-    function setdynamicpriceinput() {
+    function setDynamicPriceInput() {
         if ($("#id_max_guest_number").val().length > 0 && $("#id_min_guest_number").val().length > 0) {
             max = parseInt($("#id_max_guest_number").val());
             min = parseInt($("#id_min_guest_number").val());
@@ -111,11 +105,15 @@
         return temp.substr(temp.lastIndexOf("/") + 1);
     }
 
+    function nextStepHref(href, step) {
+        if (href.substr(-1) === '/') {
+            temp = href.substr(0, href.length - 1);
+        }
 
-    function loadForm(href) {
+        return temp.substr(0, temp.lastIndexOf("/") + 1) + step + '/';
+    }
 
-        var step = hrefToStepName(href);
-
+    function loadPriceForm(href) {
         function setListenerForDynamicPrice() {
             for (i = 1; i < 10; i++) {
                 $("#dynamic_price_input_" + i).keyup(function (e) {
@@ -133,8 +131,9 @@
                 });
 
                 $("#dynamic_price_input_" + i).focusout(function () {
-                    updatePriceInput();
-                    postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
+                    if (updatePriceInput()) {
+                        postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
+                    }
                 });
 
                 $("#dynamic_price_with_fee_input_" + i).keyup(function (e) {
@@ -152,8 +151,9 @@
                 });
 
                 $("#dynamic_price_with_fee_input_" + i).focusout(function () {
-                    updatePriceInput();
-                    postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
+                    if (updatePriceInput()) {
+                        postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
+                    }
                 });
             }
         }
@@ -168,11 +168,11 @@
             });
 
             $("#id_min_guest_number").keyup(function () {
-                setdynamicpriceinput();
+                setDynamicPriceInput();
             });
 
             $("#id_max_guest_number").keyup(function () {
-                setdynamicpriceinput();
+                setDynamicPriceInput();
             });
 
             $('#id_duration').change(function () {
@@ -230,10 +230,14 @@
                 $("#add_dynamic_price").attr("style", "display:none;");
                 $("#cancel_dynamic_price").attr("style", "");
                 $("#dynamic_price_div").attr("style", "");
-                setdynamicpriceinput();
+                setDynamicPriceInput();
                 for (i = 1; i < 10; i++) {
                     $("#dynamic_price_input_" + i).val($("#id_price").val());
                     $("#dynamic_price_with_fee_input_" + i).val($("#id_price_with_booking_fee").val());
+                }
+
+                if (updatePriceInput()) {
+                    postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
                 }
             });
 
@@ -245,6 +249,10 @@
                     $("#dynamic_price_input_" + i).val("");
                     $("#dynamic_price_with_fee_input_" + i).val("");
                     $("#dynamic_price_div_" + i).attr("style", "display:none;");
+                }
+
+                if (updatePriceInput()) {
+                    postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
                 }
             });
 
@@ -262,6 +270,13 @@
                 postDatum(location.href, {'type': $('#id_type').val()})
             });
 
+            $("#next-step").click(function (e) {
+                e.preventDefault();
+
+                var href = nextStepHref(location.href, 'overview');
+                history.pushState({}, 'Edit Experience', href);
+                loadForm(href)
+            });
         }
 
         function setupInitialValue() {
@@ -283,40 +298,165 @@
                 $("#add_dynamic_price").attr("style", "display:none;");
                 $("#cancel_dynamic_price").attr("style", "");
                 $("#dynamic_price_div").attr("style", "");
-                setdynamicpriceinput();
+                setDynamicPriceInput();
             }
         }
 
-        if (step === "price") {
-            $.get(href).done(function (response) {
-                $('#ajax-price-form').html($(response));
-            }).done(function () {
-                setupInitialValue();
-                setListenerForPriceForm();
-            }).fail(function () {
-                $('#ajax-price-form').text("Sorry but there was an error.");
+        $.get(href).done(function (response) {
+            $('#ajax-listing-form').html($(response));
+        }).done(function () {
+            setupInitialValue();
+            setListenerForPriceForm();
+        }).fail(function () {
+            $('#ajax-listing-form').text("Sorry but there was an error.");
+        });
+    }
+
+    function loadOverviewForm(href) {
+        function updateLanguage() {
+            $("#id_language").val("");
+            lan = ["english", "mandarin", "cantonese", "japanese"];
+            for (i = 0; i < lan.length; i++) {
+                if ($("#language_" + lan[i]).is(" :checked")) {
+                    new_lan = $("#id_language").val() + lan[i] + ";";
+                    $("#id_language").val(new_lan);
+                }
+            }
+        }
+
+        function countChar(object, limit, hint) {
+            var len = object.val().length;
+            if (len >= limit) {
+                object.val(object.val().substring(0, limit));
+            } else {
+                hint.text(limit - len + ' characters left');
+            }
+        }
+
+        function setListenerForOverviewForm() {
+            $("#language_cantonese, #language_mandarin, #language_japanese").click(function () {
+                updateLanguage();
+                postDatum(location.href, {
+                    'language': $('#id_language').val(),
+                    'title': $('#id_title').val(),
+                    'summary': $('#id_summary').val()
+                });
             });
+
+            $('#id_title, #id_summary').focusout(function () {
+                postDatum(location.href, {
+                    'title': $('#id_title').val(),
+                    'summary': $('#id_summary').val()
+                })
+            });
+
+            $("#next-step").click(function (e) {
+                e.preventDefault();
+
+                var href = nextStepHref(location.href, 'detail');
+                history.pushState({}, 'Edit Experience', href);
+                loadForm(href)
+            });
+        }
+
+        function setupOverviewForm() {
+            if ($("#id_language").val() != "") {
+                lans = $("#id_language").val().toLowerCase().split(';');
+                if (lans.indexOf("english") >= 0) {
+                    $("#language_english").prop("checked", true);
+                }
+                if (lans.indexOf("mandarin") >= 0) {
+                    $("#language_mandarin").prop("checked", true);
+                }
+                if (lans.indexOf("cantonese") >= 0) {
+                    $("#language_cantonese").prop("checked", true);
+                }
+                if (lans.indexOf("japanese") >= 0) {
+                    $("#language_japanese").prop("checked", true);
+                }
+
+                if (lans.indexOf("translation") >= 0) {
+                    $("#need-translation-y").prop("checked", true);
+                }
+                else {
+                    $("#need-translation-n").prop("checked", true);
+                }
+            }
+            else {
+                //new experience, choose english by default
+                $("#language_english").prop("checked", true);
+                $("#id_language").val("english;");
+            }
+
+            $("#overview_tab").click(function () {
+                $("#title_div").attr("style", "");
+                $("#summary_div").attr("style", "");
+
+                $("#other_title_div").attr("style", "display:none;");
+                $("#other_summary_div").attr("style", "display:none;");
+            });
+
+            $("#overview_other_tab").click(function () {
+                $("#title_div").attr("style", "display:none;");
+                $("#summary_div").attr("style", "display:none;");
+
+                $("#other_title_div").attr("style", "");
+                $("#other_summary_div").attr("style", "");
+            });
+
+            $("#id_title").keyup(function () {
+                countChar($("#id_title"), 40, $("#id_overview_title_limit"));
+            });
+
+            $("#id_title_other").keyup(function () {
+                countChar($("#id_title_other"), 40, $("#id_overview_title_limit_other"));
+            });
+
+            $("#id_summary").keyup(function () {
+                countChar($("#id_summary"), 500, $("#id_overview_summary_limit"));
+            });
+
+            $("#id_summary_other").keyup(function () {
+                countChar($("#id_summary_other"), 500, $("#id_overview_summary_limit_other"));
+            });
+        }
+
+        $.get(href).done(function (response) {
+            $('#ajax-listing-form').html($(response));
+        }).done(function () {
+            setupOverviewForm();
+            setListenerForOverviewForm();
+        }).fail(function () {
+            $('#ajax-listing-form').text("Sorry but there was an error.");
+        });
+    }
+
+    function loadForm(href) {
+        var step = hrefToStepName(href);
+
+        if (step === "price") {
+            loadPriceForm(href);
+        } else if (step === "overview") {
+            loadOverviewForm(href);
+        } else if (step === "detail") {
+
         }
     }
 
     function postDatum(href, datum) {
-        var step = hrefToStepName(href);
+        var signal = $('#ajax-update-singal');
 
-        if (step === "price") {
-            var signal = $('#ajax-update-singal');
-
-            $.post(href, $.extend({
-                'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value
-            }, datum)).done(function () {
-                signal.fadeIn("slow");
-                signal.text("Experience Updated");
-                signal.fadeOut("slow");
-            }).fail(function () {
-                signal.fadeIn("slow");
-                signal.text("Update Failed");
-                signal.fadeOut("slow");
-            });
-        }
+        $.post(href, $.extend({
+            'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value
+        }, datum)).done(function () {
+            signal.fadeIn("slow");
+            signal.text("Experience Updated");
+            signal.fadeOut("slow");
+        }).fail(function () {
+            signal.fadeIn("slow");
+            signal.text("Update Failed");
+            signal.fadeOut("slow");
+        });
     }
 
     $(document).ready(function () {

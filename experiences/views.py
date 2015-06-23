@@ -2247,6 +2247,65 @@ def new_experience(request):
     else:
         return render_to_response('new_experience.html', {'form': form}, context)
 
+def manage_listing_price(request, experience, context):
+    if request.method == 'GET':
+        data = {}
+        data['min_guest_number'] = experience.guest_number_min
+        data['max_guest_number'] = experience.guest_number_max
+        data['duration'] = experience.duration
+        data['price'] = experience.price
+        if experience.price != None:
+            data['price_with_booking_fee'] = round(float(experience.price) * (1.00 + settings.COMMISSION_PERCENT), 2)
+        data['dynamic_price'] = experience.dynamic_price
+        data['type'] = experience.type
+
+        form = ExperiencePriceForm(initial=data)
+
+        return render_to_response('price_form.html', {'form': form}, context)
+    elif request.method == 'POST':
+        # todo: may need to verify data e.g. min < max
+        form = ExperiencePriceForm(request.POST)
+        if form.is_valid():
+            experience.dynamic_price = form.cleaned_data['dynamic_price']
+            if form.cleaned_data['min_guest_number']:
+                experience.guest_number_min = form.cleaned_data['min_guest_number']
+            if form.cleaned_data['max_guest_number']:
+                experience.guest_number_max = form.cleaned_data['max_guest_number']
+            if form.cleaned_data['duration']:
+                experience.duration = form.cleaned_data['duration']
+            if form.cleaned_data['price']:
+                experience.price = form.cleaned_data['price']
+            if form.cleaned_data['type']:
+                experience.type = form.cleaned_data['type']
+
+            experience.save()
+            return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+def manage_listing_overview(request, experience, context):
+    if request.method == 'GET':
+        #todo: fetch record from chinese database
+        data = {}
+        data['title'] = experience.title
+        data['title_other'] = experience.title
+        data['summary'] = experience.description
+        data['summary_other'] = experience.description
+        data['language'] = experience.language
+        form = ExperienceOverviewForm(initial=data)
+
+        return render_to_response('overview_form.html', {'form': form}, context)
+
+    elif request.method == 'POST':
+        #todo: add record from chinese database
+
+        form = ExperienceOverviewForm(request.POST)
+        if form.is_valid():
+            experience.title = form.cleaned_data['title']
+            experience.description = form.cleaned_data['summary']
+            experience.language = form.cleaned_data['language']
+
+        experience.save()
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 def manage_listing(request, exp_id, step):
     #;todo: host can only edit his/her own listing
@@ -2254,42 +2313,10 @@ def manage_listing(request, exp_id, step):
     experience = get_object_or_404(Experience, pk=exp_id)
 
     if request.is_ajax():
-        if request.method == 'GET':
-            if step == 'price':
-                data = {}
-                data['min_guest_number'] = experience.guest_number_min
-                data['max_guest_number'] = experience.guest_number_max
-                data['duration'] = experience.duration
-                data['price'] = experience.price
-                if experience.price != None:
-                    data['price_with_booking_fee'] = round(float(experience.price)*(1.00+settings.COMMISSION_PERCENT),2)
-                data['dynamic_price'] = experience.dynamic_price
-                data['type'] = experience.type
-
-                form = ExperiencePriceForm(initial=data)
-
-                return render_to_response('price_form.html', {'form': form}, context)
-        elif request.method == 'POST':
-            #todo: may need to verify data
-            if step == 'price':
-                form = ExperiencePriceForm(request.POST)
-                if form.is_valid():
-                    if form.cleaned_data['min_guest_number']:
-                        experience.guest_number_min = form.cleaned_data['min_guest_number']
-                    if form.cleaned_data['max_guest_number']:
-                        experience.guest_number_max = form.cleaned_data['max_guest_number']
-                    if form.cleaned_data['duration']:
-                        experience.duration = form.cleaned_data['duration']
-                    if form.cleaned_data['price']:
-                        experience.price = form.cleaned_data['price']
-                    if form.cleaned_data['dynamic_price']:
-                        experience.dynamic_price = form.cleaned_data['dynamic_price']
-                    if form.cleaned_data['type']:
-                        experience.type = form.cleaned_data['type']
-
-
-                    experience.save()
-                    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+        if step == 'price':
+            return manage_listing_price(request, experience, context)
+        elif step == 'overview':
+            return manage_listing_overview(request, experience, context)
     else:
         return render_to_response('manage_listing.html', context)
 
