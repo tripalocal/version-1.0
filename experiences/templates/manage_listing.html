@@ -32,7 +32,7 @@
         <p id="steps-remaining">5 more steps<br>until publish!</p>
     </div>
 
-    <div id="ajax-update-singal"></div>
+    <div id="ajax-update-signal"></div>
     <div id="ajax-listing-form"></div>
 </form>
 {% endblock %}
@@ -113,6 +113,15 @@
         return temp.substr(0, temp.lastIndexOf("/") + 1) + step + '/';
     }
 
+    function nextStepBinding(step) {
+        $("#next-step").click(function (e) {
+            e.preventDefault();
+
+            var href = nextStepHref(location.href, step);
+            history.pushState({}, 'Edit Experience', href);
+            loadForm(href)
+        });
+    }
     function loadPriceForm(href) {
         function setListenerForDynamicPrice() {
             for (i = 1; i < 10; i++) {
@@ -270,13 +279,7 @@
                 postDatum(location.href, {'type': $('#id_type').val()})
             });
 
-            $("#next-step").click(function (e) {
-                e.preventDefault();
-
-                var href = nextStepHref(location.href, 'overview');
-                history.pushState({}, 'Edit Experience', href);
-                loadForm(href)
-            });
+            nextStepBinding('overview');
         }
 
         function setupInitialValue() {
@@ -350,13 +353,7 @@
                 })
             });
 
-            $("#next-step").click(function (e) {
-                e.preventDefault();
-
-                var href = nextStepHref(location.href, 'detail');
-                history.pushState({}, 'Edit Experience', href);
-                loadForm(href)
-            });
+            nextStepBinding('detail');
         }
 
         function setupOverviewForm() {
@@ -431,6 +428,149 @@
         });
     }
 
+    function loadDetailForm(href) {
+        {#            todo: duplicate countChar?#}
+        function countChar(object, limit, hint) {
+            var len = object.val().length;
+            if (len >= limit) {
+                object.val(object.val().substring(0, limit));
+            } else {
+                hint.text(limit - len + ' characters left');
+            }
+        }
+
+        function setupDetailForm() {
+            item = ["food", "transport", "ticket"];
+            $("#id_included_ticket_detail_other").attr("style", "display:none;");
+            $("#id_included_transport_detail_other").attr("style", "display:none;");
+            $("#id_included_food_detail_other").attr("style", "display:none;");
+
+            $("label[for='id_included_food_0']").attr("style", "padding-left:45px;");
+            $("label[for='id_included_transport_0']").attr("style", "padding-left:16px;");
+            $("label[for='id_included_ticket_0']").attr("style", "padding-left:40px;");
+
+            for (i = 0; i < item.length; i++) {
+                for (j = 0; j < 2; j++) {
+                    str = $("label[for='id_included_" + item[i] + "_" + j + "']")[0].innerHTML;
+                    str = str.substring(0, str.indexOf('>') + 1);
+                    $("label[for='id_included_" + item[i] + "_" + j + "']")[0].innerHTML = str;
+                }
+            }
+        }
+
+        function setListenerForDetailForm() {
+            $("#detail_tab").click(function () {
+                $("#activity_div").attr("style", "");
+                $("#interaction_div").attr("style", "");
+                $("#dress_div").attr("style", "");
+
+                $("#other_activity_div").attr("style", "display:none;");
+                $("#other_interaction_div").attr("style", "display:none;");
+                $("#other_dress_div").attr("style", "display:none;");
+
+                $("#id_included_ticket_detail").attr("style", "");
+                $("#id_included_transport_detail").attr("style", "");
+                $("#id_included_food_detail").attr("style", "");
+
+                $("#id_included_ticket_detail_other").attr("style", "display:none;");
+                $("#id_included_transport_detail_other").attr("style", "display:none;");
+                $("#id_included_food_detail_other").attr("style", "display:none;");
+            });
+
+            $("#detail_other_tab").click(function () {
+                $("#activity_div").attr("style", "display:none;");
+                $("#interaction_div").attr("style", "display:none;");
+                $("#dress_div").attr("style", "display:none;");
+
+                $("#other_activity_div").attr("style", "");
+                $("#other_interaction_div").attr("style", "");
+                $("#other_dress_div").attr("style", "");
+
+                $("#id_included_ticket_detail").attr("style", "display:none;");
+                $("#id_included_transport_detail").attr("style", "display:none;");
+                $("#id_included_food_detail").attr("style", "display:none;");
+
+                $("#id_included_ticket_detail_other").attr("style", "");
+                $("#id_included_transport_detail_other").attr("style", "");
+                $("#id_included_food_detail_other").attr("style", "");
+            });
+
+            $("#id_activity").keyup(function () {
+                countChar($("#id_activity"), 500, $("#id_detail_activity_limit"));
+            });
+
+            $("#id_activity_other").keyup(function () {
+                countChar($("#id_activity_other"), 500, $("#id_detail_activity_limit_other"));
+            });
+
+            $("#id_interaction").keyup(function () {
+                countChar($("#id_interaction"), 500, $("#id_detail_interaction_limit"));
+            });
+
+            $("#id_interaction_other").keyup(function () {
+                countChar($("#id_interaction_other"), 500, $("#id_detail_interaction_limit_other"));
+            });
+
+            $("#id_dress_code").keyup(function () {
+                countChar($("#id_dress_code"), 500, $("#id_detail_dress_limit"));
+            });
+
+            $("#id_dress_code_other").keyup(function () {
+                countChar($("#id_dress_code_other"), 500, $("#id_detail_dress_limit_other"));
+            });
+
+            nextStepBinding('photo');
+        }
+
+        function setListenerForPostingDetail() {
+            $("#id_activity").focusout(function () {
+                postDatum(location.href, {'activity': $('#id_activity').val()});
+            });
+
+            $("#id_interaction").focusout(function () {
+                postDatum(location.href, {'interaction': $('#id_interaction').val()});
+            });
+
+            $("#id_dress_code").focusout(function () {
+                postDatum(location.href, {'dress_code': $('#id_dress_code').val()});
+            });
+
+            $("#id_included_food_0, #id_included_food_1").click(function () {
+                postDatum(location.href, {'included_food': $('input[name=included_food]:checked').val()});
+            });
+
+            $("#id_included_transport_0, #id_included_transport_1").click(function () {
+                postDatum(location.href, {'included_transport': $('input[name=included_transport]:checked').val()});
+            });
+
+            $("#id_included_ticket_0, #id_included_ticket_1").click(function () {
+                postDatum(location.href, {'included_ticket': $('input[name=included_ticket]:checked').val()});
+            });
+
+            $("#id_included_food_detail").focusout(function () {
+                postDatum(location.href, {'included_food_detail': $('#id_included_food_detail').val()});
+            });
+
+            $("#id_included_transport_detail").focusout(function () {
+                postDatum(location.href, {'included_transport_detail': $('#id_included_transport_detail').val()});
+            });
+
+            $("#id_included_ticket_detail").focusout(function () {
+                postDatum(location.href, {'included_ticket_detail': $('#id_included_ticket_detail').val()});
+            });
+        }
+
+        $.get(href).done(function (response) {
+            $('#ajax-listing-form').html($(response));
+        }).done(function () {
+            setupDetailForm();
+            setListenerForDetailForm();
+            setListenerForPostingDetail();
+        }).fail(function () {
+            $('#ajax-listing-form').text("Sorry but there was an error.");
+        });
+    }
+
     function loadForm(href) {
         var step = hrefToStepName(href);
 
@@ -439,12 +579,12 @@
         } else if (step === "overview") {
             loadOverviewForm(href);
         } else if (step === "detail") {
-
+            loadDetailForm(href);
         }
     }
 
     function postDatum(href, datum) {
-        var signal = $('#ajax-update-singal');
+        var signal = $('#ajax-update-signal');
 
         $.post(href, $.extend({
             'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value

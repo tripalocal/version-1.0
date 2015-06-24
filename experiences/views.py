@@ -2307,6 +2307,52 @@ def manage_listing_overview(request, experience, context):
         experience.save()
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
+
+def manage_listing_detail(request, experience, context):
+    if request.method == 'GET':
+        #todo: fetch record from chinese database
+        data = {}
+        data['activity'] = experience.activity
+        data['activity_other'] = experience.activity
+        data['interaction'] = experience.interaction
+        data['interaction_other'] = experience.interaction
+        data['dress_code'] = experience.dress
+        data['dress_code_other'] = experience.dress
+
+        form = ExperienceDetailForm(initial=data)
+
+        return render_to_response('detail_form.html', {'form': form}, context)
+
+    elif request.method == 'POST':
+        #todo: add record from chinese database
+
+        form = ExperienceDetailForm(request.POST)
+        if form.is_valid():
+            if 'activity' in form.data:
+                experience.activity = form.cleaned_data['activity']
+            if 'interaction' in form.data:
+                experience.interaction = form.cleaned_data['interaction']
+            if 'dress_code' in form.data:
+                experience.dress = form.cleaned_data['dress_code']
+            if 'included_food' in form.data:
+                print(form.cleaned_data['included_food'])
+            if 'included_transport' in form.data:
+                print(form.cleaned_data['included_transport'])
+            if 'included_ticket' in form.data:
+                print(form.cleaned_data['included_ticket'])
+
+            if 'included_food_detail' in form.data:
+                print(form.cleaned_data['included_food_detail'])
+            if 'included_transport_detail' in form.data:
+                print(form.cleaned_data['included_transport_detail'])
+            if 'included_ticket_detail' in form.data:
+                print(form.cleaned_data['included_ticket_detail'])
+
+
+            experience.save()
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
 def manage_listing(request, exp_id, step):
     #;todo: host can only edit his/her own listing
     context = RequestContext(request)
@@ -2317,6 +2363,8 @@ def manage_listing(request, exp_id, step):
             return manage_listing_price(request, experience, context)
         elif step == 'overview':
             return manage_listing_overview(request, experience, context)
+        elif step =='detail':
+            return manage_listing_detail(request, experience, context)
     else:
         return render_to_response('manage_listing.html', context)
 

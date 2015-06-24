@@ -211,8 +211,6 @@ class ExperienceOverviewForm(forms.Form):
         self.fields['language'].widget = forms.HiddenInput()
 
 class ExperienceDetailForm(forms.Form):
-    id = forms.CharField(max_length=10, required=False)
-    changed_steps = forms.CharField(max_length=100, required=False)
     activity = forms.CharField(required=False, widget=forms.Textarea)
     interaction = forms.CharField(required=False, widget=forms.Textarea)
     dress_code = forms.CharField(required=False, widget=forms.Textarea)
@@ -230,12 +228,6 @@ class ExperienceDetailForm(forms.Form):
     included_transport_detail_other = forms.CharField(required = False, widget=forms.Textarea)
     included_ticket_detail_other = forms.CharField(required = False, widget=forms.Textarea)
 
-    def __init__(self, *args, **kwargs):
-        super(ExperienceDetailForm, self).__init__(*args, **kwargs)
-        self.fields['id'].widget.attrs['readonly'] = True
-        self.fields['id'].widget = forms.HiddenInput()
-        self.fields['changed_steps'].widget.attrs['readonly'] = True
-        self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperiencePhotoForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)
