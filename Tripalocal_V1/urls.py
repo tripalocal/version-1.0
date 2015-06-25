@@ -69,7 +69,10 @@ urlpatterns = patterns('',
                                                                                                                                              'detail': save_exit_detail,'photo':save_exit_photo,
                                                                                                                                              'location':save_exit_location})), name='experience_edit_step'),
     url(r'^experiences/new/$', login_required(new_experience)),
-    url(r'^manage-listing/(?P<exp_id>.*)/(?P<step>.*)/$', login_required(manage_listing)),
+    url(r'^manage-listing/(?P<exp_id>.*)/(?P<step>.*)/$', login_required(manage_listing), name='manage_listing'),
+    # Continue the first incomplete step.
+    url(r'^manage-listing-continue/(?P<exp_id>.*)/$', login_required(manage_listing_continue),
+           name='manage_listing_continue'),
 
     url(r'^experience_booking_confirmation/$', experience_booking_confirmation, name='experience_booking_confirmation'),
     url(r'^experience_booking_successful/$', experience_booking_successful, name='experience_booking_successful'),

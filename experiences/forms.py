@@ -76,18 +76,9 @@ class HorizRadioRenderer(forms.RadioSelect.renderer):
             return mark_safe(u'\n'.join([u'%s\n' % w for w in self]))
 
 class ExperienceForm(forms.Form):
-    id = forms.CharField(max_length=10, required=False)
-    title = forms.CharField(max_length=100, required=False)
-    duration = forms.ChoiceField(choices=Duration, required=False)
-    location = forms.ChoiceField(choices=Suburbs, required=False)
-    changed_steps = forms.CharField(max_length=100, required=False)
-
-    def __init__(self, *args, **kwargs):
-        super(ExperienceForm, self).__init__(*args, **kwargs)
-        self.fields['id'].widget.attrs['readonly'] = True
-        self.fields['id'].widget = forms.HiddenInput()
-        self.fields['changed_steps'].widget.attrs['readonly'] = True
-        self.fields['changed_steps'].widget = forms.HiddenInput()
+    title = forms.CharField(max_length=100)
+    duration = forms.ChoiceField(choices=Duration)
+    location = forms.ChoiceField(choices=Suburbs)
 
 class ExperienceCalendarForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)
@@ -187,7 +178,7 @@ class ExperiencePriceForm(forms.Form):
     min_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Min)
     max_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Max)
     type = forms.ChoiceField(choices=Type, required=False)
-    price = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
+    price = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=0)
     price_with_booking_fee = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     dynamic_price = forms.CharField(max_length=100, required=False)
 
