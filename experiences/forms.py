@@ -76,18 +76,9 @@ class HorizRadioRenderer(forms.RadioSelect.renderer):
             return mark_safe(u'\n'.join([u'%s\n' % w for w in self]))
 
 class ExperienceForm(forms.Form):
-    id = forms.CharField(max_length=10, required=False)
-    title = forms.CharField(max_length=100, required=False)
-    duration = forms.ChoiceField(choices=Duration, required=False)
-    location = forms.ChoiceField(choices=Suburbs, required=False)
-    changed_steps = forms.CharField(max_length=100, required=False)
-
-    def __init__(self, *args, **kwargs):
-        super(ExperienceForm, self).__init__(*args, **kwargs)
-        self.fields['id'].widget.attrs['readonly'] = True
-        self.fields['id'].widget = forms.HiddenInput()
-        self.fields['changed_steps'].widget.attrs['readonly'] = True
-        self.fields['changed_steps'].widget = forms.HiddenInput()
+    title = forms.CharField(max_length=100)
+    duration = forms.ChoiceField(choices=Duration)
+    location = forms.ChoiceField(choices=Suburbs)
 
 class ExperienceCalendarForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)
@@ -183,30 +174,22 @@ class ExperienceCalendarForm(forms.Form):
         self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperiencePriceForm(forms.Form):
-    id = forms.CharField(max_length=10, required=False)
-    changed_steps = forms.CharField(max_length=100, required=False)
     duration = forms.ChoiceField(required=False, choices=Duration)
     min_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Min)
     max_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Max)
     type = forms.ChoiceField(choices=Type, required=False)
-    price = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
+    price = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=0)
     price_with_booking_fee = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     dynamic_price = forms.CharField(max_length=100, required=False)
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePriceForm, self).__init__(*args, **kwargs)
-        self.fields['id'].widget.attrs['readonly'] = True
-        self.fields['id'].widget = forms.HiddenInput()
         self.fields['type'].widget.attrs['readonly'] = True
         self.fields['type'].widget = forms.HiddenInput()
         self.fields['dynamic_price'].widget.attrs['readonly'] = True
         self.fields['dynamic_price'].widget = forms.HiddenInput()
-        self.fields['changed_steps'].widget.attrs['readonly'] = True
-        self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperienceOverviewForm(forms.Form):
-    id = forms.CharField(max_length=10, required=False)
-    changed_steps = forms.CharField(max_length=100, required=False)
     title = forms.CharField(required=False, max_length=100)
     title_other = forms.CharField(required = False, max_length=100)
     summary = forms.CharField(required=False, widget=forms.Textarea)
@@ -215,16 +198,10 @@ class ExperienceOverviewForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(ExperienceOverviewForm, self).__init__(*args, **kwargs)
-        self.fields['id'].widget.attrs['readonly'] = True
-        self.fields['id'].widget = forms.HiddenInput()
         self.fields['language'].widget.attrs['readonly'] = True
         self.fields['language'].widget = forms.HiddenInput()
-        self.fields['changed_steps'].widget.attrs['readonly'] = True
-        self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperienceDetailForm(forms.Form):
-    id = forms.CharField(max_length=10, required=False)
-    changed_steps = forms.CharField(max_length=100, required=False)
     activity = forms.CharField(required=False, widget=forms.Textarea)
     interaction = forms.CharField(required=False, widget=forms.Textarea)
     dress_code = forms.CharField(required=False, widget=forms.Textarea)
@@ -242,16 +219,8 @@ class ExperienceDetailForm(forms.Form):
     included_transport_detail_other = forms.CharField(required = False, widget=forms.Textarea)
     included_ticket_detail_other = forms.CharField(required = False, widget=forms.Textarea)
 
-    def __init__(self, *args, **kwargs):
-        super(ExperienceDetailForm, self).__init__(*args, **kwargs)
-        self.fields['id'].widget.attrs['readonly'] = True
-        self.fields['id'].widget = forms.HiddenInput()
-        self.fields['changed_steps'].widget.attrs['readonly'] = True
-        self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperiencePhotoForm(forms.Form):
-    id = forms.CharField(max_length=10, required=False)
-    changed_steps = forms.CharField(max_length=100, required=False)
     experience_photo_1 = forms.ImageField(required = False)
     experience_photo_2 = forms.ImageField(required = False)
     experience_photo_3 = forms.ImageField(required = False)
@@ -266,10 +235,6 @@ class ExperiencePhotoForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePhotoForm, self).__init__(*args, **kwargs)
-        self.fields['id'].widget.attrs['readonly'] = True
-        self.fields['id'].widget = forms.HiddenInput()
-        self.fields['changed_steps'].widget.attrs['readonly'] = True
-        self.fields['changed_steps'].widget = forms.HiddenInput()
         self.fields['delete_photo'].widget.attrs['readonly'] = True
         self.fields['delete_photo'].widget = forms.HiddenInput()
 

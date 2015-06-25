@@ -214,11 +214,6 @@
 	margin-top: 10px;
 }
 
-#active-tab{
-	color: rgb(130,202,202);
-    padding-left:0px;
-    padding-right:6px;
-}
 
 .void-profile{
 	margin-left:80px; margin-right:80px; margin-top:0px;
@@ -548,7 +543,7 @@ a {color:#6CC;} a:hover{color:#699;}
 .calendar{background-color: #F7F7F7; border-left: 1px solid #D3D3D3; border-right: 1px solid #D3D3D3; height: 100%; width: 645px; z-index: 0; float: left;}
 #list-calendar{background-color: #FFF;}
 .list-menu{padding-left: 40px; color: #999999; padding-top: 30px; color: #AAAAAA;}
-.list-tab{color: #666666; margin-left: 40px; padding-bottom: 10px; margin-bottom:0px;}
+.list-tab{color: #666666; margin-left: 40px; padding-bottom: 10px; margin-bottom:0px; cursor:pointer;}
 .list-tab-button{background-color: white; border:none; margin-left: 40px; padding-bottom: 10px;}
 a:hover{text-decoration: none;}
 #steps-remaining{color: #AAAAAA; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; border: 1px solid #AAAAAA; border-radius: 5px; margin-left: 40px; width: 105px; margin-top: 15px;}
@@ -780,6 +775,11 @@ body {
 
 /*Toggle*/
 
+.active-tab{
+	color: rgb(130,202,202);
+    padding-left:0px;
+    padding-right:6px;
+}
 /*list-photo.html*/
 #section-add-photo{height: 680px;}
 #photo-heading{color: #666666; padding-top: 30px; padding-left: 30px; float: left;}

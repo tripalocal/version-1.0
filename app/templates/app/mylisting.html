@@ -46,9 +46,11 @@
                         {% endif %}
                     </div>
                     {% if experience.status|title != "Listed" %}
-                    <a class="btn btn-primary btn-sm" role="button" id="edit-draft" href="/editexperience/calendar?id={{experience.id}}">Edit draft</a>
+                        <a class="btn btn-primary btn-sm" role="button" id="edit-draft"
+                           href="{% url 'manage_listing_continue' exp_id=experience.id %}">Edit draft</a>
                     {% elif experience.status|title == "Listed" %}
-                    <a class="btn btn-primary btn-sm" role="button" id="update-listing" href="/editexperience/calendar?id={{experience.id}}">Update listing</a>
+                        <a class="btn btn-primary btn-sm" role="button" id="update-listing"
+                           href="{% url 'manage_listing_continue' exp_id=experience.id %}">Update listing</a>
                     {% endif %}
                 </div>
                 {% empty %}

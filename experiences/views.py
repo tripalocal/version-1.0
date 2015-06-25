@@ -1,8 +1,9 @@
-from django.shortcuts import render, get_object_or_404, render_to_response
+from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_protect
 from experiences.models import Experience, WhatsIncluded, Photo, BlockOutTimePeriod, InstantBookingTimePeriod
 from django.core.mail import send_mail
-from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse, Http404
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
 from django.contrib.formtools.wizard.views import SessionWizardView, NamedUrlSessionWizardView
@@ -31,6 +32,8 @@ from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as _
 from post_office import mail
 from collections import OrderedDict
+from django.http import Http404
+from django.core.urlresolvers import reverse
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -1461,7 +1464,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             cursor.execute("Insert into experiences_whatsincluded ('experience_id','item','included','details') values (%s, %s, %s, %s)", 
                             [experience.id, 'Transport', (included_transport=='Yes'), included_transport_detail_other])
                         
-        #save images
+        # save images
         dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
         if not os.path.isdir(dirname):
             os.mkdir(dirname)
@@ -2220,6 +2223,331 @@ def getProfileImage(experience):
     else:
         'profile_default.jpg'
 
+def new_experience(request):
+    context = RequestContext(request)
+    form = ExperienceForm()
+
+    if request.method == 'POST':
+        form = ExperienceForm(request.POST)
+        if form.is_valid():
+            user_id = request.user.id
+            experience = Experience(start_datetime=datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0),
+                                    end_datetime=datetime.utcnow().replace(tzinfo=pytz.UTC).replace(
+                                        minute=0) + relativedelta(years=10),
+                                    title=form.cleaned_data['title'],
+                                    duration=form.cleaned_data['duration'],
+                                    city=form.cleaned_data['location'],
+                                    language="english;",
+                                    guest_number_max=10,
+                                    guest_number_min=1
+                                    )
+            experience.save()
+            host = User.objects.get(id=user_id)
+            experience.hosts.add(host)
+
+            #todo: add record to chinese database
+
+            first_step = 'price'
+            return redirect(reverse('manage_listing', kwargs={'exp_id': experience.id, 'step': first_step}))
+    else:
+        return render_to_response('new_experience.html', {'form': form}, context)
+
+def manage_listing_price(request, experience, context):
+    if request.method == 'GET':
+        data = {}
+        data['min_guest_number'] = experience.guest_number_min
+        data['max_guest_number'] = experience.guest_number_max
+        data['duration'] = experience.duration
+        data['price'] = experience.price
+        data['dynamic_price'] = experience.dynamic_price
+        data['type'] = experience.type
+        if experience.price != None:
+            data['price_with_booking_fee'] = round(float(experience.price) * (1.00 + settings.COMMISSION_PERCENT), 2)
+
+        form = ExperiencePriceForm(initial=data)
+
+        return render_to_response('price_form.html', {'form': form}, context)
+    elif request.method == 'POST':
+        form = ExperiencePriceForm(request.POST)
+        if form.is_valid():
+            if 'dynamic_price' in form.data:
+                experience.dynamic_price = form.cleaned_data['dynamic_price']
+            if 'min_guest_number' in form.data:
+                experience.guest_number_min = form.cleaned_data['min_guest_number']
+            if 'max_guest_number' in form.data:
+                experience.guest_number_max = form.cleaned_data['max_guest_number']
+            if 'duration' in form.data:
+                experience.duration = form.cleaned_data['duration']
+            if 'price' in form.data:
+                experience.price = form.cleaned_data['price']
+            if 'type' in form.data:
+                experience.type = form.cleaned_data['type']
+
+            # todo: add to chinese db
+            experience.save()
+            return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+def manage_listing_overview(request, experience, context):
+    if request.method == 'GET':
+        data = {}
+        data['title'] = experience.title
+        data['summary'] = experience.description
+        data['language'] = experience.language
+
+        #todo: fetch record from chinese database
+        # data['title_other'] = experience.title
+        # data['summary_other'] = experience.description
+
+        form = ExperienceOverviewForm(initial=data)
+
+        return render_to_response('overview_form.html', {'form': form}, context)
+
+    elif request.method == 'POST':
+        #todo: add record from chinese database
+
+        form = ExperienceOverviewForm(request.POST)
+        if form.is_valid():
+            experience.title = form.cleaned_data['title']
+            experience.description = form.cleaned_data['summary']
+            experience.language = form.cleaned_data['language']
+
+        experience.save()
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+def manage_listing_detail(request, experience, context):
+    if request.method == 'GET':
+        data = {}
+        data['activity'] = experience.activity
+        data['interaction'] = experience.interaction
+        data['dress_code'] = experience.dress
+
+        includes = WhatsIncluded.objects.filter(experience_id=experience.id)
+        for index in range(len(includes)):
+            if includes[index].item == "Food":
+                if includes[index].included:
+                    data['included_food'] = "Yes"
+                else:
+                    data['included_food'] = "No"
+                data['included_food_detail'] = includes[index].details
+            elif includes[index].item == "Transport":
+                if includes[index].included:
+                    data['included_transport'] = "Yes"
+                else:
+                    data['included_transport'] = "No"
+                data['included_transport_detail'] = includes[index].details
+            elif includes[index].item == "Ticket":
+                if includes[index].included:
+                    data['included_ticket'] = "Yes"
+                else:
+                    data['included_ticket'] = "No"
+                data['included_ticket_detail'] = includes[index].details
+
+        #todo: fetch record from chinese database
+        # data['activity_other'] = experience.activity
+        # data['interaction_other'] = experience.interaction
+        # data['dress_code_other'] = experience.dress
+
+        form = ExperienceDetailForm(initial=data)
+
+        return render_to_response('detail_form.html', {'form': form}, context)
+
+    elif request.method == 'POST':
+        form = ExperienceDetailForm(request.POST)
+        if form.is_valid():
+            if 'activity' in form.data:
+                experience.activity = form.cleaned_data['activity']
+            if 'interaction' in form.data:
+                experience.interaction = form.cleaned_data['interaction']
+            if 'dress_code' in form.data:
+                experience.dress = form.cleaned_data['dress_code']
+
+            if 'included_food' in form.data:
+                if len(experience.whatsincluded_set.filter(item="Food")) > 0:
+                    food = experience.whatsincluded_set.filter(item="Food")[0]
+                    food.included = (form.cleaned_data['included_food'] == 'Yes')
+                    food.save()
+                else:
+                    food = WhatsIncluded(item='Food', included=(form.cleaned_data['included_food'] == 'Yes'),
+                                         experience=experience)
+                    food.save()
+
+            if 'included_food_detail' in form.data:
+                if len(experience.whatsincluded_set.filter(item="Food")) > 0:
+                    food = experience.whatsincluded_set.filter(item="Food")[0]
+                    food.details = form.cleaned_data['included_food_detail']
+                    food.save()
+                else:
+                    food = WhatsIncluded(item='Food', details=form.cleaned_data['included_food_detail'],
+                                         experience=experience)
+                    food.save()
+
+            if 'included_transport' in form.data:
+                if len(experience.whatsincluded_set.filter(item="Transport")) > 0:
+                    transport = experience.whatsincluded_set.filter(item="Transport")[0]
+                    transport.included = (form.cleaned_data['included_transport'] == 'Yes')
+                    transport.save()
+                else:
+                    transport = WhatsIncluded(item='Transport',
+                                              included=(form.cleaned_data['included_transport'] == 'Yes'),
+                                              experience=experience)
+                    transport.save()
+
+            if 'included_transport_detail' in form.data:
+                if len(experience.whatsincluded_set.filter(item="Transport")) > 0:
+                    transport = experience.whatsincluded_set.filter(item="Transport")[0]
+                    transport.details = form.cleaned_data['included_transport_detail']
+                    transport.save()
+                else:
+                    transport = WhatsIncluded(item='Transport', details=form.cleaned_data['included_transport_detail'],
+                                              experience=experience)
+                    transport.save()
+
+            if 'included_ticket' in form.data:
+                if len(experience.whatsincluded_set.filter(item="Ticket")) > 0:
+                    ticket = experience.whatsincluded_set.filter(item="Ticket")[0]
+                    ticket.included = (form.cleaned_data['included_ticket'] == 'Yes')
+                    ticket.save()
+                else:
+                    ticket = WhatsIncluded(item='Ticket', included=(form.cleaned_data['included_ticket'] == 'Yes'),
+                                           experience=experience)
+                    ticket.save()
+
+            if 'included_ticket_detail' in form.data:
+                if len(experience.whatsincluded_set.filter(item="Ticket")) > 0:
+                    ticket = experience.whatsincluded_set.filter(item="Ticket")[0]
+                    ticket.details = form.cleaned_data['included_ticket_detail']
+                    ticket.save()
+                else:
+                    ticket = WhatsIncluded(item='Ticket',
+                                           details=form.cleaned_data['included_ticket_detail'], experience=experience)
+                    ticket.save()
+
+            experience.save()
+
+        #todo: add record from chinese database
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+def manage_listing_photo(request, experience, context):
+
+    if request.method == 'GET':
+        data = {}
+        photos = Photo.objects.filter(experience_id = experience.id)
+        for index in range(len(photos)):
+            data['experience_photo_' + photos[index].name.split('.')[0].split('_')[1]] = photos[index]
+
+        form = ExperiencePhotoForm(initial=data)
+
+        return render_to_response('photo_form.html', {'form': form}, context)
+
+    elif request.method == 'POST':
+        form = ExperiencePhotoForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            for index in range(1, 10):
+                field_name = 'experience_photo_' + str(index)
+                if field_name in request.FILES:
+                    file = request.FILES[field_name]
+                    extension = '.jpg'
+                    filename = 'experience' + str(experience.id) + '_' + str(index) + extension
+                    photo = Photo(name=filename, directory='experiences/' + str(experience.id) + '/',
+                                  image=file, experience=experience)
+                    photo.save()
+
+            # todo: add to chinese db
+            experience.save()
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+def manage_listing_location(request, experience, context):
+    if request.method == 'GET':
+        data = {}
+        data['meetup_spot'] =  experience.meetup_spot
+        data['suburb'] =  experience.city
+
+        # todo: fetch from chinese db
+        # data['meetup_spot_other'] =  experience.meetup_spot
+
+        form = ExperienceLocationForm(initial=data)
+
+        return render_to_response('location_form.html', {'form': form}, context)
+
+    elif request.method == 'POST':
+        form = ExperienceLocationForm(request.POST)
+        if form.is_valid():
+            if 'meetup_spot' in form.data:
+                experience.meetup_spot = form.cleaned_data['meetup_spot']
+
+            # todo: add to chinese db
+            # if 'meetup_spot_other' in form.data:
+            # experience.meetup_spot = form.cleaned_data['meetup_spot']
+
+            if 'suburb' in form.data:
+                experience.city = form.cleaned_data['suburb']
+
+            experience.save()
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+def manage_listing(request, exp_id, step):
+    experience = get_object_or_404(Experience, pk=exp_id)
+    if not request.user in experience.hosts.all():
+        raise Http404("Sorry, but you can only edit your own experience.")
+
+    context = RequestContext(request)
+
+    if request.is_ajax():
+        if step == 'price':
+            return manage_listing_price(request, experience, context)
+        elif step == 'overview':
+            return manage_listing_overview(request, experience, context)
+        elif step == 'detail':
+            return manage_listing_detail(request, experience, context)
+        elif step == 'photo':
+            return manage_listing_photo(request, experience, context)
+        elif step == 'location':
+            return manage_listing_location(request, experience, context)
+
+    else:
+        return render_to_response('manage_listing.html', context)
+
+
+def manage_listing_continue(request, exp_id):
+    exp = get_object_or_404(Experience, pk=exp_id)
+
+    price_fields = [exp.duration, exp.guest_number_min, exp.guest_number_max, exp.type]
+    overview_fields = [exp.title, exp.description, exp.language]
+    detail_fields = [exp.activity, exp.interaction, exp.dress]
+    location_fields = [exp.city, exp.meetup_spot]
+
+    if None in price_fields or "" in price_fields:
+        return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'price'}))
+
+    if None in overview_fields or "" in overview_fields:
+        return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'overview'}))
+
+    if exp.photo_set.count() == 0:
+        return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'photo'}))
+
+    if None in detail_fields or "" in detail_fields:
+        return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'details'}))
+
+    whats_included_list = WhatsIncluded.objects.filter(experience=exp)
+    included_list = whats_included_list.filter(included=True)
+    not_included_list = whats_included_list.filter(included=False)
+
+    for field in included_list:
+        if field.details == "":
+            return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'details'}))
+
+    if None in location_fields or "" in location_fields:
+        return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
+
+    return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
+
+
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
                is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
     
@@ -2406,9 +2734,9 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
     if request.user.is_authenticated():
-        mp.track(request.user.email,"Viewed " + city.title() + " search page");
+        mp.track(request.user.email,"Viewed " + city.title() + " search page")
     else:
-        mp.track("","Viewed " + city.title() + " search page");
+        mp.track("","Viewed " + city.title() + " search page")
 
     city_display_name = None
     for i in range(len(cityList)):
