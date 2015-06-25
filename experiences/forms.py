@@ -230,8 +230,6 @@ class ExperienceDetailForm(forms.Form):
 
 
 class ExperiencePhotoForm(forms.Form):
-    id = forms.CharField(max_length=10, required=False)
-    changed_steps = forms.CharField(max_length=100, required=False)
     experience_photo_1 = forms.ImageField(required = False)
     experience_photo_2 = forms.ImageField(required = False)
     experience_photo_3 = forms.ImageField(required = False)
@@ -246,10 +244,6 @@ class ExperiencePhotoForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePhotoForm, self).__init__(*args, **kwargs)
-        self.fields['id'].widget.attrs['readonly'] = True
-        self.fields['id'].widget = forms.HiddenInput()
-        self.fields['changed_steps'].widget.attrs['readonly'] = True
-        self.fields['changed_steps'].widget = forms.HiddenInput()
         self.fields['delete_photo'].widget.attrs['readonly'] = True
         self.fields['delete_photo'].widget = forms.HiddenInput()
 

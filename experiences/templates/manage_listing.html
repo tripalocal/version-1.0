@@ -122,6 +122,7 @@
             loadForm(href)
         });
     }
+
     function loadPriceForm(href) {
         function setListenerForDynamicPrice() {
             for (i = 1; i < 10; i++) {
@@ -571,6 +572,69 @@
         });
     }
 
+    function loadPhotoForm(href) {
+        function verifyImages(i) {
+            var input, file;
+            var valid = true;
+
+            if (window.FileReader) {
+                input = document.getElementById('id_experience_photo_' + i);
+                if (input && input.files && input.files[0]) {
+                    file = input.files[0];
+                    if (file.size > 2097152) {
+                        valid = false;
+                        return valid;
+                    }
+                    str = file.name.split(".");
+                    if (['jpg', 'jpeg', 'png', 'bmp'].indexOf(str[str.length - 1]) < 0) {
+                        valid = false;
+                        return valid;
+                    }
+                }
+            }
+            return valid;
+        }
+
+        function setupPhotoForm() {
+            for (i = 1; i < 11; i++) {
+                $("#id_experience_photo_" + i).attr("class", "upload");
+                $("#id_experience_photo_" + i).change(function (e) {
+                    i = e.target.id.substr(-1, 1);
+                    string = $("#id_experience_photo_" + i).val();
+                    index = -1;
+                    index = string.lastIndexOf("\\");
+                    if (index == -1) {
+                        index = string.lastIndexOf("/");
+                    }
+
+                    $("#uploadImage_" + i).val(string.substring(index + 1));
+                });
+            }
+        }
+
+        function setListenerForPostingPhoto() {
+            for (i = 1; i < 11; i++) {
+                $('#id_experience_photo_' + i).change(function () {
+                    if (verifyImages(i)) {
+                        var formData = new FormData();
+                        formData.append('experience_photo_' + i, this.files[0]);
+                        postFile(location.href, formData);
+                    }
+                });
+            }
+        }
+
+        $.get(href).done(function (response) {
+            $('#ajax-listing-form').html($(response));
+        }).done(function () {
+            setupPhotoForm();
+            setListenerForPostingPhoto();
+        }).fail(function () {
+            $('#ajax-listing-form').text("Sorry but there was an error.");
+        });
+
+    }
+
     function loadForm(href) {
         var step = hrefToStepName(href);
 
@@ -580,6 +644,8 @@
             loadOverviewForm(href);
         } else if (step === "detail") {
             loadDetailForm(href);
+        } else if (step == "photo") {
+            loadPhotoForm(href);
         }
     }
 
@@ -596,6 +662,30 @@
             signal.fadeIn("slow");
             signal.text("Update Failed");
             signal.fadeOut("slow");
+        });
+    }
+
+    function postFile(href, formData) {
+        var signal = $('#ajax-update-signal');
+
+        formData.append('csrfmiddlewaretoken', $("[name='csrfmiddlewaretoken']")[0].value);
+
+        $.ajax({
+            url: href,
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function () {
+                signal.fadeIn("slow");
+                signal.text("Experience Updated");
+                signal.fadeOut("slow");
+            },
+            error: function () {
+                signal.fadeIn("slow");
+                signal.text("Update Failed");
+                signal.fadeOut("slow");
+            }
         });
     }
 

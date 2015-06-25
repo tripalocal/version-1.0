@@ -2353,6 +2353,36 @@ def manage_listing_detail(request, experience, context):
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
+def manage_listing_photo(request, experience, context):
+
+    if request.method == 'GET':
+        data = {}
+        photos = Photo.objects.filter(experience_id = experience.id)
+        for index in range(len(photos)):
+            data['experience_photo_' + photos[index].name.split('.')[0].split('_')[1]] = photos[index]
+
+        form = ExperiencePhotoForm(initial=data)
+
+        return render_to_response('photo_form.html', {'form': form}, context)
+
+    elif request.method == 'POST':
+        form = ExperiencePhotoForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            for index in range(1, 10):
+                field_name = 'experience_photo_' + str(index)
+                if field_name in request.FILES:
+                    file = request.FILES[field_name]
+                    extension = '.jpg'
+                    filename = 'experience' + str(experience.id) + '_' + str(index) + extension
+                    photo = Photo(name=filename, directory='experiences/' + str(experience.id) + '/',
+                                  image=file, experience=experience)
+                    photo.save()
+
+            experience.save()
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
 def manage_listing(request, exp_id, step):
     #;todo: host can only edit his/her own listing
     context = RequestContext(request)
@@ -2363,8 +2393,10 @@ def manage_listing(request, exp_id, step):
             return manage_listing_price(request, experience, context)
         elif step == 'overview':
             return manage_listing_overview(request, experience, context)
-        elif step =='detail':
+        elif step == 'detail':
             return manage_listing_detail(request, experience, context)
+        elif step == 'photo':
+            return manage_listing_photo(request, experience, context)
     else:
         return render_to_response('manage_listing.html', context)
 
