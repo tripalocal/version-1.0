@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 from datetime import *
 from calendar import monthrange 
-from experiences.models import Payment, Booking, Experience, Coupon, Review, Itinerary
+from experiences.models import Payment, Booking, Experience, Coupon, Review
 from Tripalocal_V1 import settings
 import pytz, string, subprocess, json, random
 from django.core.mail import send_mail
@@ -43,7 +43,7 @@ Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6',
 Duration = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
 ('11', '11'),('12', '12'),('13', '13'),('14', '14'),('15', '15'),('16', '16'),('17', '17'),('18', '18'),('19', '19'),('20', '20'),
 ('21', '21'),('22', '22'),('23', '23'),('24', '24'),('36', '36'),('48', '48'),('60', '60'),('72', '72'),('84', '84'),('96', '96'),
-('108', '108'),('120', '120'),)
+('108', '108'),('120', '120'),('144', '144'),('168', '168'),('192', '192'),('216', '216'),('240', '240'),('264', '264'),('288', '288'),)
 
 Included = (('Yes', ''),('No', ''),)
 
@@ -529,7 +529,8 @@ class BookingConfirmationForm(forms.Form):
         Stripe's library as a standard ValidationError for proper feedback.
         """
         cleaned = super(BookingConfirmationForm, self).clean()
- 
+        local_timezone = pytz.timezone(settings.TIME_ZONE)
+
         if not self.errors and (not 'Refresh' in self.data):
             card_number = self.cleaned_data["card_number"]
             exp_month = self.cleaned_data["expiration"].month
@@ -603,7 +604,6 @@ class BookingConfirmationForm(forms.Form):
                 host = experience.hosts.all()[0]
                 date = self.cleaned_data['date']
                 time = self.cleaned_data['time']
-                local_timezone = pytz.timezone(settings.TIME_ZONE)
                 booking_extra_information=""
                 if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information']:
                     booking_extra_information="Need Chinese Translation"
@@ -624,7 +624,7 @@ class BookingConfirmationForm(forms.Form):
                                 break
                         elif ib.repeat_cycle.lower() == "weekly":
                             weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-                            monday1 = (date.date()-timedelta(days=date.weekday()))
+                            monday1 = (date-timedelta(days=date.weekday()))
                             monday2 = (ib_start.date() - timedelta(days=ib_start.date().weekday()))
                             if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7).days%ib.repeat_frequency == 0:
                                 # for weekly repeated time periods, the start and end time must be in the same day
@@ -645,7 +645,7 @@ class BookingConfirmationForm(forms.Form):
                                 break
                     else:
                         booking_datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute))
-                        if ib_start < booking_datetime and booking_datetime < ib_end:
+                        if ib_start <= booking_datetime and booking_datetime <= ib_end:
                             is_instant_booking = True
                             break
 
@@ -661,6 +661,7 @@ class BookingConfirmationForm(forms.Form):
                                       datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
                                       submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
                 booking.save()
+                cleaned['status'] = booking.status
                 #add the user to the guest list
                 if user not in experience.guests.all():
                 #experience.guests.add(user)
@@ -709,6 +710,7 @@ class BookingConfirmationForm(forms.Form):
                     #instant booking
                     booking.status = "accepted"
                     booking.save()
+                    cleaned['status'] = booking.status
                     if booking.coupon_id != None and booking.coupon.promo_code.startswith("once"):
                         #the coupon can be used once, make it unavailable
                         booking.coupon.end_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC)
@@ -831,13 +833,15 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
         new_registereduser = RegisteredUser.objects.get(user_id = user.id)
     except RegisteredUser.DoesNotExist:
         new_registereduser = RegisteredUser(user_id = user.id)
+        if 'phone_number' in kwargs:
+            new_registereduser.phone_number = kwargs['phone_number']
         new_registereduser.save()
 
     #copy to the chinese website database
     cursor = connections['cndb'].cursor()
     cursor.execute("Insert into auth_user ('id','username','first_name','last_name','email') values (%s, %s, %s, %s, %s)", 
                    [user.id, user.username, user.first_name, user.last_name, user.email])
-    cursor.execute("Insert into app_registereduser ('user_id') values (%s)", [user.id])
+    cursor.execute("Insert into app_registereduser ('user_id', 'phone_number') values (%s, %s)", [user.id, new_registereduser.phone_number])
 
     username = user.username
 
@@ -1181,7 +1185,7 @@ class ItineraryBookingForm(forms.Form):
                                 break
                     else:
                         booking_datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute))
-                        if ib_start < booking_datetime and booking_datetime < ib_end:
+                        if ib_start <= booking_datetime and booking_datetime <= ib_end:
                             is_instant_booking = True
                             break
 

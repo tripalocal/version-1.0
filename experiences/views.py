@@ -129,11 +129,11 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                 guest_number = experience.guest_number_max
 
         if keywords is not None:
-            experience_tags = experience.tags.split(",") if experience.tags is not None else ''
-            tags = keywords.split(",")
+            experience_tags = experience.tags.strip().split(",") if experience.tags is not None else ''
+            tags = keywords.strip().split(",")
             match = False
             for tag in tags:
-                if tag in experience_tags:
+                if tag.strip() in experience_tags:
                     match = True
                     break
             if not match:
@@ -393,7 +393,7 @@ def getAvailableOptions(experience, available_options, available_date):
         #else :
             #TODO
     #set the start time to 6 hours later
-    sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+6)
+    sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+24)
 
     blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
     blockout_start = []
@@ -520,7 +520,7 @@ def getAvailableOptions(experience, available_options, available_date):
                     if instant_booking:
                         top_instant_bookings += 1
 
-                    if top_instant_bookings < 3:
+                    if instant_booking and top_instant_bookings < 3:
                         available_options.insert(top_instant_bookings, dict)
                     else:
                         available_options.append(dict)
@@ -1549,19 +1549,23 @@ class ExperienceWizard(NamedUrlSessionWizardView):
 
         return HttpResponseRedirect("/mylisting")
 
-def experience_booking_successful(request, experience, guest_number, booking_datetime, price_paid):
+def experience_booking_successful(request, experience, guest_number, booking_datetime, price_paid, is_instant_booking=False):
     if not request.user.is_authenticated():
         return HttpResponseRedirect("/accounts/login/")
     
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
     mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
 
-    return render(request,'experience_booking_successful.html',{'experience': experience,
-                                                                    'price_paid':price_paid,
-                                                                    'guest_number':guest_number,
-                                                                    'booking_datetime':booking_datetime,
-                                                                    'user':request.user,
-                                                                    'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id)})
+    template = 'experience_booking_successful_requested.html'
+    if is_instant_booking:
+        template = 'experience_booking_successful_confirmed.html'
+
+    return render(request,template,{'experience': experience,
+                                    'price_paid':price_paid,
+                                    'guest_number':guest_number,
+                                    'booking_datetime':booking_datetime,
+                                    'user':request.user,
+                                    'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id)})
 
 def experience_booking_confirmation(request):
     # Get the context from the request.
@@ -1633,11 +1637,26 @@ def experience_booking_confirmation(request):
             #submit the form
             display_error = True
             if form.is_valid():
-                return experience_booking_successful(request, 
-                                                     experience, 
-                                                     int(form.data['guest_number']),
-                                                     datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
-                                                     form.cleaned_data['price_paid'])
+                request.user.registereduser.phone_number = form.cleaned_data['phone_number']
+                request.user.registereduser.save()
+
+                #copy to the chinese website -- database
+                cursor = connections['cndb'].cursor()
+                cursor.execute("update app_registereduser set phone_number=%s where user_id=%s", 
+                                [request.user.registereduser.phone_number, request.user.id])
+
+                if form.cleaned_data['status'] == 'accepted':
+                    return experience_booking_successful(request, 
+                                                         experience, 
+                                                         int(form.data['guest_number']),
+                                                         datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
+                                                         form.cleaned_data['price_paid'], True)
+                else:
+                    return experience_booking_successful(request, 
+                                                         experience, 
+                                                         int(form.data['guest_number']),
+                                                         datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
+                                                         form.cleaned_data['price_paid'])
             
             else:
                 return render_to_response('experience_booking_confirmation.html', {'form': form, 
@@ -2788,6 +2807,7 @@ def itinerary_booking_confirmation(request):
         #form = BookingConfirmationForm()
         return HttpResponseRedirect("/")
 
+#TODO: add the template
 def itinerary_booking_successful(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect("/accounts/login/")

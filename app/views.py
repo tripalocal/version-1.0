@@ -128,16 +128,21 @@ def home(request):
         if request.LANGUAGE_CODE.startswith("zh"):
             return HttpResponseRedirect('/cn')
 
-    experienceList = Experience.objects.filter(status__iexact="listed")
+    experienceList = Experience.objects.filter(id__in=[1,2,20])
     idxList = random.sample(range(len(experienceList)), 3)
     featuredExperienceList = [experienceList[i] for i in idxList]
 
     BGImages = [getBGImageURL(exp.id) for exp in featuredExperienceList]
     profileImages = [getProfileImage(exp) for exp in featuredExperienceList]
-    cityList = [('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Cairns','Cairns'),('Goldcoast','Gold Coast'),('Adelaide','Adelaide')]
+
+    featuredExperience = []
+    for i in range(len(featuredExperienceList)+1):
+        featuredExperience.append({"experience":featuredExperienceList[i-1],"background":BGImages[i-1],"hostImage":profileImages[i-1]})
+
+    cityList = [('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Goldcoast','Gold Coast'),('Cairns','Cairns'),('Adelaide','Adelaide')]
 
     context = RequestContext(request, {
-        'featuredExperienceList': zip(featuredExperienceList, BGImages, profileImages),
+        'featuredExperience': featuredExperience,
         'cityList': cityList
     })
 

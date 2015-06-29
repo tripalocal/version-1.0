@@ -382,7 +382,7 @@ def ajax_view(request):
     else:
         raise Http404
 
-@api_view(['POST'])
+@api_view(['POST','GET'])
 @authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
 def service_wishlist(request):
     if request.method == 'POST': #request.is_ajax() and 
@@ -433,8 +433,23 @@ def service_wishlist(request):
             response={'success':False, 'error':'experience does not exist'}
             return HttpResponse(json.dumps(response),content_type="application/json")
 
+    elif request.method == 'GET' and request.user.is_authenticated():
+        try:
+            user = request.user
+            cursor = connections['default'].cursor()
+            wl = cursor.execute("select experience_id from app_registereduser_wishlist where registereduser_id=%s", [user.registereduser.id]).fetchall()
+            ids = []
+            for id in wl:
+                ids.append(id)
+
+            response={'experience_ids':ids}
+            return HttpResponse(json.dumps(response),content_type="application/json")
+
+        except Exception as err:
+            #TODO
+            return Response(status=status.HTTP_400_BAD_REQUEST)
     else:
-        raise HttpResponseForbidden
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['POST'])
 def service_login(request):
@@ -478,29 +493,41 @@ def service_signup(request):
         last_name = data['last_name']
         username = first_name.lower()
 
-        u = User.objects.filter(username = username)
+        u = User.objects.filter(first_name__iexact = username)
         counter = len(u) if u is not None else 0
         counter += 1
         username = username + str(counter) if counter > 1 else username 
 
-        user = User(first_name = first_name, last_name = last_name, email = email,username = username,
-                    date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
-                    last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
-        user.save()
+        try:
+            user = User.objects.get(email = email)
+            return Response({"error":"email already registered"}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            user = User(first_name = first_name, last_name = last_name, email = email,username = username,
+                        date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                        last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
+            user.save()
 
-        user.set_password(password)
-        user.save()
+            user.set_password(password)
+            user.save()
 
-        user_signed_up.send(sender=user.__class__, request=request, user=user)
-        user = authenticate(username=username, password=password)
-        login(request, user)
-        new_token = Token.objects.get_or_create(user=user)
-        result = {'user_id':user.id, 'token':new_token[0].key}
+            if 'phone_number' in data:
+                user_signed_up.send(sender=user.__class__, request=request, user=user, phone_number=data['phone_number'])
+            else:
+                user_signed_up.send(sender=user.__class__, request=request, user=user)
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            new_token = Token.objects.get_or_create(user=user)
+            result = {'user_id':user.id, 'token':new_token[0].key}
 
-        return Response(result, status=status.HTTP_200_OK)
+            return Response(result, status=status.HTTP_200_OK)
 
     except Exception as err:
         #TODO
+        logger = logging.getLogger("Tripalocal_V1")
+        if hasattr(err, 'detail'):
+            logger.error(err.detail)
+        else:
+            logger.error(err)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -659,7 +686,7 @@ def service_acceptreservation(request, format=None):
 
 #{"itinerary_string":[{"id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2},{"id":"20","date":"2015/06/17","time":"17:00 - 20:00","guest_number":2}],"card_number":"4242424242424242","expiration_month":10,"expiration_year":2015,"cvv":123, "coupon":"abcdefgh"}
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication)) #
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication)) #))#,
 @permission_classes((IsAuthenticated,))
 def service_booking(request, format=None):
     try:

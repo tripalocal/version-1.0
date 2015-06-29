@@ -1,8 +1,10 @@
 {% extends "app/layout.html" %}
+{% load mathfilters %}
 
 {% block head %}
     {% load staticfiles%}
     <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/tripalocal_homepage.css' %}" rel="stylesheet">
     <title>Tripalocal | Experience it like a local</title>
     <!-- H1 google font -->
     <link href='http://fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>
@@ -23,6 +25,23 @@
 {% endblock %}
 
 {% block content %}
+<!--
+    <div id="mobileTag">
+        <div id="closeTag" style="width:10%"><img src="/images/homepage/closeIcon-01.svg" width="14"></div>
+        <div id="appIcon" style="width:70px; text-align:left;position:relative">
+            <img src="/images/homepage/appIcon-01.jpg" width="60" >
+    
+            <span style="position:absolute;left:80px;">
+                <h3 style="margin-bottom:5px;font-weight:bold">Tripalocal for Android</h3>
+                <img src="/images/homepage/rating-01.svg" width="110"><span style="color:#ccc;  vertical-align: middle;"> (24,812)</span>
+            </span>
+        </div>
+
+        <div id="appInstall" style="width:20%">
+            <a type="submit" class=" btn btn-primary">Install</a>  
+        </div>
+    </div>
+-->
     <div class="home-menu-bar">
         <ul class="home-menu menu">
         {% if user.is_authenticated %}
@@ -30,7 +49,7 @@
             <li><a href="/accounts/logout/">Log out</a></li>
             <li>{{ user.first_name }}</li>
             <li><div class="profile-xs"><a href="/myprofile"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>    
-        {% else %} 
+        {% else %}
             <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com/cn">中文</a></li> 
             <li><a href="/accounts/signup/?next={{ request.path }}">Sign up</a></li>
             <li><a href="/accounts/login/?next={{ request.path }}">Log in</a></li>
@@ -41,6 +60,7 @@
     <div class="jumbotron">
         <div class="container">
             <div class="homepage-logo"></div>
+            <div class="notOnMobile"><br><br></div>
             <form id="search_form" action="" method="post">
                 {% csrf_token %}
                 <table class="home-search">
@@ -50,52 +70,150 @@
                             <td class="search-from">{{form.start_date}}</td>
                             <td class="search-to">{{form.end_date}}</td>
                             <td class="home-search-button"><input id="search-submit" type="submit" value="Search" name="search" class="btn btn-primary btn-sm btn-search"></td>
-                            <td class="melbourne"><a href="https://www.tripalocal.com/s/melbourne">Melbourne</a></td>
-                            <td class="sydney"><a href="https://www.tripalocal.com/s/sydney">Sydney</a></td>
+                        </tr>
+                        <tr>
+                            <td class="home-search-button-mobile"><input id="search-submit-button" type="submit" value="Search" name="search" class="btn btn-primary btn-sm btn-search"></td>
                         </tr>
                     </tbody>
                 </table>
             </form>
             <div>
-                <p>Tripalocal is currently available in Melbourne and Sydney </br>
-                <a href="/accounts/signup/?next={{ request.path }}">Sign up</a> to get notified when we launch in more cities.</p>
+                <p>Tripalocal is currently available in Australia </br>
+                <a href="/accounts/signup/?next={{ request.path }}">Sign up</a> to get notified when we launch in more countries.</p>
             </div>
         </div>
     </div> 
 
-    <div class="support fixCenter">
-    </div>
-
     <div class="exp-brief">
         <div class="container">
-            <h1 style="color:#666;">Step into the Shoes of Locals</h1>
-            <p style="font-size:16px;">Discover their world</p>
-            <!-- Example row of columns -->
+            <div id="exp-heading">
+                <h1 style="color:#666;">Step into the Shoes of Locals</h1>
+                <p style="font-size:16px;color:#666;margin-bottom:45px">Discover their world</p>
+            </div>
+
             <div class="tease-box">
+                <div class="row">
+                {% for experience in featuredExperience %}
+                    {% if forloop.first %}
+                    <div class="price-offer col4" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
+                        <a class="box_link" href="/experience/{{ experience.experience.id }}">
+                            <div class="profile-featured">
+                                <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
+                            </div>
+                            <div class="priceBox">
+                                From $<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> AUD/person
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                {% for city, cityDisplayName in cityList %}
+                    {% if forloop.counter <= 2 %}
+                    <div class="city col4" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                        <a class="box_link" href="{% url 'SearchView' city %}">
+                            <h1>{{ cityDisplayName }}</h1>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                </div>
+
+                <div class="row">
+                {% for city, cityDisplayName in cityList %}
+                    {% if forloop.counter == 3 %}
+                    <div class="city col8" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                        <a class="box_link" href="{% url 'SearchView' city %}">
+                            <h1>{{ cityDisplayName }}</h1>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                {% for experience in featuredExperience %}
+                    {% if forloop.counter == 2 %}
+                    <div class="price-offer col4" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
+                        <a class="box_link" href="/experience/{{ experience.experience.id }}">
+                            <div class="profile-featured">
+                                <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
+                            </div>
+                            <div class="priceBox">
+                                From $<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> AUD/person
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                </div>
+
+                <div class="row">
+                {% for city, cityDisplayName in cityList %}
+                    {% if forloop.counter == 4%}
+                    <div class="city col4" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                        <a class="box_link" href="{% url 'SearchView' city %}">
+                            <h1>{{ cityDisplayName }}</h1>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                {% for experience in featuredExperience %}
+                    {% if forloop.counter == 3 %}
+                    <div class="price-offer col4" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
+                        <a class="box_link" href="/experience/{{ experience.experience.id }}">
+                            <div class="profile-featured">
+                                <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
+                            </div>
+                            <div class="priceBox">
+                                From $<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> AUD/person
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                {% for city, cityDisplayName in cityList %}
+                    {% if forloop.counter == 5%}
+                    <div class="city col4" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                        <a class="box_link" href="{% url 'SearchView' city %}">
+                            <h1>{{ cityDisplayName }}</h1>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                </div>
             </div>
         </div>
 
         <div style="clear:both;">
         </div>
     </div>
-        
-    <div class="testim-slides">
-        <div class="container">
-            <div class="row">
-                <div id="slideshow">
-                    <div class="rev01"></div>
-                    <div class="rev02"></div>
-                    <div class="rev03"></div>
-                </div>
-            </div>
+
+    <div id="video-sec" class="video-box" style="background-image:url(/images/homepage/video_poster-01.jpg)">
+        <div class="video-overlay" >
+            <h1 style="font-size:40px;">Travel with Tripalocal</h1>
+            <p style="font-size:16px;">See how it works</p>
+            <br><br>
+            <a style="cursor:pointer" id="enter_fullscreen"><img src="images/homepage/play_btn.svg" width="75"></a>
         </div>
     </div>
-        
-    <div class="book-tease">
+    <div id="video-fullscreen">
+        <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="images/homepage/closeIcon-01.svg" width="30"></a>
+        <div class="video-wrap">
+            <video controls>
+                <source src="http://bponlinewoc2264.ngcdn.telstra.com/pd_chief/chief_preview/Tripalocal%20Delivery_1.mp4" type="video/mp4">
+                <source src="movie.ogg" type="video/ogg">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+
+    <div class="community-box">
         <div class="container">
-            <h1>Get Rewarded for Your Local Insights</h1>
-            <p>Host your own experiences when you want with a reward you decide. </br>Be a true entrepreneur.</p>
-            <div style="max-width:628px; height:424px; margin:auto; background-image:url(images/beahost.png); background-size: 628px 424px; background-position:center;">
+            <h1 style="text-align:center;margin:47px;padding:0">Our Community</h1>
+            <div class="row">
+                <div class="col6 box" style="background-image:url(/images/homepage/travelling-01.jpg)">
+                    <a class=" btn btn-danger">Travelling<br><small>(Coming soon)</small></a>  
+                </div>
+                <div class="col6 box" style="background-image:url(/images/homepage/hosting-01.jpg)">
+                    <a class=" btn btn-primary">Hosting<br><small>(Coming soon)</small></a>  
+                </div>
             </div>
         </div>
     </div>
@@ -103,59 +221,66 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
-$(function()
-{
-    var country, region, city, ip, longitude, latitude;
-    $(document).ready(function(){
-        $("#id_city").attr("class","btn btn-default dropdown-toggle homepage-city");
-        $("#id_start_date").attr("class","input-sm");
-        $("#id_end_date").attr("class","input-sm");
-        $("#id_start_date").attr("style","height:40px;");
-        $("#id_end_date").attr("style","height:40px;");
-        $("#id_start_date").attr("placeholder","From");
-        $("#id_end_date").attr("placeholder","To");
-
-        //hide loginpartial on homepage
-        $(".navBox").attr("style","display:none");
-
-        $.getScript('http://www.geoplugin.net/javascript.gp', function() 
-        {
-            country = geoplugin_countryName();
-            region = geoplugin_region();
-            city = geoplugin_city();
-            ip = geoplugin_request();
-            latitude = geoplugin_latitude();
-            longitude = geoplugin_longitude();
-        });
-
-        $("#language_switch_topbar").click(function(){
-            mixpanel.track("switched language from top bar");
-
-            if($("#user_email").val())
-            {
-                mixpanel.identify($("#user_email").val());
-            }
-        });
-
-        $("#id_start_date").click(function(){
-            $("#id_start_date_picker").data("DateTimePicker").show();  
-        });
-
-        $("#id_end_date").click(function(){  
-            $("#id_end_date_picker").data("DateTimePicker").show();  
-        }); 
-
-    });
-
-    mixpanel.track("Visited homepage_en");
-
-    if($("#user_email").val())
+    $("#video-fullscreen").hide(); 
+    $(function()
     {
-        var now  = new Date().toString();
-        mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
-        mixpanel.people.set({"$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,"$last_seen":now});  
-        mixpanel.identify($("#user_email").val());
-    }
-})
+        var country, region, city, ip, longitude, latitude;
+        $(document).ready(function(){
+            $("#id_city").attr("class","btn btn-default dropdown-toggle homepage-city");
+            $("#id_start_date").attr("class","input-sm");
+            $("#id_end_date").attr("class","input-sm");
+            $("#id_start_date").attr("style","height:40px;");
+            $("#id_end_date").attr("style","height:40px;");
+            $("#id_start_date").attr("placeholder","From");
+            $("#id_end_date").attr("placeholder","To");
+
+            //hide loginpartial on homepage
+            $(".navBox").attr("style","display:none");
+
+            $.getScript('http://www.geoplugin.net/javascript.gp', function() 
+            {
+                country = geoplugin_countryName();
+                region = geoplugin_region();
+                city = geoplugin_city();
+                ip = geoplugin_request();
+                latitude = geoplugin_latitude();
+                longitude = geoplugin_longitude();
+            });
+
+            $("#language_switch_topbar").click(function(){
+                mixpanel.track("switched language from top bar");
+
+                if($("#user_email").val())
+                {
+                    mixpanel.identify($("#user_email").val());
+                }
+            });
+
+            $("#id_start_date").click(function(){
+                $("#id_start_date_picker").data("DateTimePicker").show();  
+            });
+
+            $("#id_end_date").click(function(){  
+                $("#id_end_date_picker").data("DateTimePicker").show();  
+            });
+        });
+
+        mixpanel.track("Visited homepage_en");
+
+        if($("#user_email").val())
+        {
+            var now  = new Date().toString();
+            mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
+            mixpanel.people.set({"$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,"$last_seen":now});  
+            mixpanel.identify($("#user_email").val());
+        }
+    })
+
+    $("#enter_fullscreen").click(function(){
+        $("#video-fullscreen").fadeIn();
+    })
+    $("#exit_video").click(function(){
+        $("#video-fullscreen").fadeOut();
+    })
 </script>
 {% endblock %}

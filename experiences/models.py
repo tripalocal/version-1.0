@@ -120,7 +120,7 @@ class Booking(models.Model):
     booking_extra_information = models.TextField()
     
     def __str__(self):
-        return self.user.username + "--" + self.experience.title
+        return self.user.email + "--" + self.experience.title
 
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):
@@ -204,15 +204,15 @@ class Payment(models.Model):
             return False, e
         return True, re
 
-class Itinerary(models.Model):
-    user = models.ForeignKey(User)
-    name = models.CharField(max_length=50)
-    start_datettime = models.DateTimeField()
-    end_datetime = models.DateTimeField()
-    group_size = models.IntegerField()
-    city=models.TextField()
+#class Itinerary(models.Model):
+#    user = models.ForeignKey(User)
+#    name = models.CharField(max_length=50)
+#    start_datettime = models.DateTimeField()
+#    end_datetime = models.DateTimeField()
+#    group_size = models.IntegerField()
+#    city=models.TextField()
     #bookings = models.ManyToManyField(Booking, related_name='itinerary_bookings')
 
-    def __str__(self):
-        t = self.name if self.name != None else ''
-        return str(self.id) + '--' + str(self.user.id) + '--' + t
+#    def __str__(self):
+#        t = self.name if self.name != None else ''
+#        return str(self.id) + '--' + str(self.user.id) + '--' + t

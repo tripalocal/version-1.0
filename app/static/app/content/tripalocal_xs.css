@@ -274,7 +274,7 @@
 
 .input-sm{ padding:0px; width:120px; text-align:center; border-radius:0px;}
 .black-border{border: 2px #000000 solid; border-radius:5px;}
-.btn-search{padding:11px; width:80px; text-align:center; border:2px rgba(0,0,0,1.00) solid; border-radius:5px;}
+.btn-search{padding:11px; width:80px; text-align:center; border-radius:5px;}
 #to{border-bottom-right-radius:5px; border-top-right-radius:5px; border: 2px #000000 solid; border-left:1px #000 solid;;}
 #from{border-top:#000000 2px solid; border-bottom:#000000 2px solid; border-left:none; border-right:none;}
 .btn-english{border: 1px solid #FFF; border-radius:5px;}
