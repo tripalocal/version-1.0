@@ -7,3 +7,15 @@
 .request{border: 1px solid #2BABAB;background-color:#2BABAB;border-radius:2px;color:#FFF;position:relative;top:7px;margin-left:20px;width:80px;}
 .cancel{border: 1px solid #A7A7A7;background-color:#A7A7A7;border-radius:2px;color:#FFF;position:relative;top:7px;margin-left:20px;width:80px;}
 .text_grey{color:#CCCCCC;font-size:11px;}
+.listedItem{border-bottom: 1px solid #DFDEDF; height: 100px;}
+.listedItem img{margin: 20px;}
+.listing-status{float: left; margin-top: 25px;}
+.edit-draft{background-color: #F6F5F6}
+.update-listing{background-color: #FFF;}
+#not-pub{color:#FD6D71;}
+#published{color:#8DC300;}
+#edit-draft{background-color: #045B5B; color: #FFF; float: right; width: 100px; margin: 35px;}
+#update-listing{background-color: #30C4C4; color: #FFF; float: right; width: 100px;margin: 35px;}
+.tab_item .firstTabItem{margin-left: 20px;}
+.thumbnail{width: 99px; height: 60px; padding: 0px; margin-right: 0px; float: left; }
+.non-thumbnail{width: 99px; height: 60px; background-color: #C5C5C5; float: left; border-radius: 3px;}

@@ -16,3 +16,8 @@
 .add-note{float: right; width:347px; margin-right: 20px;}
 .pending-reminder{display: inline-block;}
 .blank-icon-group{float:left; display: inline; background-color: transparent; width: 110px; height: 47px;}
+.listedItem{border-bottom: 1px solid #DFDEDF; height: 100px;}
+.listedItem img{margin: 20px;}
+.tab_item .firstTabItem{margin-left: 20px;}
+.thumbnail{width: 99px; height: 60px; padding: 0px; margin-right: 0px; float: left; }
+.non-thumbnail{width: 99px; height: 60px; background-color: #C5C5C5; float: left; border-radius: 3px;}
