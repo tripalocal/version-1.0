@@ -42,3 +42,12 @@ class BlockOutTimePeriod(models.Model):
     repeat_frequency = models.IntegerField()
     repeat_extra_information = models.CharField(max_length=50)
     user = models.ForeignKey(User)
+
+class Message(models.Model):
+    sender = models.ForeignKey(User,related_name='message_sender',unique=False)
+    receiver = models.ForeignKey(User,related_name='message_receiver',unique=False)
+    datetime_sent = models.DateTimeField()
+    datetime_delivered = models.DateTimeField(null=True, blank=True)
+    datetime_read = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=20)
+    content = models.TextField()

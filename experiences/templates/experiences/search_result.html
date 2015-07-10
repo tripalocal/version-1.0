@@ -8,14 +8,15 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="{% static 'app/content/tripalocal_search.css' %}" rel="stylesheet">
+    <link href="{% static 'experiences/content/tripalocal_search.css' %}" rel="stylesheet">
+    <link href="{% static 'experiences/content/search_result.css' %}" rel="stylesheet">
     <title>Discover {{ city_display_name }}</title>
 {%endblock%}
 
 {% block content %} 
     <form id="search_form" action="/s/melbourne/" method="post">
         {% csrf_token %}
-        <div class="basicSearch">
+        <div class="basicSearch notOnMobile">
             <div class="row">
                 <div class="fixCenter">
                     <div class="dates">
@@ -77,7 +78,7 @@
                 </div>
             </div>
         </div>
-        <div class="advanceSearch" id="optional_criteria_div" style="display:none;">
+        <div class="advanceSearch notOnMobile" id="optional_criteria_div" style="display:none;">
             <div class="row">
                 <div class="fixCenter">
                     <div class="interests">
@@ -111,13 +112,17 @@
                     </div>
                 </div>      
             </div>
+        </div>
+        <div class="mobileSearch notOnDesktop">  
+            <h1 style="float:left;margin:15px 20px -10px 20px">Melbourne, VIC</h1>  
+            <img src="/images/search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">  
         </div>  
     </form>
 
     <div class="container-fluid searchresult">
     	<div class="row">
             <div class="fixCenter">
-                <div id="more-filters-div">
+                <div id="more-filters-div" class="notOnMobile">
                     <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:100px;float:left;">More Filters</button>
                     <div id="ajax-experience-count"></div>
                 </div>
@@ -233,7 +238,7 @@
             }
             else
             {
-                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10007</button></div>";
+                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\"><img src='/images/closeIcon-02.svg' width='10'></button></div>";
             }
 
             $("#tags_div").append(new_tag);

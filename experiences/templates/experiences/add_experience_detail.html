@@ -3,8 +3,10 @@
 {% load i18n %}
 
 {% block head %}
+    {% load staticfiles %}
     {{ wizard.form.media }}
     <title>Add a new experience -- Detail</title>
+    <link href="{% static 'experiences/content/add_experience_detail.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}

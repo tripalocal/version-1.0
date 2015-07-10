@@ -1,3 +1,8 @@
+{% block head %}
+    {% load staticfiles %}
+    <link href="{% static 'app/content/signup_login.css' %}" rel="stylesheet">    
+{% endblock %}
+
 {% if user.is_authenticated %}
 <!--
 <form id="logoutForm" action="/logout" method="post" class="navbar-right">
@@ -29,7 +34,7 @@
     </div>
     <div class = "menuhost-middle">
         <ul>
-            <li><span class = "menubus-logo"></span></li>
+            <li><span class = "menutrip-logo"></span></li>
             <li><a href="/mytrip">My Trip</a></li>
         </ul>
     </div>

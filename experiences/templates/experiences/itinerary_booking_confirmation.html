@@ -54,7 +54,7 @@
                	            <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="Refresh" value="Refresh" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6; margin-left:20px;"/> 
                         </div>
                         {% if coupon and not wrong_promo_code %}
-                        {% include "coupon_"|add:coupon.title|add:".html" %}
+                        {% include "experiences/coupon_"|add:coupon.title|add:".html" %}
                         {%endif%}
                     </div>
 

@@ -42,7 +42,8 @@ class SubscriptionForm(forms.ModelForm):
         fields = ['email']
 
 Location = (('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
-            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),)
+            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),('GRSA', 'Greater South Australia'),
+            ('GRNSW', 'Greater New South Wales'),('GRQLD', 'Greater Queensland'),)
 class HomepageSearchForm(forms.Form):
     city = forms.ChoiceField(choices=Location)
     start_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}))

@@ -16,8 +16,6 @@
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
     <link href="{% static 'app/content/tripalocal.min.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/tripalocal.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/tripalocal_xs.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/tripalocal_jx.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/tripalocal_en.css' %}" rel="stylesheet">    
     {% if form %}
         {{ form.media }}
@@ -79,9 +77,10 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
             <tbody>
                 <tr>
                     <td class="header">
+                        <img class="hamburger notOnDesktop" src="/images/menu.svg" width="15" />
                         <a class="brand" href="https://www.tripalocal.com"><img src="/images/tripalocal_Logo.png" width="115" height="39"></a>
                     </td>
-                    <td class="navbar-collapse">
+                    <td class="navbar-collapse notOnMobile">
                         {% include 'app/loginpartial.html' %}
                     </td>
                 </tr>
@@ -116,15 +115,15 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                         <ul class="footer-col travel">
                             <li><h5>Travel</h5></li>
                             <li><a href="/refundpolicy">Refund Policy</a></li>
-                            <li><a href="/mobileapps">Mobile Apps</a></li>
+                            <!--<li><a href="/mobileapps">Mobile Apps</a></li>-->
                         </ul>
                         <ul class="footer-col social">
                             <li><h5>Social</h5></li>
                             <li><a href="https://www.facebook.com/tripalocal">Facebook</a></li>
                             <li><a href="https://www.twitter.com/tripalocal">Twitter</a></li>
-                            <li><a href="https://www.twitter.com/tripalocal">Instagram</a></li>
+                            <!--<li><a href="https://www.twitter.com/tripalocal">Instagram</a></li>
                             <li><a href="https://www.twitter.com/tripalocal">Weibo</a></li> 
-                            <li><a href="https://www.twitter.com/tripalocal">Wechat</a></li>
+                            <li><a href="https://www.twitter.com/tripalocal">Wechat</a></li>-->
                         </ul>
                     </div>
                 </div>

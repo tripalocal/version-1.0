@@ -360,12 +360,12 @@ def experience_availability(request):
             #    row += 1
             #workbook.close()
 
-            return render_to_response('experience_availability.html', {'form':form,'available_options':available_options}, context)
+            return render_to_response('experiences/experience_availability.html', {'form':form,'available_options':available_options}, context)
 
-    return render_to_response('experience_availability.html', {'form':form}, context)
+    return render_to_response('experiences/experience_availability.html', {'form':form}, context)
 
 class ExperienceListView(ListView):
-    template_name = 'experience_list.html'
+    template_name = 'experiences/experience_list.html'
     #paginate_by = 9
     #context_object_name = 'experience_list'
 
@@ -393,7 +393,7 @@ def getAvailableOptions(experience, available_options, available_date):
         #else :
             #TODO
     #set the start time to 6 hours later
-    sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+24)
+    sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+23)
 
     blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
     blockout_start = []
@@ -545,7 +545,7 @@ def getAvailableOptions(experience, available_options, available_date):
 
 class ExperienceDetailView(DetailView):
     model = Experience
-    template_name = 'experience_detail.html'
+    template_name = 'experiences/experience_detail.html'
     #context_object_name = 'experience'
 
     def post(self, request, *args, **kwargs):
@@ -581,7 +581,7 @@ class ExperienceDetailView(DetailView):
             else:
                 subtotal_price = float(experience.price)*float(form.data['guest_number'])
 
-            return render(request, 'experience_booking_confirmation.html', 
+            return render(request, 'experiences/experience_booking_confirmation.html', 
                           {'form': form, #'eid':self.object.id, 
                            'experience': experience,
                            'experience_price': experience_price,
@@ -623,7 +623,9 @@ class ExperienceDetailView(DetailView):
                 context['host_only_unlisted'] = True
                 return context
 
-        cities = {'melbourne':'Melbourne','sydney':'Sydney','cairns':'Cairns','goldcoast':'Gold coast','brisbane':'Brisbane','hobart':'Hobart','adelaide':'Adelaide'}
+        cities = {'melbourne':'Melbourne','sydney':'Sydney','cairns':'Cairns','goldcoast':'Gold coast','brisbane':'Brisbane',
+                  'hobart':'Hobart','adelaide':'Adelaide','grsa':'Greater South Australia','grsnw':'Greater New South Wales',
+                  'grqld':'Greater Queensland'}
         context['experience_city'] = cities.get(experience.city.lower())
 
         available_date = getAvailableOptions(experience, available_options, available_date)
@@ -667,15 +669,17 @@ class ExperienceDetailView(DetailView):
 
         related_experiences = []
         cursor = connections['experiencedb'].cursor()
-        ids = cursor.execute("select experience_id from experiences_experience_guests where experience_id != %s and user_id in (select user_id from experiences_experience_guests where experience_id=%s)",
-                             [experience.id, experience.id]).fetchall()
+        cursor.execute("select experience_id from experiences_experience_guests where experience_id != %s and user_id in (select user_id from experiences_experience_guests where experience_id=%s)",
+                             [experience.id, experience.id])
+        ids = cursor.fetchall()
         if ids and len(ids)>0:
             for id in ids:
                 related_experiences.append(id[0])
             related_experiences = list(Experience.objects.filter(id__in=related_experiences).filter(city__iexact=experience.city))
         if len(related_experiences)<3:
-            tags = cursor.execute("select tags from experiences_experience where id = %s",
-                             [experience.id]).fetchone()
+            cursor.execute("select tags from experiences_experience where id = %s",
+                             [experience.id])
+            tags = cursor.fetchone()
             tags = tags[0].split(",") if tags[0] is not None else ''
             queryset = Experience.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").exclude(id=experience.id)
             for tag in tags:
@@ -692,8 +696,9 @@ class ExperienceDetailView(DetailView):
         
         if self.request.user.is_authenticated():
             for r in related_experiences:
-                wl = cursor.execute("select id from app_registereduser_wishlist where experience_id = %s and registereduser_id=%s",
-                             [r.id,self.request.user.registereduser.id]).fetchone()
+                cursor.execute("select id from app_registereduser_wishlist where experience_id = %s and registereduser_id=%s",
+                             [r.id,self.request.user.registereduser.id])
+                wl = cursor.fetchone()
                 if wl and len(wl)>0:
                     related_experiences_added_to_wishlist.append(True)
                 else:
@@ -715,13 +720,13 @@ FORMS = (("experience", ExperienceForm),
          ("location",ExperienceLocationForm),
          ) #("summary",ExperienceSummaryForm)
 
-TEMPLATES = {"experience": "add_experience_experience.html",
-             "calendar": "add_experience_calendar.html",
-             "price":"add_experience_price.html",
-             "overview":"add_experience_overview.html",
-             "detail":"add_experience_detail.html",
-             "photo":"add_experience_photo.html",
-             "location":"add_experience_location.html"
+TEMPLATES = {"experience": "experiences/add_experience_experience.html",
+             "calendar": "experiences/add_experience_calendar.html",
+             "price":"experiences/add_experience_price.html",
+             "overview":"experiences/add_experience_overview.html",
+             "detail":"experiences/add_experience_detail.html",
+             "photo":"experiences/add_experience_photo.html",
+             "location":"experiences/add_experience_location.html"
              } #"summary":"add_experience_summary.html"
 
 EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
@@ -733,7 +738,8 @@ def initializeExperience(experience, data):
     data.clear()
 
     cursor = connections['cndb'].cursor()
-    row = cursor.execute("select title, description, activity, interaction, dress, meetup_spot from experiences_experience where id = %s", [experience.id]).fetchone()
+    cursor.execute("select title, description, activity, interaction, dress, meetup_spot from experiences_experience where id = %s", [experience.id])
+    row = cursor.fetchone()
     
     if row:
         data['title_other'] = row[0]
@@ -743,7 +749,8 @@ def initializeExperience(experience, data):
         data['dress_code_other'] = row[4]
         data['meetup_spot_other'] = row[5]
 
-    rows = cursor.execute("select item, details from experiences_whatsincluded where experience_id = %s", [experience.id]).fetchall()
+    cursor.execute("select item, details from experiences_whatsincluded where experience_id = %s", [experience.id])
+    rows = cursor.fetchall()
     if rows:
         for index in range(len(rows)):
             if rows[index][0] == "Food":
@@ -1278,13 +1285,13 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             #add the user to the host list
             #experience.hosts.add(self.request.user)
             cursor = connections['experiencedb'].cursor()
-            cursor.execute("Insert into experiences_experience_hosts ('experience_id','user_id') values (%s, %s)", [experience.id, self.request.user.id])
+            cursor.execute("Insert into experiences_experience_hosts (experience_id,user_id) values (%s, %s)", [experience.id, self.request.user.id])
             
             #copy to the chinese database
             cursor = connections['cndb'].cursor()
-            cursor.execute("insert into experiences_experience ('id', 'start_datetime', 'end_datetime', 'repeat_cycle', 'repeat_frequency', " 
-                           + "'title', 'description', 'guest_number_min', 'guest_number_max', 'price', 'dynamic_price', 'duration', 'activity', 'interaction', "
-                           + "'dress', 'city', 'meetup_spot', 'status', 'type', 'language')"
+            cursor.execute("insert into experiences_experience (id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, " 
+                           + "title, description, guest_number_min, guest_number_max, price, dynamic_price, duration, activity, interaction, "
+                           + "dress, city, meetup_spot, status, type, language)"
                            + " values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
                            [experience.id, experience.start_datetime, experience.end_datetime, experience.repeat_cycle, experience.repeat_frequency,
                             title_other, summary_other, experience.guest_number_min, experience.guest_number_max, experience.price, experience.dynamic_price, experience.duration, activity_other, interaction_other,
@@ -1292,7 +1299,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
 
             #copy to the chinese database
             cursor = connections['cndb'].cursor()
-            cursor.execute("Insert into experiences_experience_hosts ('experience_id','user_id') values (%s, %s)", [experience.id, self.request.user.id])
+            cursor.execute("Insert into experiences_experience_hosts (experience_id,user_id) values (%s, %s)", [experience.id, self.request.user.id])
 
         else:
             #if edit
@@ -1405,7 +1412,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                     b.save()
                     #copy to chinese database
                     cursor = connections['cndb'].cursor()
-                    cursor.execute("Insert into experiences_blockouttimeperiod ('experience_id','start_datetime','end_datetime','repeat', 'repeat_cycle', 'repeat_frequency', 'repeat_extra_information', 'repeat_end_date')"
+                    cursor.execute("Insert into experiences_blockouttimeperiod (experience_id,start_datetime,end_datetime,repeat,repeat_cycle,repeat_frequency,repeat_extra_information,repeat_end_date)"
                                    + " values (%s, %s, %s, %s, %s, %s, %s, %s)", 
                                    [experience.id, b.start_datetime, b.end_datetime, b.repeat, b.repeat_cycle, b.repeat_frequency, b.repeat_extra_information, b.repeat_end_date])
                 
@@ -1433,7 +1440,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                     ib.save()
                     #copy to chinese database
                     cursor = connections['cndb'].cursor()
-                    cursor.execute("Insert into experiences_instantbookingtimeperiod ('experience_id','start_datetime','end_datetime','repeat', 'repeat_cycle', 'repeat_frequency', 'repeat_extra_information', 'repeat_end_date')"
+                    cursor.execute("Insert into experiences_instantbookingtimeperiod (experience_id,start_datetime,end_datetime,repeat, repeat_cycle, repeat_frequency, repeat_extra_information, repeat_end_date)"
                                    + " values (%s, %s, %s, %s, %s, %s, %s, %s)", 
                                    [experience.id, ib.start_datetime, ib.end_datetime, ib.repeat, ib.repeat_cycle, ib.repeat_frequency, ib.repeat_extra_information, ib.repeat_end_date])
 
@@ -1444,21 +1451,21 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             food.save()
             #copy to chinese database
             cursor = connections['cndb'].cursor()
-            cursor.execute("Insert into experiences_whatsincluded ('experience_id','item','included','details') values (%s, %s, %s, %s)", 
+            cursor.execute("Insert into experiences_whatsincluded (experience_id,item,included,details) values (%s, %s, %s, %s)", 
                             [experience.id, 'Food', (included_food=='Yes'), included_food_detail_other])
         if included_ticket != None:
             ticket = WhatsIncluded(item='Ticket', included = (included_ticket=='Yes'), details = included_ticket_detail, experience = experience)
             ticket.save()
             #copy to chinese database
             cursor = connections['cndb'].cursor()
-            cursor.execute("Insert into experiences_whatsincluded ('experience_id','item','included','details') values (%s, %s, %s, %s)", 
+            cursor.execute("Insert into experiences_whatsincluded (experience_id,item,included,details) values (%s, %s, %s, %s)", 
                         [experience.id, 'Ticket', (included_ticket=='Yes'), included_ticket_detail_other])
         if included_transport != None:
             transport = WhatsIncluded(item='Transport', included = (included_transport=='Yes'), details = included_transport_detail, experience = experience)
             transport.save()
             #copy to chinese database
             cursor = connections['cndb'].cursor()
-            cursor.execute("Insert into experiences_whatsincluded ('experience_id','item','included','details') values (%s, %s, %s, %s)", 
+            cursor.execute("Insert into experiences_whatsincluded (experience_id,item,included,details) values (%s, %s, %s, %s)", 
                             [experience.id, 'Transport', (included_transport=='Yes'), included_transport_detail_other])
                         
         #save images
@@ -1502,7 +1509,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                             photo.save()
                             #copy to the chinese database
                             cursor = connections['cndb'].cursor()
-                            cursor.execute("Insert into experiences_photo ('experience_id','name','directory','image')"
+                            cursor.execute("Insert into experiences_photo (experience_id,name,directory,image)"
                                + " values (%s, %s, %s, %s)", 
                                [experience.id, photo.name, photo.directory, photo.image.name])
 
@@ -1556,9 +1563,9 @@ def experience_booking_successful(request, experience, guest_number, booking_dat
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
     mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
 
-    template = 'experience_booking_successful_requested.html'
+    template = 'experiences/experience_booking_successful_requested.html'
     if is_instant_booking:
-        template = 'experience_booking_successful_confirmed.html'
+        template = 'experiences/experience_booking_successful_confirmed.html'
 
     return render(request,template,{'experience': experience,
                                     'price_paid':price_paid,
@@ -1620,7 +1627,7 @@ def experience_booking_confirmation(request):
             mp = Mixpanel(settings.MIXPANEL_TOKEN)
             mp.track(request.user.email, 'Clicked on "Refresh"')
 
-            return render_to_response('experience_booking_confirmation.html', {'form': form, 
+            return render_to_response('experiences/experience_booking_confirmation.html', {'form': form, 
                                                                            'user_email':request.user.email,
                                                                            'wrong_promo_code':wrong_promo_code,
                                                                            'coupon':coupon,
@@ -1659,7 +1666,7 @@ def experience_booking_confirmation(request):
                                                          form.cleaned_data['price_paid'])
             
             else:
-                return render_to_response('experience_booking_confirmation.html', {'form': form, 
+                return render_to_response('experiences/experience_booking_confirmation.html', {'form': form, 
                                                                                    'user_email':request.user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience, 
@@ -1694,12 +1701,12 @@ def saveProfileImage(user, profile, image_file):
     name, extension = os.path.splitext(image_file.name)
     extension = extension.lower();
     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
-        filename = 'host' + str(user.id) + '_1_' + user.first_name.title().strip() + user.last_name[:1].title() + extension
+        filename = ('host' + str(user.id) + '_1_' + user.first_name.title().strip() + user.last_name[:1].title() + extension).encode('ascii', 'ignore').decode('ascii')
         destination = open(dirname + filename, 'wb+')
         for chunk in image_file.chunks():              
             destination.write(chunk)
         destination.close()
-        profile.image_url = "hosts/" + str(user.id) + '/host' + str(user.id) + '_1_' + user.first_name.title().strip() + user.last_name[:1].title() + extension
+        profile.image_url = "hosts/" + str(user.id) + '/' + filename
         profile.image = profile.image_url
         profile.save()
 
@@ -1840,7 +1847,7 @@ def create_experience(request, id=None):
                     user = User.objects.get(email=form.data['host'])
                 except User.DoesNotExist:
                     form.add_error("host","host email does not exist")
-                    return render_to_response('create_experience.html', {'form': form, 'display_error':display_error}, context)
+                    return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
 
                 #create a new experience
                 experience = Experience(id=form.data['id'],
@@ -1888,7 +1895,7 @@ def create_experience(request, id=None):
             if not id and user:
                 #experience.hosts.add(user)
                 cursor = connections['experiencedb'].cursor()
-                cursor.execute("Insert into experiences_experience_hosts ('experience_id','user_id') values (%s, %s)", [experience.id, user.id])
+                cursor.execute("Insert into experiences_experience_hosts (experience_id,user_id) values (%s, %s)", [experience.id, user.id])
 
             #update host information
             user = User.objects.get(email=form.data['host'])
@@ -1986,7 +1993,7 @@ def create_experience(request, id=None):
     else:
         form = CreateExperienceForm(data, files)
 
-    return render_to_response('create_experience.html', {'form': form, 'display_error':display_error}, context)
+    return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
 
 def update_booking(id, accepted, user):
     if id and accepted:
@@ -2021,7 +2028,7 @@ def update_booking(id, accepted, user):
                       sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                       recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
                       priority='now',  #fail_silently=False, 
-                      html_message=loader.render_to_string('email_booking_confirmed_traveler.html',
+                      html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'user':guest, #not host --> need "my" phone number
@@ -2032,7 +2039,7 @@ def update_booking(id, accepted, user):
                       sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                       recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
                       priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
-                      html_message=loader.render_to_string('email_reminder_traveler.html',
+                      html_message=loader.render_to_string('experiences/experiences/email_reminder_traveler.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'user':guest, #not host --> need "my" phone number
@@ -2043,7 +2050,7 @@ def update_booking(id, accepted, user):
                       sender='Tripalocal <' + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
                       recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                       priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
-                      html_message=loader.render_to_string('email_reminder_host.html',
+                      html_message=loader.render_to_string('experiences/email_reminder_host.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'user':guest,
@@ -2054,7 +2061,7 @@ def update_booking(id, accepted, user):
                       sender='Tripalocal <enquiries@tripalocal.com>',
                       recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
                       priority='high',  scheduled_time = booking.datetime + timedelta(hours=experience.duration+1), 
-                      html_message=loader.render_to_string('email_review_traveler.html',
+                      html_message=loader.render_to_string('experiences/email_review_traveler.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
@@ -2065,12 +2072,12 @@ def update_booking(id, accepted, user):
                       sender='Tripalocal <' + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
                       recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                       priority='now',  #fail_silently=False, 
-                      html_message=loader.render_to_string('email_booking_confirmed_host.html',
+                      html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'user':guest,
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-            email_template = 'email_booking_confirmed_host.html'
+            email_template = 'experiences/email_booking_confirmed_host.html'
             booking_success = True
             #return render(request, 'email_booking_confirmed_host.html',
             #              {'experience': experience,
@@ -2130,7 +2137,7 @@ def update_booking(id, accepted, user):
                           sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                           recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail],
                           priority='now',  #fail_silently=False, 
-                          html_message=loader.render_to_string('email_booking_cancelled_traveler.html',
+                          html_message=loader.render_to_string('experiences/email_booking_cancelled_traveler.html',
                                                                 {'experience': experience,
                                                                 'booking':booking,
                                                                 'user':host,
@@ -2140,12 +2147,12 @@ def update_booking(id, accepted, user):
                           sender='Tripalocal <' + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
                           recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                           priority='now',  #fail_silently=False, 
-                          html_message=loader.render_to_string('email_booking_cancelled_host.html',
+                          html_message=loader.render_to_string('experiences/email_booking_cancelled_host.html',
                                                                 {'experience': experience,
                                                                  'booking':booking,
                                                                  'user':guest,
                                                                  'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-                email_template = 'email_booking_cancelled_host.html'
+                email_template = 'experiences/email_booking_cancelled_host.html'
                 booking_success = True
 
                 #return render(request, 'email_booking_cancelled_host.html',
@@ -2279,8 +2286,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     BGImageURLList = []
     profileImageURLList = []
     cityList= [('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
-            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA')]#,('GRSA', 'Greater region, SA'),
-            #('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD')
+            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),('Grsa', 'Greater South Australia'),
+            ('Grnsw', 'Greater New South Wales'),('Grqld', 'Greater Queensland'),]#('Grvic', 'Greater Victoria'),
 
     if is_kids_friendly:
         experienceList = [exp for exp in experienceList if tagsOnly("Kids Friendly", exp)]
@@ -2445,9 +2452,9 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         })
 
     if request.is_ajax():
-        template = 'experience_results.html'
+        template = 'experiences/experience_results.html'
     else:
-        template = 'search_result.html'
+        template = 'experiences/search_result.html'
 
     return render_to_response(template, {'form': form}, context)
 
@@ -2456,26 +2463,26 @@ def experiences(request):
     
     if request.user.is_authenticated():
         mp.track(request.user.email,"Visited prelaunch Melbourne experiences page");
-        return render(request,'experiences.html',{"user_email":request.user.email})
+        return render(request,'experiences/experiences.html',{"user_email":request.user.email})
     else:
         mp.track("","Visited prelaunch Melbourne experiences page");
-        return render(request,'experiences.html',{"user_email":""})
+        return render(request,'experiences/experiences.html',{"user_email":""})
 
 def experiences_ch(request):
-    return render(request,'experiences_ch.html')
+    return render(request,'experiences/experiences_ch.html')
 
 def experiences_pre(request):
-    return render(request,'experiences_pre.html')
+    return render(request,'experiences/experiences_pre.html')
 
 def experiences_ch_pre(request):
-    return render(request,'experiences_ch_pre.html')
+    return render(request,'experiences/experiences_ch_pre.html')
 
 def experiences_sydney_pre(request):
-    return render(request,'experiences_sydney_pre.html')
+    return render(request,'experiences/experiences_sydney_pre.html')
 
 def freeSimPromo(request):
 
-    template = loader.get_template('christmas_2014_promo.html')
+    template = loader.get_template('experiences/christmas_2014_promo.html')
 
     # Add all experiences that belong to the specified city to a new list
     # alongside a list with all the number of reviews
@@ -2606,13 +2613,13 @@ def review_experience (request, id=None):
                     row = cursor.execute("insert into experiences_review (user_id, experience_id, comment, rate, personal_comment, operator_comment, datetime) values(%s,%s,%s,%s,%s,%s,%s)",
                                          [user.id,experience.id,review.comment,review.rate,review.personal_comment,review.operator_comment,review.datetime])
 
-                    return render_to_response('review_experience_success.html', {}, context)
+                    return render_to_response('experiences/review_experience_success.html', {}, context)
             else:
                 form = ReviewForm()
         else:
             form = ReviewForm()
 
-        return render_to_response('review_experience.html', {'form': form}, context)
+        return render_to_response('experiences/review_experience.html', {'form': form}, context)
     else:
         return HttpResponseRedirect('/')
 
@@ -2713,9 +2720,9 @@ def custom_itinerary(request):
 
                 itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, tags)
             
-                return render_to_response('custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
+                return render_to_response('experiences/custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
             else:
-                return render_to_response('custom_itinerary.html', {'form':form}, context)
+                return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
         else:
             #submit bookings
             if form.is_valid():
@@ -2734,10 +2741,10 @@ def custom_itinerary(request):
                     booking_form.data['time'] += str(item['time']) + ";"
                     booking_form.data['guest_number'] = item['guest_number']
 
-                return render(request, 'itinerary_booking_confirmation.html', 
+                return render(request, 'experiences/itinerary_booking_confirmation.html', 
                           {'form': booking_form,'itinerary':itinerary})
 
-    return render_to_response('custom_itinerary.html', {'form':form}, context)
+    return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
 def itinerary_booking_confirmation(request):
     context = RequestContext(request)
@@ -2791,7 +2798,7 @@ def itinerary_booking_confirmation(request):
             #mp = Mixpanel(settings.MIXPANEL_TOKEN)
             #mp.track(request.user.email, 'Clicked on "Refresh"')
 
-            return render_to_response('itinerary_booking_confirmation.html', {'form': form,}, context)
+            return render_to_response('experiences/itinerary_booking_confirmation.html', {'form': form,}, context)
 
         else:
             #submit the form
@@ -2800,7 +2807,7 @@ def itinerary_booking_confirmation(request):
                 return itinerary_booking_successful(request)
             
             else:
-                return render_to_response('itinerary_booking_confirmation.html', {'form': form, 
+                return render_to_response('experiences/itinerary_booking_confirmation.html', {'form': form, 
                                                                            'display_error':display_error,}, context)
     else:
         # If the request was not a POST
@@ -2812,4 +2819,4 @@ def itinerary_booking_successful(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect("/accounts/login/")
     
-    return render(request,'itinerary_booking_successful.html',{})
+    return render(request,'experiences/itinerary_booking_successful.html',{})

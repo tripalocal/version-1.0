@@ -5,6 +5,7 @@
     {% load staticfiles %}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
     <title> {{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %} </title>
+    <link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -136,7 +137,7 @@
             
         	    <div class="desBox">
                     {% if experience.type == "RECOMMENDED" %}
-                    <div class="recommended-label"></div>
+                    <div class="recommended-label">Recommended</div>
                     {% endif %}
                     <h2 style="font-weight:bold">{{ experience.title }} with {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}
                     <br><small style="font-size:14px">{{experience.duration}} hrs &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
@@ -144,18 +145,18 @@
                     <table>
                         <tr style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;"> 
                             <th style="width:150px;"><h3 style="color:grey">Overview</h3></th>
-                            <td class="experience-detail-table-td">
-                                {{ experience.description }}
+                            <td id="id_experience_description" class="experience-detail-table-td">
+                                {{ experience.description }}<br>
                                 {{ experience.interaction }} 
                             </td>
                         </tr>
                         <tr style="border-bottom:1px solid #CCCCCC;"> 
                              <th><h3 style="color:grey">Activities</h3></th>
-                            <td class="experience-detail-table-td">{{ experience.activity }}</td>
+                            <td id="id_experience_activity" class="experience-detail-table-td">{{ experience.activity }}</td>
                         </tr>
                         <tr style="border-bottom:1px solid #CCCCCC;"> 
                             <th><h3 style="color:grey">What to wear</h3></th>
-                            <td class="experience-detail-table-td">{{ experience.dress }}</td>
+                            <td id="id_experience_dress" class="experience-detail-table-td">{{ experience.dress }}</td>
                         </tr>
 
                         {% for w in experience.whatsincluded_set.all %}
@@ -167,7 +168,7 @@
                         <tr style="border-bottom:1px solid #CCCCCC;height: 10px;"><th style="padding-top:0"></th><td></td></tr>
                     </table> 
 
-                    <div class="container">
+                    <div id="carousel_box" class="container">
                         <br>
                         <div id="myCarousel" class="carousel " data-ride="carousel">
                             <!-- Indicators -->
@@ -212,47 +213,49 @@
 
     {% if experience.type != "NONPRIVATE" %}
     <div class="experinence-host desBox">
-        <p>About the host, {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</p>
-        <div id="experience-hostintro" class="experience-hostintro">
-            <div class="experience-hostpic profile-lg" style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;"></div>
-            <div style="width: 35vw;float:right">
-                <div id="experience-hostinterests" class="experience-hostinterests">
-                    <div class="gradientMask"></div>
-                    <span id="host_bio">{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.bio }} {% endif %} {% endfor %}</span>
+        <div id="experinence-host-container">
+            <p>About the host, {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</p>
+            <div id="experience-hostintro" class="experience-hostintro">
+                <div class="experience-hostpic profile-lg" style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;"></div>
+                <div>
+                    <div id="experience-hostinterests" class="experience-hostinterests">
+                        <div class="gradientMask"></div>
+                        <span id="host_bio">{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.bio }} {% endif %} {% endfor %}</span>
+                    </div>
+                    {% for h in experience.hosts.all %}
+                    {% if forloop.first and h.registereduser.bio|length > 200 %}
+                    <div id="bio_show_more" value="More">+ More</div>
+                    {% endif %}
+                    {% endfor %}
                 </div>
-                {% for h in experience.hosts.all %}
-                {% if forloop.first and h.registereduser.bio|length > 200 %}
-                <div id="bio_show_more" value="More">+ More</div>
-                {% endif %}
-                {% endfor %}
             </div>
-        </div>
         
-        <div class="host-socialmedia">
-            <div class="host-trust">Trust</div>
-            {% for h in experience.hosts.all %}
-            {% if forloop.first %}
-            {% if h.socialaccount_set.all%}
-            <div class="host-facebook">
-                <div class="facebooklogo"></div>
-                <span class="followerNumber">Facebook</span><br>
-                <span class="host-friend">Verified</span>
+            <div class="host-socialmedia">
+                <div class="host-trust">Trust</div>
+                {% for h in experience.hosts.all %}
+                {% if forloop.first %}
+                {% if h.socialaccount_set.all%}
+                <div class="host-facebook">
+                    <div class="facebooklogo"></div>
+                    <span class="followerNumber">Facebook</span><br>
+                    <span class="host-friend">Verified</span>
+                </div>
+                {% endif %}
+                <div class="host-review">
+                    <div class="reviewlogo"></div>
+                    <span class="review-title">Reviews</span>
+                    <span class="review-number" style="color:#333">{{ experience.review_set.count }}</span>
+                </div>
+                {% if h.registereduser.phone_number%}
+                <div class="host-mobile">
+                    <div class="mobilelogo"></div>
+                    <span class="Mobile">Phone</span>
+                    <span class="host-verfied">Verified</span>
+                </div>
+                {% endif %}
+                {% endif %}
+                {% endfor %} 
             </div>
-            {% endif %}
-            <div class="host-review">
-                <div class="reviewlogo"></div>
-                <span class="review-title">Reviews</span>
-                <span class="review-number" style="color:#333">{{ experience.review_set.count }}</span>
-            </div>
-            {% if h.registereduser.phone_number%}
-            <div class="host-mobile">
-                <div class="mobilelogo"></div>
-                <span class="Mobile">Phone</span>
-                <span class="host-verfied">Verified</span>
-            </div>
-            {% endif %}
-            {% endif %}
-            {% endfor %} 
         </div>
     </div>
     {%endif%}
@@ -360,11 +363,15 @@ $(function(){
             $(document.body).stickem();
         }
 
-        bio = $("#host_bio").html();
-        if(bio)
+        ids=['host_bio','id_experience_activity','id_experience_dress','id_experience_description']
+        for(var i=0;i<ids.length;i++)
         {
-            bio = bio.replace(/(?:\r\n|\r|\n)/g, '<br />');
-            $("#host_bio").html(bio);
+            text = $("#"+ids[i]).html();
+            if(text)
+            {
+                text = text.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                $("#"+ids[i]).html(text);
+            }
         }
 
         var i=0;

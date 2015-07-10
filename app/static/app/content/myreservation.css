@@ -1,0 +1,18 @@
+﻿/*reservation.html*/
+#completed-reservation{padding: 0px; background-color: #F5F5F5;}
+.flexHeight{height: auto;}
+.icon-group{float: left; margin-top: 20px; width: 110px;}
+.icon-group p{width:110px; text-align: center;}
+.icon-group .icon{margin-left: 42px;}
+.line{clear: both; height: 100%;}
+.reservation-info{float: left; clear: right;}
+.reservation-info-position{position: relative; top: -6px;}
+#highlighted{color: #3ECFC4;}
+.reservation-status{color: #FFF; border-radius: 3px; margin-top: 20px; text-align: center;}
+#booked{background-color: #9ACB28; width: 65px;}
+#pending{background-color: #3DCDCE; width: 75px; display: inline-block;}
+#canceled{background-color: #CCCCCC; width: 85px;}
+#completed{color: #FFF; background-color: #FD9728; border-radius: 3px; width: 85px; text-align: center;}
+.add-note{float: right; width:347px; margin-right: 20px;}
+.pending-reminder{display: inline-block;}
+.blank-icon-group{float:left; display: inline; background-color: transparent; width: 110px; height: 47px;}

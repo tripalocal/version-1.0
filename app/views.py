@@ -278,8 +278,9 @@ def getreservation(user):
     bookings = Booking.objects.raw('select * from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime', [user.id])
     
     cursor = connections['cndb'].cursor()
-    rows = cursor.execute('select datetime, status, guest_number, user_id, experience_id, payment_id from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime',
-                         [user.id]).fetchall()
+    cursor.execute('select datetime, status, guest_number, user_id, experience_id, payment_id from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime',
+                         [user.id])
+    rows = cursor.fetchall()
     
     bookings_cn = []
     if rows:
@@ -314,7 +315,8 @@ def getreservation(user):
             current_reservations.append(reservation)
 
     for booking in bookings_cn:
-        row = cursor.execute("select id, title from experiences_experience where id = %s", [booking.experience_id]).fetchone()
+        cursor.execute("select id, title from experiences_experience where id = %s", [booking.experience_id])
+        row = cursor.fetchone()
         experience = Experience()
         if row:
             experience.id = row[0]
@@ -322,13 +324,15 @@ def getreservation(user):
             
         payment = Payment()
         if booking.payment_id != None:
-            row = cursor.execute("select city, country from experiences_payment where id = %s", [booking.payment_id]).fetchone()
+            cursor.execute("select city, country from experiences_payment where id = %s", [booking.payment_id])
+            row = cursor.fetchone()
             if row:
                 payment.city = row[0]
                 payment.country = row[1]
         
         guest = User()
-        row = cursor.execute("select first_name, last_name from auth_user where id = %s", [booking.user_id]).fetchone()
+        cursor.execute("select first_name, last_name from auth_user where id = %s", [booking.user_id])
+        row = cursor.fetchone()
         if row:
             guest.first_name = row[0]
             guest.last_name = row[1]
@@ -372,8 +376,9 @@ def mytrip(request):
             user_bookings.append(booking)
 
         cursor = connections['cndb'].cursor()
-        rows = cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s order by datetime',
-                             [request.user.id]).fetchall()
+        cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s order by datetime',
+                             [request.user.id])
+        rows = cursor.fetchall()
 
         if rows:
             for index in range(len(rows)):
@@ -382,8 +387,9 @@ def mytrip(request):
                 bk.status = rows[index][1]
                 bk.guest_number = rows[index][2]
                 exp = Experience()
-                row = cursor.execute('select city, meetup_spot, duration, title from experiences_experience where id = %s',
-                             [rows[index][3]]).fetchone()
+                cursor.execute('select city, meetup_spot, duration, title from experiences_experience where id = %s',
+                             [rows[index][3]])
+                row = cursor.fetchone()
                 exp.id = rows[index][3]
                 exp.city = row[0]
                 exp.meetup_spot = row[1]

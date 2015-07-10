@@ -5,6 +5,8 @@
 {% block head %}
     {{ wizard.form.media }}
     <title>Add a new experience -- Location</title>
+    {% load staticfiles %}
+    <link href="{% static 'experiences/content/add_experience_location.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}

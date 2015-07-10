@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpRespons
 import json, pytz, xlrd, re, os, subprocess, math, logging, ast
 from django.contrib.auth.models import User
 from datetime import *
-from app.models import RegisteredUser
+from app.models import RegisteredUser, Message
 from post_office import mail
 from Tripalocal_V1 import settings
 from tripalocal_messages.models import Aliases, Users
@@ -149,14 +149,14 @@ def saveBookingRequest(booking_request):
         profile.save()
 
         cursor = connections['default'].cursor()
-        cursor.execute("Insert into account_emailaddress ('user_id','email','verified','primary') values (%s, %s, %s, %s)", 
+        cursor.execute("Insert into account_emailaddress (user_id,email,verified,primary) values (%s, %s, %s, %s)", 
                        [user.id, email, 1, 1])
 
         #copy to the chinese website database
         cursor = connections['cndb'].cursor()
-        cursor.execute("Insert into auth_user ('id','first_name','last_name','email') values (%s, %s, %s, %s)", 
+        cursor.execute("Insert into auth_user (id,first_name,last_name,email) values (%s, %s, %s, %s)", 
                         [user.id,user.first_name, user.last_name, user.email])
-        cursor.execute("Insert into app_registereduser ('user_id') values (%s)", [user.id])
+        cursor.execute("Insert into app_registereduser (user_id) values (%s)", [user.id])
 
         username = user.username
 
@@ -200,7 +200,7 @@ def saveBookingRequest(booking_request):
     if user not in experience.guests.all():
         #experience.guests.add(user)
         cursor = connections['experiencedb'].cursor()
-        cursor.execute("Insert into experiences_experience_guests ('experience_id','user_id') values (%s, %s)", [experience_id, user.id])
+        cursor.execute("Insert into experiences_experience_guests (experience_id,user_id) values (%s, %s)", [experience_id, user.id])
 
     ## send an email to the host
     #mail.send(subject='[Tripalocal] ' + user.first_name + ' has requested your experience', message='',
@@ -230,7 +230,7 @@ def saveBookingRequest(booking_request):
                 sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
-                html_message=loader.render_to_string('email_booking_confirmed_traveler.html',
+                html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user, #not host --> need "my" phone number
@@ -241,7 +241,7 @@ def saveBookingRequest(booking_request):
                 sender='Tripalocal <enquiries@tripalocal.com>',
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime + timedelta(days=1), 
-                html_message=loader.render_to_string('email_review_traveler.html',
+                html_message=loader.render_to_string('experiences/email_review_traveler.html',
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
@@ -252,7 +252,7 @@ def saveBookingRequest(booking_request):
                 sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
-                html_message=loader.render_to_string('email_booking_confirmed_host.html',
+                html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user, # guest here
@@ -263,7 +263,7 @@ def saveBookingRequest(booking_request):
                 sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
-                html_message=loader.render_to_string('email_reminder_traveler.html',
+                html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user, #not host --> need "my" phone number
@@ -274,7 +274,7 @@ def saveBookingRequest(booking_request):
                 sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
-                html_message=loader.render_to_string('email_reminder_host.html',
+                html_message=loader.render_to_string('experiences/email_reminder_host.html',
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user,
@@ -363,7 +363,7 @@ def booking_request(request, format=None):
 
 #https://djangosnippets.org/snippets/2172/
 def ajax_view(request):
-    template = "add_experience_experience.html"
+    template = "experiences/add_experience_experience.html"
 
     if request.is_ajax() and request.user.is_authenticated():
         if request.method == 'POST':
@@ -397,16 +397,18 @@ def service_wishlist(request):
                 try:
                     #user.registereduser.wishlist.add(experience)
                     cursor = connections['default'].cursor()
-                    wl = cursor.execute("select id from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id]).fetchone()
+                    cursor.execute("select id from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id])
+                    wl = cursor.fetchone()
                     if wl is not None and len(wl)>0:
                         response={'success':False, 'error':'already added'}
                         return HttpResponse(json.dumps(response),content_type="application/json")
 
-                    cursor.execute("Insert into app_registereduser_wishlist ('experience_id','registereduser_id') values (%s, %s)", [experience.id, user.registereduser.id])
+                    cursor.execute("Insert into app_registereduser_wishlist (experience_id,registereduser_id) values (%s, %s)", [experience.id, user.registereduser.id])
                     
                     cursor = connections['cndb'].cursor()
-                    profile_id = cursor.execute("Select id from app_registereduser where user_id=%s",[user_id]).fetchone()
-                    cursor.execute("Insert into app_registereduser_wishlist ('experience_id','registereduser_id') values (%s, %s)", [experience.id, profile_id[0]])
+                    cursor.execute("Select id from app_registereduser where user_id=%s",[user_id])
+                    profile_id = cursor.fetchone()
+                    cursor.execute("Insert into app_registereduser_wishlist (experience_id,registereduser_id) values (%s, %s)", [experience.id, profile_id[0]])
                     response={'success':True, 'added':True}
                 except BaseException:
                     response={'success':False, 'error':'fail to add'}
@@ -418,7 +420,8 @@ def service_wishlist(request):
                     cursor.execute("delete from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id])
                     
                     cursor = connections['cndb'].cursor()
-                    profile_id = cursor.execute("Select id from app_registereduser where user_id=%s",[user_id]).fetchone()
+                    cursor.execute("Select id from app_registereduser where user_id=%s",[user_id])
+                    profile_id = cursor.fetchone()
                     cursor.execute("delete from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, profile_id[0]])
                     response={'success':True, 'removed':True}
                 except BaseException:
@@ -437,7 +440,8 @@ def service_wishlist(request):
         try:
             user = request.user
             cursor = connections['default'].cursor()
-            wl = cursor.execute("select experience_id from app_registereduser_wishlist where registereduser_id=%s", [user.registereduser.id]).fetchall()
+            cursor.execute("select experience_id from app_registereduser_wishlist where registereduser_id=%s", [user.registereduser.id])
+            wl = cursor.fetchall()
             ids = []
             for id in wl:
                 ids.append(id)
@@ -471,7 +475,7 @@ def service_login(request):
             result = {'user_id':user.id, 'token':new_token[0].key}
             return Response(result, status=status.HTTP_200_OK)
         else:
-            result = {"error":"User not existing"}
+            result = {"error":"Wrong username/password"}
             return Response(result, status=status.HTTP_404_NOT_FOUND)
 
     except Exception as err:
@@ -578,6 +582,7 @@ def service_search(request, format=None):
         keywords = criteria['keywords']
         language = "Mandarin,English"
 
+        guest_number = 5 #temp fix
         if int(guest_number) == 0:
             itinerary = get_itinerary(start_datetime, end_datetime, None, city, language, keywords)
         else:
@@ -596,8 +601,9 @@ def service_mytrip(request, format=None):
         user = request.user
         b = Booking.objects.filter(user=user)
         cursor = connections['cndb'].cursor()
-        rows = cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s order by datetime',
-                                [request.user.id]).fetchall()
+        cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s order by datetime',
+                                [request.user.id])
+        rows = cursor.fetchall()
 
         bookings = []
         for booking in b:
@@ -610,8 +616,9 @@ def service_mytrip(request, format=None):
                 bk.status = rows[index][1]
                 bk.guest_number = rows[index][2]
                 exp = Experience()
-                row = cursor.execute('select meetup_spot, title from experiences_experience where id = %s',
-                                [rows[index][3]]).fetchone()
+                cursor.execute('select meetup_spot, title from experiences_experience where id = %s',
+                                [rows[index][3]])
+                row = cursor.fetchone()
                 exp.id = rows[index][3]
                 exp.meetup_spot = row[0]
                 exp.title = row[1]
@@ -935,3 +942,65 @@ def service_email(request, format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
     return Response(status=status.HTTP_200_OK)
+
+@api_view(['GET','POST'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))#))#,
+@permission_classes((IsAuthenticated,))
+def service_message(request, format=None):
+    try:
+        data = request.query_params
+        if type(data) is str:
+            data = ast.literal_eval(data)
+
+        if request.method == "GET":
+            sender = data["sender_id"] if "sender_id" in data else None
+            id_earlier = data["id_earlier"] if "id_earlier" in data else None
+
+            messages = None
+            if sender is not None:
+                #history messages from a particualr user
+                if id_earlier is not None:
+                    messages = Message.objects.filter(sender_id=sender, receiver_id=request.user.id, id__lt=id_earlier)
+                #undelivered messages from a particualr user 
+                else:
+                    messages = Message.objects.filter(sender_id=sender, receiver_id=request.user.id, status__iexact="received")
+            else:
+                #all undelivered messages
+                messages = Message.objects.filter(receiver_id=request.user.id, status__iexact="received")
+
+            result = []
+            for msg in messages:
+                if msg.status == "received":
+                    msg.status="delivered"
+                    msg.datetime_delivered = datetime.utcnow().replace(tzinfo=pytz.UTC)
+                    msg.save()
+                m={"id":msg.id,"sender_id":msg.sender_id,"receiver_id":msg.receiver_id,"datetime_sent":msg.datetime_sent,
+                   "datetime_read":msg.datetime_read,"status":msg.status,"content":msg.content}
+                result.append(m)
+
+            return Response({"result":result}, status=status.HTTP_200_OK)
+        elif request.method == "POST":
+            data = request.data
+            if "message_id" not in data:
+                #save message
+                receiver_id = data["receiver_id"]
+                content = data["content"]
+              
+                message = Message(sender_id=request.user.id, receiver_id=receiver_id, content=content,
+                                  status="received", datetime_sent=datetime.utcnow().replace(tzinfo=pytz.UTC))
+                message.save()
+                return Response({"result":"message received"}, status=status.HTTP_200_OK)
+            else:
+                #update status: delivered-->read
+                sender_id = data["sender_id"]
+                message_id = data["message_id"]
+                messages = Message.objects.filter(sender_id=sender_id, receiver_id=request.user.id, 
+                                                  id__lte=message_id, status__iexact="delivered")
+                for msg in messages:
+                    msg.status="read"
+                    msg.datetime_read = datetime.utcnow().replace(tzinfo=pytz.UTC)
+                    msg.save()
+                return Response({"result":"message status updated"}, status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
