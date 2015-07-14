@@ -144,6 +144,8 @@ class StatusGenerator:
         self.now_time = datetime.now(timezone.utc)
 
     def generate_status_description(self):
+    
+
         for booking in self.booking_list:
             self.now_time = datetime.now(timezone.utc)
             if booking.status == 'rejected' or booking.status == 'accepted' or booking.status == 'requested' or booking.status == 'no_show' or booking.status == 'paid':
@@ -152,11 +154,18 @@ class StatusGenerator:
                 manipulate_function(booking)
                 booking.datetime = booking.datetime.strftime("%d %b %Y %H:%I")
             else:
-                previous_status = booking.status.split('_')[0]
+                temp = booking.status.split('_')
+                previous_status = ''
+                for ele in temp:
+                    if ele != 'archived':
+                        previous_status = previous_status + '_' + ele
+                previous_status = previous_status[1:]
+                
                 manipulate_function_name = '_manipulate_' + previous_status + '_booking'  
                 manipulate_function = getattr(self, manipulate_function_name)
                 manipulate_function(booking)
                 booking.datetime = booking.datetime.strftime("%d %b %Y %H:%I")
+                
 
     def _manipulate_requested_booking(self, booking):
         time_after_booking_submission = self.now_time - booking.submitted_datetime
@@ -278,7 +287,13 @@ def unarchive_bookings(request, **kwargs):
         for booking_id in chosen_ids:
             booking_id = int(booking_id)
             booking = Booking.objects.get(id = booking_id)
-            previous_status = booking.status.split('_')[0] 
+            temp = booking.status.split('_')
+            previous_status = ''
+            
+            for ele in temp:
+                if ele != 'archived':
+                    previous_status = previous_status + '_' + ele
+            previous_status = previous_status[1:]
             booking.status = previous_status
             booking.save()
     status = 'success'
