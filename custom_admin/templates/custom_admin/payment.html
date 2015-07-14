@@ -6,8 +6,8 @@
 
 
 {% load staticfiles %}
-<link href="{% static 'custom_admin/css/globalReset.css' %}" rel="stylesheet" type="text/css" />
-<link href="{% static 'custom_admin/css/browserStyle.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet" type="text/css" />
 <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
 <script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/custom_admin.js' %}"></script>
 
@@ -17,9 +17,12 @@
 <div class="container">
   <div class="header">
     <div class="logo"><img src="images/tripalocalLog.png" width="105" height="60" /></div>
-    <ul class="menu"><li><a href="#">Experiences</a></li><li><a href="#">Bookings</a></li>
-    <li>Payment</li></ul>
-    <div class="account">Hi, Yiyi | <a href="#">Logout</a></div>
+    <ul class="menu">
+      <li><a href="#">Experiences</a></li>
+      <li><a href="/custom_admin/">Bookings</a></li>
+      <li>Payment</li>
+  </ul>
+    <div class="account">Hi, {{user_name}} | <a href="/accounts/logout/">Logout</a></div>
   </div>
   <div class="fullColumn">
   	<div class="operation"></div>
@@ -63,7 +66,7 @@
       <p>{{booking.payment.phone_number}}</p>      <p>&nbsp;</p></td>
     <td><a href="#">Add</a></td>
     <td><p>{{booking.datetime}}</p></td>
-    <td><a href="#">{{booking.experience.title}}</a></td>
+    <td><a href="/experience/{{booking.experience.id}}" target="_blank">{{booking.experience.title}}</a></td>
     <td><p>{{booking.experience.hosts.all.0}}</p>
       <p> {{booking.payment.phone_number}} </p></td>
     <td><p>{{booking.guest_number}}</p></td>

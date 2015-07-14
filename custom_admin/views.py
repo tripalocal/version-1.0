@@ -29,6 +29,7 @@ class PaymentView(ListView):
         g.generate_status_description()
         change_status_notification_key = 'status'
         _calculte_price(context['booking_list'])
+        context['user_name'] = self.request.user.username        
         if change_status_notification_key in  self.request.GET:
             context[change_status_notification_key] = self.request.GET[change_status_notification_key]
         else:
@@ -47,7 +48,7 @@ class ArchiveView(ListView):
         context = super(ArchiveView, self).get_context_data(**kwargs)
         g = StatusGenerator(context['booking_list'])
         g.generate_status_description()
-        
+        context['user_name'] = self.request.user.username        
         return context
 
 class BookingView(ListView, FormMixin):
@@ -109,6 +110,7 @@ class BookingView(ListView, FormMixin):
         if 'form2' not in context:
             context['form2'] = self.second_form_class()
 
+        context['user_name'] = self.request.user.username
         g = StatusGenerator(context['booking_list'])
         g.generate_status_description()
         change_status_notification_key = 'status'
@@ -205,7 +207,7 @@ class StatusGenerator:
         # If the booking is accepted and there has been 24 hours after the experience
         # when the email has been sent.
         elif (time_after_experience.days > 0):
-            booking.status_description = 'The email has been sent ' + str(time_after_experience.days) + ' days and ' + str(round(float(time_after_experience.seconds/3600),1)) + ' hours ago.'
+            booking.status_description = 'The review email has been sent ' + str(time_after_experience.days) + ' days and ' + str(round(float(time_after_experience.seconds/3600),1)) + ' hours ago.'
             booking.colour = 'black'
             booking.actions = ['Mark as no show', 'Upload review']    
 
@@ -228,26 +230,33 @@ class StatusGenerator:
         pass
 
     def _manipulate_paid_booking(self, booking):
+        self._manipulate_requested_booking(booking)
+    def _manipulate_booking_booking(self, booking):
         pass   
+
+
 
 
 def mark_as_no_show(request, **kwargs):
     booking = Booking.objects.get(id = kwargs['booking_id'])
     booking.status = 'no_show'
     booking.save()
-    return HttpResponseRedirect('/custom_admin/')
+    status = 'success'
+    return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
 
 def reopen_booking(request, **kwargs):
     booking = Booking.objects.get(id = kwargs['booking_id'])
     booking.status = 'requested'
     booking.save()
-    return HttpResponseRedirect('/custom_admin/')
+    status = 'success'
+    return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
 
 def cancel_booking(request, **kwargs):
     booking = Booking.objects.get(id = kwargs['booking_id'])
     booking.status = 'rejected'
     booking.save()
-    return HttpResponseRedirect('/custom_admin/')
+    status = 'success'
+    return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
 
 def delete_bookings(request, **kwargs):
     ids_key = 'admin_panel_booking_id_checkbox'
@@ -258,7 +267,8 @@ def delete_bookings(request, **kwargs):
             booking = Booking.objects.get(id = booking_id)
             booking.status = 'deleted'
             booking.save()
-    return HttpResponseRedirect('/custom_admin/')
+    status = 'success'
+    return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
 
 def archive_bookings(request, **kwargs):
     ids_key = 'admin_panel_booking_id_checkbox'
@@ -269,7 +279,8 @@ def archive_bookings(request, **kwargs):
             booking = Booking.objects.get(id = booking_id)
             booking.status = booking.status + '_archived'
             booking.save()
-    return HttpResponseRedirect('/custom_admin/')
+    status = 'success'
+    return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
 
 def unarchive_bookings(request, **kwargs):
     ids_key = 'admin_panel_booking_id_checkbox'
@@ -281,7 +292,8 @@ def unarchive_bookings(request, **kwargs):
             previous_status = booking.status.split('_')[0] 
             booking.status = previous_status
             booking.save()
-    return HttpResponseRedirect('/custom_admin/')
+    status = 'success'
+    return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
  
 
 
@@ -327,7 +339,8 @@ def send_confirmation_email_host(request, **kwargs):
                                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
 
 
-    return HttpResponseRedirect('/custom_admin/')
+    status = 'success'
+    return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
   
 def send_confirmation_email_guest(request, **kwargs):
     ids_key = 'admin_panel_booking_id_checkbox'
@@ -366,7 +379,8 @@ def send_confirmation_email_guest(request, **kwargs):
                                                                       'booking':booking,
                                                                       'user':guest, #not host --> need "my" phone number
                                                                       'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-    return HttpResponseRedirect('/custom_admin/')
+    status = 'success'
+    return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
 
 
 

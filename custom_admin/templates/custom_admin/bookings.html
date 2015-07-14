@@ -5,8 +5,8 @@
 <title>Bookings</title>
 
 {% load staticfiles %}
-<link href="{% static 'custom_admin/css/globalReset.css' %}" rel="stylesheet" type="text/css" />
-<link href="{% static 'custom_admin/css/browserStyle.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet" type="text/css" />
 <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
 <script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/custom_admin.js' %}"></script>
 
@@ -18,15 +18,15 @@
   <div class="header">
     <div class="logo"><img src="/images/tripalocal_Logo.png" width="105" height="60" /></div>
     <ul class="menu"><li><a href="#">Experiences</a></li><li>Bookings</li>
-    <li><a href="#">Payment</a></li></ul>
-    <div class="account">Hi, Yiyi | <a href="#">Logout</a></div>
+    <li><a href="/custom_admin/payment">Payment</a></li></ul>
+    <div class="account">Hi, {{user_name}} | <a href="/accounts/logout/">Logout</a></div>
   </div>
   <div class="fullColumn">
     {% ifequal status 'success'%}
-      <div class="notification" id="change_time_success_notification">Your manipulation is succeeded.</div>
+      <div class="notification" id="change_time_success_notification">Update has been successful.</div>
     {% endifequal %}
     {% ifequal status 'failed'%}
-      <div class="notification_red" id="change_time_failed_notification">Your manipulation is failed.</div>
+      <div class="notification_red" id="change_time_failed_notification">Update has been failed.</div>
   	{% endifequal %}
 
     <div class="operation"></div>
@@ -64,11 +64,11 @@
   </tr>
  
     {% for booking in booking_list %}
-    {% if booking.status = 'requested' or booking.status = 'accepted' or booking.status = 'rejected' or booking.status = 'no_show' %}
+    {% if booking.status = 'requested' or booking.status = 'accepted' or booking.status = 'rejected' or booking.status = 'no_show' or booking.status = 'paid' %}
       <tr>
         <td><input type="checkbox" name="admin_panel_booking_id_checkbox" value="{{booking.id}}"/></td>
         <td id="booking_date_time_booking_id_{{ booking.id }}" >{{ booking.datetime }}</td>
-        <td><a href="#">{{ booking.experience.title }}</a></td>
+        <td><a href="/experience/{{booking.experience.id}}" target="_blank">{{ booking.experience.title }}</a></td>
         <td>
           {% for host in booking.experience.hosts.all %}
             <p>{{ host.first_name }}&nbsp;{{ host.last_name }}</p>
@@ -88,7 +88,7 @@
             {% endifequal %}
 
             {% ifequal action 'Mark as no show' %}
-              <p><a href="/custom_admin/mark_as_no_show/{{booking.id}}">{{action}}</a></p>
+              <p><a href="#" onclick="markAsNoShow({{booking.id}})">{{action}}</a></p>
             {% endifequal %}
 
             {% ifequal action 'Reopen booking' %}

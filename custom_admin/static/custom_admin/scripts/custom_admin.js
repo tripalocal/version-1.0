@@ -42,6 +42,13 @@ function reopenBooking(bookingId) {
     }
 }
 
+function markAsNoShow(bookingId) {
+    var r = confirm("Are you sure to mark the booking as not showing?");
+    if (r==true) {
+        document.location.href = '/custom_admin/mark_as_no_show/' + bookingId;
+    }    
+}
+
 function _convertMonthNameToNumber(month_name) {
 	switch(month_name) {
 		case "Jan":
@@ -106,7 +113,7 @@ function sendConfirmationEmailHost() {
 }
 
 function sendConfirmationEmailGuest() {
-    var r = confirm("Are you sure to send the email to hosts?");
+    var r = confirm("Are you sure to send the email to guests?");
     if (r==true) {
         var form = document.getElementById('custom_admin_panel_table_form');
         form.action = "/custom_admin/send_confirmation_email_guest/";
@@ -115,7 +122,7 @@ function sendConfirmationEmailGuest() {
 }
 
 function deleteBookings() {
-    var r = confirm("Are you sure to send the email to hosts?");
+    var r = confirm("Are you sure to delete the bookings?");
     if (r==true) {
         var form = document.getElementById('custom_admin_panel_table_form');
         form.action = "/custom_admin/delete_bookings/";
@@ -124,7 +131,7 @@ function deleteBookings() {
 }
 
 function archiveBookings() {
-    var r = confirm("Are you sure to send the email to hosts?");
+    var r = confirm("Are you sure to archive the bookings?");
     if (r==true) {
         var form = document.getElementById('custom_admin_panel_table_form');
         form.action = "/custom_admin/archive_bookings/";
@@ -133,7 +140,7 @@ function archiveBookings() {
 }
 
 function unarchiveBookings() {
-    var r = confirm("Are you sure to send the email to hosts?");
+    var r = confirm("Are you sure to unarchive the bookings?");
     if (r==true) {
         var form = document.getElementById('custom_admin_panel_table_form');
         form.action = "/custom_admin/unarchive_bookings/";
