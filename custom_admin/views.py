@@ -126,18 +126,15 @@ class BookingView(ListView, FormMixin):
 """
 It contains a page representation logic. In other word, it indicates how the status 
 information of each booking in the web page will be displayed. 
-
 Attributes:
-	    booking_list : (List)Booking  - It is a list of the Booking model retrieved 
-	                                    from the database.
-	    now_time : datetime - It shows the current time.    
-
+        booking_list : (List)Booking  - It is a list of the Booking model retrieved 
+                                        from the database.
+        now_time : datetime - It shows the current time.    
 """
 class StatusGenerator:
 
     """
     It's the constructor of this class.
-
     Parameters:
         booking_list : (List)Booking  - It is a list of the Booking model retrieved 
                                         from the database.
@@ -148,14 +145,6 @@ class StatusGenerator:
 
     def generate_status_description(self):
         for booking in self.booking_list:
-            #if booking.status == 'requested':
-            #    self._manipulate_requested_booking(booking)
-            #elif booking.status == 'accepted':
-            #    self._manipulate_accepted_booking(booking)
-            #elif booking.status == 'no_show':
-            #    self.
-            #else:
-            #    self._manipulate_rejected_booking(booking)
             self.now_time = datetime.now(timezone.utc)
             if booking.status == 'rejected' or booking.status == 'accepted' or booking.status == 'requested' or booking.status == 'no_show':
                 manipulate_function_name = '_manipulate_' + booking.status + '_booking'
@@ -312,7 +301,7 @@ def send_confirmation_email_host(request, **kwargs):
                 guest = User.objects.get(id = booking.user_id)
                 host = experience.hosts.all()[0]
                 
-                if booking.status == 'requested':
+                if booking.status == 'requested' or booking.status == 'paid':
                     #send an email to the host
                     mail.send(subject = '[Tripalocal] ' + guest.first_name + ' has requested your experience', message='',
                               sender = 'Tripalocal <' + Aliases.objects.filter(destination__contains = guest.email)[0].mail + '>',
@@ -357,7 +346,7 @@ def send_confirmation_email_guest(request, **kwargs):
                 guest = User.objects.get(id = booking.user_id)
                 host = experience.hosts.all()[0]
                 
-                if booking.status == 'requested':
+                if booking.status == 'requested' or booking.status == 'paid':
                     # send an email to the traveler
                     mail.send(subject='[Tripalocal] You booking request is sent to the host',  message='', 
                               sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
@@ -428,5 +417,3 @@ def _calculte_price(booking_list):
 def _calculate_full_price(price):
     if type(price)==int or type(price) == float:
         return round(price*(1.00+settings.COMMISSION_PERCENT)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2)
-
-
