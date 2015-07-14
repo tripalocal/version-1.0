@@ -146,7 +146,7 @@ class StatusGenerator:
     def generate_status_description(self):
         for booking in self.booking_list:
             self.now_time = datetime.now(timezone.utc)
-            if booking.status == 'rejected' or booking.status == 'accepted' or booking.status == 'requested' or booking.status == 'no_show':
+            if booking.status == 'rejected' or booking.status == 'accepted' or booking.status == 'requested' or booking.status == 'no_show' or booking.status == 'paid':
                 manipulate_function_name = '_manipulate_' + booking.status + '_booking'
                 manipulate_function = getattr(self, manipulate_function_name)
                 manipulate_function(booking)
@@ -235,7 +235,7 @@ def mark_as_no_show(request, **kwargs):
 
 def reopen_booking(request, **kwargs):
     booking = Booking.objects.get(id = kwargs['booking_id'])
-    booking.status = 'requested'
+    booking.status = 'paid'
     booking.save()
     status = 'success'
     return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
