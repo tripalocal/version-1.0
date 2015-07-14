@@ -64,7 +64,7 @@
   </tr>
  
     {% for booking in booking_list %}
-    {% if booking.status = 'requested' or booking.status = 'accepted' or booking.status = 'rejected' or booking.status = 'no_show' or booking.status = 'paid' %}
+    {% if booking.status = 'requested' or booking.status = 'accepted' or booking.status = 'rejected' or booking.status = 'no_show' or booking.status == 'paid' %}
       <tr>
         <td><input type="checkbox" name="admin_panel_booking_id_checkbox" value="{{booking.id}}"/></td>
         <td id="booking_date_time_booking_id_{{ booking.id }}" >{{ booking.datetime }}</td>
