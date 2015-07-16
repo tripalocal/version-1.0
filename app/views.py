@@ -35,6 +35,10 @@ PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
+GEO_POSTFIX = "/"
+
+CNDB = 'cndb'
+
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
 
@@ -120,13 +124,13 @@ def home(request):
             response = reader.city(ip)
             country = response.country.name
             reader.close()
-            if country.lower() in ['china']:
-                return HttpResponseRedirect('/cn')
+            #if country.lower() in ['china']:
+            #    return HttpResponseRedirect('/cn')
         except Exception:
             reader.close()
 
-        if request.LANGUAGE_CODE.startswith("zh"):
-            return HttpResponseRedirect('/cn')
+        #if request.LANGUAGE_CODE.startswith("zh"):
+        #    return HttpResponseRedirect('/cn')
 
     experienceList = Experience.objects.filter(id__in=[1,2,20])
     idxList = random.sample(range(len(experienceList)), 3)
@@ -139,7 +143,7 @@ def home(request):
     for i in range(len(featuredExperienceList)+1):
         featuredExperience.append({"experience":featuredExperienceList[i-1],"background":BGImages[i-1],"hostImage":profileImages[i-1]})
 
-    cityList = [('Melbourne', 'Melbourne'),('Sydney', 'Sydney'),('Goldcoast','Gold Coast'),('Cairns','Cairns'),('Adelaide','Adelaide')]
+    cityList = [('Melbourne', _('Melbourne')),('Sydney', _('Sydney')),('Goldcoast',_('Gold Coast')),('Cairns',_('Cairns')),('Adelaide',_('Adelaide'))]
 
     context = RequestContext(request, {
         'featuredExperience': featuredExperience,
@@ -198,7 +202,7 @@ def signup(request):
             new_user = authenticate(username=request.POST['username'],
                                     password=request.POST['password1'])
             login(request, new_user)
-            return HttpResponseRedirect("/")
+            return HttpResponseRedirect(GEO_POSTFIX)
     else:
         form = UserCreateForm()
     return render(request, "app/signup.html", {
@@ -214,7 +218,7 @@ def registration_successful(request):
             context_instance = RequestContext(request, {})
         )
     else:
-        return HttpResponseRedirect("/accounts/login/")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
 
 @receiver(email_confirmed)
 def email_confirmed(request, **kwargs):
@@ -227,7 +231,7 @@ def email_confirmed(request, **kwargs):
 
     if useremail:
         #send an email
-        mail.send(subject='[Tripalocal] Successfully registered', message='', sender='Tripalocal <enquiries@tripalocal.com>',
+        mail.send(subject=_('[Tripalocal] Successfully registered'), message='', sender=settings.DEFAULT_FROM_EMAIL,
                   recipients = [useremail], priority='now', html_message=loader.render_to_string('app/email_registration_successful.html'))
 
 @receiver(password_reset)
@@ -249,7 +253,7 @@ def disclaimer(request):
 
 def mylisting(request):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/?next=/mylisting")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "mylisting")
 
     experiences = []
     context = RequestContext(request)
@@ -258,7 +262,7 @@ def mylisting(request):
     for experience in exps:
         experiences.append(experience)
 
-    #cursor = connections['cndb'].cursor()
+    #cursor = connections[CNDB].cursor()
     #rows = cursor.execute('select id, status, title from experiences_experience where id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime',
     #                     [request.user.id]).fetchall()
     
@@ -277,7 +281,7 @@ def mylisting(request):
 def getreservation(user):
     bookings = Booking.objects.raw('select * from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime', [user.id])
     
-    cursor = connections['cndb'].cursor()
+    cursor = connections[CNDB].cursor()
     cursor.execute('select datetime, status, guest_number, user_id, experience_id, payment_id from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime',
                          [user.id])
     rows = cursor.fetchall()
@@ -351,7 +355,7 @@ def getreservation(user):
 
 def myreservation(request):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/?next=/myreservation")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "myreservation")
 
     context = RequestContext(request)
 
@@ -375,7 +379,7 @@ def mytrip(request):
         for booking in bookings:
             user_bookings.append(booking)
 
-        cursor = connections['cndb'].cursor()
+        cursor = connections[CNDB].cursor()
         cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s order by datetime',
                              [request.user.id])
         rows = cursor.fetchall()
@@ -461,11 +465,11 @@ def mytrip(request):
         return HttpResponse(template.render(context))
 
     else:
-        return HttpResponseRedirect("/accounts/login?next=/mytrip")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "mytrip")
 
 def myprofile(request):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login?next=/myprofile")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "myprofile")
 
     context = RequestContext(request)
     profile = RegisteredUser.objects.get(user_id = request.user.id)
@@ -482,7 +486,7 @@ def myprofile(request):
                 saveProfileImage(request.user, profile, request.FILES['image'])
 
             #copy to the chinese website -- database
-            cursor = connections['cndb'].cursor()
+            cursor = connections[CNDB].cursor()
             cursor.execute("update app_registereduser set phone_number=%s, image_url=%s, bio=%s, image=%s where user_id=%s", 
                            [profile.phone_number, profile.image_url, profile.bio, profile.image_url, request.user.id])
 
@@ -507,7 +511,7 @@ def myprofile(request):
 
 def mycalendar(request):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login?next=mycalendar")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "mycalendar")
 
     context = RequestContext(request)
 

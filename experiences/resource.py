@@ -29,6 +29,11 @@ from allauth.socialaccount import providers
 from allauth.socialaccount.models import SocialLogin, SocialToken, SocialApp
 from allauth.socialaccount.providers.facebook.views import fb_complete_login
 from allauth.socialaccount.helpers import complete_social_login
+from django.utils.translation import ugettext_lazy as _
+
+GEO_POSTFIX = "/"
+ENDB = 'default'
+CNDB = 'cndb'
 
 def isLegalInput(inputs):
     for input in inputs:
@@ -39,7 +44,7 @@ def isLegalInput(inputs):
 
 def updateExperienceTagsFromXLS(request):
     if not (request.user.is_authenticated() and request.user.is_superuser):
-        return HttpResponseRedirect("/accounts/login/?next=/experience_tags_xls")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "experience_tags_xls")
 
     context = RequestContext(request)
     if request.method == 'POST':
@@ -148,12 +153,12 @@ def saveBookingRequest(booking_request):
         profile = RegisteredUser(user = user, phone_number = phone)
         profile.save()
 
-        cursor = connections['default'].cursor()
+        cursor = connections[ENDB].cursor()
         cursor.execute("Insert into account_emailaddress (user_id,email,verified,primary) values (%s, %s, %s, %s)", 
                        [user.id, email, 1, 1])
 
         #copy to the chinese website database
-        cursor = connections['cndb'].cursor()
+        cursor = connections[CNDB].cursor()
         cursor.execute("Insert into auth_user (id,first_name,last_name,email) values (%s, %s, %s, %s)", 
                         [user.id,user.first_name, user.last_name, user.email])
         cursor.execute("Insert into app_registereduser (user_id) values (%s)", [user.id])
@@ -179,9 +184,9 @@ def saveBookingRequest(booking_request):
             f.close()
                     
         #send a welcome email
-        mail.send(subject='[Tripalocal] Successfully registered', message='', sender='Tripalocal <enquiries@tripalocal.com>',
+        mail.send(subject=_('[Tripalocal] Successfully registered'), message='', sender=settings.DEFAULT_FROM_EMAIL,
                       recipients = [email], priority='now', html_message=loader.render_to_string('app/email_auto_registration.html',
-                                                                                                 {'email':user.email, 'password':password, 'url':'https://www.tripalocal.com/accounts/login?next=/accounts/password/change'}))
+                                                                                                 {'email':user.email, 'password':password, 'url':'https://www.tripalocal.com' + GEO_POSTFIX + 'accounts/login?next=' + GEO_POSTFIX + 'accounts/password/change/'}))
 
     #record the booking request
     local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -202,32 +207,10 @@ def saveBookingRequest(booking_request):
         cursor = connections['experiencedb'].cursor()
         cursor.execute("Insert into experiences_experience_guests (experience_id,user_id) values (%s, %s)", [experience_id, user.id])
 
-    ## send an email to the host
-    #mail.send(subject='[Tripalocal] ' + user.first_name + ' has requested your experience', message='',
-    #            sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-    #            recipients = [Aliases.objects.filter(destination__contains=experience.hosts.all()[0].email)[0].mail], #fail_silently=False,
-    #            priority='now',
-    #            html_message=loader.render_to_string('email_booking_requested_host.html', 
-    #                                                    {'experience': experience,
-    #                                                    'booking':booking,
-    #                                                    'user_first_name':user.first_name,
-    #                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-    #                                                    'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
-    #                                                    'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))
-    ## send an email to the traveler
-    #mail.send(subject='[Tripalocal] You booking request is sent to the host',  message='', 
-    #            sender='Tripalocal <' + Aliases.objects.filter(destination__contains=experience.hosts.all()[0].email)[0].mail + '>',
-    #            recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], #fail_silently=False,
-    #            priority='now', 
-    #            html_message=loader.render_to_string('email_booking_requested_traveler.html',
-    #                                                    {'experience': experience, 
-    #                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-    #                                                    'booking':booking}))
-
     host = experience.hosts.all()[0]
     #send an email to the traveller
-    mail.send(subject='[Tripalocal] Booking confirmed', message='', 
-                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
                 html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
@@ -237,8 +220,8 @@ def saveBookingRequest(booking_request):
                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
             
     #schedule an email for reviewing the experience
-    mail.send(subject='[Tripalocal] How was your experience?', message='', 
-                sender='Tripalocal <enquiries@tripalocal.com>',
+    mail.send(subject=_('[Tripalocal] How was your experience?'), message='', 
+                sender=settings.DEFAULT_FROM_EMAIL,
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime + timedelta(days=1), 
                 html_message=loader.render_to_string('experiences/email_review_traveler.html',
@@ -248,8 +231,8 @@ def saveBookingRequest(booking_request):
                                                     'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id)}))
 
     #send an email to the host
-    mail.send(subject='[Tripalocal] Booking confirmed', message='', 
-                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
                 html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
@@ -259,8 +242,8 @@ def saveBookingRequest(booking_request):
                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
 
     #schedule an email to the traveller one day before the experience
-    mail.send(subject='[Tripalocal] Booking reminder', message='', 
-                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+    mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
                 html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
@@ -268,10 +251,10 @@ def saveBookingRequest(booking_request):
                                                     'booking':booking,
                                                     'user':user, #not host --> need "my" phone number
                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-            
+
     #schedule an email to the host one day before the experience
-    mail.send(subject='[Tripalocal] Booking reminder', message='', 
-                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+    mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
                 html_message=loader.render_to_string('experiences/email_reminder_host.html',
@@ -282,7 +265,7 @@ def saveBookingRequest(booking_request):
 
 def saveBookingRequestsFromXLS(request):
     if not (request.user.is_authenticated() and request.user.is_superuser):
-        return HttpResponseRedirect("/accounts/login/?next=/booking_request_xls")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "booking_request_xls")
 
     context = RequestContext(request)
     if request.method == 'POST':
@@ -376,7 +359,7 @@ def ajax_view(request):
                 response={'status':True}
             else:
                 response={'status':False}
-            return HttpResponse(json.dumps(response))
+            return HttpResponse(json.dumps(response, ensure_ascii=False))
         else:
             return render_to_response(template, {'form':ExperienceForm()}, context_instance=RequestContext(request))
     else:
@@ -396,7 +379,7 @@ def service_wishlist(request):
             if added == "False":
                 try:
                     #user.registereduser.wishlist.add(experience)
-                    cursor = connections['default'].cursor()
+                    cursor = connections[ENDB].cursor()
                     cursor.execute("select id from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id])
                     wl = cursor.fetchone()
                     if wl is not None and len(wl)>0:
@@ -405,7 +388,7 @@ def service_wishlist(request):
 
                     cursor.execute("Insert into app_registereduser_wishlist (experience_id,registereduser_id) values (%s, %s)", [experience.id, user.registereduser.id])
                     
-                    cursor = connections['cndb'].cursor()
+                    cursor = connections[CNDB].cursor()
                     cursor.execute("Select id from app_registereduser where user_id=%s",[user_id])
                     profile_id = cursor.fetchone()
                     cursor.execute("Insert into app_registereduser_wishlist (experience_id,registereduser_id) values (%s, %s)", [experience.id, profile_id[0]])
@@ -416,10 +399,10 @@ def service_wishlist(request):
             else:
                 try:
                     #user.registereduser.wishlist.remove(experience)
-                    cursor = connections['default'].cursor()
+                    cursor = connections[ENDB].cursor()
                     cursor.execute("delete from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id])
                     
-                    cursor = connections['cndb'].cursor()
+                    cursor = connections[CNDB].cursor()
                     cursor.execute("Select id from app_registereduser where user_id=%s",[user_id])
                     profile_id = cursor.fetchone()
                     cursor.execute("delete from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, profile_id[0]])
@@ -439,8 +422,8 @@ def service_wishlist(request):
     elif request.method == 'GET' and request.user.is_authenticated():
         try:
             user = request.user
-            cursor = connections['default'].cursor()
-            cursor.execute("select experience_id from app_registereduser_wishlist where registereduser_id=%s", [user.registereduser.id])
+            cursor = connections[ENDB].cursor()
+            wl = cursor.execute("select experience_id from app_registereduser_wishlist where registereduser_id=%s", [user.registereduser.id])
             wl = cursor.fetchall()
             ids = []
             for id in wl:
@@ -545,7 +528,7 @@ def service_logout(request):
 # http://stackoverflow.com/questions/16381732/how-to-create-new-user-and-new-django-allauth-social-account-when-given-access-t
 @api_view(['POST'])
 def service_facebook_login(request):
-    data = request.data #self.deserialize(request, request.raw_post_data, format=request.META.get('content_type', 'application/json'))
+    data = request.data
 
     access_token = data.get('access_token', '')
 
@@ -600,7 +583,7 @@ def service_mytrip(request, format=None):
     try:
         user = request.user
         b = Booking.objects.filter(user=user)
-        cursor = connections['cndb'].cursor()
+        cursor = connections[CNDB].cursor()
         cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s order by datetime',
                                 [request.user.id])
         rows = cursor.fetchall()
@@ -654,7 +637,7 @@ def service_mytrip(request, format=None):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_myreservation(request, format=None):
     try:
@@ -673,7 +656,7 @@ def service_myreservation(request, format=None):
 
 #"{"id":58,"accept":"yes"}"
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_acceptreservation(request, format=None):
     try:
@@ -693,7 +676,7 @@ def service_acceptreservation(request, format=None):
 
 #{"itinerary_string":[{"id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2},{"id":"20","date":"2015/06/17","time":"17:00 - 20:00","guest_number":2}],"card_number":"4242424242424242","expiration_month":10,"expiration_year":2015,"cvv":123, "coupon":"abcdefgh"}
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication)) #))#,
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_booking(request, format=None):
     try:
@@ -701,7 +684,7 @@ def service_booking(request, format=None):
         if type(data) is str:
             data = ast.literal_eval(data)
 
-        itinerary = data["itinerary_string"]
+        itinerary = data['itinerary_string']
 
         booking_data = {}
         booking_data['user'] = request.user
@@ -744,6 +727,8 @@ def service_booking(request, format=None):
         logger = logging.getLogger("Tripalocal_V1")
         if hasattr(err, 'detail'):
             logger.error(err.detail)
+        else:
+            logger.error(err)
         result = {"success":"false"}
         return Response(result, status=status.HTTP_400_BAD_REQUEST)
 

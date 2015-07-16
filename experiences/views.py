@@ -34,6 +34,8 @@ from collections import OrderedDict
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
+GEO_POSTFIX = "/"
+CNDB = 'cndb'
 
 def experience_fee_calculator(price):
     if type(price)==int or type(price) == float:
@@ -311,7 +313,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
 
 def experience_availability(request):
     if not request.user.is_authenticated() or not request.user.is_staff:
-        return HttpResponseRedirect("/")
+        return HttpResponseRedirect(GEO_POSTFIX)
 
     context = RequestContext(request)
     form = ExperienceAvailabilityForm()
@@ -373,7 +375,7 @@ class ExperienceListView(ListView):
         if self.request.user.is_authenticated() and self.request.user.is_superuser:
             return Experience.objects.all#()
         else:
-            return HttpResponseRedirect("/admin/login/?next=/experiencelist") #self.request.user.experience_hosts.all()
+            return HttpResponseRedirect(GEO_POSTFIX + "admin/login/?next=" + GEO_POSTFIX + "experiencelist") #self.request.user.experience_hosts.all()
 
 def getAvailableOptions(experience, available_options, available_date):
 
@@ -623,9 +625,9 @@ class ExperienceDetailView(DetailView):
                 context['host_only_unlisted'] = True
                 return context
 
-        cities = {'melbourne':'Melbourne','sydney':'Sydney','cairns':'Cairns','goldcoast':'Gold coast','brisbane':'Brisbane',
-                  'hobart':'Hobart','adelaide':'Adelaide','grsa':'Greater South Australia','grsnw':'Greater New South Wales',
-                  'grqld':'Greater Queensland'}
+        cities = {'melbourne':_('Melbourne'),'sydney':_('Sydney'),'cairns':_('Cairns'),'goldcoast':_('Gold coast'),'brisbane':_('Brisbane'),
+                  'hobart':_('Hobart'),'adelaide':_('Adelaide'),'grsa':_('Greater South Australia'),'grsnw':_('Greater New South Wales'),
+                  'grqld':_('Greater Queensland')}
         context['experience_city'] = cities.get(experience.city.lower())
 
         available_date = getAvailableOptions(experience, available_options, available_date)
@@ -737,7 +739,7 @@ EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 def initializeExperience(experience, data):
     data.clear()
 
-    cursor = connections['cndb'].cursor()
+    cursor = connections[CNDB].cursor()
     cursor.execute("select title, description, activity, interaction, dress, meetup_spot from experiences_experience where id = %s", [experience.id])
     row = cursor.fetchone()
     
@@ -897,7 +899,6 @@ def save_exit_location(wizard):
 
     return True
 
-#@user_passes_test(login_check, login_url='/accounts/login?next=/addexperience')
 class ExperienceWizard(NamedUrlSessionWizardView):
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'temp'))
 
@@ -917,13 +918,13 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                 experience = get_object_or_404(Experience, pk=id)
                 if not experience.hosts.all()[0] == self.request.user and not self.request.user.is_superuser:
                     #the user is neither the host nor a superuser
-                    return HttpResponseRedirect("/")
+                    return HttpResponseRedirect(GEO_POSTFIX)
 
                 #if kwargs['step'] != "experience":
                 #    #not start from the first step
                 #    return HttpResponseRedirect("/editexperience/experience?id="+id)
             elif not len(self.initial_dict):
-                return HttpResponseRedirect("/")
+                return HttpResponseRedirect(GEO_POSTFIX)
 
         return super(ExperienceWizard, self).dispatch(request, *args, **kwargs)
 
@@ -1288,7 +1289,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             cursor.execute("Insert into experiences_experience_hosts (experience_id,user_id) values (%s, %s)", [experience.id, self.request.user.id])
             
             #copy to the chinese database
-            cursor = connections['cndb'].cursor()
+            cursor = connections[CNDB].cursor()
             cursor.execute("insert into experiences_experience (id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, " 
                            + "title, description, guest_number_min, guest_number_max, price, dynamic_price, duration, activity, interaction, "
                            + "dress, city, meetup_spot, status, type, language)"
@@ -1298,7 +1299,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                             dress_code_other, experience.city, meetup_spot_other, "Unlisted", experience.type, experience.language])
 
             #copy to the chinese database
-            cursor = connections['cndb'].cursor()
+            cursor = connections[CNDB].cursor()
             cursor.execute("Insert into experiences_experience_hosts (experience_id,user_id) values (%s, %s)", [experience.id, self.request.user.id])
 
         else:
@@ -1326,7 +1327,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             experience.save()
 
             #copy to the chinese database
-            cursor = connections['cndb'].cursor()
+            cursor = connections[CNDB].cursor()
             command = "update experiences_experience set guest_number_min=%s, guest_number_max=%s, price=%s, dynamic_price=%s, duration=%s, city=%s, type=%s, language=%s"
             parameters = [experience.guest_number_min, experience.guest_number_max, experience.price, experience.dynamic_price, experience.duration, experience.city, experience.type, experience.language]
             if title_other!= None:
@@ -1361,7 +1362,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             #                dress_code_other, experience.city, meetup_spot_other, experience.type, experience.language, experience.id])
 
             #delete old whatsincluded records
-            cursor = connections['cndb'].cursor()
+            cursor = connections[CNDB].cursor()
             includes = WhatsIncluded.objects.filter(experience_id=experience.id)
             for include in includes:
                 if included_food != None and include.item =='Food':
@@ -1382,7 +1383,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             for oib in oibs:
                 oib.delete()
             #delete from chinese database
-            cursor = connections['cndb'].cursor()
+            cursor = connections[CNDB].cursor()
             cursor.execute("delete from experiences_blockouttimeperiod where experience_id = %s", [experience.id])
             cursor.execute("delete from experiences_instantbookingtimeperiod where experience_id = %s", [experience.id])
 
@@ -1411,7 +1412,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                                                 )
                     b.save()
                     #copy to chinese database
-                    cursor = connections['cndb'].cursor()
+                    cursor = connections[CNDB].cursor()
                     cursor.execute("Insert into experiences_blockouttimeperiod (experience_id,start_datetime,end_datetime,repeat,repeat_cycle,repeat_frequency,repeat_extra_information,repeat_end_date)"
                                    + " values (%s, %s, %s, %s, %s, %s, %s, %s)", 
                                    [experience.id, b.start_datetime, b.end_datetime, b.repeat, b.repeat_cycle, b.repeat_frequency, b.repeat_extra_information, b.repeat_end_date])
@@ -1439,7 +1440,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                                                 )
                     ib.save()
                     #copy to chinese database
-                    cursor = connections['cndb'].cursor()
+                    cursor = connections[CNDB].cursor()
                     cursor.execute("Insert into experiences_instantbookingtimeperiod (experience_id,start_datetime,end_datetime,repeat, repeat_cycle, repeat_frequency, repeat_extra_information, repeat_end_date)"
                                    + " values (%s, %s, %s, %s, %s, %s, %s, %s)", 
                                    [experience.id, ib.start_datetime, ib.end_datetime, ib.repeat, ib.repeat_cycle, ib.repeat_frequency, ib.repeat_extra_information, ib.repeat_end_date])
@@ -1450,21 +1451,21 @@ class ExperienceWizard(NamedUrlSessionWizardView):
             food = WhatsIncluded(item='Food', included = (included_food=='Yes'), details = included_food_detail, experience = experience)
             food.save()
             #copy to chinese database
-            cursor = connections['cndb'].cursor()
+            cursor = connections[CNDB].cursor()
             cursor.execute("Insert into experiences_whatsincluded (experience_id,item,included,details) values (%s, %s, %s, %s)", 
                             [experience.id, 'Food', (included_food=='Yes'), included_food_detail_other])
         if included_ticket != None:
             ticket = WhatsIncluded(item='Ticket', included = (included_ticket=='Yes'), details = included_ticket_detail, experience = experience)
             ticket.save()
             #copy to chinese database
-            cursor = connections['cndb'].cursor()
+            cursor = connections[CNDB].cursor()
             cursor.execute("Insert into experiences_whatsincluded (experience_id,item,included,details) values (%s, %s, %s, %s)", 
                         [experience.id, 'Ticket', (included_ticket=='Yes'), included_ticket_detail_other])
         if included_transport != None:
             transport = WhatsIncluded(item='Transport', included = (included_transport=='Yes'), details = included_transport_detail, experience = experience)
             transport.save()
             #copy to chinese database
-            cursor = connections['cndb'].cursor()
+            cursor = connections[CNDB].cursor()
             cursor.execute("Insert into experiences_whatsincluded (experience_id,item,included,details) values (%s, %s, %s, %s)", 
                             [experience.id, 'Transport', (included_transport=='Yes'), included_transport_detail_other])
                         
@@ -1482,7 +1483,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                     content_type = content.content_type.split('/')[0]
                     if content_type == "image":
                         if content._size > EXPERIENCE_IMAGE_SIZE_LIMIT:
-                            raise forms.ValidationError(_('Please keep filesize under %s. Current filesize %s') % (filesizeformat(EXPERIENCE_IMAGE_SIZE_LIMIT), filesizeformat(content._size)))
+                            raise forms.ValidationError(_('Please keep filesize under %s') % (filesizeformat(EXPERIENCE_IMAGE_SIZE_LIMIT)))
                     else:
                         raise forms.ValidationError(_('File type is not supported'))
 
@@ -1508,7 +1509,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                                           image = 'experiences/' + str(experience.id) + '/' + filename, experience = experience)
                             photo.save()
                             #copy to the chinese database
-                            cursor = connections['cndb'].cursor()
+                            cursor = connections[CNDB].cursor()
                             cursor.execute("Insert into experiences_photo (experience_id,name,directory,image)"
                                + " values (%s, %s, %s, %s)", 
                                [experience.id, photo.name, photo.directory, photo.image.name])
@@ -1554,11 +1555,11 @@ class ExperienceWizard(NamedUrlSessionWizardView):
         #        #'form_list': f, #'form_data': [form.cleaned_data for form in form_list],
         #    })
 
-        return HttpResponseRedirect("/mylisting")
+        return HttpResponseRedirect(GEO_POSTFIX + "mylisting")
 
 def experience_booking_successful(request, experience, guest_number, booking_datetime, price_paid, is_instant_booking=False):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
     
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
     mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
@@ -1580,7 +1581,7 @@ def experience_booking_confirmation(request):
     display_error = False
 
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
 
     # A HTTP POST?
     if request.method == 'POST':
@@ -1648,7 +1649,7 @@ def experience_booking_confirmation(request):
                 request.user.registereduser.save()
 
                 #copy to the chinese website -- database
-                cursor = connections['cndb'].cursor()
+                cursor = connections[CNDB].cursor()
                 cursor.execute("update app_registereduser set phone_number=%s where user_id=%s", 
                                 [request.user.registereduser.phone_number, request.user.id])
 
@@ -1680,7 +1681,7 @@ def experience_booking_confirmation(request):
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()
-        return HttpResponseRedirect("/")
+        return HttpResponseRedirect(GEO_POSTFIX)
 
     # Bad form (or form details), no form supplied...
     # Render the form with error messages (if any).
@@ -1690,7 +1691,7 @@ def saveProfileImage(user, profile, image_file):
     content_type = image_file.content_type.split('/')[0]
     if content_type == "image":
         if image_file._size > PROFILE_IMAGE_SIZE_LIMIT:
-            raise forms.ValidationError(_('Please keep filesize under %s. Current filesize %s') % (filesizeformat(str(PROFILE_IMAGE_SIZE_LIMIT)), filesizeformat(str(image_file._size))))
+            raise forms.ValidationError(_('Please keep filesize under %s') % (filesizeformat(str(PROFILE_IMAGE_SIZE_LIMIT))))
     else:
         raise forms.ValidationError(_('File type is not supported'))
 
@@ -1731,7 +1732,7 @@ def saveProfileImage(user, profile, image_file):
         subprocess.Popen(['cp',dirname + filename, dirname_cn + filename])
 
         #copy to the chinese website -- database
-        cursor = connections['cndb'].cursor()
+        cursor = connections[CNDB].cursor()
         cursor.execute("update app_registereduser set image_url=%s, image=%s where user_id=%s", 
                         [profile.image_url, profile.image_url, user.id])
 
@@ -1742,11 +1743,11 @@ def create_experience(request, id=None):
     display_error = False
 
     if not request.user.is_authenticated() or not request.user.is_staff:
-        return HttpResponseRedirect("/admin")
+        return HttpResponseRedirect(GEO_POSTFIX + "admin")
 
     if id:
         experience = get_object_or_404(Experience, pk=id)
-        registerUser = experience.hosts.all()[0].registereduser 
+        registerUser = experience.hosts.all()[0].registereduser
         list = experience.whatsincluded_set.filter(item="Food")
         if len(list) > 0: 
             if list[0].included:
@@ -1905,7 +1906,7 @@ def create_experience(request, id=None):
             user.registereduser.bio = form.data['host_bio']
             user.registereduser.save()
             #copy to chinese db
-            cursor = connections['cndb'].cursor()
+            cursor = connections[CNDB].cursor()
             cursor.execute("Update auth_user set first_name=%s, last_name=%s where id=%s", [user.first_name, user.last_name, user.id])
             cursor.execute("Update app_registereduser set bio=%s where user_id=%s", [user.registereduser.bio, user.id])
 
@@ -1921,7 +1922,7 @@ def create_experience(request, id=None):
                     content_type = content.content_type.split('/')[0]
                     if content_type == "image":
                         if content._size > EXPERIENCE_IMAGE_SIZE_LIMIT:
-                            raise forms.ValidationError(_('Please keep filesize under %s. Current filesize %s') % (filesizeformat(EXPERIENCE_IMAGE_SIZE_LIMIT), filesizeformat(content._size)))
+                            raise forms.ValidationError(_('Please keep filesize under %s') % (filesizeformat(EXPERIENCE_IMAGE_SIZE_LIMIT)))
                     else:
                         raise forms.ValidationError(_('File type is not supported'))
 
@@ -1988,7 +1989,7 @@ def create_experience(request, id=None):
                     transport = WhatsIncluded(item='Transport', included = (form.data['included_transport']=='Yes'), details = form.data['included_transport_detail'], experience = experience)
                     transport.save()
 
-            return HttpResponseRedirect('/admin/experiences/experience/'+experience.id) 
+            return HttpResponseRedirect(GEO_POSTFIX + 'admin/experiences/experience/'+experience.id) 
             
     else:
         form = CreateExperienceForm(data, files)
@@ -2001,16 +2002,16 @@ def update_booking(id, accepted, user):
         if booking.status.lower() == "accepted":
             # the host already accepted the booking
             #messages.add_message(request, messages.INFO, 'The booking request has already been accepted.')
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(GEO_POSTFIX)
 
         if booking.status.lower() == "rejected":
             # the host/guest already rejected/cancelled the booking
             #messages.add_message(request, messages.INFO, 'The booking request has already been rejected.')
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(GEO_POSTFIX)
 
         experience = Experience.objects.get(id=booking.experience_id)
         if not experience.hosts.all()[0].id == user.id:
-            return HttpResponseRedirect("/")
+            return HttpResponseRedirect(GEO_POSTFIX)
 
         guest = User.objects.get(id = booking.user_id)
         host = user
@@ -2024,9 +2025,9 @@ def update_booking(id, accepted, user):
                 booking.coupon.save()
 
             #send an email to the traveller
-            mail.send(subject='[Tripalocal] Booking confirmed', message='', 
-                      sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                      recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
+            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                      recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
                       priority='now',  #fail_silently=False, 
                       html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
                                                             {'experience': experience,
@@ -2035,19 +2036,19 @@ def update_booking(id, accepted, user):
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
 
             #schedule an email to the traveller one day before the experience
-            mail.send(subject='[Tripalocal] Booking reminder', message='', 
-                      sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+            mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                       recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
                       priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
-                      html_message=loader.render_to_string('experiences/experiences/email_reminder_traveler.html',
+                      html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'user':guest, #not host --> need "my" phone number
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
             
             #schedule an email to the host one day before the experience
-            mail.send(subject='[Tripalocal] Booking reminder', message='', 
-                      sender='Tripalocal <' + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
+            mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
                       recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                       priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
                       html_message=loader.render_to_string('experiences/email_reminder_host.html',
@@ -2057,8 +2058,8 @@ def update_booking(id, accepted, user):
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
                   
             #schedule an email for reviewing the experience
-            mail.send(subject='[Tripalocal] How was your experience?', message='', 
-                      sender='Tripalocal <enquiries@tripalocal.com>',
+            mail.send(subject=_('[Tripalocal] How was your experience?'), message='', 
+                      sender=settings.DEFAULT_FROM_EMAIL,
                       recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
                       priority='high',  scheduled_time = booking.datetime + timedelta(hours=experience.duration+1), 
                       html_message=loader.render_to_string('experiences/email_review_traveler.html',
@@ -2068,9 +2069,9 @@ def update_booking(id, accepted, user):
                                                             'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id)}))
 
             #send an email to the host
-            mail.send(subject='[Tripalocal] Booking confirmed', message='', 
-                      sender='Tripalocal <' + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
-                      recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
+                      recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                       priority='now',  #fail_silently=False, 
                       html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
                                                             {'experience': experience,
@@ -2133,9 +2134,9 @@ def update_booking(id, accepted, user):
                 booking.status = "rejected"
                 booking.save()
                 #send an email to the traveller
-                mail.send(subject='[Tripalocal] Your experience is cancelled', message='', 
-                          sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                          recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail],
+                mail.send(subject=_('[Tripalocal] Your experience is cancelled'), message='', 
+                          sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                          recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail],
                           priority='now',  #fail_silently=False, 
                           html_message=loader.render_to_string('experiences/email_booking_cancelled_traveler.html',
                                                                 {'experience': experience,
@@ -2143,9 +2144,9 @@ def update_booking(id, accepted, user):
                                                                 'user':host,
                                                                 'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
                 #send an email to the host
-                mail.send(subject='[Tripalocal] Cancellation confirmed', message='', 
-                          sender='Tripalocal <' + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
-                          recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+                mail.send(subject=_('[Tripalocal] Cancellation confirmed'), message='', 
+                          sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
+                          recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                           priority='now',  #fail_silently=False, 
                           html_message=loader.render_to_string('experiences/email_booking_cancelled_host.html',
                                                                 {'experience': experience,
@@ -2165,7 +2166,7 @@ def update_booking(id, accepted, user):
                 #TODO
                 #ask the host to try again, or contact us
                 #messages.add_message(request, messages.INFO, 'Please try to cancel the request later. Contact us if this happens again. Sorry for the inconvenience.')
-                #return HttpResponseRedirect('/')
+                #return HttpResponseRedirect(GEO_POSTFIX)
                 booking_success = False
         result={'booking_success':booking_success,'email_template':email_template if booking_success else '', 
                 'experience': experience, 'booking':booking, 'guest':guest,}
@@ -2183,7 +2184,7 @@ def booking_accepted(request, id=None):
     accepted = request.GET.get('accept')
 
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/?next=/booking/" + str(id) + "?accept="+accepted)
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "booking/" + str(id) + "?accept="+accepted)
 
     form = SubscriptionForm()
     user = request.user
@@ -2204,7 +2205,7 @@ def booking_accepted(request, id=None):
                         'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                         'webpage':True})
     else:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(GEO_POSTFIX)
 
 #def charge(request):
 #    if request.method == "POST":
@@ -2285,16 +2286,16 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     formattedTitleList = []
     BGImageURLList = []
     profileImageURLList = []
-    cityList= [('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
-            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),('Grsa', 'Greater South Australia'),
-            ('Grnsw', 'Greater New South Wales'),('Grqld', 'Greater Queensland'),]#('Grvic', 'Greater Victoria'),
+    cityList= [('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Brisbane', _('Brisbane, QLD')),('Cairns', _('Cairns, QLD')),
+            ('Goldcoast', _('Gold coast, QLD')),('Hobart', _('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('Grsa', _('Greater South Australia')),
+            ('Grnsw', _('Greater New South Wales')),('Grqld', _('Greater Queensland')),]#('Grvic', _('Greater Victoria')),
 
     if is_kids_friendly:
-        experienceList = [exp for exp in experienceList if tagsOnly("Kids Friendly", exp)]
+        experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
     if is_host_with_cars:
-        experienceList = [exp for exp in experienceList if tagsOnly("Host with Car", exp)]
+        experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
     if is_private_tours:
-        experienceList = [exp for exp in experienceList if tagsOnly("Private gourp", exp)]
+        experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
 
     i = 0
     while i < len(experienceList):
@@ -2458,105 +2459,6 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
     return render_to_response(template, {'form': form}, context)
 
-def experiences(request):
-    mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    
-    if request.user.is_authenticated():
-        mp.track(request.user.email,"Visited prelaunch Melbourne experiences page");
-        return render(request,'experiences/experiences.html',{"user_email":request.user.email})
-    else:
-        mp.track("","Visited prelaunch Melbourne experiences page");
-        return render(request,'experiences/experiences.html',{"user_email":""})
-
-def experiences_ch(request):
-    return render(request,'experiences/experiences_ch.html')
-
-def experiences_pre(request):
-    return render(request,'experiences/experiences_pre.html')
-
-def experiences_ch_pre(request):
-    return render(request,'experiences/experiences_ch_pre.html')
-
-def experiences_sydney_pre(request):
-    return render(request,'experiences/experiences_sydney_pre.html')
-
-def freeSimPromo(request):
-
-    template = loader.get_template('experiences/christmas_2014_promo.html')
-
-    # Add all experiences that belong to the specified city to a new list
-    # alongside a list with all the number of reviews
-    experienceList = Experience.objects.all()
-
-    mcityExperienceList = []
-    mcityExperienceReviewList = []
-    mformattedTitleList = []
-    mBGImageURLList = []
-    mprofileImageURLList = []
-
-    scityExperienceList = []
-    scityExperienceReviewList = []
-    sformattedTitleList = []
-    sBGImageURLList = []
-    sprofileImageURLList = []
-
-    i = 0
-    while i < len(experienceList):
-        experience = experienceList[i]
-        # Melbourne
-        if (experience.city.lower() == "melbourne"):
-            mcityExperienceList.append(experience)
-            mcityExperienceReviewList.append(getNReviews(experience.id))
-            # Fetch BGImageURL
-            BGImageURL = getBGImageURL(experience.id)
-            if (BGImageURL):
-                mBGImageURLList.append(BGImageURL)
-            else:
-                mBGImageURLList.append("default_experience_background.jpg")
-            # Fetch profileImageURL
-            profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
-            if (profileImageURL):
-                mprofileImageURLList.append(profileImageURL)
-            else:
-                mprofileImageURLList.append("profile_default.jpg")
-            # Format title & Description
-            if (len(experience.title) > 50):
-                mformattedTitleList.append(experience.title[:47] + "...")
-            else:
-                mformattedTitleList.append(experience.title)
-
-        # Sydney
-        if (experience.city.lower() == "sydney"):
-            scityExperienceList.append(experience)
-            scityExperienceReviewList.append(getNReviews(experience.id))
-            # Fetch BGImageURL
-            BGImageURL = getBGImageURL(experience.id)
-            if (BGImageURL):
-                sBGImageURLList.append(BGImageURL)
-            else:
-                sBGImageURLList.append("default_experience_background.jpg")
-            # Fetch profileImageURL
-            profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
-            if (profileImageURL):
-                sprofileImageURLList.append(profileImageURL)
-            else:
-                sprofileImageURLList.append("profile_default.jpg")
-            # Format title & Description
-            if (len(experience.title) > 50):
-                sformattedTitleList.append(experience.title[:47] + "...")
-            else:
-                sformattedTitleList.append(experience.title)
-        i += 1
-
-
-    context = RequestContext(request, {
-
-    'mcityExperienceList' : zip(mcityExperienceList, mcityExperienceReviewList, mformattedTitleList, mBGImageURLList, mprofileImageURLList),
-    'scityExperienceList' : zip(scityExperienceList, scityExperienceReviewList, sformattedTitleList, sBGImageURLList, sprofileImageURLList),
-
-    })
-    return HttpResponse(template.render(context))
-
 def userHasLeftReview (user, experience):
     hasLeftReview = False
     reviewsByUser = Review.objects.filter(user=user, experience=experience)
@@ -2567,7 +2469,7 @@ def userHasLeftReview (user, experience):
 def review_experience (request, id=None):
     if id:
         if not request.user.is_authenticated():
-            return HttpResponseRedirect("/accounts/login/?next=/reviewexperience/"+str(id))
+            return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "reviewexperience/"+str(id))
 
         # get experience object
         experience = get_object_or_404(Experience, pk=id)
@@ -2609,7 +2511,7 @@ def review_experience (request, id=None):
                     review.save()
 
                     #copy to the chinese db
-                    cursor = connections['cndb'].cursor()
+                    cursor = connections[CNDB].cursor()
                     row = cursor.execute("insert into experiences_review (user_id, experience_id, comment, rate, personal_comment, operator_comment, datetime) values(%s,%s,%s,%s,%s,%s,%s)",
                                          [user.id,experience.id,review.comment,review.rate,review.personal_comment,review.operator_comment,review.datetime])
 
@@ -2621,7 +2523,7 @@ def review_experience (request, id=None):
 
         return render_to_response('experiences/review_experience.html', {'form': form}, context)
     else:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(GEO_POSTFIX)
 
 def get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords=None):
 
@@ -2696,7 +2598,7 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
 
 def custom_itinerary(request):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/?next=/itinerary")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
 
     context = RequestContext(request)
     form = CustomItineraryForm()
@@ -2751,7 +2653,7 @@ def itinerary_booking_confirmation(request):
     display_error = False
 
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
 
     # A HTTP POST?
     if request.method == 'POST':
@@ -2812,11 +2714,11 @@ def itinerary_booking_confirmation(request):
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()
-        return HttpResponseRedirect("/")
+        return HttpResponseRedirect(GEO_POSTFIX)
 
 #TODO: add the template
 def itinerary_booking_successful(request):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/accounts/login/")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
     
     return render(request,'experiences/itinerary_booking_successful.html',{})
