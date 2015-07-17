@@ -30,6 +30,7 @@ from allauth.socialaccount.models import SocialLogin, SocialToken, SocialApp
 from allauth.socialaccount.providers.facebook.views import fb_complete_login
 from allauth.socialaccount.helpers import complete_social_login
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
 
 GEO_POSTFIX = "/"
 ENDB = 'default'
@@ -439,6 +440,7 @@ def service_wishlist(request):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['POST'])
+@csrf_exempt
 def service_login(request):
     try:
         data = request.data #request.query_params['data']
@@ -466,6 +468,7 @@ def service_login(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+@csrf_exempt
 def service_signup(request):
     try:
         data = request.data #request.query_params['data']
@@ -527,6 +530,7 @@ def service_logout(request):
 # http://bytefilia.com/titanium-mobile-facebook-application-django-allauth-sign-sign/
 # http://stackoverflow.com/questions/16381732/how-to-create-new-user-and-new-django-allauth-social-account-when-given-access-t
 @api_view(['POST'])
+@csrf_exempt
 def service_facebook_login(request):
     data = request.data
 
@@ -553,8 +557,7 @@ def service_facebook_login(request):
 
 #{"start_datetime":"2015-05-05", "end_datetime":"2015-05-08", "city":"melbourne", "guest_number":"2", "keywords":"Sports,Arts,Food"}
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
-#@permission_classes((IsAuthenticated,))
+@csrf_exempt
 def service_search(request, format=None):
     try:
         criteria = request.data #request.query_params['data']
@@ -794,6 +797,7 @@ def service_couponverification(request, format=None):
     return Response(result, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@csrf_exempt
 def service_experience(request, format=None):
     try:
         data = request.data
