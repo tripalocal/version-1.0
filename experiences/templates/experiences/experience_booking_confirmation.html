@@ -24,7 +24,7 @@
     <div class="container-fluid experience">
         <div class="fixCenter">
             <div class="checkoutBox">
-                <form id="category_form" method="post" action="/experience_booking_confirmation/">
+                <form id="category_form"  method="post" action="/experience_booking_confirmation/">
                     {% csrf_token %}
                     <div style="display:none">
                     {% for hidden in form.hidden_fields %}
@@ -33,15 +33,15 @@
                     </div>
 
                     <div style="display:inline-block;">
-                        <h2 style="padding-left: 20px;">Payment</h2>
+                        <h2 style="padding-left: 20px;font-weight:bold;margin-top:15px">Payment Details</h2>
                     </div>
 
                     <div class="row">
 				        <div class="">
-                            <p>Promo Code</p>
+                            <p>Promo code</p>
                         </div>
                         <div class="navbar-form " role="search">
-                            <div class="form-group" style="width:200px; display:inline-block;">
+                            <div class="form-group" style="margin-right:15px; display:inline-block;">
                                 {{form.promo_code}}
                                 {% if wrong_promo_code %}
                                 <div class="warning-sign">
@@ -51,7 +51,7 @@
                                 {%endif%}
                             </div>
                 
-               	            <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="Refresh" value="Refresh" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6; margin-left:20px;"/> 
+               	            <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="Refresh" value="Refresh" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6;"/> 
                         </div>
                         {% if coupon and not wrong_promo_code %}
                         {% include "experiences/coupon_"|add:coupon.title|add:".html" %}
@@ -59,9 +59,9 @@
                     </div>
 
                     <div class="row" id="credit_card_div">
-                        <p>Card Number</p>
+                        <p>Card number</p>
                         <div class="navbar-form navbar-left" style="width:100%" role="search">
-                            <div class="form-group" style="float:left">
+                            <div class="form-group" style="float:left;margin-right:20px">
                                 {{ form.card_number }}
                                 {% if 'card_number' in form.errors and display_error%}
                                 <br>
@@ -71,30 +71,26 @@
                                 </div>
                                 {%endif%}
                             </div>
-                            <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/visa.png)"></input>
-                            <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/master.png);"></input>
-                            <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/amex.png)"></input>
-                            <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/discover.png)"></input>
-                            <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/unionPay.jpg)"></input>
+                           <div style="display:inline-block">
+                                 <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/visa.png)"></input>
+                                <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/master.png);"></input>
+                                <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/amex.png)"></input>
+                                <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/discover.png)"></input>
+                                <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/unionPay.jpg)"></input>
+                            </div>
                         </div>
 
                         <table width="0" border="0" cellspacing="0" cellpadding="0">
                             <tr>
-                                <td>
-                                    <p>Expires on</p>
-                                </td>
-                                <td>
-                                    <p>Security Code</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="dropdown">
+                                <td  >
+                                   <p>Expires on</p>
+                                    <div class="dropdown navbar-form" id="id_expire_on">
                                         {{ form.expiration }}
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="navbar-form navbar-left" role="search">
+                                    <p>Security code</p>
+                                    <div class="navbar-form navbar-left" role="search" id="id_security_code">
                                         <div class="form-group">
                                             {{ form.cvv }}
                                         </div>
@@ -122,13 +118,16 @@
                             <!--<p class="help-message">Booking requests require host to accept the request within 24 hours. We will authorize your card for the full amount, but you will not be charged until the host accepts.</p>-->
                         </table>
                     </div>
-                    <div class="row">
+                     <div class="row" style="padding:0">
+                        <h2 style="padding-left: 20px;font-weight:bold;margin-top:15px;color:#000">Traveller Details</h2>
+                    </div>
+                    <div class="row" id="traveller_detail">
                         <table width="0" border="0" cellspacing="0" cellpadding="0">
                             <tr>
-                                <td>
-                                    <p>First Name</p>
+                                <td >
+                                    <p>First name</p>
                                     <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
+                                        <div class="form-group" >
                                             {{ form.first_name }}
                                             {% if 'first_name' in form.errors and display_error%}
                                             <div class="warning-sign">
@@ -140,7 +139,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <p>Last Name</p>
+                                    <p>Last name</p>
                                     <div class="navbar-form navbar-left" role="search">
                                         <div class="form-group">
                                             {{ form.last_name }}
@@ -155,7 +154,7 @@
                                 </td>
                             </tr>
                         </table>
-                        <table class="billingAddress" width="0" border="0" cellspacing="0" cellpadding="0">
+                        <table style="display:none" class="billingAddress" width="0" border="0" cellspacing="0" cellpadding="0">
                             <tr>
                                 <td>
                                     <p>Billing Address</p>
@@ -183,7 +182,7 @@
                             </tr>
                         </table>
                         <table class="billingAddress" width="0" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
+                            <tr style="display:none">
                                 <td>
                                     <p>City</p>
                                     <div class="navbar-form navbar-left" role="search">
@@ -234,12 +233,29 @@
                                 </td>
                             </tr>
                         </table>
-                        <p style="padding-top:10px;">Destination Mobile Number (optional)</p>
-                        <div class="navbar-form" role="search">
-                            <div class="form-group">
-                                {{ form.phone_number }}
-                            </div>
-                        </div>
+                        <table>
+                            <tr>
+                                <td style="margin-right:10px">
+                                    <p style="padding-top:10px;">Destination mobile number</p>
+                                    <div class="navbar-form" role="search">
+                                        <div class="form-group">
+                                            <input class="form-control" style="width:62px;margin-right:10px;float:left">
+                                            {{ form.phone_number }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p style="padding-top:10px;">Roaming mobile number</p>
+                                    <div class="navbar-form" role="search">
+                                        <div class="form-group">
+                                            <input class="form-control" style="width:62px;margin-right:10px;float:left">
+                                            <input id="id_phone_number" maxlength="15" name="phone_number" type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        
                         {%if experience.language == "NONE"%}
                         <div class="navbar-form" style="display:none;">
                             {{form.booking_extra_information}}<p class="help-message">我需要中文翻译</p>
@@ -247,14 +263,21 @@
                         {%endif%}
                     </div>
                     <div class="row">
-                        <input id="isAgreementSelected" type="checkbox" /><p class="help-message">By booking this listing, you agree to <a href="/termsofservice" target="_blank">Terms of Service</a>, <a href="/privacypolicy" target="_blank">Privacy Policy</a> and <a href="/refundpolicy"  target="_blank">Traveller Refund Policy</a>.
+                        <input id="isAgreementSelected" type="checkbox" /><p class="help-message" style="font-size:12px">By booking this listing, you agree to <a href="/termsofservice" target="_blank">Terms of Service</a>, <a href="/privacypolicy" target="_blank">Privacy Policy</a> and <a href="/refundpolicy"  target="_blank">Traveller Refund Policy</a>.
                         </p> <!-- and agree to Tripalocal's Terms and Conditions-->
                         <div id="id_term_condition" class="warning-sign" style="display:none;">
                             <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
                             <p>Please accept terms and conditions</p>
                         </div>
+                        <div>
+                            <img src="/images/icon/give-back.svg" width="25" style="float:left">
+                            <p style="margin:20px 10px 0 35px">It’s ok to change your mind<br>
+                                If you cancel at least 7 calendar days in advance, there is no cancellation fee.<br>
+                                If you cancel between 3 and 6 calendar days in advance, you will be charged a 50% cancellation fee.<br>
+                                If you cancel within 2 calendar days in advance, you will be charged a 100% cancellation fee.</p>
+                        </div>
                     </div>
-                    <input type="submit" id="submit_booking" name="Request to Book" value="Request to Book" class="btn btn-primary btn-lg" style="max-width:100%" />
+                    <input type="submit" id="submit_booking" name="Request to Book" value="Book Now" class="btn btn-primary btn-lg"  style="margin:0 0 30px 20px;width:140px"/>
                 </form>
             </div>
                 
@@ -270,14 +293,15 @@
                     </div>
                 </div>
                 <div class="checkoutBox checkoutInfo">
-                    <h3>{{ experience.title }}</h3>
+                    <h3 style="font-weight:bold">{{ experience.title }}</h3>
                     <p>{{ experience.city }}</p>
                     <hr style="margin-bottom:10px;">
                     <form action="/experience/{{experience.id}}/" method="get">
                         <p>Reservation for <strong>{{ guest_number }} person(s)</strong><br>
-                            on <strong>{{ date }}</strong> at <strong>{{ time }}</strong><br>
-                            <input type="submit" value="Change" name="change" style="border:none;background:none;color:#3cc;padding:0px;"/>
+                            on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> 
+                            (<input type="submit" value="Change" name="change" style="border:none;background:none;color:#3cc;padding:0px;"/>)
                         </p>
+                        <hr style="margin:10px 0">
                         <p>Rate: ${{ experience_price|floatformat|mul:1.429|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
                         <hr style="margin-bottom:10px;">
                         Subtotal: $<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
