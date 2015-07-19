@@ -63,7 +63,7 @@
                             {{form.language}} 
                             <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
                             <br> 
-                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:10px;">中文</label> 
+                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:18px;">中文</label> 
                         </div>
                     </div>
 
@@ -71,7 +71,8 @@
                     </div>
 
                     <div id="searchButton">
-                        <input class="btn-block btn btn-default" style="padding-bottom:25px; width:100px;" id="itinerary-search" type="submit" value="Search" name="Search">
+                        <input id="auto_update" type="checkbox" class="css-checkbox" ><label id="auto_update_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin:5px 0 15px 0;font-weight:normal">Auto update</label> 
+                        <input class="btn-block btn btn-default" style="padding-bottom:25px; width:100px;" id="itinerary-search" type="submit" value="Update" name="Search">
                     </div>
                     <div id="itinerary-search-button">
                     </div>
@@ -79,7 +80,7 @@
             </div>
         </div>
         <div class="advanceSearch notOnMobile" id="optional_criteria_div" style="display:none;">
-            <div class="row">
+            <div class="row" style="background-color:white;padding-bottom:10px">
                 <div class="fixCenter">
                     <div class="interests">
                         <div class="iconHeader">
@@ -123,7 +124,8 @@
     	<div class="row">
             <div class="fixCenter">
                 <div id="more-filters-div" class="notOnMobile">
-                    <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:100px;float:left;">More Filters</button>
+                    <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:100px;float:left;margin-right:10px">More Filters</button>
+                    <button class="btn-block btn btn-primary" id="apply_filters" type="button" value="Apply Filters" style="width:100px;display:none">Apply Filters</button>
                     <div id="ajax-experience-count"></div>
                 </div>
                 <div id="experience-box" class="expBox">
@@ -247,14 +249,14 @@
                 id = e.target.id.split("_")[2];
                 if($("#tag_"+id).attr("class") == "tag-selected")
                 {
-                    $("#tag_button_"+id).html("&#10003");
+                    $("#tag_button_"+id).html("<img src='/images/undo.svg' width='14'>");
                     $("#tag_"+id).attr("class", "tag-non-selected");
                     $("#tag_box_"+id).removeClass("tag-box-selected");
                     $("#tag_box_"+id).addClass("tag-box-unselected");
                 }
                 else
                 {
-                    $("#tag_button_"+id).html("&#10007");
+                    $("#tag_button_"+id).html("<img src='/images/closeIcon-02.svg' width='10'>");
                     $("#tag_"+id).attr("class", "tag-selected");
                     $("#tag_box_"+id).removeClass("tag-box-unselected");
                     $("#tag_box_"+id).addClass("tag-box-selected");
@@ -345,12 +347,14 @@
         if(tags_div.css("display")=="none")
         {
             tags_div.show();
-            $("#more_filters").text("Less Filters");
+            $("#more_filters").text("Cancel");
+            $("#apply_filters").show();
         }
         else
         {
             tags_div.hide();
             $("#more_filters").text("More Filters");
+            $("#apply_filters").hide();
         }
     });
 </script>

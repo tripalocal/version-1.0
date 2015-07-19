@@ -1,4 +1,4 @@
-﻿/*experience search results page*/
+/*experience search results page*/
 .basicSearch {border-bottom: 1px #CCC solid;color: #666;}
 .basicSearch .fixCenter {padding: 15px 0px;height: 100px;}
 .iconHeader {float: left;width: 60px;text-align: center;padding-top: 10px;}
@@ -11,7 +11,7 @@
 .formBoxes {float: right;}
 .dates .formBoxes {width: 220px;float: left;margin-left: 20px;}
 .people .formBoxes {width: 140px;}
-.language .formBoxes {width: 140px;padding-top: 10px;}
+.language .formBoxes {width: 140px;padding-top: 5px;}
 .interests .formBoxes {width: 640px;float: left;margin-left: 20px;}
 .locationSelection {color: #666;width: 210px;height: 30px;padding-left: 10px;-webkit-appearance: none;-moz-appearance: none;background: url(/images/dropdown-button.png) no-repeat;background-position: 181px 2px;background-color: #FFF;border-radius: 5px;float: left;border: solid 1px #ccc;margin-bottom: 10px;}
 .startDate {float: left;width: 100px;margin-right: 10px;}
@@ -41,3 +41,8 @@
 .searchbar{background-color:#f7f7f7; border-top:#CCC 1px solid; padding:10px 0px 30px 0px;  background-size:cover;background-position: center;}
 .destination{width: 250px;margin: auto;}
 .tag-button {border:0px; background-color:transparent; margin:0 5px;} 
+#only_tags input[type=checkbox].css-checkbox + label.css-label {margin-bottom: 20px}
+@media all and (max-width: 767px) {
+    .expList{float:left; width:100%; margin:20px 20px 20px 0px;}
+    .priceBox {left:0}
+}
