@@ -126,7 +126,7 @@
                 <div id="more-filters-div" class="notOnMobile">
                     <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:100px;float:left;margin-right:10px">More Filters</button>
                     <button class="btn-block btn btn-primary" id="apply_filters" type="button" value="Apply Filters" style="width:100px;display:none">Apply Filters</button>
-                    <div id="ajax-experience-count"></div>
+                    <div id="ajax-experience-count" style="position:relative"></div>
                 </div>
                 <div id="experience-box" class="expBox">
                     <div id="overlay"></div>
@@ -240,7 +240,7 @@
             }
             else
             {
-                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\"><img src='/images/closeIcon-02.svg' width='10'></button></div>";
+                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url(/images/closeIcon-02.svg)\"></button></div>";
             }
 
             $("#tags_div").append(new_tag);
@@ -249,14 +249,16 @@
                 id = e.target.id.split("_")[2];
                 if($("#tag_"+id).attr("class") == "tag-selected")
                 {
-                    $("#tag_button_"+id).html("<img src='/images/undo.svg' width='14'>");
+//                    $("#tag_button_"+id).html("<img src='/images/undo.svg' width='14'>");
+                    $("#tag_button_"+id).css("background-image","url(/images/undo.svg)");
                     $("#tag_"+id).attr("class", "tag-non-selected");
                     $("#tag_box_"+id).removeClass("tag-box-selected");
                     $("#tag_box_"+id).addClass("tag-box-unselected");
                 }
                 else
                 {
-                    $("#tag_button_"+id).html("<img src='/images/closeIcon-02.svg' width='10'>");
+//                    $("#tag_button_"+id).html("<img src='/images/closeIcon-02.svg' width='10'>");
+                                        $("#tag_button_"+id).css("background-image","url(/images/closeIcon-02.svg)");
                     $("#tag_"+id).attr("class", "tag-selected");
                     $("#tag_box_"+id).removeClass("tag-box-unselected");
                     $("#tag_box_"+id).addClass("tag-box-selected");

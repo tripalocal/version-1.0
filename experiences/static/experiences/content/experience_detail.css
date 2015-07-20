@@ -32,7 +32,7 @@
 .rating{color:#FC0; font-size:30px; margin-bottom:20px;}
 .reviewList{border-bottom:#CCC 1px solid; padding:20px 0px;overflow: hidden;	width: 100%;}
 .reviewList .profile-md{position: absolute}
-.reviewText {float:right; width:480px;}
+.reviewText {float:right; width:480px;  min-height: 100px;}
 .reviewDate{color:#999; margin-top:12px;}
 .experience-detail-table-td {padding-top:20px;padding-bottom:20px;}
 .carousel-indicators li{width:12px;height:12px;margin:0 5px;background-color:#CCC;border-radius:15px;border-color: transparent;}
