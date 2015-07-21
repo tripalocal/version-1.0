@@ -40,7 +40,7 @@
 .searchresult{background-color:#f7f7f7;padding-bottom: 50px;}
 .searchbar{background-color:#f7f7f7; border-top:#CCC 1px solid; padding:10px 0px 30px 0px;  background-size:cover;background-position: center;}
 .destination{width: 250px;margin: auto;}
-.tag-button {border:0px; background-color:transparent; margin:0 5px;  background-size: 10px;height: 10px;background-repeat: no-repeat;} 
+.tag-button {border:0px; background-color:transparent; margin:0 5px;  background-size: 10px;height: 10px;background-repeat: no-repeat;vertical-align: middle;} 
 #only_tags input[type=checkbox].css-checkbox + label.css-label {margin-bottom: 20px}
 @media all and (max-width: 767px) {
     .expList{float:left; width:100%; margin:20px 20px 20px 0px;}

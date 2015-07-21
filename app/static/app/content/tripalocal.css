@@ -69,7 +69,7 @@ th h3{margin: 2px}
 .checkoutBox .row {padding-left: 20px;color: rgb(87,87,87);} 
 .checkoutBox td{display: inline-block}
 #id_promo_code ,#id_card_number ,#id_country{width: 222px}
-#id_phone_number{width: 145px}
+#id_phone_number,#id_roaming_number{width: 145px}
 #id_expire_on > span > select {width: 100px;margin-right: 10px}
 #id_cvv {width: 100px}
 #traveller_detail #id_first_name, #traveller_detail #id_last_name {width: 222px;height: 34px}
