@@ -23,7 +23,7 @@ from app.forms import SubscriptionForm
 from mixpanel import Mixpanel
 from dateutil.relativedelta import relativedelta
 from django.db import connections
-from app.models import RegisteredUser
+from app.models import RegisteredUser, UserPhoto
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.core.files.storage import FileSystemStorage
 from PIL import Image
@@ -34,7 +34,9 @@ from collections import OrderedDict
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
+MaxIDImage=5
 GEO_POSTFIX = "/"
+ENDB = 'default'
 CNDB = 'cndb'
 
 def experience_fee_calculator(price):
@@ -1488,7 +1490,7 @@ class ExperienceWizard(NamedUrlSessionWizardView):
                         raise forms.ValidationError(_('File type is not supported'))
 
                     name, extension = os.path.splitext(content.name)
-                    extension = extension.lower();
+                    extension = extension.lower()
                     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                         extension = '.jpg'
                         filename = 'experience' + str(experience.id) + '_' + str(index) + extension
@@ -1700,7 +1702,7 @@ def saveProfileImage(user, profile, image_file):
         os.mkdir(dirname)
 
     name, extension = os.path.splitext(image_file.name)
-    extension = extension.lower();
+    extension = extension.lower()
     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
         filename = ('host' + str(user.id) + '_1_' + user.first_name.title().strip() + user.last_name[:1].title() + extension).encode('ascii', 'ignore').decode('ascii')
         destination = open(dirname + filename, 'wb+')
@@ -1747,6 +1749,7 @@ def create_experience(request, id=None):
 
     if id:
         experience = get_object_or_404(Experience, pk=id)
+        host = experience.hosts.all()[0]
         registerUser = experience.hosts.all()[0].registereduser
         list = experience.whatsincluded_set.filter(item="Food")
         if len(list) > 0: 
@@ -1796,6 +1799,7 @@ def create_experience(request, id=None):
             "end_datetime":experience.end_datetime,
             #"repeat_cycle":experience.repeat_cycle,
             #"repeat_frequency":experience.repeat_frequency,
+            "phone_number":registerUser.phone_number,
             "title":experience.title,
             "summary":experience.description,
             "guest_number_min":experience.guest_number_min,
@@ -1814,28 +1818,48 @@ def create_experience(request, id=None):
             "dress_code":experience.dress,
             "suburb":experience.city,
             "meetup_spot":experience.meetup_spot,
-            "status":experience.status
+            "status":experience.status,
+            "dynamic_price":experience.dynamic_price
         }
 
         for i in range(1,MaxPhotoNumber+1):
             list = experience.photo_set.filter(name__startswith='experience'+str(id)+'_'+str(i))
             if len(list)>0:
                 photo = list[0]
-                files['experience_photo_'+str(i)] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+photo.directory+photo.name, 
-                                                                             File(open(settings.MEDIA_ROOT+'/'+photo.directory+photo.name, 'rb')).read())
+                data['experience_photo_'+str(i)+'_file_name'] = photo.name
                 data['experience_photo_'+str(i)] = photo.image
-            #else:
-            #    photos['experience'+str(id)+'_'+str(i)] = None
+
+        for i in range(1,MaxIDImage+1):
+            list = host.userphoto_set.filter(name__startswith='host_id'+str(host.id)+'_'+str(i))
+            if len(list)>0:
+                photo = list[0]
+                data['host_id_photo_'+str(i)+'_file_name'] = photo.name
+                data['host_id_photo_'+str(i)] = photo.image
 
         photo = registerUser.image
         if photo:
-            files['host_image'] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+photo.name, 
-                                                     File(open(settings.MEDIA_ROOT+'/'+photo.name, 'rb')).read())
+            data['host_image_file_name'] = photo.name.split('/')[-1]
             data['host_image'] = photo
-        #if experience.hosts.all()[0] != request.user:
-        #    return HttpResponseForbidden()
     else:
         experience = Experience()
+
+    # Get payment calculation parameter.
+    context['COMMISSION_PERCENT'] = settings.COMMISSION_PERCENT
+    context['STRIPE_PRICE_PERCENT'] = settings.STRIPE_PRICE_PERCENT
+    context['STRIPE_PRICE_FIXED'] = settings.STRIPE_PRICE_FIXED
+
+    # Set dynamic prices presentation logic:
+    dynamic_pricing_items_number = 0
+    max_dynamic_pricing_items = 10
+    if experience.dynamic_price:
+        prices = str(experience.dynamic_price).split(',')[:-1]
+        context['dynamic_pricing_items'] = prices
+        dynamic_pricing_items_number = prices.__len__()
+    else:
+        context['dynamic_pricing_items'] = []
+        dynamic_pricing_items_number = 0
+
+    context['dynamic_pricing_hidden_fields'] = range(dynamic_pricing_items_number + 1,11)
 
     if request.method == 'POST':
         form = CreateExperienceForm(request.POST, request.FILES)
@@ -1852,8 +1876,8 @@ def create_experience(request, id=None):
 
                 #create a new experience
                 experience = Experience(id=form.data['id'],
-                                        start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_datetime'], "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),
-                                        end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_datetime'], "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),
+                                        start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2015-01-01 00:00", "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),#form.data['start_datetime']
+                                        end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2025-01-01 00:00", "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),#form.data['end_datetime']
                                         repeat_cycle = "Hourly",
                                         repeat_frequency = 1,
                                         title = form.data['title'], 
@@ -1868,14 +1892,16 @@ def create_experience(request, id=None):
                                         city = form.data['suburb'],
                                         meetup_spot = form.data['meetup_spot'],
                                         status = form.data['status'],
-                                        language = form.data['language']
+                                        language = form.data['language'],
+                                        dynamic_price = form.data['dynamic_price']
                                         )
-            
+                experience.save(using=CNDB)
+                experience.save(using=ENDB)
             else:
                 experience.id = form.data['id']
                 experience.language = form.data['language']
-                experience.start_datetime = datetime.strptime(form.data['start_datetime'], "%Y-%m-%d %H:%M")
-                experience.end_datetime = datetime.strptime(form.data['end_datetime'], "%Y-%m-%d %H:%M")
+                #experience.start_datetime = datetime.strptime(form.data['start_datetime'], "%Y-%m-%d %H:%M")
+                #experience.end_datetime = datetime.strptime(form.data['end_datetime'], "%Y-%m-%d %H:%M")
                 #experience.repeat_cycle = form.data['repeat_cycle']
                 #experience.repeat_frequency = form.data['repeat_frequency']
                 experience.title = form.data['title']
@@ -1890,12 +1916,15 @@ def create_experience(request, id=None):
                 experience.city = form.data['suburb']
                 experience.meetup_spot = form.data['meetup_spot']
                 experience.status = form.data['status']
-            
-            experience.save()
+                experience.dynamic_price = form.data['dynamic_price']
+                experience.save()
+
             #add the user to the host list
             if not id and user:
                 #experience.hosts.add(user)
-                cursor = connections['experiencedb'].cursor()
+                cursor = connections[CNDB].cursor()
+                cursor.execute("Insert into experiences_experience_hosts (experience_id,user_id) values (%s, %s)", [experience.id, user.id])
+                cursor = connections[ENDB].cursor()
                 cursor.execute("Insert into experiences_experience_hosts (experience_id,user_id) values (%s, %s)", [experience.id, user.id])
 
             #update host information
@@ -1904,13 +1933,14 @@ def create_experience(request, id=None):
             user.last_name = form.data['host_last_name']
             user.save()
             user.registereduser.bio = form.data['host_bio']
+            user.registereduser.phone_number = form.data['phone_number']
             user.registereduser.save()
             #copy to chinese db
             cursor = connections[CNDB].cursor()
             cursor.execute("Update auth_user set first_name=%s, last_name=%s where id=%s", [user.first_name, user.last_name, user.id])
-            cursor.execute("Update app_registereduser set bio=%s where user_id=%s", [user.registereduser.bio, user.id])
+            cursor.execute("Update app_registereduser set bio=%s, phone_number=%s where user_id=%s", [user.registereduser.bio, user.registereduser.phone_number, user.id])
 
-            #save images
+            #save experience images
             dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
             if not os.path.isdir(dirname):
                 os.mkdir(dirname)
@@ -1928,13 +1958,19 @@ def create_experience(request, id=None):
 
                     #count += 1 #count does not necessarily equal index
                     name, extension = os.path.splitext(request.FILES['experience_photo_'+str(index)].name)
-                    extension = extension.lower();
+                    extension = extension.lower()
                     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                         filename = 'experience' + str(experience.id) + '_' + str(index) + extension
                         destination = open(dirname + filename, 'wb+') 
                         for chunk in request.FILES['experience_photo_'+str(index)].chunks():            
                             destination.write(chunk)
                         destination.close()
+
+                        #copy to the chinese website -- folder+file
+                        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/experiences/' + str(experience.id) + '/'
+                        if not os.path.isdir(dirname_other):
+                            os.mkdir(dirname_other)
+                        subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
 
                         #create the corresponding thumbnail (force .jpg)
                         basewidth = 400
@@ -1944,10 +1980,59 @@ def create_experience(request, id=None):
                         img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
                         img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
 
+                        #copy to the chinese website -- folder+file
+                        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
+                        if not os.path.isdir(dirname_other):
+                            os.mkdir(dirname_other)
+                        subprocess.Popen(['cp',settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg', dirname_other + 'experience' + str(experience.id) + '_' + str(index) + '.jpg'])
+
                         if not len(experience.photo_set.filter(name__startswith=filename))>0:
                             photo = Photo(name = filename, directory = 'experiences/' + str(experience.id) + '/', 
                                           image = 'experiences/' + str(experience.id) + '/' + filename, experience = experience)
-                            photo.save()
+                            photo.save(using=ENDB)
+                            #copy to the chinese -- database
+                            cursor = connections[CNDB].cursor()
+                            cursor.execute("Insert into experiences_photo (experience_id,name,directory,image)"
+                               + " values (%s, %s, %s, %s)", 
+                               [experience.id, photo.name, photo.directory, photo.image.name])
+
+            #save host's driver license images
+            dirname = settings.MEDIA_ROOT + '/hosts_id/' + str(user.id) + '/'
+            if not os.path.isdir(dirname):
+                os.mkdir(dirname)
+
+            count = 0
+            for index in range (1,MaxIDImage+1):
+                if 'host_id_photo_'+str(index) in request.FILES:
+                    content = request.FILES['host_id_photo_'+str(index)]
+                    content_type = content.content_type.split('/')[0]
+                    if content_type == "image":
+                        if content._size > EXPERIENCE_IMAGE_SIZE_LIMIT:
+                            raise forms.ValidationError(_('Please keep filesize under %s. Current filesize %s') % (filesizeformat(EXPERIENCE_IMAGE_SIZE_LIMIT), filesizeformat(content._size)))
+                    else:
+                        raise forms.ValidationError(_('File type is not supported'))
+
+                    #count += 1 #count does not necessarily equal index
+                    name, extension = os.path.splitext(request.FILES['host_id_photo_'+str(index)].name)
+                    extension = extension.lower()
+                    if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
+                        filename = 'host_id' + str(user.id) + '_' + str(index) + extension
+                        destination = open(dirname + filename, 'wb+')
+                        for chunk in request.FILES['host_id_photo_'+str(index)].chunks():
+                            destination.write(chunk)
+                        destination.close()
+
+                        #copy to the chinese website -- folder+file
+                        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts_id/' + str(user.id) + '/'
+                        if not os.path.isdir(dirname_other):
+                            os.mkdir(dirname_other)
+                        subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
+
+                        if not len(user.userphoto_set.filter(name__startswith=filename))>0:
+                            photo = UserPhoto(name = filename, directory = 'hosts_id/' + str(user.id) + '/',
+                                          image = 'hosts_id/' + str(user.id) + '/' + filename, user = user)
+                            photo.save(using=ENDB)
+                            photo.save(using=CNDB)
 
             #save profile image
             if 'host_image' in request.FILES:
@@ -1958,9 +2043,14 @@ def create_experience(request, id=None):
                 food = WhatsIncluded(item='Food', included = (form.data['included_food']=='Yes'), details = form.data['included_food_detail'], experience = experience)
                 ticket = WhatsIncluded(item='Ticket', included = (form.data['included_ticket']=='Yes'), details = form.data['included_ticket_detail'], experience = experience)
                 transport = WhatsIncluded(item='Transport', included = (form.data['included_transport']=='Yes'), details = form.data['included_transport_detail'], experience = experience)
-                food.save()
-                ticket.save()
-                transport.save()
+                food.save(using=ENDB)
+                ticket.save(using=ENDB)
+                transport.save(using=ENDB)
+
+                #copy to chinese database
+                food.save(using=CNDB)
+                ticket.save(using=CNDB)
+                transport.save(using=CNDB)
             else:
                 if len(experience.whatsincluded_set.filter(item="Food"))>0:
                     wh = WhatsIncluded.objects.get(id=experience.whatsincluded_set.filter(item="Food")[0].id)

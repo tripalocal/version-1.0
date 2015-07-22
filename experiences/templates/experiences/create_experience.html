@@ -44,10 +44,6 @@
     <div class="container">
         <div class="leftColumn">
             <div class="operation"></div>
-            <ul class="subMenu">
-                <li><a href="/admin/experiences/experience/{{form.id.value}}">Add new experience</a></li>
-                <li><a href="/cn/admin/experiences/experience/{{form.id.value}}">体验管理</a></li> 
-            </ul>
             <div class="clear"></div>
             <div>
                 {% if form.errors and display_error%}
@@ -75,8 +71,8 @@
                     <tr>
                         <td class="coRight">Profile</td>
                         <td colspan="2">
-                            {%if form.files.host_image%}
-                            <input id="profileImage" placeholder="{{form.files.host_image.name}}" class="uploadImage" disabled="disabled"/>
+                            {% if form.data.host_image %}
+                            <input id="profileImage" placeholder="{{form.data.host_image_file_name}}" class="uploadImage" disabled="disabled"/>
                             {%else%}
                             <input id="profileImage" placeholder="No file chosen" class="uploadImage" disabled="disabled"/>
                             {%endif%}
@@ -86,7 +82,7 @@
                             </div>
                         </td>
                         <td>
-                            {%if form.files.host_image%}
+                            {%if form.data.host_image %}
                             <img src="{{MEDIA_URL}}{{form.host_image_url.value}}" class="img-circle"  width="80" height="80">
                             {%else%}
                             <img src="{{MEDIA_URL}}profile_default.jpg" class="img-circle"  width="80" height="80">
@@ -95,14 +91,110 @@
                     </tr>
 
                     <tr>
+                        <td class="coRight">Host ID Photos</td>
+                        <td colspan="3">
+                            <div>
+                            {%if form.data.host_id_photo_1 %}
+                            <input id="uploadIDImage_1" placeholder="{{form.data.host_id_photo_1_file_name}}" class="uploadImage" disabled="disabled" />
+                            {%else%}
+                            <input id="uploadIDImage_1" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.host_id_photo_1}}
+                            </div>
+                            {%if form.data.host_id_photo_1 %}
+                            <img src="{{ MEDIA_URL }}hosts_id/{{user.id}}/{{form.data.host_id_photo_1_file_name}}" width="100" height="100">
+                            {%endif%}
+                            </div>
+                            <br/>
+                            <br/>
+
+                            <div>
+                            {%if form.data.host_id_photo_2 %}
+                            <input id="uploadIDImage_2" placeholder="{{form.data.host_id_photo_2_file_name}}" class="uploadImage" disabled="disabled" />
+                            {%else%}
+                            <input id="uploadIDImage_2" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.host_id_photo_2}}
+                            </div>
+                            {%if form.data.host_id_photo_2 %}
+                            <img src="{{ MEDIA_URL }}hosts_id/{{user.id}}/{{form.data.host_id_photo_2_file_name}}" width="100" height="100">
+                            {%endif%}
+                            </div>
+                            <br/>
+                            <br/>
+
+                            <div>
+                            {%if form.data.host_id_photo_3 %}
+                            <input id="uploadIDImage_3" placeholder="{{form.data.host_id_photo_3_file_name}}" class="uploadImage" disabled="disabled" />
+                            {%else%}
+                            <input id="uploadIDImage_3" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.host_id_photo_3}}
+                            </div>
+                            {%if form.data.host_id_photo_3 %}
+                            <img src="{{ MEDIA_URL }}hosts_id/{{user.id}}/{{form.data.host_id_photo_3_file_name}}" width="100" height="100">
+                            {%endif%}
+                            </div>
+                            <br/>
+                            <br/>
+
+                            <div>
+                            {%if form.data.host_id_photo_4 %}
+                            <input id="uploadIDImage_4" placeholder="{{form.data.host_id_photo_4_file_name}}" class="uploadImage" disabled="disabled" />
+                            {%else%}
+                            <input id="uploadIDImage_4" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.host_id_photo_4}}
+                            </div>
+                            {%if form.data.host_id_photo_5 %}
+                            <img src="{{ MEDIA_URL }}hosts_id/{{user.id}}/{{form.data.host_id_photo_5_file_name}}" width="100" height="100">
+                            {%endif%}
+                            </div>
+                            <br/>
+                            <br/>
+
+                            <div>
+                            {%if form.data.host_id_photo_5 %}
+                            <input id="uploadIDImage_5" placeholder="{{form.data.host_id_photo_5_file_name}}" class="uploadImage" disabled="disabled" />
+                            {%else%}
+                            <input id="uploadIDImage_5" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                            {%endif%}
+                            <div class="fileUpload btn btn-primary">
+                                <span>Choose File</span>
+                                {{form.host_id_photo_5}}
+                            </div>
+                            {%if form.data.host_id_photo_5 %}
+                            <img src="{{ MEDIA_URL }}hosts_id/{{user.id}}/{{form.data.host_id_photo_5_file_name}}" width="100" height="100">
+                            {%endif%}
+                            </div>
+                            <br/>
+                            <br/>
+                       </td>
+                    </tr>
+
+                    <tr>
                         <td class="coRight">Bio</td>
                         <td colspan="0">{{form.host_bio}}</td>
+                    </tr>
+
+                    <tr>
+                        <td class="coRight">Phone Number</td>
+                        <td colspan="0">{{form.phone_number}}</td>
                     </tr>
 
                     <tr>
                         <td class="coRight">Language</td>
                         <td colspan="1">{{form.language}}</td>
                     </tr>
+<!--
                     <tr>
                         <td class="coRight">Start from</td>
                         <td colspan="1">{{form.start_datetime}}</td>
@@ -111,6 +203,7 @@
                         <td class="coRight">Until</td>
                         <td colspan="1">{{form.end_datetime}}</td>
                     </tr>
+-->
 <!--
                     <tr>
                         <td class="coRight">Repeats</td>
@@ -140,6 +233,47 @@
                             <br />
                             </label>
                         </td>
+                    </tr>
+                    <tr>
+                        <label>{{form.dynamic_price}}</label>
+                        <table>
+                            <tr>
+                                <td>Dynamic Pricing</td>
+                                <td>Number of people</td>
+                                <td>Traveller pay</td>
+                                <td>Host get</td>
+                            </tr>
+
+                            {% for element in dynamic_pricing_items %}
+                            <tr id="dynamicPricingrow{{forloop.counter}}">
+                                <td></td>
+                                <td>{{forloop.counter}}</td>
+                                <td>
+                                    <input id="dynamicPriceGuest{{forloop.counter}}" onchange="auto_generate_income_of_host({{forloop.counter}})"/>
+                                </td>
+                                <td>
+                                    <input value="{{element}}" id="dynamicPriceHost{{forloop.counter}}" onchange="auto_generate_payment_of_guest({{forloop.counter}})"/>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% for element in dynamic_pricing_hidden_fields %}
+                            <tr id="dynamicPricingrow{{element}}" style="display: none">
+                                <td></td>
+                                <td>{{element}}</td>
+                                <td>
+                                    <input id="dynamicPriceGuest{{element}}" onchange="auto_generate_income_of_host({{element}})"/>
+                                </td>
+                                <td>
+                                    <input id="dynamicPriceHost{{element}}" onchange="auto_generate_payment_of_guest({{element}})"/>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                            <input style="display:none;" id="COMMISSION_PERCENT" value="{{COMMISSION_PERCENT}}">
+                            <input style="display:none;" id="STRIPE_PRICE_PERCENT" value="{{STRIPE_PRICE_PERCENT}}">
+                            <input style="display:none;" id="STRIPE_PRICE_FIXED" value="{{STRIPE_PRICE_FIXED}}">
+                            <input style="display: none;" id="dynamicPricingItemNumber" value="{{dynamic_pricing_items|length}}">
+                        </table>                        
                     </tr>
                     <tr>
                         <td class="coRight">Duration</td>
@@ -200,8 +334,9 @@
                     <tr>
                         <td class="coRight">Experience photo</td>
                         <td colspan="3">
-                            {%if form.files.experience_photo_1%}
-                            <input id="uploadImage_1" placeholder="{{form.files.experience_photo_1.name}}" class="uploadImage" disabled="disabled" />
+                            <div>
+                            {%if form.data.experience_photo_1 %}
+                            <input id="uploadImage_1" placeholder="{{form.data.experience_photo_1_file_name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
                             <input id="uploadImage_1" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
                             {%endif%}
@@ -209,13 +344,14 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_1}}
                             </div>
-                            {%if form.files.experience_photo_1%}
-                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_1.name}}" width="100" height="100">
+                            {%if form.data.experience_photo_1 %}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.data.experience_photo_1_file_name}}" width="100" height="100">
                             {%endif%}
-                            <br>
-                            <br>
-                            {%if form.files.experience_photo_2%}
-                            <input id="uploadImage_2" placeholder="{{form.files.experience_photo_2.name}}" class="uploadImage" disabled="disabled" />
+                            </div>
+
+                            <div>
+                            {%if form.data.experience_photo_2 %}
+                            <input id="uploadImage_2" placeholder="{{form.data.experience_photo_2_file_name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
                             <input id="uploadImage_2" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
                             {%endif%}
@@ -223,13 +359,14 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_2}}
                             </div>
-                            {%if form.files.experience_photo_2%}
-                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_2.name}}" width="100" height="100">
+                            {%if form.data.experience_photo_2 %}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.data.experience_photo_2_file_name}}" width="100" height="100">
                             {%endif%}
-                            <br>
-                            <br>
-                            {%if form.files.experience_photo_3%}
-                            <input id="uploadImage_3" placeholder="{{form.files.experience_photo_3.name}}" class="uploadImage" disabled="disabled" />
+                            </div>
+
+                            <div>
+                            {%if form.data.experience_photo_3 %}
+                            <input id="uploadImage_3" placeholder="{{form.data.experience_photo_3_file_name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
                             <input id="uploadImage_3" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
                             {%endif%}
@@ -237,13 +374,14 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_3}}
                             </div>
-                            {%if form.files.experience_photo_3%}
-                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_3.name}}" width="100" height="100">
+                            {%if form.data.experience_photo_3 %}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.data.experience_photo_3_file_name}}" width="100" height="100">
                             {%endif%}
-                            <br>
-                            <br>
-                            {%if form.files.experience_photo_4%}
-                            <input id="uploadImage_4" placeholder="{{form.files.experience_photo_4.name}}" class="uploadImage" disabled="disabled" />
+                            </div>
+
+                            <div>
+                            {%if form.data.experience_photo_4 %}
+                            <input id="uploadImage_4" placeholder="{{form.data.experience_photo_4_file_name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
                             <input id="uploadImage_4" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
                             {%endif%}
@@ -251,13 +389,14 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_4}}
                             </div>
-                            {%if form.files.experience_photo_4%}
-                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_4.name}}" width="100" height="100">
+                            {%if form.data.experience_photo_4 %}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.data.experience_photo_4_file_name}}" width="100" height="100">
                             {%endif%}
-                            <br>
-                            <br>
-                            {%if form.files.experience_photo_5%}
-                            <input id="uploadImage_5" placeholder="{{form.files.experience_photo_5.name}}" class="uploadImage" disabled="disabled" />
+                            </div>
+
+                            <div>
+                            {%if form.data.experience_photo_5 %}
+                            <input id="uploadImage_5" placeholder="{{form.data.experience_photo_5_file_name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
                             <input id="uploadImage_5" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
                             {%endif%}
@@ -265,13 +404,14 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_5}}
                             </div>
-                            {%if form.files.experience_photo_5%}
-                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_5.name}}" width="100" height="100">
+                            {%if form.data.experience_photo_5 %}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.data.experience_photo_5_file_name}}" width="100" height="100">
                             {%endif%}
-                            <br>
-                            <br>
-                            {%if form.files.experience_photo_6%}
-                            <input id="uploadImage_6" placeholder="{{form.files.experience_photo_6.name}}" class="uploadImage" disabled="disabled" />
+                            </div>
+
+                            <div>
+                            {%if form.data.experience_photo_6 %}
+                            <input id="uploadImage_6" placeholder="{{form.data.experience_photo_6_file_name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
                             <input id="uploadImage_6" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
                             {%endif%}
@@ -279,13 +419,14 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_6}}
                             </div>
-                            {%if form.files.experience_photo_6%}
-                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_6.name}}" width="100" height="100">
+                            {%if form.data.experience_photo_6 %}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.data.experience_photo_6_file_name}}" width="100" height="100">
                             {%endif%}
-                            <br>
-                            <br>
-                            {%if form.files.experience_photo_7%}
-                            <input id="uploadImage_7" placeholder="{{form.files.experience_photo_7.name}}" class="uploadImage" disabled="disabled" />
+                            </div>
+
+                            <div>
+                            {%if form.data.experience_photo_7 %}
+                            <input id="uploadImage_7" placeholder="{{form.data.experience_photo_7_file_name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
                             <input id="uploadImage_7" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
                             {%endif%}
@@ -293,13 +434,14 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_7}}
                             </div>
-                            {%if form.files.experience_photo_7%}
-                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_7.name}}" width="100" height="100">
+                            {%if form.data.experience_photo_7 %}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.data.experience_photo_7_file_name}}" width="100" height="100">
                             {%endif%}
-                            <br>
-                            <br>
-                            {%if form.files.experience_photo_8%}
-                            <input id="uploadImage_8" placeholder="{{form.files.experience_photo_8.name}}" class="uploadImage" disabled="disabled" />
+                            </div>
+
+                            <div>
+                            {%if form.data.experience_photo_8 %}
+                            <input id="uploadImage_8" placeholder="{{form.data.experience_photo_8_file_name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
                             <input id="uploadImage_8" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
                             {%endif%}
@@ -307,13 +449,14 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_8}}
                             </div>
-                            {%if form.files.experience_photo_8%}
-                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_8.name}}" width="100" height="100">
+                            {%if form.data.experience_photo_8 %}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.data.experience_photo_8_file_name}}" width="100" height="100">
                             {%endif%}
-                            <br>
-                            <br>
-                            {%if form.files.experience_photo_9%}
-                            <input id="uploadImage_9" placeholder="{{form.files.experience_photo_9.name}}" class="uploadImage" disabled="disabled" />
+                            </div>
+
+                            <div>
+                            {%if form.data.experience_photo_9 %}
+                            <input id="uploadImage_9" placeholder="{{form.data.experience_photo_9_file_name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
                             <input id="uploadImage_9" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
                             {%endif%}
@@ -321,13 +464,14 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_9}}
                             </div>
-                            {%if form.files.experience_photo_9%}
-                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_9.name}}" width="100" height="100">
+                            {%if form.data.experience_photo_9 %}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.data.experience_photo_9_file_name}}" width="100" height="100">
                             {%endif%}
-                            <br>
-                            <br>
-                            {%if form.files.experience_photo_10%}
-                            <input id="uploadImage_10" placeholder="{{form.files.experience_photo_10.name}}" class="uploadImage" disabled="disabled" />
+                            </div>
+
+                            <div>
+                            {%if form.data.experience_photo_10 %}
+                            <input id="uploadImage_10" placeholder="{{form.data.experience_photo_10_file_name}}" class="uploadImage" disabled="disabled" />
                             {%else%}
                             <input id="uploadImage_10" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
                             {%endif%}
@@ -335,9 +479,10 @@
                                 <span>Choose File</span>
                                 {{form.experience_photo_10}}
                             </div>
-                            {%if form.files.experience_photo_10%}
-                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.files.experience_photo_10.name}}" width="100" height="100">
+                            {%if form.data.experience_photo_10 %}
+                            <img src="{{ MEDIA_URL }}experiences/{{form.id.value}}/{{form.data.experience_photo_10_file_name}}" width="100" height="100">
                             {%endif%}
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -356,6 +501,19 @@
 </body>
 
 <script charset="utf-8" type="text/javascript">
+
+    var _fill_hosts_price = function() {
+        dynamicPrices = $("#id_dynamic_price").val();
+    }
+
+    var _generate_payment = function(hostPriceId) {
+        hostPrice = parseFloat($(hostPriceId).val());
+        COMMISSION_PERCENT = parseFloat($("#COMMISSION_PERCENT").val());
+        STRIPE_PRICE_PERCENT = parseFloat($("#STRIPE_PRICE_PERCENT").val());
+        STRIPE_PRICE_FIXED = parseFloat($("#STRIPE_PRICE_FIXED").val());
+
+        return Math.round((hostPrice*(1.00+COMMISSION_PERCENT)*(1.00+STRIPE_PRICE_PERCENT) + STRIPE_PRICE_FIXED));
+    }
 
     $(document).ready(function(){
         //$("#repeat_frequency_label").text("Hours");
@@ -378,6 +536,38 @@
         $("#id_dress_code").attr("rows", 3);
         $("#id_meetup_spot").attr("rows", 5);
 
+        minGuestNumber = $("#id_guest_number_min").val();
+        maxGuestNumber = $("#id_guest_number_max").val();
+
+        if(parseInt(minGuestNumber) <= parseInt(maxGuestNumber)) 
+        {
+            for(var i=1;i<=10;i++)
+            {
+                if(i<minGuestNumber)
+                {
+                    $("#dynamicPriceGuest"+i).prop("readonly", true);
+                    $("#dynamicPriceHost"+i).prop("readonly", true);
+                    $("#dynamicPriceHost"+i).css("border", "0");
+                    $("#dynamicPriceGuest"+i).css("border", "0");
+                }
+                else if(i<=maxGuestNumber)
+                {
+                    $("#dynamicPricingrow"+i).css("display", "");
+                    $("#dynamicPriceGuest"+i).prop("readonly", false);
+                    $("#dynamicPriceHost"+i).prop("readonly", false);
+                    $("#dynamicPriceHost"+i).css("border", "1px solid");
+                    $("#dynamicPriceGuest"+i).css("border", "1px solid");
+                }
+                else
+                    $("#dynamicPricingrow"+i).css("display", "none");
+            }
+        }
+        else
+        {
+            $("#id_guest_number_min").val(this.previousValue);
+            alert("The maximum guest number should not be smaller than the minimum guest number");
+        }
+
         for(i=1;i<11;i++)
         {
             $("#id_experience_photo_"+i).attr("class", "upload");
@@ -395,6 +585,12 @@
             })
         }
 
+        var looptime = parseInt($("#dynamicPricingItemNumber").val());
+        for (i=1;i<looptime+1;i++)
+        {
+             $("#dynamicPriceGuest"+i).val( _generate_payment(("#dynamicPriceHost"+i)));
+        }
+        _fill_hosts_price();
         $("#id_host_image").attr("class", "upload");
     })
 
@@ -419,7 +615,6 @@
     })
 */
 
-
     $("#id_price").keyup(function()
     {
         var price = parseFloat($("#id_price").val());
@@ -429,7 +624,6 @@
         }
     })
 
-
     $("#id_price_with_booking_fee").keyup(function()
     {
         var price = parseFloat($("#id_price_with_booking_fee").val());
@@ -438,5 +632,145 @@
             $("#id_price").val(((price-0.0)/(1.429*1.000)).toFixed(2));
         }
     })
+
+    $("#id_guest_number_min").on("focus", function() {
+        this.previousValue = this.value;
+    }).change(function() {
+        maxGuestNumber = $("#id_guest_number_max").val();
+        minGuestNumber = this.value;
+
+        if(parseInt(minGuestNumber) <= parseInt(maxGuestNumber)) {
+
+            for(var i=1;i<=10;i++)
+            {
+                if(i<minGuestNumber)
+                {
+                    $("#dynamicPriceGuest"+i).prop("readonly", true);
+                    $("#dynamicPriceHost"+i).prop("readonly", true);
+                    $("#dynamicPriceHost"+i).css("border", "0");
+                    $("#dynamicPriceGuest"+i).css("border", "0");
+                }
+                else if(i<=maxGuestNumber)
+                {
+                    $("#dynamicPricingrow"+i).css("display", "");
+                    $("#dynamicPriceGuest"+i).prop("readonly", false);
+                    $("#dynamicPriceHost"+i).prop("readonly", false);
+                    $("#dynamicPriceHost"+i).css("border", "1px solid");
+                    $("#dynamicPriceGuest"+i).css("border", "1px solid");
+                }
+                else
+                    $("#dynamicPricingrow"+i).css("display", "none");
+            }
+        }
+        else
+        {
+            $("#id_guest_number_min").val(this.previousValue);
+            alert("The maximum guest number should not be smaller than the minimum guest number");
+        }  
+    });
+
+    $("#id_guest_number_max").on("focus", function() {
+        this.previousValue = this.value;
+    }).change(function() {
+        minGuestNumber = $("#id_guest_number_min").val();
+        maxGuestNumber = this.value;
+
+        if(parseInt(minGuestNumber) <= parseInt(maxGuestNumber)) {
+
+            for(var i=1;i<=10;i++)
+            {
+                if(i<minGuestNumber)
+                {
+                    $("#dynamicPriceGuest"+i).prop("readonly", true);
+                    $("#dynamicPriceHost"+i).prop("readonly", true);
+                    $("#dynamicPriceHost"+i).css("border", "0");
+                    $("#dynamicPriceGuest"+i).css("border", "0");
+                }
+                else if(i<=maxGuestNumber)
+                {
+                    $("#dynamicPricingrow"+i).css("display", "");
+                    $("#dynamicPriceGuest"+i).prop("readonly", false);
+                    $("#dynamicPriceHost"+i).prop("readonly", false);
+                    $("#dynamicPriceHost"+i).css("border", "1px solid");
+                    $("#dynamicPriceGuest"+i).css("border", "1px solid");
+                }
+                else
+                    $("#dynamicPricingrow"+i).css("display", "none");
+            }
+        }
+        else
+        {
+            $("#id_guest_number_min").val(this.previousValue);
+            alert("The maximum guest number should not be smaller than the minimum guest number");
+        }
+
+    });
+
+    function auto_generate_payment_to_host(id, price) {
+
+    }
+
+    function auto_generate_payment_of_guest_smaller_min(price, id) {
+        minGuestNumber = $("#id_guest_number_min").val();
+        COMMISSION_PERCENT = parseFloat($("#COMMISSION_PERCENT").val());
+        STRIPE_PRICE_PERCENT = parseFloat($("#STRIPE_PRICE_PERCENT").val());
+        STRIPE_PRICE_FIXED = parseFloat($("#STRIPE_PRICE_FIXED").val());
+        if(parseInt(minGuestNumber) === parseInt(id)) {
+            for (var i = 1; i < id; i++) {
+                var guestInput = document.getElementById("dynamicPriceGuest" + i);
+                var hostInput = document.getElementById("dynamicPriceHost" + i);
+                guestInput.value = (price * id / i).toFixed(0);
+            }
+        }
+    }
+
+    function auto_generate_payment_of_guest(id) {
+        var guestInput = document.getElementById("dynamicPriceGuest"+id);
+        var hostInput = document.getElementById("dynamicPriceHost"+id);
+        COMMISSION_PERCENT = parseFloat($("#COMMISSION_PERCENT").val());
+        STRIPE_PRICE_PERCENT = parseFloat($("#STRIPE_PRICE_PERCENT").val());
+        STRIPE_PRICE_FIXED = parseFloat($("#STRIPE_PRICE_FIXED").val());
+        guestPay = (parseFloat(hostInput.value)*(1.00+COMMISSION_PERCENT)*(1.00+STRIPE_PRICE_PERCENT) + STRIPE_PRICE_FIXED).toFixed(2);
+        guestInput.value = guestPay;
+        auto_generate_income_of_host_smaller_min(hostInput.value, id);
+        auto_generate_payment_of_guest_smaller_min(guestPay,id);
+    }
+
+    function auto_generate_income_of_host_smaller_min(price, id) {
+        minGuestNumber = $("#id_guest_number_min").val();
+        COMMISSION_PERCENT = parseFloat($("#COMMISSION_PERCENT").val());
+        STRIPE_PRICE_PERCENT = parseFloat($("#STRIPE_PRICE_PERCENT").val());
+        STRIPE_PRICE_FIXED = parseFloat($("#STRIPE_PRICE_FIXED").val());
+        if(parseInt(minGuestNumber) === parseInt(id))
+            for(var i=1; i<id;i++) {
+                var guestInput = document.getElementById("dynamicPriceGuest"+i);
+                var hostInput = document.getElementById("dynamicPriceHost"+i);
+                hostInput.value = (price*id/i).toFixed(0);
+            }
+    }
+
+    function auto_generate_income_of_host(id) {
+        var guestInput = document.getElementById("dynamicPriceGuest"+id);
+        var hostInput = document.getElementById("dynamicPriceHost"+id);
+        COMMISSION_PERCENT = parseFloat($("#COMMISSION_PERCENT").val());
+        STRIPE_PRICE_PERCENT = parseFloat($("#STRIPE_PRICE_PERCENT").val());
+        STRIPE_PRICE_FIXED = parseFloat($("#STRIPE_PRICE_FIXED").val());
+        hostIcome = (parseFloat(guestInput.value)/(1.00+COMMISSION_PERCENT)*(1.00+STRIPE_PRICE_PERCENT) + STRIPE_PRICE_FIXED).toFixed(2);
+        hostInput.value = hostIcome;
+        auto_generate_income_of_host_smaller_min(hostIcome, id);
+        auto_generate_payment_of_guest_smaller_min(guestInput.value,id);
+    }
+
+    $(document).submit(function(){
+        var dynamic_prices = "";
+        for(var i=1;i<=10;i++) {
+            if ($("#dynamicPriceHost" + i).val()) {
+                dynamic_prices = dynamic_prices + $("#dynamicPriceHost" + i).val() + ",";
+            } else {
+                break;
+            }
+        }
+        $("#id_dynamic_price").val(dynamic_prices);
+    });
 </script>
 </html>

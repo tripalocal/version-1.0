@@ -51,3 +51,13 @@ class Message(models.Model):
     datetime_read = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=20)
     content = models.TextField()
+
+class UserPhoto(models.Model):
+    def upload_path(self, name):
+        return self.directory + self.name
+
+    name = models.CharField(max_length=50)
+    directory = models.CharField(max_length=50)
+    image = models.ImageField(upload_to=upload_path)
+    user = models.ForeignKey(User)
+    type = models.CharField(max_length=50)

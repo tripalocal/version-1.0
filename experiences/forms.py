@@ -787,8 +787,8 @@ class CreateExperienceForm(forms.Form):
     host_image = forms.ImageField(required = False)
     host_bio = forms.CharField(widget=forms.Textarea, required = False)
     language = forms.ChoiceField(choices=Language)
-    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
-    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    #start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    #end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     #repeat_cycle = forms.ChoiceField(choices=Repeat_Cycle)
     #repeat_frequency = forms.ChoiceField(choices=Repeat_Frequency)
     title = forms.CharField()
@@ -820,6 +820,21 @@ class CreateExperienceForm(forms.Form):
     experience_photo_8 = forms.ImageField(required = False)
     experience_photo_9 = forms.ImageField(required = False)
     experience_photo_10 = forms.ImageField(required = False)
+    host_id_photo_1 = forms.ImageField(required = False)
+    host_id_photo_2 = forms.ImageField(required = False)
+    host_id_photo_3 = forms.ImageField(required = False)
+    host_id_photo_4 = forms.ImageField(required = False)
+    host_id_photo_5 = forms.ImageField(required = False)
+    dynamic_price = forms.CharField(widget=forms.HiddenInput, required = False)
+    phone_number = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super(CreateExperienceForm, self).__init__(*args, **kwargs)
+        self.fields['host_id_photo_1'].widget.attrs['class'] = 'upload'
+        self.fields['host_id_photo_2'].widget.attrs['class'] = 'upload'
+        self.fields['host_id_photo_3'].widget.attrs['class'] = 'upload'
+        self.fields['host_id_photo_4'].widget.attrs['class'] = 'upload'
+        self.fields['host_id_photo_5'].widget.attrs['class'] = 'upload'
 
 def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
