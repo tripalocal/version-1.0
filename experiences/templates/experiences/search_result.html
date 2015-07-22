@@ -9,8 +9,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="{% static 'experiences/content/tripalocal_search.css' %}" rel="stylesheet">
-    <link href="{% static 'experiences/content/search_result.css' %}" rel="stylesheet">
-    <title>Discover {{ city_display_name }}</title>
+    <link href="{% static 'experiences/content/tripalocal_search_async.css' %}" rel="stylesheet">
+    <title>{%trans "Discover" %} {{ city_display_name }}</title>
 {%endblock%}
 
 {% block content %} 
@@ -22,7 +22,7 @@
                     <div class="dates">
                         <div class="iconHeader">
                             <div class="iconImage" id="date"></div>
-                            <div class="iconText">Dates</div>
+                            <div class="iconText">{%trans "Dates" %}</div>
                         </div> 
                         <div class="formBoxes">
                             {{form.city}}
@@ -41,7 +41,7 @@
                         <div class="iconHeader"> 
                             <div class="iconImage" id="people">
                             </div>
-                            <div class="iconText">People
+                            <div class="iconText">{%trans "People"%}
                             </div>
                         </div>
                         <div class="formBoxes">{{form.guest_number}}
@@ -55,7 +55,7 @@
                         <div class="iconHeader">
                             <div class="iconImage" id="language">
                             </div>
-                            <div class="iconText">Language
+                            <div class="iconText">{%trans "Language"%}
                             </div>
                         </div> 
 
@@ -63,7 +63,7 @@
                             {{form.language}} 
                             <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
                             <br> 
-                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:10px;">中文</label> 
+                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:18px;">中文</label> 
                         </div>
                     </div>
 
@@ -71,7 +71,8 @@
                     </div>
 
                     <div id="searchButton">
-                        <input class="btn-block btn btn-default" style="padding-bottom:25px; width:100px;" id="itinerary-search" type="submit" value="Search" name="Search">
+                        <!--<input id="auto_update" type="checkbox" class="css-checkbox" ><label id="auto_update_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin:5px 0 15px 0;font-weight:normal">{% trans "Auto update"%}</label>-->
+                        <input class="btn-block btn btn-default" style="padding-bottom:25px; width:100px;" id="itinerary-search" type="submit" value="{% trans "Update" %}" name="{% trans "Search" %}"> 
                     </div>
                     <div id="itinerary-search-button">
                     </div>
@@ -79,13 +80,13 @@
             </div>
         </div>
         <div class="advanceSearch notOnMobile" id="optional_criteria_div" style="display:none;">
-            <div class="row">
+            <div class="row" style="background-color:white;padding-bottom:10px">
                 <div class="fixCenter">
                     <div class="interests">
                         <div class="iconHeader">
                             <div class="iconImage" id="interests">
                             </div>
-                            <div class="iconText">Interests
+                            <div class="iconText">{%trans "Interests"%}
                             </div>
                         </div>
 
@@ -97,24 +98,24 @@
                             {{ form.is_kids_friendly }}
                             <label for="{{ form.is_kids_friendly.id_for_label }}"
                                    class="css-label lite-cyan-check only-tag-label">
-                                Kids friendly only</label>
+                                {%trans "Kids friendly only"%}</label>
 
                             {{ form.is_host_with_cars }}
                             <label for="{{ form.is_host_with_cars.id_for_label }}"
                                    class="css-label lite-cyan-check only-tag-label">
-                                Hosts with cars only</label>
+                                {%trans "Hosts with cars only"%}</label>
 
                             {{ form.is_private_tours }}
                             <label for="{{ form.is_private_tours.id_for_label }}"
                                    class="css-label lite-cyan-check only-tag-label">
-                                Private tours only</label>
+                                {%trans "Private tours only"%}</label>
                         </div>
                     </div>
                 </div>      
             </div>
         </div>
         <div class="mobileSearch notOnDesktop">  
-            <h1 style="float:left;margin:15px 20px -10px 20px">Melbourne, VIC</h1>  
+            <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>  
             <img src="/images/search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">  
         </div>  
     </form>
@@ -123,18 +124,19 @@
     	<div class="row">
             <div class="fixCenter">
                 <div id="more-filters-div" class="notOnMobile">
-                    <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:100px;float:left;">More Filters</button>
-                    <div id="ajax-experience-count"></div>
+                    <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:100px;float:left;margin-right:20px;">{%trans "More Filters" %}</button>
+                    <button class="btn-block btn btn-primary" id="apply_filters" type="button" value="Apply Filters" style="width:100px;display:none">{% trans "Apply Filters" %}</button>
+                    <div id="ajax-experience-count" style="position:relative;"></div>
                 </div>
                 <div id="experience-box" class="expBox">
                     <div id="overlay"></div>
                     <div id="ajax-experience-result"></div>
                     <div class="expList">
                         <div class="listingImg" style="background-image:url({{MEDIA_URL}}request.jpg);"></div>
-                        <h3>Can't find the experience you Want?</h3>
+                        <h3>{%trans "Can't find the experience you Want?" %}</h3>
                         <div class="profile-sm" style="background:url({{MEDIA_URL}}profile_default.jpg) no-repeat; background-size:cover; background-position:center;"></div>
-                        <p style="overflow-y:hidden; height:100px">Email us at <a href="mailto:enquiries@tripalocal.com">enquiries@tripalocal.com</a> with the preferred experience, the dates and times and we will get back to you within 48 hours with a customised experience just for you!</p>
-                        <div class="listingFooter">We offer exclusive experiences with private groups</div>
+                        <p style="overflow-y:hidden; height:100px">{%trans "Email us at "%}<a href="mailto:enquiries@tripalocal.com">enquiries@tripalocal.com</a> {%trans "with the preferred experience, the dates and times and we will get back to you within 48 hours with a customised experience just for you!"%}</p>
+                        <div class="listingFooter">{%trans "We offer exclusive experiences with private groups"%}</div>
                     </div>
                 </div>       
             </div>
@@ -238,7 +240,7 @@
             }
             else
             {
-                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\"><img src='/images/closeIcon-02.svg' width='10'></button></div>";
+                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url(/images/closeIcon-02.svg)\"></button></div>";
             }
 
             $("#tags_div").append(new_tag);
@@ -247,14 +249,14 @@
                 id = e.target.id.split("_")[2];
                 if($("#tag_"+id).attr("class") == "tag-selected")
                 {
-                    $("#tag_button_"+id).html("&#10003");
+                    $("#tag_button_"+id).css("background-image","url(/images/undo.svg)");
                     $("#tag_"+id).attr("class", "tag-non-selected");
                     $("#tag_box_"+id).removeClass("tag-box-selected");
                     $("#tag_box_"+id).addClass("tag-box-unselected");
                 }
                 else
                 {
-                    $("#tag_button_"+id).html("&#10007");
+                    $("#tag_button_"+id).css("background-image","url(/images/closeIcon-02.svg)");
                     $("#tag_"+id).attr("class", "tag-selected");
                     $("#tag_box_"+id).removeClass("tag-box-unselected");
                     $("#tag_box_"+id).addClass("tag-box-selected");
@@ -345,13 +347,19 @@
         if(tags_div.css("display")=="none")
         {
             tags_div.show();
-            $("#more_filters").text("Less Filters");
+            $("#more_filters").text("Cancel");
+            $("#apply_filters").show();
         }
         else
         {
             tags_div.hide();
             $("#more_filters").text("More Filters");
+            $("#apply_filters").hide();
         }
+    });
+
+    $("#apply_filters").click(function(e){
+        $("#itinerary-search").click();
     });
 </script>
 {% endblock %}

@@ -28,7 +28,7 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.core.files.storage import FileSystemStorage
 from PIL import Image
 from django.template.defaultfilters import filesizeformat
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, string_concat
 from post_office import mail
 from collections import OrderedDict
 
@@ -2026,7 +2026,7 @@ def update_booking(id, accepted, user):
 
             #send an email to the traveller
             mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                      sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
                       recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
                       priority='now',  #fail_silently=False, 
                       html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
@@ -2037,7 +2037,7 @@ def update_booking(id, accepted, user):
 
             #schedule an email to the traveller one day before the experience
             mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                      sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
                       recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
                       priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
                       html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
@@ -2048,7 +2048,7 @@ def update_booking(id, accepted, user):
             
             #schedule an email to the host one day before the experience
             mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
+                      sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=guest.email)[0].mail, '>'),
                       recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                       priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
                       html_message=loader.render_to_string('experiences/email_reminder_host.html',
@@ -2070,7 +2070,7 @@ def update_booking(id, accepted, user):
 
             #send an email to the host
             mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
+                      sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=guest.email)[0].mail, '>'),
                       recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                       priority='now',  #fail_silently=False, 
                       html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
@@ -2135,7 +2135,7 @@ def update_booking(id, accepted, user):
                 booking.save()
                 #send an email to the traveller
                 mail.send(subject=_('[Tripalocal] Your experience is cancelled'), message='', 
-                          sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                          sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
                           recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail],
                           priority='now',  #fail_silently=False, 
                           html_message=loader.render_to_string('experiences/email_booking_cancelled_traveler.html',
@@ -2145,7 +2145,7 @@ def update_booking(id, accepted, user):
                                                                 'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
                 #send an email to the host
                 mail.send(subject=_('[Tripalocal] Cancellation confirmed'), message='', 
-                          sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
+                          sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=guest.email)[0].mail, '>'),
                           recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                           priority='now',  #fail_silently=False, 
                           html_message=loader.render_to_string('experiences/email_booking_cancelled_host.html',

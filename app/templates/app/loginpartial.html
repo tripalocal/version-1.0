@@ -1,5 +1,6 @@
 {% block head %}
     {% load staticfiles %}
+    {% load i18n %}
     <link href="{% static 'app/content/signup_login.css' %}" rel="stylesheet">    
 {% endblock %}
 
@@ -15,7 +16,7 @@
 </form>-->
 <ul class="menu">
     <li><a id="id_language_top" class="menu-language">中文</a></li>
-    <li><a href="/accounts/logout/">Log out</a></li>
+    <li><a href="/accounts/logout/">{% trans "Log out" %}</a></li>
     <li>{{ user.first_name }}</li>
     <li>
         <div class="profile-xs" id="id_profile_div">
@@ -28,31 +29,30 @@
 <div class = "menu-host" id="id_menu" hide="true" style="display:none;">
     <div class = "menuhost-top">
         <ul>
-            <li><a href="/mylisting">My Listing</a></li>
-            <li><a href="/myreservation">My Reservations</a></li>
+            <li><a href="/mylisting">{% trans "My Listing" %}</a></li>
+            <li><a href="/myreservation">{% trans "My Reservations" %}</a></li>
         </ul>
     </div>
     <div class = "menuhost-middle">
         <ul>
             <li><span class = "menutrip-logo"></span></li>
-            <li><a href="/mytrip">My Trip</a></li>
+            <li><a href="/mytrip">{% trans "My Trip" %}</a></li>
         </ul>
     </div>
     <div class = "menuhost-bottom">
         <ul>
-            <li><a href="/myprofile">Edit Profile</a></li>
-            <li><a href="/accounts/password/change/">Account Settings</a></li>
-            <li><a href="/accounts/logout/">Log out</a></li>
+            <li><a href="/myprofile">{% trans "Edit Profile" %}</a></li>
+            <li><a href="/accounts/password/change/">{% trans "Account Settings" %}</a></li>
+            <li><a href="/accounts/logout/">{% trans "Log out" %}</a></li>
         </ul>
     </div>
  </div>
-
 {% else %}
 
 <ul class="menu">
     <li><a id="id_language_top" class="home-language">中文</a></li>
-    <li><a href="/accounts/signup/?next={{ request.path }}">Sign up</a></li>
-    <li><a href="/accounts/login/?next={{ request.path }}">Log in</a></li> <!---->
+    <li><a href="/accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></li>
+    <li><a href="/accounts/login/?next={{ request.path }}">{% trans "Log in" %}</a></li> <!---->
 </ul>
 
 {% endif %}

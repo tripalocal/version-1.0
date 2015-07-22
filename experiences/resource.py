@@ -29,7 +29,7 @@ from allauth.socialaccount import providers
 from allauth.socialaccount.models import SocialLogin, SocialToken, SocialApp
 from allauth.socialaccount.providers.facebook.views import fb_complete_login
 from allauth.socialaccount.helpers import complete_social_login
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, string_concat
 from django.views.decorators.csrf import csrf_exempt
 
 GEO_POSTFIX = "/"
@@ -211,7 +211,7 @@ def saveBookingRequest(booking_request):
     host = experience.hosts.all()[0]
     #send an email to the traveller
     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
                 html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
@@ -233,7 +233,7 @@ def saveBookingRequest(booking_request):
 
     #send an email to the host
     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
                 html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
@@ -244,7 +244,7 @@ def saveBookingRequest(booking_request):
 
     #schedule an email to the traveller one day before the experience
     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
                 html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
@@ -255,7 +255,7 @@ def saveBookingRequest(booking_request):
 
     #schedule an email to the host one day before the experience
     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
                 html_message=loader.render_to_string('experiences/email_reminder_host.html',
@@ -580,15 +580,16 @@ def service_search(request, format=None):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_mytrip(request, format=None):
     try:
         user = request.user
-        b = Booking.objects.filter(user=user)
+        booking_status = "paid,accepted,rejected"
+        b = Booking.objects.filter(user=user, status__in=booking_status.split(","))
         cursor = connections[CNDB].cursor()
-        cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s order by datetime',
-                                [request.user.id])
+        cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s and status in (%s) order by datetime',
+                                [request.user.id, booking_status])
         rows = cursor.fetchall()
 
         bookings = []
@@ -679,7 +680,7 @@ def service_acceptreservation(request, format=None):
 
 #{"itinerary_string":[{"id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2},{"id":"20","date":"2015/06/17","time":"17:00 - 20:00","guest_number":2}],"card_number":"4242424242424242","expiration_month":10,"expiration_year":2015,"cvv":123, "coupon":"abcdefgh"}
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_booking(request, format=None):
     try:
@@ -865,6 +866,7 @@ def service_experience(request, format=None):
                          'host_lastname': host.last_name,
                          'host_image':host_image,
                          'host_bio':host_bio,
+                         'host_id':str(host.id),
 
                          'experience_rate':math.ceil(rate),
                          'experience_reviews':experience_reviews,
@@ -894,6 +896,23 @@ def service_myprofile(request, format=None):
             result={'id':user.id, 'first_name':user.first_name, 'last_name':user.last_name, 'email':user.email,
                      'image':user.registereduser.image_url,'phone_number':profile.phone_number,'bio':profile.bio,'rate':profile.rate}
             return Response(result, status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_publicprofile(request,format=None):
+    try:
+        data = request.query_params
+        if type(data) is str:
+            data = ast.literal_eval(data)
+
+        user = User.objects.get(id=data["user_id"])
+        profile = user.registereduser
+        result={'first_name':user.first_name, 'last_name':user.last_name, 'image':user.registereduser.image_url}
+        return Response(result, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)

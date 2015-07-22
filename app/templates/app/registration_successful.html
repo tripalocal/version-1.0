@@ -8,7 +8,7 @@
     {% if form %}
         {{ form.media }}
     {% endif %}
-    <title>Successful Registration</title>
+    <title>{% trans "Successful Registration" %}</title>
 {% endblock %}
 
 {% block content %}
@@ -74,8 +74,8 @@
 											                    <tbody>
 												                    <tr>
 													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                    <h1 style="text-align: center;"><font size="5">Thank you for your confirmation</font></h1>
-														                    <p style="text-align: center;">Your account associate with {{user.email}} is now activated.</p>
+													                    <h1 style="text-align: center;"><font size="5">{% trans "Thank you for your confirmation" %}</font></h1>
+														                    <p style="text-align: center;">{% blocktrans with account_email = user.email%} Your account associate with {{user_email}} is now activated. {% endblocktrans %}</p>
 													                    </td>
 												                    </tr>
 											                    </tbody>
@@ -92,7 +92,7 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <td align="center" valign="middle" class="mcnButtonContent" style="font-family: Arial; font-size: 16px; padding: 16px;">
-                                                                            <a class="mcnButton " title="Show me around" href="/" style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">Show me around</a>
+                                                                            <a class="mcnButton " title="Show me around" href="/" style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">{% trans "Show me around" %}</a>
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>

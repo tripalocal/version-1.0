@@ -111,6 +111,7 @@ urlpatterns = patterns('',
     url(r'^experience_tags_xls/$', 'experiences.resource.updateExperienceTagsFromXLS'),
     url(r'^service_couponverification/$', 'experiences.resource.service_couponverification', name='service_couponverification'),
     url(r'^service_message/$', 'experiences.resource.service_message'),
+    url(r'^service_publicprofile/$', 'experiences.resource.service_publicprofile'),
 
     url(r'^custom_admin/$', superuser_required(BookingView.as_view())),
     url(r'^custom_admin/change_time/(?P<booking_id>\d+)$', superuser_required(BookingView.as_view())),

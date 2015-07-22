@@ -1,8 +1,9 @@
 {% extends "app/layout.html" %}
 {% load staticfiles %}
+{% load i18n %}
 
 {% block head %}
-	<title>My Listing</title>
+	<title>{% trans "My Listing" %}</title>
     <link href="{% static 'app/content/mylisting.css' %}" rel="stylesheet" />
 {% endblock %}
 
@@ -11,10 +12,10 @@
     <div class="tab_area">
         <div class="fixCenter">
             <div class="tab_item">
-                <a href="#" class="firstTabItem" id="active-tab">My Listing</a>
-                <a href="/mytrip">My Trip</a>
-                <a href="/myprofile">My Profile</a>
-                <a href="/accounts/password/change/">My Account</a>
+                <a href="#" class="firstTabItem" id="active-tab">{% trans "My Listing" %}</a>
+                <a href="/mytrip">{% trans "My Trip" %}</a>
+                <a href="/myprofile">{% trans "My Profile" %}</a>
+                <a href="/accounts/password/change/">{% trans "My Account" %}</a>
             </div>
         </div>
     </div>
@@ -22,17 +23,17 @@
 	<div class="row row-area">
     	<div class="content-area fixCenter">
     		<div class="left-nav-box">
-    		    <p>
-                    <a href="#" id="active-tab">Managing Listing</a>
+                <p>
+                    <a href="#" id="active-tab">{% trans "Managing Listing" %}</a>
                 </p>
                 <p>
-                    <a href="/myreservation">My Reservation</a>
+                    <a href="/myreservation">{% trans "My Reservation" %}</a>
                 </p>
             </div>
 
 			<div class="right-content-box">
 		        <div class="right-content-box-header">
-                    <p>All listings</p>
+                    <p>{% trans "All listings" %}</p>
                 </div>
                 <hr>
 		        {% for experience in experiences %}
@@ -41,19 +42,19 @@
                     <div class="listing-status">
                         <p>{{experience.title}}</p>
                         {% if experience.status|title != "Listed" %}
-                        <p id="not-pub">Not Published</p>
+                        <p id="not-pub">{% trans "Not Published" %}</p>
                         {% elif experience.status|title == "Listed" %}
-                        <p id="published">Published</p>
+                        <p id="published">{% trans "Published" %}</p>
                         {% endif %}
                     </div>
                     {% if experience.status|title != "Listed" %}
-                    <a class="btn btn-primary btn-sm" role="button" id="edit-draft" href="/editexperience/calendar?id={{experience.id}}">Edit draft</a>
+                    <a class="btn btn-primary btn-sm" role="button" id="edit-draft" href="/editexperience/calendar?id={{experience.id}}">{% trans "Edit draft" %}</a>
                     {% elif experience.status|title == "Listed" %}
-                    <a class="btn btn-primary btn-sm" role="button" id="update-listing" href="/editexperience/calendar?id={{experience.id}}">Update listing</a>
+                    <a class="btn btn-primary btn-sm" role="button" id="update-listing" href="/editexperience/calendar?id={{experience.id}}">{% trans "Update listing" %}</a>
                     {% endif %}
                 </div>
                 {% empty %}
-                <p style="width:400px;">You have not hosted any experience.</p> 
+                <p style="width:400px;">{% trans "You have not hosted any experience." %}</p>
 		    	{% endfor %}
     		</div>
     	</div>

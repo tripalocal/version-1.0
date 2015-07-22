@@ -124,13 +124,13 @@ def home(request):
             response = reader.city(ip)
             country = response.country.name
             reader.close()
-            #if country.lower() in ['china']:
-            #    return HttpResponseRedirect('/cn')
+            if country.lower() in ['china']:
+                return HttpResponseRedirect('/cn')
         except Exception:
             reader.close()
 
-        #if request.LANGUAGE_CODE.startswith("zh"):
-        #    return HttpResponseRedirect('/cn')
+        if request.LANGUAGE_CODE.startswith("zh"):
+            return HttpResponseRedirect('/cn')
 
     experienceList = Experience.objects.filter(id__in=[1,2,20])
     idxList = random.sample(range(len(experienceList)), 3)

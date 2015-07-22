@@ -30,8 +30,9 @@
 .desBox th {vertical-align: top;padding:20px 0;}
 .reviewBox h2{float:left; margin-right:20px;}
 .rating{color:#FC0; font-size:30px; margin-bottom:20px;}
-.reviewList{border-bottom:#CCC 1px solid; padding:20px 0px;overflow: hidden;	width: 100%;}
-.reviewText {float:right; width:480px;}
+.reviewList{border-bottom:#CCC 1px solid; padding:20px 0px;overflow: hidden; width: 100%;}
+.reviewList .profile-md{position: absolute}
+.reviewText {float:right; width:480px; min-height: 100px;}
 .reviewDate{color:#999; margin-top:12px;}
 .experience-detail-table-td {padding-top:20px;padding-bottom:20px;}
 .carousel-indicators li{width:12px;height:12px;margin:0 5px;background-color:#CCC;border-radius:15px;border-color: transparent;}
@@ -50,7 +51,7 @@
 .gradientMask{background-image: url(/images/gradientMask.png);width: 100%;position: absolute;bottom:0px;height:46px;}
 #bio_show_more {margin-top: 140px;color:#3cc;}
 .host-socialmedia{padding-top: 10px;padding-left: 40px;}
-.host-trust {position:relative;float:left;margin-right:120px;}
+.host-trust {position:relative;float:left;margin-right:90px;}
 .host-socialmedia span{display: block;color: #666666;}
 .host-facebook,.host-instagram,.host-mobile,.host-review{width: 180px;height: 80px;float: left;border-radius: 3px;margin: 0;}
 .host-facebook,.host-instagram,.host-mobile,.host-review{margin-left: 1vw;padding-top: 5px;padding-left: 5px;}
@@ -246,15 +247,25 @@ a {color:#6CC;} a:hover{color:#699;}
 }
 
 @media (max-width: 767px) {
-
+    .desBox, .reviewBox, .bioBox {
+        width: 80%;
+         float: none; 
+    }
+    .desBox {
+        margin-top: 30px;
+    }
+    .bookingBox {
+        float: none;
+    }
     .stickit{
         position: relative;
+        padding-top: 0;
     }  
     .desBox table th{
         width:25%;
     }
     .fixCenter li {
-        margin-bottom: 0;
+        margin-bottom: 0 !important;
     }
     #carousel_box{
         height: 500px;
@@ -266,12 +277,15 @@ a {color:#6CC;} a:hover{color:#699;}
     .experinence-host {
         width: 100%;
     }
-
+    .expList{
+        width: 100%;
+    }
     .experience-hostinterests {
         width: 60%   
     }
     #experinence-host-container{
-        width: 100%
+        width: 100%;
+        overflow: hidden;
     }
     .host-facebook, .host-instagram, .host-mobile, .host-review {
         width: 100px;
@@ -295,10 +309,11 @@ a {color:#6CC;} a:hover{color:#699;}
         text-align: left;
         width:60%;
         margin-left: 140px;
+        float: none;
     }
 }
 
-@media (max-width: 550px) {
+@media (max-width: 639px) {
     #carousel_box{
         height: 350px;
     }

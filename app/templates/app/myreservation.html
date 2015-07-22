@@ -1,8 +1,9 @@
 {% extends "app/layout.html" %}
 {% load staticfiles %}
+{% load i18n %}
 
 {% block head %}
-	<title>My Reservations</title>
+	<title>{% trans "My Reservations" %}</title>
     <link href="{% static 'app/content/myreservation.css' %}" rel="stylesheet"/>
 {% endblock %}
 
@@ -11,10 +12,10 @@
     <div class="tab_area">
         <div class="fixCenter">
             <div class="tab_item">
-                <a href="#" class="firstTabItem" id="active-tab">My Listing</a>
-                <a href="/mytrip">My Trip</a>
-                <a href="/myprofile">My Profile</a>
-                <a href="/accounts/password/change/">My Account</a>
+                <a href="#" class="firstTabItem" id="active-tab">{% trans "My Listing" %}</a>
+                <a href="/mytrip">{% trans "My Trip" %}</a>
+                <a href="/myprofile">{% trans "My Profile" %}</a>
+                <a href="/accounts/password/change/">{% trans "My Account" %}</a>
             </div>
         </div>
     </div>
@@ -23,16 +24,16 @@
     	<div class="content-area fixCenter">
     		<div class="left-nav-box">
     		    <p>
-                    <a href="/mylisting">Managing Listing</a>
+                    <a href="/mylisting">{% trans "Managing Listing" %}</a>
                 </p>
                 <p>
-                    <a href="#" id="active-tab">My Reservation</a>
+                    <a href="#" id="active-tab">{% trans "My Reservation" %}</a>
                 </p>
             </div>
 
 			<div class="right-content-box" style="padding:0px;">
 		        <div class="right-content-box-header">
-                    <p class="right-content-box-heading">My Reservation</p>
+                    <p class="right-content-box-heading">{% trans "My Reservation" %}</p>
                 </div>
 
 		        {% for reservation in current_reservations %}
@@ -61,27 +62,27 @@
                         <div class="reservation-info">
                             {% if reservation.booking_status|title == "Accepted" %}
                             <div class="reservation-status" id="booked">
-                                <p>Booked</p>
+                                <p>{% trans "Booked" %}</p>
                             </div>
                             {% elif reservation.booking_status|title == "Paid" %}
                             <div>
-                                <p class="reservation-status" id="pending">Pending</p>
-                                <p class="pending-reminder">-Please check your email</p>
+                                <p class="reservation-status" id="pending">{% trans "Pending" %}</p>
+                                <p class="pending-reminder">{% trans "-Please check your email" %}</p>
                             </div>
                             {% elif reservation.booking_status|title == "Rejected" %}
                             <div class="reservation-status" id="canceled">
-                                <p>Cancelled</p>
+                                <p>{% trans "Cancelled" %}</p>
                             </div>
                             {% endif %}
                             <p class="reservation-info-position" style="max-width:200px;">
                                 <span id="highlighted">{{reservation.experience_title}}</span><br>
-                                with <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span><span> ({{reservation.guest_phone_number}})</span><br>
-                                from {{reservation.payment_city}}, {{reservation.payment_country}}
+                                {% trans "with" %} <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span><span> ({{reservation.guest_phone_number}})</span><br>
+                                {% trans "from" %} {{reservation.payment_city}}, {{reservation.payment_country}}
                             </p>
                         </div>
                         <div class="add-note" style="display:none;">
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="+ Add a note">
+                                <input type="text" class="form-control" placeholder="{% trans "+ Add a note" %}">
                             </div>
                         </div>
                     </div>
@@ -91,7 +92,7 @@
 
             <div class="right-content-box" id="completed-reservation">
 		        <div class="right-content-box-header">
-                    <p class="right-content-box-heading">Past Reservation</p>
+                    <p class="right-content-box-heading">{% trans "Past Reservation" %}</p>
                 </div>
 
 		        {% for reservation in past_reservations %}
@@ -120,19 +121,19 @@
                         <div class="reservation-info">
                             {% if reservation.booking_status|title == "Accepted" %}
                             <div class="reservation-status" id="completed">
-                                <p>Completed</p>
+                                <p>{% trans "Completed" %}</p>
                             </div>
                             {% else %}
                             <div class="reservation-status" id="canceled">
-                                <p>Cancelled</p>
+                                <p>{% trans "Cancelled" %}</p>
                             </div>
                             {% endif %}
                         
                             <p class="reservation-info-position">
                                 <span id="highlighted">{{reservation.experience_title}}</span></br>
-                                with 
+                                {% trans "with" %} 
                                 <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span>
-                                in {{reservation.experience_city}}
+                                {% trans "in" %} {{reservation.experience_city}}
                             </p>
                         </div>
                     </div>
