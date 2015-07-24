@@ -680,7 +680,7 @@ def service_acceptreservation(request, format=None):
 
 #{"itinerary_string":[{"id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2},{"id":"20","date":"2015/06/17","time":"17:00 - 20:00","guest_number":2}],"card_number":"4242424242424242","expiration_month":10,"expiration_year":2015,"cvv":123, "coupon":"abcdefgh"}
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_booking(request, format=None):
     try:
@@ -797,6 +797,7 @@ def service_couponverification(request, format=None):
 
     return Response(result, status=status.HTTP_200_OK)
 
+#TODO: change to GET
 @api_view(['POST'])
 @csrf_exempt
 def service_experience(request, format=None):
@@ -856,6 +857,84 @@ def service_experience(request, format=None):
 
                          'available_options':available_options,
                          'available_date':available_date,
+
+                         'included_food':included_food.included,
+                         'included_food_detail':included_food.details,
+                         'included_ticket':included_ticket.included,
+                         'included_ticket_detail':included_ticket.details,
+                         'included_transport':included_transport.included,
+                         'included_transport_detail':included_transport.details,
+
+                         'host_firstname': host.first_name,
+                         'host_lastname': host.last_name,
+                         'host_image':host_image,
+                         'host_bio':host_bio,
+                         'host_id':str(host.id),
+
+                         'experience_rate':math.ceil(rate),
+                         'experience_reviews':experience_reviews,
+
+                         }, status=status.HTTP_200_OK)
+
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@csrf_exempt
+def service_experiencedetail(request, format=None):
+    try:
+        data = request.query_params
+        if type(data) is str:
+            data = ast.literal_eval(data)
+
+        exp_id = data['experience_id']
+        experience = Experience.objects.get(id=exp_id)
+        
+        WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
+        included_food = WhatsIncludedList.filter(item='Food')[0]
+        included_ticket = WhatsIncludedList.filter(item='Ticket')[0]
+        included_transport = WhatsIncludedList.filter(item='Transport')[0]
+
+        host = experience.hosts.all()[0]
+        host_image = host.registereduser.image_url
+        host_bio = host.registereduser.bio
+
+        rate = 0.0
+        counter = 0
+        experience_reviews = []
+        for review in experience.review_set.all():
+            reviewer = User.objects.get(id=review.user_id)
+            d={'reviewer_firstname':reviewer.first_name,
+                  'reviewer_lastname':reviewer.last_name,
+                  'reviewer_image':reviewer.registereduser.image_url,
+                  'review_comment':review.comment,}
+            experience_reviews.append(d)
+            rate += review.rate
+            counter += 1
+        
+        if counter > 0:        
+            rate /= counter
+        
+        dynamic_price = []
+        if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
+            dynamic_price = experience.dynamic_price.split(",")
+            dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
+
+        return Response({'experience_title':experience.title,
+                         'experience_language':experience.language,
+                         'experience_duration':experience.duration,
+                         'experience_description':experience.description,
+                         'experience_activity':experience.activity,
+                         'experience_interaction':experience.interaction,
+                         'experience_dress':experience.dress,
+                         'experience_meetup_spot':experience.meetup_spot,
+                         'experience_price':experience_fee_calculator(float(experience.price)),
+                         'experience_currency': str(dict(Currency)[experience.currency.upper()]),
+                         'experience_dollarsign': DollarSign[experience.currency.upper()],
+                         'experience_dynamic_price':dynamic_price,
+                         'experience_guest_number_min':experience.guest_number_min,
+                         'experience_guest_number_max':experience.guest_number_max,
 
                          'included_food':included_food.included,
                          'included_food_detail':included_food.details,

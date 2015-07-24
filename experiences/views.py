@@ -628,10 +628,7 @@ class ExperienceDetailView(DetailView):
                 context['host_only_unlisted'] = True
                 return context
 
-        cities = {'melbourne':_('Melbourne'),'sydney':_('Sydney'),'cairns':_('Cairns'),'goldcoast':_('Gold coast'),'brisbane':_('Brisbane'),
-                  'hobart':_('Hobart'),'adelaide':_('Adelaide'),'grsa':_('Greater South Australia'),'grsnw':_('Greater New South Wales'),
-                  'grqld':_('Greater Queensland')}
-        context['experience_city'] = cities.get(experience.city.lower())
+        context['experience_city'] = dict(Location).get(experience.city)
 
         available_date = getAvailableOptions(experience, available_options, available_date)
 
@@ -1759,6 +1756,8 @@ def create_experience(request, id=None):
 
     if id:
         experience = get_object_or_404(Experience, pk=id)
+        if experience.currency is None:
+            experience.currency = 'aud'
         host = experience.hosts.all()[0]
         registerUser = experience.hosts.all()[0].registereduser
         list = experience.whatsincluded_set.filter(item="Food")
@@ -2389,9 +2388,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     formattedTitleList = []
     BGImageURLList = []
     profileImageURLList = []
-    cityList= [('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Brisbane', _('Brisbane, QLD')),('Cairns', _('Cairns, QLD')),
-            ('Goldcoast', _('Gold coast, QLD')),('Hobart', _('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('Grsa', _('Greater South Australia')),
-            ('Grnsw', _('Greater New South Wales')),('Grqld', _('Greater Queensland')),]#('Grvic', _('Greater Victoria')),
+    cityList= list(Location)
 
     if is_kids_friendly:
         experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
@@ -2545,12 +2542,13 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
     city_display_name = None
     for i in range(len(cityList)):
-        if cityList[i][0] == city.title():
+        if cityList[i][0].lower() == city.lower():
             city_display_name = cityList[i][1]
+            city = cityList[i][0]
             break
 
     context = RequestContext(request, {
-        'city' : city.title(),
+        'city' : city,
         'city_display_name':city_display_name if city_display_name is not None else city.title(),
         'length':len(cityExperienceList),
         'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),

@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from app.models import Subscription
 from bootstrap3_datetime.widgets import DateTimePicker
+from experiences.forms import Location
 
 class BootstrapAuthenticationForm(AuthenticationForm):
     """Authentication form which uses boostrap CSS."""
@@ -41,9 +42,6 @@ class SubscriptionForm(forms.ModelForm):
         model = Subscription
         fields = ['email']
 
-Location = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),
-            ('Goldcoast',_('Gold coast, QLD')),('Hobart',_('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
-            ('GRNSW', _('Greater New South Wales')),('GRQLD', _('Greater Queensland')),)
 class HomepageSearchForm(forms.Form):
     city = forms.ChoiceField(choices=Location)
     start_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}))

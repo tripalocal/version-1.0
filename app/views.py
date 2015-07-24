@@ -146,11 +146,11 @@ def home(request):
         featuredExperienceList[i].currency = str(dict(Currency)[featuredExperienceList[i].currency.upper()])
         featuredExperience.append({"experience":featuredExperienceList[i],"background":BGImages[i],"hostImage":profileImages[i]})
 
-    cityList = [('Melbourne', _('Melbourne')),('Sydney', _('Sydney')),('Goldcoast',_('Gold Coast')),('Cairns',_('Cairns')),('Adelaide',_('Adelaide'))]
+    featuredCityList = [('Melbourne', _('Melbourne')),('Sydney', _('Sydney')),('Goldcoast',_('Gold Coast')),('Cairns',_('Cairns')),('Adelaide',_('Adelaide'))]
 
     context = RequestContext(request, {
         'featuredExperience': featuredExperience,
-        'cityList': cityList
+        'cityList': featuredCityList
     })
 
     if request.user.is_authenticated():

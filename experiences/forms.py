@@ -1,4 +1,4 @@
-from django import forms
+﻿from django import forms
 from bootstrap3_datetime.widgets import DateTimePicker
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
@@ -24,8 +24,10 @@ from post_office import mail
 Type = (('PRIVATE', _('Private')),('NONPRIVATE', _('NonPrivate')),('RECOMMENDED', _('Recommended')),)
 
 Location = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),
-            ('Goldcoast',_('Gold coast, QLD')),('Hobart',_('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('Grsa', _('Greater South Australia')),
-            ('Grnsw', _('Greater New South Wales')),('Grqld', _('Greater Queensland')),)#('Grvic', _('Greater Victoria')),
+            ('Goldcoast',_('Gold coast, QLD')),('Hobart',_('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
+            ('GRVIC', _('Greater Victoria')),('GRNSW', _('Greater New South Wales')),('GRQLD', _('Greater Queensland')),
+            ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
+            ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),)#('english;translation','English+Chinese translation'),
 
@@ -63,8 +65,8 @@ Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghan
 ('Sint Maarten', 'Sint Maarten'),('Slovakia', 'Slovakia'),('Slovenia', 'Slovenia'),('Solomon Islands', 'Solomon Islands'),('Somalia', 'Somalia'),('South Africa', 'South Africa'),('South Korea', 'South Korea'),('South Sudan', 'South Sudan'),('Spain ', 'Spain '),('Sri Lanka', 'Sri Lanka'),('Sudan', 'Sudan'),('Suriname', 'Suriname'),('Swaziland ', 'Swaziland '),('Sweden', 'Sweden'),('Switzerland', 'Switzerland'),('Syria', 'Syria'),('Taiwan, China', 'Taiwan, China'),('Tajikistan', 'Tajikistan'),('Tanzania', 'Tanzania'),('Thailand ', 'Thailand '),('Timor-Leste', 'Timor-Leste'),('Togo', 'Togo'),('Tonga', 'Tonga'),('Trinidad and Tobago', 'Trinidad and Tobago'),('Tunisia', 'Tunisia'),('Turkey', 'Turkey'),('Turkmenistan', 'Turkmenistan'),
 ('Tuvalu', 'Tuvalu'),('Uganda', 'Uganda'),('Ukraine', 'Ukraine'),('United Arab Emirates', 'United Arab Emirates'),('United Kingdom', 'United Kingdom'),('Uruguay', 'Uruguay'),('Uzbekistan', 'Uzbekistan'),('Vanuatu', 'Vanuatu'),('Venezuela', 'Venezuela'),('Vietnam', 'Vietnam'),('Yemen', 'Yemen'),('Zambia', 'Zambia'),('Zimbabwe ', 'Zimbabwe '),)
 
-Currency = (('AUD',_('AUD')),('CNY',_('CNY')),('NZD',_('NZD')),)
-DollarSign = {'AUD':'$','CNY':'￥','NZD':'$'}
+Currency = (('AUD',_('AUD')),('NZD',_('NZD')),) #('CNY',_('CNY')),
+DollarSign = {'AUD':'$','NZD':'$'} #'CNY':'￥',
 
 Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted'))
 
