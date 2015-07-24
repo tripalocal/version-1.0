@@ -2436,25 +2436,41 @@ def manage_listing_photo(request, experience, context):
         data = {}
         photos = Photo.objects.filter(experience_id = experience.id)
         for index in range(len(photos)):
-            data['experience_photo_' + photos[index].name.split('.')[0].split('_')[1]] = photos[index]
+            data['experience_photo_' + photos[index].name.split('_')[-1].split('.')[0]] = photos[index]
+            data['experience_photo_' + photos[index].name.split('_')[-1].split('.')[0] + '_file_name'] = photos[index].name
+            data['id'] = experience.id
 
-        form = ExperiencePhotoForm(initial=data)
+        form = ExperiencePhotoForm(data)
+
 
         return render_to_response('photo_form.html', {'form': form}, context)
 
     elif request.method == 'POST':
         form = ExperiencePhotoForm(request.POST, request.FILES)
 
+
         if form.is_valid():
             for index in range(1, 10):
                 field_name = 'experience_photo_' + str(index)
+                dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
+                if not os.path.isdir(dirname):
+                    os.mkdir(dirname)
+
                 if field_name in request.FILES:
                     file = request.FILES[field_name]
                     extension = '.jpg'
                     filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-                    photo = Photo(name=filename, directory='experiences/' + str(experience.id) + '/',
-                                  image=file, experience=experience)
-                    photo.save()
+                    destination = open(dirname + filename, 'wb+')
+
+
+                    if Photo.objects.filter(name=filename).__len__() == 0:
+                        photo = Photo(name=filename, directory='experiences/' + str(experience.id) + '/',
+                                      image=file, experience=experience)
+                        photo.save()
+                    else:
+                        for chunk in request.FILES[field_name].chunks():
+                            destination.write(chunk)
+                            destination.close()
 
             # todo: add to chinese db
             experience.save()
@@ -2491,7 +2507,7 @@ def manage_listing_location(request, experience, context):
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
-def manage_listing(request, exp_id, step):
+def manage_listing(request, exp_id, step, ):
     experience = get_object_or_404(Experience, pk=exp_id)
     if not request.user in experience.hosts.all():
         raise Http404("Sorry, but you can only edit your own experience.")
@@ -2509,6 +2525,8 @@ def manage_listing(request, exp_id, step):
             return manage_listing_photo(request, experience, context)
         elif step == 'location':
             return manage_listing_location(request, experience, context)
+        elif step == 'ajax_upload_file':
+            return manage_listing_ajax_upload(request, experience, context)
 
     else:
         return render_to_response('manage_listing.html', context)
@@ -2546,6 +2564,10 @@ def manage_listing_continue(request, exp_id):
         return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
 
     return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
+
+def manage_listing_ajax_upload(request, experience, context):
+    print(request.POST)
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
@@ -3121,3 +3143,4 @@ def itinerary_booking_successful(request):
         return HttpResponseRedirect("/accounts/login/")
     
     return render(request,'itinerary_booking_successful.html',{})
+

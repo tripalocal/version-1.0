@@ -620,6 +620,16 @@
 
         function setupPhotoForm() {
             for (i = 1; i < 11; i++) {
+                $("#photo-preview-div-"+i).mouseover(function (e) {
+                            $(e.target.children[0]).css("display","block");
+                            $(e.target.children[1]).css("display","block");
+                        }
+                );
+                $("#photo-preview-div-"+i).mouseleave(function (e) {
+                            $(e.target.children[0]).css("display","none");
+                            $(e.target.children[1]).css("display","none");
+                        }
+                );
                 $("#id_experience_photo_" + i).attr("class", "upload");
                 $("#id_experience_photo_" + i).change(function (e) {
                     i = e.target.id.substr(-1, 1);
@@ -632,16 +642,18 @@
 
                     $("#uploadImage_" + i).val(string.substring(index + 1));
                 });
+
             }
         }
 
         function setListenerForPostingPhoto() {
             for (i = 1; i < 11; i++) {
-                $('#id_experience_photo_' + i).change(function () {
+                $('#id_experience_photo_' + i).change(function (e) {
                     if (verifyImages(i)) {
+                        $('#id_experience_photo_gif_' + i).attr("style", "display:block;");
                         var formData = new FormData();
                         formData.append('experience_photo_' + i, this.files[0]);
-                        postFile(location.href, formData);
+                        postFile(location.href, formData, i);
                     }
                 });
             }
@@ -732,11 +744,11 @@
         });
     }
 
-    function postFile(href, formData) {
+    function postFile(href, formData, index) {
         var signal = $('#ajax-update-signal');
 
         formData.append('csrfmiddlewaretoken', $("[name='csrfmiddlewaretoken']")[0].value);
-
+        experienceId = href.split('/').slice(-3)[0];
         $.ajax({
             url: href,
             data: formData,
@@ -747,11 +759,17 @@
                 signal.fadeIn("slow");
                 signal.text("Experience Updated");
                 signal.fadeOut("slow");
+                $('#id_experience_photo_gif_' + index).attr("style", "display:none;");
+                $('#photo-preview-div-'+index).css("background", "url(" + "/images/experiences/" + experienceId + "/experience" + experienceId + "_" + index + ".jpg" + "?" + new Date().getTime() +")");
+                $('#photo-preview-div-'+index).css("background-size", "cover");
+
+
             },
             error: function () {
                 signal.fadeIn("slow");
                 signal.text("Update Failed");
                 signal.fadeOut("slow");
+                $('#id_experience_photo_gif_' + index).attr("style", "display:none;");
             }
         });
     }
@@ -783,6 +801,7 @@
             }
         });
     });
+
 
 </script>
 {%endblock%}

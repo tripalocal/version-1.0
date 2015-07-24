@@ -790,7 +790,61 @@ body {
 #add-photo-button p{float: left;}
 #add-photo-button img{vertical-align: middle; padding-left: 0px; padding-right: 5px;}
 #add-photo-button a span{position: relative; top: 10px;}
-.photo-preview-thumbnail{background-color: #FFF; border-radius: 3px; border:1px solid #999999; margin-right: 15px; float: left; width: 200px; height: 40px; padding-left: 15px;}
+
+.photo-preview-div {
+	background-color: #FFF;
+	border-radius: 3px;
+	border:1px solid #999999;
+	margin-right: 15px;
+	width: 200px;
+	height: 200px;
+	padding: 0 0 0 0;
+}
+
+.photo-preview-upload-button-position{
+    position: absolute;
+	left: 25px;
+	top: 150px;
+	width: 140px;
+	height: 30px;
+	display: none;
+}
+
+.photo-preview-cancel-button{
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	left: 160px;
+	top: 10px;
+	display: none;
+
+}
+
+.photo-preview-cancel-button-icon{
+	position: relative;
+    right: 7px;
+    top: -4px;
+
+}
+
+.photo-preview-div .preview-img{
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+}
+
+.center-part {
+
+	right: 50%;
+	top: 50%;
+	bottom: 50%;
+}
+
+.photo-preview-thumbnail{background-color: #FFF; border-radius: 3px; border:1px solid #999999; margin-right: 15px; float: left; width: 200px; height: 200px; padding-left: 15px;}
+
+
+
+
 /*list-location.html*/
 #location{float: left;}
 #location-details{ color: #999999; padding-left: 30px; }

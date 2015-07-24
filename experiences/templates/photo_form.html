@@ -1,153 +1,107 @@
 
 <div id="photo-form" class="calendar">
     <div class="section" id="section-add-photo">
-        <div>
-            <p id="photo-heading"><strong>Add a photo or two!</strong></p>
-            <p id="photo-size-reminder">Please keep your images under 2MB</p>
-        </div>
-        <br><br><br>
-
-        <div id="photo-detail-info">
-            <p>
-                <span>Or three, or more!</span><br>
-                <span>Guests love photos</span><br>
-                <span>that highlight the</span><br>
-                <span>features of your</span><br>
-                <span>experiences.</span><br>
-            </p>
-        </div>
-
-        {{form.delete_photo}}
-
-        <div id="add-photo-button">
-            {%if form.initial.experience_photo_1%}
-            <input id="uploadImage_1" placeholder="{{form.initial.experience_photo_1.name}}" class="photo-preview-thumbnail" disabled="disabled" />
-            {%else%}
-            <input id="uploadImage_1" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
-            {%endif%}
-            <div class="fileUpload btn btn-primary">
-                <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+        <div class="row">
+            {% if form.data.experience_photo_1_file_name %}
+            <div id="photo-preview-div-1" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_1_file_name}}); background-size: cover;">
+                <button id="upload-file-delete-button-1" type="button" class="btn btn-primary photo-preview-cancel-button">
+                    <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
+                </button>
+                <div id="upload-file-add-button-1" class="fileUpload btn btn-primary photo-preview-upload-button-position">
+                    <img src="/images/camera.gif" alt=""><span>Replace Photo</span>
+                    {{form.experience_photo_1}}
+                </div>
+                <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_1" style="display: none;">
+            </div>
+            {% else %}
+            <div id="photo-preview-div-add-1" class = "col-lg-6 photo-preview-div">
+                <span style="color: #999;">
+                    <i class="glyphicon glyphicon-plus" style="color: #399;"/>
+                    Add New Photo
+                </span>
                 {{form.experience_photo_1}}
+                <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_1" style="display: none;">
             </div>
-        </div>
-        <br><br><br>
+            {% endif %}
 
-        <div id="add-photo-button">
-            {%if form.initial.experience_photo_2%}
-            <input id="uploadImage_2" placeholder="{{form.initial.experience_photo_2.name}}" class="photo-preview-thumbnail" disabled="disabled" />
-            {%else%}
-            <input id="uploadImage_2" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
-            {%endif%}
-            <div class="fileUpload btn btn-primary">
-                <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+            {% if form.data.experience_photo_2_file_name %}
+            <div id="photo-preview-div-2" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_2_file_name}}); background-size: cover;">
+                <button id="upload-file-delete-button-2" type="button" class="btn btn-primary photo-preview-cancel-button">
+                    <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
+                </button>
+                <div id="upload-file-add-button-2" class="fileUpload btn btn-primary photo-preview-upload-button-position">
+                    <img src="/images/camera.gif" alt=""><span>Replace Photo</span>
+                    {{form.experience_photo_2}}
+                </div>
+                <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_2" style="display: none;">
+            </div>
+            {% else %}
+            <div id="photo-preview-div-add-2" class = "col-lg-6 photo-preview-div">
+                <span style="color: #999;">
+                    <i class="glyphicon glyphicon-plus" style="color: #399;"/>
+                    Add New Photo
+                </span>
                 {{form.experience_photo_2}}
+                <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_2" style="display: none;">
             </div>
+            {% endif %}
         </div>
-        <br><br><br>
 
-        <div id="add-photo-button">
-            {%if form.initial.experience_photo_3%}
-            <input id="uploadImage_3" placeholder="{{form.initial.experience_photo_3.name}}" class="photo-preview-thumbnail" disabled="disabled" />
-            {%else%}
-            <input id="uploadImage_3" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
-            {%endif%}
-            <div class="fileUpload btn btn-primary">
-                <img src="/images/camera.gif" alt=""><span>Add Photos</span>
-                {{form.experience_photo_3}}
-            </div>
-        </div>
-        <br><br><br>
 
-        <div id="add-photo-button">
-            {%if form.initial.experience_photo_4%}
-            <input id="uploadImage_4" placeholder="{{form.initial.experience_photo_4.name}}" class="photo-preview-thumbnail" disabled="disabled" />
-            {%else%}
-            <input id="uploadImage_4" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
-            {%endif%}
-            <div class="fileUpload btn btn-primary">
-                <img src="/images/camera.gif" alt=""><span>Add Photos</span>
-                {{form.experience_photo_4}}
-            </div>
-        </div>
-        <br><br><br>
 
-        <div id="add-photo-button">
-            {%if form.initial.experience_photo_5%}
-            <input id="uploadImage_5" placeholder="{{form.initial.experience_photo_5.name}}" class="photo-preview-thumbnail" disabled="disabled" />
-            {%else%}
-            <input id="uploadImage_5" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
-            {%endif%}
-            <div class="fileUpload btn btn-primary">
-                <img src="/images/camera.gif" alt=""><span>Add Photos</span>
-                {{form.experience_photo_5}}
-            </div>
-        </div>
-        <br><br><br>
+        <div class="row">
+            {% if form.data.experience_photo_3_file_name %}
+            <div id="photo-preview-div-3" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_3_file_name}}); background-size: cover;">
+                <button id="upload-file-delete-button-3" type="button" class="btn btn-primary photo-preview-cancel-button">
+                    <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
+                </button>
+                <div id="upload-file-add-button-3" class="fileUpload btn btn-primary photo-preview-upload-button-position">
+                    <img src="/images/camera.gif" alt=""><span>Replace Photo</span>
 
-        <div id="add-photo-button">
-            {%if form.initial.experience_photo_6%}
-            <input id="uploadImage_6" placeholder="{{form.initial.experience_photo_6.name}}" class="photo-preview-thumbnail" disabled="disabled" />
-            {%else%}
-            <input id="uploadImage_6" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
-            {%endif%}
-            <div class="fileUpload btn btn-primary">
-                <img src="/images/camera.gif" alt=""><span>Add Photos</span>
-                {{form.experience_photo_6}}
-            </div>
-        </div>
-        <br><br><br>
+                    {{form.experience_photo_3}}
 
-        <div id="add-photo-button">
-            {%if form.initial.experience_photo_7%}
-            <input id="uploadImage_7" placeholder="{{form.initial.experience_photo_7.name}}" class="photo-preview-thumbnail" disabled="disabled" />
-            {%else%}
-            <input id="uploadImage_7" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
-            {%endif%}
-            <div class="fileUpload btn btn-primary">
-                <img src="/images/camera.gif" alt=""><span>Add Photos</span>
-                {{form.experience_photo_7}}
+                </div>
+                <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_3" style="display: none;">
             </div>
-        </div>
-        <br><br><br>
+            {% else %}
+            <div id="photo-preview-div-add-3" class = "col-lg-6 photo-preview-div">
+                <span style="color: #999;">
+                    <i class="glyphicon glyphicon-plus" style="color: #399;"/>
+                    Add New Photo
+                </span>
+                    <div style="display: none;">
+                    {{form.experience_photo_3}}
+                    </div>
+                <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_3" style="display: none;">
+            </div>
+            {% endif %}
 
-        <div id="add-photo-button">
-            {%if form.initial.experience_photo_8%}
-            <input id="uploadImage_8" placeholder="{{form.initial.experience_photo_8.name}}" class="photo-preview-thumbnail" disabled="disabled" />
-            {%else%}
-            <input id="uploadImage_8" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
-            {%endif%}
-            <div class="fileUpload btn btn-primary">
-                <img src="/images/camera.gif" alt=""><span>Add Photos</span>
-                {{form.experience_photo_8}}
+            {% if form.data.experience_photo_4_file_name %}
+            <div id="photo-preview-div-4" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_4_file_name}}); background-size: cover;">
+                <button id="upload-file-delete-button-4" type="button" class="btn btn-primary photo-preview-cancel-button">
+                    <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
+                </button>
+                <div id="upload-file-add-button-4" class="fileUpload btn btn-primary photo-preview-upload-button-position">
+                    <img src="/images/camera.gif" alt=""><span>Replace Photo</span>
+                    {{form.experience_photo_4}}
+                </div>
+                <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_4" style="display: none;">
             </div>
-        </div>
-        <br><br><br>
-
-        <div id="add-photo-button">
-            {%if form.initial.experience_photo_9%}
-            <input id="uploadImage_9" placeholder="{{form.initial.experience_photo_9.name}}" class="photo-preview-thumbnail" disabled="disabled" />
-            {%else%}
-            <input id="uploadImage_9" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
-            {%endif%}
-            <div class="fileUpload btn btn-primary">
-                <img src="/images/camera.gif" alt=""><span>Add Photos</span>
-                {{form.experience_photo_9}}
+            {% else %}
+            <div id="photo-preview-div-add-4" class = "col-lg-6 photo-preview-div">
+                <span style="color: #999;">
+                    <i class="glyphicon glyphicon-plus" style="color: #399;"/>
+                    Add New Photo
+                </span>
+                <div style="display: none;">
+                    {{form.experience_photo_4}}
+                </div>
+                <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_4" style="display: none;">
             </div>
-        </div>
-        <br><br><br>
-
-        <div id="add-photo-button">
-            {%if form.initial.experience_photo_10%}
-            <input id="uploadImage_10" placeholder="{{form.initial.experience_photo_10.name}}" class="photo-preview-thumbnail" disabled="disabled" />
-            {%else%}
-            <input id="uploadImage_10" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
-            {%endif%}
-            <div class="fileUpload btn btn-primary">
-                <img src="/images/camera.gif" alt=""><span>Add Photos</span>
-                {{form.experience_photo_10}}
-            </div>
+            {% endif %}
         </div>
     </div>
+
     <div class="section" style="text-align:right;">
         <input type="submit" value="Last Step" id="last-step" />
         <input type="submit" value="Next Step" id="next-step" />
