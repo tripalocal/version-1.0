@@ -15,7 +15,7 @@
 .home-search{
     width: 620px;
     border-radius: 6px;
-    height: 50px;
+    height: 48px;
 }
 .btn-search{padding:11px; width:80px; text-align:center; border-radius:5px;}
 #id_end_date {
@@ -308,7 +308,7 @@
     }
     .home-search {
         width: 255px;
-        height:100px;
+        height:95px;
     }
     .homepage-logo {
         height: 190px;
