@@ -21,6 +21,7 @@ class Experience(models.Model):
     guest_number_max = models.IntegerField()
     guest_number_min = models.IntegerField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    currency = models.CharField(max_length=10)
     dynamic_price = models.CharField(max_length=100)
 
     title = models.CharField(max_length=100)
@@ -146,9 +147,9 @@ class Payment(models.Model):
     # you could also store other information about the sale
     # but I'll leave that to you!
  
-    def charge(self, price_in_cents, number, exp_month, exp_year, cvc):
+    def charge(self, price_in_cents, currency, number, exp_month, exp_year, cvc):
         """
-        Takes a the price and credit card details: number, exp_month,
+        Takes a the price and credit card details: number, currency, exp_month,
         exp_year, cvc.
  
         Returns a tuple: (Boolean, Class) where the boolean is if
@@ -162,7 +163,7 @@ class Payment(models.Model):
         try:
             response = self.stripe.Charge.create(
                 amount = price_in_cents,
-                currency = "aud",
+                currency = currency.lower(),
                 card = {
                     "number" : number,
                     "exp_month" : exp_month,
@@ -211,7 +212,7 @@ class Payment(models.Model):
 #    end_datetime = models.DateTimeField()
 #    group_size = models.IntegerField()
 #    city=models.TextField()
-    #bookings = models.ManyToManyField(Booking, related_name='itinerary_bookings')
+#    #bookings = models.ManyToManyField(Booking, related_name='itinerary_bookings')
 
 #    def __str__(self):
 #        t = self.name if self.name != None else ''

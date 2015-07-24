@@ -12,7 +12,7 @@
 .bookingBox {background-color:#fff;border:#CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 2px;border-radius: 5px; width:300px; float:left; padding:20px; text-align:center; color: #666666;}
 .bookingBox .profile-lg {margin-top: -140px;}
 .bookingBox .profile-lg img{margin-left:1px;}
-.bookingBox #experience_price{font-size: 36px;font-weight: bold;line-height: 1;float: left;}
+.bookingBox #experience_price{font-size: 36px;font-weight: bold;line-height: 1;}
 .bookingBox .row{text-align:center; margin:auto}
 .bookingBox th{font-weight: normal; border-bottom:1px solid #CCCCCC;padding-left: 0}
 .bookingBox tbody tr{height: 40px}

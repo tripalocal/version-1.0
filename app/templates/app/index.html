@@ -102,7 +102,7 @@
                                 <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
                             </div>
                             <div class="priceBox">
-                                {% trans "From" %} $<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% trans "AUD/person" %}
+                                {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
                             </div>
                         </a>
                     </div>
@@ -137,7 +137,7 @@
                                 <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
                             </div>
                             <div class="priceBox">
-                                {% trans "From" %} $<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% trans "AUD/person" %}
+                                {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
                             </div>
                         </a>
                     </div>
@@ -163,7 +163,7 @@
                                 <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
                             </div>
                             <div class="priceBox">
-                                {% trans "From" %} $<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% trans "AUD/person" %}
+                                {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
                             </div>
                         </a>
                     </div>

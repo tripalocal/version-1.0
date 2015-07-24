@@ -12,7 +12,7 @@ from app.models import RegisteredUser, Message
 from post_office import mail
 from Tripalocal_V1 import settings
 from tripalocal_messages.models import Aliases, Users
-from experiences.forms import email_account_generator, ExperienceForm, ItineraryBookingForm, check_coupon
+from experiences.forms import email_account_generator, ExperienceForm, ItineraryBookingForm, check_coupon, Currency, DollarSign
 from django.db import connections
 from django.template import loader, RequestContext, Context
 from django.template.loader import get_template
@@ -631,7 +631,7 @@ def service_mytrip(request, format=None):
             
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status, 'guest_number':booking.guest_number, 
                   'experience_title':booking.experience.title, 'meetup_spot':booking.experience.meetup_spot, 'experience_id':booking.experience.id,
-                  'host_name':host.first_name + ' ' + host.last_name[:1] + '.', 'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
+                  'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.', 'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
 
             bks.append(bk)
 
@@ -823,11 +823,11 @@ def service_experience(request, format=None):
         experience_reviews = []
         for review in experience.review_set.all():
             reviewer = User.objects.get(id=review.user_id)
-            dict={'reviewer_firstname':reviewer.first_name,
+            d={'reviewer_firstname':reviewer.first_name,
                   'reviewer_lastname':reviewer.last_name,
                   'reviewer_image':reviewer.registereduser.image_url,
                   'review_comment':review.comment,}
-            experience_reviews.append(dict)
+            experience_reviews.append(d)
             rate += review.rate
             counter += 1
         
@@ -848,6 +848,8 @@ def service_experience(request, format=None):
                          'experience_dress':experience.dress,
                          'experience_meetup_spot':experience.meetup_spot,
                          'experience_price':experience_fee_calculator(float(experience.price)),
+                         'experience_currency': str(dict(Currency)[experience.currency.upper()]),
+                         'experience_dollarsign': DollarSign[experience.currency.upper()],
                          'experience_dynamic_price':dynamic_price,
                          'experience_guest_number_min':experience.guest_number_min,
                          'experience_guest_number_max':experience.guest_number_max,

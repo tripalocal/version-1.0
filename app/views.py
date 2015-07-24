@@ -22,6 +22,7 @@ from Tripalocal_V1 import settings
 from experiences.views import SearchView, saveProfileImage, getBGImageURL, getProfileImage
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment
+from experiences.forms import Currency, DollarSign
 from django.core.files.uploadedfile import SimpleUploadedFile, File
 from django.db import connections
 from django.template.defaultfilters import filesizeformat
@@ -140,8 +141,10 @@ def home(request):
     profileImages = [getProfileImage(exp) for exp in featuredExperienceList]
 
     featuredExperience = []
-    for i in range(len(featuredExperienceList)+1):
-        featuredExperience.append({"experience":featuredExperienceList[i-1],"background":BGImages[i-1],"hostImage":profileImages[i-1]})
+    for i in range(len(featuredExperienceList)):
+        featuredExperienceList[i].dollarsign = DollarSign[featuredExperienceList[i].currency.upper()]
+        featuredExperienceList[i].currency = str(dict(Currency)[featuredExperienceList[i].currency.upper()])
+        featuredExperience.append({"experience":featuredExperienceList[i],"background":BGImages[i],"hostImage":profileImages[i]})
 
     cityList = [('Melbourne', _('Melbourne')),('Sydney', _('Sydney')),('Goldcoast',_('Gold Coast')),('Cairns',_('Cairns')),('Adelaide',_('Adelaide'))]
 

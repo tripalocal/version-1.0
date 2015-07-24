@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, render_to_response
 from django.db.models import Q
-from experiences.models import Experience, WhatsIncluded, Photo, BlockOutTimePeriod, InstantBookingTimePeriod
+from experiences.models import Experience, WhatsIncluded, Photo, BlockOutTimePeriod, InstantBookingTimePeriod, Booking, Payment, Review, Coupon
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.views.generic.list import ListView
@@ -10,7 +10,6 @@ from experiences.forms import *
 from datetime import *
 import pytz, string, os, json, math, PIL, xlsxwriter, time, sys
 from django.template import RequestContext, loader
-from experiences.models import Experience, Booking, Payment
 from django.contrib.auth.models import User
 from Tripalocal_V1 import settings
 from decimal import Decimal
@@ -18,7 +17,6 @@ from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile, File
 from django.contrib import messages
 from tripalocal_messages.models import Aliases
-from experiences.models import Review, Photo, Coupon, BlockOutTimePeriod, InstantBookingTimePeriod, WhatsIncluded
 from app.forms import SubscriptionForm
 from mixpanel import Mixpanel
 from dateutil.relativedelta import relativedelta
@@ -179,7 +177,8 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
 
         experience_avail = {'id':experience.id, 'title': experience.title, 'meetup_spot':experience.meetup_spot, 'rate': rate, 'duration':experience.duration, 'city':experience.city, 'description':experience.description,
-                            'language':experience.language, 'host':host.first_name + ' ' + host.last_name, 'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated, 'price':experience_fee_calculator(exp_price), 'dates':{}}
+                            'language':experience.language, 'host':host.first_name + ' ' + host.last_name, 'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated, 'price':experience_fee_calculator(exp_price),
+                            'currency':str(dict(Currency)[experience.currency.upper()]),'dollarsign':DollarSign[experience.currency.upper()],'dates':{}}
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []
@@ -303,10 +302,10 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                             if sdt > instantbooking_start[ib_i]:
                                 instantbooking_i += 1
 
-                        dict = {'available_seat': experience.guest_number_max - i, 
+                        d = {'available_seat': experience.guest_number_max - i, 
                                 'time_string': sdt_local.strftime("%H").lstrip('0') if sdt_local.strftime("%H")!="00" else "0", 
                                 'instant_booking': instant_booking}
-                        experience_avail['dates'][sdt_local.strftime("%Y/%m/%d")].append(dict)
+                        experience_avail['dates'][sdt_local.strftime("%Y/%m/%d")].append(d)
 
             sdt += timedelta(hours=1)
         experience_avail['dates'] = OrderedDict(sorted(experience_avail['dates'].items(), key=lambda t: t[0]))
@@ -563,6 +562,8 @@ class ExperienceDetailView(DetailView):
             form.data = form.data.copy()
             form.data['user_id'] = request.user.id;
             experience = Experience.objects.get(id=form.data['experience_id'])
+            experience.dollarsign = DollarSign[experience.currency.upper()]
+            experience.currency = str(dict(Currency)[experience.currency.upper()])
             experience_price = experience.price
 
             guest_number = int(form.data['guest_number'])
@@ -696,6 +697,10 @@ class ExperienceDetailView(DetailView):
                 if not any(x.id == exp.id for x in related_experiences):
                     related_experiences.append(exp)
 
+        for i in range(0,len(related_experiences)):
+            related_experiences[i].dollarsign = DollarSign[related_experiences[i].currency.upper()]
+            related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
+
         related_experiences_added_to_wishlist = []
         
         if self.request.user.is_authenticated():
@@ -712,6 +717,9 @@ class ExperienceDetailView(DetailView):
                 related_experiences_added_to_wishlist.append(False)
 
         context['related_experiences'] = zip(related_experiences, related_experiences_added_to_wishlist)
+
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
 
         return context
 
@@ -1589,6 +1597,8 @@ def experience_booking_confirmation(request):
     if request.method == 'POST':
         form = BookingConfirmationForm(request.POST)
         experience = Experience.objects.get(id=form.data['experience_id'])
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
 
         guest_number = int(form.data['guest_number'])
         subtotal_price = 0.0
@@ -1806,6 +1816,7 @@ def create_experience(request, id=None):
             "guest_number_max":experience.guest_number_max,
             "price":round(experience.price,2),
             "price_with_booking_fee":round(experience.price*Decimal.from_float(1.00+settings.COMMISSION_PERCENT)*Decimal.from_float(1.00+settings.STRIPE_PRICE_PERCENT)+Decimal.from_float(settings.STRIPE_PRICE_FIXED),2),
+            "currency":experience.currency.upper(),
             "duration":experience.duration,
             "included_food":included_food,
             "included_food_detail":include_food_detail,
@@ -1885,6 +1896,7 @@ def create_experience(request, id=None):
                                         guest_number_min = form.data['guest_number_min'],
                                         guest_number_max = form.data['guest_number_max'],
                                         price = form.data['price'],
+                                        currency = form.data['currency'].lower(),
                                         duration = form.data['duration'],
                                         activity = form.data['activity'],
                                         interaction = form.data['interaction'],
@@ -1909,6 +1921,7 @@ def create_experience(request, id=None):
                 experience.guest_number_min = form.data['guest_number_min']
                 experience.guest_number_max = form.data['guest_number_max']
                 experience.price = form.data['price']
+                experience.currency = form.data['currency'].lower()
                 experience.duration = form.data['duration']
                 experience.activity = form.data['activity']
                 experience.interaction = form.data['interaction']
@@ -2436,6 +2449,9 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 continue
 
         if (experience.city.lower() == city.lower()):#dup
+            experience.dollarsign = DollarSign[experience.currency.upper()]
+            experience.currency = str(dict(Currency)[experience.currency.upper()])
+
             rate = 0.0
             counter = 0
 
@@ -2643,7 +2659,8 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
                 counter = 0
                 insert = False
                 exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
-                            'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'timeslots':experience['dates'][dt_string]}
+                            'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
+                            'dollarsign':experience['dollarsign'],'timeslots':experience['dates'][dt_string]}
                 while counter < len(day_dict['experiences']):#find the corrent rank
                     if experience['rate'] > day_dict['experiences'][counter]['rate']:
                         day_dict['experiences'].insert(counter, exp_dict)

@@ -303,13 +303,13 @@
                             (<input type="submit" value="Change" name="change" style="border:none;background:none;color:#3cc;padding:0px;"/>)
                         </p>
                         <hr style="margin:10px 0">
-                        <p>Rate: ${{ experience_price|floatformat|mul:1.429|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
+                        <p>Rate: {{experience.dollarsign}}{{ experience_price|floatformat|mul:1.429|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
                         <hr style="margin-bottom:10px;">
-                        Subtotal: $<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
+                        Subtotal: {{experience.dollarsign}}<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
                         <br>
                         <p id="id_coupon_extra_fee" style="font-size:14px;"></p>
-                        <div id="id_service_fee" style="display:none;"> Processing Fee: ${{ service_fee|stringformat:".2f" }}<br></div>
-                        <strong style="font-size:18px;">Total: $<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
+                        <div id="id_service_fee" style="display:none;"> Processing Fee: {{experience.dollarsign}}{{ service_fee|stringformat:".2f" }}<br></div>
+                        <strong style="font-size:18px;">Total: {{experience.dollarsign}}<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
                     </form>                     
                 </div>
             </div>

@@ -1,10 +1,11 @@
 {% extends "app/layout.html" %}
 {% load mathfilters %}
+{% load i18n %}
 
 {% block head %}
     {% load staticfiles %}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
-    <title> {{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %} </title>
+    <title> {{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %} </title>
     <link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">
 {% endblock %}
 
@@ -12,11 +13,11 @@
 
 {% if expired == None and listed == None %}
     {%if host_only_expired %}
-    <p style="postion:relative;top:50px;">The experience has expired. Only you can see it now.</p>
+    <p style="postion:relative;top:50px;">{% trans "The experience has expired. Only you can see it now." %}</p>
     {%endif%}
 
     {%if host_only_unlisted %}
-    <p style="postion:relative;top:50px;">The experience has not be approved. Only you can see it now.</p>
+    <p style="postion:relative;top:50px;">{% trans "The experience has not be approved. Only you can see it now." %}</p>
     {%endif%}
 
     <div class="jumbotron experienceImg" style="background-image:url(		
@@ -35,10 +36,10 @@
                         <div class="profile-lg">
                             <div style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
                         </div>
-                        Reservation with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
+                        {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
                         <br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
-                        <div class="row" style="width:160px;margin-top:10px">
-                            <span id="experience_price">${{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px"> per person<br>for {{ experience.duration }} hours<br><p>
+                        <div class="row" style="width:180px;margin-top:10px">
+                            <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px"> {% trans "per person" %}<br>{% trans "for" %} {{ experience.duration }} {% trans "hours" %}<br><p>
                         </div>
                         <form id="experience_booking_form" method="post" action="">
                             {% csrf_token %}
@@ -47,7 +48,7 @@
                                 {{ field }}
                             {% endfor %}
 
-                            <div>No. of Guests &nbsp;&nbsp;
+                            <div>{% trans "No. of Guests" %} &nbsp;&nbsp;
                                 <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none"/>
                                 <input type="text" id="guest_number_max" name="{{experience.guest_number_max}}" disabled="disabled" style="display:none"/>
                                 {% for op in available_options %} 
@@ -58,8 +59,8 @@
 
                             <table style="margin-top:15px;width:100%">
                                 <thead class="booking-exp">
-                                    <th class="date-exp">Date</th>
-                                    <th class="time-exp">Time</th>
+                                    <th class="date-exp">{% trans "Date" %}</th>
+                                    <th class="time-exp">{% trans "Time" %}</th>
                                     <th class="people-exp"></th>
                                 </thead>
 
@@ -86,9 +87,9 @@
                                         </td>
                                         <td class="people-list">
                                             {% if user.is_authenticated %}
-                                                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="Book" />  
+                                                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" />  
                                             {% else %}
-                                                <input type="button" class="btn-block btn btn-xs btn-primary" value="Book" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
+                                                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -104,9 +105,9 @@
                                     </td>
                                     <td class="people-list">
                                     {% if user.is_authenticated %}
-                                        <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="Request" />  
+                                        <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" />  
                                     {% else %}
-                                        <input type="button" class="btn-block btn btn-xs btn-primary" value="Request" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
+                                        <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
                                     {% endif %}
                                     </td>
                                 </tr>
@@ -120,13 +121,13 @@
                                 <div id="save_to_wishlist_icon" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';" class="save_to_wishlist_not_added"></div>
                                 {%endif%}
                                 <div id="save_to_wishlist_description">
-                                    <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;">Save to Wishlist</h3>
+                                    <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;">{% trans "Save to Wishlist" %}</h3>
                                     <p id="wishlist_p">Save now, plan later</p>
                                 </div>
                             {% else %}
                                 <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_added"></div>
                                 <div id="save_to_wishlist_description">
-                                    <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;">Saved to Wishlist</h3>
+                                    <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;">{% trans "Saved to Wishlist" %}</h3>
                                     <p id="wishlist_p"></p>
                                 </div>
                             {% endif %}
@@ -137,25 +138,25 @@
             
         	    <div class="desBox">
                     {% if experience.type == "RECOMMENDED" %}
-                    <div class="recommended-label">Recommended</div>
+                    <div class="recommended-label">{% trans "Recommended" %}</div>
                     {% endif %}
-                    <h2 style="font-weight:bold">{{ experience.title }} with {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}
-                    <br><small style="font-size:14px">{{experience.duration}} hrs &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
+                    <h2 style="font-weight:bold">{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}
+                    <br><small style="font-size:14px">{{experience.duration}} {% trans "hrs" %} &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
                     </h2>
                     <table>
                         <tr style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;"> 
-                            <th style="width:150px;"><h3 style="color:grey">Overview</h3></th>
+                            <th style="width:150px;"><h3 style="color:grey">{% trans "Overview" %}</h3></th>
                             <td id="id_experience_description" class="experience-detail-table-td">
                                 {{ experience.description }}<br>
                                 {{ experience.interaction }} 
                             </td>
                         </tr>
                         <tr style="border-bottom:1px solid #CCCCCC;"> 
-                             <th><h3 style="color:grey">Activities</h3></th>
+                             <th><h3 style="color:grey">{% trans "Activities" %}</h3></th>
                             <td id="id_experience_activity" class="experience-detail-table-td">{{ experience.activity }}</td>
                         </tr>
                         <tr style="border-bottom:1px solid #CCCCCC;"> 
-                            <th><h3 style="color:grey">What to wear</h3></th>
+                            <th><h3 style="color:grey">{% trans "What to wear" %}</h3></th>
                             <td id="id_experience_dress" class="experience-detail-table-td">{{ experience.dress }}</td>
                         </tr>
 
@@ -214,7 +215,7 @@
     {% if experience.type != "NONPRIVATE" %}
     <div class="experinence-host desBox">
         <div id="experinence-host-container">
-            <p>About the host, {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</p>
+            <p>{% trans "About the host," %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</p>
             <div id="experience-hostintro" class="experience-hostintro">
                 <div class="experience-hostpic profile-lg" style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;"></div>
                 <div>
@@ -224,33 +225,33 @@
                     </div>
                     {% for h in experience.hosts.all %}
                     {% if forloop.first and h.registereduser.bio|length > 200 %}
-                    <div id="bio_show_more" value="More">+ More</div>
+                    <div id="bio_show_more" value="More">+ {% trans "More" %}</div>
                     {% endif %}
                     {% endfor %}
                 </div>
             </div>
         
             <div class="host-socialmedia">
-                <div class="host-trust">Trust</div>
+                <div class="host-trust">{% trans "Trust" %}</div>
                 {% for h in experience.hosts.all %}
                 {% if forloop.first %}
                 {% if h.socialaccount_set.all%}
                 <div class="host-facebook">
                     <div class="facebooklogo"></div>
                     <span class="followerNumber">Facebook</span><br>
-                    <span class="host-friend">Verified</span>
+                    <span class="host-friend">{% trans "Verified" %}</span>
                 </div>
                 {% endif %}
                 <div class="host-review">
                     <div class="reviewlogo"></div>
-                    <span class="review-title">Reviews</span>
+                    <span class="review-title">{% trans "Reviews" %}</span>
                     <span class="review-number" style="color:#333">{{ experience.review_set.count }}</span>
                 </div>
                 {% if h.registereduser.phone_number%}
                 <div class="host-mobile">
                     <div class="mobilelogo"></div>
-                    <span class="Mobile">Phone</span>
-                    <span class="host-verfied">Verified</span>
+                    <span class="Mobile">{% trans "Phone" %}</span>
+                    <span class="host-verfied">{% trans "Verified" %}</span>
                 </div>
                 {% endif %}
                 {% endif %}
@@ -265,7 +266,7 @@
     		<div class="fixCenter">
                 <div class="reviewBox" style="margin-top:50px">
                 {% if experience.review_set.count %}
-                    <h2>{{ experience.review_set.count }} Review(s) </h2>
+                    <h2>{{ experience.review_set.count }} {% trans "review(s)" %} </h2>
                     <div class="rating">
                     {% for r in "12345" %}
                         {% if forloop.counter <= experience_rate %}
@@ -315,7 +316,7 @@
     	<div class="row">
             <div class="fixCenter">
                 <div class="expBox">
-                    <h2 style="font-weight:bold">People also booked</h2>
+                    <h2 style="font-weight:bold">{% trans "People also booked" %}</h2>
                     {% for related_experience, added_to_wishlist in related_experiences %}
                     {% if forloop.counter0 < 3 %}
                     <div class="expList">
@@ -323,7 +324,7 @@
                         <a href="/experience/{{related_experience.id}}">
                             <div class="listingImg" style="background-image:url({% for photo in related_experience.photo_set.all %}{% if forloop.first %} {{ MEDIA_URL }}{{photo.directory}}{{photo.name}} {%endif%}{%endfor%});">
                                 <div class="priceBox">
-                                From $<span>{{ related_experience.price|mul:1.429|floatformat:"0" }}</span> AUD/person
+                                {% trans "From" %} {{related_experience.dollarsign}}<span>{{ related_experience.price|mul:1.429|floatformat:"0" }}</span> {{related_experience.currency}} {% trans "/person" %}
                                 </div>
                             </div>
                         </a>
@@ -339,7 +340,7 @@
                         <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
                         <div class="listingFooter">
                             <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
-                            <div style="padding-top: 5px; padding-left: 40px;">{{ related_experience.duration }} hrs &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
+                            <div style="padding-top: 5px; padding-left: 40px;">{{ related_experience.duration }} {% trans "hrs" %} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
                         </div>
                     </div>
                     {% endif %}
@@ -349,7 +350,7 @@
         </div> 
     </div>
 {%else%}
-    <p>The experience has expired, or has not been approved.</p>
+    <p>{% trans "The experience has expired, or has not been approved." %}</p>
 {%endif%}
 {% endblock %} 
 
@@ -650,7 +651,7 @@ $(function(){
         {
             guest_number = parseInt($("#id_guest_number").val());
             price = Math.round(parseFloat(price[guest_number-min_number])*1.429);
-            $("#experience_price").text('$'+price);
+            $("#experience_price").text(price);
         }
 
         mixpanel.track("Changed number of people");

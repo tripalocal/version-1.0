@@ -1,6 +1,8 @@
 {% load mathfilters %}
+{% load i18n %}
+
 <div id="response-to-update-multiple">
-    <label id="experience-count" class="expCount">{{ length }} Experiences &#8226; {{ city_display_name }}</label>
+    <label id="experience-count" class="expCount">{{ length }} {% trans "Experiences" %} &#8226; {{ city_display_name }}</label>
 
     <div id="experience-results">
         {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
@@ -8,7 +10,7 @@
             <a href="/experience/{{ experience.id }}">
                 <div class="listingImg" style="background-image:url({{ MEDIA_URL }}{{ BGImageURL }});">
                     <div class="priceBox">
-                        From $<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> AUD/person
+                        {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
                     </div>
                 </div>
             </a>
