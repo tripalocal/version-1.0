@@ -76,8 +76,8 @@ th h3{margin: 2px}
 
 .checkoutInfo {width:300px; margin-top: 20px; padding: 15px;}
 
-.warning-sign {border: 1px #FF5E5E solid;	background-color:#FFC7C7;	border-radius:3px;	color:#FF5E5E;height: 30px;margin-top: 8px;}
-.warning-sign p{display: inline-block;position: relative;top: 4px;left: 10px;}
+.warning-sign {border: 1px #FF5E5E solid;	background-color:#FFC7C7;	border-radius:3px;	color:#FF5E5E;height: 30px;margin-top: 8px;min-width: 222px;margin-right: 20px}
+.warning-sign p{display: inline-block;position: relative;top: 4px;left: 10px;padding-right: 20px}
 
 
 

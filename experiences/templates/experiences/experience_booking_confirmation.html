@@ -71,7 +71,7 @@
                                 </div>
                                 {%endif%}
                             </div>
-                           <div style="display:inline-block">
+                           <div style="display:inline-block;">
                                  <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/visa.png)"></input>
                                 <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/master.png);"></input>
                                 <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/amex.png)"></input>
@@ -241,6 +241,10 @@
                                         <div class="form-group">
                                             <input class="form-control" style="width:62px;margin-right:10px;float:left">
                                             {{ form.phone_number }}
+                                            <div class="warning-sign">
+                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <p>{{form.last_name.errors.as_text}}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -250,6 +254,10 @@
                                         <div class="form-group">
                                             <input class="form-control" style="width:62px;margin-right:10px;float:left">
                                             <input id="id_phone_number" maxlength="15" name="phone_number" type="text" class="form-control">
+                                            <div class="warning-sign">
+                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <p>{{form.last_name.errors.as_text}}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
