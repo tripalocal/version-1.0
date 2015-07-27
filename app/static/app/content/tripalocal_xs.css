@@ -270,7 +270,7 @@
 .input-sm{ padding:0px; width:120px; text-align:center; border-radius:0px;}
 .black-border{border: 2px #000000 solid; border-radius:5px;}
 .btn-search{padding:11px; width:80px; text-align:center; border:2px rgba(0,0,0,1.00) solid; border-radius:5px;}
-#to{border-bottom-right-radius:5px; border-top-right-radius:5px; border: 2px #000000 solid; border-left:1px #000 solid;;}
+#to{border-bottom-right-radius:5px; border-top-right-radius:5px; border: 2px #000000 solid; border-left:1px #000 solid;}
 #from{border-top:#000000 2px solid; border-bottom:#000000 2px solid; border-left:none; border-right:none;}
 .btn-english{border: 1px solid #FFF; border-radius:5px;}
 .mobile-area{width:500px; margin-right:0px;}
@@ -444,7 +444,7 @@ a {color:#6CC;} a:hover{color:#699;}
 .profile{width:134px; height:134px; background-color:#FFF; border-radius: 70px; margin: 30px auto 10px auto;}
 .profile img{border-radius: 60px; margin-top:6px; border:#CCC solid 1px; width:120px; height:120;}
 .teasebox{width:180px;
- height:195px; background-size:180px 195px; background-repeat:no-repeat; margin:auto; padding:77px 9px 0px 9px; color:#999; font-size:13px;;}
+ height:195px; background-size:180px 195px; background-repeat:no-repeat; margin:auto; padding:77px 9px 0px 9px; color:#999; font-size:13px;}
 
 
 
@@ -610,7 +610,7 @@ a:hover{text-decoration: none;}
 #starts-on{float: left; padding-left: 30px;}
 #starts-on button{background-color: #FFF; border:1px solid #999999; border-radius: 3px;}
 #ends{width:200px;}
-#ends label{font-weight: 400; padding-left: 10px; position:relative; top: -3px;]}
+#ends label{font-weight: 400; padding-left: 10px; position:relative; top: -3px;}
 #ends input[type=radio]{-webkit-appearance:none; border: 1px solid #999999; background-color: #FFF; width: 16px; height: 16px; border-radius: 8px; background: none;}
 #ends input[type=radio]:checked{background: url(/images/radio-button.png) no-repeat; background-position: 3.5px 3.5px;}
 #on-radio{float:left; padding-top: 30px; padding-left: 40px;}
@@ -795,19 +795,20 @@ body {
 	background-color: #FFF;
 	border-radius: 3px;
 	border:1px solid #999999;
-	margin-right: 15px;
-	width: 200px;
-	height: 200px;
+	margin: 15px 15px 15px 15px;
+	width: 150px;
+	height: 150px;
 	padding: 0 0 0 0;
 }
 
 .photo-preview-upload-button-position{
-    position: absolute;
-	left: 25px;
-	top: 150px;
-	width: 140px;
+	position: absolute;
+	left: 10px;
+	top: 100px;
+	width: 120px;
 	height: 30px;
 	display: none;
+	font-size: 12px;
 }
 
 .photo-preview-cancel-button{
@@ -825,6 +826,15 @@ body {
     right: 7px;
     top: -4px;
 
+}
+
+.add-new-photo-button {
+	position: absolute;
+	top: 80px;
+	left: 25px;
+	width: 140px;
+	height: 30px;
+	display: none;
 }
 
 .photo-preview-div .preview-img{

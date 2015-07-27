@@ -619,17 +619,18 @@
         }
 
         function setupPhotoForm() {
+            var availableImage = $("#availableImage").val().split(',');
+            var j = 0;
+
             for (i = 1; i < 11; i++) {
-                $("#photo-preview-div-"+i).mouseover(function (e) {
-                            $(e.target.children[0]).css("display","block");
-                            $(e.target.children[1]).css("display","block");
-                        }
-                );
-                $("#photo-preview-div-"+i).mouseleave(function (e) {
-                            $(e.target.children[0]).css("display","none");
-                            $(e.target.children[1]).css("display","none");
-                        }
-                );
+                if(parseInt(availableImage[j]) == i) {
+                    changeToReplaceStyle("photo-preview-div-" + i);
+                    registerEventForImagePanel("photo-preview-div-"+i);
+                    j = j + 1;
+                } else {
+                    changeToAddNewStyle("photo-preview-div-" + i);
+                }
+
                 $("#id_experience_photo_" + i).attr("class", "upload");
                 $("#id_experience_photo_" + i).change(function (e) {
                     i = e.target.id.substr(-1, 1);
@@ -643,6 +644,9 @@
                     $("#uploadImage_" + i).val(string.substring(index + 1));
                 });
 
+                // Set upload file attributes.
+                $("input[type=file]").attr("class", "upload");
+
             }
         }
 
@@ -650,7 +654,9 @@
             for (i = 1; i < 11; i++) {
                 $('#id_experience_photo_' + i).change(function (e) {
                     if (verifyImages(i)) {
+                        // Show animation.
                         $('#id_experience_photo_gif_' + i).attr("style", "display:block;");
+                        // Fetch data and upload.
                         var formData = new FormData();
                         formData.append('experience_photo_' + i, this.files[0]);
                         postFile(location.href, formData, i);
@@ -760,6 +766,8 @@
                 signal.text("Experience Updated");
                 signal.fadeOut("slow");
                 $('#id_experience_photo_gif_' + index).attr("style", "display:none;");
+                changeToReplaceStyle('photo-preview-div-'+index);
+                registerEventForImagePanel('photo-preview-div-'+index);
                 $('#photo-preview-div-'+index).css("background", "url(" + "/images/experiences/" + experienceId + "/experience" + experienceId + "_" + index + ".jpg" + "?" + new Date().getTime() +")");
                 $('#photo-preview-div-'+index).css("background-size", "cover");
 
@@ -778,6 +786,37 @@
         $('.list-tab').removeClass('active-tab');
         var tabId = step + '-tab';
         $('#' + tabId).addClass('active-tab');
+    }
+
+    function changeToReplaceStyle(divId) {
+        $("#"+divId).find("button").css("display", "none");
+        $("#"+divId).find("div").attr("class", "fileUpload btn btn-primary photo-preview-upload-button-position");
+        $("#"+divId).find("div").css("display", "none");
+    }
+
+    function changeToAddNewStyle(divId) {
+        $("#"+divId).find("button").css("display", "none");
+        $("#"+divId).find("div").attr("class", "fileUpload btn btn-primary add-new-photo-button");
+        $("#"+divId).find("div").css("display", "block");
+        $("#"+divId).css("background-color", "white");
+    }
+
+    function registerEventForImagePanel(divId) {
+        $("#"+divId).mouseover(function (e) {
+                    $(e.target.children[0]).css("display","block");
+                    $(e.target.children[1]).css("display","block");
+                }
+        );
+        $("#"+divId).mouseleave(function (e) {
+                    $(e.target.children[0]).css("display","none");
+                    $(e.target.children[1]).css("display","none");
+                }
+        );
+    }
+
+    function unbindEventForImagePanel(divId) {
+        $("#"+divId).unbind("mouseover");
+        $("#"+divId).unbind("mouseleave");
     }
 
     $(document).ready(function () {
@@ -801,6 +840,8 @@
             }
         });
     });
+
+
 
 
 </script>

@@ -2434,11 +2434,20 @@ def manage_listing_photo(request, experience, context):
 
     if request.method == 'GET':
         data = {}
+        photo_indexes = ''
+        photo_list = []
         photos = Photo.objects.filter(experience_id = experience.id)
         for index in range(len(photos)):
-            data['experience_photo_' + photos[index].name.split('_')[-1].split('.')[0]] = photos[index]
-            data['experience_photo_' + photos[index].name.split('_')[-1].split('.')[0] + '_file_name'] = photos[index].name
+            photo_index = photos[index].name.split('_')[-1].split('.')[0]
+            data['experience_photo_' + photo_index] = photos[index]
+            data['experience_photo_' + photo_index + '_file_name'] = photos[index].name
             data['id'] = experience.id
+            photo_list = photo_list + [photo_index]
+        photo_list.sort()
+        if photo_list:
+            for photo_index in photo_list:
+                photo_indexes = photo_indexes + photo_index  + ','
+        data['photo_indexes'] = photo_indexes
 
         form = ExperiencePhotoForm(data)
 
@@ -2447,7 +2456,6 @@ def manage_listing_photo(request, experience, context):
 
     elif request.method == 'POST':
         form = ExperiencePhotoForm(request.POST, request.FILES)
-
 
         if form.is_valid():
             for index in range(1, 10):
@@ -2460,17 +2468,17 @@ def manage_listing_photo(request, experience, context):
                     file = request.FILES[field_name]
                     extension = '.jpg'
                     filename = 'experience' + str(experience.id) + '_' + str(index) + extension
+                    dir_name = 'experiences/' + str(experience.id) + '/'
                     destination = open(dirname + filename, 'wb+')
 
 
                     if Photo.objects.filter(name=filename).__len__() == 0:
-                        photo = Photo(name=filename, directory='experiences/' + str(experience.id) + '/',
-                                      image=file, experience=experience)
+                        photo = Photo(name=filename, directory=dir_name,
+                                      image=dir_name + filename, experience=experience)
                         photo.save()
-                    else:
-                        for chunk in request.FILES[field_name].chunks():
-                            destination.write(chunk)
-                            destination.close()
+                    for chunk in request.FILES[field_name].chunks():
+                        destination.write(chunk)
+                        destination.close()
 
             # todo: add to chinese db
             experience.save()

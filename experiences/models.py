@@ -80,7 +80,7 @@ class Photo(models.Model):
 
     name = models.CharField(max_length=50)
     directory = models.CharField(max_length=50)
-    image = models.ImageField(upload_to=upload_path)
+    image = models.ImageField()
     experience = models.ForeignKey(Experience)
 
 class Review(models.Model):
