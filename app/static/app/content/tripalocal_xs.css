@@ -815,10 +815,9 @@ body {
 	width: 20px;
 	height: 20px;
 	position: absolute;
-	left: 160px;
+	left: 110px;
 	top: 10px;
 	display: none;
-
 }
 
 .photo-preview-cancel-button-icon{
@@ -830,11 +829,12 @@ body {
 
 .add-new-photo-button {
 	position: absolute;
-	top: 80px;
-	left: 25px;
-	width: 140px;
+	left: 10px;
+	top: 60px;
+	width: 120px;
 	height: 30px;
 	display: none;
+	font-size: 12px;
 }
 
 .photo-preview-div .preview-img{
