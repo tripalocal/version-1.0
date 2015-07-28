@@ -1,8 +1,16 @@
-<input value="{{form.data.photo_indexes}}" id="availableImage"/>
 <div id="photo-form" class="calendar">
     <div class="section" id="section-add-photo">
+        <div id="location">
+            <p id="photo-heading"><strong>Details</strong></p><br><br><br>
+            <p id="location-details">
+                <span>Descriptions of your</span><br>
+                <span>experience displayed</span><br>
+                <span>on your public listing</span><br>
+                <span>page.</span><br>
+            </p>
+        </div>
         <div class="row">
-            <div id="photo-preview-div-1" class = "col-lg-4 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_1_file_name}}); background-size: cover;">
+            <div id="photo-preview-div-1" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_1_file_name}}); background-size: cover;">
                 <button id="upload-file-delete-button-1" type="button" class="btn btn-primary photo-preview-cancel-button">
                     <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
                 </button>
@@ -12,7 +20,7 @@
                 </div>
                 <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_1" style="display: none;">
             </div>
-            <div id="photo-preview-div-2" class = "col-lg-4 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_2_file_name}}); background-size: cover;">
+            <div id="photo-preview-div-2" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_2_file_name}}); background-size: cover;">
                 <button id="upload-file-delete-button-2" type="button" class="btn btn-primary photo-preview-cancel-button">
                     <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
                 </button>
@@ -22,7 +30,13 @@
                 </div>
                 <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_2" style="display: none;">
             </div>
-            <div id="photo-preview-div-3" class = "col-lg-4 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_3_file_name}}); background-size: cover;">
+        </div>
+
+
+        <div class="empty-block">
+        </div>
+        <div class="row">
+            <div id="photo-preview-div-3" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_3_file_name}}); background-size: cover;">
                 <button id="upload-file-delete-button-3" type="button" class="btn btn-primary photo-preview-cancel-button">
                     <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
                 </button>
@@ -32,12 +46,7 @@
                 </div>
                 <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_3" style="display: none;">
             </div>
-        </div>
-
-
-
-        <div class="row">
-            <div id="photo-preview-div-4" class = "col-lg-4 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_4_file_name}}); background-size: cover;">
+            <div id="photo-preview-div-4" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_4_file_name}}); background-size: cover;">
                 <button id="upload-file-delete-button-4" type="button" class="btn btn-primary photo-preview-cancel-button">
                     <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
                 </button>
@@ -47,7 +56,12 @@
                 </div>
                 <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_4" style="display: none;">
             </div>
-            <div id="photo-preview-div-5" class = "col-lg-4 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_5_file_name}}); background-size: cover;">
+        </div>
+
+        <div class="empty-block">
+        </div>
+        <div class="row">
+            <div id="photo-preview-div-5" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_5_file_name}}); background-size: cover;">
                 <button id="upload-file-delete-button-5" type="button" class="btn btn-primary photo-preview-cancel-button">
                     <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
                 </button>
@@ -57,8 +71,7 @@
                 </div>
                 <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_5" style="display: none;">
             </div>
-
-            <div id="photo-preview-div-6" class = "col-lg-4 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_6_file_name}}); background-size: cover;">
+            <div id="photo-preview-div-6" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_6_file_name}}); background-size: cover;">
                 <button id="upload-file-delete-button-6" type="button" class="btn btn-primary photo-preview-cancel-button">
                     <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
                 </button>
@@ -70,9 +83,10 @@
             </div>
         </div>
 
-
+        <div class="empty-block">
+        </div>
         <div class="row">
-            <div id="photo-preview-div-7" class = "col-lg-4 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_7_file_name}}); background-size: cover;">
+            <div id="photo-preview-div-7" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_7_file_name}}); background-size: cover;">
                 <button id="upload-file-delete-button-7" type="button" class="btn btn-primary photo-preview-cancel-button">
                     <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
                 </button>
@@ -82,7 +96,7 @@
                 </div>
                 <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_7" style="display: none;">
             </div>
-            <div id="photo-preview-div-8" class = "col-lg-4 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_8_file_name}}); background-size: cover;">
+            <div id="photo-preview-div-8" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_8_file_name}}); background-size: cover;">
                 <button id="upload-file-delete-button-8" type="button" class="btn btn-primary photo-preview-cancel-button">
                     <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
                 </button>
@@ -92,7 +106,12 @@
                 </div>
                 <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_8" style="display: none;">
             </div>
-            <div id="photo-preview-div-9" class = "col-lg-4 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_9_file_name}}); background-size: cover;">
+        </div>
+
+        <div class="empty-block">
+        </div>
+        <div class="row">
+            <div id="photo-preview-div-9" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_9_file_name}}); background-size: cover;">
                 <button id="upload-file-delete-button-9" type="button" class="btn btn-primary photo-preview-cancel-button">
                     <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
                 </button>
@@ -102,25 +121,26 @@
                 </div>
                 <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_9" style="display: none;">
             </div>
+            <div id="photo-preview-div-10" class = "col-lg-6 photo-preview-div" style="background: url({{ MEDIA_URL }}experiences/{{form.data.id}}/{{form.data.experience_photo_10_file_name}}); background-size: cover;">
+                <button id="upload-file-delete-button-10" type="button" class="btn btn-primary photo-preview-cancel-button">
+                    <span class="glyphicon glyphicon-remove photo-preview-cancel-button-icon"></span>
+                </button>
+                <div id="upload-file-add-button-10" class="fileUpload btn btn-primary photo-preview-upload-button-position">
+                    <img src="/images/camera.gif" alt=""><span>Replace Photo</span>
+                    {{form.experience_photo_10}}
+                </div>
+                <img src="{{MEDIA_URL}}experiences/ajax-loader.gif" id="id_experience_photo_gif_10" style="display: none;">
+            </div>
         </div>
 
+
+        <div class="section" style="text-align:right;">
+            <input type="submit" value="Last Step" id="last-step" />
+            <input type="submit" value="Next Step" id="next-step" />
+        </div>
     </div>
-
-
 </div>
 
-    <div class="section" style="text-align:right;">
-        <input type="submit" value="Last Step" id="last-step" />
-        <input type="submit" value="Next Step" id="next-step" />
-    </div>
-    <!-- creating spare space  -->
-    <div class="creating-slot-button-active create-slot-detail">
-    </div>
-    <div class="creating-slot-button-active create-slot-detail">
-    </div>
-    <div class="creating-slot-button-active create-slot-detail">
-    </div>
-</div>
 
 <!-- Info bar -->
 <div class="info-bar">
@@ -143,3 +163,4 @@
     </div>
     <br>
 </div>
+<input value="{{form.data.photo_indexes}}" id="availableImage" style="display:none;"/>

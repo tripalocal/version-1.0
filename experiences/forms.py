@@ -231,7 +231,7 @@ class ExperiencePhotoForm(forms.Form):
     experience_photo_8 = forms.ImageField(required = False)
     experience_photo_9 = forms.ImageField(required = False)
     experience_photo_10 = forms.ImageField(required = False)
-    delete_photo = forms.CharField(max_length=50, required=False)
+    delete_photo = forms.CharField(max_length=50, required=False, widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePhotoForm, self).__init__(*args, **kwargs)

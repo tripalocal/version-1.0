@@ -648,6 +648,13 @@
                 $("input[type=file]").attr("class", "upload");
 
             }
+
+            var newWidth = $("#location").width();
+            var newHeight = $("#location").height();
+            $(".empty-block").css("width", newWidth);
+            $(".empty-block").css("height", newHeight);
+            $(".empty-block").css("float", "left");
+
         }
 
         function setListenerForPostingPhoto() {
@@ -662,6 +669,14 @@
                         postFile(location.href, formData, i);
                     }
                 });
+
+                $('#upload-file-delete-button-' + i).click(function(e) {
+                    if(confirm("Are you sure to delete the image?")) {
+                        var index = i;
+                        postDatum(location.href, {'delete_file': e.target.id.split('-').pop()});
+                    }
+                });
+
             }
         }
 
@@ -739,7 +754,12 @@
 
         $.post(href, $.extend({
             'csrfmiddlewaretoken': $("[name='csrfmiddlewaretoken']")[0].value
-        }, datum)).done(function () {
+        }, datum)).done(function (result) {
+            if(result.data == "delete_image") {
+                var index = result.index;
+                unbindEventForImagePanel('photo-preview-div-'+index);
+                changeToAddNewStyle('photo-preview-div-'+index);
+            }
             signal.fadeIn("slow");
             signal.text("Experience Updated");
             signal.fadeOut("slow");
@@ -791,6 +811,7 @@
     function changeToReplaceStyle(divId) {
         $("#"+divId).find("button").css("display", "none");
         $("#"+divId).find("div").attr("class", "fileUpload btn btn-primary photo-preview-upload-button-position");
+        $("#"+divId).find("div").find("span").text("Replace the Photo");
         $("#"+divId).find("div").css("display", "none");
     }
 
@@ -798,7 +819,9 @@
         $("#"+divId).find("button").css("display", "none");
         $("#"+divId).find("div").attr("class", "fileUpload btn btn-primary add-new-photo-button");
         $("#"+divId).find("div").css("display", "block");
+        $("#"+divId).find("div").find("span").text("Add a Photo");
         $("#"+divId).css("background-color", "white");
+        $("#"+divId).css("background", "");
     }
 
     function registerEventForImagePanel(divId) {

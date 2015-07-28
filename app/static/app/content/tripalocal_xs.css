@@ -781,7 +781,7 @@ body {
     padding-right:6px;
 }
 /*list-photo.html*/
-#section-add-photo{height: 680px;}
+#section-add-photo{height: 1150px;}
 #photo-heading{color: #666666; padding-top: 30px; padding-left: 30px; float: left;}
 #photo-size-reminder{color: #999999; padding-left: 85px; padding-top: 30px; float: left;}
 #photo-detail-info{color: #999999; padding-left: 30px; float: left;}
@@ -796,26 +796,27 @@ body {
 	border-radius: 3px;
 	border:1px solid #999999;
 	margin: 15px 15px 15px 15px;
-	width: 150px;
-	height: 150px;
+	width: 200px;
+	height: 200px;
 	padding: 0 0 0 0;
+	float: left;
 }
 
 .photo-preview-upload-button-position{
 	position: absolute;
-	left: 10px;
-	top: 100px;
-	width: 120px;
+	left: 20px;
+	top: 150px;
+	width: 150px;
 	height: 30px;
 	display: none;
-	font-size: 12px;
+	font-size: 15px;
 }
 
 .photo-preview-cancel-button{
 	width: 20px;
 	height: 20px;
 	position: absolute;
-	left: 110px;
+	left: 150px;
 	top: 10px;
 	display: none;
 }
@@ -829,12 +830,12 @@ body {
 
 .add-new-photo-button {
 	position: absolute;
-	left: 10px;
-	top: 60px;
-	width: 120px;
+	left: 20px;
+	top: 80px;
+	width: 150px;
 	height: 30px;
 	display: none;
-	font-size: 12px;
+	font-size: 15px;
 }
 
 .photo-preview-div .preview-img{
@@ -852,11 +853,14 @@ body {
 
 .photo-preview-thumbnail{background-color: #FFF; border-radius: 3px; border:1px solid #999999; margin-right: 15px; float: left; width: 200px; height: 200px; padding-left: 15px;}
 
+.photo-form-empty-block {
+	width: 150px;
+}
 
 
 
 /*list-location.html*/
-#location{float: left;}
+#location{float: left; }
 #location-details{ color: #999999; padding-left: 30px; }
 #meet-up-instruction{float: right; color: #999999; padding-right: 40px; padding-top: 30px;}
 #meet-up-instruction textarea{width: 350px; height: 80px; border-radius: 3px; border: 1px solid #999999;}

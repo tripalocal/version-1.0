@@ -2456,6 +2456,24 @@ def manage_listing_photo(request, experience, context):
 
     elif request.method == 'POST':
         form = ExperiencePhotoForm(request.POST, request.FILES)
+        if 'delete_file' in request.POST:
+            index = request.POST['delete_file']
+            extension = '.jpg'
+            filename = 'experience' + str(experience.id) + '_' + str(index) + extension
+            dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
+            # Delete in file system.
+            os.remove(dirname + filename)
+            # Delete record in database.
+            photo = Photo.objects.filter(name=filename)
+            if photo.__len__() == 1:
+                photo[0].delete()
+                return HttpResponse(json.dumps({'success': True, 'data': 'delete_image', 'index':index}), content_type='application/json')
+            else:
+                return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+
+
+
+
 
         if form.is_valid():
             for index in range(1, 10):
