@@ -10,12 +10,16 @@ class RegisteredUser(models.Model):
     image_url = models.CharField(max_length=200)
     image = models.ImageField(upload_to=upload_path)
     phone_number = models.CharField(max_length=15)
-    bio = models.TextField()
     rate = models.DecimalField(max_digits=2, decimal_places=1)
     wishlist = models.ManyToManyField(Experience, related_name='user_wishlist')
 
     def __str__(self):
         return str(self.user.id) + '--' + self.user.email
+
+class RegisteredUserBio(models.Model):
+    bio = models.TextField()
+    language = models.CharField(max_length=2)
+    registereduser = models.ForeignKey(RegisteredUser)
 
 class Subscription(models.Model):
     email = models.EmailField()
@@ -61,3 +65,26 @@ class UserPhoto(models.Model):
     image = models.ImageField(upload_to=upload_path)
     user = models.ForeignKey(User)
     type = models.CharField(max_length=50)
+
+def get_user_bio(registereduser, language):
+    if registereduser.registereduserbio_set is not None and len(registereduser.registereduserbio_set.all()) > 0:
+        b = registereduser.registereduserbio_set.filter(language=language)
+        if len(b)>0:
+            return b[0].bio
+        else:
+            return registereduser.registereduserbio_set.all()[0].bio
+    else:
+        return None
+
+def save_user_bio(registereduser, newbio, language):
+    if registereduser.registereduserbio_set is not None:
+        b = registereduser.registereduserbio_set.filter(language=language)
+        if len(b)>0:
+            b[0].bio=newbio
+            b[0].save()
+        else:
+            bio = RegisteredUserBio(bio=newbio, language=language, registereduser=registereduser)
+            bio.save()
+    else:
+        bio = RegisteredUserBio(bio=newbio, language=language, registereduser=registereduser)
+        bio.save()

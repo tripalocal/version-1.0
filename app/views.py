@@ -8,12 +8,11 @@ from django.template import RequestContext, loader
 from datetime import *
 from django import forms
 from django.contrib.auth import authenticate, login
-from app.forms import UserCreateForm
-from allauth.account.signals import password_reset
+from allauth.account.signals import password_reset, user_signed_up, user_logged_in
 from allauth.account.views import PasswordResetFromKeyDoneView 
 from django.dispatch import receiver
 from app.forms import SubscriptionForm, HomepageSearchForm, UserProfileForm, UserCalendarForm
-from app.models import Subscription, RegisteredUser, InstantBookingTimePeriod, BlockOutTimePeriod
+from app.models import *
 from django.core.mail import send_mail
 from django.contrib import messages
 import string, random, pytz, base64, subprocess, os, geoip2.database, PIL
@@ -21,7 +20,7 @@ from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, saveProfileImage, getBGImageURL, getProfileImage
 from allauth.account.signals import email_confirmed, password_changed
-from experiences.models import Booking, Experience, Payment
+from experiences.models import Booking, Experience, Payment, get_experience_title, get_experience_meetup_spot
 from experiences.forms import Currency, DollarSign
 from django.core.files.uploadedfile import SimpleUploadedFile, File
 from django.db import connections
@@ -37,8 +36,6 @@ PROFILE_IMAGE_SIZE_LIMIT = 1048576
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
 GEO_POSTFIX = "/"
-
-CNDB = 'cndb'
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -125,13 +122,13 @@ def home(request):
             response = reader.city(ip)
             country = response.country.name
             reader.close()
-            #if country.lower() in ['china']:
-            #    return HttpResponseRedirect('/cn')
+            if country.lower() in ['china']:
+                return HttpResponseRedirect('/cn')
         except Exception:
             reader.close()
 
-        #if request.LANGUAGE_CODE.startswith("zh"):
-        #    return HttpResponseRedirect('/cn')
+        if request.LANGUAGE_CODE.startswith("zh"):
+            return HttpResponseRedirect('/cn')
 
     experienceList = Experience.objects.filter(id__in=[1,2,20])
     idxList = random.sample(range(len(experienceList)), 3)
@@ -263,19 +260,8 @@ def mylisting(request):
     exps = Experience.objects.raw('select * from experiences_experience where id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime', [request.user.id])
 
     for experience in exps:
+        experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
         experiences.append(experience)
-
-    #cursor = connections[CNDB].cursor()
-    #rows = cursor.execute('select id, status, title from experiences_experience where id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime',
-    #                     [request.user.id]).fetchall()
-    
-    #if rows:
-    #    for index in range(len(rows)):
-    #        exp = Experience()
-    #        exp.id = rows[index][0]
-    #        exp.status = rows[index][1]
-    #        exp.title = rows[index][2]
-    #        experiences.append(exp)
 
     context['experiences'] = experiences
 
@@ -283,23 +269,6 @@ def mylisting(request):
 
 def getreservation(user):
     bookings = Booking.objects.raw('select * from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime', [user.id])
-    
-    cursor = connections[CNDB].cursor()
-    cursor.execute('select datetime, status, guest_number, user_id, experience_id, payment_id from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime',
-                         [user.id])
-    rows = cursor.fetchall()
-    
-    bookings_cn = []
-    if rows:
-        for index in range(len(rows)):
-            bk = Booking()
-            bk.datetime = rows[index][0]
-            bk.status = rows[index][1]
-            bk.guest_number = rows[index][2]
-            bk.user_id = rows[index][3]
-            bk.experience_id = rows[index][4]
-            bk.payment_id = rows[index][5]
-            bookings_cn.append(bk)
 
     current_reservations = []
     past_reservations = []
@@ -312,44 +281,11 @@ def getreservation(user):
         phone_number = payment.phone_number if payment.phone_number != None and len(payment.phone_number) else guest.registereduser.phone_number
         reservation = {"booking_datetime":booking.datetime.astimezone(local_timezone), "booking_status":booking.status,
                        "booking_guest_number":booking.guest_number,"booking_id":booking.id,
-                       "experience_id":experience.id,"experience_title":experience.title, 
+                       "experience_id":experience.id,"experience_title":get_experience_title(experience, settings.LANGUAGES[0][0]), 
                        "payment_city":payment.city, "payment_country":payment.country,
                        "guest_first_name":guest.first_name, "guest_last_name":guest.last_name, "guest_phone_number":phone_number}
 
         if datetime.utcnow().replace(tzinfo=pytz.utc) > booking.datetime + timedelta(hours=48):
-            past_reservations.append(reservation)
-        else:
-            current_reservations.append(reservation)
-
-    for booking in bookings_cn:
-        cursor.execute("select id, title from experiences_experience where id = %s", [booking.experience_id])
-        row = cursor.fetchone()
-        experience = Experience()
-        if row:
-            experience.id = row[0]
-            experience.title = row[1]
-            
-        payment = Payment()
-        if booking.payment_id != None:
-            cursor.execute("select city, country from experiences_payment where id = %s", [booking.payment_id])
-            row = cursor.fetchone()
-            if row:
-                payment.city = row[0]
-                payment.country = row[1]
-        
-        guest = User()
-        cursor.execute("select first_name, last_name from auth_user where id = %s", [booking.user_id])
-        row = cursor.fetchone()
-        if row:
-            guest.first_name = row[0]
-            guest.last_name = row[1]
-
-        reservation = {"booking_datetime":booking.datetime.astimezone(local_timezone), "booking_status":booking.status,"booking_guest_number":booking.guest_number,
-                       "experience_id":experience.id,"experience_title":experience.title, 
-                       "payment_city":payment.city, "payment_country":payment.country,
-                       "guest_first_name":guest.first_name, "guest_last_name":guest.last_name}
-
-        if datetime.utcnow().replace(tzinfo=local_timezone) > booking.datetime + timedelta(hours=48):
             past_reservations.append(reservation)
         else:
             current_reservations.append(reservation)
@@ -380,46 +316,9 @@ def mytrip(request):
         bookings = Booking.objects.filter(user=user_id)
 
         for booking in bookings:
+            booking.experience.title = get_experience_title(booking.experience, settings.LANGUAGES[0][0])
+            booking.experience.meetup_spot = get_experience_meetup_spot(booking.experience, settings.LANGUAGES[0][0])
             user_bookings.append(booking)
-
-        cursor = connections[CNDB].cursor()
-        cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s order by datetime',
-                             [request.user.id])
-        rows = cursor.fetchall()
-
-        if rows:
-            for index in range(len(rows)):
-                bk = Booking()
-                bk.datetime = rows[index][0]
-                bk.status = rows[index][1]
-                bk.guest_number = rows[index][2]
-                exp = Experience()
-                cursor.execute('select city, meetup_spot, duration, title from experiences_experience where id = %s',
-                             [rows[index][3]])
-                row = cursor.fetchone()
-                exp.id = rows[index][3]
-                exp.city = row[0]
-                exp.meetup_spot = row[1]
-                exp.duration = row[2]
-                exp.title = row[3]
-                #row = cursor.execute('select first_name, last_name from auth_user where id in (select user_id from experiences_experience_hosts where experience_id = %s)',
-                #             [rows[index][3]]).fetchone()
-                #host = User()
-                #host.first_name = row[0]
-                #host.last_name = row[1]
-                #exp.hosts.
-                bk.experience = exp
-                user_bookings.append(bk)
-    
-        #filter out bookings with reviews given
-        #index = 0
-        #while index < len(user_bookings):
-        #    experienceKey = user_bookings[index].experience
-        #    if (hasReviewedExperience(user_id, experienceKey)):
-        #        user_bookings.pop(index)
-        #        i -= 1
-
-        #    index += 1
 
         # Sort user_bookings with their dates
         user_bookings = sorted(user_bookings, key=lambda booking: booking.datetime, reverse=True)
@@ -457,10 +356,7 @@ def mytrip(request):
                 bookings_all.append([booking])
                 end_dates.append([end_date])
             currentDate += 1
-            
 
-        #print(bookings_all)
-        #print(end_dates)
         context = RequestContext(request, {
             'bookings_all' : bookings_all,
             'end_dates' : end_dates,
@@ -481,17 +377,12 @@ def myprofile(request):
         form = UserProfileForm(request.POST, request.FILES)
         if form.is_valid():
             profile.phone_number = form.cleaned_data['phone_number']
-            profile.bio = form.cleaned_data['bio']
             profile.save()
+            save_user_bio(profile, form.cleaned_data['bio'], settings.LANGUAGES[0][0])
 
             #save the profile image
             if 'image' in request.FILES:
                 saveProfileImage(request.user, profile, request.FILES['image'])
-
-            #copy to the chinese website -- database
-            cursor = connections[CNDB].cursor()
-            cursor.execute("update app_registereduser set phone_number=%s, image_url=%s, bio=%s, image=%s where user_id=%s", 
-                           [profile.phone_number, profile.image_url, profile.bio, profile.image_url, request.user.id])
 
     #display the original/updated data
     data={"first_name":request.user.first_name, "last_name":request.user.last_name, "email":request.user.email}
@@ -505,8 +396,8 @@ def myprofile(request):
 
     if profile.phone_number:
         data["phone_number"]=profile.phone_number
-    if profile.bio:
-        data["bio"]=profile.bio
+
+    data["bio"]=get_user_bio(profile, settings.LANGUAGES[0][0])
         
     form = UserProfileForm(data=data, files=photo)
 
@@ -627,3 +518,155 @@ def mycalendar(request):
 @receiver(password_changed)
 def password_change_callback(sender, request, user, **kwargs):
     messages.success(request, str(user.id) + '_PasswordChanged')
+
+@receiver(user_signed_up)
+def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
+    try:
+        new_registereduser = RegisteredUser.objects.get(user_id = user.id)
+    except RegisteredUser.DoesNotExist:
+        new_registereduser = RegisteredUser(user_id = user.id)
+        if 'phone_number' in kwargs:
+            new_registereduser.phone_number = kwargs['phone_number']
+        new_registereduser.save()
+
+    username = user.username
+
+    new_email = Users(id = email_account_generator() + ".user@tripalocal.com",
+                        name = username,
+                        maildir = username + "/")
+    new_email.save()
+
+    new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
+    new_alias.save()
+
+    with open('/etc/postfix/canonical', 'a') as f:
+        f.write(user.email + " " + new_email.id + "\n")
+        f.close()
+
+    subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    
+    with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+        f.write(new_email.id + "\n")
+        f.close()
+
+    """get the client ip from the request
+    """
+    #remote_address = request.META.get('REMOTE_ADDR')
+    remote_address = request.META.get('HTTP_X_FORWARDED_FOR')or request.META.get('REMOTE_ADDR')
+    # set the default value of the ip to be the REMOTE_ADDR if available
+    # else None
+    ip = remote_address
+    # try to get the first non-proxy ip (not a private ip) from the
+    # HTTP_X_FORWARDED_FOR
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        proxies = x_forwarded_for.split(',')
+        # remove the private ips from the beginning
+        while (len(proxies) > 0 and proxies[0].startswith(PRIVATE_IPS_PREFIX)):
+            proxies.pop(0)
+            # take the first ip which is not a private one (of a proxy)
+            if len(proxies) > 0:
+                ip = proxies[0]
+
+    mp = Mixpanel(settings.MIXPANEL_TOKEN)
+    mp.people_set(user.email, {"IP":ip, 
+                               "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
+                               })
+
+    try:
+        reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+        response = reader.city(ip)
+        country = response.country.name
+        region = response.subdivisions.most_specific.name
+        postcode = response.postal.code
+        city = response.city.name
+        longitude = response.location.longitude
+        latitude = response.location.latitude
+
+        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "$first_name":user.first_name, "$last_name":user.last_name, "Postcode":postcode, "Latitude":latitude, "Longitude":longitude})
+        reader.close()
+    except Exception:
+        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+        reader.close()
+
+    if sociallogin:
+        data = sociallogin.account.extra_data
+        first_name=""
+        last_name=""
+        age=0
+        gender=""
+        email = user.email
+
+        if 'first_name' in data:
+            first_name = data['first_name']
+        if 'last_name' in data:
+            last_name = data['last_name']
+        if 'age' in data:
+            age = data['age']
+        if 'gender' in data:
+            gender = data['gender']
+
+        mp = Mixpanel(settings.MIXPANEL_TOKEN)
+        mp.track(email, 'has signed up via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+
+@receiver(user_logged_in)
+def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
+    remote_address = request.META.get('HTTP_X_FORWARDED_FOR')or request.META.get('REMOTE_ADDR')
+    # set the default value of the ip to be the REMOTE_ADDR if available
+    # else None
+    ip = remote_address
+    # try to get the first non-proxy ip (not a private ip) from the
+    # HTTP_X_FORWARDED_FOR
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        proxies = x_forwarded_for.split(',')
+        # remove the private ips from the beginning
+        while (len(proxies) > 0 and proxies[0].startswith(PRIVATE_IPS_PREFIX)):
+            proxies.pop(0)
+            # take the first ip which is not a private one (of a proxy)
+            if len(proxies) > 0:
+                ip = proxies[0]
+
+    mp = Mixpanel(settings.MIXPANEL_TOKEN)
+    mp.people_set(user.email, {"IP":ip})
+
+    try:
+        reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+        response = reader.city(ip)
+        country = response.country.name
+        region = response.subdivisions.most_specific.name
+        postcode = response.postal.code
+        city = response.city.name
+        longitude = response.location.longitude
+        latitude = response.location.latitude
+
+        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
+        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "Postcode":postcode, 
+                                   "Latitude":latitude, "Longitude":longitude, "Language":settings.LANGUAGES[0][1]}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
+        reader.close()
+    except Exception:
+        reader.close()
+        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
+
+    if sociallogin:
+        data = sociallogin.account.extra_data
+        first_name=""
+        last_name=""
+        age=0
+        gender=""
+        email = user.email
+
+        if 'first_name' in data:
+            first_name = data['first_name']
+        if 'last_name' in data:
+            last_name = data['last_name']
+        if 'age' in data:
+            age = data['age']
+        if 'gender' in data:
+            gender = data['gender']
+
+        mp = Mixpanel(settings.MIXPANEL_TOKEN)
+        mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})

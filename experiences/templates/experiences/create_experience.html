@@ -572,7 +572,8 @@
         {
             $("#id_experience_photo_"+i).attr("class", "upload");
 
-            $("#id_experience_photo_"+i).change(function(){
+            $("#id_experience_photo_"+i).change(function(e){
+                i = e.target.id.split("_")[3];
                 string = $("#id_experience_photo_"+i).val();
                 index=-1;
                 index = string.lastIndexOf("\\");

@@ -160,7 +160,7 @@
                             <td id="id_experience_dress" class="experience-detail-table-td">{{ experience.dress }}</td>
                         </tr>
 
-                        {% for w in experience.whatsincluded_set.all %}
+                        {% for w in experience.whatsincluded %}
                         <tr>
                             <th id="{{w.item.lower}}" style="padding-bottom:0px;"><h3 style="color:grey">{{w.item}}:</h3></th>
                             <td class="experience-detail-table-td" style="padding-bottom:0px;">{{w.details}}</td>
@@ -221,13 +221,11 @@
                 <div>
                     <div id="experience-hostinterests" class="experience-hostinterests">
                         <div class="gradientMask"></div>
-                        <span id="host_bio">{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.bio }} {% endif %} {% endfor %}</span>
-                    </div>
-                    {% for h in experience.hosts.all %}
-                    {% if forloop.first and h.registereduser.bio|length > 200 %}
+                        <span id="host_bio">{{host_bio}}</span>
+                    </div>      
+                    {% if host_bio|length > 200 %}
                     <div id="bio_show_more" value="More">+ {% trans "More" %}</div>
                     {% endif %}
-                    {% endfor %}
                 </div>
             </div>
         

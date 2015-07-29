@@ -1,4 +1,4 @@
-from experiences.models import Booking, Experience, Payment, WhatsIncluded, Coupon
+from experiences.models import *
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpRespons
 import json, pytz, xlrd, re, os, subprocess, math, logging, ast
 from django.contrib.auth.models import User
 from datetime import *
-from app.models import RegisteredUser, Message
+from app.models import *
 from post_office import mail
 from Tripalocal_V1 import settings
 from tripalocal_messages.models import Aliases, Users
@@ -33,8 +33,6 @@ from django.utils.translation import ugettext_lazy as _, string_concat
 from django.views.decorators.csrf import csrf_exempt
 
 GEO_POSTFIX = "/"
-ENDB = 'default'
-CNDB = 'cndb'
 
 def isLegalInput(inputs):
     for input in inputs:
@@ -82,14 +80,25 @@ def updateExperienceTagsFromXLS(request):
                     all_tags.append(cell_value)
                 else:
                     raise Exception("Type error: column name, " + str(curr_cell))
-            
+
+            cursor = connections['default'].cursor()
+            #delete all existing records
+            cursor.execute("delete from experiences_experience_tags where experiencetag_id in (select id from experiences_experiencetag where language=%s)",[settings.LANGUAGES[0][0]])
+            cursor.execute("delete from experiences_experiencetag where language=%s",[settings.LANGUAGES[0][0]])
+            #add new tags
+            all_tags = [x for x in all_tags if x]
+            for i in range(len(all_tags)):
+                tag = ExperienceTag(tag = all_tags[i], language = settings.LANGUAGES[0][0])
+                tag.save()
+                all_tags.remove(all_tags[i])
+                all_tags.insert(i, tag)
+
             curr_row = 0
             while curr_row < num_rows:
                 curr_row += 1
                 row = worksheet.row(curr_row)
 
                 curr_cell = 0
-                exp_tags=""
                 id = row[curr_cell].value.split("--")[0]
                 id = int(id)
                 try:
@@ -104,12 +113,9 @@ def updateExperienceTagsFromXLS(request):
 
                     if cell_type == 1 or cell_type == 0:
                         if worksheet.cell_value(curr_row, curr_cell).lower() == "y":
-                            exp_tags += all_tags[curr_cell] + ","
+                            exp.tags.add(all_tags[curr_cell-1])
                     else:
                         raise Exception("Type error: row " + str(curr_row) + ", col " + str(curr_cell))
-
-                exp.tags = exp_tags
-                exp.save()
     else:
         form = ExperienceTagsXLSForm()
 
@@ -131,6 +137,8 @@ def saveBookingRequest(booking_request):
         raise Exception("Illegal input")
 
     experience = Experience.objects.get(id=experience_id)
+    experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+    experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
     #create a new account if the user does not exist
     try:
@@ -154,15 +162,9 @@ def saveBookingRequest(booking_request):
         profile = RegisteredUser(user = user, phone_number = phone)
         profile.save()
 
-        cursor = connections[ENDB].cursor()
+        cursor = connections['default'].cursor()
         cursor.execute("Insert into account_emailaddress (user_id,email,verified,primary) values (%s, %s, %s, %s)", 
                        [user.id, email, 1, 1])
-
-        #copy to the chinese website database
-        cursor = connections[CNDB].cursor()
-        cursor.execute("Insert into auth_user (id,first_name,last_name,email) values (%s, %s, %s, %s)", 
-                        [user.id,user.first_name, user.last_name, user.email])
-        cursor.execute("Insert into app_registereduser (user_id) values (%s)", [user.id])
 
         username = user.username
 
@@ -204,9 +206,7 @@ def saveBookingRequest(booking_request):
 
     #add the user to the guest list
     if user not in experience.guests.all():
-        #experience.guests.add(user)
-        cursor = connections['experiencedb'].cursor()
-        cursor.execute("Insert into experiences_experience_guests (experience_id,user_id) values (%s, %s)", [experience_id, user.id])
+        experience.guests.add(user)
 
     host = experience.hosts.all()[0]
     #send an email to the traveller
@@ -380,7 +380,7 @@ def service_wishlist(request):
             if added == "False":
                 try:
                     #user.registereduser.wishlist.add(experience)
-                    cursor = connections[ENDB].cursor()
+                    cursor = connections['default'].cursor()
                     cursor.execute("select id from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id])
                     wl = cursor.fetchone()
                     if wl is not None and len(wl)>0:
@@ -388,11 +388,7 @@ def service_wishlist(request):
                         return HttpResponse(json.dumps(response),content_type="application/json")
 
                     cursor.execute("Insert into app_registereduser_wishlist (experience_id,registereduser_id) values (%s, %s)", [experience.id, user.registereduser.id])
-                    
-                    cursor = connections[CNDB].cursor()
-                    cursor.execute("Select id from app_registereduser where user_id=%s",[user_id])
-                    profile_id = cursor.fetchone()
-                    cursor.execute("Insert into app_registereduser_wishlist (experience_id,registereduser_id) values (%s, %s)", [experience.id, profile_id[0]])
+
                     response={'success':True, 'added':True}
                 except BaseException:
                     response={'success':False, 'error':'fail to add'}
@@ -400,13 +396,9 @@ def service_wishlist(request):
             else:
                 try:
                     #user.registereduser.wishlist.remove(experience)
-                    cursor = connections[ENDB].cursor()
+                    cursor = connections['default'].cursor()
                     cursor.execute("delete from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id])
-                    
-                    cursor = connections[CNDB].cursor()
-                    cursor.execute("Select id from app_registereduser where user_id=%s",[user_id])
-                    profile_id = cursor.fetchone()
-                    cursor.execute("delete from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, profile_id[0]])
+
                     response={'success':True, 'removed':True}
                 except BaseException:
                     response={'success':False, 'error':'fail to remove'}
@@ -423,7 +415,7 @@ def service_wishlist(request):
     elif request.method == 'GET' and request.user.is_authenticated():
         try:
             user = request.user
-            cursor = connections[ENDB].cursor()
+            cursor = connections['default'].cursor()
             wl = cursor.execute("select experience_id from app_registereduser_wishlist where registereduser_id=%s", [user.registereduser.id])
             wl = cursor.fetchall()
             ids = []
@@ -587,36 +579,10 @@ def service_mytrip(request, format=None):
         user = request.user
         booking_status = "paid,accepted,rejected"
         b = Booking.objects.filter(user=user, status__in=booking_status.split(","))
-        cursor = connections[CNDB].cursor()
-        cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s and status in (%s) order by datetime',
-                                [request.user.id, booking_status])
-        rows = cursor.fetchall()
 
         bookings = []
         for booking in b:
             bookings.append(booking)
-
-        if rows:
-            for index in range(len(rows)):
-                bk = Booking()
-                bk.datetime = rows[index][0]
-                bk.status = rows[index][1]
-                bk.guest_number = rows[index][2]
-                exp = Experience()
-                cursor.execute('select meetup_spot, title from experiences_experience where id = %s',
-                                [rows[index][3]])
-                row = cursor.fetchone()
-                exp.id = rows[index][3]
-                exp.meetup_spot = row[0]
-                exp.title = row[1]
-                #row = cursor.execute('select first_name, last_name from auth_user where id in (select user_id from experiences_experience_hosts where experience_id = %s)',
-                #             [rows[index][3]]).fetchone()
-                #host = User()
-                #host.first_name = row[0]
-                #host.last_name = row[1]
-                #exp.hosts.
-                bk.experience = exp
-                bookings.append(bk)
 
         bookings = sorted(bookings, key=lambda booking: booking.datetime, reverse=True)
 
@@ -629,9 +595,12 @@ def service_mytrip(request, format=None):
             host = booking.experience.hosts.all()[0]
             phone_number = host.registereduser.phone_number
             
-            bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status, 'guest_number':booking.guest_number, 
-                  'experience_title':booking.experience.title, 'meetup_spot':booking.experience.meetup_spot, 'experience_id':booking.experience.id,
-                  'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.', 'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
+            bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
+                  'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
+                  'experience_title':get_experience_title(booking.experience,settings.LANGUAGES[0][0]),
+                  'meetup_spot':get_experience_meetup_spot(booking.experience,settings.LANGUAGES[0][0]),
+                  'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.',
+                  'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
 
             bks.append(bk)
 
@@ -660,7 +629,7 @@ def service_myreservation(request, format=None):
 
 #"{"id":58,"accept":"yes"}"
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,)) #SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_acceptreservation(request, format=None):
     try:
@@ -738,7 +707,7 @@ def service_booking(request, format=None):
 
 #{"coupon":"aasfsaf","id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2}
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication)) #
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication)) #
 @permission_classes((IsAuthenticated,))
 def service_couponverification(request, format=None):
     try:
@@ -811,13 +780,13 @@ def service_experience(request, format=None):
         available_date = getAvailableOptions(experience, available_options, available_date)
 
         WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
-        included_food = WhatsIncludedList.filter(item='Food')[0]
-        included_ticket = WhatsIncludedList.filter(item='Ticket')[0]
-        included_transport = WhatsIncludedList.filter(item='Transport')[0]
+        included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
+        included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
+        included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
 
         host = experience.hosts.all()[0]
         host_image = host.registereduser.image_url
-        host_bio = host.registereduser.bio
+        host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
 
         rate = 0.0
         counter = 0
@@ -840,14 +809,14 @@ def service_experience(request, format=None):
             dynamic_price = experience.dynamic_price.split(",")
             dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
 
-        return Response({'experience_title':experience.title,
+        return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
-                         'experience_description':experience.description,
-                         'experience_activity':experience.activity,
-                         'experience_interaction':experience.interaction,
-                         'experience_dress':experience.dress,
-                         'experience_meetup_spot':experience.meetup_spot,
+                         'experience_description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                         'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
+                         'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
+                         'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
+                         'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
                          'experience_price':experience_fee_calculator(float(experience.price)),
                          'experience_currency': str(dict(Currency)[experience.currency.upper()]),
                          'experience_dollarsign': DollarSign[experience.currency.upper()],
@@ -892,13 +861,13 @@ def service_experiencedetail(request, format=None):
         experience = Experience.objects.get(id=exp_id)
         
         WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
-        included_food = WhatsIncludedList.filter(item='Food')[0]
-        included_ticket = WhatsIncludedList.filter(item='Ticket')[0]
-        included_transport = WhatsIncludedList.filter(item='Transport')[0]
+        included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
+        included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
+        included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
 
         host = experience.hosts.all()[0]
         host_image = host.registereduser.image_url
-        host_bio = host.registereduser.bio
+        host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
 
         rate = 0.0
         counter = 0
@@ -921,14 +890,14 @@ def service_experiencedetail(request, format=None):
             dynamic_price = experience.dynamic_price.split(",")
             dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
 
-        return Response({'experience_title':experience.title,
+        return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
-                         'experience_description':experience.description,
-                         'experience_activity':experience.activity,
-                         'experience_interaction':experience.interaction,
-                         'experience_dress':experience.dress,
-                         'experience_meetup_spot':experience.meetup_spot,
+                         'experience_description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                         'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
+                         'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
+                         'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
+                         'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
                          'experience_price':experience_fee_calculator(float(experience.price)),
                          'experience_currency': str(dict(Currency)[experience.currency.upper()]),
                          'experience_dollarsign': DollarSign[experience.currency.upper()],
@@ -959,7 +928,7 @@ def service_experiencedetail(request, format=None):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET','POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_myprofile(request, format=None):
     try:
@@ -967,7 +936,8 @@ def service_myprofile(request, format=None):
         profile = user.registereduser
         if request.method == "GET":
             result={'id':user.id, 'first_name':user.first_name, 'last_name':user.last_name, 'email':user.email,
-                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,'bio':profile.bio,'rate':profile.rate}
+                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,
+                     'bio':get_user_bio(profile, settings.LANGUAGES[0][0]),'rate':profile.rate}
             return Response(result, status=status.HTTP_200_OK)
         elif request.method == "POST":
             data = request.data
@@ -975,14 +945,15 @@ def service_myprofile(request, format=None):
             profile.phone_number = phone_number
             profile.save()
             result={'id':user.id, 'first_name':user.first_name, 'last_name':user.last_name, 'email':user.email,
-                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,'bio':profile.bio,'rate':profile.rate}
+                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,
+                     'bio':get_user_bio(profile, settings.LANGUAGES[0][0]),'rate':profile.rate}
             return Response(result, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_publicprofile(request,format=None):
     try:
