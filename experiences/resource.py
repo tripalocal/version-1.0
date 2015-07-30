@@ -29,7 +29,7 @@ from allauth.socialaccount import providers
 from allauth.socialaccount.models import SocialLogin, SocialToken, SocialApp
 from allauth.socialaccount.providers.facebook.views import fb_complete_login
 from allauth.socialaccount.helpers import complete_social_login
-from django.utils.translation import ugettext_lazy as _, string_concat
+from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
 GEO_POSTFIX = "/"
@@ -211,7 +211,7 @@ def saveBookingRequest(booking_request):
     host = experience.hosts.all()[0]
     #send an email to the traveller
     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
                 html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
@@ -233,7 +233,7 @@ def saveBookingRequest(booking_request):
 
     #send an email to the host
     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
                 html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
@@ -244,7 +244,7 @@ def saveBookingRequest(booking_request):
 
     #schedule an email to the traveller one day before the experience
     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
                 html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
@@ -255,7 +255,7 @@ def saveBookingRequest(booking_request):
 
     #schedule an email to the host one day before the experience
     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
                 html_message=loader.render_to_string('experiences/email_reminder_host.html',
@@ -1070,6 +1070,9 @@ def service_email(request, format=None):
 @permission_classes((IsAuthenticated,))
 def update_files(request, format=None):
     try:
+        if not request.user.is_superuser:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         data = request.data
         user_email = data['user_email']
         tripalocal_email = data['tripalocal_email']

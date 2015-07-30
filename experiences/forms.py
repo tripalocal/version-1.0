@@ -10,7 +10,7 @@ import pytz, string, subprocess, json, random
 from django.core.mail import send_mail
 from django.template import loader
 from tripalocal_messages.models import Aliases, Users
-from django.utils.translation import ugettext_lazy as _, string_concat
+from django.utils.translation import ugettext as _
 from allauth.socialaccount.signals import pre_social_login, social_account_added
 from django.dispatch import receiver
 from django.db import connections
@@ -895,8 +895,8 @@ class ItineraryBookingForm(forms.Form):
 
                 if not is_instant_booking:
                     # send an email to the host
-                    mail.send(subject=string_concat(_('[Tripalocal] '), user.first_name, _(' has requested your experience')), message='',
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                    mail.send(subject=_('[Tripalocal] ') + user.first_name + _(' has requested your experience'), message='',
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], #fail_silently=False,
                                 priority='now',
                                 html_message=loader.render_to_string('experiences/email_booking_requested_host.html', 
@@ -908,7 +908,7 @@ class ItineraryBookingForm(forms.Form):
                                                                         'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))
                     # send an email to the traveler
                     mail.send(subject=_('[Tripalocal] Your booking request is sent to the host'),  message='',
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], #fail_silently=False,
                                 priority='now', 
                                 html_message=loader.render_to_string('experiences/email_booking_requested_traveler.html',
@@ -926,7 +926,7 @@ class ItineraryBookingForm(forms.Form):
 
                     #send an email to the traveller
                     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                                 priority='now',  #fail_silently=False, 
                                 html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
@@ -937,7 +937,7 @@ class ItineraryBookingForm(forms.Form):
             
                     #schedule an email to the traveller one day before the experience
                     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
                                 html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
@@ -948,7 +948,7 @@ class ItineraryBookingForm(forms.Form):
             
                     #schedule an email to the host one day before the experience
                     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
                                 html_message=loader.render_to_string('experiences/email_reminder_host.html',
@@ -970,7 +970,7 @@ class ItineraryBookingForm(forms.Form):
 
                     #send an email to the host
                     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                                 priority='now',  #fail_silently=False, 
                                 html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
