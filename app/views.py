@@ -21,7 +21,7 @@ from Tripalocal_V1 import settings
 from experiences.views import SearchView, saveProfileImage, getBGImageURL, getProfileImage
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment, get_experience_title, get_experience_meetup_spot
-from experiences.forms import Currency, DollarSign
+from experiences.forms import Currency, DollarSign, email_account_generator
 from django.core.files.uploadedfile import SimpleUploadedFile, File
 from django.db import connections
 from django.template.defaultfilters import filesizeformat
@@ -30,6 +30,7 @@ from post_office import mail
 from django.contrib.auth.models import User
 from os import path
 from PIL import Image
+from tripalocal_messages.models import Aliases, Users
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
@@ -257,7 +258,7 @@ def mylisting(request):
 
     experiences = []
     context = RequestContext(request)
-    exps = Experience.objects.raw('select * from experiences_experience where id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime', [request.user.id])
+    exps = Experience.objects.raw('select id from experiences_experience where id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime', [request.user.id])
 
     for experience in exps:
         experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
@@ -268,7 +269,7 @@ def mylisting(request):
     return render_to_response('app/mylisting.html', {}, context)
 
 def getreservation(user):
-    bookings = Booking.objects.raw('select * from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime', [user.id])
+    bookings = Booking.objects.raw('select id from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime', [user.id])
 
     current_reservations = []
     past_reservations = []

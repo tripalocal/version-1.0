@@ -969,40 +969,6 @@ def service_publicprofile(request,format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-@authentication_classes((SessionAuthentication, BasicAuthentication,))#, TokenAuthentication))
-@permission_classes((IsAuthenticated,))
-def service_email(request, format=None):
-    try:
-        data = request.data
-        start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['start_date'].strip(), "%Y/%m/%d"))
-        exps = Experience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
-        hosts = []
-        exp_urls = []
-
-        for exp in exps:
-            host = exp.hosts.all()[0]
-            if host not in hosts:
-                hosts.append(host)
-                exp_urls.append([])
-                exp_urls[hosts.index(host)].append('https://www.'+settings.DOMAIN_NAME + '/experience/' + str(exp.id))
-            else:
-                exp_urls[hosts.index(host)].append('https://www.'+settings.DOMAIN_NAME + '/experience/' + str(exp.id))
-        for i in range(len(hosts)):
-            host = hosts[i]
-            host.first_name = host.first_name.title()
-            #mail.send(subject='Tripalocal - June coupon code', message='', 
-            #          sender='Tripalocal <' + 'yiyi@tripalocal.com' + '>',
-            #          recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-            #          priority='now',
-            #          html_message=loader.render_to_string('email_june_campaign_host.html',
-            #                                                {'experiences': exp_urls[i], 'host':host,
-            #                                                }))
-    except Exception as err:
-        #TODO
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
-    return Response(status=status.HTTP_200_OK)
-
 @api_view(['GET','POST'])
 @authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))#))#,
 @permission_classes((IsAuthenticated,))
@@ -1064,3 +1030,60 @@ def service_message(request, format=None):
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@authentication_classes((SessionAuthentication, BasicAuthentication,))#, TokenAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_email(request, format=None):
+    try:
+        data = request.data
+        start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['start_date'].strip(), "%Y/%m/%d"))
+        exps = Experience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
+        hosts = []
+        exp_urls = []
+
+        for exp in exps:
+            host = exp.hosts.all()[0]
+            if host not in hosts:
+                hosts.append(host)
+                exp_urls.append([])
+                exp_urls[hosts.index(host)].append('https://www.'+settings.DOMAIN_NAME + '/experience/' + str(exp.id))
+            else:
+                exp_urls[hosts.index(host)].append('https://www.'+settings.DOMAIN_NAME + '/experience/' + str(exp.id))
+        for i in range(len(hosts)):
+            host = hosts[i]
+            host.first_name = host.first_name.title()
+            #mail.send(subject='Tripalocal - June coupon code', message='', 
+            #          sender='Tripalocal <' + 'yiyi@tripalocal.com' + '>',
+            #          recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+            #          priority='now',
+            #          html_message=loader.render_to_string('email_june_campaign_host.html',
+            #                                                {'experiences': exp_urls[i], 'host':host,
+            #                                                }))
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@authentication_classes((BasicAuthentication,))#, TokenAuthentication))
+@permission_classes((IsAuthenticated,))
+def update_files(request, format=None):
+    try:
+        data = request.data
+        user_email = data['user_email']
+        tripalocal_email = data['tripalocal_email']
+
+        with open('/etc/postfix/canonical', 'a') as f:
+            f.write(user_email + " " + tripalocal_email + "\n")
+            f.close()
+
+        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    
+        with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+            f.write(tripalocal_email + "\n")
+            f.close()
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
+    return Response(status=status.HTTP_200_OK)

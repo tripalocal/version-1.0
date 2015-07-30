@@ -45,7 +45,9 @@ class Experience(models.Model):
     tags = models.ManyToManyField(ExperienceTag, related_name='experience_tags')
 
     def __str__(self):
-        t = self.experiencetitle_set.all()[0].title if self.experiencetitle_set != None and len(self.experiencetitle_set.all())>0 else ''
+        t = get_experience_title(self, settings.LANGUAGES[0][0])
+        if t is None:
+            t = ''
         s = self.status if self.status != None else ''
         c = self.city if self.city != None else ''
         return str(self.id) + '--' + t + '--' + s + '--' + c
@@ -156,7 +158,7 @@ class Booking(models.Model):
     booking_extra_information = models.TextField()
     
     def __str__(self):
-        return self.user.email + "--" + self.experience.title
+        return self.user.email + "--" + get_experience_title(self.experience,settings.LANGUAGES[0][0])
 
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):
