@@ -44,6 +44,9 @@
 
 {%block scripts%}
 <script charset="utf-8" type="text/javascript">
+    window.PRICE_FORM_INDICATOR = "none";
+
+
     function countChar(object, limit, hint) {
         var len = object.val().length;
         if (len >= limit) {
@@ -303,20 +306,63 @@
             });
 
             setListenerForDynamicPrice();
-
-            $("#experience_type").click(function () {
-                if ($("#experience_type").val() != "PRIVATE") {
-                    $("#experience_type").val("PRIVATE");
-                    $("#id_type").val("PRIVATE");
-                } else {
-                    $("#experience_type").val("NONPRIVATE");
-                    $("#id_type").val("NONPRIVATE");
-                }
-
-                postDatum(location.href, {'type': $('#id_type').val()})
-            });
+//
+//            $("#experience_type").click(function () {
+//                if ($("#experience_type").val() != "PRIVATE") {
+//                    $("#experience_type").val("PRIVATE");
+//                    $("#id_type").val("PRIVATE");
+//                } else {
+//                    $("#experience_type").val("NONPRIVATE");
+//                    $("#id_type").val("NONPRIVATE");
+//                }
+//
+//                postDatum(location.href, {'type': $('#id_type').val()})
+//            });
 
             nextStepBinding('overview');
+
+            // Set selection page listener.
+            $("#proceed-button").click(function(e) {
+                if($("#menu-selection-left").attr("data-chosen") === "true") {
+                    $("#price-form").css("display", "block");
+                    $("#private-only-part").css("display", "block");
+                    $("#selection-menu").css("display", "none");
+                    window.PRICE_FORM_INDICATOR = "private";
+                    postDatum(location.href, {'type': 'PRIVATE'})
+                }
+                else if($("#memu-selection-right").attr("data-chosen") === "true") {
+                    $("#price-form").css("display", "block");
+                    $("#private-only-part").css("display", "none");
+                    $("#selection-menu").css("display", "none");
+                    window.PRICE_FORM_INDICATOR = "public";
+                    postDatum(location.href, {'type': 'NONPRIVATE'})
+                }
+                else {
+                    alert("Please make your choice.");
+                }
+
+            });
+
+            $("#menu-selection-left").click(function(e) {
+                $("#menu-selection-left").css("background", "yellow");
+                $("#memu-selection-right").css("background", "red");
+                $("#menu-selection-left").attr("data-chosen","true");
+                $("#memu-selection-right").attr("data-chosen","false");
+            });
+
+            $("#memu-selection-right").click(function(e) {
+                $("#menu-selection-left").css("background", "red");
+                $("#memu-selection-right").css("background", "yellow");
+                $("#menu-selection-left").attr("data-chosen","false");
+                $("#memu-selection-right").attr("data-chosen","true");
+            });
+
+            $("#price-last-step").click(function() {
+                $("#price-form").css("display", "none");
+                $("#private-only-part").css("display", "none");
+                $("#selection-menu").css("display", "block");
+            });
+
         }
 
         function setupPriceForm() {
@@ -343,6 +389,49 @@
                 $("#dynamic_price_div").attr("style", "");
                 setDynamicPriceInputDisplay();
             }
+
+            if ($("#experience_type").val() == "NONE") {
+                showSelectionView();
+            }
+            if ($("#experience_type").val() == "NONPRIVATE") {
+                showPublicView();
+            }
+            if ($("#experience_type").val() == "PRIVATE") {
+                showPrivateView();
+            }
+        }
+
+        function restorePriceForm() {
+            if(window.PRICE_FORM_INDICATOR === "private") {
+                showPrivateView();
+            }
+            else if(window.PRICE_FORM_INDICATOR === "public") {
+                showPublicView();
+            }
+            else {
+                showSelectionView();
+            }
+        }
+
+        function showPublicView() {
+            $("#price-form").css("display", "block");
+            $("#private-only-part").css("display", "none");
+            $("#selection-menu").css("display", "none");
+            window.PRICE_FORM_INDICATOR = "public";
+        }
+
+        function showPrivateView() {
+            $("#price-form").css("display", "block");
+            $("#private-only-part").css("display", "block");
+            $("#selection-menu").css("display", "none");
+            window.PRICE_FORM_INDICATOR = "private";
+        }
+
+        function showSelectionView() {
+            $("#price-form").css("display", "none");
+            $("#private-only-part").css("display", "none");
+            $("#selection-menu").css("display", "block");
+            window.PRICE_FORM_INDICATOR = "none";
         }
 
         $.get(href).done(function (response) {
@@ -350,6 +439,7 @@
         }).done(function () {
             setupPriceForm();
             setListenerForPriceForm();
+            restorePriceForm();
         }).fail(function () {
             $('#ajax-listing-form').text("Sorry but there was an error.");
         });
@@ -672,7 +762,6 @@
 
                 $('#upload-file-delete-button-' + i).click(function(e) {
                     if(confirm("Are you sure to delete the image?")) {
-                        var index = i;
                         postDatum(location.href, {'delete_file': e.target.id.split('-').pop()});
                     }
                 });

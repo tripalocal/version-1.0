@@ -6,10 +6,10 @@
                 <p id="menu-title-description">Do you allow anyone to book your experience or would you like to host for private booking only?</p>
             </div>
             <div id="menu-selection-left">
-                left
+                private
             </div>
             <div id="memu-selection-right">
-                right
+                public
             </div>
             <div id="menu-operation-bar">
                 <div id="proceed-button" class="fileUpload btn btn-primary">
@@ -21,7 +21,7 @@
 
     </div>
 
-    <!-- Private Panel-->
+    <!-- Price Panel-->
     <div id="price-form" class="calendar" style="display: none">
         <div class="section" id="section-add-price">
             <div id="location">
@@ -46,10 +46,12 @@
                 <br><br><br>
                 <div style="color:#999999;">
                     {{form.type}}
-                    {% if form.type.0.value != "NONPRIVATE"%}
-                    <input type="checkbox" id="experience_type" value="PRIVATE">This is a non-private tour
+                    {% if form.type.0.value == "PRIVATE"%}
+                    <input type="checkbox" id="experience_type" value="PRIVATE" style="display: none">
+                    {% elif form.type.0.value == "NONPRIVATE"%}
+                    <input type="checkbox" id="experience_type" value="NONPRIVATE" checked style="display: none">
                     {% else %}
-                    <input type="checkbox" id="experience_type" value="NONPRIVATE" checked>This is a non-private tour
+                    <input type="checkbox" id="experience_type" value="NONE" checked style="display: none">
                     {% endif %}
                 </div>
             </div>
@@ -81,6 +83,7 @@
             </div>
         </div>
 
+        <div id="private-only-part">
         <div class="section">
             <div id="location">
                 <p id="photo-heading"><strong>Dynamic pricing</strong></p>
@@ -230,8 +233,11 @@
                 <input id="dynamic_price_input_9" type="number" min="1" step="0.01">
             </div><br>
         </div>
+        </div>
+
         <div class="section" style="text-align:right; clear:both;">
-            <input type="submit" value="Next Step" id="next-step" />
+            <input type="button" value="Last Step" class="last-step" id="price-last-step"/>
+            <input type="button" value="Next Step" class="next-step" id="next-step"/>
         </div>
         <!-- creating spare space  -->
         <div class="creating-slot-button-active create-slot-detail">
@@ -241,80 +247,6 @@
         <div class="creating-slot-button-active create-slot-detail">
         </div>
     </div>
-
-
-    <!--Public Panel-->
-    <div id="public-price-form" class="calendar" style="display: none">
-        <div class="section" id="section-add-price">
-            <div id="location">
-                <p id="photo-heading"><strong>Pricing</strong></p>
-                <br><br><br>
-                <p id="location-details">
-                    <span>Add value to your</span><br>
-                    <span>pricing is the key!</span><br>
-                    <span>Keep the group size</span><br>
-                    <span>small for a personal</span><br>
-                    <span>experience</span><br>
-                </p>
-            </div>
-
-            <div id="group-size-section">
-                <p id="group-size-heading">Group size</p>
-                <br>
-                {{ form.min_guest_number }}
-                <p id="group-size-min">Min</p>
-                {{ form.max_guest_number }}
-                <p id="group-size-max">Max</p>
-                <br><br><br>
-                <div style="color:#999999;">
-                    {{form.type}}
-                    {% if form.type.0.value != "NONPRIVATE"%}
-                    <input type="checkbox" id="experience_type" value="PRIVATE">This is a non-private tour
-                    {% else %}
-                    <input type="checkbox" id="experience_type" value="NONPRIVATE" checked>This is a non-private tour
-                    {% endif %}
-                </div>
-            </div>
-            <br><br><br>
-            <div id="price-section">
-                <div class="float-left">
-                    <p id="customers-pay">Customers pay</p>
-                    <span id="dollar-sign">$</span>
-                    {{ form.price_with_booking_fee }}
-                </div>
-                <p class="float-left math-symbol">-</p>
-                <div class="float-left">
-                    <p id="commission">Commission</p>
-                    <span id="dollar-sign-4">$</span>
-                    <p id="commission-price" class="commission-price"></p>
-                </div>
-                <p class="float-left math-symbol">=</p>
-                <div class="float-left">
-                    <p id="price-per-person">Price per person</p>
-                    <span id="dollar-sign">$</span>
-                    {{ form.price }}
-                </div>
-            </div>
-            <br>
-            <div id="duration-section">
-                <p id="duration-heading">Duration</p>
-                {{ form.duration }}
-                <p class="float-left" id="duration-hours">Hours</p>
-            </div>
-        </div>
-
-        <div class="section" style="text-align:right; clear:both;">
-            <input type="submit" value="Next Step" id="next-step" />
-        </div>
-        <!-- creating spare space  -->
-        <div class="creating-slot-button-active create-slot-detail">
-        </div>
-        <div class="creating-slot-button-active create-slot-detail">
-        </div>
-        <div class="creating-slot-button-active create-slot-detail">
-        </div>
-    </div>
-
 
     <!-- Info bar -->
     <div class="info-bar" style="display: none">

@@ -2471,10 +2471,6 @@ def manage_listing_photo(request, experience, context):
             else:
                 return HttpResponse(json.dumps({'success': False}), content_type='application/json')
 
-
-
-
-
         if form.is_valid():
             for index in range(1, 10):
                 field_name = 'experience_photo_' + str(index)
@@ -2497,6 +2493,14 @@ def manage_listing_photo(request, experience, context):
                     for chunk in request.FILES[field_name].chunks():
                         destination.write(chunk)
                         destination.close()
+
+                        #create the corresponding thumbnail (force .jpg)
+                        basewidth = 400
+                        img = Image.open(dirname + filename)
+                        wpercent = (basewidth/float(img.size[0]))
+                        hsize = int((float(img.size[1])*float(wpercent)))
+                        img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+                        img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
 
             # todo: add to chinese db
             experience.save()

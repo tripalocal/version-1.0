@@ -899,8 +899,8 @@ body {
 #menu-title-description{display: inline-block;  max-width: 320px; color: #aaaaaa;}
 #menu-title-title{}
 
-#menu-selection-left{ background: red none repeat scroll 0 0;  display: inline-block;  height: 245px;  left: 40px;  margin: 10px 35px;  position: relative;  width: 225px; }
-#memu-selection-right{    background: red none repeat scroll 0 0;  display: inline-block;  height: 245px;  margin: 10px 34px;  position: relative;  width: 225px;}
+#menu-selection-left{ background: red none repeat scroll 0 0;  display: inline-block;  height: 245px;  left: 40px;  margin: 10px 35px;  position: relative;  width: 225px; cursor: pointer;}
+#memu-selection-right{    background: red none repeat scroll 0 0;  display: inline-block;  height: 245px;  margin: 10px 34px;  position: relative;  width: 225px; cursor: pointer;}
 #menu-operation-bar {  margin-top: 30px; text-align: center; }
 
 
@@ -981,6 +981,7 @@ body {
 /*Last step, Next step, Save and Exit button*/
 #last-step{margin: 10px; float:left; background-color: #FFF; border-radius: 3px; border: 1px solid #666666; padding:5px 10px 5px 10px; color: #999999; text-align: center;}
 #next-step{margin: 10px; float:right; background-color: #FFF; border-radius: 3px; border: 1px solid #666666; padding:5px 10px 5px 10px; color: #999999; text-align: center;}
+#price-last-step{margin: 10px; float:left; background-color: #FFF; border-radius: 3px; border: 1px solid #666666; padding:5px 10px 5px 10px; color: #999999; text-align: center;}
 #save-and-exit{margin-right: 170px; margin-top:8px; margin-bottom:8px; background-color: #3ECBCB; color: #FFF; border-radius: 3px; border:1px solid #3ECBCB; text-align: center;height:35px;}
 .back-button button{margin-right: 100px; background-color: #3ECBCB; color: #FFF; border-radius: 3px; border:1px solid #3ECBCB; text-align: center;}
 /*dollar sign fix (textbox)*/
