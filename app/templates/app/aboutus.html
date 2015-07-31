@@ -1,30 +1,31 @@
 ﻿{% extends "app/layout.html" %}
 {% load staticfiles %}
+{% load i18n %}
 
 {%block head%}
-<title>Tripalocal | About Us</title>
+<title>{% trans "Tripalocal | About Us" %}</title>
+<link href="{% static 'app/content/about_us.css' %}" rel="stylesheet">
 {%endblock%}
 
 {% block content %}
     <div class="row row-area">
         <div class="content-area fixCenter">
             <div class="left-nav-box">
-                <p><a href="#">About Tripalocal</a></p>  
-                <p><a href="/contactus">Contact Tripalocal</a></p>
-                <p><a href="/termsofservice">Terms of Service</a></p>
-                <p><a href="/privacypolicy">Privacy Policy</a></p>
-                <p><a href="/refundpolicy">Traveller Refund Policy</a></p>  
+                <p><a href="#">{% trans "About Tripalocal" %}</a></p>  
+                <p><a href="/contactus">{% trans "Contact Tripalocal" %}</a></p>
+                <p><a href="/termsofservice">{% trans "Terms of Service" %}</a></p>
+                <p><a href="/privacypolicy">{% trans "Privacy Policy" %}</a></p>
+                <p><a href="/refundpolicy">{% trans "Traveller Refund Policy" %}</a></p>
             </div>
 
             <div class="right-content-box">
-                <h1>About Tripalocal</h1>
+                <h1>{% trans "About Tripalocal" %}</h1>
                 <p><img src="/images/aboutusImage.jpg" width="100%"></p>
-                <p>Based in Melbourne Australia, we are a team of passionate wanderlusts - our home is really in our bags. We are always seeking the most authentic local experiences wherever we go. There is no better way to travel than to step into the shoes of a local and appreciate it from their perspective. It is with this believe that Tripalocal was born.</p>
-                <p>Our mission is to bring travel back to its roots: a discover of the people, culture and stories.          </p>
-                <p>We hope to bring you on this journey with us. Go on, see it and experience it like a local! </p>
+                <p>{% trans "Based in Melbourne Australia, we are a team of passionate wanderlusts - our home is really in our bags. We are always seeking the most authentic local experiences wherever we go. There is no better way to travel than to step into the shoes of a local and appreciate it from their perspective. It is with this believe that Tripalocal was born." %}</p>
+                <p>{% trans "Our mission is to bring travel back to its roots: a discover of the people, culture and stories." %}</p>
+                <p>{% trans "We hope to bring you on this journey with us. Go on, see it and experience it like a local!" %}</p>
                 <div class="fixCenter support_about_us"></div>
             </div>
         </div>
     </div>
 {%endblock%}
-

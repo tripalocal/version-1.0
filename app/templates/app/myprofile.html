@@ -1,8 +1,10 @@
 {% extends "app/layout.html" %}
 {% load staticfiles %}
+{% load i18n %}
 
 {% block head %}
-	<title>My Profile</title>
+	<title>{% trans "My Profile" %}</title>
+    <link href="{% static 'app/content/myprofile.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
@@ -10,10 +12,10 @@
     <div class="tab_area">
         <div class="fixCenter">
             <div class="tab_item">
-                <a href="/mylisting">My Listing</a>
-                <a href="/mytrip">My Trip</a>
-                <a href="#" id="active-tab">My Profile</a>
-                <a href="/accounts/password/change/">My Account</a>
+                <a href="/mylisting">{% trans "My Listing" %}</a>
+                <a href="/mytrip">{% trans "My Trip" %}</a>
+                <a href="#" id="active-tab">{% trans "My Profile" %}</a>
+                <a href="/accounts/password/change/">{% trans "My Account" %}</a>
             </div>
         </div>
     </div>
@@ -21,13 +23,13 @@
 	<div class="row row-area">
     	<div class="content-area fixCenter">
     		<div class="leftsubMenu">
-    			<p>My Profile</p>    
+    			<p>{% trans "My Profile" %}</p>    
     		</div>
 
             <form id="my_profile_form" method="post" action="" enctype="multipart/form-data">
                 {% csrf_token %}
 			    <div class="rightInterface">
-		            <p id="right_box">Basic</p>
+		            <p id="right_box">{% trans "Basic" %}</p>
                     <hr>
                     <table>
                         <tr>
@@ -37,18 +39,18 @@
                                 </div>
                             </td>
                             <td>
-          	                    <div class="text_grey text-position">Clear frontal face photos are an important way for hosts and<br>
+          	                    <div class="text_grey text-position">{% blocktrans %}Clear frontal face photos are an important way for hosts and<br>
                                                                     guests to learn about each other. It's not much fun to host a <br>
                                                                     landscape! Please upload a photo that clearly shows your face.<br>
-                                                                    Please make sure your image is under 1MB.
+                                                                    Please make sure your image is under 1MB.{% endblocktrans %}
                                 </div>
                                 {%if form.files.image%}
                                 <input id="uploadImage_1" placeholder="{{form.files.image.name}}" class="uploadImage" disabled="disabled" />
                                 {%else%}
-                                <input id="uploadImage_1" placeholder="No file chosen" class="uploadImage" disabled="disabled" />
+                                <input id="uploadImage_1" placeholder="{% trans "No file chosen" %}" class="uploadImage" disabled="disabled" />
                                 {%endif%}
                                 <div class="fileUpload btn btn-primary">
-                                    <img alt="" src="/images/camera.gif"><span>Choose File</span>
+                                    <img alt="" src="/images/camera.gif"><span>{% trans "Choose File" %}</span>
                                     {{form.image}}
                                 </div>
                                 <!--<a class="btn btn-primary btn-sm button-position" role="button">Choose File</a>
@@ -59,7 +61,7 @@
                         <tr>
                             <td>
                                 <div>
-                                    <p>First Name</p>
+                                    <p>{% trans "First Name" %}</p>
                                     <div class="form-group">
                                         {{form.first_name}}
         	                        </div>
@@ -67,7 +69,7 @@
                             </td>
                             <td>
                                 <div>
-                                    <p>Last Name
+                                    <p>{% trans "Last Name" %}
                                         <img src="/images/lock.jpg">
                                     </p>
                                     <div class="form-group">
@@ -77,41 +79,41 @@
                             </td>
                         </tr>
                             <td>
-                                <div class="text_grey blank-text">This is only shared once you have a confirmed booking with <br>
-                                                                    another Tripalocal user. We only display your initial in public.
+                                <div class="text_grey blank-text">{% blocktrans %}This is only shared once you have a confirmed booking with <br>
+                                                                    another Tripalocal user. We only display your initial in public.{% endblocktrans %}
                                 </div>
                             </td>
                             <td>
-                                <div class="text_grey hinttext-position">This is only shared once you have a confirmed booking with <br>
-                                                                    another Tripalocal user. We only display your initial in public.
+                                <div class="text_grey hinttext-position">{% blocktrans %}This is only shared once you have a confirmed booking with <br>
+                                                                    another Tripalocal user. We only display your initial in public.{% endblocktrans %}
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <div>
-                                    <p>Email Address
+                                    <p>{% trans "Email Address" %}
                                         <img src="/images/lock.jpg">
                                     </p>
                                 </div>
                                 <div class="form-group">
                                     {{form.email}}
         	                    </div>
-                                <div class="text_grey hinttext-position">Your email address will not be disclosed.</div>
+                                <div class="text_grey hinttext-position">{% trans "Your email address will not be disclosed." %}</div>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <div>
-                                    <p>Local Mobile Number
+                                    <p>{% trans "Local Mobile Number" %}
                                         <img src="/images/lock.jpg">
                                     </p>
                                 </div>
                                 <div class="form-group">
           		                    {{form.phone_number}}
         	                    </div>
-                                <div class="text_grey hinttext-position">This information will be available to people who have booked your<br> experience.
+                                <div class="text_grey hinttext-position">{% trans "This information will be available to people who have booked your<br> experience." %}
                                 </div>
                             </td>
                         </tr>
@@ -119,26 +121,26 @@
                     <table>
                         <tr>
                             <td>
-        	                    <p>Bio</p>
+        	                    <p>{% trans "Bio" %}</p>
                                 {{form.bio}}
                             </td>
                             <td>
                                 <div class="bio-text-position">
                                     <div class="text_grey bio-text-position1">
-        	                        Tripalocal is all about like minded people doing things together.<br>
+        	                        {% blocktrans %} Tripalocal is all about like minded people doing things together.<br>
                                     Your profile will help people understand your style and personal-<br>
-                                    ity.
+                                    ity.{% endblocktrans %}
                                     </div>
                                     <div class="text_grey bio-text-position2">
-                                    It's like having friends all over the world to show you around, or<br>
-                                    vice versa. What type of people would you like to meet up with?
+                                    {% blocktrans %}It's like having friends all over the world to show you around, or<br>
+                                    vice versa. What type of people would you like to meet up with? {% endblocktrans %}
                                     </div>
                                 </div>
                             </td>
                         </tr>
                     </table>
                     <p></p>
-                    <input id="id_submit" type="submit" class="btn btn-primary btn-sm" value="Save" />
+                    <input id="id_submit" type="submit" class="btn btn-primary btn-sm" value="{% trans "Save" %}" />
                 </div>
             </form>
         </div>

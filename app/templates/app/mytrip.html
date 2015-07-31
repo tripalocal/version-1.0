@@ -1,8 +1,10 @@
 {% extends "app/layout.html" %}
 {% load staticfiles %}
+{% load i18n %}
 
 {% block head %}
-	<title>My Trips</title>
+	<title>{% trans "My Trip" %}</title>
+    <link href="{% static 'app/content/mytrip.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
@@ -10,10 +12,10 @@
     <div class="tab_area">
         <div class="fixCenter">
             <div class="tab_item">
-                <a href="/mylisting">My Listing</a>
-                <a href="#" id="active-tab">My Trip</a>
-                <a href="/myprofile">My Profile</a>
-                <a href="/accounts/password/change/">My Account</a>
+                <a href="/mylisting">{% trans "My Listing" %}</a>
+                <a href="#" id="active-tab">{% trans "My Trip" %}</a>
+                <a href="/myprofile">{% trans "My Profile" %}</a>
+                <a href="/accounts/password/change/">{% trans "My Account" %}</a>
             </div>
         </div>
     </div>
@@ -21,11 +23,11 @@
 	<div class="row row-area">
     	<div class="content-area fixCenter">
     		<div class="leftsubMenu">
-    			<p>My Trip</p>    
+    			<p>{% trans "My Trip" %}</p>    
     		</div>
 
 			<div class="rightInterface">
-		        <p id="right_box">My Trip</p>
+		        <p id="right_box">{% trans "My Trip" %}</p>
 
 		        <hr><!--Initial Linebreak for trips page TAKE OUT IF NO BOOKING-->
 		        <!-- FIRST DATE -->
@@ -40,10 +42,10 @@
 				            			    <div id="date" style="margin-left:28px; margin-right:0px; color:#858585;"><div class="icon" style="margin-left:22px;"></div>{{booking.datetime|date:'d-M-Y'}}<!--local date--></div>
 				            		    </td>
 				            		    <td>
-				            			    <div id="time" style="margin-left:0px; color:#858585;"><div class="icon" style="margin-left:5px;"></div>{{booking.datetime|date:'H:i'}}<!--local time of event--></div>
+				            			    <div id="time" style="margin-left:28px; color:#858585;"><div class="icon" style="margin-left:5px;"></div>{{booking.datetime|date:'H:i'}}<!--local time of event--></div>
 				            		    </td> 
 				            		    <td>
-				             			    <div id="people" style="margin-left:0px; color:#858585;"><div class="icon" style="margin-left:-10px;"></div>{{booking.guest_number}}<!--number of tickets--></div>
+				             			    <div id="people" style="margin-left:28px; margin-right:28px; color:#858585;"><div class="icon" style="margin-left:-10px;"></div>{{booking.guest_number}}<!--number of tickets--></div>
 				            		    </td>
 				            		    <td>
 				              			    <div id="img1"><img src="{{ MEDIA_URL }}thumbnails/experiences/experience{{booking.experience.id}}_1.jpg" width="100" height="60"></div><!--link to photo-->
@@ -51,14 +53,14 @@
 				            		    <td>
 				            			    <div>
                                                 {% if booking.status|lower == "accepted" %}
-					               			    <div class="confirm"><div style="margin-left:5px;">Confirmed</div></div>
+					               			    <div class="confirm"><div style="margin-left:5px;">{% trans "Confirmed" %}</div></div>
                                                 {% elif booking.status|lower == "rejected" %}
-                                                <div class="cancel"><div style="margin-left:5px;">Cancelled</div></div>
+                                                <div class="cancel"><div style="margin-left:5px;">{% trans "Cancelled" %}</div></div>
                                                 {% else %}
-                                                <div class="request"><div style="margin-left:5px;">Requested</div></div>
+                                                <div class="request"><div style="margin-left:5px;">{% trans "Requested" %}</div></div>
                                                 {% endif %}
 					               			    <div class="confirm_topic" style="color:#2BC7CD;margin-top:5px;"><a href="/experience/{{booking.experience.id}}">{{ booking.experience.title }}</a></div>
-					               			    <div class="confirm_topic">with <span style="color:#2BC7CD;">{% for h in booking.experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. <span style="color:black;">({{ h.registereduser.phone_number }})</span>{% endif %} {% endfor %}</span></div>
+					               			    <div class="confirm_topic">{% trans "with " %}<span style="color:#2BC7CD;">{% for h in booking.experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. <span style="color:black;">({{ h.registereduser.phone_number }})</span>{% endif %} {% endfor %}</span></div>
 					            		    </div>
 				        			    </td>
                                     </div>
@@ -73,8 +75,8 @@
 							            <td>
 							               <div>
 							             	    <div class="map_box" style="margin-top:15px; margin_bottom:15px;">
-								                    Meet up location: {{booking.experience.meetup_spot}}
-								                    <!--<button id="map_button" class="map_button" name="{{booking.experience.meetup_spot}} {{booking.experience.city}}"> Map </button>-->
+								                    {% trans "Meet up location: " %}{{booking.experience.meetup_spot}}
+								                    <!--<button id="map_button" class="map_button" name="{{booking.experience.meetup_spot}} {{booking.experience.city}}"> {% trans "Map" %} </button>-->
 							             	    </div>
 							               </div>
 							            </td>
@@ -84,7 +86,7 @@
 				    	</table>
 			    	{% endfor %}
                 {% empty %}
-                <p>You have not booked any trips.</p>   
+                <p>{% trans "You have not booked any trips." %}</p>   
 		    	{% endfor %}
     		</div>
     	</div>

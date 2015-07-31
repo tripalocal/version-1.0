@@ -10,6 +10,7 @@ from experiences.models import Experience
 from experiences.views import *
 from Tripalocal_V1 import settings
 from django.contrib.auth.decorators import login_required
+from custom_admin.views import *
 
 # Uncomment the next lines to enable the admin:
 from django.conf.urls import include
@@ -60,6 +61,7 @@ urlpatterns = patterns('',
     #url(r'^experiencelist/$', ExperienceListView.as_view(), name='experiencelist'),
     url(r'^experience/(?P<pk>\d+)/$', ExperienceDetailView.as_view(), name='experiencedetail'),
     url(r'^images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
+    url(r'^apk/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.PROJECT_ROOT+'/apk'}),
     url(r'^addexperience/(?P<step>[-\w]+)/$', login_required(ExperienceWizard.as_view(FORMS, url_name='experience_add_step', condition_dict={'price': save_exit_price,'overview': save_exit_overview,
                                                                                                                                              'detail': save_exit_detail,'photo':save_exit_photo,
                                                                                                                                              'location':save_exit_location})), name='experience_add_step'),
@@ -85,7 +87,6 @@ urlpatterns = patterns('',
     url(r'^disclaimer$', 'app.views.disclaimer', name='disclaimer'),
     url(r'^booking/(?P<id>\d+)/$', booking_accepted, name='booking_accepted'),
     url(r'^s/(?P<city>\S+)/$', SearchView, name='SearchView'),  
-    url(r'^freesim/$', 'experiences.views.freeSimPromo', name='freeSimPromo'),
     url(r'^mytrip/$', 'app.views.mytrip'),
     url(r'^myprofile/$', 'app.views.myprofile'),
     url(r'^mylisting/$', 'app.views.mylisting'),
@@ -115,4 +116,20 @@ urlpatterns = patterns('',
     #url(r'^service_email/$', 'experiences.resource.service_email', name='service_email'),
     url(r'^experience_tags_xls/$', 'experiences.resource.updateExperienceTagsFromXLS'),
     url(r'^service_couponverification/$', 'experiences.resource.service_couponverification', name='service_couponverification'),
+    url(r'^service_message/$', 'experiences.resource.service_message'),
+    url(r'^service_publicprofile/$', 'experiences.resource.service_publicprofile'),
+
+    url(r'^custom_admin/$', superuser_required(BookingView.as_view())),
+    url(r'^custom_admin/change_time/(?P<booking_id>\d+)$', superuser_required(BookingView.as_view())),
+    url(r'^custom_admin/mark_as_no_show/(?P<booking_id>\d+)$', superuser_required(mark_as_no_show)),
+    url(r'^custom_admin/reopen_booking/(?P<booking_id>\d+)$', superuser_required(reopen_booking)),
+    url(r'^custom_admin/cancel_booking/(?P<booking_id>\d+)$', superuser_required(cancel_booking)),
+    url(r'^custom_admin/upload_review/(?P<booking_id>\d+)$', superuser_required(BookingView.as_view())),
+    url(r'^custom_admin/send_confirmation_email_host/$', superuser_required(send_confirmation_email_host)),
+    url(r'^custom_admin/send_confirmation_email_guest/$', superuser_required(send_confirmation_email_guest)),
+    url(r'^custom_admin/delete_bookings/$', superuser_required(delete_bookings)),
+    url(r'^custom_admin/archive_bookings/$', superuser_required(archive_bookings)),
+    url(r'^custom_admin/unarchive_bookings/$', superuser_required(unarchive_bookings)),
+    url(r'^custom_admin/archive/$', superuser_required(ArchiveView.as_view())),
+    url(r'^custom_admin/payment/$', superuser_required(PaymentView.as_view())),
 )

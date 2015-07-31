@@ -1,0 +1,335 @@
+{% extends "app/layout.html" %}
+
+{% load i18n %}
+
+{% block head %}
+    {{ wizard.form.media }}
+    <title>Add a new experience -- Photo</title>
+    {% load staticfiles %}
+    <link href="{% static 'experiences/content/add_experience_photo.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+<form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+{{ wizard.management_form }}
+{{ wizard.form.id }}
+{{ wizard.form.changed_steps }}
+    <div class="back_button">
+        <button name="wizard_save_exit_photo" type="submit" val="" id="save-and-exit-top">Save and Exit</button>
+    </div>
+{%if not edit%}
+    <!-- left-side menu -->
+    <div class="left-side-bar">
+    <!-- Essential -->
+   	    <p class="list-menu">Essential</p>
+	
+   	    <p class="list-tab"><strong>Calender</strong></p>
+        <p><img src="/images/done.jpg" alt="" class="modify-icon"></p>
+   	    <p class="list-tab"><strong>Pricing</strong></p>
+   	    <p><img src="/images/done.jpg" alt="" class="modify-icon"></p>
+    
+        <!-- description -->
+   	    <p class="list-menu">Description</p>
+   	    <p class="list-tab"><strong>Overview</strong></p>
+	    <p><img src="/images/done.jpg" alt="" class="modify-icon"></p>
+	    <p class="list-tab"><strong>Details</strong></p>
+	    <p><img src="/images/done.jpg" alt="" class="modify-icon"></p>
+	    <p class="list-tab" id="active-tab"><strong>Photos</strong></p>
+	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon"></p>
+	    <p class="list-tab" ><strong>Location</strong></p>
+	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon"></p>
+
+        <!-- Steps Remaining -->
+        <p id="steps-remaining">2 more steps<br>until publish!</p>
+    </div>
+    <!-- left-side menu ends -->
+{%else%}
+    <!-- left-side menu -->
+    <div class="left-side-bar">
+    <!-- Essential -->
+   	    <p class="list-menu">Essential</p>
+	
+   	    <button name="wizard_next_step" type="submit" value="calendar" class="list-tab-button"><strong>Calender</strong></button>
+   	    <button name="wizard_next_step" type="submit" value="price" class="list-tab-button"><strong>Pricing</strong></button>
+    
+        <!-- description -->
+   	    <p class="list-menu">Description</p>
+   	    <button name="wizard_next_step" type="submit" value="overview" class="list-tab-button"><strong>Overview</strong></button>
+	    <button name="wizard_next_step" type="submit" value="detail" class="list-tab-button"><strong>Details</strong></button>
+	    <p class="list-tab" id="active-tab"><strong>Photos</strong></p>
+	    <button name="wizard_next_step" type="submit" value="location" class="list-tab-button"><strong>Location</strong></button>
+    </div>
+    <!-- left-side menu ends -->
+{%endif%}
+    <!-- right-side calendar -->
+    <div class="calendar">
+        <div class="section" id="section-add-photo">
+            <div>  
+                <p id="photo-heading"><strong>Add a photo or two!</strong></p>
+                <p id="photo-size-reminder">Please keep your images under 2MB</p>
+            </div>
+            <br><br><br>
+
+            <div id="photo-detail-info">
+                <p>
+                    <span>Or three, or more!</span><br>
+                    <span>Guests love photos</span><br>
+                    <span>that highlight the</span><br>
+                    <span>features of your</span><br>
+                    <span>experiences.</span><br>
+                </p>
+            </div>
+
+            {{wizard.form.delete_photo}}
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_1%}
+                <input id="uploadImage_1" placeholder="{{wizard.form.initial.experience_photo_1.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_1" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_1}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_2%}
+                <input id="uploadImage_2" placeholder="{{wizard.form.initial.experience_photo_2.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_2" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_2}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_3%}
+                <input id="uploadImage_3" placeholder="{{wizard.form.initial.experience_photo_3.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_3" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_3}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_4%}
+                <input id="uploadImage_4" placeholder="{{wizard.form.initial.experience_photo_4.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_4" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_4}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_5%}
+                <input id="uploadImage_5" placeholder="{{wizard.form.initial.experience_photo_5.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_5" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_5}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_6%}
+                <input id="uploadImage_6" placeholder="{{wizard.form.initial.experience_photo_6.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_6" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_6}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_7%}
+                <input id="uploadImage_7" placeholder="{{wizard.form.initial.experience_photo_7.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_7" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_7}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_8%}
+                <input id="uploadImage_8" placeholder="{{wizard.form.initial.experience_photo_8.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_8" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_8}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_9%}
+                <input id="uploadImage_9" placeholder="{{wizard.form.initial.experience_photo_9.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_9" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_9}}
+                </div>
+            </div>
+            <br><br><br>
+
+            <div id="add-photo-button">
+                {%if wizard.form.initial.experience_photo_10%}
+                <input id="uploadImage_10" placeholder="{{wizard.form.initial.experience_photo_10.name}}" class="photo-preview-thumbnail" disabled="disabled" />
+                {%else%}
+                <input id="uploadImage_10" placeholder="" class="photo-preview-thumbnail" disabled="disabled" />
+                {%endif%}
+                <div class="fileUpload btn btn-primary">
+                    <img src="/images/camera.gif" alt=""><span>Add Photos</span>
+                    {{wizard.form.experience_photo_10}}
+                </div>
+            </div>
+
+
+        </div>  
+        <div class="section" style="text-align:right;">
+            <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" id="last-step">Last Step</button>
+            <button name="wizard_save_exit_photo" type="submit" value="" id="save-and-exit">Save and Exit</button>
+            <input type="submit" value="Next Step" id="next-step" />
+        </div>
+        <!-- creating spare space  -->
+        <div class="creating-slot-button-active create-slot-detail">
+        </div>
+        <div class="creating-slot-button-active create-slot-detail">
+        </div>
+        <div class="creating-slot-button-active create-slot-detail">
+        </div>
+    </div>
+    
+    <!-- Info bar -->
+    <div class="info-bar">
+        <img src="/images/bubble-icon.png" alt="">
+        <div id="hint-msgs">
+            <p>
+                <span><strong>Photos</strong></span><br>
+                <span>Landscapes photos work the</span><br>
+                <span>best with your listing page.</span><br>
+                <span>It's always a good idea to</span><br>
+                <span>include yourself into the</span><br>
+                <span>photo to provide travellers a</span><br>
+                <span>preview of what they should</span><br>
+                <span>expect.</span><br>
+                <span>Show off your personality!</span><br>
+                <span>Sometimes someone will</span><br>
+                <span>chooese you as their host just</span><br>
+                <span>because you are different.</span>
+            </p>
+        </div>
+        <br>
+    </div>
+</form>
+{% endblock %}
+
+{%block scripts%}
+<script charset="utf-8" type="text/javascript">
+
+    function verifyImages()
+    {
+        var input, file;
+        var valid = true;
+
+        if (window.FileReader) {
+            for(i=1;i<11;i++)
+            {
+                input = document.getElementById('id_photo-experience_photo_'+i);
+                if (input && input.files && input.files[0]) 
+                {
+                    file = input.files[0];
+                    if(file.size > 2097152)
+                    {
+                        valid = false;
+                        return valid;
+                    }
+                    str = file.name.split(".");
+                    if(['jpg', 'jpeg', 'png', 'bmp'].indexOf(str[str.length-1]) < 0)
+                    {
+                        valid = false;
+                        return valid;
+                    }
+                }
+            }
+        }
+        return valid;
+    }
+
+    $(document).ready(function(){
+        $('body').attr('id','background-white');
+        $("#id_photo-changed_steps").val($("#id_photo-changed_steps").val()+'photo,');
+
+        $("#next-step").bind("click", function(e){
+            e.preventDefault();
+
+            if(verifyImages()) 
+            {
+                $("form").submit();
+            }
+        })
+
+        $("#save-and-exit").bind("click", function(e){
+            e.preventDefault();
+
+            if(verifyImages()) 
+            {
+                $("form").submit();
+            }
+        })
+ 
+        for(i=1;i<11;i++)
+        {
+            $("#id_photo-experience_photo_"+i).attr("class", "upload");
+            $("#id_photo-experience_photo_"+i).change(function(e){
+                i = e.target.id.substr(-1,1);
+                string = $("#id_photo-experience_photo_"+i).val();
+                index=-1;
+                index = string.lastIndexOf("\\");
+                if(index==-1)
+                {
+                    index = string.lastIndexOf("/");
+                }
+
+                $("#uploadImage_"+i).val(string.substring(index+1));
+            })
+        }
+    })
+
+    function bodyAppend(tagName, innerHTML) {
+        var elm;
+
+        elm = document.createElement(tagName);
+        elm.innerHTML = innerHTML;
+        document.body.appendChild(elm);
+    }
+   
+</script>
+{%endblock%}

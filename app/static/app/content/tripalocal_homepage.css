@@ -1,0 +1,333 @@
+﻿h1{
+    font-size: 32px;
+}
+.input-group-addon{
+    visibility: hidden;
+    position: absolute;
+    top:0;
+}
+.input-sm {
+    width:100px;
+    border:0;
+    border-left: #CCC 1px solid;
+    height: 44px !important;
+}
+.home-search{
+    width: 620px;
+    border-radius: 6px;
+    height: 48px;
+}
+.btn-search{padding:11px; width:80px; text-align:center; border-radius:5px;}
+#id_end_date {
+      border-radius: 0 3px 3px 0;
+}
+#search-submit{
+    border:0;
+    height: 44px !important;
+    border-radius: 3px;
+}
+.home-search-button{
+    padding:0 3px;
+}
+.home-search-button-mobile {
+    display:none;
+}
+#mobileTag{
+    display: none;
+}
+.jumbotron{
+    height: 590px;
+}
+.jumbotron p{
+    font-size: 14px;
+}
+.search-location{
+    width: 340px;
+    padding-left: 3px;
+}
+.homepage-city {
+    border: 0;
+    min-width: 340px;
+    background-position: 290px 10px;
+    border-radius: 3px 0 0 3px;
+}
+.support {
+    height: 155px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    border-bottom:#CCC 1px solid;
+}
+.box_link{  
+    width: 100%;  
+    height: 100%;
+    position: absolute;  
+    top: 0;  
+    left: 0;  
+}
+.exp-brief{
+    height: 950px;
+    padding:65px 0;
+}
+.tease-box{
+    background: none;
+    width:940px;
+    margin-top: 30px;
+}
+.video-box{
+    width: 100%;
+    height: 575px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    display: table;
+}
+.community-box{
+    width: 940px;
+    height: 535px;
+    position: relative;
+    margin: auto;
+}
+.community-box .box{
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 330px;
+}
+.community-box .box a{
+    margin-top: 260px;
+    width: 140px;
+}
+.video-overlay{
+    color: white;
+    text-align: center;
+    margin: auto;
+    display: table-cell;
+    vertical-align: middle;
+}
+#video-fullscreen{
+    background-color: black;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 16000003;
+    top: 0;
+    display: table;
+    text-align: center;
+}
+#video-fullscreen .video-wrap{
+    margin: auto;
+    display: table-cell;
+    vertical-align: middle;
+}
+#video-fullscreen video{  
+    width: 60%;
+    height:60%;
+}
+.row{
+    margin: 20px 0;
+    overflow: hidden;
+}
+.row div:first-child{
+    float: left;
+}
+.row div:last-child{
+    float: right;
+}
+.row .col4{
+    width:300px;
+}
+.row .col6{
+    width:460px;
+}
+.row .col8{
+    width:620px;
+}
+.row .col12{
+    width:100%;
+}
+.city{
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: inline-block;
+    position: relative;
+        height:220px;
+        cursor: pointer;
+    background-position: center;
+    transition: background-size 0.4s; 
+}
+.city:hover{
+    background-size: 125% 125%;
+}
+.city h1{
+    color: white;
+    font-weight: normal;
+    position: absolute;
+    margin: 0;
+    line-height: 210px;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    transition: background-color 0.4s; 
+}
+.city h1:hover{
+    background-color: RGBA(0, 0, 0, 0.7);
+}
+.price-offer{
+    background-size: cover;
+    display: inline-block;
+    text-align: center;
+    position: relative;
+    height:220px;
+}
+.priceBox {
+  top:0;
+    margin-top: 170px;
+}
+.profile-featured {
+    width:66px;
+    height:66px;
+    float:none;
+    position: absolute;
+    margin:70px 117px;
+}
+.profile-featured img{
+    width:62px;
+    height:62px;
+    margin: 2px auto;
+}
+#id_language_select{
+    width: 220px;
+    background-image: url(/images/dropdown-button.png);
+    background-repeat: no-repeat;
+    background-position: 185px 13px;
+}
+@media (max-width: 767px) {
+    #mobileTag {
+        display: table;
+        height: 80px;
+        width: 100%;
+        background-color: white;
+    }
+    #mobileTag div {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+    }
+    .support {
+        display: none;
+    }
+    .exp-brief {
+        height: 1760px;
+        padding: 0;
+    }
+    #exp-heading {
+        display: none;
+    }
+    .tease-box {
+        width: 100%;
+        margin: 0;
+        line-height: 0;
+    }
+    .city {
+        display: inline-block;
+        width: 100%;
+        margin: 0;
+        float: none;
+    }
+    .price-offer {
+        display: inline-block;
+        width: 100%;
+        margin: 0;
+        float: none;
+    }
+    .row {
+        margin: 0;
+        padding: 0;
+    }
+    .row div:first-child, .row div:last-child {
+        float: none;
+    }
+    .row .col4 {
+        width: 100%;
+    }
+    .row .col8 {
+        width: 100%;
+    }
+    .row .col6 {
+        width: 100%;
+    }
+    .video-box {
+        display: none;
+    }
+    .profile-featured {
+        position: relative;
+        margin: 70px auto;
+    }
+    .community-box {
+        width: 93%;
+        height: 835px;
+    }
+    .footer-wrapper, .footer-head {
+        width: 100%;
+    }
+    #id_language_select {
+        width: 93%;
+        background-position: 245px 13px;
+    }
+    .footer {
+        padding-top: 40px;
+    }
+    .footer-logo {
+        display: none;
+    }
+    .footer-body {
+        margin: auto;
+        padding-top: 80px;
+        width: 300px;
+    }
+    .social {
+        display: none;
+    }
+    #mixpanel {
+        display: none;
+    }
+    .search-location {
+        display: block;
+        width: 255px;
+    }
+    .homepage-city {
+        min-width: 250px;
+        margin-top: 3px;
+        background-position: 220px 10px;
+        border-radius: 3px;
+    }
+    .melbourne, .sydney {
+        display: none;
+    }
+    .home-search {
+        width: 255px;
+        height:95px;
+    }
+    .homepage-logo {
+        height: 190px;
+        background-position: center;
+        background-size: contain;
+        width: 340px;
+        margin: auto;
+    }
+    .jumbotron {
+        height: 425px;
+    }
+    .notOnMobile {
+        display: none;
+    }
+    .home-search-button-mobile {
+        display:table-cell;
+        width: 340px;
+    }
+    .btn-search {
+        width: 250px;
+    }
+}

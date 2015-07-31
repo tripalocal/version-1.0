@@ -1,0 +1,5 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {visibility:hidden;}
+#print {visibility:visible; zoom: 1.4; -moz-transform: scale(1.4); -moz-transform-origin: 0 0; width:560px; border:none;  margin-top:-100px; color:#000000;}

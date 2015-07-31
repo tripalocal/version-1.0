@@ -1,0 +1,101 @@
+{% extends "app/layout.html" %}
+
+{% load i18n %}
+
+{% block head %}
+{{ wizard.form.media }}
+<title>Add a new experience</title>
+{% load staticfiles %}
+<link href="{% static 'experiences/content/add_experience_experience.css' %}" rel="stylesheet">
+<script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.form.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="jumbotron-list-experience">
+    <div class="list-experience-header">  
+        <p id="list-an-experience">
+            List an experience
+        </p>
+        <p id="list-an-experience-detail">
+            <span>Tripalocal lets you make money while</span><br>
+            <span>showing people around your neighbourhood.</span><br>
+        </p>
+    </div>
+</div>
+
+<form id="experience_form" action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ wizard.management_form }}
+    {{ wizard.form.id }}
+    {{ wizard.form.changed_steps }}
+    <div class="list-experience-body">
+        <div id="experience-title">
+            <p>Experience title</p>
+            {{wizard.form.title}}
+            <label id="id_experience_title_limit"></label>
+        </div>
+        <br>
+        <div id="experience-duration">
+            <p>Duration of the experience</p>
+            {{wizard.form.duration}}
+            <p style="padding-left:10px;">hours</p>
+        </div>
+        <br><br><br>
+        <div id="experience-city">
+            <p>City</p>
+            {{wizard.form.location}}
+        </div>
+        <br><br><br>
+        <div>
+            <br><br><br><br>
+            <input type="submit" id="continue-button" value="Continue"/>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script charset="utf-8" type="text/javascript">
+
+    function countChar(object, limit, hint) {
+        var len = object.val().length;
+        if (len >= limit) {
+          object.val(object.val().substring(0, limit));
+        } else {
+          hint.text(limit - len + ' characters left');
+        }
+    }
+
+    $(document).ready(function(){
+        $("#id_experience-changed_steps").val($("#id_experience-changed_steps").val()+'experience,');
+        $("#id_experience-title").keyup(function() {
+            countChar($("#id_experience-title"), 40, $("#id_experience_title_limit"));
+        });
+        //$('#id_experience-title').attr("name","title");
+        //$('#id_experience-duration').attr("name","duration");
+/*
+	    $('#experience_form').ajaxForm({
+            url: '',
+            dataType:  'json',
+		    beforeSubmit: function(arr, $form, options) {
+                var title=$('#id_experience-title').val();
+                var duration=$('#id_experience-duration').val();
+                var location=$('#id_experience-location').val();
+                if (title.length && duration.length && location.length) 
+                {
+                    $('#experience_form').ajaxStart(function() {
+                        alert('loading');
+                    });
+                    return true;
+				}
+				else
+				{
+                    return false;
+				}
+			},	
+		    success: function(response) {}
+		});
+*/
+    })
+</script>
+{%endblock%}

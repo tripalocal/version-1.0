@@ -1,4 +1,4 @@
-from experiences.models import Booking, Experience, Payment, WhatsIncluded, Coupon
+from experiences.models import *
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -8,11 +8,11 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpRespons
 import json, pytz, xlrd, re, os, subprocess, math, logging, ast
 from django.contrib.auth.models import User
 from datetime import *
-from app.models import RegisteredUser
+from app.models import *
 from post_office import mail
 from Tripalocal_V1 import settings
 from tripalocal_messages.models import Aliases, Users
-from experiences.forms import email_account_generator, ExperienceForm, ItineraryBookingForm, check_coupon
+from experiences.forms import email_account_generator, ExperienceForm, ItineraryBookingForm, check_coupon, Currency, DollarSign
 from django.db import connections
 from django.template import loader, RequestContext, Context
 from django.template.loader import get_template
@@ -29,6 +29,10 @@ from allauth.socialaccount import providers
 from allauth.socialaccount.models import SocialLogin, SocialToken, SocialApp
 from allauth.socialaccount.providers.facebook.views import fb_complete_login
 from allauth.socialaccount.helpers import complete_social_login
+from django.utils.translation import ugettext_lazy as _, string_concat
+from django.views.decorators.csrf import csrf_exempt
+
+GEO_POSTFIX = "/"
 
 def isLegalInput(inputs):
     for input in inputs:
@@ -39,7 +43,7 @@ def isLegalInput(inputs):
 
 def updateExperienceTagsFromXLS(request):
     if not (request.user.is_authenticated() and request.user.is_superuser):
-        return HttpResponseRedirect("/accounts/login/?next=/experience_tags_xls")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "experience_tags_xls")
 
     context = RequestContext(request)
     if request.method == 'POST':
@@ -76,14 +80,25 @@ def updateExperienceTagsFromXLS(request):
                     all_tags.append(cell_value)
                 else:
                     raise Exception("Type error: column name, " + str(curr_cell))
-            
+
+            cursor = connections['default'].cursor()
+            #delete all existing records
+            cursor.execute("delete from experiences_experience_tags where experiencetag_id in (select id from experiences_experiencetag where language=%s)",[settings.LANGUAGES[0][0]])
+            cursor.execute("delete from experiences_experiencetag where language=%s",[settings.LANGUAGES[0][0]])
+            #add new tags
+            all_tags = [x for x in all_tags if x]
+            for i in range(len(all_tags)):
+                tag = ExperienceTag(tag = all_tags[i], language = settings.LANGUAGES[0][0])
+                tag.save()
+                all_tags.remove(all_tags[i])
+                all_tags.insert(i, tag)
+
             curr_row = 0
             while curr_row < num_rows:
                 curr_row += 1
                 row = worksheet.row(curr_row)
 
                 curr_cell = 0
-                exp_tags=""
                 id = row[curr_cell].value.split("--")[0]
                 id = int(id)
                 try:
@@ -98,12 +113,9 @@ def updateExperienceTagsFromXLS(request):
 
                     if cell_type == 1 or cell_type == 0:
                         if worksheet.cell_value(curr_row, curr_cell).lower() == "y":
-                            exp_tags += all_tags[curr_cell] + ","
+                            exp.tags.add(all_tags[curr_cell-1])
                     else:
                         raise Exception("Type error: row " + str(curr_row) + ", col " + str(curr_cell))
-
-                exp.tags = exp_tags
-                exp.save()
     else:
         form = ExperienceTagsXLSForm()
 
@@ -125,6 +137,8 @@ def saveBookingRequest(booking_request):
         raise Exception("Illegal input")
 
     experience = Experience.objects.get(id=experience_id)
+    experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+    experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
     #create a new account if the user does not exist
     try:
@@ -149,14 +163,8 @@ def saveBookingRequest(booking_request):
         profile.save()
 
         cursor = connections['default'].cursor()
-        cursor.execute("Insert into account_emailaddress ('user_id','email','verified','primary') values (%s, %s, %s, %s)", 
+        cursor.execute("Insert into account_emailaddress (user_id,email,verified,primary) values (%s, %s, %s, %s)", 
                        [user.id, email, 1, 1])
-
-        #copy to the chinese website database
-        cursor = connections['cndb'].cursor()
-        cursor.execute("Insert into auth_user ('id','first_name','last_name','email') values (%s, %s, %s, %s)", 
-                        [user.id,user.first_name, user.last_name, user.email])
-        cursor.execute("Insert into app_registereduser ('user_id') values (%s)", [user.id])
 
         username = user.username
 
@@ -179,9 +187,9 @@ def saveBookingRequest(booking_request):
             f.close()
                     
         #send a welcome email
-        mail.send(subject='[Tripalocal] Successfully registered', message='', sender='Tripalocal <enquiries@tripalocal.com>',
+        mail.send(subject=_('[Tripalocal] Successfully registered'), message='', sender=settings.DEFAULT_FROM_EMAIL,
                       recipients = [email], priority='now', html_message=loader.render_to_string('app/email_auto_registration.html',
-                                                                                                 {'email':user.email, 'password':password, 'url':'https://www.tripalocal.com/accounts/login?next=/accounts/password/change'}))
+                                                                                                 {'email':user.email, 'password':password, 'url':'https://www.tripalocal.com' + GEO_POSTFIX + 'accounts/login?next=' + GEO_POSTFIX + 'accounts/password/change/'}))
 
     #record the booking request
     local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -198,83 +206,59 @@ def saveBookingRequest(booking_request):
 
     #add the user to the guest list
     if user not in experience.guests.all():
-        #experience.guests.add(user)
-        cursor = connections['experiencedb'].cursor()
-        cursor.execute("Insert into experiences_experience_guests ('experience_id','user_id') values (%s, %s)", [experience_id, user.id])
-
-    ## send an email to the host
-    #mail.send(subject='[Tripalocal] ' + user.first_name + ' has requested your experience', message='',
-    #            sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-    #            recipients = [Aliases.objects.filter(destination__contains=experience.hosts.all()[0].email)[0].mail], #fail_silently=False,
-    #            priority='now',
-    #            html_message=loader.render_to_string('email_booking_requested_host.html', 
-    #                                                    {'experience': experience,
-    #                                                    'booking':booking,
-    #                                                    'user_first_name':user.first_name,
-    #                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-    #                                                    'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
-    #                                                    'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))
-    ## send an email to the traveler
-    #mail.send(subject='[Tripalocal] You booking request is sent to the host',  message='', 
-    #            sender='Tripalocal <' + Aliases.objects.filter(destination__contains=experience.hosts.all()[0].email)[0].mail + '>',
-    #            recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], #fail_silently=False,
-    #            priority='now', 
-    #            html_message=loader.render_to_string('email_booking_requested_traveler.html',
-    #                                                    {'experience': experience, 
-    #                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-    #                                                    'booking':booking}))
+        experience.guests.add(user)
 
     host = experience.hosts.all()[0]
     #send an email to the traveller
-    mail.send(subject='[Tripalocal] Booking confirmed', message='', 
-                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
-                html_message=loader.render_to_string('email_booking_confirmed_traveler.html',
+                html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user, #not host --> need "my" phone number
                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
             
     #schedule an email for reviewing the experience
-    mail.send(subject='[Tripalocal] How was your experience?', message='', 
-                sender='Tripalocal <enquiries@tripalocal.com>',
+    mail.send(subject=_('[Tripalocal] How was your experience?'), message='', 
+                sender=settings.DEFAULT_FROM_EMAIL,
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime + timedelta(days=1), 
-                html_message=loader.render_to_string('email_review_traveler.html',
+                html_message=loader.render_to_string('experiences/email_review_traveler.html',
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                     'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id)}))
 
     #send an email to the host
-    mail.send(subject='[Tripalocal] Booking confirmed', message='', 
-                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
-                html_message=loader.render_to_string('email_booking_confirmed_host.html',
+                html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user, # guest here
                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
 
     #schedule an email to the traveller one day before the experience
-    mail.send(subject='[Tripalocal] Booking reminder', message='', 
-                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+    mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
-                html_message=loader.render_to_string('email_reminder_traveler.html',
+                html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user, #not host --> need "my" phone number
                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-            
+
     #schedule an email to the host one day before the experience
-    mail.send(subject='[Tripalocal] Booking reminder', message='', 
-                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+    mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
-                html_message=loader.render_to_string('email_reminder_host.html',
+                html_message=loader.render_to_string('experiences/email_reminder_host.html',
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user,
@@ -282,7 +266,7 @@ def saveBookingRequest(booking_request):
 
 def saveBookingRequestsFromXLS(request):
     if not (request.user.is_authenticated() and request.user.is_superuser):
-        return HttpResponseRedirect("/accounts/login/?next=/booking_request_xls")
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "booking_request_xls")
 
     context = RequestContext(request)
     if request.method == 'POST':
@@ -363,7 +347,7 @@ def booking_request(request, format=None):
 
 #https://djangosnippets.org/snippets/2172/
 def ajax_view(request):
-    template = "add_experience_experience.html"
+    template = "experiences/add_experience_experience.html"
 
     if request.is_ajax() and request.user.is_authenticated():
         if request.method == 'POST':
@@ -376,13 +360,13 @@ def ajax_view(request):
                 response={'status':True}
             else:
                 response={'status':False}
-            return HttpResponse(json.dumps(response))
+            return HttpResponse(json.dumps(response, ensure_ascii=False))
         else:
             return render_to_response(template, {'form':ExperienceForm()}, context_instance=RequestContext(request))
     else:
         raise Http404
 
-@api_view(['POST'])
+@api_view(['POST','GET'])
 @authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
 def service_wishlist(request):
     if request.method == 'POST': #request.is_ajax() and 
@@ -397,16 +381,14 @@ def service_wishlist(request):
                 try:
                     #user.registereduser.wishlist.add(experience)
                     cursor = connections['default'].cursor()
-                    wl = cursor.execute("select id from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id]).fetchone()
+                    cursor.execute("select id from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id])
+                    wl = cursor.fetchone()
                     if wl is not None and len(wl)>0:
                         response={'success':False, 'error':'already added'}
                         return HttpResponse(json.dumps(response),content_type="application/json")
 
-                    cursor.execute("Insert into app_registereduser_wishlist ('experience_id','registereduser_id') values (%s, %s)", [experience.id, user.registereduser.id])
-                    
-                    cursor = connections['cndb'].cursor()
-                    profile_id = cursor.execute("Select id from app_registereduser where user_id=%s",[user_id]).fetchone()
-                    cursor.execute("Insert into app_registereduser_wishlist ('experience_id','registereduser_id') values (%s, %s)", [experience.id, profile_id[0]])
+                    cursor.execute("Insert into app_registereduser_wishlist (experience_id,registereduser_id) values (%s, %s)", [experience.id, user.registereduser.id])
+
                     response={'success':True, 'added':True}
                 except BaseException:
                     response={'success':False, 'error':'fail to add'}
@@ -416,10 +398,7 @@ def service_wishlist(request):
                     #user.registereduser.wishlist.remove(experience)
                     cursor = connections['default'].cursor()
                     cursor.execute("delete from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id])
-                    
-                    cursor = connections['cndb'].cursor()
-                    profile_id = cursor.execute("Select id from app_registereduser where user_id=%s",[user_id]).fetchone()
-                    cursor.execute("delete from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, profile_id[0]])
+
                     response={'success':True, 'removed':True}
                 except BaseException:
                     response={'success':False, 'error':'fail to remove'}
@@ -433,10 +412,27 @@ def service_wishlist(request):
             response={'success':False, 'error':'experience does not exist'}
             return HttpResponse(json.dumps(response),content_type="application/json")
 
+    elif request.method == 'GET' and request.user.is_authenticated():
+        try:
+            user = request.user
+            cursor = connections['default'].cursor()
+            wl = cursor.execute("select experience_id from app_registereduser_wishlist where registereduser_id=%s", [user.registereduser.id])
+            wl = cursor.fetchall()
+            ids = []
+            for id in wl:
+                ids.append(id)
+
+            response={'experience_ids':ids}
+            return HttpResponse(json.dumps(response),content_type="application/json")
+
+        except Exception as err:
+            #TODO
+            return Response(status=status.HTTP_400_BAD_REQUEST)
     else:
-        raise HttpResponseForbidden
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['POST'])
+@csrf_exempt
 def service_login(request):
     try:
         data = request.data #request.query_params['data']
@@ -456,7 +452,7 @@ def service_login(request):
             result = {'user_id':user.id, 'token':new_token[0].key}
             return Response(result, status=status.HTTP_200_OK)
         else:
-            result = {"error":"User not existing"}
+            result = {"error":"Wrong username/password"}
             return Response(result, status=status.HTTP_404_NOT_FOUND)
 
     except Exception as err:
@@ -464,6 +460,7 @@ def service_login(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+@csrf_exempt
 def service_signup(request):
     try:
         data = request.data #request.query_params['data']
@@ -478,29 +475,41 @@ def service_signup(request):
         last_name = data['last_name']
         username = first_name.lower()
 
-        u = User.objects.filter(username = username)
+        u = User.objects.filter(first_name__iexact = username)
         counter = len(u) if u is not None else 0
         counter += 1
         username = username + str(counter) if counter > 1 else username 
 
-        user = User(first_name = first_name, last_name = last_name, email = email,username = username,
-                    date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
-                    last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
-        user.save()
+        try:
+            user = User.objects.get(email = email)
+            return Response({"error":"email already registered"}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            user = User(first_name = first_name, last_name = last_name, email = email,username = username,
+                        date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                        last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
+            user.save()
 
-        user.set_password(password)
-        user.save()
+            user.set_password(password)
+            user.save()
 
-        user_signed_up.send(sender=user.__class__, request=request, user=user)
-        user = authenticate(username=username, password=password)
-        login(request, user)
-        new_token = Token.objects.get_or_create(user=user)
-        result = {'user_id':user.id, 'token':new_token[0].key}
+            if 'phone_number' in data:
+                user_signed_up.send(sender=user.__class__, request=request, user=user, phone_number=data['phone_number'])
+            else:
+                user_signed_up.send(sender=user.__class__, request=request, user=user)
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            new_token = Token.objects.get_or_create(user=user)
+            result = {'user_id':user.id, 'token':new_token[0].key}
 
-        return Response(result, status=status.HTTP_200_OK)
+            return Response(result, status=status.HTTP_200_OK)
 
     except Exception as err:
         #TODO
+        logger = logging.getLogger("Tripalocal_V1")
+        if hasattr(err, 'detail'):
+            logger.error(err.detail)
+        else:
+            logger.error(err)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -513,8 +522,9 @@ def service_logout(request):
 # http://bytefilia.com/titanium-mobile-facebook-application-django-allauth-sign-sign/
 # http://stackoverflow.com/questions/16381732/how-to-create-new-user-and-new-django-allauth-social-account-when-given-access-t
 @api_view(['POST'])
+@csrf_exempt
 def service_facebook_login(request):
-    data = request.data #self.deserialize(request, request.raw_post_data, format=request.META.get('content_type', 'application/json'))
+    data = request.data
 
     access_token = data.get('access_token', '')
 
@@ -539,8 +549,7 @@ def service_facebook_login(request):
 
 #{"start_datetime":"2015-05-05", "end_datetime":"2015-05-08", "city":"melbourne", "guest_number":"2", "keywords":"Sports,Arts,Food"}
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
-#@permission_classes((IsAuthenticated,))
+@csrf_exempt
 def service_search(request, format=None):
     try:
         criteria = request.data #request.query_params['data']
@@ -551,6 +560,7 @@ def service_search(request, format=None):
         keywords = criteria['keywords']
         language = "Mandarin,English"
 
+        guest_number = 5 #temp fix
         if int(guest_number) == 0:
             itinerary = get_itinerary(start_datetime, end_datetime, None, city, language, keywords)
         else:
@@ -562,40 +572,17 @@ def service_search(request, format=None):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_mytrip(request, format=None):
     try:
         user = request.user
-        b = Booking.objects.filter(user=user)
-        cursor = connections['cndb'].cursor()
-        rows = cursor.execute('select datetime, status, guest_number, experience_id from experiences_booking where user_id = %s order by datetime',
-                                [request.user.id]).fetchall()
+        booking_status = "paid,accepted,rejected"
+        b = Booking.objects.filter(user=user, status__in=booking_status.split(","))
 
         bookings = []
         for booking in b:
             bookings.append(booking)
-
-        if rows:
-            for index in range(len(rows)):
-                bk = Booking()
-                bk.datetime = rows[index][0]
-                bk.status = rows[index][1]
-                bk.guest_number = rows[index][2]
-                exp = Experience()
-                row = cursor.execute('select meetup_spot, title from experiences_experience where id = %s',
-                                [rows[index][3]]).fetchone()
-                exp.id = rows[index][3]
-                exp.meetup_spot = row[0]
-                exp.title = row[1]
-                #row = cursor.execute('select first_name, last_name from auth_user where id in (select user_id from experiences_experience_hosts where experience_id = %s)',
-                #             [rows[index][3]]).fetchone()
-                #host = User()
-                #host.first_name = row[0]
-                #host.last_name = row[1]
-                #exp.hosts.
-                bk.experience = exp
-                bookings.append(bk)
 
         bookings = sorted(bookings, key=lambda booking: booking.datetime, reverse=True)
 
@@ -608,9 +595,12 @@ def service_mytrip(request, format=None):
             host = booking.experience.hosts.all()[0]
             phone_number = host.registereduser.phone_number
             
-            bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status, 'guest_number':booking.guest_number, 
-                  'experience_title':booking.experience.title, 'meetup_spot':booking.experience.meetup_spot, 'experience_id':booking.experience.id,
-                  'host_name':host.first_name + ' ' + host.last_name[:1] + '.', 'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
+            bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
+                  'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
+                  'experience_title':get_experience_title(booking.experience,settings.LANGUAGES[0][0]),
+                  'meetup_spot':get_experience_meetup_spot(booking.experience,settings.LANGUAGES[0][0]),
+                  'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.',
+                  'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
 
             bks.append(bk)
 
@@ -620,7 +610,7 @@ def service_mytrip(request, format=None):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_myreservation(request, format=None):
     try:
@@ -639,7 +629,7 @@ def service_myreservation(request, format=None):
 
 #"{"id":58,"accept":"yes"}"
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,)) #SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_acceptreservation(request, format=None):
     try:
@@ -659,7 +649,7 @@ def service_acceptreservation(request, format=None):
 
 #{"itinerary_string":[{"id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2},{"id":"20","date":"2015/06/17","time":"17:00 - 20:00","guest_number":2}],"card_number":"4242424242424242","expiration_month":10,"expiration_year":2015,"cvv":123, "coupon":"abcdefgh"}
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication)) #
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_booking(request, format=None):
     try:
@@ -667,7 +657,7 @@ def service_booking(request, format=None):
         if type(data) is str:
             data = ast.literal_eval(data)
 
-        itinerary = data["itinerary_string"]
+        itinerary = data['itinerary_string']
 
         booking_data = {}
         booking_data['user'] = request.user
@@ -710,12 +700,14 @@ def service_booking(request, format=None):
         logger = logging.getLogger("Tripalocal_V1")
         if hasattr(err, 'detail'):
             logger.error(err.detail)
+        else:
+            logger.error(err)
         result = {"success":"false"}
         return Response(result, status=status.HTTP_400_BAD_REQUEST)
 
 #{"coupon":"aasfsaf","id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2}
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication)) #
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication)) #
 @permission_classes((IsAuthenticated,))
 def service_couponverification(request, format=None):
     try:
@@ -774,7 +766,9 @@ def service_couponverification(request, format=None):
 
     return Response(result, status=status.HTTP_200_OK)
 
+#TODO: change to GET
 @api_view(['POST'])
+@csrf_exempt
 def service_experience(request, format=None):
     try:
         data = request.data
@@ -786,24 +780,24 @@ def service_experience(request, format=None):
         available_date = getAvailableOptions(experience, available_options, available_date)
 
         WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
-        included_food = WhatsIncludedList.filter(item='Food')[0]
-        included_ticket = WhatsIncludedList.filter(item='Ticket')[0]
-        included_transport = WhatsIncludedList.filter(item='Transport')[0]
+        included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
+        included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
+        included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
 
         host = experience.hosts.all()[0]
         host_image = host.registereduser.image_url
-        host_bio = host.registereduser.bio
+        host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
 
         rate = 0.0
         counter = 0
         experience_reviews = []
         for review in experience.review_set.all():
             reviewer = User.objects.get(id=review.user_id)
-            dict={'reviewer_firstname':reviewer.first_name,
+            d={'reviewer_firstname':reviewer.first_name,
                   'reviewer_lastname':reviewer.last_name,
                   'reviewer_image':reviewer.registereduser.image_url,
                   'review_comment':review.comment,}
-            experience_reviews.append(dict)
+            experience_reviews.append(d)
             rate += review.rate
             counter += 1
         
@@ -815,15 +809,17 @@ def service_experience(request, format=None):
             dynamic_price = experience.dynamic_price.split(",")
             dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
 
-        return Response({'experience_title':experience.title,
+        return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
-                         'experience_description':experience.description,
-                         'experience_activity':experience.activity,
-                         'experience_interaction':experience.interaction,
-                         'experience_dress':experience.dress,
-                         'experience_meetup_spot':experience.meetup_spot,
+                         'experience_description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                         'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
+                         'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
+                         'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
+                         'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
                          'experience_price':experience_fee_calculator(float(experience.price)),
+                         'experience_currency': str(dict(Currency)[experience.currency.upper()]),
+                         'experience_dollarsign': DollarSign[experience.currency.upper()],
                          'experience_dynamic_price':dynamic_price,
                          'experience_guest_number_min':experience.guest_number_min,
                          'experience_guest_number_max':experience.guest_number_max,
@@ -842,6 +838,85 @@ def service_experience(request, format=None):
                          'host_lastname': host.last_name,
                          'host_image':host_image,
                          'host_bio':host_bio,
+                         'host_id':str(host.id),
+
+                         'experience_rate':math.ceil(rate),
+                         'experience_reviews':experience_reviews,
+
+                         }, status=status.HTTP_200_OK)
+
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@csrf_exempt
+def service_experiencedetail(request, format=None):
+    try:
+        data = request.query_params
+        if type(data) is str:
+            data = ast.literal_eval(data)
+
+        exp_id = data['experience_id']
+        experience = Experience.objects.get(id=exp_id)
+        
+        WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
+        included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
+        included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
+        included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
+
+        host = experience.hosts.all()[0]
+        host_image = host.registereduser.image_url
+        host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
+
+        rate = 0.0
+        counter = 0
+        experience_reviews = []
+        for review in experience.review_set.all():
+            reviewer = User.objects.get(id=review.user_id)
+            d={'reviewer_firstname':reviewer.first_name,
+                  'reviewer_lastname':reviewer.last_name,
+                  'reviewer_image':reviewer.registereduser.image_url,
+                  'review_comment':review.comment,}
+            experience_reviews.append(d)
+            rate += review.rate
+            counter += 1
+        
+        if counter > 0:        
+            rate /= counter
+        
+        dynamic_price = []
+        if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
+            dynamic_price = experience.dynamic_price.split(",")
+            dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
+
+        return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
+                         'experience_language':experience.language,
+                         'experience_duration':experience.duration,
+                         'experience_description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                         'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
+                         'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
+                         'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
+                         'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
+                         'experience_price':experience_fee_calculator(float(experience.price)),
+                         'experience_currency': str(dict(Currency)[experience.currency.upper()]),
+                         'experience_dollarsign': DollarSign[experience.currency.upper()],
+                         'experience_dynamic_price':dynamic_price,
+                         'experience_guest_number_min':experience.guest_number_min,
+                         'experience_guest_number_max':experience.guest_number_max,
+
+                         'included_food':included_food.included,
+                         'included_food_detail':included_food.details,
+                         'included_ticket':included_ticket.included,
+                         'included_ticket_detail':included_ticket.details,
+                         'included_transport':included_transport.included,
+                         'included_transport_detail':included_transport.details,
+
+                         'host_firstname': host.first_name,
+                         'host_lastname': host.last_name,
+                         'host_image':host_image,
+                         'host_bio':host_bio,
+                         'host_id':str(host.id),
 
                          'experience_rate':math.ceil(rate),
                          'experience_reviews':experience_reviews,
@@ -853,7 +928,7 @@ def service_experience(request, format=None):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET','POST'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_myprofile(request, format=None):
     try:
@@ -861,7 +936,8 @@ def service_myprofile(request, format=None):
         profile = user.registereduser
         if request.method == "GET":
             result={'id':user.id, 'first_name':user.first_name, 'last_name':user.last_name, 'email':user.email,
-                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,'bio':profile.bio,'rate':profile.rate}
+                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,
+                     'bio':get_user_bio(profile, settings.LANGUAGES[0][0]),'rate':profile.rate}
             return Response(result, status=status.HTTP_200_OK)
         elif request.method == "POST":
             data = request.data
@@ -869,8 +945,26 @@ def service_myprofile(request, format=None):
             profile.phone_number = phone_number
             profile.save()
             result={'id':user.id, 'first_name':user.first_name, 'last_name':user.last_name, 'email':user.email,
-                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,'bio':profile.bio,'rate':profile.rate}
+                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,
+                     'bio':get_user_bio(profile, settings.LANGUAGES[0][0]),'rate':profile.rate}
             return Response(result, status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_publicprofile(request,format=None):
+    try:
+        data = request.query_params
+        if type(data) is str:
+            data = ast.literal_eval(data)
+
+        user = User.objects.get(id=data["user_id"])
+        profile = user.registereduser
+        result={'first_name':user.first_name, 'last_name':user.last_name, 'image':user.registereduser.image_url}
+        return Response(result, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -908,3 +1002,65 @@ def service_email(request, format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
     return Response(status=status.HTTP_200_OK)
+
+@api_view(['GET','POST'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))#))#,
+@permission_classes((IsAuthenticated,))
+def service_message(request, format=None):
+    try:
+        data = request.query_params
+        if type(data) is str:
+            data = ast.literal_eval(data)
+
+        if request.method == "GET":
+            sender = data["sender_id"] if "sender_id" in data else None
+            id_earlier = data["id_earlier"] if "id_earlier" in data else None
+
+            messages = None
+            if sender is not None:
+                #history messages from a particualr user
+                if id_earlier is not None:
+                    messages = Message.objects.filter(sender_id=sender, receiver_id=request.user.id, id__lt=id_earlier)
+                #undelivered messages from a particualr user 
+                else:
+                    messages = Message.objects.filter(sender_id=sender, receiver_id=request.user.id, status__iexact="received")
+            else:
+                #all undelivered messages
+                messages = Message.objects.filter(receiver_id=request.user.id, status__iexact="received")
+
+            result = []
+            for msg in messages:
+                if msg.status == "received":
+                    msg.status="delivered"
+                    msg.datetime_delivered = datetime.utcnow().replace(tzinfo=pytz.UTC)
+                    msg.save()
+                m={"id":msg.id,"sender_id":msg.sender_id,"receiver_id":msg.receiver_id,"datetime_sent":msg.datetime_sent,
+                   "datetime_read":msg.datetime_read,"status":msg.status,"content":msg.content}
+                result.append(m)
+
+            return Response({"result":result}, status=status.HTTP_200_OK)
+        elif request.method == "POST":
+            data = request.data
+            if "message_id" not in data:
+                #save message
+                receiver_id = data["receiver_id"]
+                content = data["content"]
+              
+                message = Message(sender_id=request.user.id, receiver_id=receiver_id, content=content,
+                                  status="received", datetime_sent=datetime.utcnow().replace(tzinfo=pytz.UTC))
+                message.save()
+                return Response({"result":"message received"}, status=status.HTTP_200_OK)
+            else:
+                #update status: delivered-->read
+                sender_id = data["sender_id"]
+                message_id = data["message_id"]
+                messages = Message.objects.filter(sender_id=sender_id, receiver_id=request.user.id, 
+                                                  id__lte=message_id, status__iexact="delivered")
+                for msg in messages:
+                    msg.status="read"
+                    msg.datetime_read = datetime.utcnow().replace(tzinfo=pytz.UTC)
+                    msg.save()
+                return Response({"result":"message status updated"}, status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
