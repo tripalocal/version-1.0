@@ -38,7 +38,7 @@
                         </div>
                         {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
                         <br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
-                        <div class="row" style="width:180px;margin-top:10px">
+                        <div class="row" style="width:200px;margin-top:10px">
                             <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px"> {% trans "per person" %}<br>{% trans "for" %} {{ experience.duration }} {% trans "hours" %}<br><p>
                         </div>
                         <form id="experience_booking_form" method="post" action="">
