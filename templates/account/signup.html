@@ -65,15 +65,6 @@
                 </table>
             </div>
             {%endif%}
-            <p>{{ form.first_name }}</p>
-            <p id="first_name_error"></p>
-
-            {% if 'first_name' in form.errors%}
-            <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
-                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
-                <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.first_name.errors.as_text}}</p>
-            </div>
-            {%endif%}
             <p>{{ form.last_name }}</p>
             <p id="last_name_error"></p>
 
@@ -83,14 +74,22 @@
                 <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.last_name.errors.as_text}}</p>
             </div>
             {%endif%}
+            <p>{{ form.first_name }}</p>
+            <p id="first_name_error"></p>
+
+            {% if 'first_name' in form.errors%}
+            <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
+                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.first_name.errors.as_text}}</p>
+            </div>
+            {%endif%}
             {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
             {% endif %}
-            <p class = "tellme"><input id="id_tellme"type="checkbox" /> Tell me about Tripalocal news</p>
-            <p class="help-message">By signing up, I agree to Tripalocal's <a href="/termsofservice">Terms of Service</a>, <a href="/privacypolicy">Privacy Policy</a>, <a href="/refundpolicy">Guest Refund Policy</a></p>
-            <button id="id_signup_submit_button" class="btn btn-primary btn-lg" type="submit">Sign up</button>
+            <p class="help-message" style="display:none">我同意本土客的<a href="#">服务条款</a>, <a href="#">隐私条款</a>, <a href="#">返还条款</a></p>
+            <button id="id_signup_submit_button" class="btn btn-primary btn-lg" type="submit">注册</button>
         </form>
-        <p>{% blocktrans %}Already a Tripalocal member? <a href="{{ login_url }}">Log in</a>{% endblocktrans %}</p>
+        <p>{% blocktrans %}已经有本土客帐号？ <a href="{{ login_url }}">登录</a>{% endblocktrans %}</p>
         </div>
     </div>
 </section>
@@ -108,10 +107,10 @@ function checkEmail()
 {
     email=$('#id_email').val().trim();
     if(email==""){
-        $("#id_email_error").text("This can not be empty");
+        $("#id_email_error").text("此为必填项");
         return false;
     }else if(!isValidEmailAddress(email)){
-        $("#id_email_error").text("Please enter a valid email");
+        $("#id_email_error").text("请输入合法邮箱");
         return false;
     }
     else{
@@ -124,7 +123,7 @@ function checkInput(id_put, id_error)
 {
     input = $('#'+id_put).val().trim();
     if(input==""){
-        $("#"+id_error).text("This can not be empty");
+        $("#"+id_error).text("此为必填项");
         return false;
     }else{
         $("#"+id_error).text("");
@@ -144,28 +143,28 @@ function checkInput(id_put, id_error)
 
 //validation firstname
     $("#id_first_name").blur(function(){
-        var regexp = /^[a-zA-Z0-9-_.]+$/;
+        var regexp = /^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$/;
         if($("#id_first_name").val().search(regexp) != -1)
         {
             checkInput("id_first_name", "first_name_error"); 
         }
         else
         {
-            $("#first_name_error").text("Invalid first name");
+            $("#first_name_error").text("名字含不合法字符");
             return false;
         }
     });
     
 //validate last name 
    $("#id_last_name").blur(function(){
-        var regexp = /^[a-zA-Z0-9-_.]+$/;
+        var regexp = /^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$/;
         if($("#id_last_name").val().search(regexp) != -1)
         {
             checkInput("id_last_name", "last_name_error");
         }
         else
         {
-            $("#last_name_error").text("Invalid last name");
+            $("#last_name_error").text("姓氏含不合法字符");
             return false;
         }
     });
@@ -174,13 +173,18 @@ $(function()
 {
     var country, region, city, ip, longitude, latitude;
     $(document).ready(function(){
-        $("#id_Facebook").attr("class", "socialaccount_provider facebook");
-        $("#id_Facebook").attr("role", "button");
+        //$("#id_Facebook").attr("class", "btn btn-primary btn-lg btn-facebook");
+        //$("#id_Facebook").attr("role", "button");
 
-        //$("#id_email").attr("class", "form-control");
-        //$("#id_password1").attr("class", "form-control");
-        //$("#id_first_name").attr("class", "form-control");
-        //$("#id_last_name").attr("class", "form-control");
+        $("#id_email").attr("class", "form-control");
+        $("#id_password1").attr("class", "form-control");
+        $("#id_first_name").attr("class", "form-control");
+        $("#id_last_name").attr("class", "form-control");
+
+        $("#id_email").attr("placeholder", "邮箱");
+        $("#id_password1").attr("placeholder", "密码");
+        $("#id_first_name").attr("placeholder", "名字");
+        $("#id_last_name").attr("placeholder", "姓氏");
 
         /*
         $.getScript('http://www.geoplugin.net/javascript.gp', function() 
@@ -222,9 +226,10 @@ $(function()
                                         "$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,
                                         "$created":now, "$last_seen":now
                                         });
-                    //mixpanel.track("has signed up via email");   
+                    //mixpanel.track("has signed up via email_cn");   
                     mixpanel.identify($("#id_email").val());
 
+                    ga('send','event','sign up','click');
                     $("#signup_form").submit();
                 }
             }

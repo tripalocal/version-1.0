@@ -390,8 +390,8 @@ def myprofile(request):
     photo={}
     if profile.image_url:
         context["image_url"] = profile.image_url
-        photo["image"] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+profile.image_url, 
-                                            File(open(settings.MEDIA_ROOT+'/'+profile.image_url, 'rb')).read())
+        #photo["image"] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+profile.image_url, 
+        #                                    File(open(settings.MEDIA_ROOT+'/'+profile.image_url, 'rb')).read())
     else:
         context["image_url"] = "hosts/no_img.jpg"
 
@@ -400,7 +400,7 @@ def myprofile(request):
 
     data["bio"]=get_user_bio(profile, settings.LANGUAGES[0][0])
         
-    form = UserProfileForm(data=data, files=photo)
+    form = UserProfileForm(data=data)
 
     return render_to_response('app/myprofile.html', {'form': form}, context)
 
