@@ -371,9 +371,14 @@ def ajax_view(request):
 def service_wishlist(request):
     if request.method == 'POST': #request.is_ajax() and 
         try:
-            user_id = int(request.POST['user_id'])
-            experience_id = int(request.POST['experience_id'])
-            added = request.POST['added']
+            if request.is_ajax():
+                data = request.POST
+            else:
+                data=request.data
+
+            user_id = int(data['user_id'])
+            experience_id = int(data['experience_id'])
+            added = data['added']
 
             user = User.objects.get(id=user_id)
             experience = Experience.objects.get(id=experience_id)
@@ -418,11 +423,29 @@ def service_wishlist(request):
             cursor = connections['default'].cursor()
             wl = cursor.execute("select experience_id from app_registereduser_wishlist where registereduser_id=%s", [user.registereduser.id])
             wl = cursor.fetchall()
-            ids = []
+            experiences = []
             for id in wl:
-                ids.append(id)
+                experience = Experience.objects.get(id=id[0])
+                #price
+                if experience.guest_number_min <= 4 and experience.guest_number_max>=4:
+                    guest_number = 4
+                elif experience.guest_number_min > 4:
+                    guest_number = experience.guest_number_min
+                elif experience.guest_number_max < 4:
+                    guest_number = experience.guest_number_max
+                exp_price = float(experience.price)
+                if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
+                    exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
 
-            response={'experience_ids':ids}
+                experiences.append({'experience_id':experience.id,
+                                    'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
+                                    'experience_description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                                    'experience_price':experience_fee_calculator(exp_price),
+                                    'experience_language':experience.language,
+                                    'experience_duration':experience.duration,
+                                    'host_image':experience.hosts.all()[0].registereduser.image_url})
+
+            response={'experiences':experiences}
             return HttpResponse(json.dumps(response),content_type="application/json")
 
         except Exception as err:

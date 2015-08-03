@@ -1896,7 +1896,7 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
                 exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
                             'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
                             'dollarsign':experience['dollarsign'],'timeslots':experience['dates'][dt_string]}
-                while counter < len(day_dict['experiences']):#find the corrent rank
+                while counter < len(day_dict['experiences']):#find the correct rank
                     if experience['rate'] > day_dict['experiences'][counter]['rate']:
                         day_dict['experiences'].insert(counter, exp_dict)
                         insert = True
