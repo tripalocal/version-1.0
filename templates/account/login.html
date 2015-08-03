@@ -4,6 +4,8 @@
     {% load i18n %}
     {% load account %}
     {% load url from future %}
+    {% load staticfiles %}
+    <link href="{% static 'app/content/signup_login.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -96,12 +98,12 @@ function checkInput(id_put, id_error)
 
 //validate email
     $("#id_login").blur(function(){
-        checkEmail();
+        //checkEmail();
     });
     
 //validate password
     $("#id_password").blur(function(){
-        checkInput("id_password", "id_password_error");   
+        //checkInput("id_password", "id_password_error");   
     });
 
 $(function(){

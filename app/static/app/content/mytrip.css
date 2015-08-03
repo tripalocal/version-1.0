@@ -1,0 +1,54 @@
+﻿/* your trip page*/
+.textbox{width: 270px;height: 150px;border-radius:3px;border: #BDBDBD 1px solid;overflow:auto;}
+.textbox_date{width: 100px;height: 25px;margin: 0px;border-radius:3px;border: #BDBDBD 1px solid;text-align:center;overflow:auto;}
+#your_trip{width: 220px;}
+#your_trip p{color: rgb(154,154,154);position: relative;top: -3px;left: 5px;}
+#right_box{color:#858585;}
+#your_trip_right{margin-left: 20px;margin-top: 30px;border: rgb(207,207,207) 1px solid;border-radius: 5px;width: auto;height: auto;padding: 0px;}
+#your_trip_right hr{width: 100%;margin-top: 0px;}
+#your_trip_right p{padding-top: 10px;padding-left: 20px;}
+#img1{position:relative;top:5px;}
+.hr-mg-both{margin-top:0px;margin-bottom:10px;border-top:#CCCCCC 1px solid;width: 100%;}
+.hr-mg-tp{margin-top:10px;margin-bottom:0px;border-top:#CCCCCC 1px solid;}
+#your_trip_right hr{width: 100%;margin-top: 0px;}
+#your_trip_right p{padding-top: 10px;padding-left: 20px;}
+.confirm{border: 1px solid #A8E206;background-color:#A8E206;border-radius:2px;color:#FFF;position:relative;top:7px;margin-left:20px;width:80px;}
+.confirm_topic{margin-left:20px;position:relative;top:7px;}
+.blank{border:1px solid #000000;width: 300px;}
+.map_box{border:1px solid rgb(207,207,207);color:#858585;border-radius:2px;width:400px;position:relative;left:245px;padding-left:10px;}
+#map_button{background:#FFF;border: 1px solid #FFF;margin-left:80px;}
+.request{border: 1px solid #2BABAB;background-color:#2BABAB;border-radius:2px;color:#FFF;position:relative;top:7px;margin-left:20px;width:80px;}
+.cancel{border: 1px solid #A7A7A7;background-color:#A7A7A7;border-radius:2px;color:#FFF;position:relative;top:7px;margin-left:20px;width:80px;}
+.icon{width:27px; height:27px; background-size: 135px 135px;}
+/*optimize mobile page for my_trip*/
+.icon-text{margin-right:0px; color:#858585; display: inline-block; margin-top: 15px; float: left;}
+.rigthInterface img{float: left; margin-top: 10px;}
+#booking-detail{float: left;}
+@media (max-width: 768px){
+.menu .menu-language{display: none;}
+.menu #id_profile_div{display: none;}
+.tab_area{display: none;}
+.leftsubMenu{display: none;}
+.rightInterface{padding: 0px; width: auto; float: none; margin-left:20px; margin-right: 20px; }
+.rightInterface p{padding-top: 10px; padding-left: 20px;}
+.tab_area{display: none;}
+.rightInterface hr{margin-top: 0px; margin-bottom: 0px;}
+.rightInterface img{margin-left: 15px; margin-top: 20px; float: left;}
+#booking-detail{width: 160px; margin-top: 10px;}
+.map_box{float: left; left: 0px; margin-left: 15px; width: 260px; margin-bottom: 20px;}
+#date{margin-left: 15px;}
+}
+@media (max-width: 992px){
+.menu .menu-language{display: none;}
+.menu #id_profile_div{display: none;}
+.tab_area{display: none;}
+.leftsubMenu{display: none;}
+.rightInterface{padding: 0px; width: auto; float: none; margin-left:20px; margin-right: 20px; }
+.rightInterface p{padding-top: 10px; padding-left: 20px;}
+.tab_area{display: none;}
+.rightInterface hr{margin-top: 0px; margin-bottom: 0px;}
+.rightInterface img{margin-left: 15px; margin-top: 20px; float: left;}
+#booking-detail{width: 320px; margin-top: 10px;}
+.map_box{float: left; left: 0px; margin-left: 15px; width: 260px; margin-bottom: 20px;}
+#date{margin-left: 15px;}
+}

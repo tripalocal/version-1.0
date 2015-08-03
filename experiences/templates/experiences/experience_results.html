@@ -1,0 +1,31 @@
+{% load mathfilters %}
+{% load i18n %}
+
+<div id="response-to-update-multiple">
+    <label id="experience-count" class="expCount">{{ length }} {% trans "Experiences" %} &#8226; {{ city_display_name }}</label>
+
+    <div id="experience-results">
+        {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
+        <div class="expList">
+            <a href="/experience/{{ experience.id }}">
+                <div class="listingImg" style="background-image:url({{ MEDIA_URL }}{{ BGImageURL }});">
+                    <div class="priceBox">
+                        {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
+                    </div>
+                </div>
+            </a>
+            <a href="/experience/{{ experience.id }}"><h3>{{ formattedTitle }}</h3></a>
+
+            <div class="profile-sm"
+                    style="background:url({{ MEDIA_URL }}{{ profileImageURL }}) no-repeat; background-size:cover; background-position:center;"></div>
+
+            <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
+
+            <div class="listingFooter">
+                <a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a>
+                {{ experience.duration }} hrs &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>

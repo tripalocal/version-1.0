@@ -4,13 +4,13 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 from datetime import *
 from calendar import monthrange 
-from experiences.models import Payment, Booking, Experience, Coupon, Review, Itinerary
+from experiences.models import *
 from Tripalocal_V1 import settings
 import pytz, string, subprocess, json, random
 from django.core.mail import send_mail
 from django.template import loader
 from tripalocal_messages.models import Aliases, Users
-from allauth.account.signals import user_signed_up, user_logged_in
+from django.utils.translation import ugettext_lazy as _, string_concat
 from allauth.socialaccount.signals import pre_social_login, social_account_added
 from django.dispatch import receiver
 from django.db import connections
@@ -20,11 +20,13 @@ import geoip2.database
 from os import path
 from post_office import mail
 
-Type = (('PRIVATE', 'Private'),('NONPRIVATE', 'NonPrivate'),('RECOMMENDED', 'Recommended'),)
+Type = (('PRIVATE', _('Private')),('NONPRIVATE', _('NonPrivate')),('RECOMMENDED', _('Recommended')),)
 
-Location = (('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
-            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),)#('GRSA', 'Greater region, SA'),
-            #('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD'),
+Location = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),
+            ('Goldcoast',_('Gold coast, QLD')),('Hobart',_('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
+            ('GRVIC', _('Greater Victoria')),('GRNSW', _('Greater New South Wales')),('GRQLD', _('Greater Queensland')),
+            ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
+            ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),)#('english;translation','English+Chinese translation'),
 
@@ -43,13 +45,15 @@ Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6',
 Duration = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
 ('11', '11'),('12', '12'),('13', '13'),('14', '14'),('15', '15'),('16', '16'),('17', '17'),('18', '18'),('19', '19'),('20', '20'),
 ('21', '21'),('22', '22'),('23', '23'),('24', '24'),('36', '36'),('48', '48'),('60', '60'),('72', '72'),('84', '84'),('96', '96'),
-('108', '108'),('120', '120'),)
+('108', '108'),('120', '120'),('144', '144'),('168', '168'),('192', '192'),('216', '216'),('240', '240'),('264', '264'),('288', '288'),)
 
 Included = (('Yes', ''),('No', ''),)
 
-Suburbs = (('Melbourne', 'Melbourne, VIC'),('Sydney', 'Sydney, NSW'),('Brisbane', 'Brisbane, QLD'),('Cairns','Cairns, QLD'),
-            ('Goldcoast','Gold coast, QLD'),('Hobart','Hobart, TAS'), ('Adelaide', 'Adelaide, SA'),('GRSA', 'Greater region, SA'),
-            ('GRVIC', 'Greater region, VIC'),('GRNSW', 'Greater region, NSW'),('GRQLD', 'Greater region, QLD'),)
+Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),
+            ('Goldcoast',_('Gold coast, QLD')),('Hobart',_('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
+            ('GRVIC', _('Greater Victoria')),('GRNSW', _('Greater New South Wales')),('GRQLD', _('Greater Queensland')),
+            ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
+            ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghanistan'),('Albania', 'Albania'),('Algeria', 'Algeria'),('Andorra', 'Andorra'),('Angola', 'Angola'),('Antigua and Barbuda', 'Antigua and Barbuda'),('Argentina', 'Argentina'),('Armenia', 'Armenia'),('Aruba', 'Aruba'),('Austria', 'Austria'),('Azerbaijan', 'Azerbaijan'),('Bahamas', 'Bahamas'),('Bahrain', 'Bahrain'),('Bangladesh', 'Bangladesh'),('Barbados', 'Barbados'),('Belarus', 'Belarus'),('Belgium', 'Belgium'),('Belize', 'Belize'),('Benin', 'Benin'),('Bhutan', 'Bhutan'),('Bolivia', 'Bolivia'),('Bosnia and Herzegovina', 'Bosnia and Herzegovina'),('Botswana', 'Botswana'),('Brazil', 'Brazil'),('Brunei ', 'Brunei '),('Bulgaria', 'Bulgaria'),('Burkina Faso', 'Burkina Faso'),
 ('Burma', 'Burma'),('Burundi', 'Burundi'),('Cambodia', 'Cambodia'),('Cameroon', 'Cameroon'),('Canada', 'Canada'),('Cape Verde', 'Cape Verde'),('Central African Republic', 'Central African Republic'),('Chad', 'Chad'),('Chile', 'Chile'),('Colombia', 'Colombia'),('Comoros', 'Comoros'),('Congo, Democratic Republic of the', 'Congo, Democratic Republic of the'),('Congo, Republic of the', 'Congo, Republic of the'),('Costa Rica', 'Costa Rica'),('Cote dIvoire', 'Cote dIvoire'),('Croatia', 'Croatia'),('Cuba', 'Cuba'),('Curacao', 'Curacao'),('Cyprus', 'Cyprus'),('Czech Republic', 'Czech Republic'),('Denmark', 'Denmark'),('Djibouti', 'Djibouti'),('Dominica', 'Dominica'),('Dominican Republic', 'Dominican Republic'),
@@ -59,6 +63,9 @@ Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghan
 ('Palestinian Territories', 'Palestinian Territories'),('Panama', 'Panama'),('Papua New Guinea', 'Papua New Guinea'),('Paraguay', 'Paraguay'),('Peru', 'Peru'),('Philippines', 'Philippines'),('Poland', 'Poland'),('Portugal', 'Portugal'),('Qatar', 'Qatar'),('Romania', 'Romania'),('Russia', 'Russia'),('Rwanda', 'Rwanda'),('Saint Kitts and Nevis', 'Saint Kitts and Nevis'),('Saint Lucia', 'Saint Lucia'),('Saint Vincent and the Grenadines', 'Saint Vincent and the Grenadines'),('Samoa ', 'Samoa '),('San Marino', 'San Marino'),('Sao Tome and Principe', 'Sao Tome and Principe'),('Saudi Arabia', 'Saudi Arabia'),('Senegal', 'Senegal'),('Serbia', 'Serbia'),('Seychelles', 'Seychelles'),('Sierra Leone', 'Sierra Leone'),('Singapore', 'Singapore'),
 ('Sint Maarten', 'Sint Maarten'),('Slovakia', 'Slovakia'),('Slovenia', 'Slovenia'),('Solomon Islands', 'Solomon Islands'),('Somalia', 'Somalia'),('South Africa', 'South Africa'),('South Korea', 'South Korea'),('South Sudan', 'South Sudan'),('Spain ', 'Spain '),('Sri Lanka', 'Sri Lanka'),('Sudan', 'Sudan'),('Suriname', 'Suriname'),('Swaziland ', 'Swaziland '),('Sweden', 'Sweden'),('Switzerland', 'Switzerland'),('Syria', 'Syria'),('Taiwan, China', 'Taiwan, China'),('Tajikistan', 'Tajikistan'),('Tanzania', 'Tanzania'),('Thailand ', 'Thailand '),('Timor-Leste', 'Timor-Leste'),('Togo', 'Togo'),('Tonga', 'Tonga'),('Trinidad and Tobago', 'Trinidad and Tobago'),('Tunisia', 'Tunisia'),('Turkey', 'Turkey'),('Turkmenistan', 'Turkmenistan'),
 ('Tuvalu', 'Tuvalu'),('Uganda', 'Uganda'),('Ukraine', 'Ukraine'),('United Arab Emirates', 'United Arab Emirates'),('United Kingdom', 'United Kingdom'),('Uruguay', 'Uruguay'),('Uzbekistan', 'Uzbekistan'),('Vanuatu', 'Vanuatu'),('Venezuela', 'Venezuela'),('Vietnam', 'Vietnam'),('Yemen', 'Yemen'),('Zambia', 'Zambia'),('Zimbabwe ', 'Zimbabwe '),)
+
+Currency = (('AUD',_('AUD')),('NZD',_('NZD')),) #('CNY',_('CNY')),
+DollarSign = {'AUD':'$','NZD':'$'} #'CNY':'￥',
 
 Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted'))
 
@@ -494,7 +501,8 @@ class BookingConfirmationForm(forms.Form):
         Stripe's library as a standard ValidationError for proper feedback.
         """
         cleaned = super(BookingConfirmationForm, self).clean()
- 
+        local_timezone = pytz.timezone(settings.TIME_ZONE)
+
         if not self.errors and (not 'Refresh' in self.data):
             card_number = self.cleaned_data["card_number"]
             exp_month = self.cleaned_data["expiration"].month
@@ -506,9 +514,9 @@ class BookingConfirmationForm(forms.Form):
             free = False
             self.cleaned_data['price_paid'] = 0.0
 
-            date = self.cleaned_data['date']
-            time = self.cleaned_data['time']
-            bk_dt = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC"))
+            dt = self.cleaned_data['date']
+            tm = self.cleaned_data['time']
+            bk_dt = local_timezone.localize(datetime.datetime(dt.year, dt.month, dt.day, tm.hour, tm.minute)).astimezone(pytz.timezone("UTC"))
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
                                        end_datetime__gt = bk_dt,
                                        start_datetime__lt = bk_dt)
@@ -524,217 +532,30 @@ class BookingConfirmationForm(forms.Form):
                 else:
                     raise forms.ValidationError(valid['error'])
 
-            if not free:
-                guest_number = int(self.cleaned_data["guest_number"])
-                subtotal_price = 0.0
-                if experience.dynamic_price and type(experience.dynamic_price) == str:
-                    price = experience.dynamic_price.split(',')
-                    if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-                    #these is comma in the end, so the length is max-min+2
-                        if guest_number <= experience.guest_number_min:
-                            subtotal_price = float(experience.price) * float(experience.guest_number_min)
-                        else:
-                            subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
-                    else:
-                        #wrong dynamic settings
-                        subtotal_price = float(experience.price)*float(self.cleaned_data["guest_number"])
-                else:
-                    subtotal_price = float(experience.price)*float(self.cleaned_data["guest_number"])
+            user = User.objects.get(id=self.cleaned_data['user_id'])
+            guest_number = int(self.cleaned_data["guest_number"])
+            booking_extra_information="Need Chinese Translation" if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information'] else ""
+            coupon_extra_information=self.cleaned_data['coupon_extra_information'],
+            coupon=cp[0] if len(cp)>0 else None
+            payment_street1 = self.cleaned_data['street1']
+            payment_street2 = self.cleaned_data['street2']
+            payment_city = self.cleaned_data['city_town']
+            payment_state = self.cleaned_data['state']
+            payment_country = self.cleaned_data['country']
+            payment_postcode = self.cleaned_data['postcode']
+            payment_phone_number = self.cleaned_data['phone_number']
 
-                if extra_fee >= 1.00 or extra_fee <= -1.00:
-                    #absolute value
-                    price = round((subtotal_price*(1.00+settings.COMMISSION_PERCENT)+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2) 
-                else:
-                    #percentage, e.g., 30% discount --> percentage == -0.3
-                    price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2)
- 
-                if price > 0:
-                    payment = Payment()
-                    #change price into cent
-                    success, instance = payment.charge(int(price*100), card_number, exp_month, exp_year, cvv)
-                    self.cleaned_data['price_paid'] = price
-                else:
-                    success = True
-                    free = True
+            ids = []
+            dates = []
+            times = []
+            ids.append(self.cleaned_data['experience_id'])
+            dates.append(dt.strftime("%Y/%m/%d"))
+            times.append(tm.strftime("%H"))
 
-            else:
-                success = True
- 
-            if not success:
-                raise forms.ValidationError("Error: %s" % str(instance))
-            else:
-                #save the booking record
-                user = User.objects.get(id=self.cleaned_data['user_id'])
-                host = experience.hosts.all()[0]
-                date = self.cleaned_data['date']
-                time = self.cleaned_data['time']
-                local_timezone = pytz.timezone(settings.TIME_ZONE)
-                booking_extra_information=""
-                if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information']:
-                    booking_extra_information="Need Chinese Translation"
-
-                is_instant_booking = False
-                instant_bookings = experience.instantbookingtimeperiod_set.all()
-                for ib in instant_bookings:
-                    ib_start = ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
-                    ib_end = ib.end_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
-                    if ib.repeat:
-                        if ib.repeat_cycle.lower() == "daily":
-                            if (ib_start.date() - date).days % ib.repeat_frequency == 0:
-                                # for daily repeated time periods, the start and end time must be in the same day
-                                if not (ib_start.hour <= time.hour and time.hour <= ib_end.hour):
-                                    # not a match: hour
-                                    continue
-                                is_instant_booking = True
-                                break
-                        elif ib.repeat_cycle.lower() == "weekly":
-                            weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-                            monday1 = (date.date()-timedelta(days=date.weekday()))
-                            monday2 = (ib_start.date() - timedelta(days=ib_start.date().weekday()))
-                            if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7).days%ib.repeat_frequency == 0:
-                                # for weekly repeated time periods, the start and end time must be in the same day
-                                if not (ib_start.hour <= time.hour and time.hour <= ib_end.hour):
-                                    # not a match: hour
-                                    continue
-                                is_instant_booking = True
-                                break
-                        elif ib.repeat_cycle.lower() == "monthly":
-                            if date.day >= ib_start.date().day and date.day <= ib_end.date().day and (date.month - ib_start.month)%ib.repeat_frequency == 0:
-                                if date.day == ib_start.date().day and ib_start.hour > time.hour:
-                                    # not a match: hour
-                                    continue
-                                if date.day == ib_end.date().day and ib_end.hour < time.hour:
-                                    # not a match: hour
-                                    continue
-                                is_instant_booking = True
-                                break
-                    else:
-                        booking_datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute))
-                        if ib_start < booking_datetime and booking_datetime < ib_end:
-                            is_instant_booking = True
-                            break
-
-                if len(cp) > 0:
-                    booking = Booking(user = user, experience= experience, guest_number = self.cleaned_data['guest_number'], 
-                                      datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
-                                      submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", 
-                                      coupon_extra_information=self.cleaned_data['coupon_extra_information'],
-                                      coupon=Coupon.objects.get(promo_code__iexact = self.cleaned_data['promo_code']),
-                                      booking_extra_information=booking_extra_information)
-                else:
-                    booking = Booking(user = user, experience= experience, guest_number = self.cleaned_data['guest_number'], 
-                                      datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
-                                      submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
-                booking.save()
-                #add the user to the guest list
-                if user not in experience.guests.all():
-                #experience.guests.add(user)
-                    cursor = connections['experiencedb'].cursor()
-                    cursor.execute("Insert into experiences_experience_guests ('experience_id','user_id') values (%s, %s)", [experience.id, user.id])
-
-                if not free:
-                    instance.save()
-                    payment.charge_id = instance['id']
-                    payment.booking_id = booking.id
-                    payment.street1 = self.cleaned_data['street1']
-                    payment.street2 = self.cleaned_data['street2']
-                    payment.city = self.cleaned_data['city_town']
-                    payment.state = self.cleaned_data['state']
-                    payment.country = self.cleaned_data['country']
-                    payment.postcode = self.cleaned_data['postcode']
-                    payment.phone_number = self.cleaned_data['phone_number']
-                    payment.save()
-
-                    booking.payment_id = payment.id
-                    booking.save()
-
-                if not is_instant_booking:
-                    # send an email to the host
-                    mail.send(subject='[Tripalocal] ' + user.first_name + ' has requested your experience', message='',
-                              sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-                              recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], #fail_silently=False,
-                              priority='now',
-                              html_message=loader.render_to_string('email_booking_requested_host.html', 
-                                                                     {'experience': experience,
-                                                                      'booking':booking,
-                                                                      'user_first_name':user.first_name,
-                                                                      'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                      'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
-                                                                      'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))
-                    # send an email to the traveler
-                    mail.send(subject='[Tripalocal] You booking request is sent to the host',  message='', 
-                              sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                              recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], #fail_silently=False,
-                              priority='now',
-                              html_message=loader.render_to_string('email_booking_requested_traveler.html',
-                                                                     {'experience': experience, 
-                                                                      'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                      'booking':booking}))
-                else:
-                    #instant booking
-                    booking.status = "accepted"
-                    booking.save()
-                    if booking.coupon_id != None and booking.coupon.promo_code.startswith("once"):
-                        #the coupon can be used once, make it unavailable
-                        booking.coupon.end_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC)
-                        booking.coupon.save()
-
-                    #send an email to the traveller
-                    mail.send(subject='[Tripalocal] Booking confirmed', message='', 
-                              sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                              recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
-                              priority='now',  #fail_silently=False, 
-                              html_message=loader.render_to_string('email_booking_confirmed_traveler.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-            
-                    #schedule an email to the traveller one day before the experience
-                    mail.send(subject='[Tripalocal] Booking reminder', message='', 
-                              sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                              recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
-                              priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
-                              html_message=loader.render_to_string('email_reminder_traveler.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user, #not host --> need "my" phone number
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-            
-                    #schedule an email to the host one day before the experience
-                    mail.send(subject='[Tripalocal] Booking reminder', message='', 
-                              sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-                              recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                              priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
-                              html_message=loader.render_to_string('email_reminder_host.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-                        
-                    #schedule an email for reviewing the experience
-                    mail.send(subject='[Tripalocal] How was your experience?', message='', 
-                              sender='Tripalocal <enquiries@tripalocal.com>',
-                              recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
-                              priority='high',  scheduled_time = booking.datetime + timedelta(days=1, hours=experience.duration), 
-                              html_message=loader.render_to_string('email_review_traveler.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                    'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id)}))
-
-                    #send an email to the host
-                    mail.send(subject='[Tripalocal] Booking confirmed', message='', 
-                              sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-                              recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                              priority='now',  #fail_silently=False, 
-                              html_message=loader.render_to_string('email_booking_confirmed_host.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-
-                pass
+            ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,guest_number,
+                         card_number,exp_month,exp_year,cvv,
+                         booking_extra_information,coupon_extra_information,coupon,
+                         payment_street1,payment_street2,payment_city,payment_state,payment_country,payment_postcode,payment_phone_number)
  
         return cleaned
 
@@ -747,8 +568,8 @@ class CreateExperienceForm(forms.Form):
     host_image = forms.ImageField(required = False)
     host_bio = forms.CharField(widget=forms.Textarea, required = False)
     language = forms.ChoiceField(choices=Language)
-    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
-    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    #start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
+    #end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))
     #repeat_cycle = forms.ChoiceField(choices=Repeat_Cycle)
     #repeat_frequency = forms.ChoiceField(choices=Repeat_Frequency)
     title = forms.CharField()
@@ -757,6 +578,7 @@ class CreateExperienceForm(forms.Form):
     guest_number_max = forms.ChoiceField(choices=Guest_Number_Max)
     price = forms.DecimalField(max_digits=6, decimal_places=2)
     price_with_booking_fee = forms.DecimalField(max_digits=6, decimal_places=2)
+    currency = forms.ChoiceField(choices=Currency)
     duration = forms.ChoiceField(choices=Duration)
     included_food = forms.ChoiceField(widget=forms.RadioSelect(renderer=HorizRadioRenderer), choices=Included)
     included_food_detail = forms.CharField(required = False)
@@ -780,6 +602,21 @@ class CreateExperienceForm(forms.Form):
     experience_photo_8 = forms.ImageField(required = False)
     experience_photo_9 = forms.ImageField(required = False)
     experience_photo_10 = forms.ImageField(required = False)
+    host_id_photo_1 = forms.ImageField(required = False)
+    host_id_photo_2 = forms.ImageField(required = False)
+    host_id_photo_3 = forms.ImageField(required = False)
+    host_id_photo_4 = forms.ImageField(required = False)
+    host_id_photo_5 = forms.ImageField(required = False)
+    dynamic_price = forms.CharField(widget=forms.HiddenInput, required = False)
+    phone_number = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super(CreateExperienceForm, self).__init__(*args, **kwargs)
+        self.fields['host_id_photo_1'].widget.attrs['class'] = 'upload'
+        self.fields['host_id_photo_2'].widget.attrs['class'] = 'upload'
+        self.fields['host_id_photo_3'].widget.attrs['class'] = 'upload'
+        self.fields['host_id_photo_4'].widget.attrs['class'] = 'upload'
+        self.fields['host_id_photo_5'].widget.attrs['class'] = 'upload'
 
 def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -789,169 +626,6 @@ class UserSignupForm(forms.Form):
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.save()
-        
-@receiver(user_signed_up)
-def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
-    try:
-        new_registereduser = RegisteredUser.objects.get(user_id = user.id)
-    except RegisteredUser.DoesNotExist:
-        new_registereduser = RegisteredUser(user_id = user.id)
-        new_registereduser.save()
-
-    #copy to the chinese website database
-    cursor = connections['cndb'].cursor()
-    cursor.execute("Insert into auth_user ('id','username','first_name','last_name','email') values (%s, %s, %s, %s, %s)", 
-                   [user.id, user.username, user.first_name, user.last_name, user.email])
-    cursor.execute("Insert into app_registereduser ('user_id') values (%s)", [user.id])
-
-    username = user.username
-
-    new_email = Users(id = email_account_generator() + ".user@tripalocal.com",
-                        name = username,
-                        maildir = username + "/")
-    new_email.save()
-
-    new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
-    new_alias.save()
-
-    with open('/etc/postfix/canonical', 'a') as f:
-        f.write(user.email + " " + new_email.id + "\n")
-        f.close()
-
-    subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
-    
-    with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
-        f.write(new_email.id + "\n")
-        f.close()
-
-    """get the client ip from the request
-    """
-    #remote_address = request.META.get('REMOTE_ADDR')
-    remote_address = request.META.get('HTTP_X_FORWARDED_FOR')or request.META.get('REMOTE_ADDR')
-    # set the default value of the ip to be the REMOTE_ADDR if available
-    # else None
-    ip = remote_address
-    # try to get the first non-proxy ip (not a private ip) from the
-    # HTTP_X_FORWARDED_FOR
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        proxies = x_forwarded_for.split(',')
-        # remove the private ips from the beginning
-        while (len(proxies) > 0 and proxies[0].startswith(PRIVATE_IPS_PREFIX)):
-            proxies.pop(0)
-            # take the first ip which is not a private one (of a proxy)
-            if len(proxies) > 0:
-                ip = proxies[0]
-
-    mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP":ip, 
-                               "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
-                               })
-
-    #rawdata = pygeoip.GeoIP(settings.PROJECT_ROOT + 'GeoLiteCity.dat')
-    #data = rawdata.record_by_name(ip)
-    #country = data['country_name']
-    #city = data['city']
-    #longitude = data['longitude']
-    #latitude = data['latitude']
-
-    try:
-        reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
-        response = reader.city(ip)
-        country = response.country.name
-        region = response.subdivisions.most_specific.name
-        postcode = response.postal.code
-        city = response.city.name
-        longitude = response.location.longitude
-        latitude = response.location.latitude
-
-        mp.track(user.email, "has signed up via email")
-        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "$first_name":user.first_name, "$last_name":user.last_name, "Postcode":postcode, "Latitude":latitude, "Longitude":longitude})
-        reader.close()
-    except Exception:
-        mp.track(user.email, "has signed up via email")
-        reader.close()
-
-    if sociallogin:
-        data = sociallogin.account.extra_data
-        first_name=""
-        last_name=""
-        age=0
-        gender=""
-        email = user.email
-
-        if 'first_name' in data:
-            first_name = data['first_name']
-        if 'last_name' in data:
-            last_name = data['last_name']
-        if 'age' in data:
-            age = data['age']
-        if 'gender' in data:
-            gender = data['gender']
-
-        mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed up via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-
-@receiver(user_logged_in)
-def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
-    remote_address = request.META.get('HTTP_X_FORWARDED_FOR')or request.META.get('REMOTE_ADDR')
-    # set the default value of the ip to be the REMOTE_ADDR if available
-    # else None
-    ip = remote_address
-    # try to get the first non-proxy ip (not a private ip) from the
-    # HTTP_X_FORWARDED_FOR
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        proxies = x_forwarded_for.split(',')
-        # remove the private ips from the beginning
-        while (len(proxies) > 0 and proxies[0].startswith(PRIVATE_IPS_PREFIX)):
-            proxies.pop(0)
-            # take the first ip which is not a private one (of a proxy)
-            if len(proxies) > 0:
-                ip = proxies[0]
-
-    mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP":ip})
-
-    try:
-        reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
-        response = reader.city(ip)
-        country = response.country.name
-        region = response.subdivisions.most_specific.name
-        postcode = response.postal.code
-        city = response.city.name
-        longitude = response.location.longitude
-        latitude = response.location.latitude
-
-        mp.track(user.email, "has signed in via email")
-        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "Postcode":postcode, 
-                                   "Latitude":latitude, "Longitude":longitude, "Language":"English"}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
-        reader.close()
-    except Exception:
-        reader.close()
-        mp.track(user.email, "has signed in via email")
-
-    if sociallogin:
-        data = sociallogin.account.extra_data
-        first_name=""
-        last_name=""
-        age=0
-        gender=""
-        email = user.email
-
-        if 'first_name' in data:
-            first_name = data['first_name']
-        if 'last_name' in data:
-            last_name = data['last_name']
-        if 'age' in data:
-            age = data['age']
-        if 'gender' in data:
-            gender = data['gender']
-
-        mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
 
 class ReviewForm(forms.ModelForm):
 
@@ -994,7 +668,6 @@ class CustomItineraryForm(forms.Form):
         self.fields['language'].widget.attrs['readonly'] = True
         self.fields['language'].widget = forms.HiddenInput()
 
-#TODO: merge it with BookingConfirmationForm
 class ItineraryBookingForm(forms.Form):
     user_id = forms.CharField()
     experience_id = forms.CharField(widget=forms.Textarea)
@@ -1041,7 +714,6 @@ class ItineraryBookingForm(forms.Form):
         self.fields['itinerary_string'].widget.attrs['readonly'] = True
         self.fields['itinerary_string'].widget = forms.HiddenInput()
 
-    #TODO
     def booking(self,ids,dates,times,user,guest_number,
                 card_number,exp_month,exp_year,cvv,
                 booking_extra_information=None,coupon_extra_information=None,coupon=None,
@@ -1064,6 +736,8 @@ class ItineraryBookingForm(forms.Form):
                 booking_extra_information = card_number
 
             experience = Experience.objects.get(id=ids[i])
+            experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+            experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
             if not free:
                 subtotal_price = 0.0
@@ -1091,7 +765,7 @@ class ItineraryBookingForm(forms.Form):
                 if price > 0:
                     payment = Payment()
                     #change price into cent
-                    success, instance = payment.charge(int(price*100), card_number, exp_month, exp_year, cvv)
+                    success, instance = payment.charge(int(price*100), experience.currency, card_number, exp_month, exp_year, cvv)
                 else:
                     success = True
                     free = True
@@ -1105,8 +779,8 @@ class ItineraryBookingForm(forms.Form):
                 #save the booking record
                 #user = User.objects.get(id=self.cleaned_data['user_id']) #moved outside of the for loop
                 host = experience.hosts.all()[0]
-                date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
-                time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
+                date = pytz.timezone(settings.TIME_ZONE).localize(datetime.datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
+                time = pytz.timezone(settings.TIME_ZONE).localize(datetime.datetime.strptime(times[i].split(":")[0].strip(), "%H"))
                 local_timezone = pytz.timezone(settings.TIME_ZONE)
 
                 is_instant_booking = False
@@ -1145,28 +819,28 @@ class ItineraryBookingForm(forms.Form):
                                 is_instant_booking = True
                                 break
                     else:
-                        booking_datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute))
-                        if ib_start < booking_datetime and booking_datetime < ib_end:
+                        booking_datetime = local_timezone.localize(datetime.datetime(date.year, date.month, date.day, time.hour, time.minute))
+                        if ib_start <= booking_datetime and booking_datetime <= ib_end:
                             is_instant_booking = True
                             break
 
                 if coupon:
                     booking = Booking(user = user, experience= experience, guest_number = guest_number, 
-                                        datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
-                                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", 
+                                        datetime = local_timezone.localize(datetime.datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
+                                        submitted_datetime = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", 
                                         coupon_extra_information=coupon_extra_information,
                                         coupon=coupon,
                                         booking_extra_information=booking_extra_information)
                 else:
                     booking = Booking(user = user, experience= experience, guest_number = guest_number, 
-                                        datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
-                                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
+                                        datetime = local_timezone.localize(datetime.datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
+                                        submitted_datetime = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
                 booking.save()
                 #add the user to the guest list
                 if user not in experience.guests.all():
                 #experience.guests.add(user)
                     cursor = connections['experiencedb'].cursor()
-                    cursor.execute("Insert into experiences_experience_guests ('experience_id','user_id') values (%s, %s)", [experience.id, user.id])
+                    cursor.execute("Insert into experiences_experience_guests (experience_id,user_id) values (%s, %s)", [experience.id, user.id])
 
                 if not free:
                     instance.save()
@@ -1186,11 +860,11 @@ class ItineraryBookingForm(forms.Form):
 
                 if not is_instant_booking:
                     # send an email to the host
-                    mail.send(subject='[Tripalocal] ' + user.first_name + ' has requested your experience', message='',
-                                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+                    mail.send(subject=string_concat(_('[Tripalocal] '), user.first_name, _(' has requested your experience')), message='',
+                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
                                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], #fail_silently=False,
                                 priority='now',
-                                html_message=loader.render_to_string('email_booking_requested_host.html', 
+                                html_message=loader.render_to_string('experiences/email_booking_requested_host.html', 
                                                                         {'experience': experience,
                                                                         'booking':booking,
                                                                         'user_first_name':user.first_name,
@@ -1198,11 +872,11 @@ class ItineraryBookingForm(forms.Form):
                                                                         'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
                                                                         'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))
                     # send an email to the traveler
-                    mail.send(subject='[Tripalocal] You booking request is sent to the host',  message='', 
-                                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                    mail.send(subject=_('[Tripalocal] Your booking request is sent to the host'),  message='',
+                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
                                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], #fail_silently=False,
                                 priority='now', 
-                                html_message=loader.render_to_string('email_booking_requested_traveler.html',
+                                html_message=loader.render_to_string('experiences/email_booking_requested_traveler.html',
                                                                         {'experience': experience, 
                                                                         'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                                         'booking':booking}))
@@ -1212,15 +886,60 @@ class ItineraryBookingForm(forms.Form):
                     booking.save()
                     if booking.coupon_id != None and booking.coupon.promo_code.startswith("once"):
                         #the coupon can be used once, make it unavailable
-                        booking.coupon.end_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC)
+                        booking.coupon.end_datetime = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)
                         booking.coupon.save()
 
+
                     #send an email to the traveller
-                    mail.send(subject='[Tripalocal] Booking confirmed', message='', 
-                                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
                                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                                 priority='now',  #fail_silently=False, 
-                                html_message=loader.render_to_string('email_booking_confirmed_traveler.html',
+                                html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
+                                                                    {'experience': experience,
+                                                                    'booking':booking,
+                                                                    'user':user,
+                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+            
+                    #schedule an email to the traveller one day before the experience
+                    mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
+                                priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
+                                html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
+                                                                    {'experience': experience,
+                                                                    'booking':booking,
+                                                                    'user':user, #not host --> need "my" phone number
+                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+            
+                    #schedule an email to the host one day before the experience
+                    mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+                                priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
+                                html_message=loader.render_to_string('experiences/email_reminder_host.html',
+                                                                    {'experience': experience,
+                                                                    'booking':booking,
+                                                                    'user':user,
+                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                        
+                    #schedule an email for reviewing the experience
+                    mail.send(subject=_('[Tripalocal] How was your experience?'), message='', 
+                                sender=settings.DEFAULT_FROM_EMAIL,
+                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
+                                priority='high',  scheduled_time = booking.datetime + timedelta(days=1, hours=experience.duration), 
+                                html_message=loader.render_to_string('experiences/email_review_traveler.html',
+                                                                    {'experience': experience,
+                                                                    'booking':booking,
+                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                    'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id)}))
+
+                    #send an email to the host
+                    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+                                priority='now',  #fail_silently=False, 
+                                html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':user,
@@ -1294,8 +1013,8 @@ class ItineraryBookingForm(forms.Form):
             dates.remove('')
             times.remove('')
 
-            date_start = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[0].strip() + " " + times[0].split(":")[0].strip(), "%Y/%m/%d %H"))
-            date_end = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[len(dates)-1].strip() + " " + times[len(dates)-1].split(":")[0].strip(), "%Y/%m/%d %H"))
+            date_start = pytz.timezone(settings.TIME_ZONE).localize(datetime.datetime.strptime(dates[0].strip() + " " + times[0].split(":")[0].strip(), "%Y/%m/%d %H"))
+            date_end = pytz.timezone(settings.TIME_ZONE).localize(datetime.datetime.strptime(dates[len(dates)-1].strip() + " " + times[len(dates)-1].split(":")[0].strip(), "%Y/%m/%d %H"))
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
                                        end_datetime__gt = date_end,
                                        start_datetime__lt = date_start)

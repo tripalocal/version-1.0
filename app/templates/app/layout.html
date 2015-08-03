@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     {% load staticfiles %}
+    {% load i18n %}
     
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/bootstrap.js' %}"></script>
@@ -16,9 +17,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
     <link href="{% static 'app/content/tripalocal.min.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/tripalocal.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/tripalocal_xs.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/tripalocal_jx.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/tripalocal_en.css' %}" rel="stylesheet">    
+    <link href="{% static 'app/content/tripalocal_en.css' %}" rel="stylesheet">
+
     {% if form %}
         {{ form.media }}
     {% endif %}
@@ -48,7 +48,7 @@ for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElemen
 mixpanel.init("f94e94414c9de0cc38874706d853c400");</script><!-- end Mixpanel -->
 
 <!-- start baidu statistics -->
-<script>
+<script type="text/javascript">
 var _hmt = _hmt || [];
 (function() {
   var hm = document.createElement("script");
@@ -79,9 +79,10 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
             <tbody>
                 <tr>
                     <td class="header">
+                        <img class="hamburger notOnDesktop" src="/images/menu.svg" width="15" />
                         <a class="brand" href="https://www.tripalocal.com"><img src="/images/tripalocal_Logo.png" width="115" height="39"></a>
                     </td>
-                    <td class="navbar-collapse">
+                    <td class="navbar-collapse notOnMobile">
                         {% include 'app/loginpartial.html' %}
                     </td>
                 </tr>
@@ -103,23 +104,30 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                         </li>
                         <li class="footer-logo"></li>
                     </ul>
-        
-                    <ul class="footer-col company">
-                        <li><h5>Company</h5></li>
-                        <li><a href="/aboutus">About Us</a></li>
-                        <li><a href="/contactus">Contact Us</a></li>
-                        <li><a href="/termsofservice">Terms of Service</a></li>
-                        <li><a href="/privacypolicy">Privacy Policy</a></li>
-                    </ul>
-                    <ul class="footer-col travel">
-                        <li><h5>Travel</h5></li>
-                        <li><a href="/refundpolicy">Refund Policy</a></li>
-                    </ul>
-                    <ul class="footer-col social">
-                        <li><h5>Social</h5></li>
-                        <li><a href="https://www.facebook.com/tripalocal">Facebook</a></li>
-                        <li><a href="https://www.twitter.com/tripalocal">Twitter</a></li>
-                    </ul>
+
+                    <div class="footer-body">
+                        <ul class="footer-col company">
+                            <li><h5>{% trans "Company" %}</h5></li>
+                            <li><a href="/aboutus">{% trans "About Us" %}</a></li>
+                            <li><a href="/contactus">{% trans "Contact Us" %}</a></li>
+                            <li><a href="/termsofservice">{% trans "Terms of Service" %}</a></li>
+                            <li><a href="/privacypolicy">{% trans "Privacy Policy" %}</a></li>
+                            <!--<li id="mixpanel" style="margin-top:20px"><a href="https://mixpanel.com/f/partner"><img src="//cdn.mxpnl.com/site_media/images/partner/badge_blue.png" alt="Mobile Analytics" /></a></li>-->
+                        </ul>
+                        <ul class="footer-col travel">
+                            <li><h5>{% trans "Travel" %}</h5></li>
+                            <li><a href="/refundpolicy">{% trans "Refund Policy" %}</a></li>
+                            <!--<li><a href="/mobileapps">{% trans "Mobile Apps" %}</a></li>-->
+                        </ul>
+                        <ul class="footer-col social">
+                            <li><h5>{% trans "Social" %}</h5></li>
+                            <li><a href="https://www.facebook.com/tripalocal">{% trans "Facebook" %}</a></li>
+                            <li><a href="https://www.twitter.com/tripalocal">{% trans "Twitter" %}</a></li>
+                            <!--<li><a href="https://www.twitter.com/tripalocal">{% trans "Instagram" %}</a></li>
+                            <li><a href="https://www.twitter.com/tripalocal">{% trans "Weibo" %}</a></li> 
+                            <li><a href="https://www.twitter.com/tripalocal">{% trans "Wechat" %}</a></li>-->
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="footer-line">

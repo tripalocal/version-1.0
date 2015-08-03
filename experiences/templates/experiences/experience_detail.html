@@ -1,0 +1,734 @@
+{% extends "app/layout.html" %}
+{% load mathfilters %}
+{% load i18n %}
+
+{% block head %}
+    {% load staticfiles %}
+    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
+    <title> {{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %} </title>
+    <link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+{% if expired == None and listed == None %}
+    {%if host_only_expired %}
+    <p style="postion:relative;top:50px;">{% trans "The experience has expired. Only you can see it now." %}</p>
+    {%endif%}
+
+    {%if host_only_unlisted %}
+    <p style="postion:relative;top:50px;">{% trans "The experience has not be approved. Only you can see it now." %}</p>
+    {%endif%}
+
+    <div class="jumbotron experienceImg" style="background-image:url(		
+		{% for photo in experience.photo_set.all %}
+            {% if forloop.first %}
+				{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
+            {% endif %}
+        {% endfor %})">
+	</div>
+
+    <div class="container-fluid experience stickem-container">
+	    <div class="row">
+		    <div class="fixCenter">
+                <div class="stickem">
+                    <div class="bookingBox">
+                        <div class="profile-lg">
+                            <div style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
+                        </div>
+                        {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
+                        <br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
+                        <div class="row" style="width:180px;margin-top:10px">
+                            <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px"> {% trans "per person" %}<br>{% trans "for" %} {{ experience.duration }} {% trans "hours" %}<br><p>
+                        </div>
+                        <form id="experience_booking_form" method="post" action="">
+                            {% csrf_token %}
+                        
+                            {% for field in form.hidden_fields %}
+                                {{ field }}
+                            {% endfor %}
+
+                            <div>{% trans "No. of Guests" %} &nbsp;&nbsp;
+                                <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none"/>
+                                <input type="text" id="guest_number_max" name="{{experience.guest_number_max}}" disabled="disabled" style="display:none"/>
+                                {% for op in available_options %} 
+                                    <p id="seat_left_{{forloop.counter0}}" style="display:none"> {{op.available_seat}} </p>
+                                {% endfor %}
+                                {{form.guest_number}}
+                            </div>
+
+                            <table style="margin-top:15px;width:100%">
+                                <thead class="booking-exp">
+                                    <th class="date-exp">{% trans "Date" %}</th>
+                                    <th class="time-exp">{% trans "Time" %}</th>
+                                    <th class="people-exp"></th>
+                                </thead>
+
+                                {% for op in available_options %}
+                                    <p id="date_string_{{forloop.counter0}}" style="display:none" instant="{{op.instant_booking}}"> {{op.date_string}} </p> 
+                                {% endfor %}
+
+                                {% for op in available_options %} 
+                                    <p id="time_string_{{forloop.counter0}}" style="display:none" instant="{{op.instant_booking}}"> {{op.time_string}} </p> 
+                                {% endfor %}
+
+                                {% for op in available_options %}
+                                    {% if forloop.counter0 < 3 and op.instant_booking %}
+                                    <tr class="booking-list">
+                                        <td id="instant_booking_date_{{forloop.counter0}}" class="date-list">
+                                            {{op.date_string}}
+                                        </td>
+                                        <td id="instant_booking_time_{{forloop.counter0}}" class="time-list">
+                                            <div class="timebtn">
+                                                <div>
+                                                    <span>{{op.time_string}}</span><img src="/images/instant.png">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="people-list">
+                                            {% if user.is_authenticated %}
+                                                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" />  
+                                            {% else %}
+                                                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+
+                                <tr class="">
+                                    <td class="">
+                                        {{form.date}}
+                                    </td>
+                                    <td class="">
+                                        {{form.time}}
+                                    </td>
+                                    <td class="people-list">
+                                    {% if user.is_authenticated %}
+                                        <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" />  
+                                    {% else %}
+                                        <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
+                                    {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <div class="save_to_wishlist_button">
+                            {% if not in_wishlist %}
+                                {% if user.is_authenticated %}
+                                <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_not_added"></div>
+                                {% else %}
+                                <div id="save_to_wishlist_icon" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';" class="save_to_wishlist_not_added"></div>
+                                {%endif%}
+                                <div id="save_to_wishlist_description">
+                                    <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;">{% trans "Save to Wishlist" %}</h3>
+                                    <p id="wishlist_p">Save now, plan later</p>
+                                </div>
+                            {% else %}
+                                <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_added"></div>
+                                <div id="save_to_wishlist_description">
+                                    <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;">{% trans "Saved to Wishlist" %}</h3>
+                                    <p id="wishlist_p"></p>
+                                </div>
+                            {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            
+        	    <div class="desBox">
+                    {% if experience.type == "RECOMMENDED" %}
+                    <div class="recommended-label">{% trans "Recommended" %}</div>
+                    {% endif %}
+                    <h2 style="font-weight:bold">{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}
+                    <br><small style="font-size:14px">{{experience.duration}} {% trans "hrs" %} &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
+                    </h2>
+                    <table>
+                        <tr style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;"> 
+                            <th style="width:150px;"><h3 style="color:grey">{% trans "Overview" %}</h3></th>
+                            <td id="id_experience_description" class="experience-detail-table-td">
+                                {{ experience.description }}<br>
+                                {{ experience.interaction }} 
+                            </td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #CCCCCC;"> 
+                             <th><h3 style="color:grey">{% trans "Activities" %}</h3></th>
+                            <td id="id_experience_activity" class="experience-detail-table-td">{{ experience.activity }}</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #CCCCCC;"> 
+                            <th><h3 style="color:grey">{% trans "What to wear" %}</h3></th>
+                            <td id="id_experience_dress" class="experience-detail-table-td">{{ experience.dress }}</td>
+                        </tr>
+
+                        {% for w in experience.whatsincluded %}
+                        <tr>
+                            <th id="{{w.item.lower}}" style="padding-bottom:0px;"><h3 style="color:grey">{{w.item}}:</h3></th>
+                            <td class="experience-detail-table-td" style="padding-bottom:0px;">{{w.details}}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr style="border-bottom:1px solid #CCCCCC;height: 10px;"><th style="padding-top:0"></th><td></td></tr>
+                    </table> 
+
+                    <div id="carousel_box" class="container">
+                        <br>
+                        <div id="myCarousel" class="carousel " data-ride="carousel">
+                            <!-- Indicators -->
+                            <ol class="carousel-indicators" style="bottom: -25px;">
+                            {% for photo in experience.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+				                <li data-target="#myCarousel" data-slide-to="{{forloop.counter0}}" class="active"></li>
+                                {% else %}
+                                <li data-target="#myCarousel" data-slide-to="{{forloop.counter0}}" class="active"></li>
+                                {% endif %}
+                            {% endfor %}
+                            </ol>
+
+                            <!-- Wrapper for slides -->
+                            <div class="carousel-inner" role="listbox">
+                            {% for photo in experience.photo_set.all %}
+                                {% if forloop.counter == 1 %}
+                                <div class="item active">
+				                {%else%}
+                                <div class="item">
+                                {% endif %}
+                                    <img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}" alt="Chania" width="460" height="345">
+                                </div>
+                            {% endfor %}
+                            </div>
+
+                            <!-- Left and right controls -->
+                            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev" style="background:none">
+                                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next" style="background:none">
+                                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if experience.type != "NONPRIVATE" %}
+    <div class="experinence-host desBox">
+        <div id="experinence-host-container">
+            <p>{% trans "About the host," %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</p>
+            <div id="experience-hostintro" class="experience-hostintro">
+                <div class="experience-hostpic profile-lg" style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;"></div>
+                <div>
+                    <div id="experience-hostinterests" class="experience-hostinterests">
+                        <div class="gradientMask"></div>
+                        <span id="host_bio">{{host_bio}}</span>
+                    </div>      
+                    {% if host_bio|length > 200 %}
+                    <div id="bio_show_more" value="More">+ {% trans "More" %}</div>
+                    {% endif %}
+                </div>
+            </div>
+        
+            <div class="host-socialmedia">
+                <div class="host-trust">{% trans "Trust" %}</div>
+                {% for h in experience.hosts.all %}
+                {% if forloop.first %}
+                {% if h.socialaccount_set.all%}
+                <div class="host-facebook">
+                    <div class="facebooklogo"></div>
+                    <span class="followerNumber">Facebook</span><br>
+                    <span class="host-friend">{% trans "Verified" %}</span>
+                </div>
+                {% endif %}
+                <div class="host-review">
+                    <div class="reviewlogo"></div>
+                    <span class="review-title">{% trans "Reviews" %}</span>
+                    <span class="review-number" style="color:#333">{{ experience.review_set.count }}</span>
+                </div>
+                {% if h.registereduser.phone_number%}
+                <div class="host-mobile">
+                    <div class="mobilelogo"></div>
+                    <span class="Mobile">{% trans "Phone" %}</span>
+                    <span class="host-verfied">{% trans "Verified" %}</span>
+                </div>
+                {% endif %}
+                {% endif %}
+                {% endfor %} 
+            </div>
+        </div>
+    </div>
+    {%endif%}
+
+    <div class="container-fluid review">
+        <div class="row">
+    		<div class="fixCenter">
+                <div class="reviewBox" style="margin-top:50px">
+                {% if experience.review_set.count %}
+                    <h2>{{ experience.review_set.count }} {% trans "review(s)" %} </h2>
+                    <div class="rating">
+                    {% for r in "12345" %}
+                        {% if forloop.counter <= experience_rate %}
+                        <span>&#9733;</span>
+                        {%endif%}
+                    {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for review in experience.review_set.all|dictsortreversed:"datetime" %}
+                {% if forloop.counter|mod:3 == 1 %}
+                    <div id="review_page_{{forloop.counter|div:3|add:1}}_div">
+                {% endif %}
+                    {% if forloop.counter|mod:3 == 0 or forloop.last%}
+                        <div class="reviewList last">
+                    {% else %}
+                        <div class="reviewList">
+                    {% endif %}
+                        {%if review.user.registereduser.image_url != None and review.user.registereduser.image_url != ''%}
+                            <div class="profile-md"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
+                        {%else%}
+                            <div class="profile-md"><img src="{{ MEDIA_URL }}profile_default.jpg" width="240" height="240"></div>
+                        {%endif%}
+                            <div class="reviewText">{{review.comment}}
+                                <div class="reviewDate">{{review.datetime|date:'d M Y'}}</div>
+                            </div>
+                        </div>
+                {% if forloop.counter|mod:3 == 0 or forloop.last%}
+                    </div>
+                {% endif %}
+                {% endfor%}
+                {% if experience.review_set.count > 3 %}
+                        <div class="review_paging_container">
+                {% for review in experience.review_set.all|dictsortreversed:"datetime" %}
+                    {% if forloop.counter|mod:3 == 1 %}
+                            <div id="review_page_{{forloop.counter|div:3|add:1}}" class="review_paging">{{forloop.counter|div:3|add:1}}</div>
+                    {% endif %}
+                {% endfor%}
+                        </div>
+                {% endif %}
+                </div>
+    		</div>
+		</div>
+    </div>
+
+    <div class="container-fluid also" style="border-top: 1px solid #CCCCCC; background-color:#FFF;">
+    	<div class="row">
+            <div class="fixCenter">
+                <div class="expBox">
+                    <h2 style="font-weight:bold">{% trans "People also booked" %}</h2>
+                    {% for related_experience, added_to_wishlist in related_experiences %}
+                    {% if forloop.counter0 < 3 %}
+                    <div class="expList">
+                        <label id="related_experience_id_{{forloop.counter0}}" style="display:none;">{{related_experience.id}}</label>
+                        <a href="/experience/{{related_experience.id}}">
+                            <div class="listingImg" style="background-image:url({% for photo in related_experience.photo_set.all %}{% if forloop.first %} {{ MEDIA_URL }}{{photo.directory}}{{photo.name}} {%endif%}{%endfor%});">
+                                <div class="priceBox">
+                                {% trans "From" %} {{related_experience.dollarsign}}<span>{{ related_experience.price|mul:1.429|floatformat:"0" }}</span> {{related_experience.currency}} {% trans "/person" %}
+                                </div>
+                            </div>
+                        </a>
+                        <a href="/experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
+                        <div class="profile-sm">
+							<img src="{% for h in related_experience.hosts.all %}
+							{% if forloop.first %}
+							{{ MEDIA_URL }}{% if h.registereduser.image_url %}{{h.registereduser.image_url}}{%else%}profile_default.jpg{% endif %}
+							{% endif %}
+							{% endfor %}" width="240" height="240">
+						</div>
+          
+                        <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
+                        <div class="listingFooter">
+                            <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
+                            <div style="padding-top: 5px; padding-left: 40px;">{{ related_experience.duration }} {% trans "hrs" %} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div> 
+    </div>
+{%else%}
+    <p>{% trans "The experience has expired, or has not been approved." %}</p>
+{%endif%}
+{% endblock %} 
+
+{% block scripts %}
+
+<script charset="utf-8" type="text/javascript">
+
+$(function(){
+    $(document).ready(function(){
+        if(screen.width > 767){
+            $(document.body).stickem();
+        }
+
+        ids=['host_bio','id_experience_activity','id_experience_dress','id_experience_description']
+        for(var i=0;i<ids.length;i++)
+        {
+            text = $("#"+ids[i]).html();
+            if(text)
+            {
+                text = text.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                $("#"+ids[i]).html(text);
+            }
+        }
+
+        var i=0;
+        for(; $("#id_date option").eq(i).length; i++)
+        {
+            var parts = $("#id_date option").eq(i).text().trim().split("/");
+            var date = new Date(parseInt(parts[2], 10),
+                              parseInt(parts[1], 10) - 1,
+                              parseInt(parts[0], 10));
+            $("#id_date option").eq(i).val(date.getFullYear() + '-' + (date.getMonth()+1) + '-' +  date.getDate());
+        }
+
+        if($("#time_string_0").attr("instant") == "True")
+        {
+            first_date = $("#date_string_3").text().trim();
+            i=3;
+        }
+        else
+        {
+            first_date = $("#date_string_0").text().trim();
+            i=0;
+        }
+
+        for(; first_date && $("#date_string_"+i).text().trim() == first_date; i++)
+        {
+            if($("#time_string_"+i).attr("instant") == "True")
+            {
+                $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' style="color:green;">' + $("#time_string_"+i).text().trim() + '</option>');
+            }
+            else
+            {
+                $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+            }
+        }
+
+        seat_left = parseInt($("#seat_left_0").text());
+
+        $("#id_guest_number").html('');
+        var i = parseInt($("#guest_number_min").attr("name"));
+        if(typeof i != "number" || i < 1)
+        {
+            i=1;
+        }
+        for(;i<=seat_left;i++)
+        {
+            $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
+        }
+
+        $("#id_submit_request").bind("click", function(e) {
+            e.preventDefault();
+            mixpanel.track("Clicked on \"Request\"");
+            if($("#user_email").val())
+            {
+                mixpanel.identify($("#user_email").val());
+            }
+            $("#experience_booking_form").submit();
+        });
+
+        for(i=0;i<3;i++)
+        {
+            $("#id_submit_request_"+i).bind("click", function(e) {
+                e.preventDefault();
+                i = e.target.id.substr(-1,1);
+                var parts = $("#instant_booking_date_"+i).text().trim().split("/");
+                var date = new Date(parseInt(parts[2], 10),
+                                  parseInt(parts[1], 10) - 1,
+                                  parseInt(parts[0], 10));
+                $("#id_date").val(date.getFullYear() + '-' + (date.getMonth()+1) + '-' +  date.getDate());
+                $("#id_date").change();
+                $("#id_time").val($("#instant_booking_time_"+i).text().trim());
+                mixpanel.track("Clicked on \"Book\"");
+                if($("#user_email").val())
+                {
+                    mixpanel.identify($("#user_email").val());
+                }
+                $("#experience_booking_form").submit();
+            });
+        }
+        
+        min_number = parseInt($("#guest_number_min").attr("name"));
+        max_number = parseInt($("#guest_number_max").attr("name"));
+        if(min_number < 4)
+        {
+            if(max_number >= 4)
+            {
+                $("#id_guest_number").val(4);
+                $("#id_guest_number").change();
+            }
+            else
+            {
+                $("#id_guest_number").val(max_number);
+                $("#id_guest_number").change();
+            }
+        }
+        
+        mixpanel.track("Viewed experience page_en");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
+
+        mixpanel.track("Viewed experience");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
+
+        for(i=0;i<3;i++)
+        {
+            $('#save_to_wishlist_related_'+i).click(function(e){
+                i = e.target.id.substr(-1,1);
+                user_id=parseInt($('#id_user_id').val());
+                experience_id=parseInt($('#related_experience_id_'+i).text());
+
+                if(!isNaN(user_id) && typeof user_id === 'number' && !isNaN(experience_id) && typeof experience_id === 'number')
+                {
+                    $.ajax({
+                            type: 'POST',
+                            url: "https://www.tripalocal.com/service_wishlist/",
+                            dataType: 'json',
+                            data: {
+                                "csrfmiddlewaretoken": "{{ csrf_token }}",
+                                "user_id": user_id,
+                                "experience_id": experience_id,
+                                "added": $('#save_to_wishlist_related_'+i).attr("val")
+                            },
+                            success: function (data) {
+                                result = data; //$.parseJSON(data)
+                                if(result.success)
+                                {
+                                    if(result.added)
+                                    {
+                                        alert("The experience has been added to your wishlist");
+                                        $('#save_to_wishlist_related_'+i).removeClass("save_to_wishlist_related");
+                                        $('#save_to_wishlist_related_'+i).addClass("saved_to_wishlist_related");
+                                        $('#save_to_wishlist_related_'+i).attr("val","True");
+                                    }
+                                    if(result.removed)
+                                    {
+                                        alert("The experience has been removed from your wishlist");
+                                        $('#save_to_wishlist_related_'+i).removeClass("saved_to_wishlist_related");
+                                        $('#save_to_wishlist_related_'+i).addClass("save_to_wishlist_related");
+                                        $('#save_to_wishlist_related_'+i).attr("val","False");
+                                    }
+                                }
+                                else
+                                {
+                                    alert(result.error);
+                                }
+                            },
+                            error: function (e) {
+                                alert("Please try again later");
+                            }
+                    });
+                }
+            })
+        }
+
+        for(i=1;i<1000;i++)
+        {
+            if($("#review_page_"+i))
+            {
+                if(i!=1)
+                {
+                    $("#review_page_"+i+"_div").hide();
+                    $("#review_page_"+i).addClass("review_paging_other");
+                }
+                else
+                {
+                    $("#review_page_"+i).addClass("review_paging_current");
+                }
+                $("#review_page_"+i).click(function(e){
+                    id=e.target.id;
+                    j = id.split("_")[2];
+                    $("#review_page_"+j).removeClass("review_paging_other");
+                    $("#review_page_"+j).addClass("review_paging_current");
+                    $("#review_page_"+j+"_div").show();
+                    for(i=1;i<1000;i++)
+                    {
+                        if($("#review_page_"+i))
+                        {
+                            if(i!=j)
+                            {
+                                $("#review_page_"+i+"_div").hide();
+                                $("#review_page_"+i).removeClass("review_paging_current");
+                                $("#review_page_"+i).addClass("review_paging_other");
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                });
+            }
+            else
+            {
+                break;
+            }
+        }
+    })
+})
+
+$(function(){
+    $("#id_date").change(function(){
+        selected_date = $("#id_date option:selected").text().trim();     
+
+        $("#id_time").html('');
+
+        var i=0;
+        for(; $("#date_string_"+i).text().trim() != selected_date; i++)
+        {
+        }
+
+        for(; $("#date_string_"+i).text().trim() == selected_date; i++)
+        {
+            if($("#time_string_"+i).attr("instant") == "True")
+            {
+                $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' style="color:green;">' + $("#time_string_"+i).text().trim() + '</option>');
+            }
+            else
+            {
+                $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+            }
+        }
+
+        $("#id_time").change();
+        mixpanel.track("Changed date");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
+    })
+})
+
+$(function(){
+    $("#id_time").change(function(){
+        selected_date = $("#id_date option:selected").text().trim();
+        selected_time = $("#id_time option:selected").text().trim();
+
+        var i=0;
+        for(; $("#date_string_"+i).text().trim() != selected_date; i++)
+        {
+        }
+
+        for(; $("#time_string_"+i).text().trim() != selected_time; i++)
+        {
+        }
+
+        seat_left = parseInt($("#seat_left_"+i).text());
+
+        if("{{experience.type}}"=="NONPRIVATE")
+        {
+            $("#id_guest_number").html('');
+            var i = parseInt($("#guest_number_min").attr("name"));
+            for(;i<=seat_left;i++)
+            {
+                $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
+            }
+        }
+
+        mixpanel.track("Changed time");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
+    })
+})
+
+$(function(){
+    $("#id_guest_number").change(function(){
+        min_number = parseInt($("#guest_number_min").attr("name"));
+        max_number = parseInt($("#guest_number_max").attr("name"));
+        price = $("#experience_dynamic_price").val().split(',');
+        if(price.length == max_number - min_number + 2) // not 1
+        {
+            guest_number = parseInt($("#id_guest_number").val());
+            price = Math.round(parseFloat(price[guest_number-min_number])*1.429);
+            $("#experience_price").text(price);
+        }
+
+        mixpanel.track("Changed number of people");
+        if($("#user_email").val())
+        {
+            mixpanel.identify($("#user_email").val());
+        }
+    })
+})
+
+    $('#save_to_wishlist_icon').click(function(){
+        user_id=parseInt($('#id_user_id').val());
+        experience_id=parseInt($('#id_experience_id').val());
+
+        if(!isNaN(user_id) && typeof user_id === 'number' && !isNaN(experience_id) && typeof experience_id === 'number')
+        {
+            $.ajax({
+                    type: 'POST',
+                    url: "https://www.tripalocal.com/service_wishlist/",
+                    dataType: 'json',
+                    data: {
+                        "csrfmiddlewaretoken": "{{ csrf_token }}",
+                        "user_id": user_id,
+                        "experience_id": experience_id,
+                        "added": $('#save_to_wishlist_icon').attr("val")
+                    },
+                    success: function (data) {
+                        result = data; //$.parseJSON(data)
+                        if(result.success)
+                        {
+                            if(result.added)
+                            {
+                                alert("The experience has been added to your wishlist");
+                                $('#save_to_wishlist_icon').attr("val","True");
+                                $('#save_to_wishlist_icon').removeClass("save_to_wishlist_not_added");
+                                $('#save_to_wishlist_icon').addClass("save_to_wishlist_added");
+                                $('#wishlist_head').text("Saved to Wishlist");
+                                $('#wishlist_p').text("");
+                            }
+                            if(result.removed)
+                            {
+                                alert("The experience has been removed from your wishlist");
+                                $('#save_to_wishlist_icon').attr("val","False");
+                                $('#save_to_wishlist_icon').removeClass("save_to_wishlist_added");
+                                $('#save_to_wishlist_icon').addClass("save_to_wishlist_not_added");
+                                $('#wishlist_head').text("Save to Wishlist");
+                                $('#wishlist_p').text("Save now, plan later");
+                            }
+                        }
+                        else
+                        {
+                            alert(result.error);
+                        }
+                    },
+                    error: function (e) {
+                        alert("Please try again later");
+                    }
+            });
+        }
+    });
+
+    $("#bio_show_more").click(function(){
+        if($("#bio_show_more").attr("value") == "More")
+        {
+            bio_height = $("#host_bio").height();
+            $("#bio_show_more").attr("value", "Less");
+            $("#bio_show_more").text("- Less");
+            $(".gradientMask").hide();
+        }
+        else
+        {
+            bio_height = 140;
+            $("#bio_show_more").attr("value", "More");
+            $("#bio_show_more").text("+ More");
+            $(".gradientMask").show();
+        }
+        $("#experience-hostinterests").height(bio_height+10);
+        $("#experience-hostintro").height(bio_height+50);
+        $("#bio_show_more").css("top",bio_height+20+"px");
+    })
+</script>
+{% endblock %}
