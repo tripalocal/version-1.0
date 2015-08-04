@@ -175,6 +175,10 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
 
+        photo_url = ''
+        photos = experience.photo_set.all()
+        if photos is not None and len(photos) > 0:
+            photo_url = photos[0].directory+photos[0].name
         experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]), 
                             'meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]), 'rate': rate,
                             'duration':experience.duration, 'city':experience.city,
@@ -183,7 +187,8 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                             'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated,
                             'price':experience_fee_calculator(exp_price),
                             'currency':str(dict(Currency)[experience.currency.upper()]),
-                            'dollarsign':DollarSign[experience.currency.upper()],'dates':{}}
+                            'dollarsign':DollarSign[experience.currency.upper()],'dates':{},
+                            'photo_url':photo_url}
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []
@@ -1778,8 +1783,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             # Format title & Description
             experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
             t = get_experience_title(experience, settings.LANGUAGES[0][0])
-            if (t != None and len(t) > 40):
-                formattedTitleList.insert(counter, t[:37] + "...")
+            if (t != None and len(t) > 30):
+                formattedTitleList.insert(counter, t[:27] + "...")
             else:
                 formattedTitleList.insert(counter, t)
             i += 1
@@ -1866,7 +1871,7 @@ def review_experience (request, id=None):
     else:
         return HttpResponseRedirect(GEO_POSTFIX)
 
-def get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords=None):
+def get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False):
 
     available_options = get_available_experiences(start_datetime, end_datetime, guest_number, city, language, keywords)
     itinerary = []
@@ -1893,9 +1898,16 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
                         break
                 counter = 0
                 insert = False
-                exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
-                            'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
-                            'dollarsign':experience['dollarsign'],'timeslots':experience['dates'][dt_string]}
+
+                if mobile:
+                    exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
+                                'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
+                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url']}
+                else:
+                    exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
+                                'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
+                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'timeslots':experience['dates'][dt_string]}
+
                 while counter < len(day_dict['experiences']):#find the correct rank
                     if experience['rate'] > day_dict['experiences'][counter]['rate']:
                         day_dict['experiences'].insert(counter, exp_dict)

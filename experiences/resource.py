@@ -367,7 +367,7 @@ def ajax_view(request):
         raise Http404
 
 @api_view(['POST','GET'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 def service_wishlist(request):
     if request.method == 'POST': #request.is_ajax() and 
         try:
@@ -437,16 +437,21 @@ def service_wishlist(request):
                 if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
                     exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
 
-                experiences.append({'experience_id':experience.id,
-                                    'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
-                                    'experience_description':get_experience_description(experience, settings.LANGUAGES[0][0]),
-                                    'experience_price':experience_fee_calculator(exp_price),
-                                    'experience_language':experience.language,
-                                    'experience_duration':experience.duration,
+                photo_url = ''
+                photos = experience.photo_set.all()
+                if photos is not None and len(photos) > 0:
+                    photo_url = photos[0].directory+photos[0].name
+
+                experiences.append({'id':experience.id,
+                                    'title':get_experience_title(experience, settings.LANGUAGES[0][0]),
+                                    'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                                    'price':experience_fee_calculator(exp_price),
+                                    'language':experience.language,
+                                    'duration':experience.duration,
+                                    'photo_url':photo_url,
                                     'host_image':experience.hosts.all()[0].registereduser.image_url})
 
-            response={'experiences':experiences}
-            return HttpResponse(json.dumps(response),content_type="application/json")
+            return Response(experiences,status=status.HTTP_200_OK)
 
         except Exception as err:
             #TODO
@@ -585,9 +590,9 @@ def service_search(request, format=None):
 
         guest_number = 5 #temp fix
         if int(guest_number) == 0:
-            itinerary = get_itinerary(start_datetime, end_datetime, None, city, language, keywords)
+            itinerary = get_itinerary(start_datetime, end_datetime, None, city, language, keywords, mobile=True)
         else:
-            itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords)
+            itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords, mobile=True)
 
         return Response(itinerary, status=status.HTTP_200_OK)
     except Exception as err:
@@ -617,10 +622,16 @@ def service_mytrip(request, format=None):
             payment = booking.payment if booking.payment_id != None else Payment()
             host = booking.experience.hosts.all()[0]
             phone_number = host.registereduser.phone_number
+
+            photo_url = ''
+            photos = booking.experience.photo_set.all()
+            if photos is not None and len(photos) > 0:
+                photo_url = photos[0].directory+photos[0].name
             
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
                   'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
                   'experience_title':get_experience_title(booking.experience,settings.LANGUAGES[0][0]),
+                  'experience_photo':photo_url,
                   'meetup_spot':get_experience_meetup_spot(booking.experience,settings.LANGUAGES[0][0]),
                   'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.',
                   'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
@@ -832,6 +843,11 @@ def service_experience(request, format=None):
             dynamic_price = experience.dynamic_price.split(",")
             dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
 
+        experience_images = []
+        photos = experience.photo_set.all()
+        for photo in photos:
+            experience_images.append(photo.directory+photo.name)
+
         return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
@@ -846,6 +862,7 @@ def service_experience(request, format=None):
                          'experience_dynamic_price':dynamic_price,
                          'experience_guest_number_min':experience.guest_number_min,
                          'experience_guest_number_max':experience.guest_number_max,
+                         'experience_images':experience_images,
 
                          'available_options':available_options,
                          'available_date':available_date,
@@ -913,6 +930,11 @@ def service_experiencedetail(request, format=None):
             dynamic_price = experience.dynamic_price.split(",")
             dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
 
+        experience_images = []
+        photos = experience.photo_set.all()
+        for photo in photos:
+            experience_images.append(photo.directory+photo.name)
+
         return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
@@ -927,6 +949,7 @@ def service_experiencedetail(request, format=None):
                          'experience_dynamic_price':dynamic_price,
                          'experience_guest_number_min':experience.guest_number_min,
                          'experience_guest_number_max':experience.guest_number_max,
+                         'experience_images':experience_images,
 
                          'included_food':included_food.included,
                          'included_food_detail':included_food.details,

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
 import datetime
 from allauth.socialaccount.models import SocialAccount
 import hashlib
@@ -313,7 +314,11 @@ def get_experience_tags(experience, language):
     return tags
 
 def get_experience_whatsincluded(experience, language):
-    return WhatsIncluded.objects.filter(experience = experience, language = language)
+    w = WhatsIncluded.objects.filter(experience = experience, language = language)
+    for item in w:
+        if not item.included and (item.details is None or len(item.details))==0:
+            item.details = _('Not included')
+    return w
 
 #class Itinerary(models.Model):
 #    user = models.ForeignKey(User)
