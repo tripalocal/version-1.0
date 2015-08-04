@@ -656,12 +656,6 @@ class CreateExperienceForm(forms.Form):
 def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
-class UserSignupForm(forms.Form):
-    def signup(self, request, user):
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        user.save()
-
 class ReviewForm(forms.ModelForm):
 
     comment = forms.CharField(min_length=10, max_length=200, required = False, widget=forms.Textarea)
