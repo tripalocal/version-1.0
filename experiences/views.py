@@ -1362,18 +1362,24 @@ def update_booking(id, accepted, user):
         if booking.status.lower() == "accepted":
             # the host already accepted the booking
             #messages.add_message(request, messages.INFO, 'The booking request has already been accepted.')
-            return HttpResponseRedirect(GEO_POSTFIX)
+            booking_success = False
+            result={'booking_success':booking_success, 'error':'the booking has been accepted'}
+            return result
 
         if booking.status.lower() == "rejected":
             # the host/guest already rejected/cancelled the booking
             #messages.add_message(request, messages.INFO, 'The booking request has already been rejected.')
-            return HttpResponseRedirect(GEO_POSTFIX)
+            booking_success = False
+            result={'booking_success':booking_success, 'error':'the booking has been cancelled/rejected'}
+            return result
 
         experience = Experience.objects.get(id=booking.experience_id)
         experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
         experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
         if not experience.hosts.all()[0].id == user.id:
-            return HttpResponseRedirect(GEO_POSTFIX)
+            booking_success = False
+            result={'booking_success':booking_success, 'error':'only the host can accept/reject the booking'}
+            return result
 
         guest = User.objects.get(id = booking.user_id)
         host = user
