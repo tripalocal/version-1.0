@@ -37,7 +37,7 @@ GEO_POSTFIX = "/"
 
 def experience_fee_calculator(price):
     if type(price)==int or type(price) == float:
-        return round(price*(1.00+settings.COMMISSION_PERCENT)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,0)
+        return round(price*(1.00+settings.COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
 
     return price
 
@@ -831,7 +831,7 @@ def experience_booking_confirmation(request):
                                                                            'guest_number':form.data['guest_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
-                                                                           'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),2),
+                                                                           'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),0),
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': experience_fee_calculator(subtotal_price)}, context)
@@ -864,7 +864,7 @@ def experience_booking_confirmation(request):
                                                                            'guest_number':form.data['guest_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
-                                                                           'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),2),
+                                                                           'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),0),
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': experience_fee_calculator(subtotal_price)}, context)
@@ -1078,7 +1078,7 @@ def create_experience(request, id=None):
                 "guest_number_min":experience.guest_number_min,
                 "guest_number_max":experience.guest_number_max,
                 "price":round(experience.price,2),
-                "price_with_booking_fee":round(experience.price*Decimal.from_float(1.00+settings.COMMISSION_PERCENT)*Decimal.from_float(1.00+settings.STRIPE_PRICE_PERCENT)+Decimal.from_float(settings.STRIPE_PRICE_FIXED),2),
+                "price_with_booking_fee":round(experience.price*Decimal.from_float(1.00+settings.COMMISSION_PERCENT), 0)*Decimal.from_float(1.00+settings.STRIPE_PRICE_PERCENT)+Decimal.from_float(settings.STRIPE_PRICE_FIXED),
                 "currency":experience.currency.upper(),
                 "duration":experience.duration,
                 "included_food":included_food,
@@ -1487,12 +1487,12 @@ def update_booking(id, accepted, user):
                     subtotal_price = float(experience.price)*float(booking.guest_number)
 
                 #refund_amount does not include process fee: the transaction can't be undone
-                refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT),2)
+                refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT),0)
 
                 if extra_fee <= -1:
-                    refund_amount = round((subtotal_price+extra_fee)*(1+settings.COMMISSION_PERCENT), 2)
+                    refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT), 0) + extra_fee
                 if extra_fee < 0 and extra_fee > -1:
-                    refund_amount = round((subtotal_price*(1+extra_fee))*(1+settings.COMMISSION_PERCENT), 2)
+                    refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT), 0) * (1+extra_fee)
 
                 success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
             else:
