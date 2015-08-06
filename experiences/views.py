@@ -578,7 +578,9 @@ class ExperienceDetailView(DetailView):
         if request.method == 'POST':
             form = BookingConfirmationForm(request.POST)
             form.data = form.data.copy()
-            form.data['user_id'] = request.user.id;
+            form.data['user_id'] = request.user.id
+            form.data['first_name'] = request.user.first_name
+            form.data['last_name'] = request.user.last_name
             experience = Experience.objects.get(id=form.data['experience_id'])
             experience.dollarsign = DollarSign[experience.currency.upper()]
             experience.currency = str(dict(Currency)[experience.currency.upper()])
@@ -645,7 +647,7 @@ class ExperienceDetailView(DetailView):
             else:
                 # host, experience not published
                 context['host_only_unlisted'] = True
-                return context
+                #return context
 
         context['experience_city'] = dict(Location).get(experience.city)
 
@@ -717,6 +719,7 @@ class ExperienceDetailView(DetailView):
             related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
             related_experiences[i].title = get_experience_title(related_experiences[i], settings.LANGUAGES[0][0])
             related_experiences[i].description = get_experience_description(related_experiences[i], settings.LANGUAGES[0][0])
+            setExperienceDisplayPrice(related_experiences[i])
 
         related_experiences_added_to_wishlist = []
         
@@ -1604,6 +1607,14 @@ def getProfileImage(experience):
     else:
         'profile_default.jpg'
 
+def setExperienceDisplayPrice(experience):
+    if experience.dynamic_price and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 and experience.guest_number_min < 4:
+        dp = experience.dynamic_price.split(',')
+        if experience.guest_number_max < 4 or experience.guest_number_max - experience.guest_number_min < 4:
+            experience.price = dp[len(dp)-2]#the string ends with ",", so the last one is ''
+        elif experience.guest_number_min <= 4:
+            experience.price = dp[4-experience.guest_number_min]
+
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
                is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
     
@@ -1662,12 +1673,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         while i < len(experienceList):
             experience = experienceList[i]
 
-            if experience.dynamic_price and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 and experience.guest_number_min < 4:
-                dp = experience.dynamic_price.split(',')
-                if experience.guest_number_max < 4 or experience.guest_number_max - experience.guest_number_min < 4:
-                    experience.price = dp[len(dp)-2]#the string ends with ",", so the last one is ''
-                elif experience.guest_number_min <= 4:
-                    experience.price = dp[4-experience.guest_number_min]
+            setExperienceDisplayPrice(experience)
 
             if start_date is not None and experience.end_datetime < start_date :
                 i += 1
