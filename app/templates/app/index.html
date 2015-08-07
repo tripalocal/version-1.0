@@ -4,16 +4,20 @@
 
 {% block head %}
     {% load staticfiles%}
+    <link href="{% static 'app/content/dropdown.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/transition.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/tripalocal_homepage.css' %}" rel="stylesheet">
+
     <title>{% trans "Tripalocal | Experience it like a local"%}</title>
     <!-- H1 google font -->
     <link href='http://fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>
-
+    <script type='text/javascript' src="{% static 'app/scripts/dropdown.js' %}"></script>
+    <script type='text/javascript' src="{% static 'app/scripts/transition.js' %}"></script>
 	<script>
 		$(function() {
 			$("#slideshow > div:gt(0)").hide();
-			setInterval(function() { 
+			setInterval(function() {
 			  $('#slideshow > div:first')
 			    .fadeOut(1000)
 			    .next()
@@ -31,7 +35,7 @@
         <div id="closeTag" style="width:10%"><img src="/images/homepage/closeIcon-01.svg" width="14"></div>
         <div id="appIcon" style="width:70px; text-align:left;position:relative">
             <img src="/images/homepage/appIcon-01.jpg" width="60" >
-    
+
             <span style="position:absolute;left:80px;">
                 <h3 style="margin-bottom:5px;font-weight:bold">{% trans "Tripalocal for Android" %}</h3>
                 <img src="/images/homepage/rating-01.svg" width="110"><span style="color:#ccc;  vertical-align: middle;"> (24,812)</span>
@@ -49,9 +53,9 @@
             <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com/cn">中文</a></li>
             <li><a href="/accounts/logout/">{% trans "Log out" %}</a></li>
             <li>{{ user.first_name }}</li>
-            <li><div class="profile-xs"><a href="/myprofile"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>    
+            <li><div class="profile-xs"><a href="/myprofile"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>
         {% else %}
-            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com/cn">中文</a></li> 
+            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com/cn">中文</a></li>
             <li><a href="/accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></li>
             <li><a href="/accounts/login/?next={{ request.path }}">{% trans "Log in" %}</a></li>
         {% endif %}
@@ -67,14 +71,42 @@
                 <table class="home-search">
                     <tbody>
                         <tr>
-                            <td class="search-location">{{form.city}}</td>
+                            <td class="search-location">
+                              <div id="id-city" class="ui selection dropdown">
+                                <input type="hidden" name="city" value="city">
+                                <i class="dropdown icon"></i>
+                                <div class="text">City</div>
+                                <div class="menu">
+                                  <div class="header">Australia</div>
+                                  <div class="item" data-value="Melbourne" data-text="Melbourne">Melbourne <span class="light-color">Victoria</span></div>
+                                  <div class="item" data-value="Sydney" data-text="Sydney">Sydney <span class="light-color">New South Wales</span></div>
+                                  <div class="item" data-value="Brisbane" data-text="Brisbane">Brisbane <span class="light-color">Queensland</span></div>
+                                  <div class="item" data-value="Cairns" data-text="Cairns">Cairns <span class="light-color">Queensland</span></div>
+                                  <div class="item" data-value="Goldcoast" data-text="Gold Coast">Gold Coast <span class="light-color">Queensland</span></div>
+                                  <div class="item" data-value="Adelaide" data-text="Adelaide">Adelaide <span class="light-color">South Australia</span></div>
+                                  <div class="item" data-value="Hobart" data-text="Hobart">Hobart <span class="light-color">Tasmania</span></div>
+                                  <div class="item" data-value="Alicesprings" data-text="Alice Springs">Alice Springs <span class="light-color">Northern Territory</span></div>
+                                  <div class="item" data-value="Darwin" data-text="Darwin">Darwin <span class="light-color">Northern Territory</span></div>
+                                  <div class="header">New Zealand</div>
+                                  <div class="item" data-value="Christchurch" data-text="Christchurch">Christchurch <span class="light-color">Canterbury</span></div>
+                                  <div class="item" data-value="Queenstown" data-text="Queenstown">Queenstown <span class="light-color">Otago</span></div>
+                                  <div class="item" data-value="Auckland" data-text="Auckland">Auckland <span class="light-color">Auckland</span></div>
+                                  <div class="item" data-value="Wellington" data-text="Wellington">Wellington <span class="light-color">Wellington</span></div>
+                                </div>
+                              </div>
+                              <script charset="utf-8" type="text/javascript">
+                                $('.ui.dropdown').dropdown();
+                              </script>
+                            </td>
                             <td class="search-from">{{form.start_date}}</td>
                             <td class="search-to">{{form.end_date}}</td>
                             <td class="home-search-button"><input id="search-submit" type="submit" value="{% trans "Search" %}" name="search" class="btn btn-primary btn-sm btn-search"></td>
                         </tr>
-                        <tr>
+
+                        <tr class="mobileOnly">
                             <td class="home-search-button-mobile"><input id="search-submit-button" type="submit" value="Search" name="search" class="btn btn-primary btn-sm btn-search"></td>
                         </tr>
+
                     </tbody>
                 </table>
             </form>
@@ -83,7 +115,7 @@
                 <a href="/accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a>{% trans " to get notified when we launch in more countries."%}</p>
             </div>
         </div>
-    </div> 
+    </div>
 
     <div class="exp-brief">
         <div class="container">
@@ -188,7 +220,7 @@
 
     <div id="video-sec" class="video-box" style="background-image:url(/images/homepage/video_poster-01.jpg)">
         <div class="video-overlay" >
-            <h1 style="font-size:40px;">{% trans "Travel with Tripalocal" %}</h1>
+            <h1 style="font-size:40px;font-family:'EXO', Helvertica, sans-serif;">{% trans "Travel with Tripalocal" %}</h1>
             <p style="font-size:16px;">{% trans "See how it works" %}</p>
             <br><br>
             <a style="cursor:pointer" id="enter_fullscreen"><img src="images/homepage/play_btn.svg" width="75"></a>
@@ -210,17 +242,19 @@
             <h1 style="text-align:center;margin:47px;padding:0">{% trans "Our Community"%}</h1>
             <div class="row">
                 <div class="col6 box" style="background-image:url(/images/homepage/travelling-01.jpg)">
-                    <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>  
+                    <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>
                 </div>
                 <div class="col6 box" style="background-image:url(/images/homepage/hosting-01.jpg)">
-                    <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>  
+                    <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>
                 </div>
             </div>
         </div>
     </div>
+
 {% endblock %}
 
 {% block scripts %}
+
 <script charset="utf-8" type="text/javascript">
     $("#video-fullscreen").hide();
     $(function()
@@ -238,7 +272,7 @@
             //hide loginpartial on homepage
             $(".navBox").attr("style","display:none");
 
-            $.getScript('http://www.geoplugin.net/javascript.gp', function() 
+            $.getScript('http://www.geoplugin.net/javascript.gp', function()
             {
                 country = geoplugin_countryName();
                 region = geoplugin_region();
@@ -258,11 +292,11 @@
             });
 
             $("#id_start_date").click(function(){
-                $("#id_start_date_picker").data("DateTimePicker").show();  
+                $("#id_start_date_picker").data("DateTimePicker").show();
             });
 
-            $("#id_end_date").click(function(){  
-                $("#id_end_date_picker").data("DateTimePicker").show();  
+            $("#id_end_date").click(function(){
+                $("#id_end_date_picker").data("DateTimePicker").show();
             });
         });
 
@@ -272,7 +306,7 @@
         {
             var now  = new Date().toString();
             mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
-            mixpanel.people.set({"$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,"$last_seen":now});  
+            mixpanel.people.set({"$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,"$last_seen":now});
             mixpanel.identify($("#user_email").val());
         }
     })

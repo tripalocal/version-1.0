@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-<section class="modal--fade is-active" id="modal-fade" tabindex="-1" role="dialog" aria-labelledby="label-fade" aria-hidden="true">
+<section class="modal--fade is-active" id="modal-fade" role="dialog" aria-labelledby="label-fade" aria-hidden="true">
     <div class="signup-inner">
         <div class="content">
             {% if socialaccount.providers  %}
@@ -37,11 +37,11 @@
         <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
             {% csrf_token %}
             <!--<p>{{ form.username }}</p>-->
-            <p>{{ form.email }}</p>
+            <div>{{ form.email }}</div>
             <p id="id_email_error"></p>
 
             {% if 'email' in form.errors%}
-            <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
+            <div class="warning-sign">
                 <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
                 <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.email.errors.as_text}}</p>
             </div>
@@ -50,12 +50,12 @@
             <p id="id_password1_error"></p>
 
             {% if 'password1' in form.errors%}
-            <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
+            <div class="warning-sign">
                 <table>
                     <tbody>
                         <tr>
                             <td>
-                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:0px; left:5px;">
+                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
                             </td>
                             <td>
                                 <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.password1.errors.as_text}}</p>
@@ -136,10 +136,10 @@ function checkInput(id_put, id_error)
     $("#id_email").blur(function(){
         checkEmail();
     });
-    
+
 //validate password
     $("#id_password1").blur(function(){
-        checkInput("id_password1", "id_password1_error");   
+        checkInput("id_password1", "id_password1_error");
     });
 
 //validation firstname
@@ -147,7 +147,7 @@ function checkInput(id_put, id_error)
         var regexp = /^[a-zA-Z0-9-_.]+$/;
         if($("#id_first_name").val().search(regexp) != -1)
         {
-            checkInput("id_first_name", "first_name_error"); 
+            checkInput("id_first_name", "first_name_error");
         }
         else
         {
@@ -155,8 +155,8 @@ function checkInput(id_put, id_error)
             return false;
         }
     });
-    
-//validate last name 
+
+//validate last name
    $("#id_last_name").blur(function(){
         var regexp = /^[a-zA-Z0-9-_.]+$/;
         if($("#id_last_name").val().search(regexp) != -1)
@@ -183,7 +183,7 @@ $(function()
         //$("#id_last_name").attr("class", "form-control");
 
         /*
-        $.getScript('http://www.geoplugin.net/javascript.gp', function() 
+        $.getScript('http://www.geoplugin.net/javascript.gp', function()
         {
             country = geoplugin_countryName();
             region = geoplugin_region();
@@ -197,7 +197,7 @@ $(function()
         $("#id_signup_submit_button").bind("click", function(e){
             e.preventDefault();
 
-            if(checkEmail() && checkInput("id_password1", "id_password1_error") 
+            if(checkEmail() && checkInput("id_password1", "id_password1_error")
                 && checkInput("id_first_name", "first_name_error")
                 && checkInput("id_last_name", "last_name_error"))
             {
@@ -212,7 +212,7 @@ $(function()
                         navigator.geolocation.getCurrentPosition(function(position)
                         {
                             mixpanel.people.set({"Latitude":position.coords.latitude, "Longitude":position.coords.longitude});
-                            mixpanel.identify($("#id_email").val());   
+                            mixpanel.identify($("#id_email").val());
                         });
                         */
                     }
@@ -222,7 +222,7 @@ $(function()
                                         "$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,
                                         "$created":now, "$last_seen":now
                                         });
-                    //mixpanel.track("has signed up via email");   
+                    //mixpanel.track("has signed up via email");
                     mixpanel.identify($("#id_email").val());
 
                     ga('send','event','sign up','click');

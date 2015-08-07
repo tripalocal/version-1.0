@@ -43,7 +43,7 @@ class SubscriptionForm(forms.ModelForm):
         fields = ['email']
 
 class HomepageSearchForm(forms.Form):
-    city = forms.ChoiceField(choices=Location)
+    city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'id':'id-city','class':'ui dropdown'}))
     start_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}))
     end_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}))
 
