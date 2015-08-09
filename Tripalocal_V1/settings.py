@@ -1,6 +1,7 @@
 """
 Django settings for Tripalocal_V1 project.
 """
+import os
 
 try:
     import pymysql
@@ -313,6 +314,14 @@ POST_OFFICE = {
 }
 
 DEVELOPMENT = False
+
+if os.environ.get('ENV_MODE') == 'DEVELOPMENT':
+    try:
+        print(DATABASES['default'])
+        from test_settings import *
+    except ImportError:
+        pass
+
 
 try:
     from local_settings import *
