@@ -311,3 +311,10 @@ SESSION_COOKIE_NAME = 'Tripalocal_sessionid'
 POST_OFFICE = {
     'DEFAULT_PRIORITY': 'now'
 }
+
+DEVELOPMENT = False
+
+try:
+    from local_settings import *
+except ImportError:
+    pass

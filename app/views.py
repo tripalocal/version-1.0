@@ -521,7 +521,7 @@ def password_change_callback(sender, request, user, **kwargs):
     messages.success(request, str(user.id) + '_PasswordChanged')
 
 @receiver(user_signed_up)
-def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
+def handle_user_signed_up(request, user, is_social_login=None, **kwargs):
     try:
         new_registereduser = RegisteredUser.objects.get(user_id = user.id)
     except RegisteredUser.DoesNotExist:
@@ -540,15 +540,16 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
     new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
     new_alias.save()
 
-    with open('/etc/postfix/canonical', 'a') as f:
-        f.write(user.email + " " + new_email.id + "\n")
-        f.close()
+    if not settings.DEVELOPMENT:
+        with open('/etc/postfix/canonical', 'a') as f:
+            f.write(user.email + " " + new_email.id + "\n")
+            f.close()
 
-    subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
-    
-    with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
-        f.write(new_email.id + "\n")
-        f.close()
+        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+
+        with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+            f.write(new_email.id + "\n")
+            f.close()
 
     """get the client ip from the request
     """
@@ -569,11 +570,17 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
             if len(proxies) > 0:
                 ip = proxies[0]
 
-    mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP":ip, 
-                               "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
-                               })
+    if not settings.DEVELOPMENT:
+        track_user_signup(ip, is_social_login, user)
 
+
+def track_user_signup(ip, is_social_login, user):
+    mp = Mixpanel(settings.MIXPANEL_TOKEN)
+    mp.people_set(user.email, {"IP": ip,
+                               "$created": pytz.utc.localize(datetime.utcnow()).astimezone(
+                                   pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
+                               })
+    reader = None
     try:
         reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
@@ -584,19 +591,21 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
         longitude = response.location.longitude
         latitude = response.location.latitude
 
-        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
-        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "$first_name":user.first_name, "$last_name":user.last_name, "Postcode":postcode, "Latitude":latitude, "Longitude":longitude})
-        reader.close()
+        mp.track(user.email, "has signed up via email_" + settings.LANGUAGES[0][0])
+        mp.people_set(user.email, {'$email': user.email, "$country": country, "$city": city, "$region": region,
+                                   "$first_name": user.first_name, "$last_name": user.last_name, "Postcode": postcode,
+                                   "Latitude": latitude, "Longitude": longitude})
     except Exception:
-        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+        mp.track(user.email, "has signed up via email_" + settings.LANGUAGES[0][0])
+    finally:
         reader.close()
 
-    if sociallogin:
-        data = sociallogin.account.extra_data
-        first_name=""
-        last_name=""
-        age=0
-        gender=""
+    if is_social_login:
+        data = is_social_login.account.extra_data
+        first_name = ""
+        last_name = ""
+        age = 0
+        gender = ""
         email = user.email
 
         if 'first_name' in data:
@@ -609,11 +618,13 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
             gender = data['gender']
 
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed up via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        mp.track(email, 'has signed up via Facebook',
+                 {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
+        mp.people_set(email, {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
+
 
 @receiver(user_logged_in)
-def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
+def handle_user_logged_in(request, user, is_social_login=None, **kwargs):
     remote_address = request.META.get('HTTP_X_FORWARDED_FOR')or request.META.get('REMOTE_ADDR')
     # set the default value of the ip to be the REMOTE_ADDR if available
     # else None
@@ -630,9 +641,14 @@ def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
             if len(proxies) > 0:
                 ip = proxies[0]
 
-    mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP":ip})
+    if not settings.DEVELOPMENT:
+        track_user_login(ip, is_social_login, user)
 
+
+def track_user_login(ip, is_social_login, user):
+    mp = Mixpanel(settings.MIXPANEL_TOKEN)
+    mp.people_set(user.email, {"IP": ip})
+    reader = None
     try:
         reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
@@ -643,20 +659,21 @@ def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
         longitude = response.location.longitude
         latitude = response.location.latitude
 
-        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
-        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "Postcode":postcode, 
-                                   "Latitude":latitude, "Longitude":longitude, "Language":settings.LANGUAGES[0][1]}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
-        reader.close()
+        mp.track(user.email, "has signed in via email_" + settings.LANGUAGES[0][0])
+        mp.people_set(user.email, {'$email': user.email, "$country": country, "$city": city, "$region": region,
+                                   "Postcode": postcode,
+                                   "Latitude": latitude, "Longitude": longitude, "Language": settings.LANGUAGES[0][
+            1]})  # "$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
     except Exception:
+        mp.track(user.email, "has signed in via email_" + settings.LANGUAGES[0][0])
+    finally:
         reader.close()
-        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
-
-    if sociallogin:
-        data = sociallogin.account.extra_data
-        first_name=""
-        last_name=""
-        age=0
-        gender=""
+    if is_social_login:
+        data = is_social_login.account.extra_data
+        first_name = ""
+        last_name = ""
+        age = 0
+        gender = ""
         email = user.email
 
         if 'first_name' in data:
@@ -669,5 +686,6 @@ def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
             gender = data['gender']
 
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        mp.track(email, 'has signed in via Facebook',
+                 {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
+        mp.people_set(email, {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
