@@ -21,9 +21,13 @@
 
     </div>
 
+
     <!-- Price Panel-->
     <div id="price-form" class="calendar" style="display: none">
         <div class="section" id="section-add-price">
+            <div class="section" id="price-section-header">
+                <p>This is a public experience <a id="change-pricing-type-button">&nbsp;&nbsp;&nbsp;Change</a></p>
+            </div>
             <div id="location">
                 <p id="photo-heading"><strong>Pricing</strong></p>
                 <br><br><br>
@@ -36,7 +40,7 @@
                 </p>
             </div>
 
-            <div id="group-size-section">
+            <div id="group-size-section" style="display: block">
                 <p id="group-size-heading">Group size</p>
                 <br>
                 {{ form.min_guest_number }}
@@ -55,7 +59,7 @@
                     {% endif %}
                 </div>
             </div>
-            <br><br><br>
+
             <div id="price-section">
                 <div class="float-left">
                     <p id="customers-pay">Customers pay</p>
@@ -70,12 +74,30 @@
                 </div>
                 <p class="float-left math-symbol">=</p>
                 <div class="float-left">
-                    <p id="price-per-person">Price per person</p>
+                    <p id="price-per-person">What you get</p>
                     <span id="dollar-sign">$</span>
                     {{ form.price }}
                 </div>
             </div>
-            <br>
+            <div id="currency-section">
+                <div class="float-left">
+                    <p id="">Currency</p>
+                    <br>
+                    {{form.currency}}
+                </div>
+            </div>
+         </div>
+
+        <div class="section" id="operation-hour-section">
+            <div id="location">
+                <p id="photo-heading"><strong>Operation hours?</strong></p>
+                <br><br><br>
+                <p id="location-details">
+                    <span>Does your experience</span><br>
+                    <span>has multiple departure</span><br>
+                    <span>time?</span><br>
+                </p>
+            </div>
             <div id="duration-section">
                 <p id="duration-heading">Duration</p>
                 {{ form.duration }}
@@ -105,6 +127,22 @@
             <p id="dynamic_price_heading">Commission</p>
             <p id="dynamic_price_heading_2">Price per person</p>
             <br><br><br><br><br><br><br><br>
+            <br/>
+            <br/>
+            <div id="dynamic_price_div_0" style="display:none;">
+                <p id="no-of-pp">1</p>
+                <span id="dollar-sign-2" class="float-left">$</span>
+                <input class="float-left" id="dynamic_price_with_fee_input_0" type="number" min="1" step="0.01">
+                <p class="float-left math-symbol-2">-</p>
+                <div class="float-left">
+                  <span id="dollar-sign-4">$</span>
+                  <p id="commission-price-0" class="commission-price-2"></p>
+                </div>
+                <p class="float-left math-symbol-3">=</p>
+                <span id="dollar-sign-3" class="float-left">$</span>
+
+                <input id="dynamic_price_input_0" type="number" min="1" step="0.01">
+            </div><br>
             <div id="dynamic_price_div_1" style="display:none;">
                 <p id="no-of-pp">2</p>
                 <span id="dollar-sign-2" class="float-left">$</span>
@@ -236,8 +274,8 @@
         </div>
 
         <div class="section" style="text-align:right; clear:both;">
-            <input type="button" value="Last Step" class="last-step" id="price-last-step"/>
-            <input type="button" value="Next Step" class="next-step" id="next-step"/>
+            <input type="button" value="Back" class="last-step" id="last-step"/>
+            <input type="button" value="Next" class="next-step" id="next-step"/>
         </div>
         <!-- creating spare space  -->
         <div class="creating-slot-button-active create-slot-detail">

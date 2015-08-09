@@ -870,16 +870,30 @@ body {
 #location-city select{
 	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; width: 110px; background-position: 85px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px;}
 /*list-pricing.html*/
+#currency-section{float: right; width: 450px;}
+#currency-section p{float: left; color: #999999; }
+#currency-section select{
+	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; background-position: 75px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px; color: #999;}
+#group-size-heading{margin-bottom: 0px;}
+#group-size-min{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
+#group-size-max{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
+#price-section-header{height:50px;}
+#price-section-header p{position: relative;  top: 15px;  font-size: 16px;  color: #999999;  bottom: 10px;  padding-left: 30px;}
+#price-section-header a{cursor: pointer}
+
 #section-add-price {height:350px;}
-#group-size-section{float: right;width: 450px; padding-top: 30px;}
+#group-size-section{float: right;width: 450px; padding-top: 30px; }
 #group-size-section p{float: left; color: #999999; }
 #group-size-section select{
-	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; background-position: 75px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px; margin-top:5px;}
+	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; background-position: 75px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px; margin-top:5px; color: #999;}
 #group-size-heading{margin-bottom: 0px;}
 #group-size-min{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
 #group-size-max{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
 #price-section{float: right; width: 450px; padding-top: 20px;}
 #price-section input[type=number]{float: left; width: 100px; height:35px; border: 1px solid #AAAAAA; border-radius: 3px; background-color: #FFF; margin-top: 10px; padding-left: 25px; color: #999999; position: relative; top: -17px; z-index: 0;}
+
+#operation-hour-section {height:150px;}
+
 #customers-pay{color: #999999;}
 #commission{color: #999999;}
 .commission-price,.commission-price-2{color: #999999; padding-top: 3px; padding-left: 15px; position: relative; top: -18px; z-index: 0;}
@@ -890,7 +904,7 @@ body {
 .math-symbol, .math-symbol-2, .math-symbol-3{color: #999999; padding-top: 30px; padding-left: 20px; padding-right: 20px;}
 .math-symbol-2{padding-left: 15px; padding-right: 15px; padding-top: 6px;}
 .math-symbol-3{padding-top: 5px;}
-#duration-section{float: right; color: #999999; padding-right: 280px; padding-top: 30px; clear: both; width: 450px;}
+#duration-section{float: right; color: #999999; padding-right: 280px; padding-top: 30px; clear: both; width: 450px;position: relative;  top: -133px;}
 #duration-section select{
 	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 110px; background-position: 85px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px;}
 #duration-hours{padding-left: 20px; padding-top: 8px;}
@@ -979,11 +993,13 @@ body {
 .footer{clear: both;}
 #background-white{background-color: #FFF;}
 /*Last step, Next step, Save and Exit button*/
-#last-step{margin: 10px; float:left; background-color: #FFF; border-radius: 3px; border: 1px solid #666666; padding:5px 10px 5px 10px; color: #999999; text-align: center;}
-#next-step{margin: 10px; float:right; background-color: #FFF; border-radius: 3px; border: 1px solid #666666; padding:5px 10px 5px 10px; color: #999999; text-align: center;}
+#last-step{margin: 10px; float: left; background-color: #FFF; border-radius: 3px; border: 0px solid #666; padding: 8px 24px; color: #6BD6DE; text-align: center;}
+#next-step{margin: 10px; float:right; background-color: #3CC; border-radius: 3px; border: 0px solid #666666; padding:8px 24px 8px 24px; color: white; text-align: center;}
 #price-last-step{margin: 10px; float:left; background-color: #FFF; border-radius: 3px; border: 1px solid #666666; padding:5px 10px 5px 10px; color: #999999; text-align: center;}
 #save-and-exit{margin-right: 170px; margin-top:8px; margin-bottom:8px; background-color: #3ECBCB; color: #FFF; border-radius: 3px; border:1px solid #3ECBCB; text-align: center;height:35px;}
 .back-button button{margin-right: 100px; background-color: #3ECBCB; color: #FFF; border-radius: 3px; border:1px solid #3ECBCB; text-align: center;}
+a#nav-left{position: absolute;  left: 5%;  display: inline-block;}
+a#nav-right {position: absolute;  right: 5%;  display: inline-block;}
 /*dollar sign fix (textbox)*/
 #dollar-sign{position: relative; left: -90px; z-index: 1; color: #999999; top: 1px;}
 /*dynamic pricing*/
@@ -997,7 +1013,7 @@ body {
 #dollar-sign-4{left: 0px; top: 5px;}
 #dynamic_price_heading_2{padding-top: 30px;}
 #dynamic_price_heading{padding-top: 90px;}
-#dynamic_price_div_1, #dynamic_price_div_2,#dynamic_price_div_3,#dynamic_price_div_4,#dynamic_price_div_5,#dynamic_price_div_6,#dynamic_price_div_7,#dynamic_price_div_8{padding-left: 163px;}
+#dynamic_price_div_0, #dynamic_price_div_1, #dynamic_price_div_2,#dynamic_price_div_3,#dynamic_price_div_4,#dynamic_price_div_5,#dynamic_price_div_6,#dynamic_price_div_7,#dynamic_price_div_8{padding-left: 163px;}
 #dynamic_price_div_9{padding-left:155px; }
 
 #your-reservation{padding-left: 6px; padding-right: 6px;}
@@ -1424,4 +1440,11 @@ body {
 .experience-detail-table-td {
     padding-top:20px;
     padding-bottom:20px;
+}
+
+#ajax-update-signal {
+	color: darkgrey;
+	display: inline-block;
+	position: absolute;
+    left: 25%;
 }

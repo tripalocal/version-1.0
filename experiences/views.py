@@ -1634,9 +1634,10 @@ def manage_listing_price(request, experience, context):
         data['price'] = experience.price
         data['dynamic_price'] = experience.dynamic_price
         data['type'] = experience.type
+        data['currency'] = experience.currency
         if experience.price != None:
             data['price_with_booking_fee'] = round(float(experience.price) * (1.00 + settings.COMMISSION_PERCENT), 2)
-
+        print(data['dynamic_price'])
         form = ExperiencePriceForm(initial=data)
 
         return render_to_response('price_form.html', {'form': form}, context)
@@ -1645,6 +1646,7 @@ def manage_listing_price(request, experience, context):
         if form.is_valid():
             if 'dynamic_price' in form.data:
                 experience.dynamic_price = form.cleaned_data['dynamic_price']
+
             if 'min_guest_number' in form.data:
                 experience.guest_number_min = form.cleaned_data['min_guest_number']
             if 'max_guest_number' in form.data:
@@ -1655,9 +1657,12 @@ def manage_listing_price(request, experience, context):
                 experience.price = form.cleaned_data['price']
             if 'type' in form.data:
                 experience.type = form.cleaned_data['type']
+            if 'currency' in form.data:
+                experience.currency = form.cleaned_data['currency']
 
             # todo: add to chinese db
             experience.save()
+            print(experience.dynamic_price)
             return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
@@ -1856,6 +1861,8 @@ def manage_listing_location(request, experience, context):
         data = {}
         data['meetup_spot'] =  get_experience_meetup_spot(experience, LANG_EN)
         data['meetup_spot_other'] =  get_experience_meetup_spot(experience, LANG_CN)
+        data['dropoff_spot'] =  get_experience_dropoff_spot(experience, LANG_EN)
+        data['dropoff_spot_other'] =  get_experience_dropoff_spot(experience, LANG_CN)
         data['suburb'] =  experience.city
 
         form = ExperienceLocationForm(initial=data)
@@ -1871,6 +1878,10 @@ def manage_listing_location(request, experience, context):
                 set_exp_meetup_spot(experience, form.cleaned_data['meetup_spot_other'], LANG_CN)
             if 'suburb' in form.data:
                 experience.city = form.cleaned_data['suburb']
+            if 'dropoff_spot' in form.data:
+                set_exp_dropoff_spot_all_langs(experience, form.cleaned_data['dropoff_spot'], LANG_EN, LANG_CN)
+            if 'dropoff_spot_other' in form.data:
+                set_exp_dropoff_spot(experience, form.cleaned_data['dropoff_spot_other'], LANG_CN)
 
             experience.save()
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
@@ -1881,7 +1892,13 @@ def manage_listing(request, exp_id, step, ):
     if not request.user in experience.hosts.all():
         raise Http404("Sorry, but you can only edit your own experience.")
 
+    experience_title_cn = get_object_or_404(ExperienceTitle, experience_id=exp_id, language='zh')
+    experience_title_en = get_object_or_404(ExperienceTitle, experience_id=exp_id, language='en')
+
     context = RequestContext(request)
+    context['experience_title_cn'] = experience_title_cn
+    context['experience_title_en'] = experience_title_en
+    context['experience'] = experience
 
     if request.is_ajax():
         if step == 'price':

@@ -188,6 +188,7 @@ class ExperiencePriceForm(forms.Form):
     price = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=0)
     price_with_booking_fee = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     dynamic_price = forms.CharField(max_length=100, required=False)
+    currency = forms.ChoiceField(choices=Currency, required=False)
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePriceForm, self).__init__(*args, **kwargs)
@@ -251,6 +252,8 @@ class ExperienceLocationForm(forms.Form):
     suburb = forms.ChoiceField(required=False, choices=Suburbs)
     meetup_spot = forms.CharField(required=False, widget=forms.Textarea)
     meetup_spot_other = forms.CharField(required=False, widget=forms.Textarea)
+    dropoff_spot = forms.CharField(required=False, widget=forms.Textarea)
+    dropoff_spot_other = forms.CharField(required=False, widget=forms.Textarea)
 
     def __init__(self, *args, **kwargs):
         super(ExperienceLocationForm, self).__init__(*args, **kwargs)

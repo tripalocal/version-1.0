@@ -83,6 +83,12 @@ class ExperienceMeetupSpot(models.Model):
     language = models.CharField(max_length=2)
     experience = models.ForeignKey(Experience)
 
+
+class ExperienceDropoffSpot(models.Model):
+    dropoff_spot = models.TextField()
+    language = models.CharField(max_length=2)
+    experience = models.ForeignKey(Experience)
+
 class InstantBookingTimePeriod(models.Model):
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
@@ -300,6 +306,16 @@ def get_experience_meetup_spot(experience, language):
     else:
         return None
 
+def get_experience_dropoff_spot(experience, language):
+    if experience.experiencedropoffspot_set is not None and len(experience.experiencedropoffspot_set.all()) > 0:
+        t = experience.experiencedropoffspot_set.filter(language=language)
+        if len(t)>0:
+            return t[0].dropoff_spot
+        else:
+            return experience.experiencedropoffspot_set.all()[0].dropoff_spot
+    else:
+        return None
+
 def get_experience_tags(experience, language):
     tags = []
 
@@ -499,6 +515,17 @@ def set_exp_meetup_spot(exp, meetup_spot, lang):
         exp_meetup_spot.save()
 
 
+def set_exp_dropoff_spot(exp, dropoff_spot, lang):
+    dropoff_spot_set = exp.experiencedropoffspot_set.filter(language=lang)
+    if len(dropoff_spot_set) > 0:
+        exp_dropoff_spot = dropoff_spot_set[0]
+        exp_dropoff_spot.dropoff_spot = dropoff_spot
+        exp_dropoff_spot.save()
+    else:
+        exp_dropoff_spot = ExperienceDropoffSpot(dropoff_spot=dropoff_spot, language=lang, experience=exp)
+        exp_dropoff_spot.save()
+
+
 def has_meetup_spot_in_other_lang(exp, lang):
     meetup_spot_set = exp.experiencemeetupspot_set.filter(language=lang)
     if len(meetup_spot_set) > 0:
@@ -509,12 +536,29 @@ def has_meetup_spot_in_other_lang(exp, lang):
     else:
         return False
 
+def has_dropoff_spot_in_other_lang(exp, lang):
+    dropoff_spot_set = exp.experiencedropoffspot_set.filter(language=lang)
+    if len(dropoff_spot_set) > 0:
+        exp_dropoff_spot = dropoff_spot_set[0]
+        if exp_dropoff_spot.dropoff_spot == '':
+            return False
+        return True
+    else:
+        return False
+
 
 def set_exp_meetup_spot_all_langs(exp, meetup_spot, lang, other_lang):
     set_exp_meetup_spot(exp, meetup_spot, lang)
     if not has_meetup_spot_in_other_lang(exp, other_lang):
         set_exp_meetup_spot(exp, meetup_spot, other_lang)
-        
+
+
+def set_exp_dropoff_spot_all_langs(exp, meetup_spot, lang, other_lang):
+    set_exp_dropoff_spot(exp, meetup_spot, lang)
+    if not has_dropoff_spot_in_other_lang(exp, other_lang):
+        set_exp_dropoff_spot(exp, meetup_spot, other_lang)
+
+
 #class Itinerary(models.Model):
 #    user = models.ForeignKey(User)
 #    name = models.CharField(max_length=50)

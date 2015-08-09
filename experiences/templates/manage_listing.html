@@ -8,8 +8,16 @@
 
 {% block content %}
 <form id="add_experience_price_form" action="" method="post" enctype="multipart/form-data">{% csrf_token %}
-{#    leave here just for styling placehoder#}
+{# leave here just for styling placehoder #}
     <div class="back_button">
+        {% if language == "cn" %}
+        <a id="nav-left" href="/experience/{{experience.id}}/">{{experience_title_cn.title}}</a>
+        <a id="nav-right" href="/experience/{{experience.id}}/">Preview Listing</a>
+        {% else %}
+        <a id="nav-left" href="/experience/{{experience.id}}/">{{experience_title_en.title}}</a>
+        <a id="nav-right" href="/experience/{{experience.id}}/">Preview Listing</a>
+        {% endif %}
+        <div id="ajax-update-signal"></div>
         <button name="" id="save-and-exit-top" disabled></button>
     </div>
 
@@ -18,26 +26,26 @@
    	    <p class="list-menu">Essential</p>
 
    	    <a class="list-tab" id="calendar-tab"><strong>Calender</strong></a>
-        <p><img src="/images/done.jpg" alt="" class="modify-icon"></p>
+        <p><img src="/images/done.jpg" alt="" class="modify-icon" id="calender-status-icon"></p>
    	    <a class="list-tab" id="price-tab"><strong>Pricing</strong></a>
-   	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon"></p>
+   	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon" id="pricing-status-icon"></p>
 
         <!-- description -->
    	    <p class="list-menu">Description</p>
    	    <a class="list-tab" id="overview-tab"><strong>Overview</strong></a>
-	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon"></p>
+	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon" id="overview-status-icon"></p>
 	    <a class="list-tab" id ="detail-tab"><strong>Details</strong></a>
-	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon"></p>
+	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon" id="details-status-icon"></p>
 	    <a class="list-tab" id="photo-tab"><strong>Photos</strong></a>
-	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon"></p>
+	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon" id="photos-status-icon"></p>
 	    <a class="list-tab" id="location-tab"><strong>Location</strong></a>
-	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon"></p>
+	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon" id="location-status-icon"></p>
 
         <!-- Steps Remaining -->
         <p id="steps-remaining">5 more steps<br>until publish!</p>
     </div>
 
-    <div id="ajax-update-signal"></div>
+    <!--<div id="ajax-update-signal"></div>-->
     <div id="ajax-listing-form"></div>
 </form>
 {% endblock %}
@@ -47,9 +55,18 @@
     window.PRICE_FORM_INDICATOR = "none";
 
 
+    function setCookie(key, value) {
+        $.removeCookie(key);
+        $.cookie(key, value, { expires : 300 });
+    }
+
+    function getCookie(key) {
+        return $.cookie(key);
+    }
+
     function countChar(object, limit, hint) {
         var len = object.val().length;
-        if (len >= limit) {
+        if (len > limit) {
             object.val(object.val().substring(0, limit));
         } else {
             hint.text(limit - len + ' characters left');
@@ -96,11 +113,31 @@
             min = parseInt($("#id_min_guest_number").val());
 
             if (max >= min && min >= 1 && min <= 10 && max >= 1 && max <= 10) {
-                for (i = 1; i < min; i++) {
-                    $("#dynamic_price_div_" + i).attr("style", "display:none;");
+                // Set the row before min.
+                i = min-1;
+                var pivotHostGet = parseInt($("#id_price").val());
+                var pivotCustomerPay = parseFloat($("#id_price_with_booking_fee").val());
+                $("#dynamic_price_input_" + i).val(pivotHostGet);
+                $("#dynamic_price_with_fee_input_" + i).val(pivotCustomerPay);
+                $("#commission-price-" + i).text($("#commission-price").text());
+
+                for (i = 0; i < min; i++) {
+                    $("#dynamic_price_div_" + i).attr("style", "");
+                    $("#dynamic_price_input_" + i).css("background-color", "rgb(245, 245, 245)").css("border", "0px");
+                    $("#dynamic_price_with_fee_input_" + i).css("background-color", "rgb(245, 245, 245)").css("border", "0px");
+
+                    if(i<min-1) {
+                        var hostGet = Math.round(pivotHostGet * (min) / (i+1));
+                        var customerPay = (pivotCustomerPay * (min) / (i+1)).toFixed(2);
+                        $("#dynamic_price_input_" + i).val(hostGet);
+                        $("#dynamic_price_with_fee_input_" + i).val(customerPay);
+                        $("#commission-price-" + i).text((customerPay - hostGet).toFixed(2));
+                    }
                 }
                 for (i = min; i < max; i++) {
                     $("#dynamic_price_div_" + i).attr("style", "");
+                    $("#dynamic_price_input_" + i).css("background-color", "rgb(255, 255, 255)").css("border", "1px solid #AAA");
+                    $("#dynamic_price_with_fee_input_" + i).css("background-color", "rgb(255, 255, 255)").css("border", "1px solid #AAA");
                 }
                 for (i = max; i < 10; i++) {
                     $("#dynamic_price_div_" + i).attr("style", "display:none;");
@@ -152,10 +189,11 @@
             for (i = 1; i < 10; i++) {
                 $("#dynamic_price_input_" + i).keyup(function (e) {
                     i = e.target.id.substr(-1, 1);
-                    var price = parseFloat($("#dynamic_price_input_" + i).val());
-                    if (typeof price === 'number' && isValidNumber(price)) {
-                        $("#dynamic_price_with_fee_input_" + i).val((price * 1.429 * 1.000 + 0.0).toFixed(2));
-                        $("#commission-price-" + i).text((price * 1.429 * 1.000 + 0.0 - price).toFixed(2));
+                    var hostIncome = Math.round($("#dynamic_price_input_" + i).val());
+                    var customerPay = (hostIncome * 1.429 * 1.000 + 0.0).toFixed(2);
+                    if (typeof hostIncome === 'number' && isValidNumber(hostIncome)) {
+                        $("#dynamic_price_with_fee_input_" + i).val(customerPay);
+                        $("#commission-price-" + i).text((customerPay - hostIncome).toFixed(2));
                     }
                     else {
                         $("#dynamic_price_with_fee_input_" + i).val("0");
@@ -166,16 +204,18 @@
 
                 $("#dynamic_price_input_" + i).focusout(function () {
                     if (updateDynamicPrice()) {
+                        collectDynamicPrices();
                         postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
                     }
                 });
 
                 $("#dynamic_price_with_fee_input_" + i).keyup(function (e) {
                     i = e.target.id.substr(-1, 1);
-                    var price = parseFloat($("#dynamic_price_with_fee_input_" + i).val());
-                    if (typeof price === 'number' && isValidNumber(price)) {
-                        $("#dynamic_price_input_" + i).val(((price - 0.0) / (1.429 * 1.000)).toFixed(2));
-                        $("#commission-price-" + i).text((price - (price - 0.0) / (1.429 * 1.000)).toFixed(2));
+                    var customerPay = parseFloat(($("#dynamic_price_with_fee_input_" + i).val()));
+                    var hostIncome = Math.round((customerPay - 0.0) / (1.429 * 1.000));
+                    if (typeof customerPay === 'number' && isValidNumber(customerPay)) {
+                        $("#dynamic_price_input_" + i).val(hostIncome);
+                        $("#commission-price-" + i).text((customerPay-hostIncome).toFixed(2));
                     }
                     else {
                         $("#dynamic_price_with_fee_input_" + i).val("0");
@@ -186,6 +226,7 @@
 
                 $("#dynamic_price_with_fee_input_" + i).focusout(function () {
                     if (updateDynamicPrice()) {
+                        collectDynamicPrices();
                         postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
                     }
                 });
@@ -193,9 +234,18 @@
         }
 
         function setDynamicPrice() {
-            for (i = 1; i < 10; i++) {
-                $("#dynamic_price_input_" + i).val($("#id_price").val());
-                $("#dynamic_price_with_fee_input_" + i).val($("#id_price_with_booking_fee").val());
+            var min = parseInt($("#id_min_guest_number").val());
+            var max = parseInt($("#id_max_guest_number").val());
+            var dynamicPrices = $("#id_dynamic_price").val().split(",").slice(0, -1);
+            for (i = min; i < max; i++) {
+                if(i < dynamicPrices.length) {
+                    $("#dynamic_price_input_" + i).val(dynamicPrices[i]);
+                    $("#dynamic_price_with_fee_input_" + i).val((dynamicPrices[i] * 1.429 * 1.000 + 0.0 ).toFixed(2));
+                } else {
+                    $("#dynamic_price_input_" + i).val(0);
+                    $("#dynamic_price_with_fee_input_" + i).val(0);
+                }
+
             }
         }
 
@@ -206,10 +256,7 @@
                 if (parseInt(min_guest.val()) > parseInt(max_guest.val())) {
                     max_guest.val(min_guest.val() + "");
                 }
-
                 setDynamicPriceInputDisplay();
-                setDynamicPrice();
-
                 if (updateDynamicPrice()) {
                     postDatum(location.href, {
                         'dynamic_price': $('#id_dynamic_price').val(),
@@ -226,7 +273,6 @@
                 }
 
                 setDynamicPriceInputDisplay();
-                setDynamicPrice();
 
                 if (updateDynamicPrice()) {
                     postDatum(location.href, {
@@ -240,6 +286,10 @@
                 postDatum(location.href, {'duration': $('#id_duration').val()})
             });
 
+            $('#id_currency').change(function () {
+                postDatum(location.href, {'currency': $('#id_currency').val()})
+            });
+
             $('#id_price, #id_price_with_booking_fee').focusout(function () {
                 if (updateDynamicPrice()) {
                     postDatum(location.href, {
@@ -247,13 +297,17 @@
                         'dynamic_price': $('#id_dynamic_price').val()
                     });
                 }
+                checkPriceFormFilled();
             });
 
             $("#id_price").keyup(function () {
-                var price = parseFloat($("#id_price").val());
-                if (typeof price === 'number' && isValidNumber(price)) {
-                    $("#id_price_with_booking_fee").val((price * 1.429 * 1.000 + 0.0).toFixed(2));
-                    $("#commission-price").text((price * 1.429 * 1.000 + 0.0 - price).toFixed(2));
+                var hostIncome = parseInt($("#id_price").val());
+                var customerPay = parseFloat(hostIncome * 1.429 * 1.000 + 0.0).toFixed(2);
+                if (typeof hostIncome === 'number' && isValidNumber(hostIncome)) {
+                    $("#id_price_with_booking_fee").val(customerPay);
+                    $("#commission-price").text((customerPay - hostIncome).toFixed(2));
+                    setDynamicPriceInputDisplay();
+                    checkPriceFormFilled();
                 }
                 else {
                     $("#id_price").val("0");
@@ -263,10 +317,13 @@
             });
 
             $("#id_price_with_booking_fee").keyup(function () {
-                var price = parseFloat($("#id_price_with_booking_fee").val());
-                if (typeof price === 'number' && isValidNumber(price)) {
-                    $("#id_price").val(((price - 0.0) / (1.429 * 1.000)).toFixed(2));
-                    $("#commission-price").text((price - (price - 0.0) / (1.429 * 1.000)).toFixed(2));
+                var customerPay = parseFloat($("#id_price_with_booking_fee").val());
+                var hostIncome = Math.round((customerPay - 0.0) / (1.429 * 1.000));
+                if (typeof customerPay === 'number' && isValidNumber(customerPay)) {
+                    $("#id_price").val(hostIncome);
+                    $("#commission-price").text((customerPay - hostIncome).toFixed(2));
+                    setDynamicPriceInputDisplay();
+                    checkPriceFormFilled();
                 }
                 else {
                     $("#id_price").val("");
@@ -303,6 +360,13 @@
                 if (updateDynamicPrice()) {
                     postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
                 }
+            });
+
+            $("#change-pricing-type-button").click(function() {
+                    $("#price-form").css("display", "none");
+                    $("#private-only-part").css("display", "none");
+                    $("#selection-menu").css("display", "block");
+                    window.PRICE_FORM_INDICATOR = "none";
             });
 
             setListenerForDynamicPrice();
@@ -368,25 +432,27 @@
         function setupPriceForm() {
             var price = parseFloat($("#id_price").val());
             if (typeof price === 'number' && isValidNumber(price)) {
-                $("#id_price_with_booking_fee").val(Math.round(price * 1.429 * 1.000 + 0.0));
-                $("#commission-price").text((price * 1.429 * 1.000 + 0.0 - price).toFixed(2));
+                var customerPay = parseInt(Math.round(price * 1.429 * 1.000 + 0.0));
+                var hostIncome = parseInt($("#id_price").val());
+                $("#id_price_with_booking_fee").val(customerPay);
+                $("#commission-price").text(customerPay - hostIncome);
             }
 
             // id_dynamic_price always has id_price value as the first
-            price = $("#id_dynamic_price").val().split(',').pop();
+            price = $("#id_dynamic_price").val().split(',').slice(0, -1);
 
             if (price.length > 1) {
-                min = parseInt($("#id_min_guest_number").val());
-
-                for (i = 1; i < price.length; i++) {
-                    $("#dynamic_price_input_" + (i + min)).val(price[i]);
-                    $("#commission-price-" + (i + min)).text((parseFloat(price[i]) * 1.429 * 1.000 + 0.0 - price[i]).toFixed(2));
-                    $("#dynamic_price_with_fee_input_" + (i + min)).val(Math.round(parseFloat(price[i]) * 1.429 * 1.000 + 0.0));
+                var min = parseInt($("#id_min_guest_number").val());
+                var max = parseInt($("#id_max_guest_number").val());
+                for (i = min; i < max; i++) {
+                    $("#dynamic_price_input_" + (i)).val(price[i-min+1]);
+                    $("#commission-price-" + (i)).text((parseFloat(price[i-min+1]) * 1.429 * 1.000 + 0.0 - price[i-min+1]).toFixed(2));
+                    $("#dynamic_price_with_fee_input_" + (i)).val(Math.round(parseFloat(price[i-min+1]) * 1.429 * 1.000 + 0.0));
                 }
 
                 $("#add_dynamic_price").attr("style", "display:none;");
-                $("#cancel_dynamic_price").attr("style", "");
-                $("#dynamic_price_div").attr("style", "");
+                $("#cancel_dynamic_price").attr("style", "block");
+                $("#dynamic_price_div").attr("style", "block");
                 setDynamicPriceInputDisplay();
             }
 
@@ -401,7 +467,7 @@
             }
         }
 
-        function restorePriceForm() {
+        function choosePriceFormStatus() {
             if(window.PRICE_FORM_INDICATOR === "private") {
                 showPrivateView();
             }
@@ -434,12 +500,35 @@
             window.PRICE_FORM_INDICATOR = "none";
         }
 
+        function collectDynamicPrices() {
+            var dynamicPrices = [];
+            var min = parseInt($("#id_min_guest_number").val());
+            var max = parseInt($("#id_max_guest_number").val());
+            for(var i=min; i<max; i++) {
+                dynamicPrices.push($("#dynamic_price_input_" + i).val());
+            }
+            return dynamicPrices;
+        }
+
+        function checkPriceFormFilled() {
+           if($("#id_price").val() != '' && $("#id_price_with_booking_fee").val() != '') {
+               $("#pricing-status-icon").attr("src","/images/done.jpg");
+               setCookie("priceFilled", "True");
+           }
+           else {
+               $("#pricing-status-icon").attr("src","/images/pencil.jpg");
+               setCookie("priceFilled", "False");
+           }
+            setFinishedStatus();
+        }
+
         $.get(href).done(function (response) {
             $('#ajax-listing-form').html($(response));
         }).done(function () {
             setupPriceForm();
             setListenerForPriceForm();
-            restorePriceForm();
+            choosePriceFormStatus();
+           // setDynamicPrice();
         }).fail(function () {
             $('#ajax-listing-form').text("Sorry but there was an error.");
         });
@@ -460,6 +549,7 @@
         function setListenerForOverviewForm() {
             $("#language_cantonese, #language_mandarin, #language_japanese").click(function () {
                 updateLanguage();
+                checkOverviewFilled();
                 postDatum(location.href, {
                     'language': $('#id_language').val(),
                     'title': $('#id_title').val(),
@@ -468,6 +558,7 @@
             });
 
             $('#id_title, #id_summary').focusout(function () {
+                checkOverviewFilled();
                 postDatum(location.href, {
                     'title': $('#id_title').val(),
                     'summary': $('#id_summary').val()
@@ -538,6 +629,27 @@
             $("#id_summary_other").keyup(function () {
                 countChar($("#id_summary_other"), 500, $("#id_overview_summary_limit_other"));
             });
+        }
+
+        function checkOverviewFilled() {
+            var checkBoxFiled = false;
+            var inputBoxFiled = false;
+            $('input[type="checkbox"]').each(function() {
+                if ($(this).is(':checked')) {
+                    checkBoxFiled = true;
+                }
+            });
+            if($("#id_summary").val() != '' && $("#id_title").val() != '')
+                inputBoxFiled = true;
+
+            if(inputBoxFiled && checkBoxFiled) {
+                $("#overview-status-icon").attr("src","/images/done.jpg");
+                setCookie("overFilled", "True");
+            } else {
+                $("#overview-status-icon").attr("src","/images/pencil.jpg");
+                setCookie("overFilled", "False");
+            }
+            setFinishedStatus();
         }
 
         $.get(href).done(function (response) {
@@ -638,14 +750,17 @@
 
         function setListenerForPostingDetail() {
             $("#id_activity").focusout(function () {
+                checkDetailFiled();
                 postDatum(location.href, {'activity': $('#id_activity').val()});
             });
 
             $("#id_interaction").focusout(function () {
+                checkDetailFiled();
                 postDatum(location.href, {'interaction': $('#id_interaction').val()});
             });
 
             $("#id_dress_code").focusout(function () {
+                checkDetailFiled();
                 postDatum(location.href, {'dress_code': $('#id_dress_code').val()});
             });
 
@@ -662,16 +777,37 @@
             });
 
             $("#id_included_food_detail").focusout(function () {
+                checkDetailFiled();
                 postDatum(location.href, {'included_food_detail': $('#id_included_food_detail').val()});
             });
 
             $("#id_included_transport_detail").focusout(function () {
+                checkDetailFiled();
                 postDatum(location.href, {'included_transport_detail': $('#id_included_transport_detail').val()});
             });
 
             $("#id_included_ticket_detail").focusout(function () {
+                checkDetailFiled();
                 postDatum(location.href, {'included_ticket_detail': $('#id_included_ticket_detail').val()});
             });
+        }
+
+        function checkDetailFiled() {
+            var filled = true;
+            $('textarea').each(function() {
+                if ($(this).val() === '') {
+                    filled = false;
+                }
+            });
+
+            if(filled) {
+                $("#details-status-icon").attr("src","/images/done.jpg");
+                setCookie("detailFilled", "True");
+            } else {
+                $("#details-status-icon").attr("src","/images/pencil.jpg");
+                setCookie("detailFilled", "False");
+            }
+            setFinishedStatus();
         }
 
         $.get(href).done(function (response) {
@@ -750,6 +886,7 @@
         function setListenerForPostingPhoto() {
             for (i = 1; i < 11; i++) {
                 $('#id_experience_photo_' + i).change(function (e) {
+                   // checkPhotoFiled();
                     if (verifyImages(i)) {
                         // Show animation.
                         $('#id_experience_photo_gif_' + i).attr("style", "display:block;");
@@ -758,6 +895,7 @@
                         formData.append('experience_photo_' + i, this.files[0]);
                         postFile(location.href, formData, i);
                     }
+
                 });
 
                 $('#upload-file-delete-button-' + i).click(function(e) {
@@ -766,6 +904,8 @@
                     }
                 });
 
+
+
             }
         }
 
@@ -773,6 +913,8 @@
             lastStepBinding('detail');
             nextStepBinding('location');
         }
+
+
 
         $.get(href).done(function (response) {
             $('#ajax-listing-form').html($(response));
@@ -791,11 +933,15 @@
             $("#location_tab").click(function () {
                 $("#id_meetup_spot").attr("style", "");
                 $("#id_meetup_spot_other").attr("style", "display:none;");
+                $("#id_dropoff_spot").attr("style", "");
+                $("#id_dropoff_spot_other").attr("style", "display:none;");
             });
 
             $("#location_other_tab").click(function () {
                 $("#id_meetup_spot").attr("style", "display:none;");
                 $("#id_meetup_spot_other").attr("style", "");
+                $("#id_dropoff_spot").attr("style", "display:none;");
+                $("#id_dropoff_spot_other").attr("style", "");
             });
 
             lastStepBinding('photo');
@@ -803,10 +949,27 @@
 
         function setListenerForPostingLocation() {
             $("#id_meetup_spot").focusout(function () {
+                checkLocationFiled();
                 postDatum(location.href, {'meetup_spot': $('#id_meetup_spot').val()});
             });
 
+            $("#id_meetup_spot_other").focusout(function () {
+                checkLocationFiled();
+                postDatum(location.href, {'meetup_spot_other': $('#id_meetup_spot_other').val()});
+            });
+
+            $("#id_dropoff_spot").focusout(function () {
+                checkLocationFiled();
+                postDatum(location.href, {'dropoff_spot': $('#id_dropoff_spot').val()});
+            });
+
+            $("#id_dropoff_spot_other").focusout(function () {
+                checkLocationFiled();
+                postDatum(location.href, {'dropoff_spot_other': $('#id_dropoff_spot_other').val()});
+            });
+
             $("#id_suburb").change(function () {
+                checkLocationFiled();
                 postDatum(location.href, {'suburb': $('#id_suburb').val()});
             });
         }
@@ -815,6 +978,7 @@
             $('#ajax-listing-form').html($(response));
         }).done(function () {
             $("#id_meetup_spot_other").attr("style","display:none;");
+            $("#id_dropoff_spot_other").attr("style","display:none;");
             setListenerForLocationForm();
             setListenerForPostingLocation();
         }).fail(function () {
@@ -824,7 +988,7 @@
 
     function loadForm(href) {
         var step = hrefToStepName(href);
-
+        setFinishedStatus();
         if (step === "price") {
             loadPriceForm(href);
         } else if (step === "overview") {
@@ -838,6 +1002,70 @@
         }
     }
 
+    function setFinishedStatus() {
+        var steps = 0;
+
+        if(getCookie("priceFilled") === "True") {
+            $("#pricing-status-icon").attr("src","/images/done.jpg");
+            steps = steps + 1;
+        }
+        else {
+            $("#pricing-status-icon").attr("src","/images/pencil.jpg");
+            setCookie("isSubmited", "False");
+        }
+        if(getCookie("overFilled") === "True") {
+            $("#overview-status-icon").attr("src", "/images/done.jpg");
+            steps = steps + 1;
+        }
+        else {
+            $("#overview-status-icon").attr("src","/images/pencil.jpg");
+            setCookie("isSubmited", "False");
+        }
+        if(getCookie("detailFilled") === "True") {
+            $("#details-status-icon").attr("src","/images/done.jpg");
+            steps = steps + 1;
+        }
+        else {
+            $("#details-status-icon").attr("src","/images/pencil.jpg");
+            setCookie("isSubmited", "False");
+        }
+        if(getCookie("photoFilled") === "True") {
+            $("#photos-status-icon").attr("src","/images/done.jpg");
+            steps = steps + 1;
+        }
+        else {
+            $("#photos-status-icon").attr("src","/images/pencil.jpg");
+            setCookie("isSubmited", "False");
+        }
+        if(getCookie("locationFilled") === "True") {
+            $("#location-status-icon").attr("src","/images/done.jpg");
+            steps = steps + 1;
+        }
+        else {
+            $("#location-status-icon").attr("src", "/images/pencil.jpg");
+            setCookie("isSubmited", "False");
+        }
+
+        if(steps == 5) {
+            if(getCookie("isSubmited") === "True") {
+                $("#steps-remaining").text("Submitted");
+            } else {
+                $("#steps-remaining").text("Click to submit");
+                $("#steps-remaining").css("cursor", "pointer");
+                $("#steps-remaining").click(function() {
+                    if($(this).text() == "Click to submit") {
+                        setCookie("isSubmited", "True");
+                        $("#steps-remaining").text("Submitted");
+                    }
+                });
+            }
+        } else {
+            $("#steps-remaining").text(steps + " more step\n to submit");
+        }
+
+
+    }
+
     function postDatum(href, datum) {
         var signal = $('#ajax-update-signal');
 
@@ -848,9 +1076,11 @@
                 var index = result.index;
                 unbindEventForImagePanel('photo-preview-div-'+index);
                 changeToAddNewStyle('photo-preview-div-'+index);
+
             }
+            checkPhotoFiled();
             signal.fadeIn("slow");
-            signal.text("Experience Updated");
+            signal.text("Saved...");
             signal.fadeOut("slow");
         }).fail(function () {
             signal.fadeIn("slow");
@@ -872,13 +1102,14 @@
             type: 'POST',
             success: function () {
                 signal.fadeIn("slow");
-                signal.text("Experience Updated");
+                signal.text("Saved...");
                 signal.fadeOut("slow");
                 $('#id_experience_photo_gif_' + index).attr("style", "display:none;");
                 changeToReplaceStyle('photo-preview-div-'+index);
                 registerEventForImagePanel('photo-preview-div-'+index);
                 $('#photo-preview-div-'+index).css("background", "url(" + "/images/experiences/" + experienceId + "/experience" + experienceId + "_" + index + ".jpg" + "?" + new Date().getTime() +")");
                 $('#photo-preview-div-'+index).css("background-size", "cover");
+                checkPhotoFiled();
 
 
             },
@@ -929,6 +1160,37 @@
     function unbindEventForImagePanel(divId) {
         $("#"+divId).unbind("mouseover");
         $("#"+divId).unbind("mouseleave");
+    }
+
+    function checkPhotoFiled() {
+        if($("#photo-preview-div-1").css("background-image") != '' && $("#photo-preview-div-1").css("background-image") != 'none') {
+            $("#photos-status-icon").attr("src","/images/done.jpg");
+            setCookie("photoFilled", "True");
+        } else {
+            $("#photos-status-icon").attr("src","/images/pencil.jpg");
+            setCookie("photoFilled", "False");
+        }
+        setFinishedStatus();
+    }
+
+
+    function checkLocationFiled() {
+        var filled = true;
+        $('textarea').each(function() {
+            if ($(this).val() === '') {
+                filled = false;
+            }
+        });
+
+        if(filled) {
+            $("#location-status-icon").attr("src","/images/done.jpg");
+            setCookie("locationFilled", "True");
+        } else {
+            $("#location-status-icon").attr("src","/images/pencil.jpg");
+            setCookie("locationFilled", "False");
+        }
+
+        setFinishedStatus();
     }
 
     $(document).ready(function () {
