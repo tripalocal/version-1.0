@@ -5,7 +5,6 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
-from django.contrib.formtools.wizard.views import SessionWizardView, NamedUrlSessionWizardView
 from experiences.forms import *
 from datetime import *
 import pytz, string, os, json, math, PIL, xlsxwriter, time, sys
@@ -583,7 +582,7 @@ class ExperienceDetailView(DetailView):
             form.data['last_name'] = request.user.last_name
             experience = Experience.objects.get(id=form.data['experience_id'])
             experience.dollarsign = DollarSign[experience.currency.upper()]
-            experience.currency = str(dict(Currency)[experience.currency.upper()])
+            #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
             experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
             experience_price = experience.price
 
@@ -782,7 +781,7 @@ def experience_booking_confirmation(request):
         form = BookingConfirmationForm(request.POST)
         experience = Experience.objects.get(id=form.data['experience_id'])
         experience.dollarsign = DollarSign[experience.currency.upper()]
-        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
         experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
         experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 

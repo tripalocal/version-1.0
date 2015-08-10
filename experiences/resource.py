@@ -27,10 +27,14 @@ from allauth.account.utils import user_username, user_email, user_field
 from allauth.account.signals import user_signed_up, user_logged_in
 from allauth.socialaccount import providers
 from allauth.socialaccount.models import SocialLogin, SocialToken, SocialApp
-from allauth.socialaccount.providers.facebook.views import fb_complete_login
 from allauth.socialaccount.helpers import complete_social_login
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
+
+try:
+    from allauth.socialaccount.providers.facebook.views import fb_complete_login
+except ImportError:
+    pass
 
 GEO_POSTFIX = settings.GEO_POSTFIX
 

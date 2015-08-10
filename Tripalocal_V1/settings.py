@@ -8,6 +8,11 @@ try:
 except ImportError:
     pass
 
+try:
+    from local_settings import *
+except ImportError:
+    pass
+
 from os import path, environ
 PROJECT_ROOT = path.dirname(path.abspath(path.dirname(__file__)))
 
@@ -312,9 +317,6 @@ POST_OFFICE = {
     'DEFAULT_PRIORITY': 'now'
 }
 
-DEVELOPMENT = False
+GEO_POSTFIX = "/"
 
-try:
-    from local_settings import *
-except ImportError:
-    pass
+DEVELOPMENT = False

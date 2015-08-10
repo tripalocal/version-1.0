@@ -15,7 +15,7 @@ from app.forms import SubscriptionForm, HomepageSearchForm, UserProfileForm, Use
 from app.models import *
 from django.core.mail import send_mail
 from django.contrib import messages
-import string, random, pytz, base64, subprocess, os, geoip2.database, PIL
+import string, random, pytz, base64, subprocess, os, geoip2.database, PIL, requests
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, saveProfileImage, getBGImageURL, getProfileImage
@@ -36,7 +36,7 @@ PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
-GEO_POSTFIX = "/"
+GEO_POSTFIX = settings.GEO_POSTFIX
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -118,18 +118,19 @@ def home(request):
                 if len(proxies) > 0:
                     ip = proxies[0]
 
-        try:
-            reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
-            response = reader.city(ip)
-            country = response.country.name
-            reader.close()
-            if country.lower() in ['china']:
-                return HttpResponseRedirect('/cn')
-        except Exception:
-            reader.close()
+        if settings.LANGUAGES[0][0] != "zh":
+            try:
+                reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+                response = reader.city(ip)
+                country = response.country.name
+                reader.close()
+                if country.lower() in ['china']:
+                    return HttpResponseRedirect('/cn')
+            except Exception:
+                reader.close()
 
-        if request.LANGUAGE_CODE.startswith("zh"):
-            return HttpResponseRedirect('/cn')
+            if request.LANGUAGE_CODE.startswith("zh"):
+                return HttpResponseRedirect('/cn')
 
     experienceList = Experience.objects.filter(id__in=[1,2,20])
     idxList = random.sample(range(len(experienceList)), 3)
@@ -521,7 +522,7 @@ def password_change_callback(sender, request, user, **kwargs):
     messages.success(request, str(user.id) + '_PasswordChanged')
 
 @receiver(user_signed_up)
-def handle_user_signed_up(request, user, is_social_login=None, **kwargs):
+def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
     try:
         new_registereduser = RegisteredUser.objects.get(user_id = user.id)
     except RegisteredUser.DoesNotExist:
@@ -541,15 +542,25 @@ def handle_user_signed_up(request, user, is_social_login=None, **kwargs):
     new_alias.save()
 
     if not settings.DEVELOPMENT:
-        with open('/etc/postfix/canonical', 'a') as f:
-            f.write(user.email + " " + new_email.id + "\n")
-            f.close()
+        if len(settings.ADMINS) == 0:
+            with open('/etc/postfix/canonical', 'a') as f:
+                f.write(user.email + " " + new_email.id + "\n")
+                f.close()
 
-        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
-
-        with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
-            f.write(new_email.id + "\n")
-            f.close()
+            subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    
+            with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+                f.write(new_email.id + "\n")
+                f.close()
+        else:
+            try:
+                response = requests.post('https://www.tripalocal.com/update_files/',
+                                         data={'user_email': user.email,'tripalocal_email':new_email.id},
+                                         auth=(settings.ADMINS[0][1], settings.ADMIN_PASSWORD[0]),
+                                         timeout=3)
+            except requests.exceptions.RequestException as err:
+                #TODO
+                pass
 
     """get the client ip from the request
     """
@@ -571,15 +582,14 @@ def handle_user_signed_up(request, user, is_social_login=None, **kwargs):
                 ip = proxies[0]
 
     if not settings.DEVELOPMENT:
-        track_user_signup(ip, is_social_login, user)
+        track_user_signup(ip, sociallogin, user)
 
-
-def track_user_signup(ip, is_social_login, user):
+def track_user_signup(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP": ip,
-                               "$created": pytz.utc.localize(datetime.utcnow()).astimezone(
-                                   pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
+    mp.people_set(user.email, {"IP":ip, 
+                               "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
                                })
+
     reader = None
     try:
         reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
@@ -591,21 +601,21 @@ def track_user_signup(ip, is_social_login, user):
         longitude = response.location.longitude
         latitude = response.location.latitude
 
-        mp.track(user.email, "has signed up via email_" + settings.LANGUAGES[0][0])
-        mp.people_set(user.email, {'$email': user.email, "$country": country, "$city": city, "$region": region,
-                                   "$first_name": user.first_name, "$last_name": user.last_name, "Postcode": postcode,
-                                   "Latitude": latitude, "Longitude": longitude})
-    except Exception:
-        mp.track(user.email, "has signed up via email_" + settings.LANGUAGES[0][0])
-    finally:
+        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "$first_name":user.first_name, "$last_name":user.last_name, "Postcode":postcode, "Latitude":latitude, "Longitude":longitude})
         reader.close()
+    except Exception:
+        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+    finally:
+        if reader is not None:
+            reader.close()
 
-    if is_social_login:
-        data = is_social_login.account.extra_data
-        first_name = ""
-        last_name = ""
-        age = 0
-        gender = ""
+    if sociallogin:
+        data = sociallogin.account.extra_data
+        first_name=""
+        last_name=""
+        age=0
+        gender=""
         email = user.email
 
         if 'first_name' in data:
@@ -618,13 +628,11 @@ def track_user_signup(ip, is_social_login, user):
             gender = data['gender']
 
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed up via Facebook',
-                 {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
-        mp.people_set(email, {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
-
+        mp.track(email, 'has signed up via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
 
 @receiver(user_logged_in)
-def handle_user_logged_in(request, user, is_social_login=None, **kwargs):
+def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
     remote_address = request.META.get('HTTP_X_FORWARDED_FOR')or request.META.get('REMOTE_ADDR')
     # set the default value of the ip to be the REMOTE_ADDR if available
     # else None
@@ -642,13 +650,12 @@ def handle_user_logged_in(request, user, is_social_login=None, **kwargs):
                 ip = proxies[0]
 
     if not settings.DEVELOPMENT:
-        track_user_login(ip, is_social_login, user)
+        track_user_login(ip, sociallogin, user)
 
-
-def track_user_login(ip, is_social_login, user):
+def track_user_login(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP": ip})
-    reader = None
+    mp.people_set(user.email, {"IP":ip})
+
     try:
         reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
@@ -659,21 +666,22 @@ def track_user_login(ip, is_social_login, user):
         longitude = response.location.longitude
         latitude = response.location.latitude
 
-        mp.track(user.email, "has signed in via email_" + settings.LANGUAGES[0][0])
-        mp.people_set(user.email, {'$email': user.email, "$country": country, "$city": city, "$region": region,
-                                   "Postcode": postcode,
-                                   "Latitude": latitude, "Longitude": longitude, "Language": settings.LANGUAGES[0][
-            1]})  # "$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
-    except Exception:
-        mp.track(user.email, "has signed in via email_" + settings.LANGUAGES[0][0])
-    finally:
+        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
+        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "Postcode":postcode, 
+                                   "Latitude":latitude, "Longitude":longitude, "Language":settings.LANGUAGES[0][1]}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
         reader.close()
-    if is_social_login:
-        data = is_social_login.account.extra_data
-        first_name = ""
-        last_name = ""
-        age = 0
-        gender = ""
+    except Exception:
+        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
+    finally:
+        if reader is not None:
+            reader.close()
+
+    if sociallogin:
+        data = sociallogin.account.extra_data
+        first_name=""
+        last_name=""
+        age=0
+        gender=""
         email = user.email
 
         if 'first_name' in data:
@@ -686,6 +694,5 @@ def track_user_login(ip, is_social_login, user):
             gender = data['gender']
 
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed in via Facebook',
-                 {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
-        mp.people_set(email, {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
+        mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})

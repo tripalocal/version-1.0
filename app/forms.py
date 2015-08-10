@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from app.models import Subscription
 from bootstrap3_datetime.widgets import DateTimePicker
 from experiences.forms import Location
+from Tripalocal_V1 import settings
 
 class BootstrapAuthenticationForm(AuthenticationForm):
     """Authentication form which uses boostrap CSS."""
@@ -44,8 +45,8 @@ class SubscriptionForm(forms.ModelForm):
 
 class HomepageSearchForm(forms.Form):
     city = forms.ChoiceField(choices=Location)
-    start_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}))
-    end_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}))
+    start_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False, "language":settings.LANGUAGE_CODE}))
+    end_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False, "language":settings.LANGUAGE_CODE}))
 
 class UserProfileForm(forms.Form):
     image = forms.ImageField(required = False)
