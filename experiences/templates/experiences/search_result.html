@@ -8,12 +8,16 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.css" rel="stylesheet">
     <link href="{% static 'experiences/content/tripalocal_search.css' %}" rel="stylesheet">
     <link href="{% static 'experiences/content/tripalocal_search_async.css' %}" rel="stylesheet">
+    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
     <title>{%trans "Discover" %} {{ city_display_name }}</title>
 {%endblock%}
 
-{% block content %} 
+{% block content %}
     <form id="search_form" action="/s/melbourne/" method="post">
         {% csrf_token %}
         <div class="basicSearch notOnMobile">
@@ -23,9 +27,35 @@
                         <div class="iconHeader">
                             <div class="iconImage" id="date"></div>
                             <div class="iconText">{%trans "Dates" %}</div>
-                        </div> 
+                        </div>
                         <div class="formBoxes">
-                            {{form.city}}
+                          <div id="id_city" class="ui selection dropdown">
+                            <input type="hidden" name="city" value="Melbourne">
+                            <i class="dropdown icon"></i>
+                            <div class="text">City</div>
+                            <div class="menu">
+                              <div class="header">Australia</div>
+                              <div class="item" data-value="Melbourne" data-text="Melbourne">Melbourne <span class="light-color">Victoria</span></div>
+                              <div class="item" data-value="Sydney" data-text="Sydney">Sydney <span class="light-color">New South Wales</span></div>
+                              <div class="item" data-value="Brisbane" data-text="Brisbane">Brisbane <span class="light-color">Queensland</span></div>
+                              <div class="item" data-value="Cairns" data-text="Cairns">Cairns <span class="light-color">Queensland</span></div>
+                              <div class="item" data-value="Goldcoast" data-text="Gold Coast">Gold Coast <span class="light-color">Queensland</span></div>
+                              <div class="item" data-value="Adelaide" data-text="Adelaide">Adelaide <span class="light-color">South Australia</span></div>
+                              <div class="item" data-value="Hobart" data-text="Hobart">Hobart <span class="light-color">Tasmania</span></div>
+                              <div class="item" data-value="Alicesprings" data-text="Alice Springs">Alice Springs <span class="light-color">Northern Territory</span></div>
+                              <div class="item" data-value="Darwin" data-text="Darwin">Darwin <span class="light-color">Northern Territory</span></div>
+                              <div class="header">New Zealand</div>
+                              <div class="item" data-value="Christchurch" data-text="Christchurch">Christchurch <span class="light-color">Canterbury</span></div>
+                              <div class="item" data-value="Queenstown" data-text="Queenstown">Queenstown <span class="light-color">Otago</span></div>
+                              <div class="item" data-value="Auckland" data-text="Auckland">Auckland <span class="light-color">Auckland</span></div>
+                              <div class="item" data-value="Wellington" data-text="Wellington">Wellington <span class="light-color">Wellington</span></div>
+                            </div>
+                          </div>
+                            <script charset="utf-8" type="text/javascript">
+                            $('.ui.dropdown')
+                              .dropdown()
+                            ;
+                            </script>
                             <div class="input-group startDate">
                                 {{form.start_date}}
                             </div>
@@ -38,32 +68,37 @@
                     <div class="verticalBar">
                     </div>
                     <div class="people">
-                        <div class="iconHeader"> 
+                        <div class="iconHeader">
                             <div class="iconImage" id="people">
                             </div>
                             <div class="iconText">{%trans "People"%}
                             </div>
                         </div>
                         <div class="formBoxes">{{form.guest_number}}
+                        <script charset="utf-8" type="text/javascript">
+                        $('.ui.dropdown')
+                          .dropdown()
+                        ;
+                        </script>
                         </div>
                     </div>
 
                     <div class="verticalBar">
                     </div>
-                
+
                     <div class="language">
                         <div class="iconHeader">
                             <div class="iconImage" id="language">
                             </div>
                             <div class="iconText">{%trans "Language"%}
                             </div>
-                        </div> 
+                        </div>
 
                         <div class="formBoxes">
-                            {{form.language}} 
+                            {{form.language}}
                             <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
-                            <br> 
-                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:18px;">中文</label> 
+                            <br>
+                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:18px;">中文</label>
                         </div>
                     </div>
 
@@ -72,7 +107,7 @@
 
                     <div id="searchButton">
                         <!--<input id="auto_update" type="checkbox" class="css-checkbox" ><label id="auto_update_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin:5px 0 15px 0;font-weight:normal">{% trans "Auto update"%}</label>-->
-                        <input class="btn-block btn btn-default" style="padding-bottom:25px; width:100px;" id="itinerary-search" type="submit" value="{% trans "Update" %}" name="{% trans "Search" %}"> 
+                        <input class="btn-block btn btn-default" style="padding-bottom:25px; width:100px;" id="itinerary-search" type="submit" value="{% trans "Update" %}" name="{% trans "Search" %}">
                     </div>
                     <div id="itinerary-search-button">
                     </div>
@@ -111,16 +146,17 @@
                                 {%trans "Private tours only"%}</label>
                         </div>
                     </div>
-                </div>      
+                </div>
             </div>
         </div>
-        <div class="mobileSearch notOnDesktop">  
-            <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>  
-            <img src="/images/search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">  
-        </div>  
+        <div class="mobileSearch notOnDesktop">
+            <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>
+            <img src="/images/search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
+        </div>
     </form>
 
     <div class="container-fluid searchresult">
+      <div class="loading"><img src="/images/loading.gif" width="64px" height="64px" class="ajax-loader"/></div>
     	<div class="row">
             <div class="fixCenter">
                 <div id="more-filters-div" class="notOnMobile">
@@ -138,7 +174,7 @@
                         <p style="overflow-y:hidden; height:100px">{%trans "Email us at "%}<a href="mailto:enquiries@tripalocal.com">enquiries@tripalocal.com</a> {%trans "with the preferred experience, the dates and times and we will get back to you within 48 hours with a customised experience just for you!"%}</p>
                         <div class="listingFooter">{%trans "We offer exclusive experiences with private groups"%}</div>
                     </div>
-                </div>       
+                </div>
             </div>
         </div>
     </div>
@@ -147,6 +183,15 @@
 {% endblock %}
 
 {% block scripts %}
+<script charset="utf-8" type="text/javascript">
+  $(document).ajaxStart(function() {
+    $(".loading").show();
+  });
+  $(document).ajaxStop(function() {
+    $(".loading").hide();
+  })
+</script>
+
 <script charset="utf-8" type="text/javascript">
     function hrefToCityName(href) {
         if (href.substr(-1) === '/') {
@@ -268,7 +313,7 @@
         $(".glyphicon-calendar").hide();
 
         $("#id_start_date").click(function(){
-            $("#id_start_date_picker").data("DateTimePicker").show();  
+            $("#id_start_date_picker").data("DateTimePicker").show();
         });
 
        $("#id_start_date, #id_end_date").focusout(function () {
@@ -310,7 +355,7 @@
 
     $("#id_city").change(function(e){
         $("#search_form")[0].action = "/s/" + $("#id_city").val() + "/";
-        $("#itinerary-search").click() 
+        $("#itinerary-search").click()
     });
 
     $("#itinerary-search").click(function(e){

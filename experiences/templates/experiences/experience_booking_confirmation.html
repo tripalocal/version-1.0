@@ -21,7 +21,7 @@
             {% endif %}
         {% endif %}
     </div>
--->    
+-->
     <div class="container-fluid experience">
         <div class="fixCenter">
             <div class="checkoutBox">
@@ -51,7 +51,7 @@
                                 </div>
                                 {%endif%}
                             </div>
-                
+
                	            <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="Refresh" value="{% trans "Refresh" %}" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6;"/>
                         </div>
                         {% if coupon and not wrong_promo_code %}
@@ -90,9 +90,9 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <p>{% trans "Security code" %}</p>
+                                    <p style="margin-left:15px">{% trans "Security code" %}</p>
                                     <div class="navbar-form navbar-left" role="search" id="id_security_code">
-                                        <div class="form-group">
+                                        <div class="form-group" style="margin-left:15px">
                                             {{ form.cvv }}
                                         </div>
                                     </div>
@@ -109,7 +109,7 @@
                                 </td>
                                 <td>
                                     {% if 'cvv' in form.errors and display_error%}
-                                    <div class="warning-sign">
+                                    <div class="warning-sign" style="margin-left:15px">
                                         <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
                                         <p>{{form.cvv.errors.as_text}}</p>
                                     </div>
@@ -255,6 +255,16 @@
                                     </div>
                                 </td>
                             </tr>
+                            <tr>
+                              <td>
+                              {% if 'phone_number' in form.errors and display_error%}
+                              <div class="warning-sign">
+                                  <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                  <p>Please provide a contact phone number.</p>
+                              </div>
+                              {%endif%}
+                            </td>
+                            </tr>
                         </table>
 
                         {%if experience.language == "NONE"%}
@@ -281,12 +291,12 @@
                     <input type="submit" id="submit_booking" name="Request to Book" value="{% trans "Book Now" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:140px"/>
                 </form>
             </div>
-                
+
             <div class="expList checkoutDetails">
-                <div class="listingImg" style="background-image:url(		
+                <div class="listingImg" style="background-image:url(
 		        {% for photo in experience.photo_set.all %}
                     {% if forloop.first %}
-				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
+				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}
                     {% endif %}
                 {% endfor %})">
                     <div class="profile-md checkout-profile">
@@ -310,7 +320,7 @@
                         <p id="id_coupon_extra_fee" style="font-size:14px;"></p>
                         <div id="id_service_fee" style="display:none;"> Processing Fee: {{experience.dollarsign}}{{ service_fee|stringformat:".2f" }}<br></div>
                         <strong style="font-size:18px;">Total: {{experience.dollarsign}}<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
-                    </form>                     
+                    </form>
                 </div>
             </div>
         </div>
@@ -350,7 +360,7 @@ $(function(){
 
         $("#submit_booking").bind("click", function(e) {
             e.preventDefault();
-            if ($("#isAgreementSelected").is(':checked')) {  
+            if ($("#isAgreementSelected").is(':checked')) {
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked')) {
                     mixpanel.track("Clicked on \"Checkout\"");
                     if($("#user_email").val())
