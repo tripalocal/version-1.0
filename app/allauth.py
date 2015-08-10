@@ -1,5 +1,6 @@
 from allauth.account import app_settings
 from allauth.account.adapter import DefaultAccountAdapter
+from django.utils.translation import ugettext as _
 from django import forms
 
 class AccountAdapter(DefaultAccountAdapter):
