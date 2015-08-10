@@ -754,9 +754,10 @@ EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 def experience_booking_successful(request, experience, guest_number, booking_datetime, price_paid, is_instant_booking=False):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
-    
-    mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
+
+    if not settings.DEVELOPMENT:
+        mp = Mixpanel(settings.MIXPANEL_TOKEN)
+        mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
 
     template = 'experiences/experience_booking_successful_requested.html'
     if is_instant_booking:
@@ -823,8 +824,9 @@ def experience_booking_confirmation(request):
                 else:
                     coupon = coupons[0]
 
-            mp = Mixpanel(settings.MIXPANEL_TOKEN)
-            mp.track(request.user.email, 'Clicked on "Refresh"')
+            if not settings.DEVELOPMENT:
+                mp = Mixpanel(settings.MIXPANEL_TOKEN)
+                mp.track(request.user.email, 'Clicked on "Refresh"')
 
             return render_to_response('experiences/experience_booking_confirmation.html', {'form': form, 
                                                                            'user_email':request.user.email,
@@ -1801,12 +1803,13 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 formattedTitleList.insert(counter, t)
             i += 1
 
-        mp = Mixpanel(settings.MIXPANEL_TOKEN)
+        if not settings.DEVELOPMENT:
+            mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
-        if request.user.is_authenticated():
-            mp.track(request.user.email,"Viewed " + city.title() + " search page");
-        else:
-            mp.track("","Viewed " + city.title() + " search page");
+            if request.user.is_authenticated():
+                mp.track(request.user.email,"Viewed " + city.title() + " search page");
+            else:
+                mp.track("","Viewed " + city.title() + " search page");
 
         template = 'experiences/experience_results.html'
     else:
