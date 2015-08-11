@@ -1,7 +1,7 @@
 Django==1.7.1
 Markdown==2.5.2
 Pillow==2.7.0
-PyMySQL==0.6.3
+PyMySQL==0.6.6
 XlsxWriter==0.6.7
 defusedxml==0.4.1
 django-allauth==0.18.0
@@ -30,4 +30,5 @@ sqlparse==0.1.14
 stripe==1.24.1
 xlrd==0.9.3
 gunicorn==19.3.0
+dj-database-url==0.3.0
 

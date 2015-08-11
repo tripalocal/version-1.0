@@ -132,10 +132,6 @@ def home(request):
                 if request.LANGUAGE_CODE.startswith("zh"):
                     return HttpResponseRedirect('/cn')
 
-        if request.LANGUAGE_CODE.startswith("zh"):
-            return HttpResponseRedirect('/cn')
-
-    experienceList = Experience.objects.filter(id__in=[1,2,59])
     experienceList = Experience.objects.filter(id__in=[1,2,20])
     idxList = random.sample(range(len(experienceList)), 3)
     featuredExperienceList = [experienceList[i] for i in idxList]
