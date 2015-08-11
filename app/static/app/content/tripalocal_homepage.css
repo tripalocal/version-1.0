@@ -47,11 +47,14 @@
 }
 
 /* Dropdown menu */
-.ui.dropdown {
+.ui.selection.dropdown {
   width: 340px;
   height: 44px;
-  padding-left: 3px;
-
+  padding-left: 15px;
+  line-height: 1.5;
+  color: #9B9B9B;
+  border: none;
+  border-radius: 3px 0 0 3px;
 }
 .ui.dropdown > .dropdown.icon {
   line-height: 1.5;
@@ -59,12 +62,7 @@
 .dropdown.icon {
   background-image: none;
 }
-.ui.selection.dropdown {
-  line-height: 1.5;
-  color: #9B9B9B;
-  border: none;
-  border-radius: 3px 0 0 3px;
-}
+
 .light-color {
   color: rgb(200, 200, 200);
   margin-left: 3px;
