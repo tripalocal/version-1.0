@@ -1,0 +1,18 @@
+/* Header bar */
+.sticky {
+  position: fixed;
+  width: 100%;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  border-top: 0;
+}
+.back_button {
+
+}
+
+.back_button a {
+  padding-left: 0;
+}
+
+/* Side bar */

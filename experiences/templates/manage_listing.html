@@ -3,7 +3,9 @@
 {% load i18n %}
 
 {% block head %}
+    {% load staticfiles %}
     <title>Edit Experience</title>
+    <link href="{% static 'experiences/content/manage_listing.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
@@ -11,10 +13,10 @@
 {# leave here just for styling placehoder #}
     <div class="back_button">
         {% if language == "cn" %}
-        <a id="nav-left" href="/experience/{{experience.id}}/">{{experience_title_cn.title}}</a>
+        <a id="nav-left" href="/experience/{{experience.id}}/">&larr; {{experience_title_cn.title}}</a>
         <a id="nav-right" href="/experience/{{experience.id}}/">Preview Listing</a>
         {% else %}
-        <a id="nav-left" href="/experience/{{experience.id}}/">{{experience_title_en.title}}</a>
+        <a id="nav-left" href="/experience/{{experience.id}}/">&larr; {{experience_title_en.title}}</a>
         <a id="nav-right" href="/experience/{{experience.id}}/">Preview Listing</a>
         {% endif %}
         <div id="ajax-update-signal"></div>
