@@ -76,9 +76,9 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <p>{% trans "Security code" %}</p>
+                                    <p style="margin-left:15px">{% trans "Security code" %}</p>
                                     <div class="navbar-form navbar-left" role="search" id="id_security_code">
-                                        <div class="form-group">
+                                        <div class="form-group" style="margin-left:15px">
                                             {{ form.cvv }}
                                         </div>
                                     </div>
@@ -95,7 +95,7 @@
                                 </td>
                                 <td>
                                     {% if 'cvv' in form.errors and display_error%}
-                                    <div class="warning-sign">
+                                    <div class="warning-sign" style="margin-left:15px">
                                         <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
                                         <p>{{form.cvv.errors.as_text}}</p>
                                     </div>
@@ -241,6 +241,16 @@
                                     </div>
                                 </td>
                             </tr>
+                            <tr>
+                              <td>
+                              {% if 'phone_number' in form.errors and display_error%}
+                              <div class="warning-sign">
+                                  <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                  <p>Please provide a contact phone number.</p>
+                              </div>
+                              {%endif%}
+                            </td>
+                            </tr>
                         </table>
 
                         {%if experience.language == "NONE"%}
@@ -352,10 +362,8 @@ $(function(){
 
         $("#submit_booking").bind("click", function(e) {
             e.preventDefault();
-            if ($("#isAgreementSelected").is(':checked'))
-            {  
-                if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
-                {
+            if ($("#isAgreementSelected").is(':checked')) {
+                if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked')) {
                     mixpanel.track("Clicked on \"Checkout\"");
                     if($("#user_email").val())
                     {
@@ -380,13 +388,11 @@ $(function(){
                         $("#category_form").submit();
                     }
                 }
-                else
-                {
+                else {
                     $("#id_coupon_term_condition").attr("style","width:480px; display:inline-block; margin-bottom:10px;");
                 }
             }
-            else
-            {
+            else {
                 $("#id_term_condition").attr("style","display:inline-block;");
             }
         });
