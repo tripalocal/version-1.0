@@ -45,5 +45,5 @@ GeoLite2-City.mmdb
 
 !/images/css/
 !/images/js/
-!/images/img/
+!/images/img/*.*
 !/images/city/
