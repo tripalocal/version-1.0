@@ -1607,7 +1607,7 @@ def new_experience(request):
             experience = Experience(start_datetime=datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0),
                                     end_datetime=datetime.utcnow().replace(tzinfo=pytz.UTC).replace(
                                         minute=0) + relativedelta(years=10),
-                                    title=form.cleaned_data['title'],
+
                                     duration=form.cleaned_data['duration'],
                                     city=form.cleaned_data['location'],
                                     language="english;",
@@ -1617,7 +1617,7 @@ def new_experience(request):
             experience.save()
             host = User.objects.get(id=user_id)
             experience.hosts.add(host)
-
+            set_exp_title_all_langs(experience, form.cleaned_data['title'], LANG_EN, LANG_CN)
             #todo: add record to chinese database
 
             first_step = 'price'
