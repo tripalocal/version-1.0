@@ -109,6 +109,20 @@ class BlockOutTimePeriod(models.Model):
     repeat_extra_information = models.CharField(max_length=50)
     experience = models.ForeignKey(Experience)
 
+class ExperiencePeriod(models.Model):
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    type = models.CharField(max_length=15)
+    experience = models.ForeignKey(Experience)
+
+
+class ExperienceTime(models.Model):
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    week_day = models.CharField(max_length=15)
+    experience = models.ForeignKey(Experience)
+
+
 class WhatsIncluded(models.Model):
     item = models.CharField(max_length=50)
     included = models.BooleanField(default=False)

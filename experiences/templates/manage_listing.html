@@ -928,7 +928,28 @@
 
     }
 
-    function loadLocationForm(href) {
+function loadCalendarForm(href) {
+    function setListenerForCalendarForm() {
+        $("#chosen-date").focusout(function() {
+            postDatum(location.href, {"chosen_slot": $("#chosen-date").val()});
+        });
+    }
+
+
+    $.get(href).done(function (response) {
+        $('#ajax-listing-form').html($(response));
+    }).done(function () {
+//            $("#id_meetup_spot_other").attr("style","display:none;");
+//            $("#id_dropoff_spot_other").attr("style","display:none;");
+//            setListenerForLocationForm();
+//            setListenerForPostingLocation();
+        setListenerForCalendarForm();
+    }).fail(function () {
+//            $('#ajax-listing-form').text("Sorrfy but there was an error.");
+    });
+}
+
+function loadLocationForm(href) {
         function setListenerForLocationForm() {
             $("#location_tab").click(function () {
                 $("#id_meetup_spot").attr("style", "");
@@ -986,6 +1007,7 @@
         });
     }
 
+
     function loadForm(href) {
         var step = hrefToStepName(href);
         setFinishedStatus();
@@ -999,6 +1021,8 @@
             loadPhotoForm(href);
         } else if (step == "location") {
             loadLocationForm(href);
+        } else if (step == "calendar") {
+            loadCalendarForm(href);
         }
     }
 

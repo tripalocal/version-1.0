@@ -1886,6 +1886,13 @@ def manage_listing_location(request, experience, context):
             experience.save()
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
+def manage_listing_calendar(request, experience, context):
+    if request.method == 'GET':
+        return render_to_response('calendar_form.html', {}, {})
+    elif request.method == 'POST':
+        print(request.POST['chosen_slot'])
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+    pass
 
 def manage_listing(request, exp_id, step, ):
     experience = get_object_or_404(Experience, pk=exp_id)
@@ -1911,8 +1918,8 @@ def manage_listing(request, exp_id, step, ):
             return manage_listing_photo(request, experience, context)
         elif step == 'location':
             return manage_listing_location(request, experience, context)
-        elif step == 'ajax_upload_file':
-            return manage_listing_ajax_upload(request, experience, context)
+        elif step == 'calendar':
+            return manage_listing_calendar(request, experience, context)
 
     else:
         return render_to_response('manage_listing.html', context)
@@ -1953,9 +1960,6 @@ def manage_listing_continue(request, exp_id):
 
     return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
 
-def manage_listing_ajax_upload(request, experience, context):
-    print(request.POST)
-    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
