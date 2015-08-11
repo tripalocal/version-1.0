@@ -13,7 +13,7 @@
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/respond.js' %}"></script>
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
 
-    <link rel="icon" href="/images/favicon.ico" />
+    <link rel="icon" href="{% static 'app/img/favicon.ico'%}" />
 
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
     <link href="{% static 'app/content/tripalocal.min.css' %}" rel="stylesheet">
@@ -81,7 +81,7 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                 <tr>
                     <td class="header">
                         <img class="hamburger notOnDesktop" src="/images/menu.svg" width="15" />
-                        <a class="brand" href="https://www.tripalocal.com"><img src="/images/tripalocal_Logo.png" width="115" height="39"></a>
+                        <a class="brand" href="https://www.tripalocal.com"><img src="{{ MEDIA_URL }}img/tripalocal_Logo.png" width="115" height="39"></a>
                     </td>
                     <td class="navbar-collapse notOnMobile">
                         {% include 'app/loginpartial.html' %}

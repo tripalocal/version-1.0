@@ -37,6 +37,13 @@ ehthumbs.db
 Thumbs.db
 
 *.pyc
-images
-venv
+/images/**/*.*
+venv/
+/static/
+local_settings.py
 GeoLite2-City.mmdb
+
+!/images/css/
+!/images/js/
+!/images/img/
+!/images/city/
