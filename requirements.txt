@@ -29,4 +29,5 @@ six==1.8.0
 sqlparse==0.1.14
 stripe==1.24.1
 xlrd==0.9.3
+gunicorn==19.3.0
 
