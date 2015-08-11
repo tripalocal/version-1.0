@@ -4,24 +4,10 @@
 
 {% block head %}
     <title>{% trans "Booking Confirmation" %}</title>
+    <script src="https://checkout.stripe.com/checkout.js"></script>
 {% endblock %}
 
 {% block content %}
-<!--<div>
-        {% if form.errors and display_error%}
-            {% if form.non_field_errors %}
-                {% for error in form.non_field_errors %}
-                    {{error}}{% if not forloop.last %}, {%endif%}
-                {% endfor %}
-            {% else %}
-                <p style="color:red">The following fields are required</p>
-                {% for error in form.errors %}
-                    {{error}}{% if not forloop.last %}, {%endif%}
-                {% endfor %}
-            {% endif %}
-        {% endif %}
-    </div>
--->    
     <div class="container-fluid experience">
         <div class="fixCenter">
             <div class="checkoutBox">
@@ -59,7 +45,7 @@
                         {%endif%}
                     </div>
 
-                    <div class="row" id="credit_card_div">
+                    <div class="row" id="credit_card_div" style="display:none;">
                         <p>{% trans "Card number" %}</p>
                         <div class="navbar-form navbar-left" style="width:100%" role="search">
                             <div class="form-group" style="float:left;margin-right:20px;">
@@ -227,7 +213,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <p>{% trans "Country/Region" %}</p>
+                                    <p>{% trans "Country" %}</p>
                                     <div class="dropdown">
                                         {{ form.country }}
                                     </div>
@@ -278,7 +264,7 @@
                                 {% trans "If you cancel within 2 calendar days in advance, you will be charged a 100% cancellation fee." %}</p>
                         </div>
                     </div>
-                    <input type="submit" id="submit_booking" name="Request to Book" value="{% trans "Book Now" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:140px"/>
+                    <input type="submit" id="submit_booking" name="Request to Book" value="{% trans "Book Now" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:140px;"/>
                 </form>
             </div>
                 
@@ -348,24 +334,66 @@ $(function(){
         $("#id_phone_number").attr("class", "form-control");
         $("#id_country").attr("class", "btn btn-default dropdown-toggle");
 
+        $("#id_expiration_1 :nth-child(2)").prop('selected', true);
+
+        var handler = StripeCheckout.configure({
+                            key: 'pk_test_W9jgaSX9w9vrewiQIl5gE5l4',
+                            image: '/images/tripalocal_Logo.png',
+                            token: function(token) {
+                                // Use the token to create the charge with a server-side script.
+                                // You can access the token ID with `token.id`
+                                var input = $("<input>")
+                                               .attr("type", "hidden")
+                                               .attr("name", "stripeToken").val(token.id);
+                                $('#category_form').append($(input));
+                                $('#category_form').submit();
+                            }
+                        });
+
         $("#submit_booking").bind("click", function(e) {
             e.preventDefault();
-            if ($("#isAgreementSelected").is(':checked')) {  
-                if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked')) {
+            if ($("#isAgreementSelected").is(':checked'))
+            {  
+                if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
+                {
                     mixpanel.track("Clicked on \"Checkout\"");
                     if($("#user_email").val())
                     {
                         mixpanel.identify($("#user_email").val());
                     }
-                    $("#category_form").submit();
+                    //$("#category_form").submit();
+                    if({{total_price}}>0.00)
+                    {
+                        // Open Checkout with further options
+                        handler.open({
+                            name: 'Tripalocal',
+                            description: '',
+                            amount: {{ total_price|mul:100 }},
+                            currency: '{{experience.currency}}',
+                            locale: 'en-au',
+                            //alipay: true
+                        });
+                        e.preventDefault();
+                    }
+                    else
+                    {
+                        $("#category_form").submit();
+                    }
                 }
-                else{
+                else
+                {
                     $("#id_coupon_term_condition").attr("style","width:480px; display:inline-block; margin-bottom:10px;");
                 }
             }
-            else{
+            else
+            {
                 $("#id_term_condition").attr("style","display:inline-block;");
             }
+        });
+
+        // Close Checkout on page navigation
+            $(window).on('popstate', function() {
+            handler.close();
         });
     })
 })

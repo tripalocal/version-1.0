@@ -27,12 +27,16 @@ from allauth.account.utils import user_username, user_email, user_field
 from allauth.account.signals import user_signed_up, user_logged_in
 from allauth.socialaccount import providers
 from allauth.socialaccount.models import SocialLogin, SocialToken, SocialApp
-from allauth.socialaccount.providers.facebook.views import fb_complete_login
 from allauth.socialaccount.helpers import complete_social_login
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
-GEO_POSTFIX = "/"
+try:
+    from allauth.socialaccount.providers.facebook.views import fb_complete_login
+except ImportError:
+    pass
+
+GEO_POSTFIX = settings.GEO_POSTFIX
 
 def isLegalInput(inputs):
     for input in inputs:
@@ -287,7 +291,10 @@ def saveBookingRequestsFromXLS(request):
                 #TODO
                 raise
 
-            worksheet = workbook.sheet_by_name('English')
+            if settings.LANGUAGES[0][0] == "en":
+                worksheet = workbook.sheet_by_name('English')
+            elif settings.LANGUAGES[0][0] == "zh":
+                worksheet = workbook.sheet_by_name('Chinese')
             num_rows = worksheet.nrows - 1
             num_cells = worksheet.ncols - 1
             curr_row = 0
@@ -760,42 +767,7 @@ def service_couponverification(request, format=None):
             if coupons is not None and len(coupons) > 0:
                 valid = check_coupon(coupons[0],data["id"], data["guest_number"])
                 if valid['valid']:
-                    free = False
-                    extra_fee = 0.0
-                    rules = json.loads(coupons[0].rules)
-                    if type(rules["extra_fee"]) == int or type(rules["extra_fee"]) == float:
-                        extra_fee = rules["extra_fee"]
-                    elif type(rules["extra_fee"]) == str and rules["extra_fee"]== "FREE":
-                        free = True
-                        result={"valid":"yes","new_price":0.0}
-
-                    if not free:
-                        subtotal_price = 0.0
-                        experience = Experience.objects.get(id = data["id"])
-                        if experience.dynamic_price and type(experience.dynamic_price) == str:
-                            price = experience.dynamic_price.split(',')
-                            if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-                            #these is comma in the end, so the length is max-min+2
-                                if data["guest_number"] <= experience.guest_number_min:
-                                    subtotal_price = float(experience.price) * float(experience.guest_number_min)
-                                else:
-                                    subtotal_price = float(price[data["guest_number"]-experience.guest_number_min]) * float(data["guest_number"])
-                            else:
-                                #wrong dynamic settings
-                                subtotal_price = float(experience.price)*float(data["guest_number"])
-                        else:
-                            subtotal_price = float(experience.price)*float(data["guest_number"])
-
-                        if extra_fee == 0.00:
-                            price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
-                        elif extra_fee >= 1.00 or extra_fee <= -1.00:
-                            #absolute value
-                            price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)+extra_fee, 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
-                        else:
-                            #percentage, e.g., 30% discount --> percentage == -0.3
-                            price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
-
-                        result={"valid":"yes","new_price":price}
+                    result={"valid":"yes","new_price":valid['new_price']}
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -1080,6 +1052,32 @@ def service_message(request, format=None):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+@authentication_classes((BasicAuthentication,))#, TokenAuthentication))
+@permission_classes((IsAuthenticated,))
+def update_files(request, format=None):
+    try:
+        if not request.user.is_superuser:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data
+        user_email = data['user_email']
+        tripalocal_email = data['tripalocal_email']
+
+        with open('/etc/postfix/canonical', 'a') as f:
+            f.write(user_email + " " + tripalocal_email + "\n")
+            f.close()
+
+        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    
+        with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+            f.write(tripalocal_email + "\n")
+            f.close()
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
 @authentication_classes((SessionAuthentication, BasicAuthentication,))#, TokenAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_email(request, format=None):
@@ -1108,32 +1106,6 @@ def service_email(request, format=None):
             #          html_message=loader.render_to_string('email_june_campaign_host.html',
             #                                                {'experiences': exp_urls[i], 'host':host,
             #                                                }))
-    except Exception as err:
-        #TODO
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
-    return Response(status=status.HTTP_200_OK)
-
-@api_view(['POST'])
-@authentication_classes((BasicAuthentication,))#, TokenAuthentication))
-@permission_classes((IsAuthenticated,))
-def update_files(request, format=None):
-    try:
-        if not request.user.is_superuser:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-
-        data = request.data
-        user_email = data['user_email']
-        tripalocal_email = data['tripalocal_email']
-
-        with open('/etc/postfix/canonical', 'a') as f:
-            f.write(user_email + " " + tripalocal_email + "\n")
-            f.close()
-
-        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
-    
-        with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
-            f.write(tripalocal_email + "\n")
-            f.close()
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})

@@ -313,15 +313,17 @@ POST_OFFICE = {
     'DEFAULT_PRIORITY': 'now'
 }
 
+GEO_POSTFIX = "/"
+
 DEVELOPMENT = False
 
+# Customized settings should always be put at the bottom
 if os.environ.get('ENV_MODE') == 'DEVELOPMENT':
     try:
         print(DATABASES['default'])
         from test_settings import *
     except ImportError:
         pass
-
 
 try:
     from local_settings import *

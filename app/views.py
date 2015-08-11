@@ -9,13 +9,13 @@ from datetime import *
 from django import forms
 from django.contrib.auth import authenticate, login
 from allauth.account.signals import password_reset, user_signed_up, user_logged_in
-from allauth.account.views import PasswordResetFromKeyDoneView
+from allauth.account.views import PasswordResetFromKeyDoneView 
 from django.dispatch import receiver
 from app.forms import SubscriptionForm, HomepageSearchForm, UserProfileForm, UserCalendarForm
 from app.models import *
 from django.core.mail import send_mail
 from django.contrib import messages
-import string, random, pytz, base64, subprocess, os, geoip2.database, PIL
+import string, random, pytz, base64, subprocess, os, geoip2.database, PIL, requests
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, saveProfileImage, getBGImageURL, getProfileImage
@@ -36,7 +36,7 @@ PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
-GEO_POSTFIX = "/"
+GEO_POSTFIX = settings.GEO_POSTFIX
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -50,21 +50,21 @@ def home(request):
         if form.is_valid():
             if len(form.data['start_date']):
                 if len(form.data['end_date']):
-                    return SearchView(request, form.data['city'],
-                                             start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")),
+                    return SearchView(request, form.data['city'], 
+                                             start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")), 
                                              end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
                 else:
-                    return SearchView(request, form.data['city'],
-                                             start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")))
+                    return SearchView(request, form.data['city'], 
+                                             start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")))    
 
-            if len(form.data['end_date']):
-                return SearchView(request, form.data['city'],
+            if len(form.data['end_date']):       
+                return SearchView(request, form.data['city'], 
                                              end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
             else:
                 return SearchView(request, form.data['city'])
 
             #mp = Mixpanel(settings.MIXPANEL_TOKEN)
-            #try:
+            #try: 
             #    Subscription.objects.get(email = form.data['email'])
             #    messages.add_message(request, messages.INFO, 'It seems you already subscribed. Thank you.')
             #except Subscription.DoesNotExist:
@@ -76,29 +76,29 @@ def home(request):
             #        new_sub = Subscription(email = form.data['email'], subscribed_datetime = datetime.utcnow().replace(tzinfo=pytz.utc), ref_by = ref_by.email, ref_link=ref_link)
             #        #send an email to the referal
             #        counter = len(Subscription.objects.filter(ref_by = ref_by.email))
-
+                    
             #        if count <= 5:
             #            if counter%5 < 4: # i.e., (count+1)%5==0
             #                mp.track(ref_by.email, 'Referred a friend')
             #                mail.send('[Tripalocal] Someone has signed up because of you!', '', 'Tripalocal <enquiries@tripalocal.com>',
-            #                            [ref_by.email], fail_silently=False,
+            #                            [ref_by.email], fail_silently=False, 
             #                            html_message=loader.render_to_string('app/email_new_referral.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link, 'counter':counter%5+1, 'left':5-1-counter%5}))
             #            else:
             #                mp.track(ref_by.email, 'Qualified for a free experience')
             #                mail.send('[Tripalocal] Free experience!', '', 'Tripalocal <enquiries@tripalocal.com>',
-            #                            [ref_by.email], fail_silently=False,
+            #                            [ref_by.email], fail_silently=False, 
             #                            html_message=loader.render_to_string('app/email_free_experience.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link}))
             #    except Subscription.DoesNotExist:
             #        new_sub = Subscription(email = form.data['email'], subscribed_datetime = datetime.utcnow().replace(tzinfo=pytz.utc), ref_link=ref_link)
-            #    finally:
+            #    finally:    
             #        new_sub.save()
             #        #send an email to the new subscriber
             #        #mp.people_set(form.data['email'], {"$email": form.data['email']})
             #        #mp.track(form.data['email'], 'Entered email address at prelaunch')
             #        data = "{'event': 'Opened welcome email','properties': {'token': '" + settings.MIXPANEL_TOKEN + "', 'distinct_id': '" + form.data['email'] + "'}}"
             #        mail.send('[Tripalocal] Welcome', '', 'Tripalocal <enquiries@tripalocal.com>',
-            #                    [form.data['email']], fail_silently=False,
-            #                    html_message=loader.render_to_string('app/email_welcome.html',
+            #                    [form.data['email']], fail_silently=False, 
+            #                    html_message=loader.render_to_string('app/email_welcome.html', 
             #                                                         {'ref_url':'http://www.tripalocal.com?ref='+ref_link, 'data':base64.b64encode(data.encode('utf-8')).decode('utf-8')}))
             #        #messages.add_message(request, messages.INFO, 'Thank you for subscribing.')
             #        return render_to_response('app/welcome.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_link}, context)
@@ -117,20 +117,20 @@ def home(request):
                 # take the first ip which is not a private one (of a proxy)
                 if len(proxies) > 0:
                     ip = proxies[0]
-
         if not settings.DEVELOPMENT:
-            try:
-                reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
-                response = reader.city(ip)
-                country = response.country.name
-                reader.close()
-                if country.lower() in ['china']:
+            if settings.LANGUAGES[0][0] != "zh":
+                try:
+                    reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+                    response = reader.city(ip)
+                    country = response.country.name
+                    reader.close()
+                    if country.lower() in ['china']:
+                        return HttpResponseRedirect('/cn')
+                except Exception:
+                    reader.close()
+    
+                if request.LANGUAGE_CODE.startswith("zh"):
                     return HttpResponseRedirect('/cn')
-            except Exception:
-                reader.close()
-
-            if request.LANGUAGE_CODE.startswith("zh"):
-                return HttpResponseRedirect('/cn')
 
     experienceList = Experience.objects.filter(id__in=[1,2,20])
     idxList = random.sample(range(len(experienceList)), 3)
@@ -246,7 +246,7 @@ def current_datetime(request):
     return {'current_datetime':datetime.datetime.utcnow()}
 
 def disclaimer(request):
-
+    
     return render(
         request,
         'app/disclaimer.html',
@@ -283,7 +283,7 @@ def getreservation(user):
         phone_number = payment.phone_number if payment.phone_number != None and len(payment.phone_number) else guest.registereduser.phone_number
         reservation = {"booking_datetime":booking.datetime.astimezone(local_timezone), "booking_status":booking.status,
                        "booking_guest_number":booking.guest_number,"booking_id":booking.id,
-                       "experience_id":experience.id,"experience_title":get_experience_title(experience, settings.LANGUAGES[0][0]),
+                       "experience_id":experience.id,"experience_title":get_experience_title(experience, settings.LANGUAGES[0][0]), 
                        "payment_city":payment.city, "payment_country":payment.country,
                        "guest_first_name":guest.first_name, "guest_last_name":guest.last_name, "guest_phone_number":phone_number}
 
@@ -391,7 +391,7 @@ def myprofile(request):
     photo={}
     if profile.image_url:
         context["image_url"] = profile.image_url
-        #photo["image"] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+profile.image_url,
+        #photo["image"] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+profile.image_url, 
         #                                    File(open(settings.MEDIA_ROOT+'/'+profile.image_url, 'rb')).read())
     else:
         context["image_url"] = "hosts/no_img.jpg"
@@ -400,7 +400,7 @@ def myprofile(request):
         data["phone_number"]=profile.phone_number
 
     data["bio"]=get_user_bio(profile, settings.LANGUAGES[0][0])
-
+        
     form = UserProfileForm(data=data)
 
     return render_to_response('app/myprofile.html', {'form': form}, context)
@@ -445,43 +445,43 @@ def mycalendar(request):
             for i in range(1,6):
                 if blockout['blockout_start_datetime_'+str(i)] and blockout['blockout_end_datetime_'+str(i)]:
                     if blockout['blockout_repeat_end_date_'+str(i)]:
-                        b = BlockOutTimePeriod(start_datetime = blockout['blockout_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
+                        b = BlockOutTimePeriod(start_datetime = blockout['blockout_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0), 
                                                 end_datetime = blockout['blockout_end_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
-                                                repeat = blockout['blockout_repeat_'+str(i)],
-                                                repeat_cycle = blockout['blockout_repeat_cycle_'+str(i)],
+                                                repeat = blockout['blockout_repeat_'+str(i)], 
+                                                repeat_cycle = blockout['blockout_repeat_cycle_'+str(i)], 
                                                 repeat_frequency = blockout['blockout_repeat_frequency_'+str(i)],
                                                 repeat_extra_information = blockout['blockout_repeat_extra_information_'+str(i)],
                                                 repeat_end_date = blockout['blockout_repeat_end_date_'+str(i)],
                                                 user = request.user
                                                 )
                     else:
-                        b = BlockOutTimePeriod(start_datetime = blockout['blockout_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
+                        b = BlockOutTimePeriod(start_datetime = blockout['blockout_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0), 
                                                 end_datetime = blockout['blockout_end_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
-                                                repeat = blockout['blockout_repeat_'+str(i)],
-                                                repeat_cycle = blockout['blockout_repeat_cycle_'+str(i)],
+                                                repeat = blockout['blockout_repeat_'+str(i)], 
+                                                repeat_cycle = blockout['blockout_repeat_cycle_'+str(i)], 
                                                 repeat_frequency = blockout['blockout_repeat_frequency_'+str(i)],
                                                 repeat_extra_information = blockout['blockout_repeat_extra_information_'+str(i)],
                                                 repeat_end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2049-12-31", "%Y-%m-%d")).astimezone(pytz.timezone('UTC')),
                                                 user = request.user
                                                 )
                     b.save()
-
+                
                 if instant_booking['instant_booking_start_datetime_'+str(i)] and instant_booking['instant_booking_end_datetime_'+str(i)]:
                     if instant_booking['instant_booking_repeat_end_date_'+str(i)]:
-                        ib = InstantBookingTimePeriod(start_datetime = instant_booking['instant_booking_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
+                        ib = InstantBookingTimePeriod(start_datetime = instant_booking['instant_booking_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0), 
                                                 end_datetime = instant_booking['instant_booking_end_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
-                                                repeat = instant_booking['instant_booking_repeat_'+str(i)],
-                                                repeat_cycle = instant_booking['instant_booking_repeat_cycle_'+str(i)],
+                                                repeat = instant_booking['instant_booking_repeat_'+str(i)], 
+                                                repeat_cycle = instant_booking['instant_booking_repeat_cycle_'+str(i)], 
                                                 repeat_frequency = instant_booking['instant_booking_repeat_frequency_'+str(i)],
                                                 repeat_extra_information = instant_booking['instant_booking_repeat_extra_information_'+str(i)],
                                                 repeat_end_date = instant_booking['instant_booking_repeat_end_date_'+str(i)],
                                                 user = request.user
                                                 )
                     else:
-                        ib = InstantBookingTimePeriod(start_datetime = instant_booking['instant_booking_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
+                        ib = InstantBookingTimePeriod(start_datetime = instant_booking['instant_booking_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0), 
                                                 end_datetime = instant_booking['instant_booking_end_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
-                                                repeat = instant_booking['instant_booking_repeat_'+str(i)],
-                                                repeat_cycle = instant_booking['instant_booking_repeat_cycle_'+str(i)],
+                                                repeat = instant_booking['instant_booking_repeat_'+str(i)], 
+                                                repeat_cycle = instant_booking['instant_booking_repeat_cycle_'+str(i)], 
                                                 repeat_frequency = instant_booking['instant_booking_repeat_frequency_'+str(i)],
                                                 repeat_extra_information = instant_booking['instant_booking_repeat_extra_information_'+str(i)],
                                                 repeat_end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2049-12-31", "%Y-%m-%d")).astimezone(pytz.timezone('UTC')),
@@ -522,7 +522,7 @@ def password_change_callback(sender, request, user, **kwargs):
     messages.success(request, str(user.id) + '_PasswordChanged')
 
 @receiver(user_signed_up)
-def handle_user_signed_up(request, user, is_social_login=None, **kwargs):
+def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
     try:
         new_registereduser = RegisteredUser.objects.get(user_id = user.id)
     except RegisteredUser.DoesNotExist:
@@ -542,15 +542,25 @@ def handle_user_signed_up(request, user, is_social_login=None, **kwargs):
     new_alias.save()
 
     if not settings.DEVELOPMENT:
-        with open('/etc/postfix/canonical', 'a') as f:
-            f.write(user.email + " " + new_email.id + "\n")
-            f.close()
+        if len(settings.ADMINS) == 0:
+            with open('/etc/postfix/canonical', 'a') as f:
+                f.write(user.email + " " + new_email.id + "\n")
+                f.close()
 
-        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
-
-        with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
-            f.write(new_email.id + "\n")
-            f.close()
+            subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    
+            with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+                f.write(new_email.id + "\n")
+                f.close()
+        else:
+            try:
+                response = requests.post('https://www.tripalocal.com/update_files/',
+                                         data={'user_email': user.email,'tripalocal_email':new_email.id},
+                                         auth=(settings.ADMINS[0][1], settings.ADMIN_PASSWORD[0]),
+                                         timeout=3)
+            except requests.exceptions.RequestException as err:
+                #TODO
+                pass
 
     """get the client ip from the request
     """
@@ -572,15 +582,14 @@ def handle_user_signed_up(request, user, is_social_login=None, **kwargs):
                 ip = proxies[0]
 
     if not settings.DEVELOPMENT:
-        track_user_signup(ip, is_social_login, user)
+        track_user_signup(ip, sociallogin, user)
 
-
-def track_user_signup(ip, is_social_login, user):
+def track_user_signup(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP": ip,
-                               "$created": pytz.utc.localize(datetime.utcnow()).astimezone(
-                                   pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
+    mp.people_set(user.email, {"IP":ip, 
+                               "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
                                })
+
     reader = None
     try:
         reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
@@ -592,21 +601,21 @@ def track_user_signup(ip, is_social_login, user):
         longitude = response.location.longitude
         latitude = response.location.latitude
 
-        mp.track(user.email, "has signed up via email_" + settings.LANGUAGES[0][0])
-        mp.people_set(user.email, {'$email': user.email, "$country": country, "$city": city, "$region": region,
-                                   "$first_name": user.first_name, "$last_name": user.last_name, "Postcode": postcode,
-                                   "Latitude": latitude, "Longitude": longitude})
-    except Exception:
-        mp.track(user.email, "has signed up via email_" + settings.LANGUAGES[0][0])
-    finally:
+        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "$first_name":user.first_name, "$last_name":user.last_name, "Postcode":postcode, "Latitude":latitude, "Longitude":longitude})
         reader.close()
+    except Exception:
+        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+    finally:
+        if reader is not None:
+            reader.close()
 
-    if is_social_login:
-        data = is_social_login.account.extra_data
-        first_name = ""
-        last_name = ""
-        age = 0
-        gender = ""
+    if sociallogin:
+        data = sociallogin.account.extra_data
+        first_name=""
+        last_name=""
+        age=0
+        gender=""
         email = user.email
 
         if 'first_name' in data:
@@ -619,13 +628,11 @@ def track_user_signup(ip, is_social_login, user):
             gender = data['gender']
 
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed up via Facebook',
-                 {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
-        mp.people_set(email, {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
-
+        mp.track(email, 'has signed up via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
 
 @receiver(user_logged_in)
-def handle_user_logged_in(request, user, is_social_login=None, **kwargs):
+def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
     remote_address = request.META.get('HTTP_X_FORWARDED_FOR')or request.META.get('REMOTE_ADDR')
     # set the default value of the ip to be the REMOTE_ADDR if available
     # else None
@@ -643,13 +650,12 @@ def handle_user_logged_in(request, user, is_social_login=None, **kwargs):
                 ip = proxies[0]
 
     if not settings.DEVELOPMENT:
-        track_user_login(ip, is_social_login, user)
+        track_user_login(ip, sociallogin, user)
 
-
-def track_user_login(ip, is_social_login, user):
+def track_user_login(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP": ip})
-    reader = None
+    mp.people_set(user.email, {"IP":ip})
+
     try:
         reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
@@ -660,21 +666,22 @@ def track_user_login(ip, is_social_login, user):
         longitude = response.location.longitude
         latitude = response.location.latitude
 
-        mp.track(user.email, "has signed in via email_" + settings.LANGUAGES[0][0])
-        mp.people_set(user.email, {'$email': user.email, "$country": country, "$city": city, "$region": region,
-                                   "Postcode": postcode,
-                                   "Latitude": latitude, "Longitude": longitude, "Language": settings.LANGUAGES[0][
-            1]})  # "$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
-    except Exception:
-        mp.track(user.email, "has signed in via email_" + settings.LANGUAGES[0][0])
-    finally:
+        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
+        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "Postcode":postcode, 
+                                   "Latitude":latitude, "Longitude":longitude, "Language":settings.LANGUAGES[0][1]}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
         reader.close()
-    if is_social_login:
-        data = is_social_login.account.extra_data
-        first_name = ""
-        last_name = ""
-        age = 0
-        gender = ""
+    except Exception:
+        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
+    finally:
+        if reader is not None:
+            reader.close()
+
+    if sociallogin:
+        data = sociallogin.account.extra_data
+        first_name=""
+        last_name=""
+        age=0
+        gender=""
         email = user.email
 
         if 'first_name' in data:
@@ -687,6 +694,5 @@ def track_user_login(ip, is_social_login, user):
             gender = data['gender']
 
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed in via Facebook',
-                 {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
-        mp.people_set(email, {'$email': email, '$name': first_name + " " + last_name, 'age': age, 'gender': gender})
+        mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})

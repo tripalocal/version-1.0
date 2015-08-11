@@ -5,7 +5,6 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
-from django.contrib.formtools.wizard.views import SessionWizardView, NamedUrlSessionWizardView
 from experiences.forms import *
 from datetime import *
 import pytz, string, os, json, math, PIL, xlsxwriter, time, sys
@@ -33,7 +32,7 @@ from collections import OrderedDict
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 MaxIDImage=5
-GEO_POSTFIX = "/"
+GEO_POSTFIX = settings.GEO_POSTFIX
 
 def experience_fee_calculator(price):
     if type(price)==int or type(price) == float:
@@ -583,7 +582,7 @@ class ExperienceDetailView(DetailView):
             form.data['last_name'] = request.user.last_name
             experience = Experience.objects.get(id=form.data['experience_id'])
             experience.dollarsign = DollarSign[experience.currency.upper()]
-            experience.currency = str(dict(Currency)[experience.currency.upper()])
+            #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
             experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
             experience_price = experience.price
 
@@ -754,6 +753,9 @@ EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 def experience_booking_successful(request, experience, guest_number, booking_datetime, price_paid, is_instant_booking=False):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
+    
+    mp = Mixpanel(settings.MIXPANEL_TOKEN)
+    mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
 
     if not settings.DEVELOPMENT:
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
@@ -783,7 +785,7 @@ def experience_booking_confirmation(request):
         form = BookingConfirmationForm(request.POST)
         experience = Experience.objects.get(id=form.data['experience_id'])
         experience.dollarsign = DollarSign[experience.currency.upper()]
-        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
         experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
         experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
@@ -805,6 +807,9 @@ def experience_booking_confirmation(request):
         else:
             subtotal_price = float(experience.price)*float(form.data['guest_number'])
 
+        total_price = experience_fee_calculator(subtotal_price)
+        subtotal_price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),0)
+
         if 'Refresh' in request.POST:
             #get coupon information
             wrong_promo_code = False
@@ -823,6 +828,7 @@ def experience_booking_confirmation(request):
                     wrong_promo_code = True
                 else:
                     coupon = coupons[0]
+                    total_price = valid['new_price']
 
             if not settings.DEVELOPMENT:
                 mp = Mixpanel(settings.MIXPANEL_TOKEN)
@@ -836,10 +842,10 @@ def experience_booking_confirmation(request):
                                                                            'guest_number':form.data['guest_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
-                                                                           'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),0),
+                                                                           'subtotal_price':subtotal_price,
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
-                                                                           'total_price': experience_fee_calculator(subtotal_price)}, context)
+                                                                           'total_price': total_price}, context)
 
         else:
             #submit the form
@@ -863,16 +869,16 @@ def experience_booking_confirmation(request):
             
             else:
                 return render_to_response('experiences/experience_booking_confirmation.html', {'form': form, 
-                                                                                   'user_email':request.user.email,
+                                                                           'user_email':request.user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience, 
                                                                            'guest_number':form.data['guest_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
-                                                                           'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),0),
+                                                                           'subtotal_price':subtotal_price,
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
-                                                                           'total_price': experience_fee_calculator(subtotal_price)}, context)
+                                                                           'total_price': total_price}, context)
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()
@@ -911,12 +917,16 @@ def saveProfileImage(user, profile, image_file):
             hsize = int((float(h)*float(wpercent)))
             im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS).save(dirname + filename)
 
-        #copy to the chinese website -- folder+file
-        dirname_cn = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts/' + str(user.id) + '/'
-        if not os.path.isdir(dirname_cn):
-            os.mkdir(dirname_cn)
+        #copy to the other website -- folder+file
+        if settings.LANGUAGES[0][0] == "en":
+            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts/' + str(user.id) + '/'
+        elif settings.LANGUAGES[0][0] == "zh":
+            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/hosts/' + str(user.id) + '/'
 
-        subprocess.Popen(['cp',dirname + filename, dirname_cn + filename])
+        if not os.path.isdir(dirname_other):
+            os.mkdir(dirname_other)
+
+        subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
 
 def updateExperience(experience, id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, guest_number_min, 
                    guest_number_max, price, currency, duration, city, status, language, dynamic_price, 
@@ -1230,8 +1240,12 @@ def create_experience(request, id=None):
                             destination.write(chunk)
                         destination.close()
 
-                        #copy to the chinese website -- folder+file
-                        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/experiences/' + str(experience.id) + '/'
+                        #copy to the other website -- folder+file
+                        if settings.LANGUAGES[0][0] == "en":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/experiences/' + str(experience.id) + '/'
+                        elif settings.LANGUAGES[0][0] == "zh":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/experiences/' + str(experience.id) + '/'
+
                         if not os.path.isdir(dirname_other):
                             os.mkdir(dirname_other)
                         subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
@@ -1244,13 +1258,17 @@ def create_experience(request, id=None):
                         img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
                         img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
 
-                        #copy to the chinese website -- folder+file
-                        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
+                        #copy to the other website -- folder+file
+                        if settings.LANGUAGES[0][0] == "en":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
+                        elif settings.LANGUAGES[0][0] == "zh":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/thumbnails/experiences/'
                         if not os.path.isdir(dirname_other):
                             os.mkdir(dirname_other)
                         subprocess.Popen(['cp',settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg', dirname_other + 'experience' + str(experience.id) + '_' + str(index) + '.jpg'])
 
-                        if not len(experience.photo_set.filter(name__startswith=filename))>0:
+                        name = 'experience' + str(experience.id) + '_' + str(index)
+                        if not len(experience.photo_set.filter(name__startswith=name))>0:
                             photo = Photo(name = filename, directory = 'experiences/' + str(experience.id) + '/', 
                                           image = 'experiences/' + str(experience.id) + '/' + filename, experience = experience)
                             photo.save()
@@ -1281,8 +1299,11 @@ def create_experience(request, id=None):
                             destination.write(chunk)
                         destination.close()
 
-                        #copy to the chinese website -- folder+file
-                        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts_id/' + str(user.id) + '/'
+                        #copy to the other website -- folder+file
+                        if settings.LANGUAGES[0][0] == "en":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts_id/' + str(user.id) + '/'
+                        elif settings.LANGUAGES[0][0] == "zh":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/hosts_id/' + str(user.id) + '/'
                         if not os.path.isdir(dirname_other):
                             os.mkdir(dirname_other)
                         subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
