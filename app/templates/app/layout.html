@@ -74,6 +74,64 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
 </head>
 
 <body>
+    <!-- Popup Modal -->
+    <div class="modal fade" id="help-popup" tabindex="-1" role="dialog" aria-labelledby="help-popup">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content help" style="background-image:url('{% static 'app/img/nightlight_web.jpg' %}')">
+          <div id="popup-page-1">
+            <h1>Do you need help planning your trip?</h1>
+            <div class="modal-body">
+              <div class="container-fluid">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <button class="btn btn-primary" id="help-yes">YES</button>
+                  </div>
+                  <div class="col-xs-6">
+                    <button class="btn btn-primary" id="help-no">NO</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a class="close-popup">close</a>
+          </div>
+          <div id="popup-page-2" hidden="true">
+            <h1>Tell us about your trip</h1>
+            <p>and we will get back to you within 48 hours</p>
+            <form class="popup-form" action="MAILTO:enquiries@tripalocal.com" method="post" enctype="text/plain">
+              <div class="form-group">
+                <textarea class="form-control" id="popup-form-details" rows="4" placeholder="Please tell us more details"></textarea>
+              </div>
+              <div class="form-group">
+                <input type="email" class="form-control" id="popup-form-email" placeholder="Email address">
+              </div>
+              <br>
+              <button class="btn btn-primary popup-form-submit" type="submit" value="send">Send</button>
+            </form>
+            <a class="close-popup">close</a>
+          </div>
+      </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+      setTimeout(function() {
+        $('#help-popup').modal('show');
+      }, 60000); // milliseconds
+      $('.close-popup').click(function() {
+        $('#help-popup').modal('hide');
+      })
+      $('#help-no').click(function() {
+        $('#help-popup').modal('hide');
+      });
+      $('#help-yes').click(function() {
+        $('#popup-page-1').hide();
+        $('#popup-page-2').show();
+      })
+    });
+    </script>
+    <!-- End Modal -->
+
     <div class="navBox">
         <input type="hidden" id="user_email" value="{{user_email}}" readonly>
         <table class="container-fluid" style="width:100%;">
