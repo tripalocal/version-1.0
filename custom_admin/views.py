@@ -17,19 +17,24 @@ from tripalocal_messages.models import Aliases
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import user_passes_test
 
-class PaymentView(ListView):
-    model = Booking
-    template_name = 'custom_admin/payment.html'
-    context_object_name = 'booking_list'
 
+class BookingInfoMixin(object):
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super(PaymentView, self).get_context_data(**kwargs)
-        g = StatusGenerator(context['booking_list'])
-        g.generate_status_description()
+        context = super(BookingInfoMixin, self).get_context_data(**kwargs)
+        # Add booking info to the context.
+        booking_list = Booking.objects.all()
+        status_generator = StatusGenerator(booking_list)
+        status_generator.generate_status_description()
+        context['booking_list'] = booking_list
+        # Add user name to the context.
+        context['user_name'] = self.request.user.username
+        return context
+
+
+class NotificationMixin(object):
+    def get_context_data(self, **kwargs):
+        context = super(NotificationMixin, self).get_context_data(**kwargs)
         change_status_notification_key = 'status'
-        _calculte_price(context['booking_list'])
-        context['user_name'] = self.request.user.username        
         if change_status_notification_key in  self.request.GET:
             context[change_status_notification_key] = self.request.GET[change_status_notification_key]
         else:
@@ -37,24 +42,25 @@ class PaymentView(ListView):
         return context
 
 
-
-class ArchiveView(ListView):
+class PaymentView(BookingInfoMixin, NotificationMixin, ListView):
     model = Booking
-    template_name = 'custom_admin/archives.html'
-    context_object_name = 'booking_list'
-    
+    template_name = 'custom_admin/payment.html'
+
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
-        context = super(ArchiveView, self).get_context_data(**kwargs)
-        g = StatusGenerator(context['booking_list'])
-        g.generate_status_description()
-        context['user_name'] = self.request.user.username        
+        context = super(PaymentView, self).get_context_data(**kwargs)
+        _calculte_price(context['booking_list'])
         return context
 
-class BookingView(ListView, FormMixin):
+
+class ArchiveView(BookingInfoMixin, NotificationMixin, ListView):
+    model = Booking
+    template_name = 'custom_admin/archives.html'
+
+
+class BookingView(BookingInfoMixin, NotificationMixin, FormMixin, ListView):
     model = Booking
     template_name = 'custom_admin/bookings.html'
-    context_object_name = 'booking_list'
     form_class = ChangeTimeForm
     second_form_class = UploadReviewForm
 
@@ -99,28 +105,47 @@ class BookingView(ListView, FormMixin):
             else:
                 status = 'failed'
             return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
-        
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(BookingView, self).get_context_data(**kwargs)
-    #    context['form'] = self.get_form(self.form_class)
         if 'form' not in context:
             context['form'] = self.form_class()
         if 'form2' not in context:
             context['form2'] = self.second_form_class()
+        return context
 
-        context['user_name'] = self.request.user.username
-        g = StatusGenerator(context['booking_list'])
-        g.generate_status_description()
-        change_status_notification_key = 'status'
-        if change_status_notification_key in  self.request.GET:
-            context[change_status_notification_key] = self.request.GET[change_status_notification_key]
-        else:
-            context[change_status_notification_key] = 'none'
-        
+
+class ExperienceView(FormMixin, ListView):
+    model = Experience
+    template_name = 'custom_admin/experiences.html'
+    context_object_name = 'experience_list'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(ExperienceView, self).get_context_data(**kwargs)
+
+        experinece_list = Experience.objects.all()
+        #experience_title
+        for exp in experinec_list:
+
+
+ExperienceTitle(models.Model)
+
+ExperienceDescription(models.Model)
+
+ExperienceActivity(models.Model)
+
+ExperienceInteraction(models.Model)
+
+
+ExperienceDress(models.Model)
+
+ExperienceMeetupSpot(models.Model)
+ExperienceDropoffSpot
 
         return context
+
 
     
 """
@@ -144,8 +169,6 @@ class StatusGenerator:
         self.now_time = datetime.now(timezone.utc)
 
     def generate_status_description(self):
-    
-
         for booking in self.booking_list:
             self.now_time = datetime.now(timezone.utc)
             if booking.status == 'rejected' or booking.status == 'accepted' or booking.status == 'requested' or booking.status == 'no_show' or booking.status == 'paid':
@@ -165,7 +188,6 @@ class StatusGenerator:
                 manipulate_function = getattr(self, manipulate_function_name)
                 manipulate_function(booking)
                 booking.datetime = booking.datetime.strftime("%d %b %Y %H:%I")
-                
 
     def _manipulate_requested_booking(self, booking):
         time_after_booking_submission = self.now_time - booking.submitted_datetime
@@ -174,7 +196,6 @@ class StatusGenerator:
         if (time_after_booking_submission.days < 0):
             booking.status_description = 'Server external error.'
             booking.colour = 'red'
-
         # The booking hasn't been manipulated by anyone yet, and the time after the 
         # submission is greater than 12 hours.
         elif (time_after_booking_submission.days == 0 and time_after_booking_submission.seconds > 43200): 
@@ -207,8 +228,7 @@ class StatusGenerator:
         elif (time_after_experience.days > 0):
             booking.status_description = 'The review email has been sent ' + str(time_after_experience.days) + ' days and ' + str(round(float(time_after_experience.seconds/3600),1)) + ' hours ago.'
             booking.colour = 'black'
-            booking.actions = ['Mark as no show', 'Upload review']    
-
+            booking.actions = ['Mark as no show', 'Upload review']
         else:
             booking.status_description = 'The host has accepted the booking.' 
             booking.colour = 'black'    
@@ -229,11 +249,6 @@ class StatusGenerator:
 
     def _manipulate_paid_booking(self, booking):
         self._manipulate_requested_booking(booking)
-    def _manipulate_booking_booking(self, booking):
-        pass   
-
-
-
 
 def mark_as_no_show(request, **kwargs):
     booking = Booking.objects.get(id = kwargs['booking_id'])
@@ -289,7 +304,6 @@ def unarchive_bookings(request, **kwargs):
             booking = Booking.objects.get(id = booking_id)
             temp = booking.status.split('_')
             previous_status = ''
-            
             for ele in temp:
                 if ele != 'archived':
                     previous_status = previous_status + '_' + ele
@@ -298,8 +312,6 @@ def unarchive_bookings(request, **kwargs):
             booking.save()
     status = 'success'
     return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
- 
-
 
 def send_confirmation_email_host(request, **kwargs):
     ids_key = 'admin_panel_booking_id_checkbox'
@@ -345,7 +357,7 @@ def send_confirmation_email_host(request, **kwargs):
 
     status = 'success'
     return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
-  
+
 def send_confirmation_email_guest(request, **kwargs):
     ids_key = 'admin_panel_booking_id_checkbox'
     all_chosen_key = 'all'

@@ -53,8 +53,22 @@ class Experience(models.Model):
         c = self.city if self.city != None else ''
         return str(self.id) + '--' + t + '--' + s + '--' + c
 
+    def get_experience_i18n_info(self, luanguage):
+        pass
+
     class Meta:
         ordering = ['id']
+
+class ExperienceI18n(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    language = models.CharField(max_length=2)
+    activity = models.TextField()
+    interaction = models.TextField()
+    dress = models.TextField()
+    meetup_spot = models.TextField()
+    dropoff_spot = models.TextField()
+    experience = models.ForeignKey(Experience)
 
 class ExperienceTitle(models.Model):
     title = models.CharField(max_length=100)
@@ -319,7 +333,6 @@ def get_experience_meetup_spot(experience, language):
 
 def get_experience_tags(experience, language):
     tags = []
-
     if experience.tags is not None and len(experience.tags.all()) > 0:
         t = experience.tags.filter(language=language)
         for i in range(len(t)):

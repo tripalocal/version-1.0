@@ -129,4 +129,5 @@ urlpatterns = patterns('',
     url(r'^custom_admin/unarchive_bookings/$', superuser_required(unarchive_bookings)),
     url(r'^custom_admin/archive/$', superuser_required(ArchiveView.as_view())),
     url(r'^custom_admin/payment/$', superuser_required(PaymentView.as_view())),
+    url(r'^custom_admin/experience/$', superuser_required(ExperienceView.as_view())),
 )
