@@ -1842,7 +1842,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                             'length':len(cityExperienceList),
                             'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
                             'cityList':cityList,
-                            'user_email':request.user.email if request.user.is_authenticated() else None
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'locations' : Locations
                             })
     return render_to_response(template, {'form': form}, context)
 

@@ -75,29 +75,10 @@
                             <td class="search-location">
                               <div id="id-city" class="ui selection dropdown">
                                 <input type="hidden" name="city" value="city">
-                                <i class="dropdown icon"></i>
-                                <div class="text">City</div>
-                                <div class="menu">
-                                  <div class="header">Australia</div>
-                                  <div class="item" data-value="Melbourne" data-text="Melbourne">Melbourne <span class="light-color">Victoria</span></div>
-                                  <div class="item" data-value="Sydney" data-text="Sydney">Sydney <span class="light-color">New South Wales</span></div>
-                                  <div class="item" data-value="Brisbane" data-text="Brisbane">Brisbane <span class="light-color">Queensland</span></div>
-                                  <div class="item" data-value="Cairns" data-text="Cairns">Cairns <span class="light-color">Queensland</span></div>
-                                  <div class="item" data-value="Goldcoast" data-text="Gold Coast">Gold Coast <span class="light-color">Queensland</span></div>
-                                  <div class="item" data-value="Adelaide" data-text="Adelaide">Adelaide <span class="light-color">South Australia</span></div>
-                                  <div class="item" data-value="Hobart" data-text="Hobart">Hobart <span class="light-color">Tasmania</span></div>
-                                  <div class="item" data-value="Alicesprings" data-text="Alice Springs">Alice Springs <span class="light-color">Northern Territory</span></div>
-                                  <div class="item" data-value="Darwin" data-text="Darwin">Darwin <span class="light-color">Northern Territory</span></div>
-                                  <div class="header">New Zealand</div>
-                                  <div class="item" data-value="Christchurch" data-text="Christchurch">Christchurch <span class="light-color">Canterbury</span></div>
-                                  <div class="item" data-value="Queenstown" data-text="Queenstown">Queenstown <span class="light-color">Otago</span></div>
-                                  <div class="item" data-value="Auckland" data-text="Auckland">Auckland <span class="light-color">Auckland</span></div>
-                                  <div class="item" data-value="Wellington" data-text="Wellington">Wellington <span class="light-color">Wellington</span></div>
-                                </div>
+                                  <i class="dropdown icon"></i>
+                                  <div class="text">City</div>
+                                  <div id="city-menu" class="menu"></div>
                               </div>
-                              <script charset="utf-8" type="text/javascript">
-                                $('.ui.dropdown').dropdown();
-                              </script>
                             </td>
                             <td class="search-from">{{form.start_date}}</td>
                             <td class="search-to">{{form.end_date}}</td>
@@ -269,6 +250,19 @@
             $("#id_end_date").attr("style","height:40px;");
             $("#id_start_date").attr("placeholder","From");
             $("#id_end_date").attr("placeholder","To");
+
+            {% for k, v in locations %}
+                var header = '<div class=\"header\">' + '{{ k }}' + '</div>';
+                $('#city-menu').append(header);
+                {% for id, name, state in v %}
+                    var city = '<div class=\"item\" data-value=' + '{{ id }}' +
+                            ' data-text=' + '{{ name }}' + '>' + '{{ name }} ' +
+                            '<span class=\"light-color\">' + '{{ state }}' + '</span></div>';
+                    $('#city-menu').append(city);
+                {% endfor %}
+            {% endfor %}
+
+            $('.ui.dropdown').dropdown();
 
             //hide loginpartial on homepage
             $(".navBox").attr("style","display:none");

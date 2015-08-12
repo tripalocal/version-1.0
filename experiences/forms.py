@@ -28,6 +28,17 @@ Location = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Br
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
+Locations = [('Australia', [('Melbourne', _('Melbourne'), _('Victoria')), ('Sydney', _('Sydney'), _('New South Wales')),
+                           ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
+                           ('Goldcoast', _('Gold coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
+                           ('Adelaide', _('Adelaide'), _('South Australia')),
+                           ('Darwin', _('Darwin'), _('Northern Territory')),
+                           ('Alicesprings', _('Alice Springs'), _('Northern Territory'))]),
+             ('New Zealand', [('Christchurch', _('Christchurch'), _('Canterbury')),
+                             ('Queenstown', _('Queenstown'), _('Otago')),
+                             ('Auckland', _('Auckland'), _('Auckland')),
+                             ('Wellington', _('Wellington'), _('Wellington'))])]
+
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),)#('english;translation','English+Chinese translation'),
 
 Repeat_Cycle = (('Weekly', 'Weekly'), ('Daily', 'Daily'), ('Monthly', 'Monthly'),)
