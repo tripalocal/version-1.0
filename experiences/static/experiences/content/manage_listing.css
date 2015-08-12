@@ -7,12 +7,64 @@
   z-index: 100;
   border-top: 0;
 }
+
 .back_button {
 
 }
 
+.button_icon {
+  margin-right: 5px;
+  line-height: 1.5;
+}
+#nav-right {
+
+}
 .back_button a {
   padding-left: 0;
 }
 
 /* Side bar */
+.form-nav {
+  padding-top: 20px;
+  padding-bottom: 15px;
+}
+.form-nav li {
+  margin-bottom: 15px;
+}
+.list-menu {
+  padding: 0;
+}
+.list-tab {
+  margin-left: 0;
+}
+.modify-icon {
+  top: 0;
+}
+
+
+/* Content */
+.form-content {
+  margin-left: 200px;
+  height: 800px;
+  width: auto;
+  position: relative;
+  overflow: auto;
+  z-index: 1;
+}
+
+/* Price Form */
+#menu-selection-left {
+  width: 226px;
+  height: 278px;
+  background: rgb(247,247,247);
+  background-image: url('/images/private.png');
+  background-size: cover;
+}
+
+#menu-selection-right {
+  width: 226px;
+  height: 278px;
+  background: rgb(247,247,247);
+  background-image: url('/images/public.png');
+  background-size: cover;
+}

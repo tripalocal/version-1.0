@@ -72,7 +72,7 @@
 }
 .modal-inner{
 	float:none;
-	margin: 0 auto;	
+	margin: 0 auto;
 }
 .modal-fade{
 	z-index:10;
@@ -308,11 +308,11 @@
 }
 
 .slide-copy h1 {
-  color: #363636;  
-  
+  color: #363636;
+
   font-family: 'Oswald', sans-serif;
   font-weight: 400;
-  
+
   font-size: 40px;
   margin-top: 105px;
   margin-bottom: 0px;
@@ -320,10 +320,10 @@
 
 .slide-copy h2 {
   color: #b7b7b7;
-  
+
   font-family: 'Oswald', sans-serif;
   font-weight: 400;
-  
+
   font-size: 40px;
   margin: 5px;
 }
@@ -356,11 +356,11 @@
 .slide-feature a {
   display: block;
   color: #6fc5e0;
-  
+
   font-family: "HelveticaNeueMdCn", Helvetica, sans-serif;
   font-family: 'Oswald', sans-serif;
   font-weight: 400;
-  
+
   font-size: 20px;
 }
 
@@ -621,7 +621,7 @@ a:hover{text-decoration: none;}
 .repeat-frequency select{
 	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; width: 80px; background-position: 60px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px;}
 
-.repeat-every select{ 
+.repeat-every select{
 	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; width: 50px; background-position: 30px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px;}
 /*checkbox*/
 label {
@@ -634,19 +634,19 @@ user-select: none;
 }
 
 input[type=checkbox].css-checkbox {
-	  position: absolute; 
-    overflow: hidden; 
-    clip: rect(0 0 0 0); 
-    height:1px; 
-    width:1px; 
-    margin:-1px; 
+	  position: absolute;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    height:1px;
+    width:1px;
+    margin:-1px;
     padding:0;
     border:0;
 }
 
 input[type=checkbox].css-checkbox + label.css-label {
 	padding-left:20px;
-	height:15px; 
+	height:15px;
 	display:inline-block;
 	line-height:17px;
 	background-repeat:no-repeat;
@@ -669,12 +669,12 @@ input[type=checkbox].css-checkbox:checked + label.css-label {
 
 /*Toggle*/
 *, *:before, *:after {
-   -moz-box-sizing: border-box; 
-  -webkit-box-sizing: border-box; 
+   -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 body {
-  font-family:'Helvetica', sans-serif; 
+  font-family:'Helvetica', sans-serif;
 }
 
 /* BUTTON */
@@ -705,9 +705,9 @@ body {
   transition:all 0.2s ease;
 }
 .four .button-active .button-switch { left:0px; }
-.four .button-in, 
+.four .button-in,
 .four .button-out {
-  position:absolute; 
+  position:absolute;
   transition:all 0.2s ease;
   padding-top:15px;
   font-size:0.8em;
@@ -753,9 +753,9 @@ body {
   transition:all 0.2s ease;
 }
 .five .button-active .button-switch { left:100px; }
-.five .button-in, 
+.five .button-in,
 .five .button-out {
-  position:absolute; 
+  position:absolute;
   transition:all 0.2s ease;
   padding-top:15px;
   font-size:0.8em;
@@ -914,7 +914,7 @@ body {
 #menu-title-title{}
 
 #menu-selection-left{ background: red none repeat scroll 0 0;  display: inline-block;  height: 245px;  left: 40px;  margin: 10px 35px;  position: relative;  width: 225px; cursor: pointer;}
-#memu-selection-right{    background: red none repeat scroll 0 0;  display: inline-block;  height: 245px;  margin: 10px 34px;  position: relative;  width: 225px; cursor: pointer;}
+#menu-selection-right{    background: red none repeat scroll 0 0;  display: inline-block;  height: 245px;  margin: 10px 34px;  position: relative;  width: 225px; cursor: pointer;}
 #menu-operation-bar {  margin-top: 30px; text-align: center; }
 
 
@@ -1165,8 +1165,8 @@ a#nav-right {position: absolute;  right: 5%;  display: inline-block;}
 #fix-interface-itinerary{margin-left: 700px; margin-top: 20px;}
 #fix-interface-itinerary span{display:inline-block;width:80px;}
 #optional_criteria_container{width: 940px; margin:auto;}
-#itinerary_table tr{border: 0px;}  
-#itinerary_table td{border: 1px solid #CDCDCD; margin:10px;} 
+#itinerary_table tr{border: 0px;}
+#itinerary_table td{border: 1px solid #CDCDCD; margin:10px;}
 #itinerary_table{width:940px;margin: auto;}
 #itinerary_table input[type=checkbox] {
   /* All browsers except webkit*/
@@ -1310,18 +1310,18 @@ a#nav-right {position: absolute;  right: 5%;  display: inline-block;}
 	top: 5px;
 	left: 5px;
 }
-#id_login,#id_password,#id_password1,#id_email,#id_first_name,#id_last_name{  
-    width:25vw;  
-    height:34px;  
-    border: 1px solid #cccccc;  
-    border-radius: 3px;  
-    padding-left: 2vw;  
-    display: inline;  
-    font-size: 14px;  
+#id_login,#id_password,#id_password1,#id_email,#id_first_name,#id_last_name{
+    width:25vw;
+    height:34px;
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    padding-left: 2vw;
+    display: inline;
+    font-size: 14px;
 }
 /** changes on add experience -pricing page **/
 .preview_listing{
-	float: right; 
+	float: right;
 }
 .eye-icon{
 	background-image: url(/images/icons.png);
@@ -1360,11 +1360,11 @@ a#nav-right {position: absolute;  right: 5%;  display: inline-block;}
 
 .save_to_wishlist_button{
     border:1px solid #CCCCCC;
-    color:#666666; 
-    margin-top:30px; 
-    height:50px; 
+    color:#666666;
+    margin-top:30px;
+    height:50px;
     width: 100%;
-    margin-left:auto; 
+    margin-left:auto;
     margin-right:auto;
     border-radius: 3px;
     padding:5px 55px;
