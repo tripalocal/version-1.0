@@ -22,3 +22,11 @@ In order to get rid of stash and unstashes, here is a better practice to customi
 2. In template, reference static files using `{% static '<app_name>/...' %}`.
 3. In CSS, reference static files using `background: url('../img/foo.png');`.
 4. Remember to run `python manage.py collectstatic`.
+
+### Turn on S3
+To turn on S3, add DEFAULT_FILE_STORAGE, STATICFILES_STORAGE ENV variables:
+
+In Mac OS, do it like this:
+
+`DEFAULT_FILE_STORAGE=custom_storages.MediaStorage`
+`STATICFILES_STORAGE=custom_storages.StaticStorage`
