@@ -29,10 +29,10 @@
                             <div class="iconText">{%trans "Dates" %}</div>
                         </div>
                         <div class="formBoxes">
-                          <div id="id_city" class="ui selection dropdown">
-                            <input type="hidden" name="city" value="city">
+                          <div class="ui selection dropdown">
+                            <input id="id_city" type="hidden" name="city" value="city">
                             <i class="dropdown icon"></i>
-                            <div class="text">City</div>
+                            <div id="city_name" class="text">City</div>
                             <div id="city-menu" class="menu"></div>
                           </div>
                             <div class="input-group startDate">
@@ -235,6 +235,7 @@
             {% endfor %}
         {% endfor %}
 
+        $("#city_name").text("{{city}}");
         $('.ui.dropdown').dropdown();
 
         $("#id_guest_number").addClass("guestNumber");
@@ -338,6 +339,7 @@
             if (e.originalEvent.state !== null) {
                 var city = hrefToCityName(location.href);
                 $("#id_city").val(city);
+                $("#city_name").text(city);
                 loadExperienceList(location.href);
             }
         });
