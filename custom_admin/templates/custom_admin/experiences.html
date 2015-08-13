@@ -63,17 +63,17 @@
                         </label>
                     </span>
                 </td>
-                <td>1</td>
-                <td><a href="#">Italian Home Dining Experience</a></td>
+                <td>{{experience.id}}</td>
+                <td><a href="#">{{experience.title}}</a></td>
                 <td>30%</td>
                 <td id="Green">
-                    Listed
+                    {{experience.status}}
                 </td>
-                <td>Private</td>
+                <td>{{experience.type}}</td>
                 <td><p><a href="#">Yiyi Wang</a></p>
                     <p>(<a href="#">Change Host</a>)</p>
                 </td>
-                <td>Melbourne</td>
+                <td>{{experience.city}}</td>
                 <td><p><a href="#">Edit</a></p></td>
             </tr>
             {% endfor %}

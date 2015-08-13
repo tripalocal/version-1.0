@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 import datetime
 from allauth.socialaccount.models import SocialAccount
@@ -53,21 +54,36 @@ class Experience(models.Model):
         c = self.city if self.city != None else ''
         return str(self.id) + '--' + t + '--' + s + '--' + c
 
-    def get_experience_i18n_info(self, luanguage):
-        pass
+    def get_experience_i18n_info(self, **kwargs):
+        # The default language is english.
+        language = 'en'
+        if 'language' in kwargs:
+            language = kwargs['language']
+        exp = ExperienceI18n.objects.filter(experience_id=self.id, language=language)
+        if exp.__len__() == 1:
+            exp_i18n = exp[0]
+            self.title = exp_i18n.title
+            self.description = exp_i18n.description
+            self.activity = exp_i18n.activity
+            self.dress = exp_i18n.activity
+            self.interaction = exp_i18n.interaction
+            self.meetup_spot = exp_i18n.meetup_spot
+            self.dropoff_spot = exp_i18n.dropoff_spot
+
+
 
     class Meta:
         ordering = ['id']
 
 class ExperienceI18n(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    language = models.CharField(max_length=2)
-    activity = models.TextField()
-    interaction = models.TextField()
-    dress = models.TextField()
-    meetup_spot = models.TextField()
-    dropoff_spot = models.TextField()
+    title = models.CharField(max_length=100, null=True)
+    description = models.TextField(null=True)
+    language = models.CharField(max_length=2, null=True)
+    activity = models.TextField(null=True)
+    interaction = models.TextField(null=True)
+    dress = models.TextField(null=True)
+    meetup_spot = models.TextField(null=True)
+    dropoff_spot = models.TextField(null=True)
     experience = models.ForeignKey(Experience)
 
 class ExperienceTitle(models.Model):

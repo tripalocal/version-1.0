@@ -2,8 +2,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormMixin
 from custom_admin.forms import ChangeTimeForm, UploadReviewForm
 
-from experiences.models import Booking,Experience
-from experiences.models import Review
+from experiences.models import *
 from django.contrib.auth.models import User
 from django.template import RequestContext, loader
 from datetime import datetime,timezone,timedelta
@@ -17,7 +16,6 @@ from tripalocal_messages.models import Aliases
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import user_passes_test
 
-
 class BookingInfoMixin(object):
     def get_context_data(self, **kwargs):
         context = super(BookingInfoMixin, self).get_context_data(**kwargs)
@@ -30,7 +28,6 @@ class BookingInfoMixin(object):
         context['user_name'] = self.request.user.username
         return context
 
-
 class NotificationMixin(object):
     def get_context_data(self, **kwargs):
         context = super(NotificationMixin, self).get_context_data(**kwargs)
@@ -40,7 +37,6 @@ class NotificationMixin(object):
         else:
             context[change_status_notification_key] = 'none'
         return context
-
 
 class PaymentView(BookingInfoMixin, NotificationMixin, ListView):
     model = Booking
@@ -52,11 +48,9 @@ class PaymentView(BookingInfoMixin, NotificationMixin, ListView):
         _calculte_price(context['booking_list'])
         return context
 
-
 class ArchiveView(BookingInfoMixin, NotificationMixin, ListView):
     model = Booking
     template_name = 'custom_admin/archives.html'
-
 
 class BookingView(BookingInfoMixin, NotificationMixin, FormMixin, ListView):
     model = Booking
@@ -115,35 +109,17 @@ class BookingView(BookingInfoMixin, NotificationMixin, FormMixin, ListView):
             context['form2'] = self.second_form_class()
         return context
 
-
 class ExperienceView(FormMixin, ListView):
     model = Experience
     template_name = 'custom_admin/experiences.html'
     context_object_name = 'experience_list'
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super(ExperienceView, self).get_context_data(**kwargs)
-
         experinece_list = Experience.objects.all()
-        #experience_title
-        for exp in experinec_list:
-
-
-ExperienceTitle(models.Model)
-
-ExperienceDescription(models.Model)
-
-ExperienceActivity(models.Model)
-
-ExperienceInteraction(models.Model)
-
-
-ExperienceDress(models.Model)
-
-ExperienceMeetupSpot(models.Model)
-ExperienceDropoffSpot
-
+        for exp in experinece_list:
+            exp.get_experience_i18n_info()
+        context['experience_list'] = experinece_list
         return context
 
 
