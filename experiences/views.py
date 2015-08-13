@@ -616,7 +616,9 @@ class ExperienceDetailView(DetailView):
                            'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),0),
                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                            'total_price': experience_fee_calculator(subtotal_price),
-                           'user_email':request.user.email
+                           'user_email':request.user.email,
+                           'GEO_POSTFIX':settings.GEO_POSTFIX,
+                           'LANGUAGE':settings.LANGUAGE_CODE
                            })
 
     def get_context_data(self, **kwargs):
@@ -746,6 +748,8 @@ class ExperienceDetailView(DetailView):
         experience.dress = get_experience_dress(experience, settings.LANGUAGES[0][0])
         experience.whatsincluded = get_experience_whatsincluded(experience, settings.LANGUAGES[0][0])
 
+        context['GEO_POSTFIX'] = settings.GEO_POSTFIX
+        context['LANGUAGE'] = settings.LANGUAGE_CODE
         return context
 
 EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
@@ -753,9 +757,6 @@ EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 def experience_booking_successful(request, experience, guest_number, booking_datetime, price_paid, is_instant_booking=False):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
-    
-    mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
 
     if not settings.DEVELOPMENT:
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
@@ -770,7 +771,9 @@ def experience_booking_successful(request, experience, guest_number, booking_dat
                                     'guest_number':guest_number,
                                     'booking_datetime':booking_datetime,
                                     'user':request.user,
-                                    'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id)})
+                                    'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                    'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                    'LANGUAGE':settings.LANGUAGE_CODE})
 
 def experience_booking_confirmation(request):
     # Get the context from the request.
@@ -845,7 +848,9 @@ def experience_booking_confirmation(request):
                                                                            'subtotal_price':subtotal_price,
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
-                                                                           'total_price': total_price}, context)
+                                                                           'total_price': total_price,
+                                                                           'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                                                           'LANGUAGE':settings.LANGUAGE_CODE}, context)
 
         else:
             #submit the form
@@ -878,7 +883,9 @@ def experience_booking_confirmation(request):
                                                                            'subtotal_price':subtotal_price,
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
-                                                                           'total_price': total_price}, context)
+                                                                           'total_price': total_price,
+                                                                           'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                                                           'LANGUAGE':settings.LANGUAGE_CODE}, context)
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()

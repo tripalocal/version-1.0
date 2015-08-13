@@ -13,9 +13,9 @@
         <div class="fixCenter">
             <div class="tab_item">
                 <a href="#" class="firstTabItem" id="active-tab">{% trans "My Listing" %}</a>
-                <a href="/mytrip">{% trans "My Trip" %}</a>
-                <a href="/myprofile">{% trans "My Profile" %}</a>
-                <a href="/accounts/password/change/">{% trans "My Account" %}</a>
+                <a href="{{GEO_POSTFIX}}mytrip">{% trans "My Trip" %}</a>
+                <a href="{{GEO_POSTFIX}}myprofile">{% trans "My Profile" %}</a>
+                <a href="{{GEO_POSTFIX}}accounts/password/change/">{% trans "My Account" %}</a>
             </div>
         </div>
     </div>
@@ -24,7 +24,7 @@
     	<div class="content-area fixCenter">
     		<div class="left-nav-box">
     		    <p>
-                    <a href="/mylisting">{% trans "Managing Listing" %}</a>
+                    <a href="{{GEO_POSTFIX}}mylisting">{% trans "Managing Listing" %}</a>
                 </p>
                 <p>
                     <a href="#" id="active-tab">{% trans "My Reservation" %}</a>
@@ -42,7 +42,11 @@
                         <div class="icon-group">
                             <div id="date">
                                 <div class="icon"></div>
+                                {%if LANGUAGE != "zh-CN"%}
                                 <p>{{reservation.booking_datetime|date:'d-M-Y'}}</p>
+                                {%else%}
+                                <p>{{reservation.booking_datetime|date:'Y-M-d'}}</p>
+                                {%endif%}
                             </div>
                         </div>
                         <div class="icon-group">
@@ -76,8 +80,13 @@
                             {% endif %}
                             <p class="reservation-info-position" style="max-width:200px;">
                                 <span id="highlighted">{{reservation.experience_title}}</span><br>
+                                {%if LANGUAGE != "zh-CN"%}
                                 {% trans "with" %} <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span><span> ({{reservation.guest_phone_number}})</span><br>
                                 {% trans "from" %} {{reservation.payment_city}}, {{reservation.payment_country}}
+                                {%else%}
+                                {% trans "with" %}{% trans "from" %} {{reservation.payment_city}}, {{reservation.payment_country}}{% trans "'s" %}<br>
+                                <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span><span> ({{reservation.guest_phone_number}})</span>
+                                {%endif%}
                             </p>
                         </div>
                         <div class="add-note" style="display:none;">
@@ -101,7 +110,11 @@
                         <div class="icon-group">
                             <div id="date">
                                 <div class="icon"></div>
+                                {%if LANGUAGE != "zh-CN"%}
                                 <p>{{reservation.booking_datetime|date:'d-M-Y'}}</p>
+                                {%else%}
+                                <p>{{reservation.booking_datetime|date:'Y-M-d'}}</p>
+                                {%endif%}
                             </div>
                         </div>
                         <div class="icon-group">
@@ -131,9 +144,14 @@
                         
                             <p class="reservation-info-position">
                                 <span id="highlighted">{{reservation.experience_title}}</span></br>
+                                {%if LANGUAGE != "zh-CN"%}
                                 {% trans "with" %} 
                                 <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span>
                                 {% trans "in" %} {{reservation.experience_city}}
+                                {%else%}
+                                {% trans "with" %}<span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span>
+                                {% trans "in" %}{{reservation.experience_city}}
+                                {%endif%}
                             </p>
                         </div>
                     </div>
