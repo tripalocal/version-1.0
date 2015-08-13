@@ -89,7 +89,6 @@ Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
-Tags = "Food & wine, Education, History & culture, Architecture, For couples, Photography worthy, Livability research, Outdoor & nature, Shopping, Sports & leisure, Extreme fun, Events, Health & beauty"
 Tags = "Food & wine, Education, History & culture, Architecture, For couples, Photography worthy, Livability research, Kids friendly, Outdoor & nature, Shopping, Sports & leisure, Host with car, Extreme fun, Events, Health & beauty, Private group"
 
 if settings.LANGUAGE_CODE.lower()=="zh-cn":
@@ -1096,8 +1095,8 @@ class ItineraryBookingForm(forms.Form):
 class SearchForm(forms.Form):
     start_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     end_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    guest_number = forms.ChoiceField(choices=Guest_Number, widget=forms.Select(attrs={'id':'guest-number-id','class':'ui dropdown smaller-box'}), required=False)
-    city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'id':'city-id','class':'ui dropdown'}), required=True)
+    guest_number = forms.ChoiceField(choices=Guest_Number, widget=forms.Select(attrs={'class':'ui dropdown smaller-box'}), required=False)
+    city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'class':'ui dropdown'}), required=True)
     language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")
     is_kids_friendly = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
     is_host_with_cars = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
