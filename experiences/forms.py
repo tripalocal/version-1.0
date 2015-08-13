@@ -10,7 +10,7 @@ import pytz, string, subprocess, json, random
 from django.core.mail import send_mail
 from django.template import loader
 from tripalocal_messages.models import Aliases, Users
-from django.utils.translation import ugettext_lazy as _, string_concat
+from django.utils.translation import ugettext as _
 from allauth.socialaccount.signals import pre_social_login, social_account_added
 from django.dispatch import receiver
 from django.db import connections
@@ -35,8 +35,8 @@ Repeat_Cycle = (('Weekly', 'Weekly'), ('Daily', 'Daily'), ('Monthly', 'Monthly')
 Repeat_Frequency = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),
     ('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
-Guest_Number = (('1', '1 Guest'),('2', '2 Guests'),('3', '3 Guests'),('4', '4 Guests'),('5', '5 Guests'),
-                ('6', '6 Guests'),('7', '7 Guests'),('8', '8 Guests'),('9', '9 Guests'),('10', '10 Guests'),)
+Guest_Number = (('1', '1' + _(' Guest')),('2', '2' + _(' Guests')),('3', '3' + _(' Guests')),('4', '4' + _(' Guests')),('5', '5' + _(' Guests')),
+                ('6', '6' + _(' Guests')),('7', '7' + _(' Guests')),('8', '8' + _(' Guests')),('9', '9' + _(' Guests')),('10', '10' + _(' Guests')),)
 
 Guest_Number_Min = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
@@ -55,6 +55,13 @@ Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Bri
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
+Currency = (('AUD',_('AUD')),('NZD',_('NZD')),) #('CNY',_('CNY')),
+DollarSign = {'AUD':'$','NZD':'$'} #'CNY':'￥',
+
+Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted'))
+
+PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
+
 Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghanistan'),('Albania', 'Albania'),('Algeria', 'Algeria'),('Andorra', 'Andorra'),('Angola', 'Angola'),('Antigua and Barbuda', 'Antigua and Barbuda'),('Argentina', 'Argentina'),('Armenia', 'Armenia'),('Aruba', 'Aruba'),('Austria', 'Austria'),('Azerbaijan', 'Azerbaijan'),('Bahamas', 'Bahamas'),('Bahrain', 'Bahrain'),('Bangladesh', 'Bangladesh'),('Barbados', 'Barbados'),('Belarus', 'Belarus'),('Belgium', 'Belgium'),('Belize', 'Belize'),('Benin', 'Benin'),('Bhutan', 'Bhutan'),('Bolivia', 'Bolivia'),('Bosnia and Herzegovina', 'Bosnia and Herzegovina'),('Botswana', 'Botswana'),('Brazil', 'Brazil'),('Brunei ', 'Brunei '),('Bulgaria', 'Bulgaria'),('Burkina Faso', 'Burkina Faso'),
 ('Burma', 'Burma'),('Burundi', 'Burundi'),('Cambodia', 'Cambodia'),('Cameroon', 'Cameroon'),('Canada', 'Canada'),('Cape Verde', 'Cape Verde'),('Central African Republic', 'Central African Republic'),('Chad', 'Chad'),('Chile', 'Chile'),('Colombia', 'Colombia'),('Comoros', 'Comoros'),('Congo, Democratic Republic of the', 'Congo, Democratic Republic of the'),('Congo, Republic of the', 'Congo, Republic of the'),('Costa Rica', 'Costa Rica'),('Cote dIvoire', 'Cote dIvoire'),('Croatia', 'Croatia'),('Cuba', 'Cuba'),('Curacao', 'Curacao'),('Cyprus', 'Cyprus'),('Czech Republic', 'Czech Republic'),('Denmark', 'Denmark'),('Djibouti', 'Djibouti'),('Dominica', 'Dominica'),('Dominican Republic', 'Dominican Republic'),
 ('East Timor', 'East Timor'),('Ecuador', 'Ecuador'),('Egypt', 'Egypt'),('El Salvador', 'El Salvador'),('Equatorial Guinea', 'Equatorial Guinea'),('Eritrea', 'Eritrea'),('Estonia', 'Estonia'),('Ethiopia', 'Ethiopia'),('Fiji', 'Fiji'),('Finland', 'Finland'),('France', 'France'),('Gabon', 'Gabon'),('Gambia', 'Gambia'),('Georgia', 'Georgia'),('Germany', 'Germany'),('Ghana', 'Ghana'),('Greece', 'Greece'),('Grenada', 'Grenada'),('Guatemala', 'Guatemala'),('Guinea', 'Guinea'),('Guinea-Bissau', 'Guinea-Bissau'),('Guyana', 'Guyana'),('Haiti', 'Haiti'),('Holy See', 'Holy See'),('Honduras', 'Honduras'),('Hong Kong, China', 'Hong Kong, China'),('Hungary', 'Hungary'),('Iceland', 'Iceland'),('India', 'India'),('Indonesia', 'Indonesia'),
@@ -71,7 +78,19 @@ Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
+Tags = "Food & wine, Education, History & culture, Architecture, For couples, Photography worthy, Livability research, Outdoor & nature, Shopping, Sports & leisure, Extreme fun, Events, Health & beauty"
 Tags = "Food & wine, Education, History & culture, Architecture, For couples, Photography worthy, Livability research, Kids friendly, Outdoor & nature, Shopping, Sports & leisure, Host with car, Extreme fun, Events, Health & beauty, Private group"
+
+if settings.LANGUAGE_CODE.lower()=="zh-cn":
+    Country = (('China', 'China'),('Australia', 'Australia'),('Afghanistan', 'Afghanistan'),('Albania', 'Albania'),('Algeria', 'Algeria'),('Andorra', 'Andorra'),('Angola', 'Angola'),('Antigua and Barbuda', 'Antigua and Barbuda'),('Argentina', 'Argentina'),('Armenia', 'Armenia'),('Aruba', 'Aruba'),('Austria', 'Austria'),('Azerbaijan', 'Azerbaijan'),('Bahamas', 'Bahamas'),('Bahrain', 'Bahrain'),('Bangladesh', 'Bangladesh'),('Barbados', 'Barbados'),('Belarus', 'Belarus'),('Belgium', 'Belgium'),('Belize', 'Belize'),('Benin', 'Benin'),('Bhutan', 'Bhutan'),('Bolivia', 'Bolivia'),('Bosnia and Herzegovina', 'Bosnia and Herzegovina'),('Botswana', 'Botswana'),('Brazil', 'Brazil'),('Brunei ', 'Brunei '),('Bulgaria', 'Bulgaria'),('Burkina Faso', 'Burkina Faso'),
+('Burma', 'Burma'),('Burundi', 'Burundi'),('Cambodia', 'Cambodia'),('Cameroon', 'Cameroon'),('Canada', 'Canada'),('Cape Verde', 'Cape Verde'),('Central African Republic', 'Central African Republic'),('Chad', 'Chad'),('Chile', 'Chile'),('Colombia', 'Colombia'),('Comoros', 'Comoros'),('Congo, Democratic Republic of the', 'Congo, Democratic Republic of the'),('Congo, Republic of the', 'Congo, Republic of the'),('Costa Rica', 'Costa Rica'),('Cote dIvoire', 'Cote dIvoire'),('Croatia', 'Croatia'),('Cuba', 'Cuba'),('Curacao', 'Curacao'),('Cyprus', 'Cyprus'),('Czech Republic', 'Czech Republic'),('Denmark', 'Denmark'),('Djibouti', 'Djibouti'),('Dominica', 'Dominica'),('Dominican Republic', 'Dominican Republic'),
+('East Timor', 'East Timor'),('Ecuador', 'Ecuador'),('Egypt', 'Egypt'),('El Salvador', 'El Salvador'),('Equatorial Guinea', 'Equatorial Guinea'),('Eritrea', 'Eritrea'),('Estonia', 'Estonia'),('Ethiopia', 'Ethiopia'),('Fiji', 'Fiji'),('Finland', 'Finland'),('France', 'France'),('Gabon', 'Gabon'),('Gambia', 'Gambia'),('Georgia', 'Georgia'),('Germany', 'Germany'),('Ghana', 'Ghana'),('Greece', 'Greece'),('Grenada', 'Grenada'),('Guatemala', 'Guatemala'),('Guinea', 'Guinea'),('Guinea-Bissau', 'Guinea-Bissau'),('Guyana', 'Guyana'),('Haiti', 'Haiti'),('Holy See', 'Holy See'),('Honduras', 'Honduras'),('Hong Kong, China', 'Hong Kong, China'),('Hungary', 'Hungary'),('Iceland', 'Iceland'),('India', 'India'),('Indonesia', 'Indonesia'),
+('Iran', 'Iran'),('Iraq', 'Iraq'),('Ireland', 'Ireland'),('Israel', 'Israel'),('Italy', 'Italy'),('Jamaica', 'Jamaica'),('Japan', 'Japan'),('Jordan', 'Jordan'),('Kazakhstan', 'Kazakhstan'),('Kenya', 'Kenya'),('Kiribati', 'Kiribati'),('Korea, North', 'Korea, North'),('Korea, South', 'Korea, South'),('Kosovo', 'Kosovo'),('Kuwait', 'Kuwait'),('Kyrgyzstan', 'Kyrgyzstan'),('Laos', 'Laos'),('Latvia', 'Latvia'),('Lebanon', 'Lebanon'),('Lesotho', 'Lesotho'),('Liberia', 'Liberia'),('Libya', 'Libya'),('Liechtenstein', 'Liechtenstein'),('Lithuania', 'Lithuania'),('Luxembourg', 'Luxembourg'),('Macau, China', 'Macau, China'),('Macedonia', 'Macedonia'),('Madagascar', 'Madagascar'),('Malawi', 'Malawi'),('Malaysia', 'Malaysia'),
+('Maldives', 'Maldives'),('Mali', 'Mali'),('Malta', 'Malta'),('Marshall Islands', 'Marshall Islands'),('Mauritania', 'Mauritania'),('Mauritius', 'Mauritius'),('Mexico', 'Mexico'),('Micronesia', 'Micronesia'),('Moldova', 'Moldova'),('Monaco', 'Monaco'),('Mongolia', 'Mongolia'),('Montenegro', 'Montenegro'),('Morocco', 'Morocco'),('Mozambique', 'Mozambique'),('Namibia', 'Namibia'),('Nauru', 'Nauru'),('Nepal', 'Nepal'),('Netherlands', 'Netherlands'),('Netherlands Antilles', 'Netherlands Antilles'),('New Zealand', 'New Zealand'),('Nicaragua', 'Nicaragua'),('Niger', 'Niger'),('Nigeria', 'Nigeria'),('North Korea', 'North Korea'),('Norway', 'Norway'),('Oman', 'Oman'),('Pakistan', 'Pakistan'),('Palau', 'Palau'),
+('Palestinian Territories', 'Palestinian Territories'),('Panama', 'Panama'),('Papua New Guinea', 'Papua New Guinea'),('Paraguay', 'Paraguay'),('Peru', 'Peru'),('Philippines', 'Philippines'),('Poland', 'Poland'),('Portugal', 'Portugal'),('Qatar', 'Qatar'),('Romania', 'Romania'),('Russia', 'Russia'),('Rwanda', 'Rwanda'),('Saint Kitts and Nevis', 'Saint Kitts and Nevis'),('Saint Lucia', 'Saint Lucia'),('Saint Vincent and the Grenadines', 'Saint Vincent and the Grenadines'),('Samoa ', 'Samoa '),('San Marino', 'San Marino'),('Sao Tome and Principe', 'Sao Tome and Principe'),('Saudi Arabia', 'Saudi Arabia'),('Senegal', 'Senegal'),('Serbia', 'Serbia'),('Seychelles', 'Seychelles'),('Sierra Leone', 'Sierra Leone'),('Singapore', 'Singapore'),
+('Sint Maarten', 'Sint Maarten'),('Slovakia', 'Slovakia'),('Slovenia', 'Slovenia'),('Solomon Islands', 'Solomon Islands'),('Somalia', 'Somalia'),('South Africa', 'South Africa'),('South Korea', 'South Korea'),('South Sudan', 'South Sudan'),('Spain ', 'Spain '),('Sri Lanka', 'Sri Lanka'),('Sudan', 'Sudan'),('Suriname', 'Suriname'),('Swaziland ', 'Swaziland '),('Sweden', 'Sweden'),('Switzerland', 'Switzerland'),('Syria', 'Syria'),('Taiwan, China', 'Taiwan, China'),('Tajikistan', 'Tajikistan'),('Tanzania', 'Tanzania'),('Thailand ', 'Thailand '),('Timor-Leste', 'Timor-Leste'),('Togo', 'Togo'),('Tonga', 'Tonga'),('Trinidad and Tobago', 'Trinidad and Tobago'),('Tunisia', 'Tunisia'),('Turkey', 'Turkey'),('Turkmenistan', 'Turkmenistan'),
+('Tuvalu', 'Tuvalu'),('Uganda', 'Uganda'),('Ukraine', 'Ukraine'),('United Arab Emirates', 'United Arab Emirates'),('United Kingdom', 'United Kingdom'),('Uruguay', 'Uruguay'),('Uzbekistan', 'Uzbekistan'),('Vanuatu', 'Vanuatu'),('Venezuela', 'Venezuela'),('Vietnam', 'Vietnam'),('Yemen', 'Yemen'),('Zambia', 'Zambia'),('Zimbabwe ', 'Zimbabwe '),)
+    Tags = "美食美酒, 名校游学, 历史人文, 经典建筑, 蜜月旅拍, 风光摄影, 移民考察, 亲子夏令营, 户外探险, 购物扫货, 运动休闲, 领路人自驾, 刺激享乐, 赛事庆典, 美容保健, 私人团"
 
 #from http://stackoverflow.com/questions/16773579/customize-radio-buttons-in-django
 class HorizRadioRenderer(forms.RadioSelect.renderer):
@@ -432,9 +451,8 @@ class CCExpField(forms.MultiValueField):
 def check_coupon(coupon, experience_id, guest_number):
 
     rules = json.loads(coupon.rules)
-    if not coupon.rules or not coupon.rules.strip():
-        result = {"valid":True}
-        return result
+    guest_number = int(guest_number)
+    experience_id = int(experience_id)
 
     if "ids" in rules and experience_id not in rules["ids"]:
         result = {"valid":False,"error":"the coupon cannot be used on this experience -- id"}
@@ -450,7 +468,42 @@ def check_coupon(coupon, experience_id, guest_number):
         result = {"valid":False,"error":"the coupon cannot be used on this experience -- times"}
         return result
 
-    result = {"valid":True}
+    free = False
+    extra_fee = 0.0
+    if type(rules["extra_fee"]) == int or type(rules["extra_fee"]) == float:
+        extra_fee = rules["extra_fee"]
+    elif type(rules["extra_fee"]) == str and rules["extra_fee"]== "FREE":
+        free = True
+        result={"valid":True,"new_price":0.0}
+        return result
+
+    #not free:
+    subtotal_price = 0.0
+    experience = Experience.objects.get(id = experience_id)
+    if experience.dynamic_price and type(experience.dynamic_price) == str:
+        price = experience.dynamic_price.split(',')
+        if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
+        #these is comma in the end, so the length is max-min+2
+            if guest_number <= experience.guest_number_min:
+                subtotal_price = float(experience.price) * float(experience.guest_number_min)
+            else:
+                subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
+        else:
+            #wrong dynamic settings
+            subtotal_price = float(experience.price)*float(guest_number)
+    else:
+        subtotal_price = float(experience.price)*float(guest_number)
+
+    if extra_fee == 0.00:
+        price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+    elif extra_fee >= 1.00 or extra_fee <= -1.00:
+        #absolute value
+        price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)+extra_fee, 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+    else:
+        #percentage, e.g., 30% discount --> percentage == -0.3
+        price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+ 
+    result = {"valid":True, "new_price":price}
     return result
 
 class BookingConfirmationForm(forms.Form):
@@ -462,9 +515,9 @@ class BookingConfirmationForm(forms.Form):
     status = forms.CharField(initial="Requested")
     promo_code = forms.CharField(required=False)
 
-    card_number = CreditCardField(required=True, label="Card Number")
-    expiration = CCExpField(required=True, label="Expiration")
-    cvv = forms.IntegerField(required=True, label="CVV Number",
+    card_number = CreditCardField(required=False, label="Card Number")
+    expiration = CCExpField(required=False, label="Expiration")
+    cvv = forms.IntegerField(required=False, label="CVV Number",
         max_value=9999, widget=forms.TextInput(attrs={'size': '4'}))
 
     first_name = forms.CharField(max_length=50)
@@ -475,7 +528,7 @@ class BookingConfirmationForm(forms.Form):
     state = forms.CharField(max_length=10, required = False)
     country = forms.ChoiceField(choices=Country, required = False)
     postcode = forms.CharField(max_length=4, required = False)
-    phone_number = forms.CharField(max_length=15, required=False)
+    phone_number = forms.CharField(max_length=15, required=True)
 
     coupon_extra_information = forms.CharField(max_length=500, required=False)
     booking_extra_information = forms.BooleanField(required=False)
@@ -507,10 +560,11 @@ class BookingConfirmationForm(forms.Form):
         local_timezone = pytz.timezone(settings.TIME_ZONE)
 
         if not self.errors and (not 'Refresh' in self.data):
-            card_number = self.cleaned_data["card_number"]
-            exp_month = self.cleaned_data["expiration"].month
-            exp_year = self.cleaned_data["expiration"].year
-            cvv = self.cleaned_data["cvv"]
+            stripeToken = self.data["stripeToken"] if "stripeToken" in self.data else None
+            #card_number = self.cleaned_data["card_number"]
+            #exp_month = self.cleaned_data["expiration"].month
+            #exp_year = self.cleaned_data["expiration"].year
+            #cvv = self.cleaned_data["cvv"]
             experience = Experience.objects.get(id=self.cleaned_data['experience_id'])
 
             extra_fee = 0.00
@@ -554,12 +608,11 @@ class BookingConfirmationForm(forms.Form):
             ids.append(self.cleaned_data['experience_id'])
             dates.append(dt.strftime("%Y/%m/%d"))
             times.append(tm.strftime("%H"))
-
+            
             ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,guest_number,
-                         card_number,exp_month,exp_year,cvv,
-                         booking_extra_information,coupon_extra_information,coupon,
-                         payment_street1,payment_street2,payment_city,payment_state,payment_country,payment_postcode,payment_phone_number)
- 
+                         coupon_extra_information = coupon_extra_information, coupon = coupon,
+                         payment_phone_number = payment_phone_number, stripe_token = stripeToken)
+
         return cleaned
 
 class CreateExperienceForm(forms.Form):
@@ -623,12 +676,6 @@ class CreateExperienceForm(forms.Form):
 
 def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
-
-class UserSignupForm(forms.Form):
-    def signup(self, request, user):
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        user.save()
 
 class ReviewForm(forms.ModelForm):
 
@@ -718,10 +765,10 @@ class ItineraryBookingForm(forms.Form):
         self.fields['itinerary_string'].widget = forms.HiddenInput()
 
     def booking(self,ids,dates,times,user,guest_number,
-                card_number,exp_month,exp_year,cvv,
+                card_number=None,exp_month=None,exp_year=None,cvv=None,
                 booking_extra_information=None,coupon_extra_information=None,coupon=None,
                 payment_street1=None,payment_street2=None,payment_city=None,
-                payment_state=None,payment_country=None,payment_postcode=None,payment_phone_number=None):
+                payment_state=None,payment_country=None,payment_postcode=None,payment_phone_number=None,stripe_token=None):
 
         for i in range(len(ids)):
             extra_fee = 0.00
@@ -758,17 +805,19 @@ class ItineraryBookingForm(forms.Form):
                 else:
                     subtotal_price = float(experience.price)*float(guest_number)
 
-                if extra_fee >= 1.00 or extra_fee <= -1.00:
+                if extra_fee == 0.00:
+                    price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+                elif extra_fee >= 1.00 or extra_fee <= -1.00:
                     #absolute value
-                    price = round((subtotal_price*(1.00+settings.COMMISSION_PERCENT)+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2) 
+                    price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)+extra_fee, 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
                 else:
                     #percentage, e.g., 30% discount --> percentage == -0.3
-                    price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2)
+                    price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
  
                 if price > 0:
                     payment = Payment()
                     #change price into cent
-                    success, instance = payment.charge(int(price*100), experience.currency, card_number, exp_month, exp_year, cvv)
+                    success, instance = payment.charge(int(price*100), experience.currency, card_number, exp_month, exp_year, cvv, stripe_token)
                 else:
                     success = True
                     free = True
@@ -842,7 +891,7 @@ class ItineraryBookingForm(forms.Form):
                 #add the user to the guest list
                 if user not in experience.guests.all():
                 #experience.guests.add(user)
-                    cursor = connections['experiencedb'].cursor()
+                    cursor = connections['default'].cursor()
                     cursor.execute("Insert into experiences_experience_guests (experience_id,user_id) values (%s, %s)", [experience.id, user.id])
 
                 if not free:
@@ -863,8 +912,8 @@ class ItineraryBookingForm(forms.Form):
 
                 if not is_instant_booking:
                     # send an email to the host
-                    mail.send(subject=string_concat(_('[Tripalocal] '), user.first_name, _(' has requested your experience')), message='',
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                    mail.send(subject=_('[Tripalocal] ') + user.first_name + _(' has requested your experience'), message='',
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], #fail_silently=False,
                                 priority='now',
                                 html_message=loader.render_to_string('experiences/email_booking_requested_host.html', 
@@ -876,7 +925,7 @@ class ItineraryBookingForm(forms.Form):
                                                                         'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))
                     # send an email to the traveler
                     mail.send(subject=_('[Tripalocal] Your booking request is sent to the host'),  message='',
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], #fail_silently=False,
                                 priority='now', 
                                 html_message=loader.render_to_string('experiences/email_booking_requested_traveler.html',
@@ -895,7 +944,7 @@ class ItineraryBookingForm(forms.Form):
 
                     #send an email to the traveller
                     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                                 priority='now',  #fail_silently=False, 
                                 html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
@@ -906,7 +955,7 @@ class ItineraryBookingForm(forms.Form):
             
                     #schedule an email to the traveller one day before the experience
                     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
                                 html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
@@ -917,7 +966,7 @@ class ItineraryBookingForm(forms.Form):
             
                     #schedule an email to the host one day before the experience
                     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
                                 html_message=loader.render_to_string('experiences/email_reminder_host.html',
@@ -939,7 +988,7 @@ class ItineraryBookingForm(forms.Form):
 
                     #send an email to the host
                     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                                 priority='now',  #fail_silently=False, 
                                 html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
@@ -1049,8 +1098,8 @@ class ItineraryBookingForm(forms.Form):
 class SearchForm(forms.Form):
     start_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     end_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    guest_number = forms.ChoiceField(choices=Guest_Number, required=False)
-    city = forms.ChoiceField(choices=Location,  required=True)
+    guest_number = forms.ChoiceField(choices=Guest_Number, widget=forms.Select(attrs={'id':'guest-number-id','class':'ui dropdown smaller-box'}), required=False)
+    city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'id':'city-id','class':'ui dropdown'}), required=True)
     language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")
     is_kids_friendly = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
     is_host_with_cars = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))

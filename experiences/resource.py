@@ -27,12 +27,16 @@ from allauth.account.utils import user_username, user_email, user_field
 from allauth.account.signals import user_signed_up, user_logged_in
 from allauth.socialaccount import providers
 from allauth.socialaccount.models import SocialLogin, SocialToken, SocialApp
-from allauth.socialaccount.providers.facebook.views import fb_complete_login
 from allauth.socialaccount.helpers import complete_social_login
-from django.utils.translation import ugettext_lazy as _, string_concat
+from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
-GEO_POSTFIX = "/"
+try:
+    from allauth.socialaccount.providers.facebook.views import fb_complete_login
+except ImportError:
+    pass
+
+GEO_POSTFIX = settings.GEO_POSTFIX
 
 def isLegalInput(inputs):
     for input in inputs:
@@ -211,7 +215,7 @@ def saveBookingRequest(booking_request):
     host = experience.hosts.all()[0]
     #send an email to the traveller
     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
                 html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
@@ -233,7 +237,7 @@ def saveBookingRequest(booking_request):
 
     #send an email to the host
     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
-                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='now',  #fail_silently=False, 
                 html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
@@ -244,7 +248,7 @@ def saveBookingRequest(booking_request):
 
     #schedule an email to the traveller one day before the experience
     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
                 html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
@@ -255,7 +259,7 @@ def saveBookingRequest(booking_request):
 
     #schedule an email to the host one day before the experience
     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
-                sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=user.email)[0].mail, '>'),
+                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                 priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
                 html_message=loader.render_to_string('experiences/email_reminder_host.html',
@@ -287,7 +291,10 @@ def saveBookingRequestsFromXLS(request):
                 #TODO
                 raise
 
-            worksheet = workbook.sheet_by_name('English')
+            if settings.LANGUAGES[0][0] == "en":
+                worksheet = workbook.sheet_by_name('English')
+            elif settings.LANGUAGES[0][0] == "zh":
+                worksheet = workbook.sheet_by_name('Chinese')
             num_rows = worksheet.nrows - 1
             num_cells = worksheet.ncols - 1
             curr_row = 0
@@ -367,13 +374,18 @@ def ajax_view(request):
         raise Http404
 
 @api_view(['POST','GET'])
-@authentication_classes((TokenAuthentication,))#, SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 def service_wishlist(request):
     if request.method == 'POST': #request.is_ajax() and 
         try:
-            user_id = int(request.POST['user_id'])
-            experience_id = int(request.POST['experience_id'])
-            added = request.POST['added']
+            if request.is_ajax():
+                data = request.POST
+            else:
+                data=request.data
+
+            user_id = int(data['user_id'])
+            experience_id = int(data['experience_id'])
+            added = data['added']
 
             user = User.objects.get(id=user_id)
             experience = Experience.objects.get(id=experience_id)
@@ -418,12 +430,35 @@ def service_wishlist(request):
             cursor = connections['default'].cursor()
             wl = cursor.execute("select experience_id from app_registereduser_wishlist where registereduser_id=%s", [user.registereduser.id])
             wl = cursor.fetchall()
-            ids = []
+            experiences = []
             for id in wl:
-                ids.append(id)
+                experience = Experience.objects.get(id=id[0])
+                #price
+                if experience.guest_number_min <= 4 and experience.guest_number_max>=4:
+                    guest_number = 4
+                elif experience.guest_number_min > 4:
+                    guest_number = experience.guest_number_min
+                elif experience.guest_number_max < 4:
+                    guest_number = experience.guest_number_max
+                exp_price = float(experience.price)
+                if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
+                    exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
 
-            response={'experience_ids':ids}
-            return HttpResponse(json.dumps(response),content_type="application/json")
+                photo_url = ''
+                photos = experience.photo_set.all()
+                if photos is not None and len(photos) > 0:
+                    photo_url = photos[0].directory+photos[0].name
+
+                experiences.append({'id':experience.id,
+                                    'title':get_experience_title(experience, settings.LANGUAGES[0][0]),
+                                    'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                                    'price':experience_fee_calculator(exp_price),
+                                    'language':experience.language,
+                                    'duration':experience.duration,
+                                    'photo_url':photo_url,
+                                    'host_image':experience.hosts.all()[0].registereduser.image_url})
+
+            return Response(experiences,status=status.HTTP_200_OK)
 
         except Exception as err:
             #TODO
@@ -562,9 +597,9 @@ def service_search(request, format=None):
 
         guest_number = 5 #temp fix
         if int(guest_number) == 0:
-            itinerary = get_itinerary(start_datetime, end_datetime, None, city, language, keywords)
+            itinerary = get_itinerary(start_datetime, end_datetime, None, city, language, keywords, mobile=True)
         else:
-            itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords)
+            itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords, mobile=True)
 
         return Response(itinerary, status=status.HTTP_200_OK)
     except Exception as err:
@@ -594,10 +629,16 @@ def service_mytrip(request, format=None):
             payment = booking.payment if booking.payment_id != None else Payment()
             host = booking.experience.hosts.all()[0]
             phone_number = host.registereduser.phone_number
+
+            photo_url = ''
+            photos = booking.experience.photo_set.all()
+            if photos is not None and len(photos) > 0:
+                photo_url = photos[0].directory+photos[0].name
             
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
                   'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
                   'experience_title':get_experience_title(booking.experience,settings.LANGUAGES[0][0]),
+                  'experience_photo':photo_url,
                   'meetup_spot':get_experience_meetup_spot(booking.experience,settings.LANGUAGES[0][0]),
                   'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.',
                   'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
@@ -726,40 +767,7 @@ def service_couponverification(request, format=None):
             if coupons is not None and len(coupons) > 0:
                 valid = check_coupon(coupons[0],data["id"], data["guest_number"])
                 if valid['valid']:
-                    free = False
-                    extra_fee = 0.0
-                    rules = json.loads(coupons[0].rules)
-                    if type(rules["extra_fee"]) == int or type(rules["extra_fee"]) == float:
-                        extra_fee = rules["extra_fee"]
-                    elif type(rules["extra_fee"]) == str and rules["extra_fee"]== "FREE":
-                        free = True
-                        result={"valid":"yes","new_price":0.0}
-
-                    if not free:
-                        subtotal_price = 0.0
-                        experience = Experience.objects.get(id = data["id"])
-                        if experience.dynamic_price and type(experience.dynamic_price) == str:
-                            price = experience.dynamic_price.split(',')
-                            if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-                            #these is comma in the end, so the length is max-min+2
-                                if data["guest_number"] <= experience.guest_number_min:
-                                    subtotal_price = float(experience.price) * float(experience.guest_number_min)
-                                else:
-                                    subtotal_price = float(price[data["guest_number"]-experience.guest_number_min]) * float(data["guest_number"])
-                            else:
-                                #wrong dynamic settings
-                                subtotal_price = float(experience.price)*float(data["guest_number"])
-                        else:
-                            subtotal_price = float(experience.price)*float(data["guest_number"])
-
-                        if extra_fee >= 1.00 or extra_fee <= -1.00:
-                            #absolute value
-                            price = round((subtotal_price*(1.00+settings.COMMISSION_PERCENT)+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2) 
-                        else:
-                            #percentage, e.g., 30% discount --> percentage == -0.3
-                            price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2)
-
-                        result={"valid":"yes","new_price":price}
+                    result={"valid":"yes","new_price":valid['new_price']}
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -809,6 +817,11 @@ def service_experience(request, format=None):
             dynamic_price = experience.dynamic_price.split(",")
             dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
 
+        experience_images = []
+        photos = experience.photo_set.all()
+        for photo in photos:
+            experience_images.append(photo.directory+photo.name)
+
         return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
@@ -823,6 +836,7 @@ def service_experience(request, format=None):
                          'experience_dynamic_price':dynamic_price,
                          'experience_guest_number_min':experience.guest_number_min,
                          'experience_guest_number_max':experience.guest_number_max,
+                         'experience_images':experience_images,
 
                          'available_options':available_options,
                          'available_date':available_date,
@@ -890,6 +904,11 @@ def service_experiencedetail(request, format=None):
             dynamic_price = experience.dynamic_price.split(",")
             dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
 
+        experience_images = []
+        photos = experience.photo_set.all()
+        for photo in photos:
+            experience_images.append(photo.directory+photo.name)
+
         return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
@@ -904,6 +923,7 @@ def service_experiencedetail(request, format=None):
                          'experience_dynamic_price':dynamic_price,
                          'experience_guest_number_min':experience.guest_number_min,
                          'experience_guest_number_max':experience.guest_number_max,
+                         'experience_images':experience_images,
 
                          'included_food':included_food.included,
                          'included_food_detail':included_food.details,
@@ -969,40 +989,6 @@ def service_publicprofile(request,format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-@authentication_classes((SessionAuthentication, BasicAuthentication,))#, TokenAuthentication))
-@permission_classes((IsAuthenticated,))
-def service_email(request, format=None):
-    try:
-        data = request.data
-        start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['start_date'].strip(), "%Y/%m/%d"))
-        exps = Experience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
-        hosts = []
-        exp_urls = []
-
-        for exp in exps:
-            host = exp.hosts.all()[0]
-            if host not in hosts:
-                hosts.append(host)
-                exp_urls.append([])
-                exp_urls[hosts.index(host)].append('https://www.'+settings.DOMAIN_NAME + '/experience/' + str(exp.id))
-            else:
-                exp_urls[hosts.index(host)].append('https://www.'+settings.DOMAIN_NAME + '/experience/' + str(exp.id))
-        for i in range(len(hosts)):
-            host = hosts[i]
-            host.first_name = host.first_name.title()
-            #mail.send(subject='Tripalocal - June coupon code', message='', 
-            #          sender='Tripalocal <' + 'yiyi@tripalocal.com' + '>',
-            #          recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-            #          priority='now',
-            #          html_message=loader.render_to_string('email_june_campaign_host.html',
-            #                                                {'experiences': exp_urls[i], 'host':host,
-            #                                                }))
-    except Exception as err:
-        #TODO
-        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
-    return Response(status=status.HTTP_200_OK)
-
 @api_view(['GET','POST'])
 @authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))#))#,
 @permission_classes((IsAuthenticated,))
@@ -1064,3 +1050,63 @@ def service_message(request, format=None):
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@authentication_classes((BasicAuthentication,))#, TokenAuthentication))
+@permission_classes((IsAuthenticated,))
+def update_files(request, format=None):
+    try:
+        if not request.user.is_superuser:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data
+        user_email = data['user_email']
+        tripalocal_email = data['tripalocal_email']
+
+        with open('/etc/postfix/canonical', 'a') as f:
+            f.write(user_email + " " + tripalocal_email + "\n")
+            f.close()
+
+        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+    
+        with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+            f.write(tripalocal_email + "\n")
+            f.close()
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@authentication_classes((SessionAuthentication, BasicAuthentication,))#, TokenAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_email(request, format=None):
+    try:
+        data = request.data
+        start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['start_date'].strip(), "%Y/%m/%d"))
+        exps = Experience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
+        hosts = []
+        exp_urls = []
+
+        for exp in exps:
+            host = exp.hosts.all()[0]
+            if host not in hosts:
+                hosts.append(host)
+                exp_urls.append([])
+                exp_urls[hosts.index(host)].append('https://www.'+settings.DOMAIN_NAME + '/experience/' + str(exp.id))
+            else:
+                exp_urls[hosts.index(host)].append('https://www.'+settings.DOMAIN_NAME + '/experience/' + str(exp.id))
+        for i in range(len(hosts)):
+            host = hosts[i]
+            host.first_name = host.first_name.title()
+            #mail.send(subject='Tripalocal - June coupon code', message='', 
+            #          sender='Tripalocal <' + 'yiyi@tripalocal.com' + '>',
+            #          recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+            #          priority='now',
+            #          html_message=loader.render_to_string('email_june_campaign_host.html',
+            #                                                {'experiences': exp_urls[i], 'host':host,
+            #                                                }))
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
+    return Response(status=status.HTTP_200_OK)

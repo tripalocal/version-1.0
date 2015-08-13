@@ -16,7 +16,7 @@
 {{time_changed_status}}
 <div class="container">
   <div class="header">
-    <div class="logo"><img src="/images/tripalocal_Logo.png" width="105" height="60" /></div>
+    <div class="logo"><img src="{{ MEDIA_URL }}img/tripalocal_Logo.png" width="105" height="60" /></div>
     <ul class="menu"><li><a href="#">Experiences</a></li><li>Bookings</li>
     <li><a href="/custom_admin/payment">Payment</a></li></ul>
     <div class="account">Hi, {{user_name}} | <a href="/accounts/logout/">Logout</a></div>
@@ -64,7 +64,7 @@
   </tr>
  
     {% for booking in booking_list %}
-    {% if booking.status = 'requested' or booking.status = 'accepted' or booking.status = 'rejected' or booking.status = 'no_show' or booking.status == 'paid' %}
+    {% if booking.status == 'requested' or booking.status == 'accepted' or booking.status == 'rejected' or booking.status == 'no_show' or booking.status == 'paid' %}
       <tr>
         <td><input type="checkbox" name="admin_panel_booking_id_checkbox" value="{{booking.id}}"/></td>
         <td id="booking_date_time_booking_id_{{ booking.id }}" >{{ booking.datetime }}</td>
@@ -80,7 +80,7 @@
           <p>{{ booking.user.registereduser.phone_number }}</p>
         </td>
         <td>{{ booking.guest_number }}</td>
-        <td style="color:{{booking.colour}}">{{ booking.status_description }}</td>
+        <td style="color:{{booking.color}};">{{ booking.status_description }}</td>
         <td>
           {% for action in booking.actions %}
             {% ifequal action 'Change time'%}

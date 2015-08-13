@@ -1,7 +1,7 @@
 """
 Definition of forms.
 """
-
+from allauth.account import app_settings
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.utils.translation import ugettext_lazy as _
@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from app.models import Subscription
 from bootstrap3_datetime.widgets import DateTimePicker
 from experiences.forms import Location
+from Tripalocal_V1 import settings
 
 class BootstrapAuthenticationForm(AuthenticationForm):
     """Authentication form which uses boostrap CSS."""
@@ -43,9 +44,9 @@ class SubscriptionForm(forms.ModelForm):
         fields = ['email']
 
 class HomepageSearchForm(forms.Form):
-    city = forms.ChoiceField(choices=Location)
-    start_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}))
-    end_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}))
+    city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'id':'id-city','class':'ui dropdown'}))
+    start_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False, "language":settings.LANGUAGE_CODE}))
+    end_date = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False, "language":settings.LANGUAGE_CODE}))
 
 class UserProfileForm(forms.Form):
     image = forms.ImageField(required = False)
@@ -152,3 +153,22 @@ class UserCalendarForm(forms.Form):
     instant_booking_repeat_frequency_5 = forms.ChoiceField(required=False, choices=Repeat_Frequency)
     instant_booking_repeat_end_date_5 = forms.DateField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     instant_booking_repeat_extra_information_5 = forms.CharField(required=False, max_length=50)
+
+class SignupForm(forms.Form):
+    first_name = forms.CharField(label=_("first_name"),
+                                 max_length=30,
+                                 min_length=app_settings.USERNAME_MIN_LENGTH,
+                                 widget=forms.TextInput(
+                                     attrs={'placeholder':
+                                                _('First Name')}))
+    last_name = forms.CharField(label=_("last_name"),
+                                max_length=30,
+                                min_length=app_settings.USERNAME_MIN_LENGTH,
+                                widget=forms.TextInput(
+                                    attrs={'placeholder':
+                                               _('Last Name')}))
+
+    def signup(self, request, user):
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.save()

@@ -15,13 +15,13 @@ from app.forms import SubscriptionForm, HomepageSearchForm, UserProfileForm, Use
 from app.models import *
 from django.core.mail import send_mail
 from django.contrib import messages
-import string, random, pytz, base64, subprocess, os, geoip2.database, PIL
+import string, random, pytz, base64, subprocess, os, geoip2.database, PIL, requests
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, saveProfileImage, getBGImageURL, getProfileImage
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment, get_experience_title, get_experience_meetup_spot
-from experiences.forms import Currency, DollarSign
+from experiences.forms import Currency, DollarSign, email_account_generator
 from django.core.files.uploadedfile import SimpleUploadedFile, File
 from django.db import connections
 from django.template.defaultfilters import filesizeformat
@@ -30,12 +30,13 @@ from post_office import mail
 from django.contrib.auth.models import User
 from os import path
 from PIL import Image
+from tripalocal_messages.models import Aliases, Users
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
-GEO_POSTFIX = "/"
+GEO_POSTFIX = settings.GEO_POSTFIX
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -116,19 +117,20 @@ def home(request):
                 # take the first ip which is not a private one (of a proxy)
                 if len(proxies) > 0:
                     ip = proxies[0]
-
-        try:
-            reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
-            response = reader.city(ip)
-            country = response.country.name
-            reader.close()
-            if country.lower() in ['china']:
-                return HttpResponseRedirect('/cn')
-        except Exception:
-            reader.close()
-
-        if request.LANGUAGE_CODE.startswith("zh"):
-            return HttpResponseRedirect('/cn')
+        if not settings.DEVELOPMENT:
+            if settings.LANGUAGES[0][0] != "zh":
+                try:
+                    reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+                    response = reader.city(ip)
+                    country = response.country.name
+                    reader.close()
+                    if country.lower() in ['china']:
+                        return HttpResponseRedirect('/cn')
+                except Exception:
+                    reader.close()
+    
+                if request.LANGUAGE_CODE.startswith("zh"):
+                    return HttpResponseRedirect('/cn')
 
     experienceList = Experience.objects.filter(id__in=[1,2,20])
     idxList = random.sample(range(len(experienceList)), 3)
@@ -257,7 +259,7 @@ def mylisting(request):
 
     experiences = []
     context = RequestContext(request)
-    exps = Experience.objects.raw('select * from experiences_experience where id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime', [request.user.id])
+    exps = Experience.objects.raw('select id from experiences_experience where id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime', [request.user.id])
 
     for experience in exps:
         experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
@@ -268,7 +270,7 @@ def mylisting(request):
     return render_to_response('app/mylisting.html', {}, context)
 
 def getreservation(user):
-    bookings = Booking.objects.raw('select * from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime', [user.id])
+    bookings = Booking.objects.raw('select id from experiences_booking where experience_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by datetime', [user.id])
 
     current_reservations = []
     past_reservations = []
@@ -389,8 +391,8 @@ def myprofile(request):
     photo={}
     if profile.image_url:
         context["image_url"] = profile.image_url
-        photo["image"] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+profile.image_url, 
-                                            File(open(settings.MEDIA_ROOT+'/'+profile.image_url, 'rb')).read())
+        #photo["image"] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+profile.image_url, 
+        #                                    File(open(settings.MEDIA_ROOT+'/'+profile.image_url, 'rb')).read())
     else:
         context["image_url"] = "hosts/no_img.jpg"
 
@@ -399,7 +401,7 @@ def myprofile(request):
 
     data["bio"]=get_user_bio(profile, settings.LANGUAGES[0][0])
         
-    form = UserProfileForm(data=data, files=photo)
+    form = UserProfileForm(data=data)
 
     return render_to_response('app/myprofile.html', {'form': form}, context)
 
@@ -539,15 +541,26 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
     new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
     new_alias.save()
 
-    with open('/etc/postfix/canonical', 'a') as f:
-        f.write(user.email + " " + new_email.id + "\n")
-        f.close()
+    if not settings.DEVELOPMENT:
+        if len(settings.ADMINS) == 0:
+            with open('/etc/postfix/canonical', 'a') as f:
+                f.write(user.email + " " + new_email.id + "\n")
+                f.close()
 
-    subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+            subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
     
-    with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
-        f.write(new_email.id + "\n")
-        f.close()
+            with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+                f.write(new_email.id + "\n")
+                f.close()
+        else:
+            try:
+                response = requests.post('https://www.tripalocal.com/update_files/',
+                                         data={'user_email': user.email,'tripalocal_email':new_email.id},
+                                         auth=(settings.ADMINS[0][1], settings.ADMIN_PASSWORD[0]),
+                                         timeout=3)
+            except requests.exceptions.RequestException as err:
+                #TODO
+                pass
 
     """get the client ip from the request
     """
@@ -568,11 +581,16 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
             if len(proxies) > 0:
                 ip = proxies[0]
 
+    if not settings.DEVELOPMENT:
+        track_user_signup(ip, sociallogin, user)
+
+def track_user_signup(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
     mp.people_set(user.email, {"IP":ip, 
                                "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
                                })
 
+    reader = None
     try:
         reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
@@ -588,7 +606,9 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
         reader.close()
     except Exception:
         mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
-        reader.close()
+    finally:
+        if reader is not None:
+            reader.close()
 
     if sociallogin:
         data = sociallogin.account.extra_data
@@ -629,6 +649,10 @@ def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
             if len(proxies) > 0:
                 ip = proxies[0]
 
+    if not settings.DEVELOPMENT:
+        track_user_login(ip, sociallogin, user)
+
+def track_user_login(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
     mp.people_set(user.email, {"IP":ip})
 
@@ -647,8 +671,10 @@ def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
                                    "Latitude":latitude, "Longitude":longitude, "Language":settings.LANGUAGES[0][1]}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
         reader.close()
     except Exception:
-        reader.close()
         mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
+    finally:
+        if reader is not None:
+            reader.close()
 
     if sociallogin:
         data = sociallogin.account.extra_data

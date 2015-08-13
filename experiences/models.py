@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
 import datetime
 from allauth.socialaccount.models import SocialAccount
 import hashlib
@@ -45,7 +46,9 @@ class Experience(models.Model):
     tags = models.ManyToManyField(ExperienceTag, related_name='experience_tags')
 
     def __str__(self):
-        t = self.experiencetitle_set.all()[0].title if self.experiencetitle_set != None and len(self.experiencetitle_set.all())>0 else ''
+        t = get_experience_title(self, settings.LANGUAGES[0][0])
+        if t is None:
+            t = ''
         s = self.status if self.status != None else ''
         c = self.city if self.city != None else ''
         return str(self.id) + '--' + t + '--' + s + '--' + c
@@ -88,6 +91,7 @@ class ExperienceDropoffSpot(models.Model):
     dropoff_spot = models.TextField()
     language = models.CharField(max_length=2)
     experience = models.ForeignKey(Experience)
+
 
 class InstantBookingTimePeriod(models.Model):
     start_datetime = models.DateTimeField()
@@ -176,7 +180,7 @@ class Booking(models.Model):
     booking_extra_information = models.TextField()
     
     def __str__(self):
-        return self.user.email + "--" + self.experience.title
+        return self.user.email + "--" + get_experience_title(self.experience,settings.LANGUAGES[0][0])
 
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):
@@ -202,7 +206,7 @@ class Payment(models.Model):
     # you could also store other information about the sale
     # but I'll leave that to you!
  
-    def charge(self, price_in_cents, currency, number, exp_month, exp_year, cvc):
+    def charge(self, price_in_cents, currency, number=None, exp_month=None, exp_year=None, cvc=None, stripe_token=None):
         """
         Takes a the price and credit card details: number, currency, exp_month,
         exp_year, cvc.
@@ -216,30 +220,39 @@ class Payment(models.Model):
             return False, Exception(message="Already charged.")
  
         try:
-            response = self.stripe.Charge.create(
-                amount = price_in_cents,
-                currency = currency.lower(),
-                card = {
-                    "number" : number,
-                    "exp_month" : exp_month,
-                    "exp_year" : exp_year,
-                    "cvc" : cvc,
+            if stripe_token is not None:
+                response = self.stripe.Charge.create(
+                            amount = price_in_cents,
+                            currency = currency.lower(),
+                            source = stripe_token,
+                            description='')
+            else:
+                response = self.stripe.Charge.create(
+                            amount = price_in_cents,
+                            currency = currency.lower(),
+                            card = {
+                                "number" : number,
+                                "exp_month" : exp_month,
+                                "exp_year" : exp_year,
+                                "cvc" : cvc,
  
-                    #### it is recommended to include the address!
-                    "address_line1" : self.street1,
-                    "address_line2" : self.street2,
-                    "address_city" : self.city,
-                    "address_zip" : self.zip_code,
-                    "address_state" : self.state,
-                    "address_country" : self.country,
-                },
-                description='Thank you for your purchase!')
+                                #### it is recommended to include the address!
+                                "address_line1" : self.street1,
+                                "address_line2" : self.street2,
+                                "address_city" : self.city,
+                                "address_zip" : self.zip_code,
+                                "address_state" : self.state,
+                                "address_country" : self.country,
+                            },
+                            description='')
  
             self.charge_id = response.id
  
         except self.stripe.CardError as ce:
             # charge failed
             return False, ce
+        except Exception as ex:
+            return False, ex
  
         return True, response
 

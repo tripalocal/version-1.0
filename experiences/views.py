@@ -6,7 +6,6 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse, Http404
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
-from django.contrib.formtools.wizard.views import SessionWizardView, NamedUrlSessionWizardView
 from experiences.forms import *
 from datetime import *
 import pytz, string, os, json, math, PIL, xlsxwriter, time, sys
@@ -27,7 +26,7 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.core.files.storage import FileSystemStorage
 from PIL import Image
 from django.template.defaultfilters import filesizeformat
-from django.utils.translation import ugettext_lazy as _, string_concat
+from django.utils.translation import ugettext as _
 from post_office import mail
 from collections import OrderedDict
 from django.http import Http404
@@ -36,13 +35,14 @@ from django.core.urlresolvers import reverse
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 MaxIDImage=5
-GEO_POSTFIX = "/"
+
 LANG_CN = settings.LANGUAGES[1][0]
 LANG_EN = settings.LANGUAGES[0][0]
+GEO_POSTFIX = settings.GEO_POSTFIX
 
 def experience_fee_calculator(price):
     if type(price)==int or type(price) == float:
-        return round(price*(1.00+settings.COMMISSION_PERCENT)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,0)
+        return round(price*(1.00+settings.COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
 
     return price
 
@@ -180,7 +180,11 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
 
-        experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]),
+        photo_url = ''
+        photos = experience.photo_set.all()
+        if photos is not None and len(photos) > 0:
+            photo_url = photos[0].directory+photos[0].name
+        experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]), 
                             'meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]), 'rate': rate,
                             'duration':experience.duration, 'city':experience.city,
                             'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
@@ -188,7 +192,8 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                             'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated,
                             'price':experience_fee_calculator(exp_price),
                             'currency':str(dict(Currency)[experience.currency.upper()]),
-                            'dollarsign':DollarSign[experience.currency.upper()],'dates':{}}
+                            'dollarsign':DollarSign[experience.currency.upper()],'dates':{},
+                            'photo_url':photo_url}
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []
@@ -578,10 +583,12 @@ class ExperienceDetailView(DetailView):
         if request.method == 'POST':
             form = BookingConfirmationForm(request.POST)
             form.data = form.data.copy()
-            form.data['user_id'] = request.user.id;
+            form.data['user_id'] = request.user.id
+            form.data['first_name'] = request.user.first_name
+            form.data['last_name'] = request.user.last_name
             experience = Experience.objects.get(id=form.data['experience_id'])
             experience.dollarsign = DollarSign[experience.currency.upper()]
-            experience.currency = str(dict(Currency)[experience.currency.upper()])
+            #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
             experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
             experience_price = experience.price
 
@@ -717,6 +724,7 @@ class ExperienceDetailView(DetailView):
             related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
             related_experiences[i].title = get_experience_title(related_experiences[i], settings.LANGUAGES[0][0])
             related_experiences[i].description = get_experience_description(related_experiences[i], settings.LANGUAGES[0][0])
+            setExperienceDisplayPrice(related_experiences[i])
 
         related_experiences_added_to_wishlist = []
 
@@ -755,6 +763,10 @@ def experience_booking_successful(request, experience, guest_number, booking_dat
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
     mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
 
+    if not settings.DEVELOPMENT:
+        mp = Mixpanel(settings.MIXPANEL_TOKEN)
+        mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
+
     template = 'experiences/experience_booking_successful_requested.html'
     if is_instant_booking:
         template = 'experiences/experience_booking_successful_confirmed.html'
@@ -779,7 +791,7 @@ def experience_booking_confirmation(request):
         form = BookingConfirmationForm(request.POST)
         experience = Experience.objects.get(id=form.data['experience_id'])
         experience.dollarsign = DollarSign[experience.currency.upper()]
-        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
         experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
         experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
@@ -801,6 +813,9 @@ def experience_booking_confirmation(request):
         else:
             subtotal_price = float(experience.price)*float(form.data['guest_number'])
 
+        total_price = experience_fee_calculator(subtotal_price)
+        subtotal_price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),0)
+
         if 'Refresh' in request.POST:
             #get coupon information
             wrong_promo_code = False
@@ -819,9 +834,11 @@ def experience_booking_confirmation(request):
                     wrong_promo_code = True
                 else:
                     coupon = coupons[0]
+                    total_price = valid['new_price']
 
-            mp = Mixpanel(settings.MIXPANEL_TOKEN)
-            mp.track(request.user.email, 'Clicked on "Refresh"')
+            if not settings.DEVELOPMENT:
+                mp = Mixpanel(settings.MIXPANEL_TOKEN)
+                mp.track(request.user.email, 'Clicked on "Refresh"')
 
             return render_to_response('experiences/experience_booking_confirmation.html', {'form': form,
                                                                            'user_email':request.user.email,
@@ -831,10 +848,10 @@ def experience_booking_confirmation(request):
                                                                            'guest_number':form.data['guest_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
-                                                                           'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),2),
+                                                                           'subtotal_price':subtotal_price,
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
-                                                                           'total_price': experience_fee_calculator(subtotal_price)}, context)
+                                                                           'total_price': total_price}, context)
 
         else:
             #submit the form
@@ -864,10 +881,10 @@ def experience_booking_confirmation(request):
                                                                            'guest_number':form.data['guest_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
-                                                                           'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),2),
+                                                                           'subtotal_price':subtotal_price,
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
-                                                                           'total_price': experience_fee_calculator(subtotal_price)}, context)
+                                                                           'total_price': total_price}, context)
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()
@@ -906,15 +923,17 @@ def saveProfileImage(user, profile, image_file):
             hsize = int((float(h)*float(wpercent)))
             im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS).save(dirname + filename)
 
-        #copy to the chinese website -- folder+file
-        dirname_cn = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts/' + str(user.id) + '/'
-        if not os.path.isdir(dirname_cn):
-            os.mkdir(dirname_cn)
+        #copy to the other website -- folder+file
+        if settings.LANGUAGES[0][0] == "en":
+            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts/' + str(user.id) + '/'
+        elif settings.LANGUAGES[0][0] == "zh":
+            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/hosts/' + str(user.id) + '/'
 
-        subprocess.Popen(['cp',dirname + filename, dirname_cn + filename])
+        if not os.path.isdir(dirname_other):
+            os.mkdir(dirname_other)
 
-def updateExperience(experience, id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, guest_number_min,
-                   guest_number_max, price, currency, duration, city, status, language, dynamic_price,
+def updateExperience(experience, id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, guest_number_min, 
+                   guest_number_max, price, currency, duration, city, status, language, dynamic_price, 
                    title, description, activity, interaction, dress, meetup_spot, lan, lan2=None):
     experience.id = id
     experience.start_datetime = start_datetime
@@ -1078,8 +1097,8 @@ def create_experience(request, id=None):
                 "guest_number_min":experience.guest_number_min,
                 "guest_number_max":experience.guest_number_max,
                 "price":round(experience.price,2),
-                "price_with_booking_fee":round(experience.price*Decimal.from_float(1.00+settings.COMMISSION_PERCENT)*Decimal.from_float(1.00+settings.STRIPE_PRICE_PERCENT)+Decimal.from_float(settings.STRIPE_PRICE_FIXED),2),
-                    "currency":experience.currency.upper(),
+                "price_with_booking_fee":round(experience.price*Decimal.from_float(1.00+settings.COMMISSION_PERCENT), 0)*Decimal.from_float(1.00+settings.STRIPE_PRICE_PERCENT)+Decimal.from_float(settings.STRIPE_PRICE_FIXED),
+                "currency":experience.currency.upper(),
                 "duration":experience.duration,
                 "included_food":included_food,
                 "included_food_detail":include_food_detail,
@@ -1151,6 +1170,8 @@ def create_experience(request, id=None):
 
             if not id:
                 #create a new experience
+                if len(Experience.objects.filter(id=form.data['id']))>0:
+                    raise forms.ValidationError(_('Experience with the same Id already exists'))
                 experience = Experience()
                 lan2 = settings.LANGUAGES[1][0]
             else:
@@ -1223,8 +1244,12 @@ def create_experience(request, id=None):
                             destination.write(chunk)
                         destination.close()
 
-                        #copy to the chinese website -- folder+file
-                        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/experiences/' + str(experience.id) + '/'
+                        #copy to the other website -- folder+file
+                        if settings.LANGUAGES[0][0] == "en":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/experiences/' + str(experience.id) + '/'
+                        elif settings.LANGUAGES[0][0] == "zh":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/experiences/' + str(experience.id) + '/'
+
                         if not os.path.isdir(dirname_other):
                             os.mkdir(dirname_other)
                         subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
@@ -1237,8 +1262,11 @@ def create_experience(request, id=None):
                         img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
                         img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
 
-                        #copy to the chinese website -- folder+file
-                        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
+                        #copy to the other website -- folder+file
+                        if settings.LANGUAGES[0][0] == "en":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
+                        elif settings.LANGUAGES[0][0] == "zh":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/thumbnails/experiences/'
                         if not os.path.isdir(dirname_other):
                             os.mkdir(dirname_other)
                         subprocess.Popen(['cp',settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg', dirname_other + 'experience' + str(experience.id) + '_' + str(index) + '.jpg'])
@@ -1274,8 +1302,11 @@ def create_experience(request, id=None):
                             destination.write(chunk)
                         destination.close()
 
-                        #copy to the chinese website -- folder+file
-                        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts_id/' + str(user.id) + '/'
+                        #copy to the other website -- folder+file
+                        if settings.LANGUAGES[0][0] == "en":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts_id/' + str(user.id) + '/'
+                        elif settings.LANGUAGES[0][0] == "zh":
+                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/hosts_id/' + str(user.id) + '/'
                         if not os.path.isdir(dirname_other):
                             os.mkdir(dirname_other)
                         subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
@@ -1360,18 +1391,24 @@ def update_booking(id, accepted, user):
         if booking.status.lower() == "accepted":
             # the host already accepted the booking
             #messages.add_message(request, messages.INFO, 'The booking request has already been accepted.')
-            return HttpResponseRedirect(GEO_POSTFIX)
+            booking_success = False
+            result={'booking_success':booking_success, 'error':'the booking has been accepted'}
+            return result
 
         if booking.status.lower() == "rejected":
             # the host/guest already rejected/cancelled the booking
             #messages.add_message(request, messages.INFO, 'The booking request has already been rejected.')
-            return HttpResponseRedirect(GEO_POSTFIX)
+            booking_success = False
+            result={'booking_success':booking_success, 'error':'the booking has been cancelled/rejected'}
+            return result
 
         experience = Experience.objects.get(id=booking.experience_id)
         experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
         experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
         if not experience.hosts.all()[0].id == user.id:
-            return HttpResponseRedirect(GEO_POSTFIX)
+            booking_success = False
+            result={'booking_success':booking_success, 'error':'only the host can accept/reject the booking'}
+            return result
 
         guest = User.objects.get(id = booking.user_id)
         host = user
@@ -1385,10 +1422,10 @@ def update_booking(id, accepted, user):
                 booking.coupon.save()
 
             #send an email to the traveller
-            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
-                      sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
-                      recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail],
-                      priority='now',  #fail_silently=False,
+            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                      recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
+                      priority='now',  #fail_silently=False, 
                       html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
                                                             {'experience': experience,
                                                             'booking':booking,
@@ -1396,27 +1433,27 @@ def update_booking(id, accepted, user):
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
 
             #schedule an email to the traveller one day before the experience
-            mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
-                      sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
-                      recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail],
-                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
+            mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                      recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
+                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
                       html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'user':guest, #not host --> need "my" phone number
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-
+            
             #schedule an email to the host one day before the experience
-            mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
-                      sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=guest.email)[0].mail, '>'),
-                      recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail],
-                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
+            mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
+                      recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
                       html_message=loader.render_to_string('experiences/email_reminder_host.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'user':guest,
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-
+                  
             #schedule an email for reviewing the experience
             mail.send(subject=_('[Tripalocal] How was your experience?'), message='',
                       sender=settings.DEFAULT_FROM_EMAIL,
@@ -1429,10 +1466,10 @@ def update_booking(id, accepted, user):
                                                             'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id)}))
 
             #send an email to the host
-            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
-                      sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=guest.email)[0].mail, '>'),
-                      recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail],
-                      priority='now',  #fail_silently=False,
+            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                      sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
+                      recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+                      priority='now',  #fail_silently=False, 
                       html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
                                                             {'experience': experience,
                                                             'booking':booking,
@@ -1479,12 +1516,12 @@ def update_booking(id, accepted, user):
                     subtotal_price = float(experience.price)*float(booking.guest_number)
 
                 #refund_amount does not include process fee: the transaction can't be undone
-                refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT),2)
+                refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT),0)
 
                 if extra_fee <= -1:
-                    refund_amount = round((subtotal_price+extra_fee)*(1+settings.COMMISSION_PERCENT), 2)
+                    refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT), 0) + extra_fee
                 if extra_fee < 0 and extra_fee > -1:
-                    refund_amount = round((subtotal_price*(1+extra_fee))*(1+settings.COMMISSION_PERCENT), 2)
+                    refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT), 0) * (1+extra_fee)
 
                 success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
             else:
@@ -1494,8 +1531,8 @@ def update_booking(id, accepted, user):
                 booking.status = "rejected"
                 booking.save()
                 #send an email to the traveller
-                mail.send(subject=_('[Tripalocal] Your experience is cancelled'), message='',
-                          sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=host.email)[0].mail, '>'),
+                mail.send(subject=_('[Tripalocal] Your experience is cancelled'), message='', 
+                          sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                           recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail],
                           priority='now',  #fail_silently=False,
                           html_message=loader.render_to_string('experiences/email_booking_cancelled_traveler.html',
@@ -1504,10 +1541,10 @@ def update_booking(id, accepted, user):
                                                                 'user':host,
                                                                 'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
                 #send an email to the host
-                mail.send(subject=_('[Tripalocal] Cancellation confirmed'), message='',
-                          sender=string_concat(_('Tripalocal <'), Aliases.objects.filter(destination__contains=guest.email)[0].mail, '>'),
-                          recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail],
-                          priority='now',  #fail_silently=False,
+                mail.send(subject=_('[Tripalocal] Cancellation confirmed'), message='', 
+                          sender=_('Tripalocal <') + liases.objects.filter(destination__contains=guest.email)[0].mail + '>',
+                          recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
+                          priority='now',  #fail_silently=False, 
                           html_message=loader.render_to_string('experiences/email_booking_cancelled_host.html',
                                                                 {'experience': experience,
                                                                  'booking':booking,
@@ -1595,6 +1632,14 @@ def getProfileImage(experience):
         return profileImage
     else:
         'profile_default.jpg'
+
+def setExperienceDisplayPrice(experience):
+    if experience.dynamic_price and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 and experience.guest_number_min < 4:
+        dp = experience.dynamic_price.split(',')
+        if experience.guest_number_max < 4 or experience.guest_number_max - experience.guest_number_min < 4:
+            experience.price = dp[len(dp)-2]#the string ends with ",", so the last one is ''
+        elif experience.guest_number_min <= 4:
+            experience.price = dp[4-experience.guest_number_min]
 
 def new_experience(request):
     context = RequestContext(request)
@@ -1964,7 +2009,7 @@ def manage_listing_continue(request, exp_id):
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
                is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
-
+    
     form = SearchForm()
     form.data = form.data.copy()
     form.data['city'] = city.title()
@@ -2020,12 +2065,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     while i < len(experienceList):
         experience = experienceList[i]
 
-        if experience.dynamic_price and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 and experience.guest_number_min < 4:
-            dp = experience.dynamic_price.split(',')
-            if experience.guest_number_max < 4 or experience.guest_number_max - experience.guest_number_min < 4:
-                experience.price = dp[len(dp)-2]#the string ends with ",", so the last one is ''
-            elif experience.guest_number_min <= 4:
-                experience.price = dp[4-experience.guest_number_min]
+        setExperienceDisplayPrice(experience)
 
         if start_date is not None and experience.end_datetime < start_date :
             i += 1
@@ -2078,7 +2118,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                     counter += 1
             else:
                 rate = -1
-
+            
             if counter > 0:
                 rate /= counter
 
@@ -2147,18 +2187,19 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             # Format title & Description
             experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
             t = get_experience_title(experience, settings.LANGUAGES[0][0])
-            if (t != None and len(t) > 40):
-                formattedTitleList.insert(counter, t[:37] + "...")
+            if (t != None and len(t) > 30):
+                formattedTitleList.insert(counter, t[:27] + "...")
             else:
                 formattedTitleList.insert(counter, t)
-        i += 1
+            i += 1
 
-        mp = Mixpanel(settings.MIXPANEL_TOKEN)
+        if not settings.DEVELOPMENT:
+            mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
-        if request.user.is_authenticated():
-            mp.track(request.user.email,"Viewed " + city.title() + " search page")
-        else:
-            mp.track("","Viewed " + city.title() + " search page")
+            if request.user.is_authenticated():
+                mp.track(request.user.email,"Viewed " + city.title() + " search page");
+            else:
+                mp.track("","Viewed " + city.title() + " search page");
 
         template = 'experiences/experience_results.html'
     else:
@@ -2235,7 +2276,7 @@ def review_experience (request, id=None):
     else:
         return HttpResponseRedirect(GEO_POSTFIX)
 
-def get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords=None):
+def get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False):
 
     available_options = get_available_experiences(start_datetime, end_datetime, guest_number, city, language, keywords)
     itinerary = []
@@ -2262,10 +2303,17 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
                         break
                 counter = 0
                 insert = False
-                exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
-                            'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
-                            'dollarsign':experience['dollarsign'],'timeslots':experience['dates'][dt_string]}
-                while counter < len(day_dict['experiences']):#find the corrent rank
+
+                if mobile:
+                    exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
+                                'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
+                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url']}
+                else:
+                    exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
+                                'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
+                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'timeslots':experience['dates'][dt_string]}
+
+                while counter < len(day_dict['experiences']):#find the correct rank
                     if experience['rate'] > day_dict['experiences'][counter]['rate']:
                         day_dict['experiences'].insert(counter, exp_dict)
                         insert = True

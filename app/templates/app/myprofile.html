@@ -23,7 +23,7 @@
 	<div class="row row-area">
     	<div class="content-area fixCenter">
     		<div class="leftsubMenu">
-    			<p>{% trans "My Profile" %}</p>    
+    			<p>{% trans "My Profile" %}</p>
     		</div>
 
             <form id="my_profile_form" method="post" action="" enctype="multipart/form-data">
@@ -35,7 +35,7 @@
                         <tr>
                             <td>
           	                    <div class="profile-lg void-profile">
-                                    <img src="{{MEDIA_URL}}{{image_url}}" width="200px" height="200px">
+                                    <img src="{{MEDIA_URL}}{{image_url}}">
                                 </div>
                             </td>
                             <td>
@@ -57,7 +57,7 @@
                                 <p class="no-file">No File Selected</p>-->
                             </td>
                         </tr>
-        
+
                         <tr>
                             <td>
                                 <div>
@@ -145,7 +145,7 @@
             </form>
         </div>
     </div>
-		        
+
 {% endblock %}
 
 {% block scripts %}
@@ -165,7 +165,7 @@
 
             if (window.FileReader) {
                 input = document.getElementById('id_image');
-                if (input && input.files && input.files[0]) 
+                if (input && input.files && input.files[0])
                 {
                     file = input.files[0];
                     if(file.size > 1048576)
@@ -180,7 +180,7 @@
                 }
             }
 
-            if(valid) 
+            if(valid)
             {
                 $("form").submit();
             }
