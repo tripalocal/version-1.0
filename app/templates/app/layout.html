@@ -118,16 +118,20 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
       if ($(window).width() > 520) {
         setTimeout(function() {
           $('#help-popup').modal('show');
+          mixpanel.track("saw popup01");
         }, 60000); // milliseconds
         $('.close-popup').click(function() {
           $('#help-popup').modal('hide');
+          mixpanel.track("closed popup02");
         })
         $('#help-no').click(function() {
           $('#help-popup').modal('hide');
+          mixpanel.track("selected No from popup01");
         });
         $('#help-yes').click(function() {
           $('#popup-page-1').hide();
           $('#popup-page-2').show();
+          mixpanel.track("selected Yes from popup01");
         });
       };
 
