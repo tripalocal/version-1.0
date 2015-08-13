@@ -28,6 +28,17 @@ Location = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Br
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
+Locations = [('Australia', [('Melbourne', _('Melbourne'), _('Victoria')), ('Sydney', _('Sydney'), _('New South Wales')),
+                           ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
+                           ('Goldcoast', _('Gold coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
+                           ('Adelaide', _('Adelaide'), _('South Australia')),
+                           ('Darwin', _('Darwin'), _('Northern Territory')),
+                           ('Alicesprings', _('Alice Springs'), _('Northern Territory'))]),
+             ('New Zealand', [('Christchurch', _('Christchurch'), _('Canterbury')),
+                             ('Queenstown', _('Queenstown'), _('Otago')),
+                             ('Auckland', _('Auckland'), _('Auckland')),
+                             ('Wellington', _('Wellington'), _('Wellington'))])]
+
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),)#('english;translation','English+Chinese translation'),
 
 Repeat_Cycle = (('Weekly', 'Weekly'), ('Daily', 'Daily'), ('Monthly', 'Monthly'),)
@@ -70,6 +81,13 @@ Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghan
 ('Palestinian Territories', 'Palestinian Territories'),('Panama', 'Panama'),('Papua New Guinea', 'Papua New Guinea'),('Paraguay', 'Paraguay'),('Peru', 'Peru'),('Philippines', 'Philippines'),('Poland', 'Poland'),('Portugal', 'Portugal'),('Qatar', 'Qatar'),('Romania', 'Romania'),('Russia', 'Russia'),('Rwanda', 'Rwanda'),('Saint Kitts and Nevis', 'Saint Kitts and Nevis'),('Saint Lucia', 'Saint Lucia'),('Saint Vincent and the Grenadines', 'Saint Vincent and the Grenadines'),('Samoa ', 'Samoa '),('San Marino', 'San Marino'),('Sao Tome and Principe', 'Sao Tome and Principe'),('Saudi Arabia', 'Saudi Arabia'),('Senegal', 'Senegal'),('Serbia', 'Serbia'),('Seychelles', 'Seychelles'),('Sierra Leone', 'Sierra Leone'),('Singapore', 'Singapore'),
 ('Sint Maarten', 'Sint Maarten'),('Slovakia', 'Slovakia'),('Slovenia', 'Slovenia'),('Solomon Islands', 'Solomon Islands'),('Somalia', 'Somalia'),('South Africa', 'South Africa'),('South Korea', 'South Korea'),('South Sudan', 'South Sudan'),('Spain ', 'Spain '),('Sri Lanka', 'Sri Lanka'),('Sudan', 'Sudan'),('Suriname', 'Suriname'),('Swaziland ', 'Swaziland '),('Sweden', 'Sweden'),('Switzerland', 'Switzerland'),('Syria', 'Syria'),('Taiwan, China', 'Taiwan, China'),('Tajikistan', 'Tajikistan'),('Tanzania', 'Tanzania'),('Thailand ', 'Thailand '),('Timor-Leste', 'Timor-Leste'),('Togo', 'Togo'),('Tonga', 'Tonga'),('Trinidad and Tobago', 'Trinidad and Tobago'),('Tunisia', 'Tunisia'),('Turkey', 'Turkey'),('Turkmenistan', 'Turkmenistan'),
 ('Tuvalu', 'Tuvalu'),('Uganda', 'Uganda'),('Ukraine', 'Ukraine'),('United Arab Emirates', 'United Arab Emirates'),('United Kingdom', 'United Kingdom'),('Uruguay', 'Uruguay'),('Uzbekistan', 'Uzbekistan'),('Vanuatu', 'Vanuatu'),('Venezuela', 'Venezuela'),('Vietnam', 'Vietnam'),('Yemen', 'Yemen'),('Zambia', 'Zambia'),('Zimbabwe ', 'Zimbabwe '),)
+
+Currency = (('AUD',_('AUD')),('NZD',_('NZD')),) #('CNY',_('CNY')),
+DollarSign = {'AUD':'$','NZD':'$'} #'CNY':'￥',
+
+Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted'))
+
+PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
 Tags = "Food & wine, Education, History & culture, Architecture, For couples, Photography worthy, Livability research, Kids friendly, Outdoor & nature, Shopping, Sports & leisure, Host with car, Extreme fun, Events, Health & beauty, Private group"
 
@@ -552,7 +570,7 @@ class BookingConfirmationForm(forms.Form):
     state = forms.CharField(max_length=10, required = False)
     country = forms.ChoiceField(choices=Country, required = False)
     postcode = forms.CharField(max_length=4, required = False)
-    phone_number = forms.CharField(max_length=15, required=False)
+    phone_number = forms.CharField(max_length=15, required=True)
 
     coupon_extra_information = forms.CharField(max_length=500, required=False)
     booking_extra_information = forms.BooleanField(required=False)
@@ -632,11 +650,11 @@ class BookingConfirmationForm(forms.Form):
             ids.append(self.cleaned_data['experience_id'])
             dates.append(dt.strftime("%Y/%m/%d"))
             times.append(tm.strftime("%H"))
-
+            
             ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,guest_number,
                          coupon_extra_information = coupon_extra_information, coupon = coupon,
                          payment_phone_number = payment_phone_number, stripe_token = stripeToken)
- 
+
         return cleaned
 
 class CreateExperienceForm(forms.Form):
@@ -1077,8 +1095,8 @@ class ItineraryBookingForm(forms.Form):
 class SearchForm(forms.Form):
     start_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     end_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    guest_number = forms.ChoiceField(choices=Guest_Number, required=False)
-    city = forms.ChoiceField(choices=Location,  required=True)
+    guest_number = forms.ChoiceField(choices=Guest_Number, widget=forms.Select(attrs={'class':'ui dropdown smaller-box'}), required=False)
+    city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'class':'ui dropdown'}), required=True)
     language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")
     is_kids_friendly = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
     is_host_with_cars = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))

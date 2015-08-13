@@ -6,6 +6,7 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, loader
 from datetime import *
+from experiences.forms import Locations
 from django import forms
 from django.contrib.auth import authenticate, login
 from allauth.account.signals import password_reset, user_signed_up, user_logged_in
@@ -117,20 +118,20 @@ def home(request):
                 # take the first ip which is not a private one (of a proxy)
                 if len(proxies) > 0:
                     ip = proxies[0]
-
-        if settings.LANGUAGES[0][0] != "zh":
-            try:
-                reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
-                response = reader.city(ip)
-                country = response.country.name
-                reader.close()
-                if country.lower() in ['china']:
+        if not settings.DEVELOPMENT:
+            if settings.LANGUAGES[0][0] != "zh":
+                try:
+                    reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+                    response = reader.city(ip)
+                    country = response.country.name
+                    reader.close()
+                    if country.lower() in ['china']:
+                        return HttpResponseRedirect('/cn')
+                except Exception:
+                    reader.close()
+    
+                if request.LANGUAGE_CODE.startswith("zh"):
                     return HttpResponseRedirect('/cn')
-            except Exception:
-                reader.close()
-
-            if request.LANGUAGE_CODE.startswith("zh"):
-                return HttpResponseRedirect('/cn')
 
     experienceList = Experience.objects.filter(id__in=[1,2,20])
     idxList = random.sample(range(len(experienceList)), 3)
@@ -149,7 +150,8 @@ def home(request):
 
     context = RequestContext(request, {
         'featuredExperience': featuredExperience,
-        'cityList': featuredCityList
+        'cityList': featuredCityList,
+        'locations': Locations,
     })
 
     if request.user.is_authenticated():
