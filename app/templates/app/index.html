@@ -260,6 +260,17 @@
 {% block scripts %}
 
 <script charset="utf-8" type="text/javascript">
+/*
+var pathname = window.location.href;
+var isCN = new RegExp("/cn")
+if (pathname).search(isCN) {
+  $(".custom-itinerary").css('background-image', 'url({% static "app/img/homepage_banner_cn" %})');
+}*/
+    $(document).ready(function() {
+      $(".request-btn").click(function() {
+        window.location.href="mailto:enquiries@tripalocal.com";
+      });
+    });
     $("#video-fullscreen").hide();
     $(function()
     {

@@ -247,7 +247,9 @@ a {color:#6CC;} a:hover{color:#699;}
     width: 100%;
     cursor: pointer;
 }
-
+#id_experience_description {
+  padding-top: 0;
+}
 @media (max-width: 767px) {
     .desBox, .reviewBox, .bioBox {
         width: 80%;

@@ -81,7 +81,11 @@ textarea {
   height: 40px;
 }
 
-
+@media (max-width: 767px) {
+  .help .col-xs-6 {
+    float: left;
+  }
+}
 
 /* styles for validation helpers */
 .field-validation-error {

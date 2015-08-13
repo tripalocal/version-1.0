@@ -167,12 +167,8 @@
                 <div id="experience-box" class="expBox">
                     <div id="overlay"></div>
                     <div id="ajax-experience-result"></div>
-                    <div class="expList">
-                        <div class="listingImg" style="background-image:url({{MEDIA_URL}}request.jpg);"></div>
-                        <h3>{%trans "Can't find the experience you Want?" %}</h3>
-                        <div class="profile-sm" style="background:url({{MEDIA_URL}}profile_default.jpg) no-repeat; background-size:cover; background-position:center;"></div>
-                        <p style="overflow-y:hidden; height:100px">{%trans "Email us at "%}<a href="mailto:enquiries@tripalocal.com">enquiries@tripalocal.com</a> {%trans "with the preferred experience, the dates and times and we will get back to you within 48 hours with a customised experience just for you!"%}</p>
-                        <div class="listingFooter">{%trans "We offer exclusive experiences with private groups"%}</div>
+                    <div class="expList custom-itinerary" style="background-image:url({% static 'experiences/img/searchpage_banner.jpg' %});">
+                      <button class="btn btn-primary request-btn">Request a trip</button>
                     </div>
                 </div>
             </div>
@@ -190,6 +186,11 @@
   $(document).ajaxStop(function() {
     $(".loading").hide();
   })
+  $(document).ready(function() {
+    $(".request-btn").click(function() {
+      window.location.href="mailto:enquiries@tripalocal.com";
+    });
+  });
 </script>
 
 <script charset="utf-8" type="text/javascript">
