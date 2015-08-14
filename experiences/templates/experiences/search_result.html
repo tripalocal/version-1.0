@@ -211,7 +211,7 @@
                 $('#ajax-experience-result').html($(response).find('#experience-results'));
                 $('#ajax-experience-count').html($(response).find('#experience-count'));
         }).fail(function () {
-                $('#ajax-experience-result').text(gettext('Sorry but there was an error.'));
+                $('#ajax-experience-result').text('{%trans "Sorry but there was an error."%}');
         });
     }
 
@@ -346,7 +346,7 @@
     });
 
     $("#id_city").change(function(e){
-        $("#search_form")[0].action = "{{GEO_POSTFIX}s/" + $("#id_city").val() + "/";
+        $("#search_form")[0].action = "{{GEO_POSTFIX}}s/" + $("#id_city").val() + "/";
         $("#itinerary-search").click();
     });
 
@@ -384,13 +384,13 @@
         if(tags_div.css("display")=="none")
         {
             tags_div.show();
-            $("#more_filters").text(gettext('Cancel'));
+            $("#more_filters").text('{%trans "Cancel"%}');
             $("#apply_filters").show();
         }
         else
         {
             tags_div.hide();
-            $("#more_filters").text(gettext('More Filters'));
+            $("#more_filters").text('{%trans "More Filters"%}');
             $("#apply_filters").hide();
         }
     });

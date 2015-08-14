@@ -538,14 +538,14 @@ $(function(){
                                 {
                                     if(result.added)
                                     {
-                                        alert(gettext('The experience has been added to your wishlist'));
+                                        alert('{%trans "The experience has been added to your wishlist" %}');
                                         $('#save_to_wishlist_related_'+i).removeClass("save_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).addClass("saved_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).attr("val","True");
                                     }
                                     if(result.removed)
                                     {
-                                        alert(gettext('The experience has been removed from your wishlist'));
+                                        alert('{%trans "The experience has been removed from your wishlist" %}');
                                         $('#save_to_wishlist_related_'+i).removeClass("saved_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).addClass("save_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).attr("val","False");
@@ -557,7 +557,7 @@ $(function(){
                                 }
                             },
                             error: function (e) {
-                                alert(gettext('Please try again later'));
+                                alert('{%trans "Please try again later" %}');
                             }
                     });
                 }
@@ -729,21 +729,21 @@ $(function(){
                         {
                             if(result.added)
                             {
-                                alert(gettext('The experience has been added to your wishlist'));
+                                alert('{%trans "The experience has been added to your wishlist"%}');
                                 $('#save_to_wishlist_icon').attr("val","True");
                                 $('#save_to_wishlist_icon').removeClass("save_to_wishlist_not_added");
                                 $('#save_to_wishlist_icon').addClass("save_to_wishlist_added");
-                                $('#wishlist_head').text(gettext('Saved to Wishlist'));
+                                $('#wishlist_head').text('{%trans "Saved to Wishlist"%}');
                                 $('#wishlist_p').text("");
                             }
                             if(result.removed)
                             {
-                                alert(gettext('The experience has been removed from your wishlist'));
+                                alert('{%trans "The experience has been removed from your wishlist"%}');
                                 $('#save_to_wishlist_icon').attr("val","False");
                                 $('#save_to_wishlist_icon').removeClass("save_to_wishlist_added");
                                 $('#save_to_wishlist_icon').addClass("save_to_wishlist_not_added");
-                                $('#wishlist_head').text(gettext('Save to Wishlist'));
-                                $('#wishlist_p').text(gettext('Save now, plan later'));
+                                $('#wishlist_head').text('{%trans "Save to Wishlist"%}');
+                                $('#wishlist_p').text('{%trans "Save now, plan later"%}');
                             }
                         }
                         else
@@ -752,7 +752,7 @@ $(function(){
                         }
                     },
                     error: function (e) {
-                        alert(gettext('Please try again later'));
+                        alert('{%trans "Please try again later"%}');
                     }
             });
         }
@@ -763,7 +763,7 @@ $(function(){
         {
             bio_height = $("#host_bio").height();
             $("#bio_show_more").attr("value", "Less");
-            $("#bio_show_more").text(gettext('- Less'));
+            $("#bio_show_more").text('{%trans "- Less"%}');
             $(".gradientMask").hide();
             $("#experience-hostintro").height(bio_height+140);
         }
@@ -771,7 +771,7 @@ $(function(){
         {
             bio_height = 140;
             $("#bio_show_more").attr("value", "More");
-            $("#bio_show_more").text(gettext('+ More'));
+            $("#bio_show_more").text('{%trans "+ More" %}');
             $(".gradientMask").show();
             $("#experience-hostintro").removeAttr("style");
         }
