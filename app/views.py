@@ -6,6 +6,7 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, loader
 from datetime import *
+from experiences.forms import Locations
 from django import forms
 from django.contrib.auth import authenticate, login
 from allauth.account.signals import password_reset, user_signed_up, user_logged_in
@@ -149,7 +150,8 @@ def home(request):
 
     context = RequestContext(request, {
         'featuredExperience': featuredExperience,
-        'cityList': featuredCityList
+        'cityList': featuredCityList,
+        'locations': Locations,
     })
 
     if request.user.is_authenticated():

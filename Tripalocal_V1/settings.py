@@ -183,6 +183,7 @@ INSTALLED_APPS = (
     'post_office',
     'rest_framework',
     'rest_framework.authtoken',
+    'storages',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -317,10 +318,29 @@ GEO_POSTFIX = "/"
 
 DEVELOPMENT = False
 
+# AWS S3
+AWS_STORAGE_BUCKET_NAME = 'tripalocal-static'
+AWS_ACCESS_KEY_ID = 'AKIAJ2SSSHLAOMYAKHCQ'
+AWS_SECRET_ACCESS_KEY = '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'
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+STATICFILES_LOCATION = 'static'
+MEDIAFILES_LOCATION = 'images'
+
+
+if 'DEFAULT_FILE_STORAGE' in os.environ:
+    DEFAULT_FILE_STORAGE = os.environ.get('DEFAULT_FILE_STORAGE')
+    MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+
+if 'STATICFILES_STORAGE' in os.environ:
+    STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE')
+    STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
+
+
 # Customized settings should always be put at the bottom
 if os.environ.get('ENV_MODE') == 'DEVELOPMENT':
     try:
-        print(DATABASES['default'])
         from test_settings import *
     except ImportError:
         pass

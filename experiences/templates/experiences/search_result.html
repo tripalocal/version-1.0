@@ -29,7 +29,12 @@
                             <div class="iconText">Dates</div>
                         </div>
                         <div class="formBoxes">
-                            {{form.city}}
+                          <div class="ui selection dropdown">
+                            <input id="id_city" type="hidden" name="city" value="city">
+                            <i class="dropdown icon"></i>
+                            <div id="city_name" class="text">City</div>
+                            <div id="city-menu" class="menu"></div>
+                          </div>
                             <div class="input-group startDate">
                                 {{form.start_date}}
                             </div>
@@ -45,10 +50,15 @@
                         <div class="iconHeader">
                             <div class="iconImage" id="people">
                             </div>
-                            <div class="iconText">People
+                            <div class="iconText">{%trans "People"%}
                             </div>
                         </div>
                         <div class="formBoxes">{{form.guest_number}}
+                        <script charset="utf-8" type="text/javascript">
+                        $('.ui.dropdown')
+                          .dropdown()
+                        ;
+                        </script>
                         </div>
                     </div>
 
@@ -59,7 +69,7 @@
                         <div class="iconHeader">
                             <div class="iconImage" id="language">
                             </div>
-                            <div class="iconText">Language
+                            <div class="iconText">{%trans "Language"%}
                             </div>
                         </div>
 
@@ -120,7 +130,7 @@
         </div>
         <div class="mobileSearch notOnDesktop">
             <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>
-            <img src="/images/search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
+            <img src="{{ MEDIA_URL }}search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
         </div>
     </form>
 
@@ -216,6 +226,20 @@
             mixpanel.identify($("#user_email").val());
         }
 
+        {% for k, v in locations %}
+            var header = '<div class=\"header\">' + '{{ k }}' + '</div>';
+            $('#city-menu').append(header);
+            {% for id, name, state in v %}
+                var city = '<div class=\"item\" data-value=' + '{{ id }}' +
+                        ' data-text=' + '{{ name }}' + '>' + '{{ name }} ' +
+                        '<span class=\"light-color\">' + '{{ state }}' + '</span></div>';
+                $('#city-menu').append(city);
+            {% endfor %}
+        {% endfor %}
+
+        $("#city_name").text("{{city}}");
+        $('.ui.dropdown').dropdown();
+
         $("#id_guest_number").addClass("guestNumber");
 
         $("#id_city").addClass("locationSelection");
@@ -256,7 +280,7 @@
             }
             else
             {
-                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url(/images/closeIcon-02.svg)\"></button></div>";
+                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url({{ MEDIA_URL }}closeIcon-02.svg)\"></button></div>";
             }
 
             $("#tags_div").append(new_tag);
@@ -265,15 +289,14 @@
                 id = e.target.id.split("_")[2];
                 if($("#tag_"+id).attr("class") == "tag-selected")
                 {
-//                    $("#tag_button_"+id).html("<img src='/images/undo.svg' width='14'>");
-                    $("#tag_button_"+id).css("background-image","url(/images/undo.svg)");
+                    $("#tag_button_"+id).css("background-image","url({{ MEDIA_URL }}undo.svg)");
                     $("#tag_"+id).attr("class", "tag-non-selected");
                     $("#tag_box_"+id).removeClass("tag-box-selected");
                     $("#tag_box_"+id).addClass("tag-box-unselected");
                 }
                 else
                 {
-                    $("#tag_button_"+id).css("background-image","url(/images/closeIcon-02.svg)");
+                    $("#tag_button_"+id).css("background-image","url({{ MEDIA_URL }}closeIcon-02.svg)");
                     $("#tag_"+id).attr("class", "tag-selected");
                     $("#tag_box_"+id).removeClass("tag-box-unselected");
                     $("#tag_box_"+id).addClass("tag-box-selected");
@@ -318,6 +341,7 @@
             if (e.originalEvent.state !== null) {
                 var city = hrefToCityName(location.href);
                 $("#id_city").val(city);
+                $("#city_name").text(city);
                 loadExperienceList(location.href);
             }
         });
