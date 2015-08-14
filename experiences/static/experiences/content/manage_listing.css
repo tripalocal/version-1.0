@@ -8,13 +8,16 @@
   border-top: 0;
 }
 
-.back_button {
-
-}
-
 .button_icon {
+  position: relative;
   margin-right: 5px;
   line-height: 1.5;
+}
+
+.button_icon img {
+  position: absolute;
+  bottom: -5px;
+  left: -30px;
 }
 #nav-right {
 
@@ -52,6 +55,23 @@
   z-index: 1;
 }
 
+.form-info {
+  width: 180px;
+  height: 500px;
+}
+
+/* Photo Form */
+.fileUpload img {
+  position: absolute;
+  bottom: 0px;
+  left: 10px;
+}
+.fileUpload span {
+  position: absolute;
+  left: 50px;
+  bottom: 3px;
+}
+
 /* Price Form */
 #menu-selection-left {
   width: 226px;
@@ -67,4 +87,20 @@
   background: rgb(247,247,247);
   background-image: url('/images/public.png');
   background-size: cover;
+}
+
+/* Location Form */
+
+.text-input {
+  width: 320px;
+  float: left;
+  padding-left: 50px;
+  padding-top: 30px;
+}
+.text-input textarea {
+  width: 350px;
+  height: 100px;
+}
+.text-input p {
+  color: #999;
 }

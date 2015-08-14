@@ -862,7 +862,7 @@ body {
 /*list-location.html*/
 #location{float: left; }
 #location-details{ color: #999999; padding-left: 30px; }
-#meet-up-instruction{float: right; color: #999999; padding-right: 40px; padding-top: 30px;}
+/*#meet-up-instruction{float: right; color: #999999; padding-right: 40px; padding-top: 30px;}*/
 #meet-up-instruction textarea{width: 350px; height: 80px; border-radius: 3px; border: 1px solid #999999;}
 .drop-off-instruction{float: right; color: #999999; padding-right: 40px; padding-top: 20px; clear: both;}
 .drop-off-instruction textarea{width: 350px; height: 80px;}
