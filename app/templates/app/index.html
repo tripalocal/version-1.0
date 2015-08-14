@@ -262,10 +262,6 @@
 <script charset="utf-8" type="text/javascript">
 
     $(document).ready(function() {
-      var des_url = window.location.pathname;
-      if(des_url.search("/cn") > 0) {
-        $(".custom-itinerary").css('background-image', 'url({% static "app/img/homepage_banner_cn.jpg" %})');
-      }
       $(".request-btn").click(function() {
         window.location.href="mailto:enquiries@tripalocal.com";
         mixpanel.track("requested a trip from homepage");
