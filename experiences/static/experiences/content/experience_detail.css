@@ -1,4 +1,4 @@
-﻿/*experience detail page*/
+/*experience detail page*/
 .experience{background-color: rgb(245,245,245); border-top: 1px solid rgb(197,197,197)}
 .icon{width:27px; height:27px; background-size: 135px 135px;}
 .bookingBox .icon{ margin:auto; margin:auto;}
@@ -154,7 +154,7 @@ a {color:#6CC;} a:hover{color:#699;}
 .profile{width:134px; height:134px; background-color:#FFF; border-radius: 70px; margin: 30px auto 10px auto;}
 .profile img{border-radius: 60px; margin-top:6px; border:#CCC solid 1px; width:120px; height:120;}
 .teasebox{width:180px;
- height:195px; background-size:180px 195px; background-repeat:no-repeat; margin:auto; padding:77px 9px 0px 9px; color:#999; font-size:13px;;}
+    height:195px; background-size:180px 195px; background-repeat:no-repeat; margin:auto; padding:77px 9px 0px 9px; color:#999; font-size:13px;;}
 
 .footer h1{color:#666;}
 .footer img{margin:30 0;}
@@ -178,24 +178,24 @@ a {color:#6CC;} a:hover{color:#699;}
 
 /* Star Rating */
 .rating_review {
-  unicode-bidi: bidi-override;
-  direction: rtl;
-  color: grey;
-  font-size: 20px;
-  width: 30%;
-  float: left;
+    unicode-bidi: bidi-override;
+    direction: rtl;
+    color: grey;
+    font-size: 20px;
+    width: 30%;
+    float: left;
 }
 
 .rating_review > span {
-  display: inline-block;
-  position: relative;
-  width: 1.1em;
+    display: inline-block;
+    position: relative;
+    width: 1.1em;
 }
 .rating_review > span:hover:before,
 .rating_review > span:hover ~ span:before {
-   content: "\2605";
-   position: absolute;
-   color: rgb(253,198,7);
+    content: "\2605";
+    position: absolute;
+    color: rgb(253,198,7);
 }
 .reviewHeaderPosition{padding-left: 20px; padding-top: 20px;}
 .checkoutBox .row{padding-left: 20px; color: rgb(87,87,87);}
@@ -270,7 +270,7 @@ a {color:#6CC;} a:hover{color:#699;}
     .col-sm-3 {
     margin-bottom: 0;
     }
-    
+
     .desBox, .reviewBox, .bioBox {
         width: 80%;
          float: none;
