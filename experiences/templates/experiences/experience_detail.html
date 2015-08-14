@@ -310,9 +310,9 @@
                         <div class="reviewList">
                     {% endif %}
                         {%if review.user.registereduser.image_url != None and review.user.registereduser.image_url != ''%}
-                            <div class="profile-"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
+                            <div class="profile-md"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
                         {%else%}
-                            <div class="profile-"><img src="{{ MEDIA_URL }}profile_default.jpg" width="240" height="240"></div>
+                            <div class="profile-md"><img src="{{ MEDIA_URL }}profile_default.jpg" width="240" height="240"></div>
                         {%endif%}
                             <div class="reviewText">{{review.comment}}
                                 <div class="reviewDate">{{review.datetime|date:'d M Y'}}</div>
