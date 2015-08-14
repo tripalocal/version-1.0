@@ -10,7 +10,7 @@ from django import forms
 from experiences.forms import Locations
 from django.contrib.auth import authenticate, login
 from allauth.account.signals import password_reset, user_signed_up, user_logged_in
-from allauth.account.views import PasswordResetFromKeyDoneView 
+from allauth.account.views import PasswordResetFromKeyDoneView
 from django.dispatch import receiver
 from app.forms import SubscriptionForm, HomepageSearchForm, UserProfileForm, UserCalendarForm
 from app.models import *
@@ -51,21 +51,21 @@ def home(request):
         if form.is_valid():
             if len(form.data['start_date']):
                 if len(form.data['end_date']):
-                    return SearchView(request, form.data['city'], 
+                    return SearchView(request, form.data['city'],
                                              start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")), 
                                              end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
                 else:
-                    return SearchView(request, form.data['city'], 
+                    return SearchView(request, form.data['city'],
                                              start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")))    
 
-            if len(form.data['end_date']):       
-                return SearchView(request, form.data['city'], 
+            if len(form.data['end_date']):
+                return SearchView(request, form.data['city'],
                                              end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
             else:
                 return SearchView(request, form.data['city'])
 
             #mp = Mixpanel(settings.MIXPANEL_TOKEN)
-            #try: 
+            #try:
             #    Subscription.objects.get(email = form.data['email'])
             #    messages.add_message(request, messages.INFO, 'It seems you already subscribed. Thank you.')
             #except Subscription.DoesNotExist:
@@ -77,29 +77,29 @@ def home(request):
             #        new_sub = Subscription(email = form.data['email'], subscribed_datetime = datetime.utcnow().replace(tzinfo=pytz.utc), ref_by = ref_by.email, ref_link=ref_link)
             #        #send an email to the referal
             #        counter = len(Subscription.objects.filter(ref_by = ref_by.email))
-                    
+
             #        if count <= 5:
             #            if counter%5 < 4: # i.e., (count+1)%5==0
             #                mp.track(ref_by.email, 'Referred a friend')
             #                mail.send('[Tripalocal] Someone has signed up because of you!', '', 'Tripalocal <enquiries@tripalocal.com>',
-            #                            [ref_by.email], fail_silently=False, 
+            #                            [ref_by.email], fail_silently=False,
             #                            html_message=loader.render_to_string('app/email_new_referral.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link, 'counter':counter%5+1, 'left':5-1-counter%5}))
             #            else:
             #                mp.track(ref_by.email, 'Qualified for a free experience')
             #                mail.send('[Tripalocal] Free experience!', '', 'Tripalocal <enquiries@tripalocal.com>',
-            #                            [ref_by.email], fail_silently=False, 
+            #                            [ref_by.email], fail_silently=False,
             #                            html_message=loader.render_to_string('app/email_free_experience.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link}))
             #    except Subscription.DoesNotExist:
             #        new_sub = Subscription(email = form.data['email'], subscribed_datetime = datetime.utcnow().replace(tzinfo=pytz.utc), ref_link=ref_link)
-            #    finally:    
+            #    finally:
             #        new_sub.save()
             #        #send an email to the new subscriber
             #        #mp.people_set(form.data['email'], {"$email": form.data['email']})
             #        #mp.track(form.data['email'], 'Entered email address at prelaunch')
             #        data = "{'event': 'Opened welcome email','properties': {'token': '" + settings.MIXPANEL_TOKEN + "', 'distinct_id': '" + form.data['email'] + "'}}"
             #        mail.send('[Tripalocal] Welcome', '', 'Tripalocal <enquiries@tripalocal.com>',
-            #                    [form.data['email']], fail_silently=False, 
-            #                    html_message=loader.render_to_string('app/email_welcome.html', 
+            #                    [form.data['email']], fail_silently=False,
+            #                    html_message=loader.render_to_string('app/email_welcome.html',
             #                                                         {'ref_url':'http://www.tripalocal.com?ref='+ref_link, 'data':base64.b64encode(data.encode('utf-8')).decode('utf-8')}))
             #        #messages.add_message(request, messages.INFO, 'Thank you for subscribing.')
             #        return render_to_response('app/welcome.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_link}, context)
@@ -127,14 +127,14 @@ def home(request):
                     country = response.country.name
                     reader.close()
                     if country.lower() in ['china']:
-                        return HttpResponseRedirect('/cn')
+                        return HttpResponseRedirect('/cn/')
                 except Exception:
                     reader.close()
 
                 if request.LANGUAGE_CODE.startswith("zh"):
-                    return HttpResponseRedirect('/cn')
+                    return HttpResponseRedirect('/cn/')
 
-    experienceList = Experience.objects.filter(id__in=[1,2,20])
+    experienceList = Experience.objects.filter(id__in=[1,2,59])
     idxList = random.sample(range(len(experienceList)), 3)
     featuredExperienceList = [experienceList[i] for i in idxList]
 
@@ -256,7 +256,6 @@ def current_datetime(request):
     return {'current_datetime':datetime.datetime.utcnow()}
 
 def disclaimer(request):
-    
     return render(
         request,
         'app/disclaimer.html',
@@ -295,7 +294,7 @@ def getreservation(user):
         phone_number = payment.phone_number if payment.phone_number != None and len(payment.phone_number) else guest.registereduser.phone_number
         reservation = {"booking_datetime":booking.datetime.astimezone(local_timezone), "booking_status":booking.status,
                        "booking_guest_number":booking.guest_number,"booking_id":booking.id,
-                       "experience_id":experience.id,"experience_title":get_experience_title(experience, settings.LANGUAGES[0][0]), 
+                       "experience_id":experience.id,"experience_title":get_experience_title(experience, settings.LANGUAGES[0][0]),
                        "payment_city":payment.city, "payment_country":payment.country,
                        "guest_first_name":guest.first_name, "guest_last_name":guest.last_name, "guest_phone_number":phone_number}
 
@@ -407,7 +406,7 @@ def myprofile(request):
     photo={}
     if profile.image_url:
         context["image_url"] = profile.image_url
-        #photo["image"] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+profile.image_url, 
+        #photo["image"] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+profile.image_url,
         #                                    File(open(settings.MEDIA_ROOT+'/'+profile.image_url, 'rb')).read())
     else:
         context["image_url"] = "hosts/no_img.jpg"
@@ -416,7 +415,7 @@ def myprofile(request):
         data["phone_number"]=profile.phone_number
 
     data["bio"]=get_user_bio(profile, settings.LANGUAGES[0][0])
-        
+
     form = UserProfileForm(data=data)
     context['GEO_POSTFIX'] = settings.GEO_POSTFIX
     context['LANGUAGE'] = settings.LANGUAGE_CODE
@@ -462,43 +461,43 @@ def mycalendar(request):
             for i in range(1,6):
                 if blockout['blockout_start_datetime_'+str(i)] and blockout['blockout_end_datetime_'+str(i)]:
                     if blockout['blockout_repeat_end_date_'+str(i)]:
-                        b = BlockOutTimePeriod(start_datetime = blockout['blockout_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0), 
+                        b = BlockOutTimePeriod(start_datetime = blockout['blockout_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
                                                 end_datetime = blockout['blockout_end_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
-                                                repeat = blockout['blockout_repeat_'+str(i)], 
-                                                repeat_cycle = blockout['blockout_repeat_cycle_'+str(i)], 
+                                                repeat = blockout['blockout_repeat_'+str(i)],
+                                                repeat_cycle = blockout['blockout_repeat_cycle_'+str(i)],
                                                 repeat_frequency = blockout['blockout_repeat_frequency_'+str(i)],
                                                 repeat_extra_information = blockout['blockout_repeat_extra_information_'+str(i)],
                                                 repeat_end_date = blockout['blockout_repeat_end_date_'+str(i)],
                                                 user = request.user
                                                 )
                     else:
-                        b = BlockOutTimePeriod(start_datetime = blockout['blockout_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0), 
+                        b = BlockOutTimePeriod(start_datetime = blockout['blockout_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
                                                 end_datetime = blockout['blockout_end_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
-                                                repeat = blockout['blockout_repeat_'+str(i)], 
-                                                repeat_cycle = blockout['blockout_repeat_cycle_'+str(i)], 
+                                                repeat = blockout['blockout_repeat_'+str(i)],
+                                                repeat_cycle = blockout['blockout_repeat_cycle_'+str(i)],
                                                 repeat_frequency = blockout['blockout_repeat_frequency_'+str(i)],
                                                 repeat_extra_information = blockout['blockout_repeat_extra_information_'+str(i)],
                                                 repeat_end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2049-12-31", "%Y-%m-%d")).astimezone(pytz.timezone('UTC')),
                                                 user = request.user
                                                 )
                     b.save()
-                
+
                 if instant_booking['instant_booking_start_datetime_'+str(i)] and instant_booking['instant_booking_end_datetime_'+str(i)]:
                     if instant_booking['instant_booking_repeat_end_date_'+str(i)]:
-                        ib = InstantBookingTimePeriod(start_datetime = instant_booking['instant_booking_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0), 
+                        ib = InstantBookingTimePeriod(start_datetime = instant_booking['instant_booking_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
                                                 end_datetime = instant_booking['instant_booking_end_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
-                                                repeat = instant_booking['instant_booking_repeat_'+str(i)], 
-                                                repeat_cycle = instant_booking['instant_booking_repeat_cycle_'+str(i)], 
+                                                repeat = instant_booking['instant_booking_repeat_'+str(i)],
+                                                repeat_cycle = instant_booking['instant_booking_repeat_cycle_'+str(i)],
                                                 repeat_frequency = instant_booking['instant_booking_repeat_frequency_'+str(i)],
                                                 repeat_extra_information = instant_booking['instant_booking_repeat_extra_information_'+str(i)],
                                                 repeat_end_date = instant_booking['instant_booking_repeat_end_date_'+str(i)],
                                                 user = request.user
                                                 )
                     else:
-                        ib = InstantBookingTimePeriod(start_datetime = instant_booking['instant_booking_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0), 
+                        ib = InstantBookingTimePeriod(start_datetime = instant_booking['instant_booking_start_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
                                                 end_datetime = instant_booking['instant_booking_end_datetime_'+str(i)].astimezone(pytz.timezone('UTC')).replace(minute=0),
-                                                repeat = instant_booking['instant_booking_repeat_'+str(i)], 
-                                                repeat_cycle = instant_booking['instant_booking_repeat_cycle_'+str(i)], 
+                                                repeat = instant_booking['instant_booking_repeat_'+str(i)],
+                                                repeat_cycle = instant_booking['instant_booking_repeat_cycle_'+str(i)],
                                                 repeat_frequency = instant_booking['instant_booking_repeat_frequency_'+str(i)],
                                                 repeat_extra_information = instant_booking['instant_booking_repeat_extra_information_'+str(i)],
                                                 repeat_end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2049-12-31", "%Y-%m-%d")).astimezone(pytz.timezone('UTC')),
@@ -566,7 +565,7 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
                 f.close()
 
             subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
-    
+
             with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
                 f.write(new_email.id + "\n")
                 f.close()
@@ -604,7 +603,7 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
 
 def track_user_signup(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP":ip, 
+    mp.people_set(user.email, {"IP":ip,
                                "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
                                })
 
@@ -685,7 +684,7 @@ def track_user_login(ip, sociallogin, user):
         latitude = response.location.latitude
 
         mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
-        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "Postcode":postcode, 
+        mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "Postcode":postcode,
                                    "Latitude":latitude, "Longitude":longitude, "Language":settings.LANGUAGES[0][1]}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
         reader.close()
     except Exception:

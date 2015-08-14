@@ -5,8 +5,13 @@
 {% block head %}
     {% load staticfiles %}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
-    <title> {{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %} </title>
+    {% if LANGUAGE != "zh-CN" %}
+    <title>{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</title>
+    {%else%}
+    <title>{% trans "with" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "Experience" %}{{ experience.title }}</title>
+    {%endif%}
     <link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -36,10 +41,18 @@
                         <div class="profile-lg">
                             <div style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
                         </div>
+                        {% if LANGUAGE != "zh-CN" %}
                         {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
+                        {%else%}
+                        {% trans "with" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "Reservation" %}
+                        {%endif%}
                         <br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
                         <div class="row" style="width:200px;margin-top:10px">
-                            <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px"> {% trans "per person" %}<br>{% trans "for" %} {{ experience.duration }} {% trans "hours" %}<br><p>
+                        {% if LANGUAGE != "zh-CN" %}
+                            <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {{ experience.duration }} {% trans "hours" %}<br><p>
+                        {%else%}
+                            <label>{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><label>{{experience.currency}}</label><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {{ experience.duration }} {% trans "hours" %}<br><p>
+                        {%endif%}
                         </div>
                         <form id="experience_booking_form" method="post" action="">
                             {% csrf_token %}
@@ -49,10 +62,10 @@
                             {% endfor %}
 
                             <div>{% trans "No. of Guests" %} &nbsp;&nbsp;
-                                <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none"/>
-                                <input type="text" id="guest_number_max" name="{{experience.guest_number_max}}" disabled="disabled" style="display:none"/>
+                                <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none;"/>
+                                <input type="text" id="guest_number_max" name="{{experience.guest_number_max}}" disabled="disabled" style="display:none;"/>
                                 {% for op in available_options %} 
-                                    <p id="seat_left_{{forloop.counter0}}" style="display:none"> {{op.available_seat}} </p>
+                                    <p id="seat_left_{{forloop.counter0}}" style="display:none;"> {{op.available_seat}} </p>
                                 {% endfor %}
                                 {{form.guest_number}}
                             </div>
@@ -65,11 +78,11 @@
                                 </thead>
 
                                 {% for op in available_options %}
-                                    <p id="date_string_{{forloop.counter0}}" style="display:none" instant="{{op.instant_booking}}"> {{op.date_string}} </p> 
+                                    <p id="date_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.date_string}} </p> 
                                 {% endfor %}
 
                                 {% for op in available_options %} 
-                                    <p id="time_string_{{forloop.counter0}}" style="display:none" instant="{{op.instant_booking}}"> {{op.time_string}} </p> 
+                                    <p id="time_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.time_string}} </p> 
                                 {% endfor %}
 
                                 {% for op in available_options %}
@@ -89,7 +102,7 @@
                                             {% if user.is_authenticated %}
                                                 <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" />  
                                             {% else %}
-                                                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
+                                                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/> 
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -118,7 +131,7 @@
                                 {% if user.is_authenticated %}
                                 <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_not_added"></div>
                                 {% else %}
-                                <div id="save_to_wishlist_icon" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';" class="save_to_wishlist_not_added"></div>
+                                <div id="save_to_wishlist_icon" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';" class="save_to_wishlist_not_added"></div>
                                 {%endif%}
                                 <div id="save_to_wishlist_description">
                                     <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;">{% trans "Save to Wishlist" %}</h3>
@@ -135,12 +148,16 @@
                         </form>
                     </div>
                 </div>
-            
-        	    <div class="desBox">
+
+                <div class="desBox">
                     {% if experience.type == "RECOMMENDED" %}
                     <div class="recommended-label">{% trans "Recommended" %}</div>
                     {% endif %}
+                    {% if LANGUAGE != "zh-CN" %}
                     <h2 style="font-weight:bold">{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}
+                    {% else %}
+                    <h2 style="font-weight:bold">{% trans "with" %}{% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}{% trans "Experience" %}{{ experience.title }}
+                    {% endif %}
                     <br><small style="font-size:14px">{{experience.duration}} {% trans "hrs" %} &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
                     </h2>
                     <table>
@@ -162,7 +179,7 @@
 
                         {% for w in experience.whatsincluded %}
                         <tr>
-                            <th id="{{w.item.lower}}" style="padding-bottom:0px;"><h3 style="color:grey">{{w.item}}:</h3></th>
+                            <th id="{{w.item.lower}}" style="padding-bottom:0px;"><h3 style="color:grey">{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%else%}交通{%endif%}{%endif%}:</h3></th>
                             <td class="experience-detail-table-td" style="padding-bottom:0px;">{{w.details}}</td>
                         </tr>
                         {% endfor %}
@@ -228,7 +245,7 @@
                     {% endif %}
                 </div>
             </div>
-        
+
             <div class="host-socialmedia">
                 <div class="host-trust">{% trans "Trust" %}</div>
                 {% for h in experience.hosts.all %}
@@ -264,7 +281,7 @@
     		<div class="fixCenter">
                 <div class="reviewBox" style="margin-top:50px">
                 {% if experience.review_set.count %}
-                    <h2>{{ experience.review_set.count }} {% trans "review(s)" %} </h2>
+                    <h2>{{ experience.review_set.count }}{% trans "review(s)" %} </h2>
                     <div class="rating">
                     {% for r in "12345" %}
                         {% if forloop.counter <= experience_rate %}
@@ -289,7 +306,13 @@
                             <div class="profile-md"><img src="{{ MEDIA_URL }}profile_default.jpg" width="240" height="240"></div>
                         {%endif%}
                             <div class="reviewText">{{review.comment}}
-                                <div class="reviewDate">{{review.datetime|date:'d M Y'}}</div>
+                                <div class="reviewDate">
+                                {% if LANGUAGE != "zh-CN" %}
+                                    {{review.datetime|date:'d M Y'}}
+                                {%else%}
+                                    {{review.datetime|date:'Y'}}年{{review.datetime|date:'m'}}月{{review.datetime|date:'d'}}日
+                                {%endif%}
+                                </div>
                             </div>
                         </div>
                 {% if forloop.counter|mod:3 == 0 or forloop.last%}
@@ -319,14 +342,14 @@
                     {% if forloop.counter0 < 3 %}
                     <div class="expList">
                         <label id="related_experience_id_{{forloop.counter0}}" style="display:none;">{{related_experience.id}}</label>
-                        <a href="/experience/{{related_experience.id}}">
+                        <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}">
                             <div class="listingImg" style="background-image:url({% for photo in related_experience.photo_set.all %}{% if forloop.first %} {{ MEDIA_URL }}{{photo.directory}}{{photo.name}} {%endif%}{%endfor%});">
                                 <div class="priceBox">
                                 {% trans "From" %} {{related_experience.dollarsign}}<span>{{ related_experience.price|mul:1.429|floatformat:"0" }}</span> {{related_experience.currency}} {% trans "/person" %}
                                 </div>
                             </div>
                         </a>
-                        <a href="/experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
+                        <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
                         <div class="profile-sm">
 							<img src="{% for h in related_experience.hosts.all %}
 							{% if forloop.first %}
@@ -337,7 +360,7 @@
           
                         <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
                         <div class="listingFooter">
-                            <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
+                            <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
                             <div style="padding-top: 5px; padding-left: 40px;">{{ related_experience.duration }} {% trans "hrs" %} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
                         </div>
                     </div>
@@ -421,7 +444,11 @@ $(function(){
 
         $("#id_submit_request").bind("click", function(e) {
             e.preventDefault();
+            {% if LANGUAGE != "zh-CN" %}
             mixpanel.track("Clicked on \"Request\"");
+            {% else %}
+            mixpanel.track("Clicked on \"Request\"_cn");
+            {% endif %}
             if($("#user_email").val())
             {
                 mixpanel.identify($("#user_email").val());
@@ -441,7 +468,11 @@ $(function(){
                 $("#id_date").val(date.getFullYear() + '-' + (date.getMonth()+1) + '-' +  date.getDate());
                 $("#id_date").change();
                 $("#id_time").val($("#instant_booking_time_"+i).text().trim());
+                {% if LANGUAGE != "zh-CN" %}
                 mixpanel.track("Clicked on \"Book\"");
+                {% else %}
+                mixpanel.track("Clicked on \"Book_cn\"");
+                {% endif %}
                 if($("#user_email").val())
                 {
                     mixpanel.identify($("#user_email").val());
@@ -449,7 +480,7 @@ $(function(){
                 $("#experience_booking_form").submit();
             });
         }
-        
+
         min_number = parseInt($("#guest_number_min").attr("name"));
         max_number = parseInt($("#guest_number_max").attr("name"));
         if(min_number < 4)
@@ -465,8 +496,12 @@ $(function(){
                 $("#id_guest_number").change();
             }
         }
-        
+
+        {% if LANGUAGE != "zh-CN" %}
         mixpanel.track("Viewed experience page_en");
+        {% else %}
+        mixpanel.track("Viewed experience page_cn");
+        {% endif %}
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());
@@ -489,7 +524,7 @@ $(function(){
                 {
                     $.ajax({
                             type: 'POST',
-                            url: "https://www.tripalocal.com/service_wishlist/",
+                            url: "{{wishlist_webservice}}",
                             dataType: 'json',
                             data: {
                                 "csrfmiddlewaretoken": "{{ csrf_token }}",
@@ -503,14 +538,14 @@ $(function(){
                                 {
                                     if(result.added)
                                     {
-                                        alert("The experience has been added to your wishlist");
+                                        alert(gettext('The experience has been added to your wishlist'));
                                         $('#save_to_wishlist_related_'+i).removeClass("save_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).addClass("saved_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).attr("val","True");
                                     }
                                     if(result.removed)
                                     {
-                                        alert("The experience has been removed from your wishlist");
+                                        alert(gettext('The experience has been removed from your wishlist'));
                                         $('#save_to_wishlist_related_'+i).removeClass("saved_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).addClass("save_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).attr("val","False");
@@ -522,7 +557,7 @@ $(function(){
                                 }
                             },
                             error: function (e) {
-                                alert("Please try again later");
+                                alert(gettext('Please try again later'));
                             }
                     });
                 }
@@ -598,7 +633,11 @@ $(function(){
         }
 
         $("#id_time").change();
+        {% if LANGUAGE != "zh-CN" %}
         mixpanel.track("Changed date");
+        {% else %}
+        mixpanel.track("Changed date_cn");
+        {% endif %}
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());
@@ -632,7 +671,11 @@ $(function(){
             }
         }
 
+        {% if LANGUAGE != "zh-CN" %}
         mixpanel.track("Changed time");
+        {% else %}
+        mixpanel.track("Changed time_cn");
+        {% endif %}
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());
@@ -652,7 +695,11 @@ $(function(){
             $("#experience_price").text(price);
         }
 
+        {% if LANGUAGE != "zh-CN" %}
         mixpanel.track("Changed number of people");
+        {% else %}
+        mixpanel.track("Changed number of people_cn");
+        {% endif %}
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());
@@ -668,7 +715,7 @@ $(function(){
         {
             $.ajax({
                     type: 'POST',
-                    url: "https://www.tripalocal.com/service_wishlist/",
+                    url: "{{wishlist_webservice}}",
                     dataType: 'json',
                     data: {
                         "csrfmiddlewaretoken": "{{ csrf_token }}",
@@ -682,21 +729,21 @@ $(function(){
                         {
                             if(result.added)
                             {
-                                alert("The experience has been added to your wishlist");
+                                alert(gettext('The experience has been added to your wishlist'));
                                 $('#save_to_wishlist_icon').attr("val","True");
                                 $('#save_to_wishlist_icon').removeClass("save_to_wishlist_not_added");
                                 $('#save_to_wishlist_icon').addClass("save_to_wishlist_added");
-                                $('#wishlist_head').text("Saved to Wishlist");
+                                $('#wishlist_head').text(gettext('Saved to Wishlist'));
                                 $('#wishlist_p').text("");
                             }
                             if(result.removed)
                             {
-                                alert("The experience has been removed from your wishlist");
+                                alert(gettext('The experience has been removed from your wishlist'));
                                 $('#save_to_wishlist_icon').attr("val","False");
                                 $('#save_to_wishlist_icon').removeClass("save_to_wishlist_added");
                                 $('#save_to_wishlist_icon').addClass("save_to_wishlist_not_added");
-                                $('#wishlist_head').text("Save to Wishlist");
-                                $('#wishlist_p').text("Save now, plan later");
+                                $('#wishlist_head').text(gettext('Save to Wishlist'));
+                                $('#wishlist_p').text(gettext('Save now, plan later'));
                             }
                         }
                         else
@@ -705,7 +752,7 @@ $(function(){
                         }
                     },
                     error: function (e) {
-                        alert("Please try again later");
+                        alert(gettext('Please try again later'));
                     }
             });
         }
@@ -716,7 +763,7 @@ $(function(){
         {
             bio_height = $("#host_bio").height();
             $("#bio_show_more").attr("value", "Less");
-            $("#bio_show_more").text("- Less");
+            $("#bio_show_more").text(gettext('- Less'));
             $(".gradientMask").hide();
             $("#experience-hostintro").height(bio_height+140);
         }
@@ -724,9 +771,9 @@ $(function(){
         {
             bio_height = 140;
             $("#bio_show_more").attr("value", "More");
-            $("#bio_show_more").text("+ More");
+            $("#bio_show_more").text(gettext('+ More'));
             $(".gradientMask").show();
-            $("#experience-hostintro").removeAttr("style"); 
+            $("#experience-hostintro").removeAttr("style");
         }
         $("#experience-hostinterests").height(bio_height+10);
         $("#bio_show_more").css("top",bio_height+20+"px");

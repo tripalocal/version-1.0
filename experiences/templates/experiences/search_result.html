@@ -233,6 +233,9 @@
             {% endfor %}
         {% endfor %}
 
+        $("#city_name").text("{{city}}");
+        $('.ui.dropdown').dropdown();
+
         $("#id_guest_number").addClass("guestNumber");
 
         $("#id_city").addClass("locationSelection");

@@ -750,6 +750,7 @@ class ExperienceDetailView(DetailView):
 
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE
+        context['wishlist_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_wishlist/"
         return context
 
 EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
@@ -1850,7 +1851,9 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                             'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
                             'cityList':cityList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
-                            'locations' : Locations
+                            'locations' : Locations,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
                             })
     return render_to_response(template, {'form': form}, context)
 
