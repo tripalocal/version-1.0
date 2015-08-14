@@ -130,7 +130,7 @@
         </div>
         <div class="mobileSearch notOnDesktop">
             <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>
-            <img src="/images/search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
+            <img src="{{ MEDIA_URL }}search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
         </div>
     </form>
 
@@ -278,7 +278,7 @@
             }
             else
             {
-                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url(/images/closeIcon-02.svg)\"></button></div>";
+                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url({{ MEDIA_URL }}closeIcon-02.svg)\"></button></div>";
             }
 
             $("#tags_div").append(new_tag);
@@ -287,14 +287,14 @@
                 id = e.target.id.split("_")[2];
                 if($("#tag_"+id).attr("class") == "tag-selected")
                 {
-                    $("#tag_button_"+id).css("background-image","url(/images/undo.svg)");
+                    $("#tag_button_"+id).css("background-image","url({{ MEDIA_URL }}undo.svg)");
                     $("#tag_"+id).attr("class", "tag-non-selected");
                     $("#tag_box_"+id).removeClass("tag-box-selected");
                     $("#tag_box_"+id).addClass("tag-box-unselected");
                 }
                 else
                 {
-                    $("#tag_button_"+id).css("background-image","url(/images/closeIcon-02.svg)");
+                    $("#tag_button_"+id).css("background-image","url({{ MEDIA_URL }}closeIcon-02.svg)");
                     $("#tag_"+id).attr("class", "tag-selected");
                     $("#tag_box_"+id).removeClass("tag-box-unselected");
                     $("#tag_box_"+id).addClass("tag-box-selected");
