@@ -107,6 +107,31 @@
   color: rgb(200, 200, 200);
 }
 
+.custom-itinerary {
+  background-color: white;
+  background-size: contain;
+  background-repeat: no-repeat;
+  display: inline-block;
+  position: relative;
+  height: 373px;
+  width: 300px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ddd;
+  border-radius: 3px;
+}
+
+.request-btn {
+  position: absolute;
+  bottom: 45px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 210px;
+  height: 45px;
+}
+
 @media only screen and (max-width: 767px) {
   .ui.selection.dropdown .menu {
     max-height: none;
@@ -138,6 +163,9 @@
     .expList .listingImg{
         width: 120%;
         margin: 0 -10%;
+    }
+    .custom-itinerary {
+      display: none;
     }
 /*
     .expList p{

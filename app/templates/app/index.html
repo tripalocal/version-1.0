@@ -102,8 +102,8 @@
     <div class="exp-brief">
         <div class="container">
             <div id="exp-heading">
-                <h1 style="color:#666;">{% trans "Step into the Shoes of Locals" %}</h1>
-                <p style="font-size:16px;color:#666;margin-bottom:45px">{%trans "Discover their world" %}</p>
+                <h1 style="color:#666;">{% trans "Discover authentic experiences" %}</h1>
+                <p style="font-size:16px;color:#666;margin-bottom:45px">{%trans "Explore local places" %}</p>
             </div>
 
             <div class="tease-box">
@@ -123,20 +123,23 @@
                     {% endif %}
                 {% endfor %}
                 {% for city, cityDisplayName in cityList %}
-                    {% if forloop.counter <= 2 %}
-                    <div class="city col4" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                    {% if forloop.counter <= 1 %}
+                    <div class="city col4" style="background-image: linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                         <a class="box_link" href="{% url 'SearchView' city %}">
                             <h1>{{ cityDisplayName }}</h1>
                         </a>
                     </div>
                     {% endif %}
                 {% endfor %}
+                <div class="custom-itinerary col4" style="background-image:url({% static 'app/img/homepage_banner.jpg' %});">
+                  <button class="btn btn-primary request-btn">Request a trip</button>
+                </div>
                 </div>
 
                 <div class="row">
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 3 %}
-                    <div class="city col8" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                    <div class="city col8" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                         <a class="box_link" href="{% url 'SearchView' city %}">
                             <h1>{{ cityDisplayName }}</h1>
                         </a>
@@ -162,7 +165,7 @@
                 <div class="row">
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 4%}
-                    <div class="city col4" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                    <div class="city col4" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                         <a class="box_link" href="{% url 'SearchView' city %}">
                             <h1>{{ cityDisplayName }}</h1>
                         </a>
@@ -185,7 +188,7 @@
                 {% endfor %}
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 5%}
-                    <div class="city col4" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                    <div class="city col4" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                         <a class="box_link" href="{% url 'SearchView' city %}">
                             <h1>{{ cityDisplayName }}</h1>
                         </a>
@@ -202,7 +205,7 @@
 
     <div id="video-sec" class="video-box" style="background-image:url({{ MEDIA_URL }}homepage/video_poster-01.jpg)">
         <div class="video-overlay" >
-            <h1 style="font-size:40px;font-family:'EXO', Helvertica, sans-serif;">{% trans "Travel with Tripalocal" %}</h1>
+            <h1 style="font-size:32px;font-family:'EXO', Helvertica, sans-serif;">{% trans "Travel with Tripalocal" %}</h1>
             <p style="font-size:16px;">{% trans "See how it works" %}</p>
             <br><br>
             <a style="cursor:pointer" id="enter_fullscreen"><img src="{{ MEDIA_URL }}homepage/play_btn.svg" width="75"></a>
@@ -238,6 +241,13 @@
 {% block scripts %}
 
 <script charset="utf-8" type="text/javascript">
+
+    $(document).ready(function() {
+      $(".request-btn").click(function() {
+        window.location.href="mailto:enquiries@tripalocal.com";
+        mixpanel.track("requested a trip from homepage");
+      });
+    });
     $("#video-fullscreen").hide();
     $(function()
     {

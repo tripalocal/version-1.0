@@ -1,4 +1,4 @@
-﻿h1{
+h1{
     font-size: 32px;
 }
 .input-group-addon{
@@ -97,6 +97,9 @@
 }
 
 @media only screen and (max-width: 767px) {
+  .ui.selection.dropdown {
+    width: 250px;
+  }
   .ui.selection.dropdown .menu {
     max-height: none;
   }
@@ -224,8 +227,8 @@
     background-repeat: no-repeat;
     display: inline-block;
     position: relative;
-        height:220px;
-        cursor: pointer;
+    height:220px;
+    cursor: pointer;
     background-position: center;
     transition: background-size 0.4s;
 }
@@ -244,8 +247,21 @@
     transition: background-color 0.4s;
 }
 .city h1:hover{
-    background-color: RGBA(0, 0, 0, 0.7);
+    background-color: RGBA(0, 0, 0, 0.2);
 }
+
+.custom-itinerary {
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: inline-block;
+  position: relative;
+  height: 220px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ddd;
+  border-radius: 3px;
+}
+
 .price-offer{
     background-size: cover;
     display: inline-block;
@@ -277,6 +293,17 @@
 }
 .mobileOnly {
   display: none;
+}
+
+.request-btn {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 210px;
+  height: 45px;
 }
 @media (max-width: 767px) {
     #mobileTag {
@@ -310,6 +337,15 @@
         width: 100%;
         margin: 0;
         float: none;
+    }
+    .custom-itinerary {
+      background-size: contain;
+      background-color: white;
+      background-position: center;
+      display: inline-block;
+      width: 100%;
+      margin: 0;
+      float: none;
     }
     .price-offer {
         display: inline-block;
@@ -415,5 +451,16 @@
     }
     .ui.selection.dropdown {
       border-radius: 3px 3px 3px 3px;
+    }
+
+    .request-btn {
+      position: absolute;
+      bottom: 14px;
+      left: 0;
+      right: 0;
+      margin-left: auto;
+      margin-right: auto;
+      width: 210px;
+      height: 45px;
     }
 }
