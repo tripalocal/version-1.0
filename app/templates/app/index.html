@@ -1,5 +1,6 @@
 {% extends "app/layout.html" %}
 {% load mathfilters %}
+{% load staticfiles%}
 {% load i18n %}
 
 {% block head %}
@@ -13,8 +14,10 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.css" rel="stylesheet">
     <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/tripalocal_homepage.css' %}" rel="stylesheet">
+
     <!-- H1 google font -->
-    <link href='http://fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>
+
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
 
@@ -108,8 +111,8 @@
     <div class="exp-brief">
         <div class="container">
             <div id="exp-heading">
-                <h1 style="color:#666;">{% trans "Step into the Shoes of Locals" %}</h1>
-                <p style="font-size:16px;color:#666;margin-bottom:45px">{%trans "Discover their world" %}</p>
+                <h1 style="color:#666;">{% trans "Discover authentic experiences" %}</h1>
+                <p style="font-size:16px;color:#666;margin-bottom:45px">{%trans "Explore local places" %}</p>
             </div>
 
             <div class="tease-box">
@@ -129,20 +132,23 @@
                     {% endif %}
                 {% endfor %}
                 {% for city, cityDisplayName in cityList %}
-                    {% if forloop.counter <= 2 %}
-                    <div class="city col4" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                    {% if forloop.counter <= 1 %}
+                    <div class="city col4" style="background-image: linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                         <a class="box_link" href="{% url 'SearchView' city %}">
                             <h1>{{ cityDisplayName }}</h1>
                         </a>
                     </div>
                     {% endif %}
                 {% endfor %}
+                <div class="custom-itinerary col4" style="background-image:url({% static 'app/img/homepage_banner.jpg' %});">
+                  <button class="btn btn-primary request-btn">Request a trip</button>
+                </div>
                 </div>
 
                 <div class="row">
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 3 %}
-                    <div class="city col8" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                    <div class="city col8" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                         <a class="box_link" href="{% url 'SearchView' city %}">
                             <h1>{{ cityDisplayName }}</h1>
                         </a>
@@ -168,7 +174,7 @@
                 <div class="row">
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 4%}
-                    <div class="city col4" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                    <div class="city col4" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                         <a class="box_link" href="{% url 'SearchView' city %}">
                             <h1>{{ cityDisplayName }}</h1>
                         </a>
@@ -191,7 +197,7 @@
                 {% endfor %}
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 5%}
-                    <div class="city col4" style="background-image:url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                    <div class="city col4" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                         <a class="box_link" href="{% url 'SearchView' city %}">
                             <h1>{{ cityDisplayName }}</h1>
                         </a>
@@ -206,18 +212,18 @@
         </div>
     </div>
 
-    <div id="video-sec" class="video-box" style="background-image:url(/images/homepage/video_poster-01.jpg)">
+    <div id="video-sec" class="video-box" style="background-image:url({{ MEDIA_URL }}homepage/video_poster-01.jpg)">
         <div class="video-overlay" >
-            <h1 style="font-size:40px;font-family:'EXO', Helvertica, sans-serif;">{% trans "Travel with Tripalocal" %}</h1>
+            <h1 style="font-size:32px;font-family:'EXO', Helvertica, sans-serif;">{% trans "Travel with Tripalocal" %}</h1>
             <p style="font-size:16px;">{% trans "See how it works" %}</p>
             <br><br>
-            <a style="cursor:pointer" id="enter_fullscreen"><img src="images/homepage/play_btn.svg" width="75"></a>
+            <a style="cursor:pointer" id="enter_fullscreen"><img src="{{ MEDIA_URL }}homepage/play_btn.svg" width="75"></a>
         </div>
     </div>
     <div id="video-fullscreen">
-        <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="images/homepage/closeIcon-01.svg" width="30"></a>
+        <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="{{ MEDIA_URL }}homepage/closeIcon-01.svg" width="30"></a>
         <div class="video-wrap">
-            <video controls>
+            <video controls preload="metadata">
                 <source src="http://bponlinewoc2264.ngcdn.telstra.com/pd_chief/chief_preview/Tripalocal%20Delivery_1.mp4" type="video/mp4">
                 <source src="movie.ogg" type="video/ogg">
                 {% trans "Your browser does not support the video tag."%}
@@ -242,6 +248,13 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
+
+    $(document).ready(function() {
+      $(".request-btn").click(function() {
+        window.location.href="mailto:enquiries@tripalocal.com";
+        mixpanel.track("requested a trip from homepage");
+      });
+    });
     $("#video-fullscreen").hide();
     function getParameterByName(name) {
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -277,7 +290,7 @@
             //hide loginpartial on homepage
             $(".navBox").attr("style","display:none");
 
-            $.getScript('http://www.geoplugin.net/javascript.gp', function() 
+            $.getScript('//www.geoplugin.net/javascript.gp', function()
             {
                 country = geoplugin_countryName();
                 region = geoplugin_region();
@@ -337,16 +350,17 @@
         {
             mixpanel.identify($("#user_email").val());
         }
-    })
+    });
 
     var video = $("video").get(0);
     $("#enter_fullscreen").click(function(){
         $("#video-fullscreen").fadeIn();
         video.play();
-    })
+    });
+
     $("#exit_video").click(function(){
         $("#video-fullscreen").fadeOut();
         video.pause();
-    })
+    });
 </script>
 {% endblock %}

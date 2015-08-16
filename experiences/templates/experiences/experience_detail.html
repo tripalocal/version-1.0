@@ -160,31 +160,51 @@
                     {% endif %}
                     <br><small style="font-size:14px">{{experience.duration}} {% trans "hrs" %} &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
                     </h2>
-                    <table>
-                        <tr style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;"> 
-                            <th style="width:150px;"><h3 style="color:grey">{% trans "Overview" %}</h3></th>
-                            <td id="id_experience_description" class="experience-detail-table-td">
-                                {{ experience.description }}<br>
-                                {{ experience.interaction }} 
-                            </td>
-                        </tr>
-                        <tr style="border-bottom:1px solid #CCCCCC;"> 
-                             <th><h3 style="color:grey">{% trans "Activities" %}</h3></th>
-                            <td id="id_experience_activity" class="experience-detail-table-td">{{ experience.activity }}</td>
-                        </tr>
-                        <tr style="border-bottom:1px solid #CCCCCC;"> 
-                            <th><h3 style="color:grey">{% trans "What to wear" %}</h3></th>
-                            <td id="id_experience_dress" class="experience-detail-table-td">{{ experience.dress }}</td>
-                        </tr>
 
-                        {% for w in experience.whatsincluded %}
-                        <tr>
-                            <th id="{{w.item.lower}}" style="padding-bottom:0px;"><h3 style="color:grey">{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%else%}交通{%endif%}{%endif%}:</h3></th>
-                            <td class="experience-detail-table-td" style="padding-bottom:0px;">{{w.details}}</td>
-                        </tr>
-                        {% endfor %}
-                        <tr style="border-bottom:1px solid #CCCCCC;height: 10px;"><th style="padding-top:0"></th><td></td></tr>
-                    </table> 
+                    <div class="container" style="text-align:left;">
+						<div class="row" style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;">
+							<div class="col-sm-3 col-xs-12">
+								<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Overview" %}</h3>
+							</div>
+							<div class="col-sm-9 col-xs-12">
+								{{ experience.description }}<br>
+								{{ experience.interaction }}
+							</div>
+						</div>
+
+						<div class="row" style="border-bottom:1px solid #CCCCCC;">
+							<div class="col-sm-3 col-xs-12">
+								<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Activities" %}</h3>
+							</div>
+							<div class="col-sm-9 col-xs-12">
+								{{ experience.activity }}
+							</div>
+						</div>
+						<div class="row" style="border-bottom:1px solid #CCCCCC;">
+							<div class="col-sm-3 col-xs-12">
+								<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "What to wear" %}</h3>
+							</div>
+							<div class="col-sm-9 col-xs-12">
+								{{ experience.dress }}
+							</div>
+						</div>
+						{% for w in experience.whatsincluded %}
+						<div class="row">
+							<div class="col-sm-3 col-xs-12" style="margin-bottom:0;">
+								<h3 style="color:grey;margin-top:0;line-height:1.5;">{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%else%}交通{%endif%}{%endif%}:</h3>
+							</div>
+							<div class="col-sm-9 col-xs-12" style="margin-bottom:0;">
+								{{w.details}}
+							</div>
+						</div>
+						{% endfor %}
+						<div class="row" style="border-bottom:1px solid #CCCCCC;height: 10px;">
+							<div class="col-sm-3 col-xs-12">
+							</div>
+							<div class="col-sm-9 col-xs-12">
+							</div>
+						</div>
+					</div>
 
                     <div id="carousel_box" class="container">
                         <br>
@@ -257,11 +277,13 @@
                     <span class="host-friend">{% trans "Verified" %}</span>
                 </div>
                 {% endif %}
+                {% if experience.review_set.count > 0 %}
                 <div class="host-review">
                     <div class="reviewlogo"></div>
                     <span class="review-title">{% trans "Reviews" %}</span>
                     <span class="review-number" style="color:#333">{{ experience.review_set.count }}</span>
                 </div>
+                {% endif %}
                 {% if h.registereduser.phone_number%}
                 <div class="host-mobile">
                     <div class="mobilelogo"></div>
@@ -361,7 +383,7 @@
                         <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
                         <div class="listingFooter">
                             <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
-                            <div style="padding-top: 5px; padding-left: 40px;">{{ related_experience.duration }} {% trans "hrs" %} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
+                            <div>{{ related_experience.duration }} {% trans "hrs" %} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
                         </div>
                     </div>
                     {% endif %}

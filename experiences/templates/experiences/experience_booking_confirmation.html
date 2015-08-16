@@ -37,7 +37,7 @@
                                 </div>
                                 {%endif%}
                             </div>
-                
+
                	            <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="Refresh" value="{% trans "Refresh" %}" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6;"/>
                         </div>
                         {% if coupon and not wrong_promo_code %}
@@ -127,7 +127,7 @@
                                 <td>
                                     <p>{% trans "First name" %}</p>
                                     <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
+                                        <div class="form-group" >
                                             {{ form.first_name }}
                                             {% if 'first_name' in form.errors and display_error%}
                                             <div class="warning-sign">
@@ -271,6 +271,7 @@
                                 </td>
                             </tr>
                         </table>
+
                         <table>
                             <tr>
                                 <td style="margin-right:10px">
@@ -307,6 +308,7 @@
                             <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
                             <p>{% trans "Please accept terms and conditions" %}</p>
                         </div>
+
                         <div>
                             <img src="/images/icon/give-back.svg" width="25" style="float:left">
                             <p style="margin:20px 10px 0 35px">{% trans "It’s ok to change your mind" %}<br>
@@ -318,12 +320,12 @@
                     <input type="submit" id="submit_booking" name="Request to Book" value="{% trans "Book Now" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:140px;"/>
                 </form>
             </div>
-                
+
             <div class="expList checkoutDetails">
-                <div class="listingImg" style="background-image:url(		
+                <div class="listingImg" style="background-image:url(
 		        {% for photo in experience.photo_set.all %}
                     {% if forloop.first %}
-				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
+				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}
                     {% endif %}
                 {% endfor %})">
                     <div class="profile-md checkout-profile">
@@ -440,6 +442,7 @@ $(function(){
             {
                 $("#id_term_condition").attr("style","display:inline-block;");
             }
+
         });
 
         // Close Checkout on page navigation

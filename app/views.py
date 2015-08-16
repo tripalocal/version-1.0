@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Definition of views.
 """
@@ -376,6 +377,7 @@ def mytrip(request):
             'bookings_all' : bookings_all,
             'end_dates' : end_dates,
             })
+
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE
         return HttpResponse(template.render(context))
@@ -417,6 +419,7 @@ def myprofile(request):
     data["bio"]=get_user_bio(profile, settings.LANGUAGES[0][0])
 
     form = UserProfileForm(data=data)
+
     context['GEO_POSTFIX'] = settings.GEO_POSTFIX
     context['LANGUAGE'] = settings.LANGUAGE_CODE
     return render_to_response('app/myprofile.html', {'form': form}, context)
@@ -530,6 +533,7 @@ def mycalendar(request):
             data['instant_booking_repeat_extra_information_'+str(index+1)] = instant_bookings[index].repeat_extra_information
 
         form = UserCalendarForm(data=data)
+
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE
         return render_to_response('app/mycalendar.html', {'form': form}, context)
@@ -713,3 +717,11 @@ def track_user_login(ip, sociallogin, user):
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
         mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
         mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+
+@require_POST
+def email_custom_trip(request):
+    email = request.POST.get("email", "Blank")
+    message = request.POST.get("message", "Blank")
+    send_mail("Trip suggestion from " + email,  message, "enquiries@tripalocal.com",
+              ["enquiries@tripalocal.com"], fail_silently=False)
+    return HttpResponse(json.dumps({}))

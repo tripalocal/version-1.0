@@ -35,26 +35,7 @@ urlpatterns = patterns('',
     url(r'^termsofservice', 'app.views.termsofservice'),
     url(r'^privacypolicy', 'app.views.privacypolicy'),
     url(r'^refundpolicy', 'app.views.refundpolicy'),
-    #url(r'^login/$',
-    #    'django.contrib.auth.views.login',
-    #    {
-    #        'template_name': 'app/login.html',
-    #        'authentication_form': BootstrapAuthenticationForm,
-    #        'extra_context':
-    #        {
-    #            'title':'Log in',
-    #            'year':datetime.now().year,
-    #        }
-    #    },
-    #    name='login'),
-    #url(r'^logout$',
-    #    'django.contrib.auth.views.logout',
-    #    {
-    #        'next_page': '/',
-    #    },
-    #    name='logout'),
-
-    #url(r'^signup/$', 'app.views.signup', name='signup'),
+    url(r'^email_custom_trip', 'app.views.email_custom_trip'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -86,7 +67,7 @@ urlpatterns = patterns('',
     url(r'^registration_successful', 'app.views.registration_successful', name='registration_successful'),
     url(r'^disclaimer$', 'app.views.disclaimer', name='disclaimer'),
     url(r'^booking/(?P<id>\d+)/$', booking_accepted, name='booking_accepted'),
-    url(r'^s/(?P<city>\S+)/$', SearchView, name='SearchView'),  
+    url(r'^s/(?P<city>\S+)/$', SearchView, name='SearchView'),
     url(r'^mytrip/$', 'app.views.mytrip'),
     url(r'^myprofile/$', 'app.views.myprofile'),
     url(r'^mylisting/$', 'app.views.mylisting'),

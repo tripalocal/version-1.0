@@ -29,6 +29,7 @@
                             <div class="iconImage" id="date"></div>
                             <div class="iconText">{%trans "Dates" %}</div>
                         </div> 
+<<<<<<< HEAD
                         <div class="formBoxes">
                             <div class="ui selection dropdown">
                                 <input id="id_city" type="hidden" name="city" value="city">
@@ -129,7 +130,7 @@
         </div>
         <div class="mobileSearch notOnDesktop">  
             <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>  
-            <img src="/images/search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">  
+            <img src="{{ MEDIA_URL }}search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
         </div>
     </form>
 
@@ -145,12 +146,8 @@
                 <div id="experience-box" class="expBox">
                     <div id="overlay"></div>
                     <div id="ajax-experience-result"></div>
-                    <div class="expList">
-                        <div class="listingImg" style="background-image:url({{MEDIA_URL}}request.jpg);"></div>
-                        <h3>{%trans "Can't find the experience you Want?" %}</h3>
-                        <div class="profile-sm" style="background:url({{MEDIA_URL}}profile_default.jpg) no-repeat; background-size:cover; background-position:center;"></div>
-                        <p style="overflow-y:hidden; height:100px">{%trans "Email us at "%}<a href="mailto:enquiries@tripalocal.com">enquiries@tripalocal.com</a> {%trans "with the preferred experience, the dates and times and we will get back to you within 48 hours with a customised experience just for you!"%}</p>
-                        <div class="listingFooter">{%trans "We offer exclusive experiences with private groups"%}</div>
+                    <div class="expList custom-itinerary" style="background-image:url({% static 'experiences/img/searchpage_banner.jpg' %});">
+                      <button class="btn btn-primary request-btn">Request a trip</button>
                     </div>
                 </div>       
             </div>
@@ -162,14 +159,21 @@
 
 {% block scripts %}
 <script charset="utf-8" type="text/javascript">
-    $(document).ajaxStart(function() {
-        $(".loading").show();
-    });
+	$(document).ajaxStart(function() {
+		$(".loading").show();
+	});
+	$(document).ajaxStop(function() {
+		$(".loading").hide();
+	})
+	$(document).ready(function() {
+		$(".request-btn").click(function() {
+			window.location.href="mailto:enquiries@tripalocal.com";
+			mixpanel.track("requested a trip from searchpage");
+		});
+	});
+</script>
 
-    $(document).ajaxStop(function() {
-        $(".loading").hide();
-    })
-
+<script charset="utf-8" type="text/javascript">
     function hrefToCityName(href) {
         if (href.substr(-1) === '/') {
             temp = href.substr(0, href.length - 1);
@@ -208,10 +212,10 @@
             'tags': $("#id_tags").val(),
             'all_tags': $("#id_all_tags").val()
         }, data)).done(function (response) {
-                $('#ajax-experience-result').html($(response).find('#experience-results'));
-                $('#ajax-experience-count').html($(response).find('#experience-count'));
+            $('#ajax-experience-result').html($(response).find('#experience-results'));
+            $('#ajax-experience-count').html($(response).find('#experience-count'));
         }).fail(function () {
-                $('#ajax-experience-result').text('{%trans "Sorry but there was an error."%}');
+            $('#ajax-experience-result').text("Sorry but there was an error.");
         });
     }
 
@@ -276,7 +280,7 @@
             }
             else
             {
-                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url(/images/closeIcon-02.svg)\"></button></div>";
+                new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url({{ MEDIA_URL }}closeIcon-02.svg)\"></button></div>";
             }
 
             $("#tags_div").append(new_tag);
@@ -285,14 +289,14 @@
                 id = e.target.id.split("_")[2];
                 if($("#tag_"+id).attr("class") == "tag-selected")
                 {
-                    $("#tag_button_"+id).css("background-image","url(/images/undo.svg)");
+                    $("#tag_button_"+id).css("background-image","url({{ MEDIA_URL }}undo.svg)");
                     $("#tag_"+id).attr("class", "tag-non-selected");
                     $("#tag_box_"+id).removeClass("tag-box-selected");
                     $("#tag_box_"+id).addClass("tag-box-unselected");
                 }
                 else
                 {
-                    $("#tag_button_"+id).css("background-image","url(/images/closeIcon-02.svg)");
+                    $("#tag_button_"+id).css("background-image","url({{ MEDIA_URL }}closeIcon-02.svg)");
                     $("#tag_"+id).attr("class", "tag-selected");
                     $("#tag_box_"+id).removeClass("tag-box-unselected");
                     $("#tag_box_"+id).addClass("tag-box-selected");

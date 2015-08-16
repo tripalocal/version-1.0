@@ -7,11 +7,11 @@
 
     {% load staticfiles %}
     {% load i18n %}
-    
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/bootstrap.js' %}"></script>
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/respond.js' %}"></script>
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
+
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
 
     <link rel="icon" href="{% static 'app/img/favicon.ico'%}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
@@ -78,13 +78,113 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
 </head>
 
 <body>
+    <!-- Popup Modal -->
+    <div class="modal fade" id="help-popup" tabindex="-1" role="dialog" aria-labelledby="help-popup">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content help" style="background-image:url('{% static 'app/img/nightlight_web.jpg' %}')">
+                <div id="popup-page-1">
+                    <h1>{% trans "Do you need help planning your trip?" %}</h1>
+
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-xs-6" style="float:left;">
+                                    <button class="btn btn-primary" id="help-yes">YES</button>
+                                </div>
+                                <div class="col-xs-6" style="float:left;">
+                                    <button class="btn btn-primary" id="help-no">NO</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="close-popup">close</a>
+                </div>
+                <div id="popup-page-2" hidden="true">
+                    <h1>{% trans "Tell us about your trip" %}</h1>
+
+                    <p>{% trans "and we will get back to you within 48 hours" %}</p>
+                    <div id="results"></div> <!-- errors go here -->
+                    <form id="custom-trip-form" class="popup-form" action="/email_custom_trip" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <textarea class="form-control" id="popup-form-details" rows="4"
+                                      placeholder="Please tell us more details"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="popup-form-email" placeholder="Email address">
+                        </div>
+                        <br>
+                        <button class="btn btn-primary popup-form-submit" type="submit" value="send">Send</button>
+                    </form>
+                    <a class="close-popup">{% trans "close" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function create_post() {
+            $.ajax({
+                url: "email_custom_trip",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    message: $('#popup-form-details').val(),
+                    email: $('#popup-form-email').val()
+                },
+
+                success: function (json) {
+                    console.log(json);
+                },
+
+                error: function (xhr, errmsg, err) {
+                    $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: " + errmsg +
+                            " <a href='#' class='close'>&times;</a></div>");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $('#custom-trip-form').on('submit', function (event) {
+                event.preventDefault();
+                $('#result').empty();
+                create_post();
+            });
+
+            if ($(window).width() > 520) {
+                setTimeout(function () {
+                    $('#help-popup').modal('show');
+                    mixpanel.track("saw popup01");
+                }, 60000); // milliseconds
+
+                $('.close-popup').click(function () {
+                    $('#help-popup').modal('hide');
+                    mixpanel.track("closed popup02");
+                });
+
+                $('#help-no').click(function () {
+                    $('#help-popup').modal('hide');
+                    mixpanel.track("selected No from popup01");
+                });
+
+                $('#help-yes').click(function () {
+                    $('#popup-page-1').hide();
+                    $('#popup-page-2').show();
+                    mixpanel.track("selected Yes from popup01");
+                });
+            }
+        });
+    </script>
+    <!-- End Modal -->
+
     <div class="navBox">
         <input type="hidden" id="user_email" value="{{user_email}}" readonly>
         <table class="container-fluid" style="width:100%;">
             <tbody>
                 <tr>
                     <td class="header">
-                        <img class="hamburger notOnDesktop" src="/images/menu.svg" width="15" />
+                        <img class="hamburger notOnDesktop" src="{{ MEDIA_URL }}menu.svg" width="15" />
                         <a class="brand" href="https://www.tripalocal.com{{GEO_POSTFIX}}"><img src="{{ MEDIA_URL }}img/tripalocal_Logo.png" width="115" height="39"></a>
                     </td>
                     <td class="navbar-collapse notOnMobile">
