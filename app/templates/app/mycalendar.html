@@ -4,10 +4,11 @@
 
 {% block head %}
     {% load staticfiles %}
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/fullcalendar.min.js' %}"></script>
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/date.js' %}"></script>
-    <link href="{% static 'app/content/fullcalendar.min.css' %}" rel="stylesheet" />
-	<link href="{% static 'app/content/fullcalendar.print.css' %}" rel="stylesheet" media="print" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.3.2/fullcalendar.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.3.2/fullcalendar.print.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.3.2/fullcalendar.css">
 
     <style>
     .fc-minor {
