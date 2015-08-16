@@ -1,5 +1,6 @@
 {% extends "app/layout.html" %}
 {% load mathfilters %}
+{% load staticfiles%}
 {% load i18n %}
 
 {% block head %}
@@ -349,16 +350,17 @@
         {
             mixpanel.identify($("#user_email").val());
         }
-    })
+    });
 
     var video = $("video").get(0);
     $("#enter_fullscreen").click(function(){
         $("#video-fullscreen").fadeIn();
         video.play();
-    })
+    });
+
     $("#exit_video").click(function(){
         $("#video-fullscreen").fadeOut();
         video.pause();
-    })
+    });
 </script>
 {% endblock %}

@@ -1,36 +1,12 @@
+{% load staticfiles %}
+
 <html>
 <head>
-    {% load staticfiles %}
-    <script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
     <title>Experience List</title>
-<!--<link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet">
--->
 </head>
 <body>
 {% if user.is_authenticated and user.is_staff %}
-<!--
-    <div class="container">
-        <div class="leftColumn">
-            <div class="operation"></div>
-            <ul class="subMenu">
-                <li>Experience List</li>
-            </ul>
-            <div class="clear"></div>
-
-            <table border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td colspan="9" class="tableEdit">&nbsp;&nbsp;?<input name="input" type="button" value="Delete" /></td>
-                </tr> 
-
-
-            </table>
-        </div>
-        <div class="rightColumn">
-
-        </div>
-    </div>
--->
     <h2> Experience List </h2>
     <p> Click to edit</p>
     <ul>
