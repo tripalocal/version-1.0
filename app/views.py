@@ -7,6 +7,7 @@ from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, loader
 from datetime import *
 from django import forms
+from django.views.decorators.http import require_POST
 from experiences.forms import Locations
 from django.contrib.auth import authenticate, login
 from allauth.account.signals import password_reset, user_signed_up, user_logged_in
@@ -23,15 +24,12 @@ from experiences.views import SearchView, saveProfileImage, getBGImageURL, getPr
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment, get_experience_title, get_experience_meetup_spot
 from experiences.forms import Currency, DollarSign, email_account_generator
-from django.core.files.uploadedfile import SimpleUploadedFile, File
-from django.db import connections
-from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as _
 from post_office import mail
 from django.contrib.auth.models import User
 from os import path
-from PIL import Image
 from tripalocal_messages.models import Aliases, Users
+import json
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
