@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """
 Definition of views.
 """
