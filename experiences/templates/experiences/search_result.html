@@ -14,11 +14,12 @@
     <link href="{% static 'experiences/content/tripalocal_search_async.css' %}" rel="stylesheet">
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
     <title>{%trans "Discover" %} {{ city_display_name }}</title>
 {%endblock%}
 
 {% block content %}
-    <form id="search_form" action="/s/melbourne/" method="post">
+    <form id="search_form" action="{{GEO_POSTFIX}}s/melbourne/" method="post">
         {% csrf_token %}
         <div class="basicSearch notOnMobile">
             <div class="row">
@@ -26,15 +27,15 @@
                     <div class="dates">
                         <div class="iconHeader">
                             <div class="iconImage" id="date"></div>
-                            <div class="iconText">Dates</div>
-                        </div>
+                            <div class="iconText">{%trans "Dates" %}</div>
+                        </div> 
                         <div class="formBoxes">
-                          <div class="ui selection dropdown">
-                            <input id="id_city" type="hidden" name="city" value="city">
-                            <i class="dropdown icon"></i>
-                            <div id="city_name" class="text">City</div>
-                            <div id="city-menu" class="menu"></div>
-                          </div>
+                            <div class="ui selection dropdown">
+                                <input id="id_city" type="hidden" name="city" value="city">
+                                <i class="dropdown icon"></i>
+                                <div id="city_name" class="text">{%trans "City" %}</div>
+                                <div id="city-menu" class="menu"></div>
+                            </div>
                             <div class="input-group startDate">
                                 {{form.start_date}}
                             </div>
@@ -47,7 +48,7 @@
                     <div class="verticalBar">
                     </div>
                     <div class="people">
-                        <div class="iconHeader">
+                        <div class="iconHeader"> 
                             <div class="iconImage" id="people">
                             </div>
                             <div class="iconText">{%trans "People"%}
@@ -55,29 +56,27 @@
                         </div>
                         <div class="formBoxes">{{form.guest_number}}
                         <script charset="utf-8" type="text/javascript">
-                        $('.ui.dropdown')
-                          .dropdown()
-                        ;
+                            $('.ui.dropdown').dropdown();
                         </script>
                         </div>
                     </div>
 
                     <div class="verticalBar">
                     </div>
-
+                
                     <div class="language">
                         <div class="iconHeader">
                             <div class="iconImage" id="language">
                             </div>
                             <div class="iconText">{%trans "Language"%}
                             </div>
-                        </div>
+                        </div> 
 
                         <div class="formBoxes">
-                            {{form.language}}
+                            {{form.language}} 
                             <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
-                            <br>
-                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:18px;">中文</label>
+                            <br> 
+                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:18px;">中文</label> 
                         </div>
                     </div>
 
@@ -85,7 +84,7 @@
                     </div>
 
                     <div id="searchButton">
-                        <!--<input id="auto_update" type="checkbox" class="css-checkbox" ><label id="auto_update_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin:5px 0 15px 0;font-weight:normal">{% trans "Auto update"%}</label>-->
+                        <!--<input id="auto_update" type="checkbox" class="css-checkbox" ><label id="auto_update_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin:5px 0 15px 0;font-weight:normal">{% trans "Auto update" %}</label>-->
                         <input class="btn-block btn btn-default" style="padding-bottom:25px; width:100px;" id="itinerary-search" type="submit" value="{% trans "Update" %}" name="{% trans "Search" %}">
                     </div>
                     <div id="itinerary-search-button">
@@ -125,9 +124,10 @@
                                 {%trans "Private tours only"%}</label>
                         </div>
                     </div>
-                </div>
+                </div>      
             </div>
         </div>
+
         <div class="mobileSearch notOnDesktop">
             <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>
             <img src="{{ MEDIA_URL }}search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
@@ -135,7 +135,7 @@
     </form>
 
     <div class="container-fluid searchresult">
-      <div class="loading"><img src="{% static 'experiences/img/loading.gif' %}" width="64px" height="64px" class="ajax-loader"/></div>
+        <div class="loading"><img src="{% static 'experiences/img/loading.gif' %}" width="64px" height="64px" class="ajax-loader"/></div>
     	<div class="row">
             <div class="fixCenter">
                 <div id="more-filters-div" class="notOnMobile">
@@ -149,7 +149,7 @@
                     <div class="expList custom-itinerary" style="background-image:url({% static 'experiences/img/searchpage_banner.jpg' %});">
                       <button class="btn btn-primary request-btn">Request a trip</button>
                     </div>
-                </div>
+                </div>       
             </div>
         </div>
     </div>
@@ -308,7 +308,7 @@
         $(".glyphicon-calendar").hide();
 
         $("#id_start_date").click(function(){
-            $("#id_start_date_picker").data("DateTimePicker").show();
+            $("#id_start_date_picker").data("DateTimePicker").show();  
         });
 
        $("#id_start_date, #id_end_date").focusout(function () {
@@ -332,7 +332,7 @@
 
         $('#itinerary-search').on('click', function (event) {
             event.preventDefault();
-            var href = '/s/' + $("#id_city").val() + '/';
+            var href = '{{GEO_POSTFIX}}s/' + $("#id_city").val() + '/';
             history.pushState({}, 'City', href);
             loadExperienceList(href);
         });
@@ -350,8 +350,8 @@
     });
 
     $("#id_city").change(function(e){
-        $("#search_form")[0].action = "/s/" + $("#id_city").val() + "/";
-        $("#itinerary-search").click()
+        $("#search_form")[0].action = "{{GEO_POSTFIX}}s/" + $("#id_city").val() + "/";
+        $("#itinerary-search").click();
     });
 
     $("#itinerary-search").click(function(e){
@@ -388,13 +388,13 @@
         if(tags_div.css("display")=="none")
         {
             tags_div.show();
-            $("#more_filters").text("Cancel");
+            $("#more_filters").text('{%trans "Cancel"%}');
             $("#apply_filters").show();
         }
         else
         {
             tags_div.hide();
-            $("#more_filters").text("More Filters");
+            $("#more_filters").text('{%trans "More Filters"%}');
             $("#apply_filters").hide();
         }
     });

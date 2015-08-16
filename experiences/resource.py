@@ -31,10 +31,8 @@ from allauth.socialaccount.helpers import complete_social_login
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
-try:
+if settings.LANGUAGE_CODE.lower() != "zh-cn":
     from allauth.socialaccount.providers.facebook.views import fb_complete_login
-except ImportError:
-    pass
 
 GEO_POSTFIX = settings.GEO_POSTFIX
 
@@ -989,67 +987,93 @@ def service_publicprofile(request,format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+#{"messages":[{"receiver_id":677,"msg_content":"afdaf","msg_date":"2015/04/06/00/00/00/123","local_id":100},{"receiver_id":677,"msg_content":"sdfg","msg_date":"2015/05/06/00/00/00/567","local_id":200}]}
 @api_view(['GET','POST'])
 @authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))#))#,
 @permission_classes((IsAuthenticated,))
 def service_message(request, format=None):
     try:
-        data = request.query_params
-        if type(data) is str:
-            data = ast.literal_eval(data)
-
         if request.method == "GET":
-            sender = data["sender_id"] if "sender_id" in data else None
-            id_earlier = data["id_earlier"] if "id_earlier" in data else None
+            data = request.query_params
+            if type(data) is str:
+                data = ast.literal_eval(data)
+
+            sender_id = int(data["sender_id"]) if "sender_id" in data else None
+            receiver_id = request.user.id
+            last_update_id = int(data["last_update_id"]) if "last_update_id" in data else None
 
             messages = None
-            if sender is not None:
-                #history messages from a particualr user
-                if id_earlier is not None:
-                    messages = Message.objects.filter(sender_id=sender, receiver_id=request.user.id, id__lt=id_earlier)
-                #undelivered messages from a particualr user 
-                else:
-                    messages = Message.objects.filter(sender_id=sender, receiver_id=request.user.id, status__iexact="received")
+            if sender_id is not None and last_update_id is not None:
+                #messages since last_update_id from a particualr user
+                messages = Message.objects.raw('select * from app_message where ((sender_id=%s and receiver_id=%s) or (sender_id=%s and receiver_id=%s)) and id > %s',
+                                               [sender_id, receiver_id, receiver_id, sender_id, last_update_id])
             else:
-                #all undelivered messages
-                messages = Message.objects.filter(receiver_id=request.user.id, status__iexact="received")
+                message_list = {"error":"missing parameters"}
+                return Response({"result":message_list}, status=status.HTTP_400_BAD_REQUEST)
 
-            result = []
+            message_list = []
             for msg in messages:
-                if msg.status == "received":
-                    msg.status="delivered"
-                    msg.datetime_delivered = datetime.utcnow().replace(tzinfo=pytz.UTC)
-                    msg.save()
-                m={"id":msg.id,"sender_id":msg.sender_id,"receiver_id":msg.receiver_id,"datetime_sent":msg.datetime_sent,
-                   "datetime_read":msg.datetime_read,"status":msg.status,"content":msg.content}
-                result.append(m)
+                m = {"id":msg.id,"sender_id":msg.sender_id,"receiver_id":msg.receiver_id,
+                        "msg_date":msg.datetime_sent.strftime("%Y/%m/%d/%H/%M/%S/%f"),"msg_content":msg.content}
+                message_list.append(m)
 
-            return Response({"result":result}, status=status.HTTP_200_OK)
+            return Response(message_list, status=status.HTTP_200_OK)
         elif request.method == "POST":
             data = request.data
-            if "message_id" not in data:
-                #save message
-                receiver_id = data["receiver_id"]
-                content = data["content"]
-              
-                message = Message(sender_id=request.user.id, receiver_id=receiver_id, content=content,
-                                  status="received", datetime_sent=datetime.utcnow().replace(tzinfo=pytz.UTC))
+            if type(data) is str:
+                data = ast.literal_eval(data)
+
+            #save messages
+            messages = data["messages"]
+            msg_ids = []
+
+            for msg in messages:
+                message = Message(sender_id=request.user.id, receiver_id=msg['receiver_id'], content=msg['msg_content'],
+                                    status="received", datetime_sent=datetime.strptime(msg['msg_date'], '%Y/%m/%d/%H/%M/%S/%f'))
                 message.save()
-                return Response({"result":"message received"}, status=status.HTTP_200_OK)
-            else:
-                #update status: delivered-->read
-                sender_id = data["sender_id"]
-                message_id = data["message_id"]
-                messages = Message.objects.filter(sender_id=sender_id, receiver_id=request.user.id, 
-                                                  id__lte=message_id, status__iexact="delivered")
-                for msg in messages:
-                    msg.status="read"
-                    msg.datetime_read = datetime.utcnow().replace(tzinfo=pytz.UTC)
-                    msg.save()
-                return Response({"result":"message status updated"}, status=status.HTTP_200_OK)
+                msg_ids.append({"local_id":msg['local_id'],"global_id":message.id})
+
+            #send an email notification
+            #receiver = User.objects.get(id=messages[0]['receiver_id'])
+            #mail.send(subject=_('[Tripalocal] ') + request.user.first_name + _(' has sent you messages'), message='',
+            #            sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=request.user.email)[0].mail + '>',
+            #            recipients = [Aliases.objects.filter(destination__contains=receiver.email)[0].mail], #fail_silently=False,
+            #            priority='now',
+            #            html_message=loader.render_to_string('app/email_new_messages.html', 
+            #                                                    {}))
+            return Response(msg_ids, status=status.HTTP_200_OK)
+
     except Exception as err:
         #TODO
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error":err}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))#))#,
+@permission_classes((IsAuthenticated,))
+def service_message_list(request, format=None):
+    try:
+        cursor = connections['default'].cursor()
+        count = cursor.execute('select distinct sender_id from app_message where receiver_id=%s',[request.user.id])
+        if count > 1:
+            # set @num := 0;
+            messages = Message.objects.raw('select id, datetime_sent, x.sender as sender_id, receiver_id, content from (select id, datetime_sent, receiver_id, content, @num := if(@sender_id = sender_id, @num + 1, 1) as row_number, @sender_id := sender_id as sender from app_message where receiver_id=%s order by sender_id, datetime_sent desc) as x where x.row_number =1 order by sender_id',
+                                            [request.user.id])
+        else:
+            messages = Message.objects.raw('select * from app_message where receiver_id=%s order by datetime_sent desc limit 1',
+                                           [request.user.id])
+        len(list(messages))
+        message_list = []
+        for msg in messages:
+            sender = User.objects.get(id=msg.sender_id)
+            m = {"id":msg.id,"sender_id":msg.sender_id,
+                    "msg_date":msg.datetime_sent.strftime("%Y/%m/%d/%H/%M/%S/%f"),"msg_content":msg.content,
+                    "sender_name":sender.first_name, "sender_image":sender.registereduser.image_url}
+            message_list.append(m)
+
+        return Response(message_list, status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response({"error":err}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @authentication_classes((BasicAuthentication,))#, TokenAuthentication))

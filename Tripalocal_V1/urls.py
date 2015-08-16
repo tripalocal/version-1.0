@@ -19,12 +19,16 @@ from django.contrib import admin
 from rest_framework.authtoken import views
 
 from django.conf.urls import *
-#from experiences.resource import ajax_view
+from django.views.i18n import javascript_catalog
+
+js_info_dict = {
+    'packages': ('Tripalocal_V1.app','Tripalocal_V1.experience',),
+}
 
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
+    url(r'^jsi18n/$', javascript_catalog, js_info_dict),
     url(r'^$', 'app.views.home', name='home'),
     url(r'^contactus$', 'app.views.contact', name='contact'),
     url(r'^aboutus', 'app.views.about', name='about'),
@@ -93,7 +97,7 @@ urlpatterns = patterns('',
     url(r'^api-token-auth/', views.obtain_auth_token),
     url(r'^booking_request_xls/$', 'experiences.resource.saveBookingRequestsFromXLS'),
     #url(r'^experience_autosave$', ajax_view, name="ajax_view"),
-    url(r'^experience_availability/$', experience_availability, name='experience_availability'),
+    #url(r'^experience_availability/$', experience_availability, name='experience_availability'),
     url(r'^itinerary/$', custom_itinerary, name='custom_itinerary'),
     url(r'^service_search/$', 'experiences.resource.service_search', name='service_search'),
     url(r'^service_mytrip/$', 'experiences.resource.service_mytrip', name='service_mytrip'),
@@ -113,6 +117,7 @@ urlpatterns = patterns('',
     url(r'^experience_tags_xls/$', 'experiences.resource.updateExperienceTagsFromXLS'),
     url(r'^service_couponverification/$', 'experiences.resource.service_couponverification', name='service_couponverification'),
     url(r'^service_message/$', 'experiences.resource.service_message'),
+    url(r'^service_message_list/$', 'experiences.resource.service_message_list'),
     url(r'^service_publicprofile/$', 'experiences.resource.service_publicprofile'),
     url(r'^service_experiencedetail/$', 'experiences.resource.service_experiencedetail'),
     url(r'^update_files/$', 'experiences.resource.update_files'),

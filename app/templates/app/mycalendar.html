@@ -38,9 +38,9 @@
 <div>
     <div class="calendar">
     {% if updated == True %}
-        Your calendar has been successfully updated
+        {% trans "Your calendar has been successfully updated" %}
     {% elif error == True %}
-        Invalid input
+        {% trans "Invalid input" %}
     {% endif %}
         <div id='id_user_calendar' style="width:540px;font-size:8px;margin-top:20px;margin-left:45px;padding-bottom:10px;"></div>
 

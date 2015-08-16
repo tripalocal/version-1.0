@@ -10,6 +10,8 @@
 
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/main.css">
+
+  <script language="javascript" type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.js"></script>
 </head>
 
 <body>
@@ -21,7 +23,7 @@
   <div class="links">
     <div class="container">
       <a class="badge" href="https://itunes.apple.com/cn/app/ben-tu-ke/id1023198122?mt=8"><img src="img/app-store-badge_zh.png" height="40px"></a>
-      <a class="badge" href="http://m.tripalocal.com/html/tripalocalapp.html?utm=b15"><img src="img/play-store-badge_zh.png" height="40px"></a>
+      <a class="badge" href="?utm=b15"><img src="img/play-store-badge_zh.png" height="40px"></a>
     </div>
   </div>
 
@@ -31,11 +33,28 @@
 
   <div class="links">
     <div class="container">
-      <a class="badge" href=""><img src="img/app-store-badge_zh.png" height="40px"></a>
-      <a class="badge" href=""><img src="img/play-store-badge_zh.png" height="40px"></a>
+      <a class="badge" href="https://itunes.apple.com/cn/app/ben-tu-ke/id1023198122?mt=8"><img src="img/app-store-badge_zh.png" height="40px"></a>
+      <a class="badge" href="?utm=b15"><img src="img/play-store-badge_zh.png" height="40px"></a>
     </div>
   </div>
 
 </body>
 
 </html>
+
+<script>
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
+    $(document).ready(function(){
+        var utmId = getParameterByName('utm');
+        if(utmId)
+        {
+            window.location.href = "https://www.tripalocal.com/apk/tripalocal_v1.0_1_" + utmId + ".apk";
+        }
+    });
+</script>

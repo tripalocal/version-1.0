@@ -13,9 +13,9 @@
         <div class="fixCenter">
             <div class="tab_item">
                 <a href="#" class="firstTabItem" id="active-tab">{% trans "My Listing" %}</a>
-                <a href="/mytrip">{% trans "My Trip" %}</a>
-                <a href="/myprofile">{% trans "My Profile" %}</a>
-                <a href="/accounts/password/change/">{% trans "My Account" %}</a>
+                <a href="{{GEO_POSTFIX}}mytrip">{% trans "My Trip" %}</a>
+                <a href="{{GEO_POSTFIX}}myprofile">{% trans "My Profile" %}</a>
+                <a href="{{GEO_POSTFIX}}accounts/password/change/">{% trans "My Account" %}</a>
             </div>
         </div>
     </div>
@@ -27,7 +27,7 @@
                     <a href="#" id="active-tab">{% trans "Managing Listing" %}</a>
                 </p>
                 <p>
-                    <a href="/myreservation">{% trans "My Reservation" %}</a>
+                    <a href="{{GEO_POSTFIX}}myreservation">{% trans "My Reservation" %}</a>
                 </p>
             </div>
 
@@ -48,9 +48,9 @@
                         {% endif %}
                     </div>
                     {% if experience.status|title != "Listed" %}
-                    <a class="btn btn-primary btn-sm" role="button" id="edit-draft" href="/editexperience/calendar?id={{experience.id}}">{% trans "Edit draft" %}</a>
+                    <a class="btn btn-primary btn-sm" role="button" id="edit-draft" href="{{GEO_POSTFIX}}editexperience/calendar?id={{experience.id}}">{% trans "Edit draft" %}</a>
                     {% elif experience.status|title == "Listed" %}
-                    <a class="btn btn-primary btn-sm" role="button" id="update-listing" href="/editexperience/calendar?id={{experience.id}}">{% trans "Update listing" %}</a>
+                    <a class="btn btn-primary btn-sm" role="button" id="update-listing" href="{{GEO_POSTFIX}}editexperience/calendar?id={{experience.id}}">{% trans "Update listing" %}</a>
                     {% endif %}
                 </div>
                 {% empty %}

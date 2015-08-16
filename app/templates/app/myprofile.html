@@ -12,10 +12,10 @@
     <div class="tab_area">
         <div class="fixCenter">
             <div class="tab_item">
-                <a href="/mylisting">{% trans "My Listing" %}</a>
-                <a href="/mytrip">{% trans "My Trip" %}</a>
+                <a href="{{GEO_POSTFIX}}mylisting">{% trans "My Listing" %}</a>
+                <a href="{{GEO_POSTFIX}}mytrip">{% trans "My Trip" %}</a>
                 <a href="#" id="active-tab">{% trans "My Profile" %}</a>
-                <a href="/accounts/password/change/">{% trans "My Account" %}</a>
+                <a href="{{GEO_POSTFIX}}accounts/password/change/">{% trans "My Account" %}</a>
             </div>
         </div>
     </div>
@@ -23,7 +23,7 @@
 	<div class="row row-area">
     	<div class="content-area fixCenter">
     		<div class="leftsubMenu">
-    			<p>{% trans "My Profile" %}</p>
+    			<p>{% trans "My Profile" %}</p>    
     		</div>
 
             <form id="my_profile_form" method="post" action="" enctype="multipart/form-data">
@@ -35,7 +35,7 @@
                         <tr>
                             <td>
           	                    <div class="profile-lg void-profile">
-                                    <img src="{{MEDIA_URL}}{{image_url}}">
+                                    <img src="{{MEDIA_URL}}{{image_url}}" width="200px" height="200px">
                                 </div>
                             </td>
                             <td>
@@ -57,7 +57,7 @@
                                 <p class="no-file">No File Selected</p>-->
                             </td>
                         </tr>
-
+                        {% if LANGUAGE != "zh-CN" %}
                         <tr>
                             <td>
                                 <div>
@@ -78,6 +78,7 @@
                                 </div>
                             </td>
                         </tr>
+                        <tr>
                             <td>
                                 <div class="text_grey blank-text">{% blocktrans %}This is only shared once you have a confirmed booking with <br>
                                                                     another Tripalocal user. We only display your initial in public.{% endblocktrans %}
@@ -89,6 +90,40 @@
                                 </div>
                             </td>
                         </tr>
+                        {%else%}
+                        <tr>
+                            <td>
+                                <div>
+                                    <p>{% trans "Last Name" %}
+                                        <img src="/images/lock.jpg">
+                                    </p>
+                                    <div class="form-group">
+                                        {{form.last_name}}
+        	                        </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <p>{% trans "First Name" %}</p>
+                                    <div class="form-group">
+                                        {{form.first_name}}
+        	                        </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="text_grey hinttext-position">{% blocktrans %}This is only shared once you have a confirmed booking with <br>
+                                                                    another Tripalocal user. We only display your initial in public.{% endblocktrans %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text_grey blank-text">{% blocktrans %}This is only shared once you have a confirmed booking with <br>
+                                                                    another Tripalocal user. We only display your initial in public.{% endblocktrans %}
+                                </div>
+                            </td>
+                        </tr>
+                        {%endif%}
                         <tr>
                             <td>
                                 <div>
@@ -145,7 +180,7 @@
             </form>
         </div>
     </div>
-
+		        
 {% endblock %}
 
 {% block scripts %}
@@ -165,7 +200,7 @@
 
             if (window.FileReader) {
                 input = document.getElementById('id_image');
-                if (input && input.files && input.files[0])
+                if (input && input.files && input.files[0]) 
                 {
                     file = input.files[0];
                     if(file.size > 1048576)
@@ -180,7 +215,7 @@
                 }
             }
 
-            if(valid)
+            if(valid) 
             {
                 $("form").submit();
             }

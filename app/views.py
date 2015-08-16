@@ -6,8 +6,8 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, loader
 from datetime import *
-from experiences.forms import Locations
 from django import forms
+from experiences.forms import Locations
 from django.contrib.auth import authenticate, login
 from allauth.account.signals import password_reset, user_signed_up, user_logged_in
 from allauth.account.views import PasswordResetFromKeyDoneView
@@ -52,11 +52,11 @@ def home(request):
             if len(form.data['start_date']):
                 if len(form.data['end_date']):
                     return SearchView(request, form.data['city'],
-                                             start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")),
+                                             start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")), 
                                              end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
                 else:
                     return SearchView(request, form.data['city'],
-                                             start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")))
+                                             start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")))    
 
             if len(form.data['end_date']):
                 return SearchView(request, form.data['city'],
@@ -118,7 +118,8 @@ def home(request):
                 # take the first ip which is not a private one (of a proxy)
                 if len(proxies) > 0:
                     ip = proxies[0]
-        if not settings.DEVELOPMENT:
+
+        if not settings.DEVELOPMENT: 
             if settings.LANGUAGES[0][0] != "zh":
                 try:
                     reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
@@ -126,12 +127,12 @@ def home(request):
                     country = response.country.name
                     reader.close()
                     if country.lower() in ['china']:
-                        return HttpResponseRedirect('/cn')
+                        return HttpResponseRedirect('/cn/')
                 except Exception:
                     reader.close()
 
                 if request.LANGUAGE_CODE.startswith("zh"):
-                    return HttpResponseRedirect('/cn')
+                    return HttpResponseRedirect('/cn/')
 
     experienceList = Experience.objects.filter(id__in=[1,2,59])
     idxList = random.sample(range(len(experienceList)), 3)
@@ -152,6 +153,8 @@ def home(request):
         'featuredExperience': featuredExperience,
         'cityList': featuredCityList,
         'locations': Locations,
+        'GEO_POSTFIX':settings.GEO_POSTFIX,
+        'LANGUAGE':settings.LANGUAGE_CODE
     })
 
     if request.user.is_authenticated():
@@ -165,7 +168,8 @@ def contact(request):
     return render(
         request,
         'app/contactus.html',
-        context_instance = RequestContext(request)
+        context_instance = RequestContext(request,{'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                                   'LANGUAGE':settings.LANGUAGE_CODE})
     )
 
 def about(request):
@@ -174,7 +178,8 @@ def about(request):
     return render(
         request,
         'app/aboutus.html',
-        context_instance = RequestContext(request)
+        context_instance = RequestContext(request,{'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                                   'LANGUAGE':settings.LANGUAGE_CODE})
     )
 
 def termsofservice(request):
@@ -211,6 +216,8 @@ def signup(request):
         form = UserCreateForm()
     return render(request, "app/signup.html", {
         'form': form,
+        'GEO_POSTFIX':settings.GEO_POSTFIX,
+        'LANGUAGE':settings.LANGUAGE_CODE
     })
 
 def registration_successful(request):
@@ -219,7 +226,8 @@ def registration_successful(request):
         return render(
             request,
             'app/registration_successful.html',
-            context_instance = RequestContext(request, {})
+            context_instance = RequestContext(request, {'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                                        'LANGUAGE':settings.LANGUAGE_CODE})
         )
     else:
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
@@ -248,7 +256,6 @@ def current_datetime(request):
     return {'current_datetime':datetime.datetime.utcnow()}
 
 def disclaimer(request):
-
     return render(
         request,
         'app/disclaimer.html',
@@ -268,6 +275,8 @@ def mylisting(request):
         experiences.append(experience)
 
     context['experiences'] = experiences
+    context['GEO_POSTFIX'] = settings.GEO_POSTFIX
+    context['LANGUAGE'] = settings.LANGUAGE_CODE
 
     return render_to_response('app/mylisting.html', {}, context)
 
@@ -306,6 +315,8 @@ def myreservation(request):
 
     context['current_reservations'] = reservations['current_reservations']
     context['past_reservations'] = reservations['past_reservations']
+    context['GEO_POSTFIX'] = settings.GEO_POSTFIX
+    context['LANGUAGE'] = settings.LANGUAGE_CODE
 
     return render_to_response('app/myreservation.html', {}, context)
 
@@ -365,6 +376,8 @@ def mytrip(request):
             'bookings_all' : bookings_all,
             'end_dates' : end_dates,
             })
+        context['GEO_POSTFIX'] = settings.GEO_POSTFIX
+        context['LANGUAGE'] = settings.LANGUAGE_CODE
         return HttpResponse(template.render(context))
 
     else:
@@ -404,7 +417,8 @@ def myprofile(request):
     data["bio"]=get_user_bio(profile, settings.LANGUAGES[0][0])
 
     form = UserProfileForm(data=data)
-
+    context['GEO_POSTFIX'] = settings.GEO_POSTFIX
+    context['LANGUAGE'] = settings.LANGUAGE_CODE
     return render_to_response('app/myprofile.html', {'form': form}, context)
 
 def mycalendar(request):
@@ -516,7 +530,8 @@ def mycalendar(request):
             data['instant_booking_repeat_extra_information_'+str(index+1)] = instant_bookings[index].repeat_extra_information
 
         form = UserCalendarForm(data=data)
-
+        context['GEO_POSTFIX'] = settings.GEO_POSTFIX
+        context['LANGUAGE'] = settings.LANGUAGE_CODE
         return render_to_response('app/mycalendar.html', {'form': form}, context)
 
 @receiver(password_changed)

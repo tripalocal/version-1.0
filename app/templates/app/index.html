@@ -4,21 +4,26 @@
 
 {% block head %}
     {% load staticfiles%}
+    <title>{% trans "Tripalocal | Experience it like a local"%}</title>
+    {%if LANGUAGE == "zh-CN"%}
+    <meta name="keywords" content="私人导游，本土导游，境外旅游，澳洲旅行，个性化旅行线路"/>
+    <meta name="description" content="本土客，一个提供个性化向导的旅行平台，拥有全球私人导游，搜罗海外本土特色旅行线路！本土客专注游客目的地、旅行线路，p2p出境游，分享游客旅行经验。全球游客发布目的地旅行线路，支持预订目的地线路，本土客当地人带你体验目的地旅行魅力，看最美丽的风景，吃最地道的美食，玩最刺激的活动，做最接地气的文化交流，让你体验一段真正属于自己风格的自由行。"/>
+    {% endif %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.css" rel="stylesheet">
     <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/tripalocal_homepage.css' %}" rel="stylesheet">
 
-    <title>{% trans "Tripalocal | Experience it like a local"%}</title>
     <!-- H1 google font -->
     <link href='//fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>
 
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+
 	<script>
 		$(function() {
 			$("#slideshow > div:gt(0)").hide();
-			setInterval(function() {
+			setInterval(function() { 
 			  $('#slideshow > div:first')
 			    .fadeOut(1000)
 			    .next()
@@ -28,6 +33,7 @@
 			},  5000);
 		});
 	</script>
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -36,7 +42,7 @@
         <div id="closeTag" style="width:10%"><img src="/images/homepage/closeIcon-01.svg" width="14"></div>
         <div id="appIcon" style="width:70px; text-align:left;position:relative">
             <img src="/images/homepage/appIcon-01.jpg" width="60" >
-
+    
             <span style="position:absolute;left:80px;">
                 <h3 style="margin-bottom:5px;font-weight:bold">{% trans "Tripalocal for Android" %}</h3>
                 <img src="/images/homepage/rating-01.svg" width="110"><span style="color:#ccc;  vertical-align: middle;"> (24,812)</span>
@@ -51,14 +57,14 @@
     <div class="home-menu-bar">
         <ul class="home-menu menu">
         {% if user.is_authenticated %}
-            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com/cn">中文</a></li>
-            <li><a href="/accounts/logout/">{% trans "Log out" %}</a></li>
+            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a></li>
+            <li><a href="{{GEO_POSTFIX}}accounts/logout/">{% trans "Log out" %}</a></li>
             <li>{{ user.first_name }}</li>
-            <li><div class="profile-xs"><a href="/myprofile"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>
+            <li><div class="profile-xs"><a href="{{GEO_POSTFIX}}myprofile"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>    
         {% else %}
-            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com/cn">中文</a></li>
-            <li><a href="/accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></li>
-            <li><a href="/accounts/login/?next={{ request.path }}">{% trans "Log in" %}</a></li>
+            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a></li> 
+            <li><a href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></li>
+            <li><a href="{{GEO_POSTFIX}}accounts/login/?next={{ request.path }}">{% trans "Log in" %}</a></li>
         {% endif %}
         </ul>
     </div>
@@ -76,7 +82,7 @@
                               <div id="id-city" class="ui selection dropdown">
                                 <input type="hidden" name="city" value="city">
                                   <i class="dropdown icon"></i>
-                                  <div class="text">City</div>
+                                  <div class="text">{% trans "City" %}</div>
                                   <div id="city-menu" class="menu"></div>
                               </div>
                             </td>
@@ -84,20 +90,22 @@
                             <td class="search-to">{{form.end_date}}</td>
                             <td class="home-search-button"><input id="search-submit" type="submit" value="{% trans "Search" %}" name="search" class="btn btn-primary btn-sm btn-search"></td>
                         </tr>
-
                         <tr class="mobileOnly">
-                            <td class="home-search-button-mobile"><input id="search-submit-button" type="submit" value="Search" name="search" class="btn btn-primary btn-sm btn-search"></td>
+                            <td class="home-search-button-mobile"><input id="search-submit-button" type="submit" value="{% trans "Search" %}" name="search" class="btn btn-primary btn-sm btn-search"></td>
                         </tr>
-
                     </tbody>
                 </table>
             </form>
             <div>
+            {%if LANGUAGE == "zh-CN"%}
+                <p>{% trans " to get notified when we launch in more countries."%}<a href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></p>
+            {%else%}
                 <p>{% trans "Tripalocal is currently available in Australia" %} </br>
-                <a href="/accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a>{% trans " to get notified when we launch in more countries."%}</p>
+                <a href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a>{% trans " to get notified when we launch in more countries."%}</p>
+            {%endif%}
             </div>
         </div>
-    </div>
+    </div> 
 
     <div class="exp-brief">
         <div class="container">
@@ -111,7 +119,7 @@
                 {% for experience in featuredExperience %}
                     {% if forloop.first %}
                     <div class="price-offer col4" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
-                        <a class="box_link" href="/experience/{{ experience.experience.id }}">
+                        <a class="box_link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
                             <div class="profile-featured">
                                 <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
                             </div>
@@ -149,7 +157,7 @@
                 {% for experience in featuredExperience %}
                     {% if forloop.counter == 2 %}
                     <div class="price-offer col4" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
-                        <a class="box_link" href="/experience/{{ experience.experience.id }}">
+                        <a class="box_link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
                             <div class="profile-featured">
                                 <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
                             </div>
@@ -175,7 +183,7 @@
                 {% for experience in featuredExperience %}
                     {% if forloop.counter == 3 %}
                     <div class="price-offer col4" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
-                        <a class="box_link" href="/experience/{{ experience.experience.id }}">
+                        <a class="box_link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
                             <div class="profile-featured">
                                 <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
                             </div>
@@ -226,20 +234,18 @@
         <div class="container">
             <h1 style="text-align:center;margin:47px;padding:0">{% trans "Our Community"%}</h1>
             <div class="row">
-                <div class="col6 box" style="background-image:url({{ MEDIA_URL }}homepage/travelling-01.jpg)">
-                    <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>
+                <div class="col6 box" style="background-image:url(/images/homepage/travelling-01.jpg)">
+                    <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>  
                 </div>
-                <div class="col6 box" style="background-image:url({{ MEDIA_URL }}homepage/hosting-01.jpg)">
-                    <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>
+                <div class="col6 box" style="background-image:url(/images/homepage/hosting-01.jpg)">
+                    <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>  
                 </div>
             </div>
         </div>
     </div>
-
 {% endblock %}
 
 {% block scripts %}
-
 <script charset="utf-8" type="text/javascript">
 
     $(document).ready(function() {
@@ -249,6 +255,12 @@
       });
     });
     $("#video-fullscreen").hide();
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
     $(function()
     {
         var country, region, city, ip, longitude, latitude;
@@ -258,8 +270,8 @@
             $("#id_end_date").attr("class","input-sm");
             $("#id_start_date").attr("style","height:40px;");
             $("#id_end_date").attr("style","height:40px;");
-            $("#id_start_date").attr("placeholder","From");
-            $("#id_end_date").attr("placeholder","To");
+            $("#id_start_date").attr("placeholder",'{%trans " From " %}');
+            $("#id_end_date").attr("placeholder",'{%trans " To " %}');
 
             {% for k, v in locations %}
                 var header = '<div class=\"header\">' + '{{ k }}' + '</div>';
@@ -288,7 +300,14 @@
             });
 
             $("#language_switch_topbar").click(function(){
-                mixpanel.track("switched language from top bar");
+                if("{{LANGUAGE}}" == "zh-CN")
+                {
+                    mixpanel.track("switched language from top bar_cn");
+                }
+                else
+                {
+                    mixpanel.track("switched language from top bar");
+                }
 
                 if($("#user_email").val())
                 {
@@ -297,21 +316,37 @@
             });
 
             $("#id_start_date").click(function(){
-                $("#id_start_date_picker").data("DateTimePicker").show();
+                $("#id_start_date_picker").data("DateTimePicker").show();  
             });
 
-            $("#id_end_date").click(function(){
-                $("#id_end_date_picker").data("DateTimePicker").show();
+            $("#id_end_date").click(function(){  
+                $("#id_end_date_picker").data("DateTimePicker").show();  
             });
         });
 
-        mixpanel.track("Visited homepage_en");
+        if("{{LANGUAGE}}" == "zh-CN")
+        {
+            mixpanel.track("Visited homepage_cn");
+        }
+        else
+        {
+            mixpanel.track("Visited homepage_en");
+        }
 
+        var utmId = getParameterByName('utm');
+        if(utmId)
+        {
+            initial_referrer = "utm"+utmId;
+        }
+        else
+        {
+            initial_referrer = document.referrer;
+        }
+        var now  = new Date().toString();
+        mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
+        mixpanel.people.set({"$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": initial_referrer,"$last_seen":now});
         if($("#user_email").val())
         {
-            var now  = new Date().toString();
-            mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
-            mixpanel.people.set({"$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,"$last_seen":now});
             mixpanel.identify($("#user_email").val());
         }
     })

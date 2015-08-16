@@ -3,14 +3,15 @@
 {% load i18n %}
 
 {% block head %}
-    <title>Booking Confirmation</title>
+    <title>{% trans "Booking Confirmation" %}</title>
+    <script src="https://checkout.stripe.com/checkout.js"></script>
 {% endblock %}
 
 {% block content %}
     <div class="container-fluid experience">
         <div class="fixCenter">
             <div class="checkoutBox">
-                <form id="category_form"  method="post" action="/experience_booking_confirmation/">
+                <form id="category_form" method="post" action="{{GEO_POSTFIX}}experience_booking_confirmation/">
                     {% csrf_token %}
                     <div style="display:none">
                     {% for hidden in form.hidden_fields %}
@@ -53,7 +54,11 @@
                                 <br>
                                 <div class="warning-sign">
                                     <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                    {%if LANGUAGE != "zh-CN"%}
                                     <p>{{form.card_number.errors.as_text}}</p>
+                                    {%else%}
+                                    <p>请输入正确卡号</p>
+                                    {%endif%}
                                 </div>
                                 {%endif%}
                             </div>
@@ -75,9 +80,9 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <p style="margin-left:15px">{% trans "Security code" %}</p>
+                                    <p>{% trans "Security code" %}</p>
                                     <div class="navbar-form navbar-left" role="search" id="id_security_code">
-                                        <div class="form-group" style="margin-left:15px">
+                                        <div class="form-group">
                                             {{ form.cvv }}
                                         </div>
                                     </div>
@@ -88,15 +93,23 @@
                                     {% if 'expiration' in form.errors and display_error%}
                                     <div class="warning-sign">
                                         <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                        {%if LANGUAGE != "zh-CN"%}
                                         <p>{{form.expiration.errors.as_text}}</p>
+                                        {%else%}
+                                        <p>请选择正确到期时间</p>
+                                        {%endif%}
                                     </div>
                                     {%endif%}
                                 </td>
                                 <td>
                                     {% if 'cvv' in form.errors and display_error%}
-                                    <div class="warning-sign" style="margin-left:15px">
+                                    <div class="warning-sign">
                                         <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                        {%if LANGUAGE != "zh-CN"%}
                                         <p>{{form.cvv.errors.as_text}}</p>
+                                        {%else%}
+                                        <p>无效CVV</p>
+                                        {%endif%}
                                     </div>
                                     {%endif%}
                                 </td>
@@ -110,6 +123,7 @@
                     <div class="row" id="traveller_detail">
                         <table width="0" border="0" cellspacing="0" cellpadding="0">
                             <tr>
+                                {%if LANGUAGE != "zh-CN"%}
                                 <td>
                                     <p>{% trans "First name" %}</p>
                                     <div class="navbar-form navbar-left" role="search">
@@ -138,6 +152,36 @@
                                         </div>
                                     </div>
                                 </td>
+                                {%else%}
+                                <td>
+                                    <p>{% trans "Last name" %}</p>
+                                    <div class="navbar-form navbar-left" role="search">
+                                        <div class="form-group">
+                                            {{ form.last_name }}
+                                            {% if 'last_name' in form.errors and display_error%}
+                                            <div class="warning-sign">
+                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <p>此项必填</p>
+                                            </div>
+                                            {%endif%}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p>{% trans "First name" %}</p>
+                                    <div class="navbar-form navbar-left" role="search">
+                                        <div class="form-group">
+                                            {{ form.first_name }}
+                                            {% if 'first_name' in form.errors and display_error%}
+                                            <div class="warning-sign">
+                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <p>此项必填</p>
+                                            </div>
+                                            {%endif%}
+                                        </div>
+                                    </div>
+                                </td>
+                                {%endif%}
                             </tr>
                         </table>
                         <table style="display:none;" class="billingAddress" width="0" border="0" cellspacing="0" cellpadding="0">
@@ -151,7 +195,11 @@
                                             <br>
                                             <div class="warning-sign">
                                                 <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                {%if LANGUAGE != "zh-CN"%}
                                                 <p>{{form.street1.errors.as_text}}</p>
+                                                {%else%}
+                                                <p>请输入正确账单地址</p>
+                                                {%endif%}
                                             </div>
                                             {%endif%}
                                         </div>
@@ -177,7 +225,11 @@
                                             {% if 'city_town' in form.errors and display_error%}
                                             <div class="warning-sign">
                                                 <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                {%if LANGUAGE != "zh-CN"%}
                                                 <p>{{form.city_town.errors.as_text}}</p>
+                                                {%else%}
+                                                <p>此项必填</p>
+                                                {%endif%}
                                             </div>
                                             {%endif%}
                                         </div>
@@ -240,16 +292,6 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr>
-                              <td>
-                              {% if 'phone_number' in form.errors and display_error%}
-                              <div class="warning-sign">
-                                  <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                  <p>Please provide a contact phone number.</p>
-                              </div>
-                              {%endif%}
-                            </td>
-                            </tr>
                         </table>
 
                         {%if experience.language == "NONE"%}
@@ -259,7 +301,7 @@
                         {%endif%}
                     </div>
                     <div class="row">
-                        <input id="isAgreementSelected" type="checkbox" /><p class="help-message" style="font-size:12px">{% trans "By booking this listing, you agree to " %}<a href="/termsofservice" target="_blank">{% trans "Terms of Service" %}</a>, <a href="/privacypolicy" target="_blank">{% trans "Privacy Policy" %}</a> {% trans "and" %} <a href="/refundpolicy"  target="_blank">{% trans "Traveller Refund Policy" %}</a>.
+                        <input id="isAgreementSelected" type="checkbox" /><p class="help-message" style="font-size:12px">{% trans "By booking this listing, you agree to " %}<a href="{{GEO_POSTFIX}}termsofservice" target="_blank">{% trans "Terms of Service" %}</a>, <a href="{{GEO_POSTFIX}}privacypolicy" target="_blank">{% trans "Privacy Policy" %}</a> {% trans "and" %} <a href="{{GEO_POSTFIX}}refundpolicy"  target="_blank">{% trans "Traveller Refund Policy" %}</a>.
                         </p> <!-- and agree to Tripalocal's Terms and Conditions-->
                         <div id="id_term_condition" class="warning-sign" style="display:none;">
                             <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
@@ -269,8 +311,8 @@
                             <img src="/images/icon/give-back.svg" width="25" style="float:left">
                             <p style="margin:20px 10px 0 35px">{% trans "It’s ok to change your mind" %}<br>
                                 {% trans "If you cancel at least 7 calendar days in advance, there is no cancellation fee." %}<br>
-                                {% trans "If you cancel between 3 and 6 calendar days in advance, you will be charged a 50% cancellation fee." %}<br>
-                                {% trans "If you cancel within 2 calendar days in advance, you will be charged a 100% cancellation fee." %}</p>
+                                {% trans "If you cancel between 3 and 6 calendar days in advance, you will be charged a 50 percent cancellation fee." %}<br>
+                                {% trans "If you cancel within 2 calendar days in advance, you will be charged a 100 percent cancellation fee." %}</p>
                         </div>
                         <div>
                             <img src="/images/icon/give-back.svg" width="25" style="float:left">
@@ -299,20 +341,20 @@
                     <h3 style="font-weight:bold;">{{ experience.title }}</h3>
                     <p>{{ experience.city }}</p>
                     <hr style="margin-bottom:10px;">
-                    <form action="/experience/{{experience.id}}/" method="get">
-                        <p>Reservation for <strong>{{ guest_number }} person(s)</strong><br>
-                            on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>
-                            (<input type="submit" value="Change" name="change" style="border:none;background:none;color:#3cc;padding:0px;"/>)
+                    <form action="{{GEO_POSTFIX}}experience/{{experience.id}}/" method="get">
+                        <p>{% trans "Reservation for" %} <strong>{{ guest_number }}{% trans " person(s)" %}</strong><br>
+                           {% trans "on" %} <strong>{{date}}</strong>{% trans " at" %} <strong>{{time}}</strong>
+                            (<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)
                         </p>
                         <hr style="margin:10px 0">
-                        <p>Rate: {{experience.dollarsign}}{{ experience_price|floatformat|mul:1.429|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
+                        <p>{% trans "Rate:" %} {{experience.dollarsign}}{{experience_price|floatformat|mul:1.429|floatformat:"0"}}{% trans " per person for " %}{{experience.duration}}{% trans " hours" %}</p>
                         <hr style="margin-bottom:10px;">
-                        Subtotal: {{experience.dollarsign}}<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
+                        {% trans "Subtotal:" %} {{experience.dollarsign}}<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
                         <br>
                         <p id="id_coupon_extra_fee" style="font-size:14px;"></p>
-                        <div id="id_service_fee" style="display:none;"> Processing Fee: {{experience.dollarsign}}{{ service_fee|stringformat:".2f" }}<br></div>
-                        <strong style="font-size:18px;">Total: {{experience.dollarsign}}<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
-                    </form>
+                        <div id="id_service_fee" style="display:none;">{% trans "Processing Fee:" %} {{experience.dollarsign}}{{ service_fee|stringformat:".2f" }}<br></div>
+                        <strong style="font-size:18px;">{% trans "Total:" %} {{experience.dollarsign}}<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
+                    </form>                     
                 </div>
             </div>
         </div>
@@ -354,7 +396,7 @@ $(function(){
 
         var handler = StripeCheckout.configure({
                             key: 'pk_test_W9jgaSX9w9vrewiQIl5gE5l4',
-                            image: '{{ MEDIA_URL }}img/tripalocal_Logo.png',
+                            image: '/images/tripalocal_Logo.png',
                             token: function(token) {
                                 // Use the token to create the charge with a server-side script.
                                 // You can access the token ID with `token.id`
@@ -368,8 +410,10 @@ $(function(){
 
         $("#submit_booking").bind("click", function(e) {
             e.preventDefault();
-            if ($("#isAgreementSelected").is(':checked')) {
-                if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked')) {
+            if ($("#isAgreementSelected").is(':checked'))
+            {  
+                if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
+                {
                     mixpanel.track("Clicked on \"Checkout\"");
                     if($("#user_email").val())
                     {
@@ -384,8 +428,8 @@ $(function(){
                             description: '',
                             amount: {{ total_price|mul:100 }},
                             currency: '{{experience.currency}}',
-                            locale: 'en-au',
-                            //alipay: true
+                            locale: '{{LANGUAGE}}',
+                            alipay: true
                         });
                         e.preventDefault();
                     }
@@ -394,11 +438,13 @@ $(function(){
                         $("#category_form").submit();
                     }
                 }
-                else {
+                else
+                {
                     $("#id_coupon_term_condition").attr("style","width:480px; display:inline-block; margin-bottom:10px;");
                 }
             }
-            else {
+            else
+            {
                 $("#id_term_condition").attr("style","display:inline-block;");
             }
         });
