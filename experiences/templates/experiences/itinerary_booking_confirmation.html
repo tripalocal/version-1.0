@@ -20,7 +20,7 @@
             {% endif %}
         {% endif %}
     </div>
--->    
+-->
     <div class="container-fluid experience">
         <div class="fixCenter">
             <div class="checkoutBox">
@@ -41,7 +41,7 @@
                             <p>Promo Code</p>
                         </div>
                         <div class="navbar-form " role="search">
-                            <div class="form-group" style="display:inline-block;margin-right:20px;">
+                            <div class="form-group" style="display:inline-block;margin-right:20px">
                                 {{form.promo_code}}
                                 {% if wrong_promo_code %}
                                 <div class="warning-sign">
@@ -50,8 +50,8 @@
                                 </div>
                                 {%endif%}
                             </div>
-                
-               	            <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="Refresh" value="Refresh" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6;"/> 
+
+               	            <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="Refresh" value="Refresh" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6; "/>
                         </div>
                         {% if coupon and not wrong_promo_code %}
                         {% include "experiences/coupon_"|add:coupon.title|add:".html" %}
@@ -60,8 +60,8 @@
 
                     <div class="row" id="credit_card_div">
                         <p>Card Number</p>
-                        <div class="navbar-form navbar-left" style="width:100%;" role="search">
-                            <div class="form-group" style="float:left;margin-right:20px;">
+                        <div class="navbar-form navbar-left" style="width:100%" role="search">
+                            <div class="form-group" style="float:left;margin-right:20px">
                                 {{ form.card_number }}
                                 {% if 'card_number' in form.errors and display_error%}
                                 <br>
@@ -310,7 +310,7 @@ $(function(){
 
         $("#submit_booking").bind("click", function(e) {
             e.preventDefault();
-            if ($("#isAgreementSelected").is(':checked')) {  
+            if ($("#isAgreementSelected").is(':checked')) {
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked')) {
                     mixpanel.track("Clicked on \"Checkout\"");
                     if($("#user_email").val())

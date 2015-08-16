@@ -3,15 +3,14 @@
 {% load i18n %}
 
 {% block head %}
-    <title>{% trans "Booking Confirmation" %}</title>
-    <script src="https://checkout.stripe.com/checkout.js"></script>
+    <title>Booking Confirmation</title>
 {% endblock %}
 
 {% block content %}
     <div class="container-fluid experience">
         <div class="fixCenter">
             <div class="checkoutBox">
-                <form id="category_form" method="post" action="/experience_booking_confirmation/">
+                <form id="category_form"  method="post" action="/experience_booking_confirmation/">
                     {% csrf_token %}
                     <div style="display:none">
                     {% for hidden in form.hidden_fields %}
@@ -37,7 +36,7 @@
                                 </div>
                                 {%endif%}
                             </div>
-                
+
                	            <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="Refresh" value="{% trans "Refresh" %}" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6;"/>
                         </div>
                         {% if coupon and not wrong_promo_code %}
@@ -114,7 +113,7 @@
                                 <td>
                                     <p>{% trans "First name" %}</p>
                                     <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
+                                        <div class="form-group" >
                                             {{ form.first_name }}
                                             {% if 'first_name' in form.errors and display_error%}
                                             <div class="warning-sign">
@@ -273,16 +272,23 @@
                                 {% trans "If you cancel between 3 and 6 calendar days in advance, you will be charged a 50% cancellation fee." %}<br>
                                 {% trans "If you cancel within 2 calendar days in advance, you will be charged a 100% cancellation fee." %}</p>
                         </div>
+                        <div>
+                            <img src="/images/icon/give-back.svg" width="25" style="float:left">
+                            <p style="margin:20px 10px 0 35px">It’s ok to change your mind<br>
+                                If you cancel at least 7 calendar days in advance, there is no cancellation fee.<br>
+                                If you cancel between 3 and 6 calendar days in advance, you will be charged a 50% cancellation fee.<br>
+                                If you cancel within 2 calendar days in advance, you will be charged a 100% cancellation fee.</p>
+                        </div>
                     </div>
                     <input type="submit" id="submit_booking" name="Request to Book" value="{% trans "Book Now" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:140px;"/>
                 </form>
             </div>
-                
+
             <div class="expList checkoutDetails">
-                <div class="listingImg" style="background-image:url(		
+                <div class="listingImg" style="background-image:url(
 		        {% for photo in experience.photo_set.all %}
                     {% if forloop.first %}
-				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
+				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}
                     {% endif %}
                 {% endfor %})">
                     <div class="profile-md checkout-profile">
@@ -306,7 +312,7 @@
                         <p id="id_coupon_extra_fee" style="font-size:14px;"></p>
                         <div id="id_service_fee" style="display:none;"> Processing Fee: {{experience.dollarsign}}{{ service_fee|stringformat:".2f" }}<br></div>
                         <strong style="font-size:18px;">Total: {{experience.dollarsign}}<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
-                    </form>                     
+                    </form>
                 </div>
             </div>
         </div>
