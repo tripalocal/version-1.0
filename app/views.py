@@ -184,21 +184,24 @@ def termsofservice(request):
     return render(
         request,
         'app/termsofservice.html',
-        context_instance = RequestContext(request)
+        context_instance = RequestContext(request,{'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                                   'LANGUAGE':settings.LANGUAGE_CODE})
     )
 
 def privacypolicy(request):
     return render(
         request,
         'app/privacypolicy.html',
-        context_instance = RequestContext(request)
+        context_instance = RequestContext(request,{'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                                   'LANGUAGE':settings.LANGUAGE_CODE})
     )
 
 def refundpolicy(request):
     return render(
         request,
         'app/refundpolicy.html',
-        context_instance = RequestContext(request)
+        context_instance = RequestContext(request,{'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                                   'LANGUAGE':settings.LANGUAGE_CODE})
     )
 
 def signup(request):
