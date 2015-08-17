@@ -1280,6 +1280,11 @@ def create_experience(request, id=None):
                             photo = Photo(name = filename, directory = 'experiences/' + str(experience.id) + '/', 
                                           image = 'experiences/' + str(experience.id) + '/' + filename, experience = experience)
                             photo.save()
+                        else:
+                            photo = experience.photo_set.filter(name__startswith=name)[0]
+                            photo.name = filename
+                            photo.image = 'experiences/' + str(experience.id) + '/' + filename
+                            photo.save()
 
             #save host's driver license images
             dirname = settings.MEDIA_ROOT + '/hosts_id/' + str(user.id) + '/'

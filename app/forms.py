@@ -167,6 +167,8 @@ class SignupForm(forms.Form):
                                 widget=forms.TextInput(
                                     attrs={'placeholder':
                                                _('Last Name')}))
+    language = forms.CharField(max_length=5, initial=settings.LANGUAGE_CODE, required = False)
+    geo = forms.CharField(max_length=5, initial=settings.GEO_POSTFIX, required = False)
 
     def signup(self, request, user):
         user.first_name = self.cleaned_data['first_name']

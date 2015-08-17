@@ -276,7 +276,7 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
     });
 
     $('#id_language_select').change( function(){
-        if({{LANGUAGE}} == "zh-CN")
+        if("{{LANGUAGE}}" == "zh-CN")
         {
             mixpanel.track("switched language from footer_cn");
         }
