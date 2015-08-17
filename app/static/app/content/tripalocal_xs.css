@@ -214,11 +214,6 @@
 	margin-top: 10px;
 }
 
-#active-tab{
-	color: rgb(130,202,202);
-    padding-left:0px;
-    padding-right:6px;
-}
 
 .void-profile{
 	margin-left:80px; margin-right:80px; margin-top:0px;
@@ -274,8 +269,8 @@
 
 .input-sm{ padding:0px; width:120px; text-align:center; border-radius:0px;}
 .black-border{border: 2px #000000 solid; border-radius:5px;}
-.btn-search{padding:11px; width:80px; text-align:center; border-radius:5px;}
-#to{border-bottom-right-radius:5px; border-top-right-radius:5px; border: 2px #000000 solid; border-left:1px #000 solid;;}
+.btn-search{padding:11px; width:80px; text-align:center; border:2px rgba(0,0,0,1.00) solid; border-radius:5px;}
+#to{border-bottom-right-radius:5px; border-top-right-radius:5px; border: 2px #000000 solid; border-left:1px #000 solid;}
 #from{border-top:#000000 2px solid; border-bottom:#000000 2px solid; border-left:none; border-right:none;}
 .btn-english{border: 1px solid #FFF; border-radius:5px;}
 .mobile-area{width:500px; margin-right:0px;}
@@ -449,7 +444,7 @@ a {color:#6CC;} a:hover{color:#699;}
 .profile{width:134px; height:134px; background-color:#FFF; border-radius: 70px; margin: 30px auto 10px auto;}
 .profile img{border-radius: 60px; margin-top:6px; border:#CCC solid 1px; width:120px; height:120;}
 .teasebox{width:180px;
- height:195px; background-size:180px 195px; background-repeat:no-repeat; margin:auto; padding:77px 9px 0px 9px; color:#999; font-size:13px;;}
+ height:195px; background-size:180px 195px; background-repeat:no-repeat; margin:auto; padding:77px 9px 0px 9px; color:#999; font-size:13px;}
 
 
 
@@ -548,7 +543,7 @@ a {color:#6CC;} a:hover{color:#699;}
 .calendar{background-color: #F7F7F7; border-left: 1px solid #D3D3D3; border-right: 1px solid #D3D3D3; height: 100%; width: 645px; z-index: 0; float: left;}
 #list-calendar{background-color: #FFF;}
 .list-menu{padding-left: 40px; color: #999999; padding-top: 30px; color: #AAAAAA;}
-.list-tab{color: #666666; margin-left: 40px; padding-bottom: 10px; margin-bottom:0px;}
+.list-tab{color: #666666; margin-left: 40px; padding-bottom: 10px; margin-bottom:0px; cursor:pointer;}
 .list-tab-button{background-color: white; border:none; margin-left: 40px; padding-bottom: 10px;}
 a:hover{text-decoration: none;}
 #steps-remaining{color: #AAAAAA; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; border: 1px solid #AAAAAA; border-radius: 5px; margin-left: 40px; width: 105px; margin-top: 15px;}
@@ -615,7 +610,7 @@ a:hover{text-decoration: none;}
 #starts-on{float: left; padding-left: 30px;}
 #starts-on button{background-color: #FFF; border:1px solid #999999; border-radius: 3px;}
 #ends{width:200px;}
-#ends label{font-weight: 400; padding-left: 10px; position:relative; top: -3px;]}
+#ends label{font-weight: 400; padding-left: 10px; position:relative; top: -3px;}
 #ends input[type=radio]{-webkit-appearance:none; border: 1px solid #999999; background-color: #FFF; width: 16px; height: 16px; border-radius: 8px; background: none;}
 #ends input[type=radio]:checked{background: url(/images/radio-button.png) no-repeat; background-position: 3.5px 3.5px;}
 #on-radio{float:left; padding-top: 30px; padding-left: 40px;}
@@ -780,8 +775,13 @@ body {
 
 /*Toggle*/
 
+.active-tab{
+	color: rgb(130,202,202);
+    padding-left:0px;
+    padding-right:6px;
+}
 /*list-photo.html*/
-#section-add-photo{height: 680px;}
+#section-add-photo{height: 1150px;}
 #photo-heading{color: #666666; padding-top: 30px; padding-left: 30px; float: left;}
 #photo-size-reminder{color: #999999; padding-left: 85px; padding-top: 30px; float: left;}
 #photo-detail-info{color: #999999; padding-left: 30px; float: left;}
@@ -790,9 +790,77 @@ body {
 #add-photo-button p{float: left;}
 #add-photo-button img{vertical-align: middle; padding-left: 0px; padding-right: 5px;}
 #add-photo-button a span{position: relative; top: 10px;}
-.photo-preview-thumbnail{background-color: #FFF; border-radius: 3px; border:1px solid #999999; margin-right: 15px; float: left; width: 200px; height: 40px; padding-left: 15px;}
+
+.photo-preview-div {
+	background-color: #FFF;
+	border-radius: 3px;
+	border:1px solid #999999;
+	margin: 15px 15px 15px 15px;
+	width: 200px;
+	height: 200px;
+	padding: 0 0 0 0;
+	float: left;
+}
+
+.photo-preview-upload-button-position{
+	position: absolute;
+	left: 20px;
+	top: 150px;
+	width: 150px;
+	height: 30px;
+	display: none;
+	font-size: 15px;
+}
+
+.photo-preview-cancel-button{
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	left: 150px;
+	top: 10px;
+	display: none;
+}
+
+.photo-preview-cancel-button-icon{
+	position: relative;
+    right: 7px;
+    top: -4px;
+
+}
+
+.add-new-photo-button {
+	position: absolute;
+	left: 20px;
+	top: 80px;
+	width: 150px;
+	height: 30px;
+	display: none;
+	font-size: 15px;
+}
+
+.photo-preview-div .preview-img{
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+}
+
+.center-part {
+
+	right: 50%;
+	top: 50%;
+	bottom: 50%;
+}
+
+.photo-preview-thumbnail{background-color: #FFF; border-radius: 3px; border:1px solid #999999; margin-right: 15px; float: left; width: 200px; height: 200px; padding-left: 15px;}
+
+.photo-form-empty-block {
+	width: 150px;
+}
+
+
+
 /*list-location.html*/
-#location{float: left;}
+#location{float: left; }
 #location-details{ color: #999999; padding-left: 30px; }
 #meet-up-instruction{float: right; color: #999999; padding-right: 40px; padding-top: 30px;}
 #meet-up-instruction textarea{width: 350px; height: 80px; border-radius: 3px; border: 1px solid #999999;}
@@ -802,16 +870,30 @@ body {
 #location-city select{
 	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; width: 110px; background-position: 85px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px;}
 /*list-pricing.html*/
+#currency-section{float: right; width: 450px;}
+#currency-section p{float: left; color: #999999; }
+#currency-section select{
+	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; background-position: 75px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px; color: #999;}
+#group-size-heading{margin-bottom: 0px;}
+#group-size-min{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
+#group-size-max{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
+#price-section-header{height:50px;}
+#price-section-header p{position: relative;  top: 15px;  font-size: 16px;  color: #999999;  bottom: 10px;  padding-left: 30px;}
+#price-section-header a{cursor: pointer}
+
 #section-add-price {height:350px;}
-#group-size-section{float: right;width: 450px; padding-top: 30px;}
+#group-size-section{float: right;width: 450px; padding-top: 30px; }
 #group-size-section p{float: left; color: #999999; }
 #group-size-section select{
-	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; background-position: 75px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px; margin-top:5px;}
+	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; background-position: 75px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px; margin-top:5px; color: #999;}
 #group-size-heading{margin-bottom: 0px;}
 #group-size-min{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
 #group-size-max{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
 #price-section{float: right; width: 450px; padding-top: 20px;}
 #price-section input[type=number]{float: left; width: 100px; height:35px; border: 1px solid #AAAAAA; border-radius: 3px; background-color: #FFF; margin-top: 10px; padding-left: 25px; color: #999999; position: relative; top: -17px; z-index: 0;}
+
+#operation-hour-section {height:150px;}
+
 #customers-pay{color: #999999;}
 #commission{color: #999999;}
 .commission-price,.commission-price-2{color: #999999; padding-top: 3px; padding-left: 15px; position: relative; top: -18px; z-index: 0;}
@@ -822,10 +904,28 @@ body {
 .math-symbol, .math-symbol-2, .math-symbol-3{color: #999999; padding-top: 30px; padding-left: 20px; padding-right: 20px;}
 .math-symbol-2{padding-left: 15px; padding-right: 15px; padding-top: 6px;}
 .math-symbol-3{padding-top: 5px;}
-#duration-section{float: right; color: #999999; padding-right: 280px; padding-top: 30px; clear: both; width: 450px;}
+#duration-section{float: right; color: #999999; padding-right: 280px; padding-top: 30px; clear: both; width: 450px;position: relative;  top: -133px;}
 #duration-section select{
 	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 110px; background-position: 85px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px;}
 #duration-hours{padding-left: 20px; padding-top: 8px;}
+#section-selection-menu{height: 800px;}
+#menu-title{width: auto;  position: relative;  top: 50px;  height: 100px;  margin-bottom: 30px; text-align: center;}
+#menu-title-description{display: inline-block;  max-width: 320px; color: #aaaaaa;}
+#menu-title-title{}
+
+#menu-selection-left{ background: red none repeat scroll 0 0;  display: inline-block;  height: 245px;  left: 40px;  margin: 10px 35px;  position: relative;  width: 225px; cursor: pointer;}
+#memu-selection-right{    background: red none repeat scroll 0 0;  display: inline-block;  height: 245px;  margin: 10px 34px;  position: relative;  width: 225px; cursor: pointer;}
+#menu-operation-bar {  margin-top: 30px; text-align: center; }
+
+
+
+
+
+
+
+
+
+
 /*list-experience.html*/
 .jumbotron-list-experience {background: url(/images/searchbar.jpg) no-repeat;background-size: cover; height: 320px; border-top: 1px solid #CCCCCC; border-bottom: 1px solid #CCCCCC;}
 .list-experience-header{height: 100%; text-align: center; vertical-align: middle;}
@@ -893,10 +993,13 @@ body {
 .footer{clear: both;}
 #background-white{background-color: #FFF;}
 /*Last step, Next step, Save and Exit button*/
-#last-step{margin: 10px; float:left; background-color: #FFF; border-radius: 3px; border: 1px solid #666666; padding:5px 10px 5px 10px; color: #999999; text-align: center;}
-#next-step{margin: 10px; float:right; background-color: #FFF; border-radius: 3px; border: 1px solid #666666; padding:5px 10px 5px 10px; color: #999999; text-align: center;}
+#last-step{margin: 10px; float: left; background-color: #FFF; border-radius: 3px; border: 0px solid #666; padding: 8px 24px; color: #6BD6DE; text-align: center;}
+#next-step{margin: 10px; float:right; background-color: #3CC; border-radius: 3px; border: 0px solid #666666; padding:8px 24px 8px 24px; color: white; text-align: center;}
+#price-last-step{margin: 10px; float:left; background-color: #FFF; border-radius: 3px; border: 1px solid #666666; padding:5px 10px 5px 10px; color: #999999; text-align: center;}
 #save-and-exit{margin-right: 170px; margin-top:8px; margin-bottom:8px; background-color: #3ECBCB; color: #FFF; border-radius: 3px; border:1px solid #3ECBCB; text-align: center;height:35px;}
 .back-button button{margin-right: 100px; background-color: #3ECBCB; color: #FFF; border-radius: 3px; border:1px solid #3ECBCB; text-align: center;}
+a#nav-left{position: absolute;  left: 5%;  display: inline-block;}
+a#nav-right {position: absolute;  right: 5%;  display: inline-block;}
 /*dollar sign fix (textbox)*/
 #dollar-sign{position: relative; left: -90px; z-index: 1; color: #999999; top: 1px;}
 /*dynamic pricing*/
@@ -910,7 +1013,7 @@ body {
 #dollar-sign-4{left: 0px; top: 5px;}
 #dynamic_price_heading_2{padding-top: 30px;}
 #dynamic_price_heading{padding-top: 90px;}
-#dynamic_price_div_1, #dynamic_price_div_2,#dynamic_price_div_3,#dynamic_price_div_4,#dynamic_price_div_5,#dynamic_price_div_6,#dynamic_price_div_7,#dynamic_price_div_8{padding-left: 163px;}
+#dynamic_price_div_0, #dynamic_price_div_1, #dynamic_price_div_2,#dynamic_price_div_3,#dynamic_price_div_4,#dynamic_price_div_5,#dynamic_price_div_6,#dynamic_price_div_7,#dynamic_price_div_8{padding-left: 163px;}
 #dynamic_price_div_9{padding-left:155px; }
 
 #your-reservation{padding-left: 6px; padding-right: 6px;}
@@ -1337,4 +1440,11 @@ body {
 .experience-detail-table-td {
     padding-top:20px;
     padding-bottom:20px;
+}
+
+#ajax-update-signal {
+	color: darkgrey;
+	display: inline-block;
+	position: absolute;
+    left: 25%;
 }

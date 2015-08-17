@@ -183,7 +183,7 @@ INSTALLED_APPS = (
     'post_office',
     'rest_framework',
     'rest_framework.authtoken',
-    'storages',
+    #'storages',
 )
 
 # A sample logging configuration. The only tangible logging

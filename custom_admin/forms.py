@@ -1,7 +1,6 @@
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 
-
 class ChangeTimeForm(forms.Form):
     new_date = forms.DateTimeField(widget = SelectDateWidget())
     new_time = forms.CharField(max_length = 5)
@@ -20,6 +19,18 @@ class ChangeTimeForm(forms.Form):
             msg = "Must put 'help' in subject when cc'ing yourself."
             self.add_error('new_time', msg)
 RATE_CHOICES = [('1','1'), ('2','2'), ('3','3'), ('4','4'), ('5','5')]
+STATUS_CHOICES = {'Listed':True, 'Unlisted':True, 'Submitted':True, 'Draft': True }
+
 class UploadReviewForm(forms.Form):
     review = forms.CharField(widget=forms.Textarea)  
-    rate = forms.ChoiceField(choices=RATE_CHOICES) 
+    rate = forms.ChoiceField(choices=RATE_CHOICES)
+
+class ExperienceUploadForm(forms.Form):
+    status = forms.CharField(max_length=10, required=False)
+    commission = forms.FloatField(required=False)
+
+    def clean_status(self):
+        data = self.cleaned_data['status']
+        if data not in STATUS_CHOICES:
+            raise forms.ValidationError("You have wrong choice!")
+        return data
