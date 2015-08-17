@@ -185,7 +185,8 @@ def termsofservice(request):
         request,
         'app/termsofservice.html',
         context_instance = RequestContext(request,{'GEO_POSTFIX':settings.GEO_POSTFIX,
-                                                   'LANGUAGE':settings.LANGUAGE_CODE})
+                                                   'LANGUAGE':settings.LANGUAGE_CODE,
+                                                   'refundpolicy_url':'http://'+settings.ALLOWED_HOSTS[0]+settings.GEO_POSTFIX+'refundpolicy'})
     )
 
 def privacypolicy(request):

@@ -89,15 +89,15 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-xs-6" style="float:left;">
-                                    <button class="btn btn-primary" id="help-yes">YES</button>
+                                    <button class="btn btn-primary" id="help-yes">{% trans "YES" %}</button>
                                 </div>
                                 <div class="col-xs-6" style="float:left;">
-                                    <button class="btn btn-primary" id="help-no">NO</button>
+                                    <button class="btn btn-primary" id="help-no">{% trans "NO" %}</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <a class="close-popup">close</a>
+                    <a class="close-popup">{% trans "Close" %}</a>
                 </div>
                 <div id="popup-page-2" hidden="true">
                     <h1>{% trans "Tell us about your trip" %}</h1>
@@ -262,6 +262,11 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
         {
             $('#id_language_select').val('cn');
             $('#id_language_top').attr("href","https://www.tripalocal.com" + des_url.substring(3));
+        }
+        else if(des_url.indexOf(".cn") > -1)
+        {
+            $('#id_language_select').val('cn');
+            $('#id_language_top').attr("href","https://www.tripalocal.com" + des_url);
         }
         else
         {

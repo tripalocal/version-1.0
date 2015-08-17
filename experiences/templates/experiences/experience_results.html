@@ -7,17 +7,17 @@
     <div id="experience-results">
         {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
         <div class="expList">
-            <a href="/experience/{{ experience.id }}">
+            <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
                 <div class="listingImg" style="background-image:url({{ MEDIA_URL }}{{ BGImageURL }});">
                     <div class="priceBox">
                         {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
                     </div>
                 </div>
             </a>
-            <a href="/experience/{{ experience.id }}"><h3>{{ formattedTitle }}</h3></a>
+            <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ formattedTitle }}</h3></a>
 
             <div class="profile-sm"
-                    style="background:url({{ MEDIA_URL }}{{ profileImageURL }}) no-repeat; background-size:cover; background-position:center;"></div>
+                style="background:url({{ MEDIA_URL }}{{ profileImageURL }}) no-repeat; background-size:cover; background-position:center;"></div>
 
             <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
 

@@ -1908,12 +1908,13 @@ def review_experience (request, id=None):
                     review.datetime = datetime.utcnow().replace(tzinfo=pytz.UTC)
                     review.save()
 
-                    return render_to_response('experiences/review_experience_success.html', {}, context)
+                    return render_to_response('experiences/review_experience_success.html', {'home_url':'http://'+settings.ALLOWED_HOSTS[0]+settings.GEO_POSTFIX}, context)
             else:
                 form = ReviewForm()
         else:
             form = ReviewForm()
 
+        context['LANGUAGE'] = settings.LANGUAGE_CODE
         return render_to_response('experiences/review_experience.html', {'form': form}, context)
     else:
         return HttpResponseRedirect(GEO_POSTFIX)

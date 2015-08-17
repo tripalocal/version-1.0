@@ -15,7 +15,7 @@
         <div class="row">
             <div class="fixCenter">
                 <div class="checkoutBox">
-                    You did not book this experience.
+                    {% trans "You did not book this experience."%}
                 </div>
         	</div>
         </div>
@@ -25,19 +25,13 @@
         <div class="row">
             <div class="fixCenter">
                 <div class="checkoutBox">
-		            You left a review for this experience already.
+		            {% trans "You left a review for this experience already." %}
                 </div>
         	</div>
         </div>
     </div>
 	{% else %}
-    <!--
-    <ul>
-		{% for error in form.errors %}
-		<li>{{ error }}</li>
-		{% endfor %}
-	</ul>
-    -->
+
     <div class="container-fluid experience">
         <div class="row">
             <div class="fixCenter">
@@ -45,10 +39,10 @@
                     <form action="" method="post">
                     {% csrf_token %}
                         <div class="reviewHeaderPosition">
-                            <h2>How did you go with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}?</h2>
+                            <h2>{% trans "How did you go with "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}.{% endif %} {% endfor %}{% trans "'s experience?"%}</h2>
                         </div>
                         <div class="row">
-				            <div><p>How did you feel about the overall experience?</p>
+				            <div><p>{% trans "How did you feel about the overall experience?" %}</p>
                             </div>
                             <!-- Star Rating Start-->
                             <div class="rating_review" align="left">
@@ -67,27 +61,27 @@
                         </div>
 
                         <div class="row ">
-                            <p>Please leave a review for this experience for the host's public profile</p>
+                            <p>{% trans "Please leave a review for this experience for the host's public profile" %}</p>
                             <div class="input-group">  
                                 {{form.comment}}
                             </div>
                         </div>
 
                         <div class="row ">
-                            <p>Is there anything you'd like to tell {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %} personally?</p>
+                            <p>{% trans "Is there anything you'd like to tell " %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}.{% endif %} {% endfor %}{%trans " personally?" %}</p>
                             <div class="input-group">
                                 {{form.personal_comment}}
                             </div>
                         </div>
 
                         <div class="row ">
-                            <p>Anything we should know about? (Only Tripalocal team will see this section)
+                            <p>{% trans "Anything we should know about? (Only Tripalocal team will see this section)" %}
                                 <img src="/images/lock.jpg">
                             </p>
                             <div class="input-group">
                                 {{form.operator_comment}}
                             </div>
-                            <input type="submit" class="btn btn-primary btn-sm submitButton" style="color:#FFFFFF;" value="Submit"/>
+                            <input type="submit" class="btn btn-primary btn-sm submitButton" style="color:#FFFFFF;" value="{% trans "Submit" %}"/>
                         </div>
                     </form>
                 </div>
@@ -105,8 +99,14 @@
                     </div>
 
                     <div class="checkoutBox">
-                        <p>On <strong>{{booking.datetime|date:'d M Y'}}</strong> at <strong>{{booking.datetime|date:'H:i'}}</strong><br>You have experienced </p>
-                        <h3>{{ experience.title }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</h3>
+                        <p>{% trans "On " %}<strong>{% if LANGUAGE != "zh-CN" %}{{booking.datetime|date:'d M Y'}}{% else %}{{booking.datetime|date:'Y/m/d'}}{% endif %}</strong>{% trans " at " %}<strong>{{booking.datetime|date:'H:i'}}</strong>,
+                        {% if LANGUAGE != "zh-CN" %}
+                        <br>{% trans "You have experienced" %}</p>
+                        <h3>{{ experience.title }}{% trans " with " %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</h3>
+                        {% else %}
+                        {% trans " with " %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "You have experienced" %}</p>
+                        <h3>{{ experience.title }}</h3>
+                        {% endif %}
                         <p>{{ experience.city }}</p>
                     </div>
                 </div>
@@ -140,7 +140,7 @@
         $("#rate_star_5").html("&#9734;");
 
         $("#rate_result").attr("style","display:inline-block;");
-        $("#rate_result").html("1 - Not satisfied");
+        $("#rate_result").html("1 - {% trans "Not satisfied" %}");
         $("#rate_result_div").attr("style","display:inline-block;");
     })
 
@@ -154,7 +154,7 @@
         $("#rate_star_5").html("&#9734;");
 
         $("#rate_result").attr("style","display:inline-block;");
-        $("#rate_result").html("2 - A little disappointed");
+        $("#rate_result").html("2 - {% trans "A little disappointed" %}");
         $("#rate_result_div").attr("style","display:inline-block;");
     })
 
@@ -168,7 +168,7 @@
         $("#rate_star_5").html("&#9734;");
 
         $("#rate_result").attr("style","display:inline-block;");
-        $("#rate_result").html("3 - It was ok");
+        $("#rate_result").html("3 - {% trans "It was ok" %}");
         $("#rate_result_div").attr("style","display:inline-block;");
     })
 
@@ -182,7 +182,7 @@
         $("#rate_star_5").html("&#9734;");
 
         $("#rate_result").attr("style","display:inline-block;");
-        $("#rate_result").html("4 - It was pleasant");
+        $("#rate_result").html("4 - {% trans "It was pleasant" %}");
         $("#rate_result_div").attr("style","display:inline-block;");
     })
     $("#rate_star_5").click(function(){
@@ -195,7 +195,7 @@
         $("#rate_star_5").html("&#9733;");
 
         $("#rate_result").attr("style","display:inline-block;");
-        $("#rate_result").html("5 - It couldn't be better");
+        $("#rate_result").html("5 - {% trans "It couldn't be better" %}");
         $("#rate_result_div").attr("style","display:inline-block;");
     })
 
