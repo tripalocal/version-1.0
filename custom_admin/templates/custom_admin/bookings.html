@@ -8,11 +8,12 @@
 <link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet" type="text/css" />
 <link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet" type="text/css" />
 <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/custom_admin.js' %}"></script>
+<script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/admin_booking.js' %}"></script>
 
 </head>
 
 <body>
+<form action="" method="post">{% csrf_token %}
 {{time_changed_status}}
 <div class="container">
   <div class="header">
@@ -36,8 +37,6 @@
    
     </ul>
     <div class="clear"></div>
-
-<form id = "custom_admin_panel_table_form" action="/custom_admin/send_confirmation_email/" method="post"> 
   {% csrf_token %}
 <table border="0" cellspacing="0" cellpadding="0">
     <tr>
@@ -80,29 +79,29 @@
           <p>{{ booking.user.registereduser.phone_number }}</p>
         </td>
         <td>{{ booking.guest_number }}</td>
-        <td style="color:{{booking.color}};">{{ booking.status_description }}</td>
-        <td>
+        <td id="td-status-description-{{booking.id}}" style="color:{{booking.color}};">{{ booking.status_description }}</td>
+        <td id="td-action-{{booking.id}}">
           {% for action in booking.actions %}
             {% ifequal action 'Change time'%}
-              <p><a href="#" onclick="changeTime({{booking.id}})">{{action}}</a></p>
+              <a href="#" id="booking-change-time-link-{{booking.id}}">{{action}}</a>
             {% endifequal %}
 
             {% ifequal action 'Mark as no show' %}
-              <p><a href="#" onclick="markAsNoShow({{booking.id}})">{{action}}</a></p>
+              <a href="#" onclick="markAsNoShow({{booking.id}})">{{action}}</a>
             {% endifequal %}
 
             {% ifequal action 'Reopen booking' %}
-              <p><a href="#" onclick = "reopenBooking({{ booking.id }})">{{action}}</a></p>
+              <a href="#" onclick = "reopenBooking({{ booking.id }})">{{action}}</a>
             {% endifequal %}
             
             {% ifequal action 'Cancel booking' %}
-              <p><a href="#" onclick = "cancelBooking({{ booking.id }})">{{action}}</a></p>
+               <a href="#" onclick = "cancelBooking({{ booking.id }})">{{action}}</a>
             {% endifequal %}
 
             {% ifequal action 'Upload review' %}
-              <p><a href="#" onclick = "uploadReview({{ booking.id }})">{{action}}</a></p>
+               <a href="#" id="booking-upload-review-link-{{booking.id}}">{{action}}</a>
             {% endifequal %}
-
+            <br/><br/>
           {% endfor %}
         </td>
     </tr>
@@ -110,7 +109,6 @@
     {% endfor %}
   
   </table>
-</form>
   </div>
 
 
@@ -119,11 +117,9 @@
 <div class="footer">© TRIPALOCAL Pty Ltd. All Rights Reserved, 2014</div>
 
 
-<div id="change_time_popup"style="display:none">
-<form id = "change_time_form" action="/your-name/" method="post">
-    {% csrf_token %}
+<div id="change-time-popup"style="display:none">
 <div id="light" class="white_content">
-<div class="operation"><a href="#" onclick="closeChangeTimePopup()">Close</a></div>
+<div class="operation"><a href="#" id="close-change-time-button">Close</a></div>
 <h1>Change time and date</h1>
 <table border="0" cellspacing="0" cellpadding="0">
   <tr>
@@ -143,19 +139,17 @@
 </table>
 
   <div class="tableButton">
-    <input type="submit" name="button" id="big_button" value="Update" />
+    <input type="submit" name="button" class="big_button" value="Update" />
   </div>
 </div>
 <div id="fade" class="black_overlay"></div>
-</form>
 </div>
 
 
-<div id="upload_review_popup"style="display:none">
-<form id = "upload_review_form" action="/your-name/" method="post">
+<div id="upload-review-popup"style="display:none">
     {% csrf_token %}
-<div id="light" class="white_content">
-<div class="operation"><a href="#" onclick="closeUploadReviewPopup()">Close</a></div>
+<div class="white_content">
+<div class="operation"><a href="#" id="close-upload-review-button">Close</a></div>
 <h1>Upload review</h1>
 <div class="scroll"><table border="0" cellspacing="0" cellpadding="0">
         <tr>
@@ -166,9 +160,9 @@
         <tr>
           <td class="coRight"></td>
       <td>
-        {{ form2.review }}
+        {{ form.review }}
         <br />
-        {{ form2.rate }}
+        {{ form.rate }}
         <br />
       </td>
       </tr>
@@ -176,13 +170,12 @@
 </div>
 
   <div class="tableButton">
-    <input type="submit" name="button" id="big_button" value="Submit Review" />
+    <input type="button" id="upload-review-button" name="button" class="big_button" value="Submit Review" />
   </div>
 </div>
 <div id="fade" class="black_overlay"></div>
-</form>
 </div>
-
+</form>
 
 
 </body>

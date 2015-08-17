@@ -68,7 +68,7 @@
                     </span>
                 </td>
                 <td>{{experience.id}}</td>
-                <td><a href="#">{{experience.title}}</a></td>
+                <td><a href="{% url 'experiencedetail' pk=experience.id %}">{{experience.title}}</a></td>
                 <td id="td-commission-{{experience.id}}">
                     <p>30%</p>
                     <input id="input-commission-{{experience.id}}"/>

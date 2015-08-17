@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
-import datetime
+from datetime import datetime
 from allauth.socialaccount.models import SocialAccount
 import hashlib
 from Tripalocal_V1 import settings
@@ -209,6 +209,12 @@ class Booking(models.Model):
     
     def __str__(self):
         return self.user.email + "--" + get_experience_title(self.experience,settings.LANGUAGES[0][0])
+
+    def upload_review(self, booking_id, rate=None, review=None):
+        booking = get_object_or_404(Booking, id = booking_id)
+        experience_id = booking.experience_id
+        user_id = booking.user_id
+        Review.objects.update_or_create(experience_id = int(experience_id), user_id = int(user_id), defaults = {'comment': review, 'rate': int(rate), 'datetime': datetime.now()})
 
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):

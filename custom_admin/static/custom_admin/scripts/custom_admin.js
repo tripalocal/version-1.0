@@ -21,9 +21,6 @@ function changeTime(bookingId) {
     // Show the popup.
     changeTimePopup.style.display = "block";
 
-
-
-
     // Change the form action.
     form.action = "/custom_admin/change_time/" + bookingId;
 }
