@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 import datetime
 from allauth.socialaccount.models import SocialAccount
@@ -54,37 +53,8 @@ class Experience(models.Model):
         c = self.city if self.city != None else ''
         return str(self.id) + '--' + t + '--' + s + '--' + c
 
-    def get_experience_i18n_info(self, **kwargs):
-        # The default language is english.
-        language = 'en'
-        if 'language' in kwargs:
-            language = kwargs['language']
-        exp = ExperienceI18n.objects.filter(experience_id=self.id, language=language)
-        if exp.__len__() == 1:
-            exp_i18n = exp[0]
-            self.title = exp_i18n.title
-            self.description = exp_i18n.description
-            self.activity = exp_i18n.activity
-            self.dress = exp_i18n.activity
-            self.interaction = exp_i18n.interaction
-            self.meetup_spot = exp_i18n.meetup_spot
-            self.dropoff_spot = exp_i18n.dropoff_spot
-
-
-
     class Meta:
         ordering = ['id']
-
-class ExperienceI18n(models.Model):
-    title = models.CharField(max_length=100, null=True)
-    description = models.TextField(null=True)
-    language = models.CharField(max_length=2, null=True)
-    activity = models.TextField(null=True)
-    interaction = models.TextField(null=True)
-    dress = models.TextField(null=True)
-    meetup_spot = models.TextField(null=True)
-    dropoff_spot = models.TextField(null=True)
-    experience = models.ForeignKey(Experience)
 
 class ExperienceTitle(models.Model):
     title = models.CharField(max_length=100)
@@ -141,20 +111,6 @@ class BlockOutTimePeriod(models.Model):
     repeat_extra_information = models.CharField(max_length=50)
     experience = models.ForeignKey(Experience)
 
-class ExperiencePeriod(models.Model):
-    start_datetime = models.DateTimeField()
-    end_datetime = models.DateTimeField()
-    type = models.CharField(max_length=15)
-    experience = models.ForeignKey(Experience)
-
-
-class ExperienceTime(models.Model):
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-    week_day = models.CharField(max_length=15)
-    experience = models.ForeignKey(Experience)
-
-
 class WhatsIncluded(models.Model):
     item = models.CharField(max_length=50)
     included = models.BooleanField(default=False)
@@ -168,7 +124,7 @@ class Photo(models.Model):
 
     name = models.CharField(max_length=50)
     directory = models.CharField(max_length=50)
-    image = models.ImageField()
+    image = models.ImageField(upload_to=upload_path)
     experience = models.ForeignKey(Experience)
 
 class Review(models.Model):
@@ -361,18 +317,9 @@ def get_experience_meetup_spot(experience, language):
     else:
         return None
 
-def get_experience_dropoff_spot(experience, language):
-    if experience.experiencedropoffspot_set is not None and len(experience.experiencedropoffspot_set.all()) > 0:
-        t = experience.experiencedropoffspot_set.filter(language=language)
-        if len(t)>0:
-            return t[0].dropoff_spot
-        else:
-            return experience.experiencedropoffspot_set.all()[0].dropoff_spot
-    else:
-        return None
-
 def get_experience_tags(experience, language):
     tags = []
+
     if experience.tags is not None and len(experience.tags.all()) > 0:
         t = experience.tags.filter(language=language)
         for i in range(len(t)):
@@ -381,237 +328,11 @@ def get_experience_tags(experience, language):
     return tags
 
 def get_experience_whatsincluded(experience, language):
-    return WhatsIncluded.objects.filter(experience = experience, language = language)
-
-
-# add new or update experience title
-def set_exp_title_all_langs(exp, title, lang, other_lang):
-    set_exp_title(exp, title, lang)
-    if not has_title_in_other_lang(exp, title, other_lang):
-        set_exp_title(exp, title, other_lang)
-
-
-def has_title_in_other_lang(exp, title, lang):
-    title_set = exp.experiencetitle_set.filter(language=lang)
-    if len(title_set) > 0:
-        title = title_set[0]
-        if title.title == '':
-            return False
-        return True
-    else:
-        return False
-
-
-def set_exp_title(exp, title, lang):
-    title_set = exp.experiencetitle_set.filter(language=lang)
-    if len(title_set) > 0:
-        title_set[0].title = title
-        title_set[0].save()
-    else:
-        exp_title = ExperienceTitle(experience=exp, title=title, language=lang)
-        exp_title.save()
-
-
-def set_exp_desc_all_langs(exp, desc, lang, other_lang):
-    set_exp_description(exp, desc, lang)
-    if not has_desc_in_other_lang(exp, desc, other_lang):
-        set_exp_description(exp, desc, other_lang)
-
-
-def has_desc_in_other_lang(exp, activity, lang):
-    desc_set = exp.experiencedescription_set.filter(language=lang)
-    if len(desc_set) > 0:
-        desc = desc_set[0]
-        if desc.description == '':
-            return False
-        return True
-    else:
-        return False
-
-
-def set_exp_description(exp, desc, lang):
-    description_set = exp.experiencedescription_set.filter(language=lang)
-    if len(description_set) > 0:
-        description_set[0].description = desc
-        description_set[0].save()
-    else:
-        exp_desc = ExperienceDescription(experience=exp, description=desc, language=lang)
-        exp_desc.save()
-
-
-def set_exp_activity_all_langs(exp, activity, lang, other_lang):
-    set_exp_activity(exp, activity, lang)
-    if not has_activity_in_other_lang(exp, activity, other_lang):
-        set_exp_activity(exp, activity, other_lang)
-
-
-def has_activity_in_other_lang(exp, activity, lang):
-    activity_set = exp.experienceactivity_set.filter(language=lang)
-    if len(activity_set) > 0:
-        activity = activity_set[0]
-        if activity.activity == '':
-            return False
-        return True
-    else:
-        return False
-
-
-def set_exp_activity(exp, activity, lang):
-    activity_set = exp.experienceactivity_set.filter(language=lang)
-    if len(activity_set) > 0:
-        activity_set[0].activity = activity
-        activity_set[0].save()
-    else:
-        exp_activity = ExperienceActivity(experience=exp, activity=activity, language=lang)
-        exp_activity.save()
-
-
-def set_exp_interaction_all_langs(exp, activity, lang, other_lang):
-    set_exp_interaction(exp, activity, lang)
-    if not has_interaction_in_other_lang(exp, activity, other_lang):
-        set_exp_interaction(exp, activity, other_lang)
-
-
-def has_interaction_in_other_lang(exp, activity, lang):
-    interaction_set = exp.experienceinteraction_set.filter(language=lang)
-    if len(interaction_set) > 0:
-        interaction = interaction_set[0]
-        if interaction.interaction == '':
-            return False
-        return True
-    else:
-        return False
-
-
-def set_exp_interaction(exp, interaction, lang):
-    interaction_set = exp.experienceinteraction_set.filter(language=lang)
-    if len(interaction_set) > 0:
-        interaction_set[0].interaction = interaction
-        interaction_set[0].save()
-    else:
-        exp_interaction = ExperienceInteraction(experience=exp, interaction=interaction, language=lang)
-        exp_interaction.save()
-
-
-def set_exp_dress_all_langs(exp, activity, lang, other_lang):
-    set_exp_dress(exp, activity, lang)
-    if not has_dress_in_other_lang(exp, activity, other_lang):
-        set_exp_dress(exp, activity, other_lang)
-
-
-def has_dress_in_other_lang(exp, activity, lang):
-    dress_set = exp.experiencedress_set.filter(language=lang)
-    if len(dress_set) > 0:
-        dress = dress_set[0]
-        if dress.dress == '':
-            return False
-        return True
-    else:
-        return False
-
-
-def set_exp_dress(exp, dress, lang):
-    dress_set = exp.experiencedress_set.filter(language=lang)
-    if len(dress_set) > 0:
-        dress_set[0].dress = dress
-        dress_set[0].save()
-    else:
-        exp_dress = ExperienceDress(experience=exp, dress=dress, language=lang)
-        exp_dress.save()
-
-
-def set_experience_includes(experience, item, is_include, lang):
-    include_set = experience.whatsincluded_set.filter(item=item, language=lang)
-    if len(include_set) > 0:
-        exp_include = include_set[0]
-        exp_include.included = is_include
-        exp_include.save()
-    else:
-        exp_include = WhatsIncluded(item=item, included=is_include, language=lang, experience=experience)
-        exp_include.save()
-
-def set_exp_includes_detail_all_langs(exp, item, detail, lang, other_lang):
-    set_exp_includes_detail(exp, item, detail, lang)
-    if not has_includes_detail_in_other_lang(exp, item, detail, other_lang):
-        set_exp_includes_detail(exp, item, detail, other_lang)
-
-
-def has_includes_detail_in_other_lang(exp, item, detail, lang):
-    include_set = exp.whatsincluded_set.filter(item=item, language=lang)
-    if len(include_set) > 0:
-        exp_include = include_set[0]
-        if exp_include.details == '':
-            return False
-        return True
-    else:
-        return False
-
-
-def set_exp_includes_detail(exp, item, detail, lang):
-    include_set = exp.whatsincluded_set.filter(item=item, language=lang)
-    if len(include_set) > 0:
-        exp_include = include_set[0]
-        exp_include.details = detail
-        exp_include.save()
-    else:
-        exp_include = WhatsIncluded(item=item, details=detail, language=lang, experience=exp)
-        exp_include.save()
-
-
-def set_exp_meetup_spot(exp, meetup_spot, lang):
-    meetup_spot_set = exp.experiencemeetupspot_set.filter(language=lang)
-    if len(meetup_spot_set) > 0:
-        exp_meetup_spot = meetup_spot_set[0]
-        exp_meetup_spot.meetup_spot = meetup_spot
-        exp_meetup_spot.save()
-    else:
-        exp_meetup_spot = ExperienceMeetupSpot(meetup_spot=meetup_spot, language=lang, experience=exp)
-        exp_meetup_spot.save()
-
-
-def set_exp_dropoff_spot(exp, dropoff_spot, lang):
-    dropoff_spot_set = exp.experiencedropoffspot_set.filter(language=lang)
-    if len(dropoff_spot_set) > 0:
-        exp_dropoff_spot = dropoff_spot_set[0]
-        exp_dropoff_spot.dropoff_spot = dropoff_spot
-        exp_dropoff_spot.save()
-    else:
-        exp_dropoff_spot = ExperienceDropoffSpot(dropoff_spot=dropoff_spot, language=lang, experience=exp)
-        exp_dropoff_spot.save()
-
-
-def has_meetup_spot_in_other_lang(exp, lang):
-    meetup_spot_set = exp.experiencemeetupspot_set.filter(language=lang)
-    if len(meetup_spot_set) > 0:
-        exp_meetup_spot = meetup_spot_set[0]
-        if exp_meetup_spot.meetup_spot == '':
-            return False
-        return True
-    else:
-        return False
-
-def has_dropoff_spot_in_other_lang(exp, lang):
-    dropoff_spot_set = exp.experiencedropoffspot_set.filter(language=lang)
-    if len(dropoff_spot_set) > 0:
-        exp_dropoff_spot = dropoff_spot_set[0]
-        if exp_dropoff_spot.dropoff_spot == '':
-            return False
-        return True
-    else:
-        return False
-
-
-def set_exp_meetup_spot_all_langs(exp, meetup_spot, lang, other_lang):
-    set_exp_meetup_spot(exp, meetup_spot, lang)
-    if not has_meetup_spot_in_other_lang(exp, other_lang):
-        set_exp_meetup_spot(exp, meetup_spot, other_lang)
-
-
-def set_exp_dropoff_spot_all_langs(exp, meetup_spot, lang, other_lang):
-    set_exp_dropoff_spot(exp, meetup_spot, lang)
-    if not has_dropoff_spot_in_other_lang(exp, other_lang):
-        set_exp_dropoff_spot(exp, meetup_spot, other_lang)
-
+    w = WhatsIncluded.objects.filter(experience = experience, language = language)
+    for item in w:
+        if not item.included and (item.details is None or len(item.details))==0:
+            item.details = _('Not included')
+    return w
 
 #class Itinerary(models.Model):
 #    user = models.ForeignKey(User)

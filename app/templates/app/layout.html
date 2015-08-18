@@ -12,7 +12,6 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.cookie.js' %}"></script>
 
     <link rel="icon" href="{% static 'app/img/favicon.ico'%}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
@@ -23,14 +22,13 @@
     {%else%}
     <link href="{% static 'app/content/tripalocal_en.css' %}" rel="stylesheet">
     {%endif%}
-    <link href="{% static 'app/content/tripalocal_xs.css' %}" rel="stylesheet">
 
     {% if form %}
         {{ form.media }}
     {% endif %}
 
     {% block head %}
-    <title> {{ title }} </title>
+    <title> {{ title }} </title>   
     {% endblock %}
 
     <style>
@@ -41,7 +39,7 @@
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
             -webkit-appearance: none;
-            margin: 0;
+            margin: 0; 
         }
 
         select::-ms-expand {
@@ -186,8 +184,8 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
             <tbody>
                 <tr>
                     <td class="header">
-                        <img class="hamburger notOnDesktop" src="/images/menu.svg" width="15" />
-                        <a class="brand" href="https://www.tripalocal.com"><img src="{{ MEDIA_URL }}img/tripalocal_Logo.png" width="115" height="39"></a>
+                        <img class="hamburger notOnDesktop" src="{{ MEDIA_URL }}menu.svg" width="15" />
+                        <a class="brand" href="https://www.tripalocal.com{{GEO_POSTFIX}}"><img src="{{ MEDIA_URL }}img/tripalocal_Logo.png" width="115" height="39"></a>
                     </td>
                     <td class="navbar-collapse notOnMobile">
                         {% include 'app/loginpartial.html' %}
@@ -231,7 +229,7 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                             <li><a href="https://www.facebook.com/tripalocal">{% trans "Facebook" %}</a></li>
                             <li><a href="https://www.twitter.com/tripalocal">{% trans "Twitter" %}</a></li>
                             <!--<li><a href="https://www.twitter.com/tripalocal">{% trans "Instagram" %}</a></li>
-                            <li><a href="https://www.twitter.com/tripalocal">{% trans "Weibo" %}</a></li>
+                            <li><a href="https://www.twitter.com/tripalocal">{% trans "Weibo" %}</a></li> 
                             <li><a href="https://www.twitter.com/tripalocal">{% trans "Wechat" %}</a></li>-->
                         </ul>
                     </div>

@@ -37,8 +37,6 @@ urlpatterns = patterns('',
     url(r'^refundpolicy', 'app.views.refundpolicy'),
     url(r'^email_custom_trip', 'app.views.email_custom_trip'),
 
-    #url(r'^signup/$', 'app.views.signup', name='signup'),
-
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
@@ -56,15 +54,9 @@ urlpatterns = patterns('',
     #                                                                                                                                         'location':save_exit_location})), name='experience_add_step'),
     #url(r'^addexperience/$', login_required(ExperienceWizard.as_view(FORMS, url_name='experience_add_step')), name='experience_add'),
     #url(r'^editexperience/$', login_required(ExperienceWizard.as_view(FORMS, url_name='experience_edit_step')), name='experience_edit'),
-    # url(r'^editexperience/(?P<step>[-\w]+)/$', login_required(ExperienceWizard.as_view(FORMS, url_name='experience_edit_step', condition_dict={'experience':save_exit_experience, 'price': save_exit_price,'overview': save_exit_overview,
-    #                                                                                                                                          'detail': save_exit_detail,'photo':save_exit_photo,
-    #                                                                                                                                          'location':save_exit_location})), name='experience_edit_step'),
-    url(r'^experiences/new/$', login_required(new_experience)),
-    url(r'^manage-listing/(?P<exp_id>.*)/(?P<step>.*)/$', login_required(manage_listing), name='manage_listing'),
-    # Continue the first incomplete step.
-    url(r'^manage-listing-continue/(?P<exp_id>.*)/$', login_required(manage_listing_continue),
-           name='manage_listing_continue'),
-
+    #url(r'^editexperience/(?P<step>[-\w]+)/$', login_required(ExperienceWizard.as_view(FORMS, url_name='experience_edit_step', condition_dict={'experience':save_exit_experience, 'price': save_exit_price,'overview': save_exit_overview,
+    #                                                                                                                                         'detail': save_exit_detail,'photo':save_exit_photo,
+    #                                                                                                                                         'location':save_exit_location})), name='experience_edit_step'),
     url(r'^experience_booking_confirmation/$', experience_booking_confirmation, name='experience_booking_confirmation'),
     url(r'^experience_booking_successful/$', experience_booking_successful, name='experience_booking_successful'),
     #url(r'^createexperience/$', create_experience, name='create_experience'),
@@ -124,6 +116,4 @@ urlpatterns = patterns('',
     url(r'^custom_admin/unarchive_bookings/$', superuser_required(unarchive_bookings)),
     url(r'^custom_admin/archive/$', superuser_required(ArchiveView.as_view())),
     url(r'^custom_admin/payment/$', superuser_required(PaymentView.as_view())),
-    url(r'^custom_admin/experience/', superuser_required(ExperienceView.as_view())),
-
 )

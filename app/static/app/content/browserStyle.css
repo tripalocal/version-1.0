@@ -62,11 +62,6 @@ body a:hover{
 	margin-top: 50px;
 	float: left;
 }
-.fullColumn {
-	margin-top: 50px;
-	float: left;
-	width:inherit;
-}
 .operation {
 	float: right;
 }
@@ -261,9 +256,6 @@ table tr .rowspan {
 #Red   {
 	color: #C00;
 }
-#Grey   {
-	color: #CCC;
-}
 
 #big_button {
 	min-width:140px;
@@ -360,14 +352,6 @@ table tr .rowspan {
 	color: #669900;
 	font-size: 18px;
 	border: 1px solid #99CC00;
-}
-.notification_red {
-	margin-bottom: 20px;
-	padding: 15px;
-	background-color: #ffcccc;
-	color: #ff3333;
-	font-size: 18px;
-	border: 1px solid #ff3333;
 }
 .tableButton {
 	text-align: right;

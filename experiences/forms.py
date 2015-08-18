@@ -1,4 +1,4 @@
-from django import forms
+﻿from django import forms
 from bootstrap3_datetime.widgets import DateTimePicker
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
@@ -105,9 +105,18 @@ class HorizRadioRenderer(forms.RadioSelect.renderer):
             return mark_safe(u'\n'.join([u'%s\n' % w for w in self]))
 
 class ExperienceForm(forms.Form):
-    title = forms.CharField(max_length=100)
-    duration = forms.ChoiceField(choices=Duration)
-    location = forms.ChoiceField(choices=Suburbs)
+    id = forms.CharField(max_length=10, required=False)
+    title = forms.CharField(max_length=100, required=False)
+    duration = forms.ChoiceField(choices=Duration, required=False)
+    location = forms.ChoiceField(choices=Suburbs, required=False)
+    changed_steps = forms.CharField(max_length=100, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(ExperienceForm, self).__init__(*args, **kwargs)
+        self.fields['id'].widget.attrs['readonly'] = True
+        self.fields['id'].widget = forms.HiddenInput()
+        self.fields['changed_steps'].widget.attrs['readonly'] = True
+        self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperienceCalendarForm(forms.Form):
     id = forms.CharField(max_length=10, required=False)
@@ -203,23 +212,30 @@ class ExperienceCalendarForm(forms.Form):
         self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperiencePriceForm(forms.Form):
+    id = forms.CharField(max_length=10, required=False)
+    changed_steps = forms.CharField(max_length=100, required=False)
     duration = forms.ChoiceField(required=False, choices=Duration)
     min_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Min)
     max_guest_number = forms.ChoiceField(required=False, choices=Guest_Number_Max)
     type = forms.ChoiceField(choices=Type, required=False)
-    price = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=0)
+    price = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     price_with_booking_fee = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     dynamic_price = forms.CharField(max_length=100, required=False)
-    currency = forms.ChoiceField(choices=Currency, required=False)
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePriceForm, self).__init__(*args, **kwargs)
+        self.fields['id'].widget.attrs['readonly'] = True
+        self.fields['id'].widget = forms.HiddenInput()
         self.fields['type'].widget.attrs['readonly'] = True
         self.fields['type'].widget = forms.HiddenInput()
         self.fields['dynamic_price'].widget.attrs['readonly'] = True
         self.fields['dynamic_price'].widget = forms.HiddenInput()
+        self.fields['changed_steps'].widget.attrs['readonly'] = True
+        self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperienceOverviewForm(forms.Form):
+    id = forms.CharField(max_length=10, required=False)
+    changed_steps = forms.CharField(max_length=100, required=False)
     title = forms.CharField(required=False, max_length=100)
     title_other = forms.CharField(required = False, max_length=100)
     summary = forms.CharField(required=False, widget=forms.Textarea)
@@ -228,10 +244,16 @@ class ExperienceOverviewForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(ExperienceOverviewForm, self).__init__(*args, **kwargs)
+        self.fields['id'].widget.attrs['readonly'] = True
+        self.fields['id'].widget = forms.HiddenInput()
         self.fields['language'].widget.attrs['readonly'] = True
         self.fields['language'].widget = forms.HiddenInput()
+        self.fields['changed_steps'].widget.attrs['readonly'] = True
+        self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperienceDetailForm(forms.Form):
+    id = forms.CharField(max_length=10, required=False)
+    changed_steps = forms.CharField(max_length=100, required=False)
     activity = forms.CharField(required=False, widget=forms.Textarea)
     interaction = forms.CharField(required=False, widget=forms.Textarea)
     dress_code = forms.CharField(required=False, widget=forms.Textarea)
@@ -249,8 +271,16 @@ class ExperienceDetailForm(forms.Form):
     included_transport_detail_other = forms.CharField(required = False, widget=forms.Textarea)
     included_ticket_detail_other = forms.CharField(required = False, widget=forms.Textarea)
 
+    def __init__(self, *args, **kwargs):
+        super(ExperienceDetailForm, self).__init__(*args, **kwargs)
+        self.fields['id'].widget.attrs['readonly'] = True
+        self.fields['id'].widget = forms.HiddenInput()
+        self.fields['changed_steps'].widget.attrs['readonly'] = True
+        self.fields['changed_steps'].widget = forms.HiddenInput()
 
 class ExperiencePhotoForm(forms.Form):
+    id = forms.CharField(max_length=10, required=False)
+    changed_steps = forms.CharField(max_length=100, required=False)
     experience_photo_1 = forms.ImageField(required = False)
     experience_photo_2 = forms.ImageField(required = False)
     experience_photo_3 = forms.ImageField(required = False)
@@ -261,10 +291,14 @@ class ExperiencePhotoForm(forms.Form):
     experience_photo_8 = forms.ImageField(required = False)
     experience_photo_9 = forms.ImageField(required = False)
     experience_photo_10 = forms.ImageField(required = False)
-    delete_photo = forms.CharField(max_length=50, required=False, widget=forms.HiddenInput)
+    delete_photo = forms.CharField(max_length=50, required=False)
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePhotoForm, self).__init__(*args, **kwargs)
+        self.fields['id'].widget.attrs['readonly'] = True
+        self.fields['id'].widget = forms.HiddenInput()
+        self.fields['changed_steps'].widget.attrs['readonly'] = True
+        self.fields['changed_steps'].widget = forms.HiddenInput()
         self.fields['delete_photo'].widget.attrs['readonly'] = True
         self.fields['delete_photo'].widget = forms.HiddenInput()
 
@@ -274,8 +308,6 @@ class ExperienceLocationForm(forms.Form):
     suburb = forms.ChoiceField(required=False, choices=Suburbs)
     meetup_spot = forms.CharField(required=False, widget=forms.Textarea)
     meetup_spot_other = forms.CharField(required=False, widget=forms.Textarea)
-    dropoff_spot = forms.CharField(required=False, widget=forms.Textarea)
-    dropoff_spot_other = forms.CharField(required=False, widget=forms.Textarea)
 
     def __init__(self, *args, **kwargs):
         super(ExperienceLocationForm, self).__init__(*args, **kwargs)
@@ -944,7 +976,6 @@ class ItineraryBookingForm(forms.Form):
                         booking.coupon.end_datetime = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)
                         booking.coupon.save()
 
-
                     #send an email to the traveller
                     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
                                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
@@ -995,50 +1026,6 @@ class ItineraryBookingForm(forms.Form):
                                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                                 priority='now',  #fail_silently=False, 
                                 html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-            
-                    #schedule an email to the traveller one day before the experience
-                    mail.send(subject='[Tripalocal] Booking reminder', message='', 
-                                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
-                                priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
-                                html_message=loader.render_to_string('email_reminder_traveler.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user, #not host --> need "my" phone number
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-            
-                    #schedule an email to the host one day before the experience
-                    mail.send(subject='[Tripalocal] Booking reminder', message='', 
-                                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                                priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
-                                html_message=loader.render_to_string('email_reminder_host.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
-                        
-                    #schedule an email for reviewing the experience
-                    mail.send(subject='[Tripalocal] How was your experience?', message='', 
-                                sender='Tripalocal <enquiries@tripalocal.com>',
-                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
-                                priority='high',  scheduled_time = booking.datetime + timedelta(days=1, hours=experience.duration), 
-                                html_message=loader.render_to_string('email_review_traveler.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                    'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id)}))
-
-                    #send an email to the host
-                    mail.send(subject='[Tripalocal] Booking confirmed', message='', 
-                                sender='Tripalocal <' + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                                priority='now',  #fail_silently=False, 
-                                html_message=loader.render_to_string('email_booking_confirmed_host.html',
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':user,
