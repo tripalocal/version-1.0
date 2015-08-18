@@ -13,7 +13,7 @@
 </head>
 
 <body>
-<form action="" method="post">{% csrf_token %}
+<form id="booking-form" action="" method="post">{% csrf_token %}
 {{time_changed_status}}
 <div class="container">
   <div class="header">
@@ -66,7 +66,7 @@
     {% if booking.status == 'requested' or booking.status == 'accepted' or booking.status == 'rejected' or booking.status == 'no_show' or booking.status == 'paid' %}
       <tr>
         <td><input type="checkbox" name="admin_panel_booking_id_checkbox" value="{{booking.id}}"/></td>
-        <td id="booking_date_time_booking_id_{{ booking.id }}" >{{ booking.datetime }}</td>
+        <td id="td-booking-datetime-{{ booking.id }}" >{{ booking.datetime }}</td>
         <td><a href="/experience/{{booking.experience.id}}" target="_blank">{{ booking.experience.title }}</a></td>
         <td>
           {% for host in booking.experience.hosts.all %}
@@ -139,7 +139,7 @@
 </table>
 
   <div class="tableButton">
-    <input type="submit" name="button" class="big_button" value="Update" />
+    <input id="change-time-button" type="button" name="button" class="big_button" value="Update" />
   </div>
 </div>
 <div id="fade" class="black_overlay"></div>

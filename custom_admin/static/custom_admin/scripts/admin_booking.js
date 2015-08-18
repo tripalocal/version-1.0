@@ -31,7 +31,7 @@ var domPresentationEvents = {
 
     changeTimeEvent: function() {
         // Click the change time link, popup for changing time showed.
-        $("a[id^='booking-change-time-link-']").on("click",{"popupDivId": "change-time-popup"},domPresentationEventsProcessor.showPopup);
+        $("a[id^='booking-change-time-link-']").on("click",{"popupDivId": "change-time-popup"},domPresentationEventsProcessor.setPopupDateTime);
         // Close the change time popup.
         $("#close-change-time-button").on("click", {"popupDivId": "change-time-popup"}, domPresentationEventsProcessor.hidePopup);
     },
@@ -54,16 +54,32 @@ var domPresentationEventsProcessor = {
         var popupDivId = event.data.popupDivId;
         $("#" + popupDivId).hide();
         eventQueue.addEvent(event);
-    }
+    },
+    setPopupDateTime: function(event) {
+        domPresentationEventsProcessor.showPopup(event);
+        var triggerId = event.currentTarget.id;
+        var bookingId = helper.getLineIdByElementId(triggerId);
+        var datetime = helper.getDateTimeFromString($("#" + constant.TD_DATETIME_PREFIX + bookingId).text());
+        $("#id_new_date_year").val(datetime.year);
+        $("#id_new_date_month").val(datetime.month);
+        $("#id_new_date_day").val(datetime.day);
+        $("#id_new_time").val(datetime.time);
+        $("#booking_id_in_change_time_popup").text(bookingId);
+    },
 }
 
 var domCommEvents = {
     setListener: function() {
         this.uploadReviewEvent();
+        this.changeTimeEvent();
     },
 
     uploadReviewEvent: function() {
         $("#upload-review-button").on("click", {}, dommCommEventsProcessor.processUploadReviewEvent);
+    },
+
+    changeTimeEvent: function() {
+        $("#change-time-button").on("click", {}, dommCommEventsProcessor.processChangeTimeEvent);
     }
 
 }
@@ -86,6 +102,24 @@ var dommCommEventsProcessor = {
         $("#upload-review-popup").hide();
         eventQueue.addEvent(event);
     },
+
+    processChangeTimeEvent: function(event) {
+        var previousTriggerId = eventQueue.getPreviousEvent().currentTarget.id;
+        var objectId = helper.getLineIdByElementId(previousTriggerId);
+        var newDate = $("#id_new_date_year").val() + "-" + $("#id_new_date_month").val() + "-" + $("#id_new_date_day").val();
+        var newTime = $("#id_new_time").val();
+        var href = location.href;
+        var datum = {
+            "operation": "change_time",
+            "new_date": newDate,
+            "new_time": newTime,
+            "object_id": objectId,
+        };
+        console.log(datum);
+        commModule.postData(href, datum, helper.genaralSuccessNotification, helper.genaralFailNotification);
+        $("#upload-review-popup").hide();
+        eventQueue.addEvent(event);
+    }
 }
 
 var dommCommEventsCallBack = {
@@ -116,21 +150,60 @@ var commModule = {
 }
 
 var helper = {
-    getLineIdByElementId: function(name) {
+    getLineIdByElementId: function (name) {
         // Id is the part following the last '-' in a DOM name.
         return name.split("-").pop();
     },
-    genaralSuccessNotification: function(result) {
-        if(result.success) {
+    genaralSuccessNotification: function (result) {
+        if (result.success) {
             alert("Success Updated!");
         } else {
-            alert("Failed Updated! Because: " + result.serverInfo);
-        };
+            alert("Failed Updated! Because: " + result.server_info);
+        }
+        ;
     },
-    genaralFailNotification: function() {
+    genaralFailNotification: function () {
         alert("Failed Updated!");
     },
+    convertMonthNameToNumber: function(month_name) {
+        switch (month_name) {
+            case "Jan":
+                return 1;
+            case "Feb":
+                return 2;
+            case "Mar":
+                return 3;
+            case "Apr":
+                return 4;
+            case "May":
+                return 5;
+            case "Jun":
+                return 6;
+            case "Jul":
+                return 7;
+            case "Aug":
+                return 8;
+            case "Sep":
+                return 9;
+            case "Oct":
+                return 10;
+            case "Nov":
+                return 11;
+            case "Dec":
+                return 12;
+        }
+    },
+    getDateTimeFromString: function (bookingTime) {
+        var date_info = bookingTime.split(" ");
+        return {
+            day: date_info[0],
+            month: this.convertMonthNameToNumber(date_info[1]),
+            year: date_info[2],
+            time: date_info[3]
+        };
+    },
 }
+
 
 
 var presentationUtil = {
@@ -142,7 +215,7 @@ var presentationUtil = {
         firstLink.id = newFirstId + id;
         secondLink.innerHTML = newSecondTitle;
         secondLink = newSecondId + id;
-    }
+    },
 }
 
 var constant = {
@@ -151,5 +224,7 @@ var constant = {
 
     CANCEL_BOOKING_ID_PREFIX: "booking-cancel-booking-link-",
     CHANGE_TIME_ID_PREFIX: "booking-change-time-link-",
+
+    TD_DATETIME_PREFIX: "td-booking-datetime-",
 }
 

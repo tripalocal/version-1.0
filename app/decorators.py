@@ -13,10 +13,10 @@ def ajax_form_validate(form_class=None):
                 for attr in request.POST:
                     if attr in form_class.__dict__['base_fields']:
                         init_data[attr] = request.POST[attr]
-                form = form_class(init_data)
+                form = form_class(data = init_data)
                 form.is_bound = True
                 if not form.is_valid():
-                    return HttpResponse(json.dumps({'success': False, "reason": 'Form validate Failed.'}), content_type='application/json')
+                    return HttpResponse(json.dumps({'success': False, "server_info": 'Form validate Failed.'}), content_type='application/json')
                 else:
                     return decorated_function(request, *args, **kwargs)
             except:
