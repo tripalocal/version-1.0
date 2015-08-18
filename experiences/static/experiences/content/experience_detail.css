@@ -30,8 +30,8 @@
 .desBox th {vertical-align: top;padding:20px 0;}
 .reviewBox h2{float:left; margin-right:20px;}
 .rating{color:#FC0; font-size:30px; margin-bottom:20px;}
-.reviewList{border-bottom:#CCC 1px solid; padding:20px 0px;overflow: hidden; width: 100%;}
-.reviewList .profile-md{position: absolute}
+.reviewList{border-bottom:#CCC 1px solid; padding:20px 0px;overflow: hidden; width: 100%; position: relative;}
+.reviewList .profile-md img {position: absolute; height: 98px; width: auto}
 .reviewText {float:right; width:480px; min-height: 100px;}
 .reviewDate{color:#999; margin-top:12px;}
 .experience-detail-table-td {padding-top:20px;padding-bottom:20px;}
@@ -210,10 +210,13 @@ a {color:#6CC;} a:hover{color:#699;}
 .expList p{font-size:12px;}
 .expList h3{color: #333;font-size: 15px;}
 .expList a:hover{text-decoration: none;border-bottom: 1px solid #333;}
+.expList .profile-sm {
+  position: relative;
+}
 .expList .profile-sm img {
   position: absolute;
+  height: 80px;
   width: auto;
-  
 }
 
 .row{overflow: visible;}

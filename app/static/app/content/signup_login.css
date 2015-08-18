@@ -235,6 +235,11 @@
 .warning-sign {
   width: 100%;
 }
+
+.profile-lg img {
+  width: auto;
+  position: absolute;
+}
 /**
 @media screen and (min-width: 910px) and (max-width: 1072px) {
   .inner, .signup-inner, .resetPassword-inner {
