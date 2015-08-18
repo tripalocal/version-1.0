@@ -90,7 +90,7 @@
 												                    <tr>
 													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
 													                        <h1 style="text-align: center;"><font size="5">{% trans "How was your experience with "%}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.first_name|title }}{% endif %}{% endfor %}{% trans "? "%}</font></h1>
-														                    <p style="text-align: center;">{% trans "You have completed the following experience on "%}{%if LANGUAGE!= "zh-CN"%}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y/m/d' }}{%endif%}{% trans ", how did it go?" %}<br>
+														                    <p style="text-align: center;">{% trans "You have completed the following experience on "%}{%if LANGUAGE != "zh-CN"%}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y/m/d' }}{%endif%}{% trans ", how did it go?" %}<br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
                                                                                 <br>
                                                                                 {% trans "Leave a review for your host so they can get more bookings :)"%}

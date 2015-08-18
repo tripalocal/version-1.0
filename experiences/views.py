@@ -1558,7 +1558,7 @@ def update_booking(id, accepted, user):
                                                                 'LANGUAGE':settings.LANGUAGE_CODE}))
                 #send an email to the host
                 mail.send(subject=_('[Tripalocal] Cancellation confirmed'), message='', 
-                          sender=_('Tripalocal <') + liases.objects.filter(destination__contains=guest.email)[0].mail + '>',
+                          sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
                           recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
                           priority='now',  #fail_silently=False, 
                           html_message=loader.render_to_string('experiences/email_booking_cancelled_host.html',

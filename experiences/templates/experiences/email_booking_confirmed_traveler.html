@@ -93,11 +93,11 @@
 													                        <h1 style="text-align: center;"><font size="5">{% trans "Booking confirmed" %}</font></h1>
 														                    <p style="text-align: center;">{% trans "Please meet "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " at the meeting point"%}<br>
                                                                                 <strong>{{experience.meetup_spot}}</strong><br>
-                                                                                {% trans "on" %} <strong>{% if LANGUAGE != "zh-CN"%}{{ booking_datetime|date:'d/m/Y' }}{% else %}{{ booking_datetime|date:'Y-m-d' }}{% endif %}</strong>{%trans " at " %}<strong> {{ booking_datetime|date:'H:i' }}</strong><br>
+                                                                                {% trans "on" %} <strong>{% if LANGUAGE != "zh-CN"%}{{ booking.datetime|date:'d/m/Y' }}{% else %}{{ booking.datetime|date:'Y-m-d' }}{% endif %}</strong>{%trans " at " %}<strong> {{ booking.datetime|date:'H:i' }}</strong><br>
                                                                                 {% trans "to experience" %}<br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
                                                                                 <br>
-                                                                                {% for h in experience.hosts.all %}{% if forloop.first %}{{ h.first_name }}{% trans "'s local mobile number is "%}<strong>{{ h.registereduser.phone_number }}{% endif %}{% endfor %}</strong><br>
+                                                                                {% for h in experience.hosts.all %}{% if forloop.first %}{{ h.first_name }}{% trans "'s local mobile number is "%}<strong>{{ h.registereduser.phone_number }}</strong><br>
                                                                                 {% trans "Please contact "%}{{ h.first_name }}{% trans " on the day for any last minute changes."%}<br>
                                                                                 {% trans "We have given your number to "%}{{ h.first_name }}:<strong> {{user.registereduser.phone_number }}</strong><br>
                                                                                 {% trans "please send "%}{{ h.first_name }}{% trans " a message if this number is incorrect." %}
