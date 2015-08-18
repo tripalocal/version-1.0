@@ -97,13 +97,13 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                             </div>
                         </div>
                     </div>
-                    <a class="close-popup">close</a>
+                    <a class="close-popup">{% trans "close" %}</a>
                 </div>
                 <div id="popup-page-2" hidden="true">
                     <h1>{% trans "Tell us about your trip" %}</h1>
 
                     <p>{% trans "and we will get back to you within 48 hours" %}</p>
-                    <div id="results"></div> <!-- errors go here -->
+                    <div id="results"></div>
                     <form id="custom-trip-form" class="popup-form" action="/email_custom_trip" method="POST">
                         {% csrf_token %}
                         <div class="form-group">
@@ -123,24 +123,25 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
     </div>
 
     <script type="text/javascript">
-        function create_post() {
+        function create_post(email, message) {
             $.ajax({
                 url: "email_custom_trip",
                 type: "POST",
                 dataType: "json",
                 data: {
-                    csrfmiddlewaretoken: '{{ csrf_token }}',
-                    message: $('#popup-form-details').val(),
-                    email: $('#popup-form-email').val()
+                    csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
+                    message: message,
+                    email: email
                 },
 
                 success: function (json) {
-                    console.log(json);
+                    $('#popup-form-details').val('');
+                    $('#popup-form-email').val('');
+                    $('#results').html("<p class=''>Thank you for you suggestion.</p>");
                 },
 
                 error: function (xhr, errmsg, err) {
-                    $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: " + errmsg +
-                            " <a href='#' class='close'>&times;</a></div>");
+                    $('#results').html("<p class=''>Oops! We have encountered an error.</p>");
                 }
             });
         }
@@ -148,8 +149,20 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
         $(document).ready(function () {
             $('#custom-trip-form').on('submit', function (event) {
                 event.preventDefault();
-                $('#result').empty();
-                create_post();
+                $('#results').empty();
+                email = $('#popup-form-email').val();
+                message = $('#popup-form-details').val();
+
+                if (!message || !email) {
+                    $('#results').html("<p class=''>Please fill all fields.</p>");
+                } else {
+                    var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                    if (regex.test(email)) {
+                        create_post(email, message);
+                    } else {
+                        $('#results').html("<p class=''>Email Invalid.</p>");
+                    }
+                }
             });
 
             if ($(window).width() > 520) {
@@ -229,7 +242,7 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                             <li><a href="https://www.facebook.com/tripalocal">{% trans "Facebook" %}</a></li>
                             <li><a href="https://www.twitter.com/tripalocal">{% trans "Twitter" %}</a></li>
                             <!--<li><a href="https://www.twitter.com/tripalocal">{% trans "Instagram" %}</a></li>
-                            <li><a href="https://www.twitter.com/tripalocal">{% trans "Weibo" %}</a></li>
+                            <li><a href="https://www.twitter.com/tripalocal">{% trans "Weibo" %}</a></li> 
                             <li><a href="https://www.twitter.com/tripalocal">{% trans "Wechat" %}</a></li>-->
                         </ul>
                     </div>
