@@ -99,7 +99,7 @@
                                                                                 {% trans "to take them on your experience" %}<br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
                                                                                 <br>
-                                                                                {% for h in hosts %}{% if forloop.first %}
+                                                                                {% for h in experience.hosts.all %}{% if forloop.first %}
                                                                                 {% blocktrans with user_first_name=user.first_name user_phone_number=user.registereduser.phone_number host_phone_number=h.registereduser.phone_number%}{{user_first_name}}'s local mobile&nbsp;number is <strong>{{user_phone_number}}</strong><br>
                                                                                 Please contact {{user_first_name}}&nbsp;on the day for any last minute changes.<br>
                                                                                 We have given {{user_first_name}} your number <strong> {{ host_phone_number }}</strong><br>
