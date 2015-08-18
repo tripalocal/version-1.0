@@ -33,7 +33,7 @@
                                                             <tbody>
                                                                 <tr>
                                                                     <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: Reply above this line to send a message to {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} ::</span></div>
+                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: {% trans "Reply above this line to send a message to " %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} ::</span></div>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -90,17 +90,18 @@
 											                    <tbody>
 												                    <tr>
 													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                        <h1 style="text-align: center;"><font size="5">Booking confirmed</font></h1>
-														                    <p style="text-align: center;">Please meet {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} at the meeting point<br>
+													                        <h1 style="text-align: center;"><font size="5">{% trans "Booking confirmed" %}</font></h1>
+														                    <p style="text-align: center;">{% trans "Please meet "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " at the meeting point"%}<br>
                                                                                 <strong>{{experience.meetup_spot}}</strong><br>
-                                                                                on <strong>{{ booking.datetime|date:'d/m/Y' }} </strong> at <strong> {{ booking.datetime|date:'H:i' }}</strong><br>
-                                                                                to experience<br>
+                                                                                {% trans "on" %} <strong>{% if LANGUAGE != "zh-CN"%}{{ booking_datetime|date:'d/m/Y' }}{% else %}{{ booking_datetime|date:'Y-m-d' }}{% endif %}</strong>{%trans " at " %}<strong> {{ booking_datetime|date:'H:i' }}</strong><br>
+                                                                                {% trans "to experience" %}<br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
                                                                                 <br>
-                                                                                {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}'s local mobile number is <strong>{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.phone_number }}{% endif %}{% endfor %}</strong><br>
-                                                                                Please contact {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} on the day for any last minute changes.<br>
-                                                                                We have given {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} your number <strong>{{user.registereduser.phone_number }}</strong><br>
-                                                                                please send {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} a message if this number is incorrect.
+                                                                                {% for h in experience.hosts.all %}{% if forloop.first %}{{ h.first_name }}{% trans "'s local mobile number is "%}<strong>{{ h.registereduser.phone_number }}{% endif %}{% endfor %}</strong><br>
+                                                                                {% trans "Please contact "%}{{ h.first_name }}{% trans " on the day for any last minute changes."%}<br>
+                                                                                {% trans "We have given your number to "%}{{ h.first_name }}:<strong> {{user.registereduser.phone_number }}</strong><br>
+                                                                                {% trans "please send "%}{{ h.first_name }}{% trans " a message if this number is incorrect." %}
+                                                                                {% endif %}{% endfor %}
                                                                             </p>
 													                    </td>
 												                    </tr>

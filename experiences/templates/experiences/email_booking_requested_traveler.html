@@ -33,7 +33,7 @@
                                                             <tbody>
                                                                 <tr>
                                                                     <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: Reply above this line to send a message to {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} ::</span></div>
+                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: {% trans "Reply above this line to send a message to " %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} ::</span></div>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -90,10 +90,10 @@
 											                    <tbody>
 												                    <tr>
 													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                        <h1 style="text-align: center;"><font size="5">Your booking request has been sent to {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}</font></h1>
-														                    <p style="text-align: center;">You {%if booking.guest_number > 1 %} and {{booking.guest_number|sub:1}} of your {%if booking.guest_number > 2%}friends{%else%}friend{%endif%}{%endif%} have requested to experience <br>
+													                        <h1 style="text-align: center;"><font size="5">{% trans "Your booking request has been sent to "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}</font></h1>
+														                    <p style="text-align: center;">{% trans "You "%}{%if guest_number > 1 %}{% trans " and "%}{{guest_number|sub:1}}{% trans " of your "%}{%if guest_number > 2%}{% trans "friends"%}{%else%}{% trans "friend"%}{%endif%}{%endif%}{% trans " have requested to experience "%}<br>
                                                                                 <a href="{{experience_url}}" target="_blank"><span style="line-height:21px; text-align:center">{{experience.title}}</span></a><br>
-                                                                                on {{ booking.datetime|date:'d/m/Y' }} </strong> at <strong> {{ booking.datetime|date:'H:i' }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}
+                                                                                {% trans "on "%}<strong>{% if LANGUAGE != "zh-CN"%}{{ booking_datetime|date:'d/m/Y' }}{%else%}{{ booking_datetime|date:'Y-m-d' }}{%endif%}{% trans " at "%}{{ booking_datetime|date:'H:i' }}</strong>
                                                                             </p>
 													                    </td>
 												                    </tr>
@@ -111,8 +111,8 @@
                                                                 <tbody>
 						                                            <tr>
 							                                            <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-								                                            <div style="text-align: center;">{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} should get back to you within 24 hours.<br>
-                                                                            If you don't hear from {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} within the next 24 hours, your payment will be refunded.</div>
+								                                            <div style="text-align: center;">{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " should get back to you within 24 hours."%}<br>
+                                                                            {% trans "If you don't hear from "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " within next 24 hours, your payment will be refunded."%}</div>
 							                                            </td>
 						                                            </tr>
 					                                            </tbody>

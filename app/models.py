@@ -74,7 +74,7 @@ def get_user_bio(registereduser, language):
         else:
             return registereduser.registereduserbio_set.all()[0].bio
     else:
-        return None
+        return ""
 
 def save_user_bio(registereduser, newbio, language):
     if registereduser.registereduserbio_set is not None:

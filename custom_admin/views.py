@@ -144,28 +144,19 @@ class StatusGenerator:
         self.now_time = datetime.now(timezone.utc)
 
     def generate_status_description(self):
-    
-
         for booking in self.booking_list:
             self.now_time = datetime.now(timezone.utc)
-            if booking.status == 'rejected' or booking.status == 'accepted' or booking.status == 'requested' or booking.status == 'no_show' or booking.status == 'paid':
+            if booking.status == 'rejected' or booking.status == 'accepted' or booking.status == 'requested' or booking.status == 'no_show':
                 manipulate_function_name = '_manipulate_' + booking.status + '_booking'
                 manipulate_function = getattr(self, manipulate_function_name)
                 manipulate_function(booking)
                 booking.datetime = booking.datetime.strftime("%d %b %Y %H:%I")
             else:
-                temp = booking.status.split('_')
-                previous_status = ''
-                for ele in temp:
-                    if ele != 'archived':
-                        previous_status = previous_status + '_' + ele
-                previous_status = previous_status[1:]
-                
+                previous_status = booking.status.split('_')[0]
                 manipulate_function_name = '_manipulate_' + previous_status + '_booking'  
                 manipulate_function = getattr(self, manipulate_function_name)
                 manipulate_function(booking)
                 booking.datetime = booking.datetime.strftime("%d %b %Y %H:%I")
-                
 
     def _manipulate_requested_booking(self, booking):
         time_after_booking_submission = self.now_time - booking.submitted_datetime
@@ -244,7 +235,7 @@ def mark_as_no_show(request, **kwargs):
 
 def reopen_booking(request, **kwargs):
     booking = Booking.objects.get(id = kwargs['booking_id'])
-    booking.status = 'paid'
+    booking.status = 'requested'
     booking.save()
     status = 'success'
     return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
@@ -287,13 +278,7 @@ def unarchive_bookings(request, **kwargs):
         for booking_id in chosen_ids:
             booking_id = int(booking_id)
             booking = Booking.objects.get(id = booking_id)
-            temp = booking.status.split('_')
-            previous_status = ''
-            
-            for ele in temp:
-                if ele != 'archived':
-                    previous_status = previous_status + '_' + ele
-            previous_status = previous_status[1:]
+            previous_status = booking.status.split('_')[0] 
             booking.status = previous_status
             booking.save()
     status = 'success'
@@ -328,7 +313,8 @@ def send_confirmation_email_host(request, **kwargs):
                                                                       'user_first_name':guest.first_name,
                                                                       'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                                       'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
-                                                                      'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))                
+                                                                      'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no',
+                                                                      'LANGUAGE':settings.LANGUAGE_CODE}))
 
                 if booking.status == 'accepted':
                     #send an email to the host
@@ -340,7 +326,8 @@ def send_confirmation_email_host(request, **kwargs):
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':guest,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
 
 
     status = 'success'
@@ -363,14 +350,15 @@ def send_confirmation_email_guest(request, **kwargs):
                 
                 if booking.status == 'requested' or booking.status == 'paid':
                     # send an email to the traveler
-                    mail.send(subject='[Tripalocal] You booking request is sent to the host',  message='', 
+                    mail.send(subject='[Tripalocal] Your booking request is sent to the host',  message='', 
                               sender='Tripalocal <' + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                               recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], #fail_silently=False,
                               priority='now',
                               html_message=loader.render_to_string('experiences/email_booking_requested_traveler.html',
                                                                      {'experience': experience, 
                                                                       'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                      'booking':booking}))                    
+                                                                      'booking':booking,
+                                                                      'LANGUAGE':settings.LANGUAGE_CODE}))                    
 
                 if booking.status == 'accepted':
                     # send an email to the traveler
@@ -382,7 +370,8 @@ def send_confirmation_email_guest(request, **kwargs):
                                                                       {'experience': experience,
                                                                       'booking':booking,
                                                                       'user':guest, #not host --> need "my" phone number
-                                                                      'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                                                                      'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                      'LANGUAGE':settings.LANGUAGE_CODE}))
     status = 'success'
     return HttpResponseRedirect('/custom_admin/?status=%s' % (status))
 

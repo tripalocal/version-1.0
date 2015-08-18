@@ -33,7 +33,7 @@
                                                             <tbody>
                                                                 <tr>
                                                                     <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: Reply above this line to send a message to {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} ::</span></div>
+                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: {% trans "Reply above this line to send a message to " %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} ::</span></div>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -90,13 +90,12 @@
 											                    <tbody>
 												                    <tr>
 													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                        <h1 style="text-align: center;"><font size="5">Cancellation confirmed</font></h1>
-														                    <p style="text-align: center;">Your experience with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} is now cancelled <br>
+													                        <h1 style="text-align: center;"><font size="5">{% trans "Cancellation confirmed" %}</font></h1>
+														                    <p style="text-align: center;">{% trans "Your experience with " %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " is now cancelled" %}<br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
                                                                                 <br>
-                                                                                Your refund is now on the way back to your original payment method.<br>
-                                                                                The refund usually takes 2-3 business days but may take up to 10 business days<br>
-                                                                                depending on the bank.
+                                                                                {% trans "Your refund is now on the way back to your original payment method." %}<br>
+                                                                                {% trans "The refund usually takes 2-3 business days but may take up to 10 business days depending on the bank." %}
                                                                             </p>
 													                    </td>
 												                    </tr>

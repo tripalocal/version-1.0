@@ -34,7 +34,7 @@
                                                                 <tr>
                                                                     <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
                                                                         {% if not webpage %}
-                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: Reply above this line to send a message to {{user.first_name}} ::</span></div>
+                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: {% trans "Reply above this line to send a message to " %}{{user.first_name}} ::</span></div>
                                                                         {%endif%}
                                                                     </td>
                                                                 </tr>
@@ -92,12 +92,12 @@
 											                    <tbody>
 												                    <tr>
 													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                        <h1 style="text-align: center;"><font size="5">Cancellation confirmed</font></h1>
-														                    <p style="text-align: center;">Your following booking with {{user.first_name}} is now cancelled:<br>
-                                                                                <strong>{{experience.meetup_spot}}</strong> on <strong>{{ booking.datetime|date:'d/m/Y' }} </strong> at <strong> {{ booking.datetime|date:'H:i' }}</strong><br>
+													                        <h1 style="text-align: center;"><font size="5">{% trans "Cancellation confirmed" %}</font></h1>
+														                    <p style="text-align: center;">{% blocktrans with first_name=user.first_name%}Your following booking with {{first_name}} is now cancelled: {% endblocktrans %}<br>
+                                                                                <strong>{{experience.meetup_spot}}</strong>, <strong>{% if LANGUAHE != "zh-CN" %}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{% endif %}</strong>, <strong>{{ booking.datetime|date:'H:i' }}</strong><br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
                                                                                 <br>
-                                                                                To avoid future cancellations, please update your calendar regularly.
+                                                                                {% trans "To avoid future cancellations, please update your calendar regularly." %}
                                                                             </p>
 													                    </td>
 												                    </tr>

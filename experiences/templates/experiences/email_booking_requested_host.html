@@ -33,7 +33,7 @@
                                                             <tbody>
                                                                 <tr>
                                                                     <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: Reply above this line to send a message to {{user_first_name}} ::</span></div>
+                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: {% trans "Reply above this line to send a message to "%}{{user_first_name}} ::</span></div>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -90,8 +90,8 @@
 											                    <tbody>
 												                    <tr>
 													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                        <h1 style="text-align: center;"><font size="5">{{user_first_name}} has requested for your experience</font></h1>
-														                    <p style="text-align: center;">Are you free on {{ booking.datetime|date:'d/m/Y' }} </strong> at <strong> {{ booking.datetime|date:'H:i' }} to take {{user_first_name}}{%if booking.guest_number > 1%} and {{booking.guest_number|sub:1}} {%if booking.guest_number > 2%}others{%else%}other{%endif%}{%endif%} on your experience<br>
+													                        <h1 style="text-align: center;"><font size="5">{{user_first_name}}{% trans " has requested for your experience"%}</font></h1>
+														                    <p style="text-align: center;">{% trans "Are you free on "%}{% if LANGUAGE != "zh-CN" %}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{%endif%}</strong>{% trans " at " %}<strong> {{ booking.datetime|date:'H:i' }}{% trans " to take " %}{{user_first_name}}{%if booking.guest_number > 1%}{% trans " and " %}{{booking.guest_number|sub:1}} {%if booking.guest_number > 2%}{% trans "others" %}{%else%}{% trans "other" %}{%endif%}{%endif%}{% trans " on your experience" %}<br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a>?
                                                                             </p>
 													                    </td>
@@ -110,7 +110,7 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <td align="center" valign="middle" class="mcnButtonContent" style="font-family: Arial; font-size: 16px; padding: 16px;">
-                                                                            <a class="mcnButton " title="Yes, I'm available." href="{{accept_url}}" style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">Yes, I'm available.</a>
+                                                                            <a class="mcnButton " title="Yes, I'm available." href="{{accept_url}}" style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">{% trans "Yes, I'm available." %}</a>
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -127,7 +127,7 @@
                                                                 <tbody>
 						                                            <tr>
 							                                            <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-								                                            If you are not available on the proposed date, please reply to this email to {{user_first_name}} with a new date and time. If a new time cannot be arranged, you can cancel this reservation below and {{user_first_name}} will be refunded.
+								                                            {% blocktrans with user_first_name=user_first_name %}If you are not available on the proposed date, please reply to this email to {{user_first_name}} with a new date and time. If a new time cannot be arranged, you can cancel this reservation below and {{user_first_name}} will be refunded.{% endtransblock %}
 							                                            </td>
 						                                            </tr>
 					                                            </tbody>
@@ -144,7 +144,7 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <td align="center" valign="middle" class="mcnButtonContent" style="font-family: Arial; font-size: 16px; padding: 16px;">
-                                                                            <a class="mcnButton " title="Cancel booking" href="{{reject_url}}" style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">Cancel booking</a>
+                                                                            <a class="mcnButton " title="Cancel booking" href="{{reject_url}}" style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">{% trans "Cancel booking" %}</a>
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>

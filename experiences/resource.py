@@ -220,7 +220,8 @@ def saveBookingRequest(booking_request):
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user, #not host --> need "my" phone number
-                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
             
     #schedule an email for reviewing the experience
     mail.send(subject=_('[Tripalocal] How was your experience?'), message='', 
@@ -231,7 +232,8 @@ def saveBookingRequest(booking_request):
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                    'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id)}))
+                                                    'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id),
+                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
 
     #send an email to the host
     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
@@ -242,7 +244,8 @@ def saveBookingRequest(booking_request):
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user, # guest here
-                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
 
     #schedule an email to the traveller one day before the experience
     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
@@ -253,7 +256,8 @@ def saveBookingRequest(booking_request):
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user, #not host --> need "my" phone number
-                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
 
     #schedule an email to the host one day before the experience
     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
@@ -264,7 +268,8 @@ def saveBookingRequest(booking_request):
                                                     {'experience': experience,
                                                     'booking':booking,
                                                     'user':user,
-                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
 
 def saveBookingRequestsFromXLS(request):
     if not (request.user.is_authenticated() and request.user.is_superuser):

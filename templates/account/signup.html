@@ -108,7 +108,7 @@
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
             {% endif %}
             <p class = "tellme"><input id="id_tellme"type="checkbox" /> {% trans "Tell me about Tripalocal news" %}</p>
-            <p class="help-message">{% blocktrans %}By signing up, I agree to Tripalocal's <a href="{{form.geo.value}}termsofservice">Terms of Service</a>, <a href="{{form.geo.value}}privacypolicy">Privacy Policy</a>, <a href="{{form.geo.value}}refundpolicy">Guest Refund Policy</a>{% endblocktrans %}</p>
+            <p class="help-message">{% blocktrans with geo=form.geo.value%}By signing up, I agree to Tripalocal's <a href="{{geo}}termsofservice">Terms of Service</a>, <a href="{{geo}}privacypolicy">Privacy Policy</a>, <a href="{{geo}}refundpolicy">Guest Refund Policy</a>{% endblocktrans %}</p>
             <button id="id_signup_submit_button" class="btn btn-primary btn-lg" type="submit">{% trans "Sign up" %}</button>
         </form>
         <p>{% blocktrans %}Already a Tripalocal member? <a href="{{ login_url }}">Log in</a>{% endblocktrans %}</p>
@@ -165,11 +165,14 @@ function checkInput(id_put, id_error)
 
 //validation firstname
     $("#id_first_name").blur(function(){
-        {% if form.language.value !="zh-CN" %}
-        var regexp = /^[a-zA-Z0-9-_.]+$/;
-        {% else %}
-        var regexp = /^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$/;
-        {% endif %}
+        if("{{form.language.value}}" !="zh-CN")
+        {
+            var regexp = /^[a-zA-Z0-9-_.]+$/;
+        }
+        else
+        {
+            var regexp = /^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$/;
+        }
         if($("#id_first_name").val().search(regexp) != -1)
         {
             checkInput("id_first_name", "first_name_error"); 
@@ -183,11 +186,14 @@ function checkInput(id_put, id_error)
     
 //validate last name 
    $("#id_last_name").blur(function(){
-        {% if form.language.value !="zh-CN" %}
-        var regexp = /^[a-zA-Z0-9-_.]+$/;
-        {% else %}
-        var regexp = /^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$/;
-        {% endif %}
+        if("{{form.language.value}}" !="zh-CN")
+        {
+            var regexp = /^[a-zA-Z0-9-_.]+$/;
+        }
+        else
+        {
+            var regexp = /^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$/;
+        }
         if($("#id_last_name").val().search(regexp) != -1)
         {
             checkInput("id_last_name", "last_name_error");
@@ -203,10 +209,11 @@ $(function()
 {
     var country, region, city, ip, longitude, latitude;
     $(document).ready(function(){
-        {% if form.language.value !="zh-CN" %}
-        $("#id_Facebook").attr("class", "socialaccount_provider facebook");
-        $("#id_Facebook").attr("role", "button");
-        {% endif %}
+        if("{{form.language.value}}" !="zh-CN")
+        {
+            $("#id_Facebook").attr("class", "socialaccount_provider facebook");
+            $("#id_Facebook").attr("role", "button");
+        }
 
         $("#id_email").attr("placeholder", "{% trans "Email" %}");
         $("#id_password1").attr("placeholder", "{% trans "Password" %}");

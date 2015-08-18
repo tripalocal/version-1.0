@@ -34,7 +34,7 @@
                                                                 <tr>
                                                                     <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
                                                                         {% if not webpage %}
-                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: Reply above this line to send a message to {{user.first_name}} ::</span></div>
+                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: {% trans "Reply above this line to send a message to " %}{{user.first_name}} ::</span></div>
                                                                         {%endif%}
                                                                     </td>
                                                                 </tr>
@@ -92,17 +92,19 @@
 											                    <tbody>
 												                    <tr>
 													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                        <h1 style="text-align: center;"><font size="5">Booking confirmed</font></h1>
-														                    <p style="text-align: center;">Please meet {{user.first_name}}{%if booking.guest_number > 1 %} and {{booking.guest_number|sub:1}} {%if booking.guest_number > 2 %}others{%else%}other{%endif%}{%endif%} at the meeting point<br>
+													                        <h1 style="text-align: center;"><font size="5">{% trans "Booking confirmed" %}</font></h1>
+														                    <p style="text-align: center;">{% blocktrans with first_name=user.first_name guest_number=booking.guest_number%}Please meet {{first_name}}{%if guest_number > 1 %} and {{guest_number|sub:1}} {%if guest_number > 2 %}others{%else%}other{%endif%}{%endif%} at the meeting point{% endblocktrans %}<br>
                                                                                 <strong>{{experience.meetup_spot}}</strong><br>
-                                                                                on <strong>{{ booking.datetime|date:'d/m/Y' }} </strong> at <strong> {{ booking.datetime|date:'H:i' }}</strong><br>
-                                                                                to take them on your experience<br>
+                                                                                {% trans "on " %}<strong>{% if LANGUAGE != "zh-CN" %}{{ booking.datetime|date:'d/m/Y' }}{% else %}{{ booking.datetime|date:'Y-m-d' }}{%endif%} </strong>{% trans " at " %}<strong> {{ booking.datetime|date:'H:i' }}</strong><br>
+                                                                                {% trans "to take them on your experience" %}<br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
                                                                                 <br>
-                                                                                {{user.first_name}}'s local mobile&nbsp;number is <strong>{{user.registereduser.phone_number}}</strong><br>
-                                                                                Please contact {{user.first_name}}&nbsp;on the day for any last minute changes.<br>
-                                                                                We have given {{user.first_name}} your number <strong>{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.registereduser.phone_number }}{% endif %}{% endfor %}</strong><br>
-                                                                                please send {{user.first_name}} a message if this number is incorrect.
+                                                                                {% for h in hosts %}{% if forloop.first %}
+                                                                                {% blocktrans with user_first_name=user.first_name user_phone_number=user.registereduser.phone_number host_phone_number=h.registereduser.phone_number%}{{user_first_name}}'s local mobile&nbsp;number is <strong>{{user_phone_number}}</strong><br>
+                                                                                Please contact {{user_first_name}}&nbsp;on the day for any last minute changes.<br>
+                                                                                We have given {{user_first_name}} your number <strong> {{ host_phone_number }}</strong><br>
+                                                                                please send {{user_first_name}} a message if this number is incorrect.{% endblocktrans %}
+                                                                                {% endif %}{% endfor %}
                                                                             </p>
 													                    </td>
 												                    </tr>

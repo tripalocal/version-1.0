@@ -1,4 +1,4 @@
-﻿from django import forms
+from django import forms
 from bootstrap3_datetime.widgets import DateTimePicker
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
@@ -957,7 +957,8 @@ class ItineraryBookingForm(forms.Form):
                                                                         'user_first_name':user.first_name,
                                                                         'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                                         'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
-                                                                        'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no'}))
+                                                                        'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no',
+                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
                     # send an email to the traveler
                     mail.send(subject=_('[Tripalocal] Your booking request is sent to the host'),  message='',
                                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
@@ -966,7 +967,8 @@ class ItineraryBookingForm(forms.Form):
                                 html_message=loader.render_to_string('experiences/email_booking_requested_traveler.html',
                                                                         {'experience': experience, 
                                                                         'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                        'booking':booking}))
+                                                                        'booking':booking,
+                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
                 else:
                     #instant booking
                     booking.status = "accepted"
@@ -985,7 +987,8 @@ class ItineraryBookingForm(forms.Form):
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
             
                     #schedule an email to the traveller one day before the experience
                     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
@@ -996,7 +999,8 @@ class ItineraryBookingForm(forms.Form):
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':user, #not host --> need "my" phone number
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
             
                     #schedule an email to the host one day before the experience
                     mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
@@ -1007,7 +1011,8 @@ class ItineraryBookingForm(forms.Form):
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
                         
                     #schedule an email for reviewing the experience
                     mail.send(subject=_('[Tripalocal] How was your experience?'), message='', 
@@ -1018,7 +1023,8 @@ class ItineraryBookingForm(forms.Form):
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                    'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id)}))
+                                                                    'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id),
+                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
 
                     #send an email to the host
                     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
@@ -1029,7 +1035,8 @@ class ItineraryBookingForm(forms.Form):
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id)}))
+                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
 
                 pass
 
