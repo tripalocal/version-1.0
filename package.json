@@ -1,0 +1,13 @@
+{
+  "name": "website_v1.0",
+  "version": "1.0.0",
+  "description": "Tripalocal website",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tripalocal/website_v1.0.git"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-sass": "^2.0.4"
+  }
+}
