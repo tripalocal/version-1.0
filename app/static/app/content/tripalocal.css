@@ -178,7 +178,7 @@ input[type=checkbox] { margin: 2px 10px 0 0; float: left;}
 .book-tease{  background-repeat:no-repeat; background-size:cover;}
 .footer-logo{height: 200px;width: 240px;background-position: center;background-repeat: no-repeat;}
 .melbourne, .sydney{display:none;float:left;}
-.footer-logo{background-image: url(/images/footer_logo.png)}
+.footer-logo{background-image: url(../img/footer_logo.png)}
 .menu li a{ color:#999;}
 .book-tease{  background-repeat:no-repeat; background-size:cover;}
 .menu{margin-top:6px; margin-right:10px;}
@@ -431,7 +431,7 @@ user-select: none;
   border-right: 1px #000 solid;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background: url(/images/dropdown-button.png) no-repeat;
+  background: url(/images/icon/dropdown-button.png) no-repeat;
   float: left;
   background-position: 200px 10px;
   background-color: #FFF;
@@ -446,7 +446,7 @@ user-select: none;
   border-color: transparent;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url(/images/dropdown-button.png) no-repeat;
+  background-image: url(/images/icon/dropdown-button.png) no-repeat;
   background-color: #FFF;
   background-position: 170px 13px;
   text-align: -moz-left;
@@ -604,7 +604,16 @@ a:hover{text-decoration: none;}
   text-align: center;
 }
 #characters-left{float: right;}
-.booking_form_people{-webkit-appearance:none;-moz-appearance:none;text-align: -moz-left;background: url(/images/dropdown-button.png) no-repeat;background-position: 22px 2px;width: 44px;padding-left: 10px;}
+
+.booking_form_people {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-align: -moz-left;
+    background: url(/images/icon/dropdown-button.png) no-repeat;
+    background-position: 22px 2px;
+    width: 44px;
+    padding-left: 10px;
+}
 
 
 .loading {

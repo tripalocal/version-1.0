@@ -47,16 +47,34 @@
 #ends{width:200px;}
 #ends label{font-weight: 400; padding-left: 10px; position:relative; top: -3px;]}
 #ends input[type=radio]{-webkit-appearance:none; border: 1px solid #999999; background-color: #FFF; width: 16px; height: 16px; border-radius: 8px; background: none;}
-#ends input[type=radio]:checked{background: url(/images/radio-button.png) no-repeat; background-position: 3.5px 3.5px;}
+#ends input[type=radio]:checked{background: url(/images/icon/radio-button.png) no-repeat; background-position: 3.5px 3.5px;}
 #on-radio{float:left; padding-top: 30px; padding-left: 40px;}
 #on-radio label{font-weight: 400; padding-left: 10px;padding-right: 10px; position: relative; top: -3px;}
 #on-radio button{background-color: #FFF; border:1px solid #999999; border-radius: 3px; width: 90px; position: relative; top: -5px;}
 #on-radio input[type=radio]{-webkit-appearance:none; border: 1px solid #999999; background-color: #FFF; width: 16px; height: 16px; border-radius: 8px; background: none;}
-#on-radio input[type=radio]:checked{background: url(/images/radio-button.png) no-repeat; background-position: 3.5px 3.5px;}
+#on-radio input[type=radio]:checked{background: url(/images/icon/radio-button.png) no-repeat; background-position: 3.5px 3.5px;}
 .repeat-frequency select{
-	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; width: 80px; background-position: 60px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px;}
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background: url(/images/icon/dropdown-button.png) no-repeat;
+	width: 80px;
+	background-position: 60px 3px;
+	border: 1px solid #999999;
+	background-color: #FFF;
+	border-radius: 3px;
+	padding: 5px;
+}
 
-.repeat-every select{ 
-	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; width: 50px; background-position: 30px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px;}
+.repeat-every select{
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background: url(/images/icon/dropdown-button.png) no-repeat;
+	width: 50px;
+	background-position: 30px 3px;
+	border: 1px solid #999999;
+	background-color: #FFF;
+	border-radius: 3px;
+	padding: 5px;
+}
 	/*fix calendar background color*/
 .fc-future{background-color: white;}

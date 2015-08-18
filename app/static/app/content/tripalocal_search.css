@@ -18,17 +18,40 @@
 .people .formBoxes{width:140px;}
 .language .formBoxes{width:140px; padding-top:10px;}
 
-.iconImage{background-image: url(/images/icons.png);width: 27px;height: 27px;background-size: 210px 320px;margin-left:auto;margin-right:auto;}
+.iconImage{background-image: url(/images/icon/icons.png);width: 27px;height: 27px;background-size: 210px 320px;margin-left:auto;margin-right:auto;}
 #date{background-position: -27px 0px; width:27px;}
 #people{background-position: -81px 0px;}
 #language{background-position: -81px -27px;}
 .iconText{margin-top:5px;}
 
-.locationSelection{color: #666;width: 210px;height: 30px;padding-left: 10px;-webkit-appearance: none;-moz-appearance: none;background: url(/images/dropdown-button.png) no-repeat;background-position: 181px 2px;  background-color: #FFF;  border-radius: 5px;float: left;
+.locationSelection {
+    color: #666;
+    width: 210px;
+    height: 30px;
+    padding-left: 10px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: url(/images/icon/dropdown-button.png) no-repeat;
+    background-position: 181px 2px;
+    background-color: #FFF;
+    border-radius: 5px;
+    float: left;
 border: solid 1px #ccc;  margin-bottom: 10px;}
 .startDate{float:left;width:100px;margin-right:10px;}
 .endDate{float:left;width:100px;}
-.guestNumber {  -webkit-appearance: none;  -moz-appearance: none;  text-align: -moz-left;  background: url(/images/dropdown-button.png) no-repeat;  background-position: 72px 3px;  width: 100px;  padding-left: 10px;  background-color: #fff;  height: 30px;  border-color: #ccc;  margin-top: 10px;
+
+.guestNumber {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-align: -moz-left;
+    background: url(/images/icon/dropdown-button.png) no-repeat;
+    background-position: 72px 3px;
+    width: 100px;
+    padding-left: 10px;
+    background-color: #fff;
+    height: 30px;
+    border-color: #ccc;
+    margin-top: 10px;
 }
 #language_English_label, #language_Mandarin_label{font-weight: normal;}
 .only-tag-label{font-weight: normal;}

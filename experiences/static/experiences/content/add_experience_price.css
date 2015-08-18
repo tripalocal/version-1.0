@@ -3,7 +3,18 @@
 #group-size-section{float: right;width: 450px; padding-top: 30px;}
 #group-size-section p{float: left; color: #999999; }
 #group-size-section select{
-	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 100px; background-position: 75px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px; margin-top:5px;}
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background: url(/images/icon/dropdown-button.png) no-repeat;
+	float: left;
+	width: 100px;
+	background-position: 75px 3px;
+	border: 1px solid #999999;
+	background-color: #FFF;
+	border-radius: 3px;
+	padding: 5px 0 5px 15px;
+	margin-top: 5px;
+}
 #group-size-heading{margin-bottom: 0px;}
 #group-size-min{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
 #group-size-max{padding-top: 18px; padding-left: 12px; padding-right: 20px;}
@@ -19,7 +30,17 @@
 .math-symbol-3{padding-top: 5px;}
 #duration-section{float: right; color: #999999; padding-right: 280px; padding-top: 30px; clear: both; width: 450px;}
 #duration-section select{
-	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; float:left; width: 110px; background-position: 85px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px 0 5px 15px;}
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background: url(/images/icon/dropdown-button.png) no-repeat;
+	float: left;
+	width: 110px;
+	background-position: 85px 3px;
+	border: 1px solid #999999;
+	background-color: #FFF;
+	border-radius: 3px;
+	padding: 5px 0 5px 15px;
+}
 #duration-hours{padding-left: 20px; padding-top: 8px;}
 /*dollar sign fix (textbox)*/
 #dollar-sign{position: relative; left: -90px; z-index: 1; color: #999999; top: 1px;}
@@ -40,4 +61,4 @@
 
 /** changes on add experience -pricing page **/
 .preview_listing{float: right; }
-.eye-icon{background-image: url(/images/icons.png);width: 27px;height: 27px;background-size: 135px 135px;background-position: -81px -54px;position: relative;left:-150px;margin-bottom:-10px;margin-right: 30px;float: right;}
+.eye-icon{background-image: url(/images/icon/icons.png);width: 27px;height: 27px;background-size: 135px 135px;background-position: -81px -54px;position: relative;left:-150px;margin-bottom:-10px;margin-right: 30px;float: right;}

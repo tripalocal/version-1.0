@@ -287,7 +287,7 @@ h1{
 }
 #id_language_select{
     width: 220px;
-    background-image: url(/images/dropdown-button.png);
+    background-image: url(/images/icon/dropdown-button.png);
     background-repeat: no-repeat;
     background-position: 185px 13px;
 }

@@ -7,4 +7,13 @@
 .drop-off-instruction textarea{width: 350px; height: 80px;}
 #location-city{float: right; color: #999999; padding-right: 210px; padding-top: 30px; clear: both;}
 #location-city select{
-	-webkit-appearance:none; -moz-appearance: none; background: url(/images/dropdown-button.png) no-repeat; width: 110px; background-position: 85px 3px; border: 1px solid #999999; background-color: #FFF; border-radius: 3px; padding: 5px;}
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background: url(/images/icon/dropdown-button.png) no-repeat;
+	width: 110px;
+	background-position: 85px 3px;
+	border: 1px solid #999999;
+	background-color: #FFF;
+	border-radius: 3px;
+	padding: 5px;
+}
