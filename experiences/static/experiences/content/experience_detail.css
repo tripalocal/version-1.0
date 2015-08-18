@@ -62,12 +62,42 @@
 .facebooklogo{background-image:url(/images/icon/icons.png);background-position: -135px 0px;}
 .mobilelogo{background-image:url(/images/icon/icons.png);background-position: -135px -135px;}
 .reviewlogo {background-image:url(/images/icon/icons.png);background-position: -135px -45px;}
-.save_to_wishlist_related {position:relative;float:left;width:27px;height:27px;background-image:url('/images/heart_small_red.svg'); background-repeat: no-repeat;}
-.saved_to_wishlist_related {position:relative;float:left;width:27px;height:27px;background-image:url('/images/heart_small_filled.svg');  background-repeat: no-repeat;}
+
+.save_to_wishlist_related {
+    position: relative;
+    float: left;
+    width: 27px;
+    height: 27px;
+    background-image: url('../img/heart_small_red.svg');
+    background-repeat: no-repeat;
+}
+
+.saved_to_wishlist_related {
+    position: relative;
+    float: left;
+    width: 27px;
+    height: 27px;
+    background-image: url('../img/heart_small_filled.svg');
+    background-repeat: no-repeat;
+}
 .review-number {font-size:20px;margin-left:2px;line-height: 25px;font-weight: bold;float: left;}
-#save_to_wishlist_icon {background-image:url('/images/heart_large_red.svg');height:27px;width:27px; background-repeat: no-repeat;;float:left;margin-top: 5px;}
-.save_to_wishlist_not_added {background-image:url('/images/heart_large_red.svg');}
-.save_to_wishlist_added {background-image:url('/images/heart_large_filled.svg');}
+
+#save_to_wishlist_icon {
+    background-image: url('../img/heart_large_red.svg');
+    height: 27px;
+    width: 27px;
+    background-repeat: no-repeat;;
+    float: left;
+    margin-top: 5px;
+}
+
+.save_to_wishlist_not_added {
+    background-image: url('../img/heart_large_red.svg');
+}
+
+.save_to_wishlist_added {
+    background-image: url('../img/heart_large_filled.svg');
+}
 .booking-exp{width: 100%;height: 50px;border-bottom: 1px solid #eee;}
 .save_to_wishlist_button{border:1px solid #CCCCCC;color:#666666; margin-top:30px; height:50px; width: 100%;margin-left:auto; margin-right:auto;border-radius: 3px;padding:5px 55px;}
 #wishlist_p {font-size:12px;color: #CCCCCC;}

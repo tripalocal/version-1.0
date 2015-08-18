@@ -50,7 +50,7 @@
                                 <input id="uploadImage_1" placeholder="{% trans "No file chosen" %}" class="uploadImage" disabled="disabled" />
                                 {%endif%}
                                 <div class="fileUpload btn btn-primary">
-                                    <img alt="" src="/images/camera.gif"><span>{% trans "Choose File" %}</span>
+                                    <img alt="" src="{% static '/app/img/camera.gif' %}"><span>{% trans "Choose File" %}</span>
                                     {{form.image}}
                                 </div>
                                 <!--<a class="btn btn-primary btn-sm button-position" role="button">Choose File</a>
@@ -70,7 +70,7 @@
                             <td>
                                 <div>
                                     <p>{% trans "Last Name" %}
-                                        <img src="/images/lock.jpg">
+                                        <img src="{{ MEDIA_URL }}icon/lock.jpg">
                                     </p>
                                     <div class="form-group">
                                         {{form.last_name}}
@@ -95,7 +95,7 @@
                             <td>
                                 <div>
                                     <p>{% trans "Last Name" %}
-                                        <img src="/images/lock.jpg">
+                                        <img src="{{ MEDIA_URL }}icon/lock.jpg">
                                     </p>
                                     <div class="form-group">
                                         {{form.last_name}}
@@ -128,7 +128,7 @@
                             <td>
                                 <div>
                                     <p>{% trans "Email Address" %}
-                                        <img src="/images/lock.jpg">
+                                        <img src="{{ MEDIA_URL }}icon/lock.jpg">
                                     </p>
                                 </div>
                                 <div class="form-group">
@@ -142,7 +142,7 @@
                             <td>
                                 <div>
                                     <p>{% trans "Local Mobile Number" %}
-                                        <img src="/images/lock.jpg">
+                                        <img src="{{ MEDIA_URL }}icon/lock.jpg">
                                     </p>
                                 </div>
                                 <div class="form-group">
