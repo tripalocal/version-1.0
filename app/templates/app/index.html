@@ -24,7 +24,7 @@
 	<script>
 		$(function() {
 			$("#slideshow > div:gt(0)").hide();
-			setInterval(function() { 
+			setInterval(function() {
 			  $('#slideshow > div:first')
 			    .fadeOut(1000)
 			    .next()
@@ -43,7 +43,7 @@
         <div id="closeTag" style="width:10%"><img src="/images/homepage/closeIcon-01.svg" width="14"></div>
         <div id="appIcon" style="width:70px; text-align:left;position:relative">
             <img src="/images/homepage/appIcon-01.jpg" width="60" >
-    
+
             <span style="position:absolute;left:80px;">
                 <h3 style="margin-bottom:5px;font-weight:bold">{% trans "Tripalocal for Android" %}</h3>
                 <img src="/images/homepage/rating-01.svg" width="110"><span style="color:#ccc;  vertical-align: middle;"> (24,812)</span>
@@ -61,9 +61,9 @@
             <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a></li>
             <li><a href="{{GEO_POSTFIX}}accounts/logout/">{% trans "Log out" %}</a></li>
             <li>{{ user.first_name }}</li>
-            <li><div class="profile-xs"><a href="{{GEO_POSTFIX}}myprofile"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>    
+            <li><div class="profile-xs"><a href="{{GEO_POSTFIX}}myprofile"><img class="menu-bar-profile" src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>    
         {% else %}
-            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a></li> 
+            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a></li>
             <li><a href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></li>
             <li><a href="{{GEO_POSTFIX}}accounts/login/?next={{ request.path }}">{% trans "Log in" %}</a></li>
         {% endif %}
@@ -106,7 +106,7 @@
             {%endif%}
             </div>
         </div>
-    </div> 
+    </div>
 
     <div class="exp-brief">
         <div class="container">
@@ -236,10 +236,10 @@
             <h1 style="text-align:center;margin:47px;padding:0">{% trans "Our Community"%}</h1>
             <div class="row">
                 <div class="col6 box" style="background-image:url(/images/homepage/travelling-01.jpg)">
-                    <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>  
+                    <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>
                 </div>
                 <div class="col6 box" style="background-image:url(/images/homepage/hosting-01.jpg)">
-                    <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>  
+                    <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>
                 </div>
             </div>
         </div>
@@ -317,11 +317,11 @@
             });
 
             $("#id_start_date").click(function(){
-                $("#id_start_date_picker").data("DateTimePicker").show();  
+                $("#id_start_date_picker").data("DateTimePicker").show();
             });
 
-            $("#id_end_date").click(function(){  
-                $("#id_end_date_picker").data("DateTimePicker").show();  
+            $("#id_end_date").click(function(){
+                $("#id_end_date_picker").data("DateTimePicker").show();
             });
         });
 

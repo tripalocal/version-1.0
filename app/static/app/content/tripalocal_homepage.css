@@ -305,6 +305,10 @@ h1{
   width: 210px;
   height: 45px;
 }
+
+.menu-bar-profile {
+  position: absolute; left: -2px; top: -3px;
+}
 @media (max-width: 767px) {
     #mobileTag {
         display: table;
