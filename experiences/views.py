@@ -1849,8 +1849,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
             if request.user.is_authenticated():
                 mp.track(request.user.email,"Viewed " + city.title() + " search page");
-            else:
-                mp.track("","Viewed " + city.title() + " search page");
+            #else:
+            #    mp.track("","Viewed " + city.title() + " search page");
 
         template = 'experiences/experience_results.html'
     else:
