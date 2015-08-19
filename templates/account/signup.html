@@ -42,7 +42,7 @@
 
             {% if 'email' in form.errors%}
             <div class="warning-sign">
-                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                 <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.email.errors.as_text}}</p>
             </div>
             {%endif%}
@@ -55,7 +55,7 @@
                     <tbody>
                         <tr>
                             <td>
-                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                             </td>
                             <td>
                                 <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.password1.errors.as_text}}</p>
@@ -71,7 +71,7 @@
 
             {% if 'first_name' in form.errors%}
             <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
-                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                 <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.first_name.errors.as_text}}</p>
             </div>
             {%endif%}
@@ -80,7 +80,7 @@
 
             {% if 'last_name' in form.errors%}
             <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
-                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                 <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.last_name.errors.as_text}}</p>
             </div>
             {%endif%}

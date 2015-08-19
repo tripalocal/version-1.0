@@ -331,7 +331,7 @@ a{
     border: 1px solid #cccccc;
 }
 .time-icon{
-    background-image: url(/images/icons.gif);
+    background-image: url(/images/icon/icons.gif);
     width: 27px;
     height: 27px;
     background-size: 135px 135px;
@@ -674,7 +674,7 @@ a{
 .menutrip-logo{
     width: 25px;
     height:25px; 
-    background-image:url(/images/icons.gif);
+    background-image:url(/images/icon/icons.gif);
     background-position: -28px -85px;
     display: block;
 }
@@ -682,7 +682,7 @@ a{
 .menubus-logo{
  	width: 25px;
     height:25px; 
-    background-image:url(/images/bus.gif);
+    background-image:url(../img/bus.gif);
     background-position: -4px;
     display: block;
 }

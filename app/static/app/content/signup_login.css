@@ -60,7 +60,7 @@
   color: #FB716E;
   padding-left: 30px;
   padding-top: 2px;
-  background-image: url(/images/error_icon.png);
+  background-image: url(../img/error_icon.png);
   background-repeat: no-repeat;
   background-position: left top;
 }
@@ -214,14 +214,14 @@
 .menutrip-logo {
   width: 25px;
   height: 25px;
-  background-image: url(/images/icons.gif);
+  background-image: url(../img/icons.gif);
   background-position: -28px -85px;
   display: block;
 }
 .menubus-logo {
   width: 25px;
   height: 25px;
-  background-image: url(/images/bus.gif);
+  background-image: url(../img/bus.gif);
   background-position: -4px;
   display: block;
 }
@@ -234,6 +234,11 @@
 }
 .warning-sign {
   width: 100%;
+}
+
+.profile-lg img {
+  width: auto;
+  position: absolute;
 }
 /**
 @media screen and (min-width: 910px) and (max-width: 1072px) {

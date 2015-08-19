@@ -30,8 +30,8 @@
 .desBox th {vertical-align: top;padding:20px 0;}
 .reviewBox h2{float:left; margin-right:20px;}
 .rating{color:#FC0; font-size:30px; margin-bottom:20px;}
-.reviewList{border-bottom:#CCC 1px solid; padding:20px 0px;overflow: hidden; width: 100%;}
-.reviewList .profile-md{position: absolute}
+.reviewList{border-bottom:#CCC 1px solid; padding:20px 0px;overflow: hidden; width: 100%; position: relative;}
+.reviewList .profile-md img {position: absolute; height: 98px; width: auto}
 .reviewText {float:right; width:480px; min-height: 100px;}
 .reviewDate{color:#999; margin-top:12px;}
 .experience-detail-table-td {padding-top:20px;padding-bottom:20px;}
@@ -59,15 +59,45 @@
 .host-socialmedia .Mobile, .review-title{ font-size: 10px;margin-top: 1px;}
 .host-facebook .host-friend,.host-instagram .host-contact,.host-mobile .host-verfied{display: block;font-size: 10px;float: left;}
 .facebooklogo,.instagramlogo,.mobilelogo, .reviewlogo{width: 45px;height:45px;margin: 0;padding: 0;float: left;margin-right: 4px;background-size: 210px 320px;}
-.facebooklogo{background-image:url(/images/icons.png);background-position: -135px 0px;}
-.mobilelogo{background-image:url(/images/icons.png);background-position: -135px -135px;}
-.reviewlogo {background-image:url(/images/icons.png);background-position: -135px -45px;}
-.save_to_wishlist_related {position:relative;float:left;width:27px;height:27px;background-image:url('/images/heart_small_red.svg'); background-repeat: no-repeat;}
-.saved_to_wishlist_related {position:relative;float:left;width:27px;height:27px;background-image:url('/images/heart_small_filled.svg');  background-repeat: no-repeat;}
+.facebooklogo{background-image:url(/images/icon/icons.png);background-position: -135px 0px;}
+.mobilelogo{background-image:url(/images/icon/icons.png);background-position: -135px -135px;}
+.reviewlogo {background-image:url(/images/icon/icons.png);background-position: -135px -45px;}
+
+.save_to_wishlist_related {
+    position: relative;
+    float: left;
+    width: 27px;
+    height: 27px;
+    background-image: url('../img/heart_small_red.svg');
+    background-repeat: no-repeat;
+}
+
+.saved_to_wishlist_related {
+    position: relative;
+    float: left;
+    width: 27px;
+    height: 27px;
+    background-image: url('../img/heart_small_filled.svg');
+    background-repeat: no-repeat;
+}
 .review-number {font-size:20px;margin-left:2px;line-height: 25px;font-weight: bold;float: left;}
-#save_to_wishlist_icon {background-image:url('/images/heart_large_red.svg');height:27px;width:27px; background-repeat: no-repeat;;float:left;margin-top: 5px;}
-.save_to_wishlist_not_added {background-image:url('/images/heart_large_red.svg');}
-.save_to_wishlist_added {background-image:url('/images/heart_large_filled.svg');}
+
+#save_to_wishlist_icon {
+    background-image: url('../img/heart_large_red.svg');
+    height: 27px;
+    width: 27px;
+    background-repeat: no-repeat;;
+    float: left;
+    margin-top: 5px;
+}
+
+.save_to_wishlist_not_added {
+    background-image: url('../img/heart_large_red.svg');
+}
+
+.save_to_wishlist_added {
+    background-image: url('../img/heart_large_filled.svg');
+}
 .booking-exp{width: 100%;height: 50px;border-bottom: 1px solid #eee;}
 .save_to_wishlist_button{border:1px solid #CCCCCC;color:#666666; margin-top:30px; height:50px; width: 100%;margin-left:auto; margin-right:auto;border-radius: 3px;padding:5px 55px;}
 #wishlist_p {font-size:12px;color: #CCCCCC;}
@@ -96,7 +126,7 @@
 .timebtn span{font-size: 12px;font-weight: 100;float:none;position:relative;left:0px;top:5px;}
 .timebtn img{width: 20px;height: 20px;position: relative;top: 5px;}
 .people-list select{width: 100%;height: 30px;border: 1px solid #cccccc;}
-.time-icon{background-image: url(/images/icons.gif);width: 27px;height: 27px;background-size: 135px 135px;background-position: -54px 0px;position: relative;left:42px;margin-bottom:-10px;}
+.time-icon{background-image: url(/images/icon/icons.gif);width: 27px;height: 27px;background-size: 135px 135px;background-position: -54px 0px;position: relative;left:42px;margin-bottom:-10px;}
 .bookingform-box{width: 250px;height: 100px;border-top: 1px solid #cccccc;margin-left: 25px;margin-right: 25px;padding-top: 10px;}
 .bookingform-box{padding-right: 0;}
 .bookingform-box select{border-top: 1px solid #cccccc;height: 30px;}
@@ -160,9 +190,9 @@ a {color:#6CC;} a:hover{color:#699;}
 .footer img{margin:30 0;}
 
 .navbar span {width:23px; height:23px; background-size:90px 45px; display:block;  margin: -2 -8;}
-.navbar #twitter span { background-image:url(/images/icons.png); background-position: 0 -23px;}
-.navbar  #facebook span{ background-image:url(/images/icons.png); background-position: -23px -23px;}
-.navbar #linkedin span{ background-image:url(/images/icons.png); background-position: -68px -23px;}
+.navbar #twitter span { background-image:url(/images/icon/icons.png); background-position: 0 -23px;}
+.navbar  #facebook span{ background-image:url(/images/icon/icons.png); background-position: -23px -23px;}
+.navbar #linkedin span{ background-image:url(/images/icon/icons.png); background-position: -68px -23px;}
 
 .book-tease, .priority{padding:100px 0;}
 
@@ -210,6 +240,14 @@ a {color:#6CC;} a:hover{color:#699;}
 .expList p{font-size:12px;}
 .expList h3{color: #333;font-size: 15px;}
 .expList a:hover{text-decoration: none;border-bottom: 1px solid #333;}
+.expList .profile-sm {
+  position: relative;
+}
+.expList .profile-sm img {
+  position: absolute;
+  height: 80px;
+  width: auto;
+}
 
 .row{overflow: visible;}
 
@@ -361,9 +399,38 @@ a {color:#6CC;} a:hover{color:#699;}
   }
 }
 
-.interests-icon{background-image: url(/images/icons.png);width: 27px;height: 27px;background-size: 210px 320px;background-position: 0px -27px;position: relative;margin-bottom:-10px;float:left;margin-top:35px;margin-right:25px;}
-.money-icon{background-image: url(/images/icons.png);width: 27px;height: 27px;background-size: 210px 320px;background-position: -27px -27px;position: relative;left:15px;margin-bottom:-10px;}
-.hour-icon{background-image: url(/images/icons.png);width: 27px;height: 27px;background-size: 210px 320px;background-position: -54px 0px;position: relative;left:15px;margin-bottom:-10px;}
-#id_date{-webkit-appearance:none;-moz-appearance:none;text-align: -moz-left;background: url(/images/dropdown-button.png) no-repeat;background-position: 78px 2px;width: 100px;padding-left: 5px;margin-right:5px;}
-#id_time{-webkit-appearance:none;-moz-appearance:none;text-align: -moz-left;background: url(/images/dropdown-button.png) no-repeat;background-position: 43px 2px;width: 65px;padding-left: 5px;margin-right:5px;}
-.booking_form_people{-webkit-appearance:none;-moz-appearance:none;text-align: -moz-left;background: url(/images/dropdown-button.png) no-repeat;background-position: 22px 2px;width: 44px;padding-left: 10px;}
+.interests-icon{background-image: url(/images/icon/icons.png);width: 27px;height: 27px;background-size: 210px 320px;background-position: 0px -27px;position: relative;margin-bottom:-10px;float:left;margin-top:35px;margin-right:25px;}
+.money-icon{background-image: url(/images/icon/icons.png);width: 27px;height: 27px;background-size: 210px 320px;background-position: -27px -27px;position: relative;left:15px;margin-bottom:-10px;}
+.hour-icon{background-image: url(/images/icon/icons.png);width: 27px;height: 27px;background-size: 210px 320px;background-position: -54px 0px;position: relative;left:15px;margin-bottom:-10px;}
+
+#id_date {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-align: -moz-left;
+    background: url(/images/icon/dropdown-button.png) no-repeat;
+    background-position: 78px 2px;
+    width: 100px;
+    padding-left: 5px;
+    margin-right: 5px;
+}
+
+#id_time {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-align: -moz-left;
+    background: url(/images/icon/dropdown-button.png) no-repeat;
+    background-position: 43px 2px;
+    width: 65px;
+    padding-left: 5px;
+    margin-right: 5px;
+}
+
+.booking_form_people {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-align: -moz-left;
+    background: url(/images/icon/dropdown-button.png) no-repeat;
+    background-position: 22px 2px;
+    width: 44px;
+    padding-left: 10px;
+}

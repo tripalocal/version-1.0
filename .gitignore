@@ -38,13 +38,8 @@ Thumbs.db
 
 *.pyc
 .env
-/images/**/*.*
 venv/
 /static/
 local_settings.py
 GeoLite2-City.mmdb
 
-!/images/css/
-!/images/js/
-!/images/img/*.*
-!/images/city/
