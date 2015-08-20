@@ -12,6 +12,7 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <link rel="icon" href="{% static 'app/img/favicon.ico'%}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
@@ -134,7 +135,7 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
     </div>
 
     <script type="text/javascript">
-        function create_post(email, message) {
+        function create_post(email, message, popupTimmer) {
             $.ajax({
                 url: "email_custom_trip",
                 type: "POST",
@@ -149,6 +150,8 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                     $('#popup-form-details').val('');
                     $('#popup-form-email').val('');
                     $('#results').html("<p class=''>Thank you for you suggestion.</p>");
+                    clearInterval(popupTimmer);
+                    $.cookie("closePopup", 2);
                 },
 
                 error: function (xhr, errmsg, err) {
@@ -158,37 +161,45 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
         }
 
         $(document).ready(function () {
-            $('#custom-trip-form').on('submit', function (event) {
-                event.preventDefault();
-                $('#results').empty();
-                email = $('#popup-form-email').val();
-                message = $('#popup-form-details').val();
-
-                if (!message || !email) {
-                    $('#results').html("<p class=''>Please fill all fields.</p>");
-                } else {
-                    var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-                    if (regex.test(email)) {
-                        alert('Thanks.');
-                        create_post(email, message);
-                    } else {
-                        $('#results').html("<p class=''>Email Invalid.</p>");
-                    }
-                }
-            });
+            var popupTimmer;
 
             if ($(window).width() > 520) {
-                setTimeout(function () {
-                    $('#help-popup').modal('show');
-                    mixpanel.track("saw popup01");
-                }, 60000); // milliseconds
+                var nClose = parseInt($.cookie("closePopup"), 10);
+                if (!nClose || nClose < 2) {
+                    popupTimmer = setInterval(function () {
+                        $('#help-popup').modal('show');
+                        mixpanel.track("saw popup01");
+                    }, 6000); // milliseconds
+                }
 
                 $('.close-popup').click(function () {
+                    var nClose = parseInt($.cookie("closePopup"), 10);
+                    if (nClose) {
+                        if (nClose >= 2) {
+                            clearInterval(popupTimmer);
+                        } else {
+                            $.cookie("closePopup", nClose + 1);
+                        }
+                    } else {
+                        $.cookie("closePopup", 1);
+                    }
+
                     $('#help-popup').modal('hide');
                     mixpanel.track("closed popup02");
                 });
 
                 $('#help-no').click(function () {
+                    var nClose = parseInt($.cookie("closePopup"), 10);
+                    if (nClose) {
+                        if (nClose >= 2) {
+                            clearInterval(popupTimmer);
+                        } else {
+                            $.cookie("closePopup", nClose + 1);
+                        }
+                    } else {
+                        $.cookie("closePopup", 1);
+                    }
+
                     $('#help-popup').modal('hide');
                     mixpanel.track("selected No from popup01");
                 });
@@ -197,6 +208,26 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                     $('#popup-page-1').hide();
                     $('#popup-page-2').show();
                     mixpanel.track("selected Yes from popup01");
+                });
+
+                $('#custom-trip-form').on('submit', function (event) {
+                    event.preventDefault();
+
+                    $('#results').empty();
+                    email = $('#popup-form-email').val();
+                    message = $('#popup-form-details').val();
+
+                    if (!message || !email) {
+                        $('#results').html("<p class=''>Please fill all fields.</p>");
+                    } else {
+                        var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                        if (regex.test(email)) {
+                            alert('Thanks.');
+                            create_post(email, message, popupTimmer);
+                        } else {
+                            $('#results').html("<p class=''>Email Invalid.</p>");
+                        }
+                    }
                 });
             }
         });

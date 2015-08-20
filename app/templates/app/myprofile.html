@@ -50,7 +50,7 @@
                                 <input id="uploadImage_1" placeholder="{% trans "No file chosen" %}" class="uploadImage" disabled="disabled" />
                                 {%endif%}
                                 <div class="fileUpload btn btn-primary">
-                                    <img alt="" src="/images/camera.gif"><span>{% trans "Choose File" %}</span>
+                                    <img alt="" src="{% static 'app/img/camera.gif' %}"><span>{% trans "Choose File" %}</span>
                                     {{form.image}}
                                 </div>
                                 <!--<a class="btn btn-primary btn-sm button-position" role="button">Choose File</a>

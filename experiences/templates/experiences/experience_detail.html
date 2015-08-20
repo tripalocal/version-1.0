@@ -325,7 +325,7 @@
                         {%if review.user.registereduser.image_url != None and review.user.registereduser.image_url != ''%}
                             <div class="profile-md"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
                         {%else%}
-                            <div class="profile-md"><img src="{{ MEDIA_URL }}profile_default.jpg" width="240" height="240"></div>
+                            <div class="profile-md"><img src="{{ MEDIA_URL }}img/profile_default.jpg" width="240" height="240"></div>
                         {%endif%}
                             <div class="reviewText">{{review.comment}}
                                 <div class="reviewDate">
@@ -375,7 +375,7 @@
                         <div class="profile-sm">
 							<img src="{% for h in related_experience.hosts.all %}
 							{% if forloop.first %}
-							{{ MEDIA_URL }}{% if h.registereduser.image_url %}{{h.registereduser.image_url}}{%else%}profile_default.jpg{% endif %}
+							{{ MEDIA_URL }}{% if h.registereduser.image_url %}{{h.registereduser.image_url}}{%else%}{{ MEDIA_URL }}img/profile_default.jpg{% endif %}
 							{% endif %}
 							{% endfor %}" width="240" height="240">
 						</div>
