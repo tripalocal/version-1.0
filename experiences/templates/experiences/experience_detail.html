@@ -25,10 +25,10 @@
     <p style="postion:relative;top:50px;">{% trans "The experience has not be approved. Only you can see it now." %}</p>
     {%endif%}
 
-    <div class="jumbotron experienceImg" style="background-image:url(		
+    <div class="jumbotron experienceImg" style="background-image:url(
 		{% for photo in experience.photo_set.all %}
             {% if forloop.first %}
-				{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
+				{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}
             {% endif %}
         {% endfor %})">
 	</div>
@@ -56,7 +56,7 @@
                         </div>
                         <form id="experience_booking_form" method="post" action="">
                             {% csrf_token %}
-                        
+
                             {% for field in form.hidden_fields %}
                                 {{ field }}
                             {% endfor %}
@@ -64,7 +64,7 @@
                             <div>{% trans "No. of Guests" %} &nbsp;&nbsp;
                                 <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none;"/>
                                 <input type="text" id="guest_number_max" name="{{experience.guest_number_max}}" disabled="disabled" style="display:none;"/>
-                                {% for op in available_options %} 
+                                {% for op in available_options %}
                                     <p id="seat_left_{{forloop.counter0}}" style="display:none;"> {{op.available_seat}} </p>
                                 {% endfor %}
                                 {{form.guest_number}}
@@ -78,11 +78,11 @@
                                 </thead>
 
                                 {% for op in available_options %}
-                                    <p id="date_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.date_string}} </p> 
+                                    <p id="date_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.date_string}} </p>
                                 {% endfor %}
 
-                                {% for op in available_options %} 
-                                    <p id="time_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.time_string}} </p> 
+                                {% for op in available_options %}
+                                    <p id="time_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.time_string}} </p>
                                 {% endfor %}
 
                                 {% for op in available_options %}
@@ -100,9 +100,9 @@
                                         </td>
                                         <td class="people-list">
                                             {% if user.is_authenticated %}
-                                                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" />  
+                                                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" />
                                             {% else %}
-                                                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/> 
+                                                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -118,14 +118,14 @@
                                     </td>
                                     <td class="people-list">
                                     {% if user.is_authenticated %}
-                                        <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" />  
+                                        <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" />
                                     {% else %}
-                                        <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '/accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/> 
+                                        <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '/accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
                                     {% endif %}
                                     </td>
                                 </tr>
                             </table>
-                            
+
                             <div class="save_to_wishlist_button">
                             {% if not in_wishlist %}
                                 {% if user.is_authenticated %}
@@ -259,7 +259,7 @@
                     <div id="experience-hostinterests" class="experience-hostinterests">
                         <div class="gradientMask"></div>
                         <span id="host_bio">{{host_bio}}</span>
-                    </div>      
+                    </div>
                     {% if host_bio|length > 200 %}
                     <div id="bio_show_more" value="More">+ {% trans "More" %}</div>
                     {% endif %}
@@ -292,7 +292,7 @@
                 </div>
                 {% endif %}
                 {% endif %}
-                {% endfor %} 
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -379,7 +379,7 @@
 							{% endif %}
 							{% endfor %}" width="240" height="240">
 						</div>
-          
+
                         <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
                         <div class="listingFooter">
                             <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
@@ -390,12 +390,12 @@
                     {% endfor %}
                 </div>
             </div>
-        </div> 
+        </div>
     </div>
 {%else%}
     <p>{% trans "The experience has expired, or has not been approved." %}</p>
 {%endif%}
-{% endblock %} 
+{% endblock %}
 
 {% block scripts %}
 
@@ -403,6 +403,7 @@
 
 $(function(){
     $(document).ready(function(){
+      mixpanel.track("viewed an experience");
         if(screen.width > 767){
             $(document.body).stickem();
         }
@@ -467,13 +468,13 @@ $(function(){
         $("#id_submit_request").bind("click", function(e) {
             e.preventDefault();
             {% if LANGUAGE != "zh-CN" %}
-            mixpanel.track("Clicked on \"Request\"");
+            //mixpanel.track("Clicked on \"Request\"");
             {% else %}
-            mixpanel.track("Clicked on \"Request\"_cn");
+            //mixpanel.track("Clicked on \"Request\"_cn");
             {% endif %}
             if($("#user_email").val())
             {
-                mixpanel.identify($("#user_email").val());
+                //mixpanel.identify($("#user_email").val());
             }
             $("#experience_booking_form").submit();
         });
@@ -520,16 +521,16 @@ $(function(){
         }
 
         {% if LANGUAGE != "zh-CN" %}
-        mixpanel.track("Viewed experience page_en");
+        // mixpanel.track("Viewed experience page_en");
         {% else %}
-        mixpanel.track("Viewed experience page_cn");
+        // mixpanel.track("Viewed experience page_cn");
         {% endif %}
         if($("#user_email").val())
         {
-            mixpanel.identify($("#user_email").val());
+            //mixpanel.identify($("#user_email").val());
         }
 
-        mixpanel.track("Viewed experience");
+        //mixpanel.track("Viewed experience");
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());
@@ -633,7 +634,7 @@ $(function(){
 
 $(function(){
     $("#id_date").change(function(){
-        selected_date = $("#id_date option:selected").text().trim();     
+        selected_date = $("#id_date option:selected").text().trim();
 
         $("#id_time").html('');
 
@@ -655,14 +656,10 @@ $(function(){
         }
 
         $("#id_time").change();
-        {% if LANGUAGE != "zh-CN" %}
-        mixpanel.track("Changed date");
-        {% else %}
-        mixpanel.track("Changed date_cn");
-        {% endif %}
+        mixpanel.track("changed date");
         if($("#user_email").val())
         {
-            mixpanel.identify($("#user_email").val());
+            //mixpanel.identify($("#user_email").val());
         }
     })
 })
@@ -694,13 +691,13 @@ $(function(){
         }
 
         {% if LANGUAGE != "zh-CN" %}
-        mixpanel.track("Changed time");
+        //mixpanel.track("Changed time");
         {% else %}
-        mixpanel.track("Changed time_cn");
+        //mixpanel.track("Changed time_cn");
         {% endif %}
         if($("#user_email").val())
         {
-            mixpanel.identify($("#user_email").val());
+            //mixpanel.identify($("#user_email").val());
         }
     })
 })
@@ -717,14 +714,11 @@ $(function(){
             $("#experience_price").text(price);
         }
 
-        {% if LANGUAGE != "zh-CN" %}
-        mixpanel.track("Changed number of people");
-        {% else %}
-        mixpanel.track("Changed number of people_cn");
-        {% endif %}
+
+        mixpanel.track("changed number of people");
         if($("#user_email").val())
         {
-            mixpanel.identify($("#user_email").val());
+            //mixpanel.identify($("#user_email").val());
         }
     })
 })

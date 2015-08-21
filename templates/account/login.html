@@ -100,10 +100,10 @@ function checkInput(id_put, id_error)
     $("#id_login").blur(function(){
         //checkEmail();
     });
-    
+
 //validate password
     $("#id_password").blur(function(){
-        //checkInput("id_password", "id_password_error");   
+        //checkInput("id_password", "id_password_error");
     });
 
 $(function(){
@@ -124,7 +124,12 @@ $(function(){
             if(checkEmail() && checkInput("id_password", "id_password_error"))
             {
                 mixpanel.people.set({"$last_seen": new Date().toString()});
-                mixpanel.identify($("#id_login").val());   
+                mixpanel.identify($("#id_login").val());
+                if ($(window).width() < 768) {
+                  mixpanel.track("signed in via mobile site");
+                } else {
+                  mixpanel.track("signed in via website");
+                }
                 $("#login_form").submit();
             }
         })

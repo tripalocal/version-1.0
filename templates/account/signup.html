@@ -157,10 +157,10 @@ function checkInput(id_put, id_error)
     $("#id_email").blur(function(){
         checkEmail();
     });
-    
+
 //validate password
     $("#id_password1").blur(function(){
-        checkInput("id_password1", "id_password1_error");   
+        checkInput("id_password1", "id_password1_error");
     });
 
 //validation firstname
@@ -175,7 +175,7 @@ function checkInput(id_put, id_error)
         }
         if($("#id_first_name").val().search(regexp) != -1)
         {
-            checkInput("id_first_name", "first_name_error"); 
+            checkInput("id_first_name", "first_name_error");
         }
         else
         {
@@ -183,8 +183,8 @@ function checkInput(id_put, id_error)
             return false;
         }
     });
-    
-//validate last name 
+
+//validate last name
    $("#id_last_name").blur(function(){
         if("{{form.language.value}}" !="zh-CN")
         {
@@ -221,7 +221,7 @@ $(function()
         $("#id_last_name").attr("placeholder", "{% trans "Last Name" %}");
 
         /*
-        $.getScript('http://www.geoplugin.net/javascript.gp', function() 
+        $.getScript('http://www.geoplugin.net/javascript.gp', function()
         {
             country = geoplugin_countryName();
             region = geoplugin_region();
@@ -235,7 +235,7 @@ $(function()
         $("#id_signup_submit_button").bind("click", function(e){
             e.preventDefault();
 
-            if(checkEmail() && checkInput("id_password1", "id_password1_error") 
+            if(checkEmail() && checkInput("id_password1", "id_password1_error")
                 && checkInput("id_first_name", "first_name_error")
                 && checkInput("id_last_name", "last_name_error"))
             {
@@ -250,7 +250,7 @@ $(function()
                         navigator.geolocation.getCurrentPosition(function(position)
                         {
                             mixpanel.people.set({"Latitude":position.coords.latitude, "Longitude":position.coords.longitude});
-                            mixpanel.identify($("#id_email").val());   
+                            mixpanel.identify($("#id_email").val());
                         });
                         */
                     }
@@ -261,7 +261,11 @@ $(function()
                                         "$created":now, "$last_seen":now
                                         });
                     mixpanel.identify($("#id_email").val());
-
+                    if ($(window).width() < 768) {
+                      mixpanel.track("signed up via mobile site");
+                    } else {
+                      mixpanel.track("signed up via website");
+                    }
                     ga('send','event','{% trans "sign up" %}','click');
                     $("#signup_form").submit();
                 }

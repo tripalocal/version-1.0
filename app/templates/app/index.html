@@ -61,7 +61,7 @@
             <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a></li>
             <li><a href="{{GEO_POSTFIX}}accounts/logout/">{% trans "Log out" %}</a></li>
             <li>{{ user.first_name }}</li>
-            <li><div class="profile-xs"><a href="{{GEO_POSTFIX}}myprofile"><img class="menu-bar-profile" src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>    
+            <li><div class="profile-xs"><a href="{{GEO_POSTFIX}}myprofile"><img class="menu-bar-profile" src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>
         {% else %}
             <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a></li>
             <li><a href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></li>
@@ -250,6 +250,7 @@
 <script charset="utf-8" type="text/javascript">
 
     $(document).ready(function() {
+      mixpanel.track("viewed homepage");
       $(".request-btn").click(function() {
         window.location.href="mailto:enquiries@tripalocal.com";
         mixpanel.track("requested a trip from homepage");
@@ -327,11 +328,11 @@
 
         if("{{LANGUAGE}}" == "zh-CN")
         {
-            mixpanel.track("Visited homepage_cn");
+            //mixpanel.track("Visited homepage_cn");
         }
         else
         {
-            mixpanel.track("Visited homepage_en");
+            //mixpanel.track("Visited homepage_en");
         }
 
         var utmId = getParameterByName('utm');
@@ -344,7 +345,7 @@
             initial_referrer = document.referrer;
         }
         var now  = new Date().toString();
-        mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
+        mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Language":{{LANGUAGE}}, "Latitude":latitude, "Longitude":longitude });
         mixpanel.people.set({"$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": initial_referrer,"$last_seen":now});
         if($("#user_email").val())
         {
@@ -355,6 +356,7 @@
     var video = $("video").get(0);
     $("#enter_fullscreen").click(function(){
         $("#video-fullscreen").fadeIn();
+        mixpanel.track("viewed video");
         video.play();
     });
 

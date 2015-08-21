@@ -28,7 +28,7 @@
                         <div class="iconHeader">
                             <div class="iconImage" id="date"></div>
                             <div class="iconText">{%trans "Dates" %}</div>
-                        </div> 
+                        </div>
 
                         <div class="formBoxes">
                             <div class="ui selection dropdown">
@@ -49,7 +49,7 @@
                     <div class="verticalBar">
                     </div>
                     <div class="people">
-                        <div class="iconHeader"> 
+                        <div class="iconHeader">
                             <div class="iconImage" id="people">
                             </div>
                             <div class="iconText">{%trans "People"%}
@@ -64,20 +64,20 @@
 
                     <div class="verticalBar">
                     </div>
-                
+
                     <div class="language">
                         <div class="iconHeader">
                             <div class="iconImage" id="language">
                             </div>
                             <div class="iconText">{%trans "Language"%}
                             </div>
-                        </div> 
+                        </div>
 
                         <div class="formBoxes">
-                            {{form.language}} 
+                            {{form.language}}
                             <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
-                            <br> 
-                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:18px;">中文</label> 
+                            <br>
+                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:18px;">中文</label>
                         </div>
                     </div>
 
@@ -125,11 +125,11 @@
                                 {%trans "Private tours only"%}</label>
                         </div>
                     </div>
-                </div>      
+                </div>
             </div>
         </div>
-        <div class="mobileSearch notOnDesktop">  
-            <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>  
+        <div class="mobileSearch notOnDesktop">
+            <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>
             <img src="{{ MEDIA_URL }}search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
         </div>
     </form>
@@ -149,7 +149,7 @@
                     <div class="expList custom-itinerary" style="background-image:url({% static 'experiences/img/searchpage_banner.jpg' %});">
                       <button class="btn btn-primary request-btn">{% trans "Request a trip" %}</button>
                     </div>
-                </div>       
+                </div>
             </div>
         </div>
     </div>
@@ -220,7 +220,7 @@
     }
 
     $(document).ready(function(){
-        mixpanel.track("Search");
+        mixpanel.track("viewed search page");
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());
@@ -308,7 +308,7 @@
         $(".glyphicon-calendar").hide();
 
         $("#id_start_date").click(function(){
-            $("#id_start_date_picker").data("DateTimePicker").show();  
+            $("#id_start_date_picker").data("DateTimePicker").show();
         });
 
        $("#id_start_date, #id_end_date").focusout(function () {

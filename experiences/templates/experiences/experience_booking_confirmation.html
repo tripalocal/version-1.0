@@ -349,7 +349,7 @@
                         <p id="id_coupon_extra_fee" style="font-size:14px;"></p>
                         <div id="id_service_fee" style="display:none;">{% trans "Processing Fee:" %} {{experience.dollarsign}}{{ service_fee|stringformat:".2f" }}<br></div>
                         <strong style="font-size:18px;">{% trans "Total:" %} {{experience.dollarsign}}<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
-                    </form>                     
+                    </form>
                 </div>
             </div>
         </div>
@@ -362,7 +362,7 @@
 
 $(function(){
     $(document).ready(function(){
-        mixpanel.track("Checkout");
+        mixpanel.track("checkout");
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());
@@ -406,13 +406,13 @@ $(function(){
         $("#submit_booking").bind("click", function(e) {
             e.preventDefault();
             if ($("#isAgreementSelected").is(':checked'))
-            {  
+            {
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
                 {
-                    mixpanel.track("Clicked on \"Checkout\"");
+                    //mixpanel.track("Clicked on \"Checkout\"");
                     if($("#user_email").val())
                     {
-                        mixpanel.identify($("#user_email").val());
+                        //mixpanel.identify($("#user_email").val());
                     }
                     //$("#category_form").submit();
                     if({{total_price}}>0.00)

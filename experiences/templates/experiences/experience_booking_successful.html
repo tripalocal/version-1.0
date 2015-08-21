@@ -33,7 +33,7 @@
 {% endblock %}
 
 {% block content %}
-        
+
     <center>
         <table align="center" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable">
             <tr>
@@ -56,7 +56,7 @@
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
-                                                        </table>  
+                                                        </table>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -125,7 +125,7 @@
                                             <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock">
                                                 <tbody class="mcnTextBlockOuter">
                                                     <tr>
-                                                        <td valign="top" class="mcnTextBlockInner">              
+                                                        <td valign="top" class="mcnTextBlockInner">
                                                             <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
                                                                 <tbody>
 						                                            <tr>
@@ -135,7 +135,7 @@
 							                                            </td>
 						                                            </tr>
 					                                            </tbody>
-				                                            </table>              
+				                                            </table>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -186,7 +186,7 @@
     $(document).ready(function(){
         $("#footer_div").hide();
 
-        mixpanel.track("Payment");
+        mixpanel.track("completed payment");
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());
