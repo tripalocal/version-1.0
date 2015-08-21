@@ -53,6 +53,7 @@
                         <a class="btn btn-primary btn-sm" role="button" id="update-listing"
                            href="{% url 'manage_listing_continue' exp_id=experience.id %}">Update listing</a>
                     {% endif %}
+
                 </div>
                 {% empty %}
                 <p style="width:400px;">>{% trans "You have not hosted any experience." %}</p>
