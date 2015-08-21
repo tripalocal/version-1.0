@@ -1,3 +1,6 @@
+import traceback
+
+from django.http import Http404
 from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
@@ -70,7 +73,9 @@ class Experience(models.Model):
             self.meetup_spot = exp_i18n.meetup_spot
             self.dropoff_spot = exp_i18n.dropoff_spot
 
-
+    def change_status(self, new_status=None):
+        self.status = new_status
+        self.save()
 
     class Meta:
         ordering = ['id']
@@ -206,15 +211,57 @@ class Booking(models.Model):
     payment = models.ForeignKey("Payment", related_name="payment")
     refund_id = models.CharField(max_length=50)
     booking_extra_information = models.TextField()
-    
+
     def __str__(self):
         return self.user.email + "--" + get_experience_title(self.experience,settings.LANGUAGES[0][0])
 
-    def upload_review(self, booking_id, rate=None, review=None):
-        booking = get_object_or_404(Booking, id = booking_id)
-        experience_id = booking.experience_id
-        user_id = booking.user_id
+    def upload_review(self, rate=None, review=None):
+        experience_id = self.experience_id
+        user_id = self.user_id
         Review.objects.update_or_create(experience_id = int(experience_id), user_id = int(user_id), defaults = {'comment': review, 'rate': int(rate), 'datetime': datetime.now()})
+        return True
+
+    def change_time(self, new_time=None, new_date=None):
+        if new_time and new_date:
+            new_datetime = datetime.combine(new_date, new_time)
+            self.datetime = new_datetime
+            self.save()
+            return new_datetime
+        else:
+            traceback.print_exc()
+            raise Http404('Change time failed.')
+
+    def change_status(self, new_status=None):
+        if new_status == "archived":
+            self.status = self.status + '_archived'
+        elif new_status == "unarchived":
+            self.status = self.status[:-9]
+        else:
+            self.status = new_status
+        self.save()
+        return self.status
+
+    def get_experience(self):
+        return get_object_or_404(Experience, id = self.experience_id)
+
+    def get_guest(self):
+        return get_object_or_404(User, id = self.user_id)
+
+    def get_hosts(self):
+        return self.get_experience().hosts.all()
+
+    def attach_guest_price(self):
+        host_price = float(self.experience.price) * float(self.guest_number)
+        full_price = self._calculate_full_price(host_price)
+        self.full_price = full_price
+        self.host_price = host_price
+
+    def _calculate_full_price(self, price):
+        if type(price)==int or type(price) == float:
+            return round(price*(1.00+settings.COMMISSION_PERCENT)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2)
+
+
+
 
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):

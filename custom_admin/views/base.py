@@ -1,28 +1,20 @@
-__author__ = 'lyy'
 from datetime import datetime, timezone, timedelta
 
 from experiences.models import Booking, Review
+from django.utils.timezone import localtime
 
 class BookingInfoMixin(object):
     def get_context_data(self, **kwargs):
         context = super(BookingInfoMixin, self).get_context_data(**kwargs)
         # Add booking info to the context.
-        booking_list = Booking.objects.all()
+        booking_list = context['booking_list']
+        for booking in booking_list:
+            print(booking.status)
         status_generator = StatusGenerator(booking_list)
         status_generator.generate_status_description()
         context['booking_list'] = booking_list
         # Add user name to the context.
         context['user_name'] = self.request.user.username
-        return context
-
-class NotificationMixin(object):
-    def get_context_data(self, **kwargs):
-        context = super(NotificationMixin, self).get_context_data(**kwargs)
-        change_status_notification_key = 'status'
-        if change_status_notification_key in  self.request.GET:
-            context[change_status_notification_key] = self.request.GET[change_status_notification_key]
-        else:
-            context[change_status_notification_key] = 'none'
         return context
 
 """
@@ -54,7 +46,8 @@ class StatusGenerator:
                 manipulate_function_name = '_manipulate_' + booking.status + '_booking'
                 manipulate_function = getattr(self, manipulate_function_name)
                 manipulate_function(booking)
-                booking.datetime = booking.datetime.strftime("%d %b %Y %H:%I")
+                booking.datetime = localtime(booking.datetime)
+                booking.datetime = booking.datetime.strftime("%d %b %Y %H:%M")
             else:
                 temp = booking.status.split('_')
                 previous_status = ''
@@ -66,7 +59,8 @@ class StatusGenerator:
                 manipulate_function_name = '_manipulate_' + previous_status + '_booking'
                 manipulate_function = getattr(self, manipulate_function_name)
                 manipulate_function(booking)
-                booking.datetime = booking.datetime.strftime("%d %b %Y %H:%I")
+                booking.datetime = localtime(booking.datetime)
+                booking.datetime = booking.datetime.strftime("%d %b %Y %H:%M")
 
     def _manipulate_requested_booking(self, booking):
         time_after_booking_submission = self.now_time - booking.submitted_datetime
@@ -75,6 +69,7 @@ class StatusGenerator:
         if (time_after_booking_submission.days < 0):
             booking.status_description = 'Server external error.'
             booking.colour = 'red'
+            booking.actions = []
         # The booking hasn't been manipulated by anyone yet, and the time after the
         # submission is greater than 12 hours.
         elif (time_after_booking_submission.days == 0 and time_after_booking_submission.seconds > 43200):
@@ -102,6 +97,7 @@ class StatusGenerator:
             time_after_review = self.now_time - review[0].datetime
             booking.status_description = 'The review has been received ' + str(time_after_review.days) + ' days and ' + str(round(float(time_after_review.seconds/3600),1)) + ' hours ago.'
             booking.colour = 'black'
+            booking.actions = []
         # If the booking is accepted and there has been 24 hours after the experience
         # when the email has been sent.
         elif (time_after_experience.days > 0):
@@ -124,7 +120,9 @@ class StatusGenerator:
         booking.actions = []
 
     def _manipulate_deleted_booking(self, booking):
-        pass
+        booking.status_description = ''
+        booking.colour = ''
+        booking.actions = []
 
     def _manipulate_paid_booking(self, booking):
         self._manipulate_requested_booking(booking)

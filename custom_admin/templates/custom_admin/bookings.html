@@ -33,18 +33,18 @@
     <div class="operation"></div>
   	<ul class="subMenu">
     <li>Current Bookings</li>
-    <li id="activated"><a href="/custom_admin/archive/">Archived</a></li>
+    <li id="activated"><a href="/custom_admin/booking-archive/">Archived</a></li>
    
     </ul>
     <div class="clear"></div>
-  {% csrf_token %}
+
 <table border="0" cellspacing="0" cellpadding="0">
     <tr>
     <td colspan="11" class="tableEdit">&nbsp;&nbsp;↓
-<input name="input" type="button" value="Delete" onclick="deleteBookings()"/>&nbsp;&nbsp;
-<input name="input" type="button" value="Email to Host" onclick="sendConfirmationEmailHost()"/>&nbsp;&nbsp;
-<input name="input" type="button" value="Email to Traveller" onclick="sendConfirmationEmailGuest()"/>&nbsp;&nbsp;
-<input name="input" type="button" value="Archive" onclick="archiveBookings()"/></td>
+<input id="bookings-delete-link" name="input" type="button" value="Delete"/>&nbsp;&nbsp;
+<input id="bookings-email-to-host-link" name="input" type="button" value="Email to Host"/>&nbsp;&nbsp;
+<input id="bookings-email-to-guest-link" name="input" type="button" value="Email to Traveller"/>&nbsp;&nbsp;
+<input id="bookings-archive-link" name="input" type="button" value="Archive"/></td>
     </tr>
   <tr>
     <th scope="col"><span id="sprycheckbox1">
@@ -64,8 +64,8 @@
  
     {% for booking in booking_list %}
     {% if booking.status == 'requested' or booking.status == 'accepted' or booking.status == 'rejected' or booking.status == 'no_show' or booking.status == 'paid' %}
-      <tr>
-        <td><input type="checkbox" name="admin_panel_booking_id_checkbox" value="{{booking.id}}"/></td>
+      <tr id="booking-table-row-{{booking.id}}">
+        <td><input type="checkbox" name="admin-panel-booking-id-checkbox" value="{{booking.id}}"/></td>
         <td id="td-booking-datetime-{{ booking.id }}" >{{ booking.datetime }}</td>
         <td><a href="/experience/{{booking.experience.id}}" target="_blank">{{ booking.experience.title }}</a></td>
         <td>
@@ -87,15 +87,15 @@
             {% endifequal %}
 
             {% ifequal action 'Mark as no show' %}
-              <a href="#" onclick="markAsNoShow({{booking.id}})">{{action}}</a>
+              <a href="#/" id="booking-mark-as-no-show-link-{{booking.id}}">{{action}}</a>
             {% endifequal %}
 
             {% ifequal action 'Reopen booking' %}
-              <a href="#" onclick = "reopenBooking({{ booking.id }})">{{action}}</a>
+              <a href="#/" id="booking-reopen-booking-link-{{booking.id}}">{{action}}</a>
             {% endifequal %}
             
             {% ifequal action 'Cancel booking' %}
-               <a href="#" onclick = "cancelBooking({{ booking.id }})">{{action}}</a>
+               <a href="#/" id="booking-cancel-booking-link-{{booking.id}}">{{action}}</a>
             {% endifequal %}
 
             {% ifequal action 'Upload review' %}
@@ -109,6 +109,22 @@
     {% endfor %}
   
   </table>
+    {% if is_paginated %}
+        <div class="pagination">
+            <span class="page-links">
+                {% if page_obj.has_previous %}
+                 <a href="{% url 'admin_booking' %}?page={{page_obj.previous_page_number}}">previous</a>
+                {% endif %}
+                <span class="page-current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="{% url 'admin_booking' %}?page={{page_obj.next_page_number}}">next</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+
   </div>
 
 
@@ -137,7 +153,6 @@
     </td>
     </tr>
 </table>
-
   <div class="tableButton">
     <input id="change-time-button" type="button" name="button" class="big_button" value="Update" />
   </div>
@@ -147,7 +162,6 @@
 
 
 <div id="upload-review-popup"style="display:none">
-    {% csrf_token %}
 <div class="white_content">
 <div class="operation"><a href="#" id="close-upload-review-button">Close</a></div>
 <h1>Upload review</h1>
@@ -176,6 +190,8 @@
 <div id="fade" class="black_overlay"></div>
 </div>
 </form>
+
+
 
 
 </body>

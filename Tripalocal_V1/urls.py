@@ -16,11 +16,8 @@ from django.conf.urls import include
 from django.contrib import admin
 
 from rest_framework.authtoken import views
-
-from custom_admin.new_views.experience_view import ExperienceView
-from custom_admin.new_views.booking_view import BookingView
-from custom_admin.views import mark_as_no_show, reopen_booking, cancel_booking, delete_bookings
-from custom_admin.views import send_confirmation_email_host, send_confirmation_email_guest, archive_bookings, unarchive_bookings, ArchiveView, PaymentView
+from app.decorators import superuser_required
+from custom_admin.views.main import BookingView, BookingArchiveView, ExperienceView, PaymentView
 from django.conf.urls import *
 #from experiences.resource import ajax_view
 
@@ -125,19 +122,10 @@ urlpatterns = patterns('',
     url(r'^service_experiencedetail/$', 'experiences.resource.service_experiencedetail'),
     url(r'^update_files/$', 'experiences.resource.update_files'),
 
-    url(r'^custom_admin/$', BookingView.as_view()),
-    url(r'^custom_admin/change_time/(?P<booking_id>\d+)$', BookingView.as_view()),
-    url(r'^custom_admin/mark_as_no_show/(?P<booking_id>\d+)$', mark_as_no_show),
-    url(r'^custom_admin/reopen_booking/(?P<booking_id>\d+)$', reopen_booking),
-    url(r'^custom_admin/cancel_booking/(?P<booking_id>\d+)$', cancel_booking),
-    url(r'^custom_admin/upload_review/(?P<booking_id>\d+)$', BookingView.as_view()),
-    url(r'^custom_admin/send_confirmation_email_host/$', send_confirmation_email_host),
-    url(r'^custom_admin/send_confirmation_email_guest/$', send_confirmation_email_guest),
-    url(r'^custom_admin/delete_bookings/$', delete_bookings),
-    url(r'^custom_admin/archive_bookings/$', archive_bookings),
-    url(r'^custom_admin/unarchive_bookings/$', unarchive_bookings),
-    url(r'^custom_admin/archive/$', ArchiveView.as_view()),
-    url(r'^custom_admin/payment/$', PaymentView.as_view()),
-    url(r'^custom_admin/experience/', ExperienceView.as_view()),
+    url(r'^custom_admin/booking$', superuser_required(BookingView.as_view()), name='admin_booking'),
+   # url(r'^custom_admin/change_time/(?P<booking_id>\d+)$', BookingView.as_view()),
+    url(r'^custom_admin/booking-archive/$', superuser_required(BookingArchiveView.as_view()), name='admin_booking_archive'),
+    url(r'^custom_admin/payment/$', superuser_required(PaymentView.as_view()), name='admin_payment'),
+    url(r'^custom_admin/experience/$', superuser_required(ExperienceView.as_view()), name='admin_experience'),
 
 )

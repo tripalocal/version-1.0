@@ -1941,8 +1941,9 @@ def manage_listing_calendar(request, experience, context):
 
 def manage_listing(request, exp_id, step, ):
     experience = get_object_or_404(Experience, pk=exp_id)
-    if not request.user in experience.hosts.all():
-        raise Http404("Sorry, but you can only edit your own experience.")
+    if not request.user.is_superuser:
+        if not request.user in experience.hosts.all():
+            raise Http404("Sorry, but you can only edit your own experience.")
 
     experience_title_cn = get_object_or_404(ExperienceTitle, experience_id=exp_id, language='zh')
     experience_title_en = get_object_or_404(ExperienceTitle, experience_id=exp_id, language='en')
