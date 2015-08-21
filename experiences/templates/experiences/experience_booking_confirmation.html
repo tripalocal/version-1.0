@@ -32,7 +32,7 @@
                                 {{form.promo_code}}
                                 {% if wrong_promo_code %}
                                 <div class="warning-sign">
-                                    <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                    <img src="{{MEDIA_URL}}error_icon.png" style="position: relative; top:4px; left:5px;">
                                     <p>{% trans "Invalid promo code" %}</p>
                                 </div>
                                 {%endif%}
@@ -409,12 +409,11 @@ $(function(){
             {
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
                 {
-                    //mixpanel.track("Clicked on \"Checkout\"");
                     if($("#user_email").val())
                     {
                         //mixpanel.identify($("#user_email").val());
                     }
-                    //$("#category_form").submit();
+
                     if({{total_price}}>0.00)
                     {
                         // Open Checkout with further options
