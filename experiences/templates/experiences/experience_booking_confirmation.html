@@ -32,7 +32,7 @@
                                 {{form.promo_code}}
                                 {% if wrong_promo_code %}
                                 <div class="warning-sign">
-                                    <img src="{{MEDIA_URL}}error_icon.png" style="position: relative; top:4px; left:5px;">
+                                    <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                     <p>{% trans "Invalid promo code" %}</p>
                                 </div>
                                 {%endif%}
@@ -53,7 +53,7 @@
                                 {% if 'card_number' in form.errors and display_error%}
                                 <br>
                                 <div class="warning-sign">
-                                    <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                    <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                     {%if LANGUAGE != "zh-CN"%}
                                     <p>{{form.card_number.errors.as_text}}</p>
                                     {%else%}
@@ -92,7 +92,7 @@
                                 <td>
                                     {% if 'expiration' in form.errors and display_error%}
                                     <div class="warning-sign">
-                                        <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                        <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                         {%if LANGUAGE != "zh-CN"%}
                                         <p>{{form.expiration.errors.as_text}}</p>
                                         {%else%}
@@ -104,7 +104,7 @@
                                 <td>
                                     {% if 'cvv' in form.errors and display_error%}
                                     <div class="warning-sign">
-                                        <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                        <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                         {%if LANGUAGE != "zh-CN"%}
                                         <p>{{form.cvv.errors.as_text}}</p>
                                         {%else%}
@@ -131,7 +131,7 @@
                                             {{ form.first_name }}
                                             {% if 'first_name' in form.errors and display_error%}
                                             <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                                 <p>{{form.first_name.errors.as_text}}</p>
                                             </div>
                                             {%endif%}
@@ -145,7 +145,7 @@
                                             {{ form.last_name }}
                                             {% if 'last_name' in form.errors and display_error%}
                                             <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                                 <p>{{form.last_name.errors.as_text}}</p>
                                             </div>
                                             {%endif%}
@@ -160,7 +160,7 @@
                                             {{ form.last_name }}
                                             {% if 'last_name' in form.errors and display_error%}
                                             <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                                 <p>此项必填</p>
                                             </div>
                                             {%endif%}
@@ -174,7 +174,7 @@
                                             {{ form.first_name }}
                                             {% if 'first_name' in form.errors and display_error%}
                                             <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                                 <p>此项必填</p>
                                             </div>
                                             {%endif%}
@@ -194,7 +194,7 @@
                                             {% if 'street1' in form.errors and display_error%}
                                             <br>
                                             <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                                 {%if LANGUAGE != "zh-CN"%}
                                                 <p>{{form.street1.errors.as_text}}</p>
                                                 {%else%}
@@ -224,7 +224,7 @@
                                             {{ form.city_town }}
                                             {% if 'city_town' in form.errors and display_error%}
                                             <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                                 {%if LANGUAGE != "zh-CN"%}
                                                 <p>{{form.city_town.errors.as_text}}</p>
                                                 {%else%}
@@ -242,7 +242,7 @@
                                             {{ form.state }}
                                             {% if 'state' in form.errors and display_error%}
                                             <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                             </div>
                                             {%endif%}
                                         </div>
@@ -255,7 +255,7 @@
                                             {{ form.postcode }}
                                             {% if 'postcode' in form.errors and display_error%}
                                             <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                                             </div>
                                             {%endif%}
                                         </div>
@@ -305,7 +305,7 @@
                         <input id="isAgreementSelected" type="checkbox" /><p class="help-message" style="font-size:12px">{% trans "By booking this listing, you agree to " %}<a href="{{GEO_POSTFIX}}termsofservice" target="_blank">{% trans "Terms of Service" %}</a>, <a href="{{GEO_POSTFIX}}privacypolicy" target="_blank">{% trans "Privacy Policy" %}</a> {% trans "and" %} <a href="{{GEO_POSTFIX}}refundpolicy"  target="_blank">{% trans "Traveller Refund Policy" %}</a>.
                         </p> <!-- and agree to Tripalocal's Terms and Conditions-->
                         <div id="id_term_condition" class="warning-sign" style="display:none;">
-                            <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                            <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                             <p>{% trans "Please accept terms and conditions" %}</p>
                         </div>
 

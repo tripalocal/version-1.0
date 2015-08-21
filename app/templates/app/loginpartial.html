@@ -21,7 +21,13 @@
     <li>
         <div class="profile-xs" id="id_profile_div">
             <!--<a href="/myprofile"></a>-->
-            <img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/>
+            <img src="{% if user.socialaccount_set.all %}
+                        http://graph.facebook.com/{{ user.socialaccount_set.all.0.uid }}/picture?width=40&height=40
+                     {% elif user.registereduser.image_url and user.registereduser.image_url.strip %}
+                        {{ MEDIA_URL }}{{ user.registereduser.image_url }}
+                     {% else %}
+                        {{ MEDIA_URL }}img/profile_default.jpg
+                     {% endif %}"/>
         </div>
     </li>    
 </ul>

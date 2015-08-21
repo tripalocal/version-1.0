@@ -90,7 +90,7 @@
 
             {% if 'last_name' in form.errors%}
             <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
-                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                 <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.last_name.errors.as_text}}</p>
             </div>
             {%endif%}
@@ -99,7 +99,7 @@
 
             {% if 'first_name' in form.errors%}
             <div class="warning-sign" style="width:340px; display:inline-block; margin-bottom:8px">
-                <img src="{{MEDIA_URL}}/error_icon.png" style="position: relative; top:4px; left:5px;">
+                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                 <p style="display: inline; position:relative; top: 6px; font-size:12px;">{{form.first_name.errors.as_text}}</p>
             </div>
             {%endif%}
@@ -123,7 +123,7 @@
 function isValidEmailAddress(emailAddress) {
     var pattern = new RegExp( /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i);
     return pattern.test(emailAddress);
-};
+}
 
 function checkEmail()
 {
@@ -165,13 +165,14 @@ function checkInput(id_put, id_error)
 
 //validation firstname
     $("#id_first_name").blur(function(){
+        var regexp;
         if("{{form.language.value}}" !="zh-CN")
         {
-            var regexp = /^[a-zA-Z0-9-_.]+$/;
+            regexp = /^[a-zA-Z0-9-_.]+$/;
         }
         else
         {
-            var regexp = /^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$/;
+            regexp = /^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$/;
         }
         if($("#id_first_name").val().search(regexp) != -1)
         {
@@ -205,12 +206,9 @@ function checkInput(id_put, id_error)
         }
     });
 
-$(function()
-{
-    var country, region, city, ip, longitude, latitude;
-    $(document).ready(function(){
-        if("{{form.language.value}}" !="zh-CN")
-        {
+$(function () {
+    $(document).ready(function () {
+        if ("{{form.language.value}}" != "zh-CN") {
             $("#id_Facebook").attr("class", "socialaccount_provider facebook");
             $("#id_Facebook").attr("role", "button");
         }
@@ -220,53 +218,22 @@ $(function()
         $("#id_first_name").attr("placeholder", "{% trans "First Name" %}");
         $("#id_last_name").attr("placeholder", "{% trans "Last Name" %}");
 
-        /*
-        $.getScript('http://www.geoplugin.net/javascript.gp', function()
-        {
-            country = geoplugin_countryName();
-            region = geoplugin_region();
-            city = geoplugin_city();
-            ip = geoplugin_request();
-            latitude = geoplugin_latitude();
-            longitude = geoplugin_longitude();
-        });
-        */
-
-        $("#id_signup_submit_button").bind("click", function(e){
+        $("#id_signup_submit_button").bind("click", function (e) {
             e.preventDefault();
 
-            if(checkEmail() && checkInput("id_password1", "id_password1_error")
-                && checkInput("id_first_name", "first_name_error")
-                && checkInput("id_last_name", "last_name_error"))
-            {
-                if($("#id_email").val().trim().toLowerCase().indexOf("@tripalocal.com") >= 0)
-                {
+            if (checkEmail() && checkInput("id_password1", "id_password1_error")
+                    && checkInput("id_first_name", "first_name_error")
+                    && checkInput("id_last_name", "last_name_error")) {
+                if ($("#id_email").val().trim().toLowerCase().indexOf("@tripalocal.com") >= 0) {
                     alert("Please use a different email account. Thank you.");
-                }
-                else
-                {
-                    if (navigator.geolocation) {
-                        /*
-                        navigator.geolocation.getCurrentPosition(function(position)
-                        {
-                            mixpanel.people.set({"Latitude":position.coords.latitude, "Longitude":position.coords.longitude});
-                            mixpanel.identify($("#id_email").val());
-                        });
-                        */
-                    }
-                    var now  = new Date().toString();
-                    //mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Latitude":latitude, "Longitude":longitude});
-                    mixpanel.people.set({"$email": $("#id_email").val(),"$first_name": $("#id_first_name").val(),"$last_name": $("#id_last_name").val(),
-                                        "$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": document.referrer,
-                                        "$created":now, "$last_seen":now
-                                        });
+                } else {
                     mixpanel.identify($("#id_email").val());
                     if ($(window).width() < 768) {
-                      mixpanel.track("signed up via mobile site");
+                        mixpanel.track("signed up via mobile site");
                     } else {
-                      mixpanel.track("signed up via website");
+                        mixpanel.track("signed up via website");
                     }
-                    ga('send','event','{% trans "sign up" %}','click');
+                    ga('send', 'event', '{% trans "sign up" %}', 'click');
                     $("#signup_form").submit();
                 }
             }
