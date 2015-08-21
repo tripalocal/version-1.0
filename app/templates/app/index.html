@@ -326,15 +326,6 @@
             });
         });
 
-        if("{{LANGUAGE}}" == "zh-CN")
-        {
-            //mixpanel.track("Visited homepage_cn");
-        }
-        else
-        {
-            //mixpanel.track("Visited homepage_en");
-        }
-
         var utmId = getParameterByName('utm');
         if(utmId)
         {
@@ -344,9 +335,9 @@
         {
             initial_referrer = document.referrer;
         }
-        var now  = new Date().toString();
-        mixpanel.people.set({"$country":country, "$region":region, "$city":city, "IP":ip, "Language":{{LANGUAGE}}, "Latitude":latitude, "Longitude":longitude });
-        mixpanel.people.set({"$browser":navigator.userAgent, "$os":navigator.platform, "$initial_referrer": initial_referrer,"$last_seen":now});
+
+        mixpanel.people.set({"Language":'{{LANGUAGE}}'});
+        mixpanel.people.set({"$initial_referrer": initial_referrer});
         if($("#user_email").val())
         {
             mixpanel.identify($("#user_email").val());
