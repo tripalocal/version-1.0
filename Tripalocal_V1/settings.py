@@ -249,6 +249,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "allauth.socialaccount.context_processors.socialaccount",
     "app.views.current_datetime",
     "django.contrib.messages.context_processors.messages",
+    "app.context_processor.geo_postfix"
 )
 
 AUTHENTICATION_BACKENDS = (
