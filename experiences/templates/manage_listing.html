@@ -795,7 +795,7 @@
         function checkDetailFiled() {
             var filled = true;
             $('textarea').each(function() {
-                if ($(this).val() === '') {
+                if ($(this).val() === '' && $(this).attr("id") != "popup-form-details") {
                     filled = false;
                 }
             });
@@ -1201,7 +1201,7 @@ function loadLocationForm(href) {
     function checkLocationFiled() {
         var filled = true;
         $('textarea').each(function() {
-            if ($(this).val() === '') {
+            if ($(this).val() === '' && $(this).attr("id") != "popup-form-details") {
                 filled = false;
             }
         });
