@@ -2092,144 +2092,144 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         # alongside a list with all the number of reviews
         experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed")
 
-    if is_kids_friendly:
-            experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
-    if is_host_with_cars:
-            experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
-    if is_private_tours:
-            experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
+        if is_kids_friendly:
+                experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
+        if is_host_with_cars:
+                experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
+        if is_private_tours:
+                experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
 
-    i = 0
-    while i < len(experienceList):
-        experience = experienceList[i]
+        i = 0
+        while i < len(experienceList):
+            experience = experienceList[i]
 
-        setExperienceDisplayPrice(experience)
+            setExperienceDisplayPrice(experience)
 
-        if start_date is not None and experience.end_datetime < start_date :
-            i += 1
-            continue
+            if start_date is not None and experience.end_datetime < start_date :
+                i += 1
+                continue
 
-        if end_date is not None and experience.start_datetime > end_date:
-            i += 1
-            continue
+            if end_date is not None and experience.start_datetime > end_date:
+                i += 1
+                continue
 
-        if guest_number is not None and len(guest_number) > 0 and experience.guest_number_max < int(guest_number):
-            i += 1
-            continue
+            if guest_number is not None and len(guest_number) > 0 and experience.guest_number_max < int(guest_number):
+                i += 1
+                continue
 
-            experience_tags = get_experience_tags(experience, settings.LANGUAGES[0][0])
-            if keywords is not None and len(keywords) > 0 and experience_tags is not None and len(experience_tags) > 0:
-                tags = keywords.strip().split(",")
+                experience_tags = get_experience_tags(experience, settings.LANGUAGES[0][0])
+                if keywords is not None and len(keywords) > 0 and experience_tags is not None and len(experience_tags) > 0:
+                    tags = keywords.strip().split(",")
+                    match = False
+                    for tag in tags:
+                        if tag.strip() in experience_tags:
+                            match = True
+                            break
+                    if not match:
+                        i += 1
+                        continue
+
+            if language is not None and len(language) > 0 and experience.language is not None and len(experience.language) > 0:
+                experience_language = experience.language.split(";")
+                experience_language = [x.lower() for x in experience_language]
+                languages = language.split(",")
                 match = False
-                for tag in tags:
-                    if tag.strip() in experience_tags:
+                for l in languages:
+                    if l.lower() in experience_language:
                         match = True
                         break
                 if not match:
                     i += 1
                     continue
 
-        if language is not None and len(language) > 0 and experience.language is not None and len(experience.language) > 0:
-            experience_language = experience.language.split(";")
-            experience_language = [x.lower() for x in experience_language]
-            languages = language.split(",")
-            match = False
-            for l in languages:
-                if l.lower() in experience_language:
-                    match = True
-                    break
-            if not match:
-                i += 1
-                continue
+                experience.dollarsign = DollarSign[experience.currency.upper()]
+                experience.currency = str(dict(Currency)[experience.currency.upper()])
 
-            experience.dollarsign = DollarSign[experience.currency.upper()]
-            experience.currency = str(dict(Currency)[experience.currency.upper()])
-
-            rate = 0.0
-            counter = 0
-
-            photoset = experience.photo_set.all()
-            image_url = experience.hosts.all()[0].registereduser.image_url
-            if photoset!= None and len(photoset) > 0 and image_url != None and len(image_url) > 0:
-                for review in experience.review_set.all():
-                    rate += review.rate
-                    counter += 1
-            else:
-                rate = -1
-            
-            if counter > 0:
-                rate /= counter
-
-            #find the correct index to insert --> sort the list by rate
-            counter = 0
-            if len(rateList) == 0:
-                rateList.append(rate)
+                rate = 0.0
                 counter = 0
-            else:
-                for counter in range(0, len(rateList)):
-                    if rateList[counter] < rate:
-                        rateList.insert(counter, rate)
-                        break
-                    elif rateList[counter] > rate:
-                        counter += 1
-                        if counter == len(rateList):
-                            rateList.append(rate)
-                            break
-                    else:
-                        # == --> check instant booking time, unavailable time
-                        if len(experience.instantbookingtimeperiod_set.all()) > 0:
-                            #the exp has set instant booking
-                            while counter < len(rateList) and rateList[counter] == rate and len(cityExperienceList[counter].instantbookingtimeperiod_set.all()) > 0:
-                                counter += 1
-                            if counter == len(rateList):
-                                rateList.append(rate)
-                            else:
-                                rateList.insert(counter, rate)
-                            break
-                        elif not len(experience.blockouttimeperiod_set.all()) > 0:
-                            #the exp has neither set instant booking nor blockout time
-                            while counter < len(rateList) and rateList[counter] == rate:
-                                counter += 1
-                            if counter == len(rateList):
-                                rateList.append(rate)
-                            else:
-                                rateList.insert(counter, rate)
-                            break
-                        else:
-                            #the exp has set blockout time
-                            while counter < len(rateList) and rateList[counter] == rate:
-                                if len(cityExperienceList[counter].instantbookingtimeperiod_set.all()) > 0 or len(cityExperienceList[counter].blockouttimeperiod_set.all()) > 0:
-                                    counter += 1
-                                else:
-                                    break
-                            if counter == len(rateList):
-                                rateList.append(rate)
-                            else:
-                                rateList.insert(counter, rate)
-                            break
 
-            cityExperienceList.insert(counter, experience)
-            cityExperienceReviewList.insert(counter, getNReviews(experience.id))
-            # Fetch BGImageURL
-            BGImageURL = getBGImageURL(experience.id)
-            if (BGImageURL):
-                BGImageURLList.insert(counter, BGImageURL)
-            else:
-                BGImageURLList.insert(counter, "default_experience_background.jpg")
-            # Fetch profileImageURL
-            profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
-            if (profileImageURL):
-                profileImageURLList.insert(counter, profileImageURL)
-            else:
-                profileImageURLList.insert(counter, "profile_default.jpg")
-            # Format title & Description
-            experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
-            t = get_experience_title(experience, settings.LANGUAGES[0][0])
-            if (t != None and len(t) > 30):
-                formattedTitleList.insert(counter, t[:27] + "...")
-            else:
-                formattedTitleList.insert(counter, t)
-            i += 1
+                photoset = experience.photo_set.all()
+                image_url = experience.hosts.all()[0].registereduser.image_url
+                if photoset!= None and len(photoset) > 0 and image_url != None and len(image_url) > 0:
+                    for review in experience.review_set.all():
+                        rate += review.rate
+                        counter += 1
+                else:
+                    rate = -1
+
+                if counter > 0:
+                    rate /= counter
+
+                #find the correct index to insert --> sort the list by rate
+                counter = 0
+                if len(rateList) == 0:
+                    rateList.append(rate)
+                    counter = 0
+                else:
+                    for counter in range(0, len(rateList)):
+                        if rateList[counter] < rate:
+                            rateList.insert(counter, rate)
+                            break
+                        elif rateList[counter] > rate:
+                            counter += 1
+                            if counter == len(rateList):
+                                rateList.append(rate)
+                                break
+                        else:
+                            # == --> check instant booking time, unavailable time
+                            if len(experience.instantbookingtimeperiod_set.all()) > 0:
+                                #the exp has set instant booking
+                                while counter < len(rateList) and rateList[counter] == rate and len(cityExperienceList[counter].instantbookingtimeperiod_set.all()) > 0:
+                                    counter += 1
+                                if counter == len(rateList):
+                                    rateList.append(rate)
+                                else:
+                                    rateList.insert(counter, rate)
+                                break
+                            elif not len(experience.blockouttimeperiod_set.all()) > 0:
+                                #the exp has neither set instant booking nor blockout time
+                                while counter < len(rateList) and rateList[counter] == rate:
+                                    counter += 1
+                                if counter == len(rateList):
+                                    rateList.append(rate)
+                                else:
+                                    rateList.insert(counter, rate)
+                                break
+                            else:
+                                #the exp has set blockout time
+                                while counter < len(rateList) and rateList[counter] == rate:
+                                    if len(cityExperienceList[counter].instantbookingtimeperiod_set.all()) > 0 or len(cityExperienceList[counter].blockouttimeperiod_set.all()) > 0:
+                                        counter += 1
+                                    else:
+                                        break
+                                if counter == len(rateList):
+                                    rateList.append(rate)
+                                else:
+                                    rateList.insert(counter, rate)
+                                break
+
+                cityExperienceList.insert(counter, experience)
+                cityExperienceReviewList.insert(counter, getNReviews(experience.id))
+                # Fetch BGImageURL
+                BGImageURL = getBGImageURL(experience.id)
+                if (BGImageURL):
+                    BGImageURLList.insert(counter, BGImageURL)
+                else:
+                    BGImageURLList.insert(counter, "default_experience_background.jpg")
+                # Fetch profileImageURL
+                profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+                if (profileImageURL):
+                    profileImageURLList.insert(counter, profileImageURL)
+                else:
+                    profileImageURLList.insert(counter, "profile_default.jpg")
+                # Format title & Description
+                experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
+                t = get_experience_title(experience, settings.LANGUAGES[0][0])
+                if (t != None and len(t) > 30):
+                    formattedTitleList.insert(counter, t[:27] + "...")
+                else:
+                    formattedTitleList.insert(counter, t)
+                i += 1
 
         if not settings.DEVELOPMENT:
             mp = Mixpanel(settings.MIXPANEL_TOKEN)
