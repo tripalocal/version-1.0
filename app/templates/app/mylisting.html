@@ -48,9 +48,9 @@
                         {% endif %}
                     </div>
                     {% if experience.status|title != "Listed" %}
-                    <a class="btn btn-primary btn-sm" role="button" id="edit-draft" href="{{GEO_POSTFIX}}editexperience/calendar?id={{experience.id}}">{% trans "Edit draft" %}</a>
+                    <a class="btn btn-primary btn-sm" role="button" id="edit-draft" href="{{GEO_POSTFIX}}manage-listing-continue/{{ experience.id }}">{% trans "Edit draft" %}</a>
                     {% elif experience.status|title == "Listed" %}
-                    <a class="btn btn-primary btn-sm" role="button" id="update-listing" href="{{GEO_POSTFIX}}editexperience/calendar?id={{experience.id}}">{% trans "Update listing" %}</a>
+                    <a class="btn btn-primary btn-sm" role="button" id="update-listing" href="{{GEO_POSTFIX}}manage-listing-continue/{{ experience.id }}">{% trans "Update listing" %}</a>
                     {% endif %}
 
                 </div>
