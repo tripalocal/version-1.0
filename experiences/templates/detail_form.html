@@ -1,0 +1,163 @@
+<div id='detail-form' class="calendar">
+    <ul id="myTab" class="nav nav-tabs">
+        {%if language == "cn" %}
+        <li class="active"><a id="detail_tab" role="button" data-toggle="tab">中文（简体）</a></li>
+        <li><a id="detail_other_tab" role="button" data-toggle="tab">English</a></li>
+        {%else%}
+        <li class="active"><a id="detail_tab" role="button" data-toggle="tab">English</a></li>
+        <li><a id="detail_other_tab" role="button" data-toggle="tab">中文（简体）</a></li>
+        {%endif%}
+    </ul>
+
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade in active" id="english">
+            <div class="section" id="section-included">
+                <div id="location">
+                    <p id="photo-heading"><strong>What's included</strong></p><br><br><br>
+                    <p id="location-details">
+                        <span>Please specify what</span><br>
+                        <span>exactly you are offer-</span><br>
+                        <span>ing, if no, please</span><br>
+                        <span>specify how much it</span><br>
+                        <span>will roughly cost for</span><br>
+                        <span>your guest</span><br>
+                    </p>
+                </div>
+
+                <div id="yes-no-check">
+                    <p style="padding-left:115px;">&nbsp;</p>
+                    <p id="yes-no-detail">Yes</p>
+                    <p id="yes-no-detail">No</p>
+                    <p id="yes-no-detail">Detail</p>
+                </div>
+                <br><br><br>
+                <div id="included-check">
+                    <p>Food</p>
+                    {{form.included_food_detail}}
+                    {{form.included_food_detail_other}}<br>
+                    {{form.included_food}}
+                </div>
+                <br><br>
+                <div id="included-check">
+                    <p>Transport</p>
+                    {{form.included_transport_detail}}
+                    {{form.included_transport_detail_other}}<br>
+                    {{form.included_transport}}
+                </div>
+                <br><br><br><br><br><br>
+                <div id="included-check">
+                    <p>Ticket</p>
+                    {{form.included_ticket_detail}}
+                    {{form.included_ticket_detail_other}}<br>
+                    {{form.included_ticket}}
+                </div>
+            </div>
+            <div class="section" id="section-details">
+                <div id="location">
+                    <p id="photo-heading"><strong>Details</strong></p><br><br><br>
+                    <p id="location-details">
+                        <span>Descriptions of your</span><br>
+                        <span>experience displayed</span><br>
+                        <span>on your public listing</span><br>
+                        <span>page.</span><br>
+                    </p>
+                </div>
+
+                <div id="activity_div" class="activity-instruction">
+                    <p id="meet-up-heading">Activity</p>
+                    {{ form.activity }}<br>
+                    <p id="characters-left"><label id="id_detail_activity_limit"></label></p>
+                </div>
+
+                <div id="other_activity_div" class="activity-instruction" style="display:none;">
+                    <p id="meet-up-heading">Activity</p>
+                    {{ form.activity_other }}<br>
+                    <p id="characters-left"><label id="id_detail_activity_limit_other"></label></p>
+                </div>
+
+                <div id="interaction_div" class="drop-off-instruction">
+                    <p id="drop-off-heading">Interaction</p>
+                    {{ form.interaction }}<br>
+                    <p id="characters-left"><label id="id_detail_interaction_limit"></label></p>
+                </div>
+
+                <div id="other_interaction_div" class="drop-off-instruction" style="display:none;">
+                    <p id="drop-off-heading">Interaction</p>
+                    {{ form.interaction_other }}<br>
+                    <p id="characters-left"><label id="id_detail_interaction_limit_other"></label></p>
+                </div>
+
+                <div id="dress_div" class="drop-off-instruction">
+                    <p id="drop-off-heading">Appropriate Dress</p>
+                    {{ form.dress_code }}<br>
+                    <p id="characters-left"><label id="id_detail_dress_limit"></label></p>
+                </div>
+
+                <div id="other_dress_div" class="drop-off-instruction" style="display:none;">
+                    <p id="drop-off-heading">Appropriate Dress</p>
+                    {{ form.dress_code_other }}<br>
+                    <p id="characters-left"><label id="id_detail_dress_limit_other"></label></p>
+                </div>
+            </div>
+            <div class="section" style="text-align:right;">
+                <input type="submit" value="Last Step" id="last-step" />
+                <input type="submit" value="Next Step" id="next-step" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info bar -->
+<div class="info-bar" style="width:300px;">
+    <img src="/images/bubble-icon.png" alt="">
+    <div id="hint-msgs">
+        <p>
+            <span><strong>Activity</strong></span><br>
+            <span>This is where you write</span><br>
+            <span>of your experience.</span><br>
+            <span>Where would you take your</span><br>
+            <span>guests to?</span><br>
+            <span>What would you do with</span><br>
+            <span>your guests?</span><br>
+            <span>Please write as first person.</span><br>
+        </p>
+    </div>
+    <img src="/images/bubble-icon.png" alt="">
+    <div id="hint-msgs">
+        <p>
+            <span><strong>Interaction</strong></span><br>
+            <span>How much would you inter-</span><br>
+            <span>act with your guests?</span><br>
+            <span>What's your communication</span><br>
+            <span>style?</span><br>
+            <span>Please write as a paragraph.</span><br>
+        </p>
+    </div>
+    <img src="/images/bubble-icon.png" alt="">
+    <div id="hint-msgs">
+        <p>
+            <span><strong>Appropriate dress</strong></span><br>
+            <span>What will the weather be</span><br>
+            <span>like?</span><br>
+            <span>Will there be a lot of walking</span><br>
+            <span>involved?</span><br>
+            <span>What will the locals wear?</span><br>
+            <span>your guests?</span><br>
+            <span>Please write as a paragraph.</span><br>
+        </p>
+    </div>
+    <img src="/images/bubble-icon.png" alt="">
+    <div id="hint-msgs">
+        <p>
+            <span><strong>What's included</strong></span><br>
+            <span>If a cost is included, simply</span><br>
+            <span>describe what is it. If a cost</span><br>
+            <span>is not included, please give</span><br>
+            <span>a best estimate to how</span><br>
+            <span>much it may cost, or if it's</span><br>
+            <span>not required.</span><br>
+        </p>
+    </div>
+    <br>
+</div>
+
