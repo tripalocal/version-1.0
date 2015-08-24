@@ -33,7 +33,7 @@ $(document).ready(function () {
             popupTimmer = setTimeout(function () {
                 $('#help-popup').modal('show');
                 mixpanel.track("saw popup01");
-            }, 6000); // milliseconds
+            }, 60000); // milliseconds
         }
 
         $('.close-popup').click(function () {
