@@ -1,7 +1,6 @@
 """
 Definition of urls for Tripalocal_V1.
 """
-
 from datetime import datetime
 from django.conf.urls import patterns, url
 from app.forms import BootstrapAuthenticationForm, SubscriptionForm
@@ -10,7 +9,6 @@ from experiences.models import Experience
 from experiences.views import *
 from Tripalocal_V1 import settings
 from django.contrib.auth.decorators import login_required
-from custom_admin.views import *
 
 # Uncomment the next lines to enable the admin:
 from django.conf.urls import include
@@ -18,6 +16,8 @@ from django.contrib import admin
 
 from rest_framework.authtoken import views
 
+from app.decorators import superuser_required
+from custom_admin.views.main import BookingView, BookingArchiveView, ExperienceView, PaymentView
 from django.conf.urls import *
 from django.views.i18n import javascript_catalog
 
@@ -57,6 +57,12 @@ urlpatterns = patterns('',
     #url(r'^editexperience/(?P<step>[-\w]+)/$', login_required(ExperienceWizard.as_view(FORMS, url_name='experience_edit_step', condition_dict={'experience':save_exit_experience, 'price': save_exit_price,'overview': save_exit_overview,
     #                                                                                                                                         'detail': save_exit_detail,'photo':save_exit_photo,
     #                                                                                                                                         'location':save_exit_location})), name='experience_edit_step'),
+    url(r'^experiences/new/$', login_required(new_experience)),
+    url(r'^manage-listing/(?P<exp_id>.*)/(?P<step>.*)/$', login_required(manage_listing), name='manage_listing'),
+    # Continue the first incomplete step.
+    url(r'^manage-listing-continue/(?P<exp_id>.*)/$', login_required(manage_listing_continue),
+           name='manage_listing_continue'),
+
     url(r'^experience_booking_confirmation/$', experience_booking_confirmation, name='experience_booking_confirmation'),
     url(r'^experience_booking_successful/$', experience_booking_successful, name='experience_booking_successful'),
     #url(r'^createexperience/$', create_experience, name='create_experience'),
@@ -103,17 +109,9 @@ urlpatterns = patterns('',
     url(r'^service_experiencedetail/$', 'experiences.resource.service_experiencedetail'),
     url(r'^update_files/$', 'experiences.resource.update_files'),
 
-    url(r'^custom_admin/$', superuser_required(BookingView.as_view())),
-    url(r'^custom_admin/change_time/(?P<booking_id>\d+)$', superuser_required(BookingView.as_view())),
-    url(r'^custom_admin/mark_as_no_show/(?P<booking_id>\d+)$', superuser_required(mark_as_no_show)),
-    url(r'^custom_admin/reopen_booking/(?P<booking_id>\d+)$', superuser_required(reopen_booking)),
-    url(r'^custom_admin/cancel_booking/(?P<booking_id>\d+)$', superuser_required(cancel_booking)),
-    url(r'^custom_admin/upload_review/(?P<booking_id>\d+)$', superuser_required(BookingView.as_view())),
-    url(r'^custom_admin/send_confirmation_email_host/$', superuser_required(send_confirmation_email_host)),
-    url(r'^custom_admin/send_confirmation_email_guest/$', superuser_required(send_confirmation_email_guest)),
-    url(r'^custom_admin/delete_bookings/$', superuser_required(delete_bookings)),
-    url(r'^custom_admin/archive_bookings/$', superuser_required(archive_bookings)),
-    url(r'^custom_admin/unarchive_bookings/$', superuser_required(unarchive_bookings)),
-    url(r'^custom_admin/archive/$', superuser_required(ArchiveView.as_view())),
-    url(r'^custom_admin/payment/$', superuser_required(PaymentView.as_view())),
+    url(r'^custom_admin/booking$', superuser_required(BookingView.as_view()), name='admin_booking'),
+   # url(r'^custom_admin/change_time/(?P<booking_id>\d+)$', BookingView.as_view()),
+    url(r'^custom_admin/booking-archive/$', superuser_required(BookingArchiveView.as_view()), name='admin_booking_archive'),
+    url(r'^custom_admin/payment/$', superuser_required(PaymentView.as_view()), name='admin_payment'),
+    url(r'^custom_admin/experience/$', superuser_required(ExperienceView.as_view()), name='admin_experience'),
 )

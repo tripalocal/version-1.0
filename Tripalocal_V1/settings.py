@@ -1,7 +1,7 @@
 """
 Django settings for Tripalocal_V1 project.
 """
-import os
+import os, sys
 
 try:
     import pymysql
@@ -43,6 +43,7 @@ DATABASES = {
         'PORT': '',
     }
 }
+
 
 DATABASE_ROUTERS = ['tripalocal_messages.routers.message_router']
 

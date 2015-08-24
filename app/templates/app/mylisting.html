@@ -52,6 +52,7 @@
                     {% elif experience.status|title == "Listed" %}
                     <a class="btn btn-primary btn-sm" role="button" id="update-listing" href="{{GEO_POSTFIX}}editexperience/calendar?id={{experience.id}}">{% trans "Update listing" %}</a>
                     {% endif %}
+
                 </div>
                 {% empty %}
                 <p style="width:400px;">{% trans "You have not hosted any experience." %}</p>

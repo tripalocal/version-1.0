@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -9,7 +9,7 @@
 <link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet" type="text/css" />
 <link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet" type="text/css" />
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/custom_admin.js' %}"></script>
+<script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/admin_archived.js' %}"></script>
 
 </head>
 
@@ -35,7 +35,7 @@
 
     <div class="operation"></div>
     <ul class="subMenu">
-    <li  id="activated"><a href="/custom_admin/">Current Bookings</a></li>
+    <li  id="activated"><a href="/custom_admin/booking">Current Bookings</a></li>
     <li>Archived</li>
    
     </ul>
@@ -46,9 +46,9 @@
 <table border="0" cellspacing="0" cellpadding="0">
     <tr>
     <td colspan="11" class="tableEdit">&nbsp;&nbsp;↓
-<input name="input" type="button" value="Delete" onclick="deleteBookings()"/>&nbsp;&nbsp;
+<input id="bookings-delete-link" name="input" type="button" value="Delete"/>&nbsp;&nbsp;
 
-<input name="input" type="button" value="Unarchive" onclick="unarchiveBookings()"/></td>
+<input id="bookings-unarchive-link" name="input" type="button" value="Unarchive" /></td>
     </tr>
   <tr>
     <th scope="col"><span id="sprycheckbox1">
@@ -67,8 +67,8 @@
  
     {% for booking in booking_list %}
     {% if not booking.status = 'requested' and not booking.status = 'accepted' and not booking.status = 'rejected' and not booking.status = 'no_show' and not booking.status = 'deleted' and not booking.status = 'paid'%}
-      <tr>
-        <td><input type="checkbox" name="admin_panel_booking_id_checkbox" value="{{booking.id}}"/></td>
+      <tr id="booking-table-row-{{booking.id}}">
+        <td><input type="checkbox" name="admin-panel-booking-id-checkbox" value="{{booking.id}}"/></td>
         <td id="booking_date_time_booking_id_{{ booking.id }}" >{{ booking.datetime }}</td>
         <td><a href="/experience/{{booking.experience.id}}" target="_blank">{{ booking.experience.title }}</a></td>
         <td>
@@ -88,6 +88,22 @@
     {% endfor %}
   
   </table>
+
+        {% if is_paginated %}
+        <div class="pagination">
+            <span class="page-links">
+                {% if page_obj.has_previous %}
+                 <a href="{% url 'admin_booking_archive' %}?page={{page_obj.previous_page_number}}">previous</a>
+                {% endif %}
+                <span class="page-current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="{% url 'admin_booking_archive' %}?page={{page_obj.next_page_number}}">next</a>
+                {% endif %}
+            </span>
+        </div>
+        {% endif %}
 </form>
   </div>
 
@@ -160,8 +176,8 @@
 <div id="fade" class="black_overlay"></div>
 </form>
 </div>
+<div id="ajax-listing-form">
 
-
-
+</div>
 </body>
 </html>
