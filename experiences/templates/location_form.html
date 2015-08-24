@@ -9,31 +9,31 @@
         {%endif%}
     </ul>
 
-    <div class="section" id="section-add-location">
-        <div id="location">
-            <p id="photo-heading"><strong>Location</strong></p><br><br><br>
-            <p id="details">
-                <span>Please specify the </span><br>
-                <span>meet up and drop off</span><br>
-                <span>location of your experience.</span><br>
-            </p>
-        </div>
+    <div id="location" class="form-info">
+        <p id="photo-heading"><strong>Location</strong></p><br><br><br>
+        <p id="location-details">
+          <span>Please specify the meet up and drop off location of your experience.</span>
+        </p>
+    </div>
 
-        <div id="meet-up-instruction" style="width:320px;">
+    <div class="section" id="section-add-location" style="height: 500px;">
+
+
+        <div id="meet-up-instruction" class="text-input">
             <p id="meet-up-heading">Meet up instruction for confirmed guests</p>
             {{ form.meetup_spot }}
             {{ form.meetup_spot_other }}<br>
         </div>
 
 
-        <div id="drop-off-instruction" style="width:160px;">
+        <div id="drop-off-instruction" class="text-input">
             <p id="drop-off-heading">Drop off instruction for confirmed guests</p>
             {{ form.dropoff_spot }}
             {{ form.dropoff_spot_other }}
         </div>
 
 
-        <div id="city">
+        <div id="city" class="text-input">
             <p id="city-heading">City</p>
             {{ form.suburb }}
         </div>

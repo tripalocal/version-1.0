@@ -8,7 +8,7 @@
     <title>Experience list</title>
     <link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet" type="text/css"/>
     <link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet" type="text/css"/>
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
     <script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/admin_experience.js' %}"></script>
 
 </head>
@@ -30,7 +30,7 @@
         <ul class="subMenu">
             <li>Experience List</li>
             <li id="activated"><a href="#">Archived</a></li>
-            <li id="activated"><a href="#">+ Add New Experience</a></li>
+            <li id="activated"><a href="/experiences/new/">+ Add New Experience</a></li>
         </ul>
         <div class="clear"></div>
         <form action="" method="post"> {% csrf_token %}
@@ -83,7 +83,7 @@
                     </select>
                 </td>
                 <td>{{experience.type}}</td>
-                <td><p><a href="#">Yiyi Wang</a></p>
+                <td><p><a href="#">{{experience.hosts.all.0}}</a></p>
                     <p>(<a href="#">Change Host</a>)</p>
                 </td>
                 <td>{{experience.city}}</td>

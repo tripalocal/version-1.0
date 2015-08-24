@@ -45,6 +45,12 @@
             </div>
             <br><br><br>
 
+            {% if user.is_superuser %}
+            <span id="user-id" style="margin-left: 500px;margin-top: 20px;display: block;">
+                User Name/ID/Email&nbsp;&nbsp;
+                {{ form.user_id }}
+            </span>
+            {% endif %}
             <div>
                 <br><br><br><br>
                 <input type="submit" id="continue-button" value="Continue"/>

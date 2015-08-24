@@ -1674,7 +1674,6 @@ def new_experience(request):
     if request.method == 'POST':
         form = ExperienceForm(request.POST)
         if form.is_valid():
-            user_id = request.user.id
             experience = Experience(start_datetime=datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0),
                                     end_datetime=datetime.utcnow().replace(tzinfo=pytz.UTC).replace(
                                         minute=0) + relativedelta(years=10),
@@ -1686,7 +1685,19 @@ def new_experience(request):
                                     guest_number_min=1
                                     )
             experience.save()
-            host = User.objects.get(id=user_id)
+            user_id = None
+            host = None
+            if request.user.is_superuser:
+                user_id = form.cleaned_data['user_id']
+                if User.objects.filter(username=user_id).__len__() == 1:
+                    host = User.objects.get(username=user_id)
+                elif User.objects.filter(email=user_id).__len__() == 1:
+                    host = User.objects.get(email=user_id)
+                elif User.objects.filter(id=int(user_id)).__len__() == 1:
+                    host = User.objects.get(id=int(user_id))
+            else:
+                user_id = request.user.id
+                host = User.objects.get(id=user_id)
             experience.hosts.add(host)
             set_exp_title_all_langs(experience, form.cleaned_data['title'], LANG_EN, LANG_CN)
             #todo: add record to chinese database

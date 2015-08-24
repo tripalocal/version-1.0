@@ -1,4 +1,4 @@
-from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormMixin, FormView
 from django.views.generic import ListView
 from django.http import Http404
 from django.utils.decorators import method_decorator
@@ -8,7 +8,7 @@ from app.base import AjaxDisptcherProcessorMixin
 from app.utils import MailSupportMixin
 from experiences.models import Booking, Experience
 from custom_admin.views.base import BookingInfoMixin
-from custom_admin.forms import BookingForm, ExperienceUploadForm
+from custom_admin.forms import BookingForm, ExperienceUploadForm, CreateExperienceForm
 from custom_admin.views.base import StatusGenerator
 from custom_admin.mail import MailService
 

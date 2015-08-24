@@ -3,7 +3,9 @@
 {% load i18n %}
 
 {% block head %}
+    {% load staticfiles %}
     <title>Edit Experience</title>
+    <link href="{% static 'experiences/content/manage_listing.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
@@ -11,47 +13,62 @@
 {# leave here just for styling placehoder #}
     <div class="back_button">
         {% if language == "cn" %}
-        <a id="nav-left" href="/experience/{{experience.id}}/">{{experience_title_cn.title}}</a>
-        <a id="nav-right" href="/experience/{{experience.id}}/">Preview Listing</a>
+        <a id="nav-left" href="/experience/{{experience.id}}/">&larr; {{experience_title_cn.title}}</a>
+        <a id="nav-right" href="/experience/{{experience.id}}/"><span class="button_icon" ><img src="/images/eye.svg"></span>Preview Listing</a>
         {% else %}
-        <a id="nav-left" href="/experience/{{experience.id}}/">{{experience_title_en.title}}</a>
-        <a id="nav-right" href="/experience/{{experience.id}}/">Preview Listing</a>
+        <a id="nav-left" href="/experience/{{experience.id}}/">&larr; {{experience_title_en.title}}</a>
+        <a id="nav-right" href="/experience/{{experience.id}}/"><span class="button_icon" ><img src="/images/eye.svg"></span>Preview Listing</a>
         {% endif %}
         <div id="ajax-update-signal"></div>
         <button name="" id="save-and-exit-top" disabled></button>
     </div>
 
     <div class="left-side-bar">
-        <!-- Essential -->
-   	    <p class="list-menu">Essential</p>
+      <ul class="form-nav">
+        <li class="list-menu">Essential</li>
+        <li><a class="list-tab" id="calendar-tab"><strong>Calender</strong></a><img src="/images/done.jpg" alt="" class="modify-icon" id="calender-status-icon"></li>
+        <li><a class="list-tab" id="price-tab"><strong>Pricing</strong></a><img src="/images/pencil.jpg" alt="" class="modify-icon" id="pricing-status-icon"></li>
+        <li><br></li>
+        <li class="list-menu">Description</li>
+        <li><a class="list-tab" id="overview-tab"><strong>Overview</strong></a><img src="/images/pencil.jpg" alt="" class="modify-icon" id="overview-status-icon"></li>
+        <li><a class="list-tab" id ="detail-tab"><strong>Details</strong></a><img src="/images/pencil.jpg" alt="" class="modify-icon" id="details-status-icon"></li>
+        <li><a class="list-tab" id="photo-tab"><strong>Photos</strong></a><img src="/images/pencil.jpg" alt="" class="modify-icon" id="photos-status-icon"></li>
+        <li><a class="list-tab" id="location-tab"><strong>Location</strong></a><img src="/images/pencil.jpg" alt="" class="modify-icon" id="location-status-icon"></li>
+      </ul>
 
-   	    <a class="list-tab" id="calendar-tab"><strong>Calender</strong></a>
-        <p><img src="/images/done.jpg" alt="" class="modify-icon" id="calender-status-icon"></p>
-   	    <a class="list-tab" id="price-tab"><strong>Pricing</strong></a>
-   	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon" id="pricing-status-icon"></p>
-
-        <!-- description -->
-   	    <p class="list-menu">Description</p>
-   	    <a class="list-tab" id="overview-tab"><strong>Overview</strong></a>
-	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon" id="overview-status-icon"></p>
-	    <a class="list-tab" id ="detail-tab"><strong>Details</strong></a>
-	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon" id="details-status-icon"></p>
-	    <a class="list-tab" id="photo-tab"><strong>Photos</strong></a>
-	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon" id="photos-status-icon"></p>
-	    <a class="list-tab" id="location-tab"><strong>Location</strong></a>
-	    <p><img src="/images/pencil.jpg" alt="" class="modify-icon" id="location-status-icon"></p>
-
-        <!-- Steps Remaining -->
-        <p id="steps-remaining">5 more steps<br>until publish!</p>
+      <!-- Steps Remaining -->
+      <p id="steps-remaining">5 more steps<br>until publish!</p>
     </div>
-
-    <!--<div id="ajax-update-signal"></div>-->
-    <div id="ajax-listing-form"></div>
+    <div class="form-content">
+      <!--<div id="ajax-update-signal"></div>-->
+      <div id="ajax-listing-form"></div>
+    </div>
 </form>
 {% endblock %}
 
 {%block scripts%}
 <script charset="utf-8" type="text/javascript">
+  // Sticky top
+  $(document).ready(function() {
+    var stickyNavTop = $('.back_button').offset().top;
+
+    var stickyNav = function(){
+      var scrollTop = $(window).scrollTop();
+
+      if (scrollTop > stickyNavTop) {
+        $('.back_button').addClass('sticky');
+      } else {
+        $('.back_button').removeClass('sticky');
+      }
+    };
+
+    stickyNav();
+
+    $(window).scroll(function() {
+      stickyNav();
+    });
+  });
+
     window.PRICE_FORM_INDICATOR = "none";
 
 
@@ -387,14 +404,14 @@
 
             // Set selection page listener.
             $("#proceed-button").click(function(e) {
-                if($("#menu-selection-left").attr("data-chosen") === "true") {
+                if($("#menu-selection-left").attr("data-chosen") === "true" && $("#memu-selection-right").attr("data-chosen") === "false") {
                     $("#price-form").css("display", "block");
                     $("#private-only-part").css("display", "block");
                     $("#selection-menu").css("display", "none");
                     window.PRICE_FORM_INDICATOR = "private";
                     postDatum(location.href, {'type': 'PRIVATE'})
                 }
-                else if($("#memu-selection-right").attr("data-chosen") === "true") {
+                else if($("#memu-selection-right").attr("data-chosen") === "true" && $("#menu-selection-left").attr("data-chosen") === "false" ) {
                     $("#price-form").css("display", "block");
                     $("#private-only-part").css("display", "none");
                     $("#selection-menu").css("display", "none");
@@ -408,20 +425,21 @@
             });
 
             $("#menu-selection-left").click(function(e) {
-                $("#menu-selection-left").css("background", "yellow");
-                $("#memu-selection-right").css("background", "red");
+                $("#menu-selection-left").css("background-image", "url('/images/private_selected.png')");
+                $("#menu-selection-right").css("background-image", "url('/images/public.png')");
                 $("#menu-selection-left").attr("data-chosen","true");
-                $("#memu-selection-right").attr("data-chosen","false");
+                $("#menu-selection-right").attr("data-chosen","false");
             });
 
-            $("#memu-selection-right").click(function(e) {
-                $("#menu-selection-left").css("background", "red");
-                $("#memu-selection-right").css("background", "yellow");
+            $("#menu-selection-right").click(function(e) {
+                $("#menu-selection-left").css("background-image", "url('/images/private.png')");
+                $("#menu-selection-right").css("background-image", "url('/images/public_selected.png')");
                 $("#menu-selection-left").attr("data-chosen","false");
-                $("#memu-selection-right").attr("data-chosen","true");
+                $("#menu-selection-right").attr("data-chosen","true");
             });
 
             $("#price-last-step").click(function() {
+
                 $("#price-form").css("display", "none");
                 $("#private-only-part").css("display", "none");
                 $("#selection-menu").css("display", "block");
