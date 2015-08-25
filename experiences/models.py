@@ -2,6 +2,7 @@ import traceback
 
 from django.http import Http404
 from django.db import models
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from datetime import datetime
@@ -61,16 +62,25 @@ class Experience(models.Model):
         language = 'en'
         if 'language' in kwargs:
             language = kwargs['language']
-        exp = ExperienceI18n.objects.filter(experience_id=self.id, language=language)
-        if exp.__len__() == 1:
-            exp_i18n = exp[0]
-            self.title = exp_i18n.title
-            self.description = exp_i18n.description
-            self.activity = exp_i18n.activity
-            self.dress = exp_i18n.activity
-            self.interaction = exp_i18n.interaction
-            self.meetup_spot = exp_i18n.meetup_spot
-            self.dropoff_spot = exp_i18n.dropoff_spot
+        self.title = get_experience_title(self, language)
+        self.description = get_experience_description(self, language)
+        self.activity = get_experience_activity(self, language)
+        self.dress = get_experience_dress(self, language)
+        self.interaction = get_experience_interaction(self, language)
+        self.meetup_spot = get_experience_meetup_spot(self, language)
+        self.dropoff_spot = get_experience_dropoff_spot(self, language)
+
+        #exp = ExperienceI18n.objects.filter(experience_id=self.id, language=language)
+        #if exp.__len__() == 1:
+            # exp_i18n = exp[0]
+            # self.title = exp_i18n.title
+            # self.description = exp_i18n.description
+            # self.activity = exp_i18n.activity
+            # self.dress = exp_i18n.activity
+            # self.interaction = exp_i18n.interaction
+            # self.meetup_spot = exp_i18n.meetup_spot
+            # self.dropoff_spot = exp_i18n.dropoff_spot
+
 
     def change_status(self, new_status=None):
         self.status = new_status
