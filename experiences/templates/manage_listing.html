@@ -13,27 +13,36 @@
 {# leave here just for styling placehoder #}
     <div class="back_button">
         {% if language == "cn" %}
-        <a id="nav-left" href="/experience/{{experience.id}}/">&larr; {{experience_title_cn.title}}</a>
-        <a id="nav-right" href="/experience/{{experience.id}}/"><span class="button_icon" ><img src="/images/eye.svg"></span>Preview Listing</a>
+            <a id="nav-left" href="/experience/{{ experience.id }}/">&larr; {{ experience_title_cn.title }}</a>
+            <a id="nav-right" href="/experience/{{ experience.id }}/"><span class="button_icon">
+            <img src="/images/icon/eye.svg"></span>Preview Listing</a>
         {% else %}
-        <a id="nav-left" href="/experience/{{experience.id}}/">&larr; {{experience_title_en.title}}</a>
-        <a id="nav-right" href="/experience/{{experience.id}}/"><span class="button_icon" ><img src="/images/eye.svg"></span>Preview Listing</a>
+            <a id="nav-left" href="/experience/{{ experience.id }}/">&larr; {{ experience_title_en.title }}</a>
+            <a id="nav-right" href="/experience/{{ experience.id }}/"><span class="button_icon">
+            <img src="/images/icon/eye.svg"></span>Preview Listing</a>
         {% endif %}
+
         <div id="ajax-update-signal"></div>
         <button name="" id="save-and-exit-top" disabled></button>
     </div>
 
     <div class="left-side-bar">
-      <ul class="form-nav">
-        <li class="list-menu">Essential</li>
-        <li><a class="list-tab" id="calendar-tab"><strong>Calender</strong></a><img src="/images/done.jpg" alt="" class="modify-icon" id="calender-status-icon"></li>
-        <li><a class="list-tab" id="price-tab"><strong>Pricing</strong></a><img src="/images/pencil.jpg" alt="" class="modify-icon" id="pricing-status-icon"></li>
-        <li><br></li>
-        <li class="list-menu">Description</li>
-        <li><a class="list-tab" id="overview-tab"><strong>Overview</strong></a><img src="/images/pencil.jpg" alt="" class="modify-icon" id="overview-status-icon"></li>
-        <li><a class="list-tab" id ="detail-tab"><strong>Details</strong></a><img src="/images/pencil.jpg" alt="" class="modify-icon" id="details-status-icon"></li>
-        <li><a class="list-tab" id="photo-tab"><strong>Photos</strong></a><img src="/images/pencil.jpg" alt="" class="modify-icon" id="photos-status-icon"></li>
-        <li><a class="list-tab" id="location-tab"><strong>Location</strong></a><img src="/images/pencil.jpg" alt="" class="modify-icon" id="location-status-icon"></li>
+        <ul class="form-nav">
+            <li class="list-menu">Essential</li>
+{#            <li><a class="list-tab" id="calendar-tab"><strong>Calender</strong></a>#}
+{#                <img src="/images/icon/done.jpg" alt="" class="modify-icon" id="calender-status-icon"></li>#}
+            <li><a class="list-tab" id="price-tab"><strong>Pricing</strong></a>
+                <span class="modify-icon" id="pricing-status-icon"></span>
+            </li>
+            <li class="list-menu">Description</li>
+            <li><a class="list-tab" id="overview-tab"><strong>Overview</strong></a>
+                <div class="modify-icon" id="overview-status-icon"></div></li>
+            <li><a class="list-tab" id="detail-tab"><strong>Details</strong></a>
+                <div class="modify-icon" id="details-status-icon"></div></li>
+            <li><a class="list-tab" id="photo-tab"><strong>Photos</strong></a>
+                <div class="modify-icon" id="photos-status-icon"></div></li>
+            <li><a class="list-tab" id="location-tab"><strong>Location</strong></a>
+                <div class="modify-icon" id="location-status-icon"></div></li>
       </ul>
 
       <!-- Steps Remaining -->
@@ -530,11 +539,11 @@
 
         function checkPriceFormFilled() {
            if($("#id_price").val() != '' && $("#id_price_with_booking_fee").val() != '') {
-               $("#pricing-status-icon").attr("src","/images/done.jpg");
+               $("#pricing-status-icon").attr("class","status-done");
                setCookie("priceFilled", "True");
            }
            else {
-               $("#pricing-status-icon").attr("src","/images/pencil.jpg");
+               $("#pricing-status-icon").attr("class","status-edit");
                setCookie("priceFilled", "False");
            }
             setFinishedStatus();
@@ -661,10 +670,10 @@
                 inputBoxFiled = true;
 
             if(inputBoxFiled && checkBoxFiled) {
-                $("#overview-status-icon").attr("src","/images/done.jpg");
+                $("#overview-status-icon").attr("class","status-done");
                 setCookie("overFilled", "True");
             } else {
-                $("#overview-status-icon").attr("src","/images/pencil.jpg");
+                $("#overview-status-icon").attr("class","status-edit");
                 setCookie("overFilled", "False");
             }
             setFinishedStatus();
@@ -819,10 +828,10 @@
             });
 
             if(filled) {
-                $("#details-status-icon").attr("src","/images/done.jpg");
+                $("#details-status-icon").attr("class","status-done");
                 setCookie("detailFilled", "True");
             } else {
-                $("#details-status-icon").attr("src","/images/pencil.jpg");
+                $("#details-status-icon").attr("class","status-edit");
                 setCookie("detailFilled", "False");
             }
             setFinishedStatus();
@@ -1047,49 +1056,44 @@ function loadLocationForm(href) {
     function setFinishedStatus() {
         var steps = 0;
 
-        if(getCookie("priceFilled") === "True") {
-            $("#pricing-status-icon").attr("src","/images/done.jpg");
+        if (getCookie("priceFilled") === "True") {
+            $("#pricing-status-icon").attr("class", "status-done");
             steps = steps + 1;
-        }
-        else {
-            $("#pricing-status-icon").attr("src","/images/pencil.jpg");
+        } else {
+            $("#pricing-status-icon").attr("class", "status-edit");
             setCookie("isSubmited", "False");
         }
-        if(getCookie("overFilled") === "True") {
-            $("#overview-status-icon").attr("src", "/images/done.jpg");
+        if (getCookie("overFilled") === "True") {
+            $("#overview-status-icon").attr("class", "status-done");
             steps = steps + 1;
-        }
-        else {
-            $("#overview-status-icon").attr("src","/images/pencil.jpg");
+        } else {
+            $("#overview-status-icon").attr("class", "status-edit");
             setCookie("isSubmited", "False");
         }
-        if(getCookie("detailFilled") === "True") {
-            $("#details-status-icon").attr("src","/images/done.jpg");
+        if (getCookie("detailFilled") === "True") {
+            $("#details-status-icon").attr("class", "status-done");
             steps = steps + 1;
-        }
-        else {
-            $("#details-status-icon").attr("src","/images/pencil.jpg");
+        } else {
+            $("#details-status-icon").attr("class", "status-edit");
             setCookie("isSubmited", "False");
         }
-        if(getCookie("photoFilled") === "True") {
-            $("#photos-status-icon").attr("src","/images/done.jpg");
+        if (getCookie("photoFilled") === "True") {
+            $("#photos-status-icon").attr("class", "status-done");
             steps = steps + 1;
-        }
-        else {
-            $("#photos-status-icon").attr("src","/images/pencil.jpg");
+        } else {
+            $("#photos-status-icon").attr("class", "status-edit");
             setCookie("isSubmited", "False");
         }
-        if(getCookie("locationFilled") === "True") {
-            $("#location-status-icon").attr("src","/images/done.jpg");
+        if (getCookie("locationFilled") === "True") {
+            $("#location-status-icon").attr("class", "status-done");
             steps = steps + 1;
-        }
-        else {
-            $("#location-status-icon").attr("src", "/images/pencil.jpg");
+        } else {
+            $("#location-status-icon").attr("class", "status-edit");
             setCookie("isSubmited", "False");
         }
 
-        if(steps == 5) {
-            if(getCookie("isSubmited") === "True") {
+        if (steps == 5) {
+            if (getCookie("isSubmited") === "True") {
                 $("#steps-remaining").text("Submitted");
             } else {
                 $("#steps-remaining").text("Click to submit");
@@ -1104,8 +1108,6 @@ function loadLocationForm(href) {
         } else {
             $("#steps-remaining").text(steps + " more step\n to submit");
         }
-
-
     }
 
     function postDatum(href, datum) {
@@ -1206,10 +1208,10 @@ function loadLocationForm(href) {
 
     function checkPhotoFiled() {
         if($("#photo-preview-div-1").css("background-image") != '' && $("#photo-preview-div-1").css("background-image") != 'none') {
-            $("#photos-status-icon").attr("src","/images/done.jpg");
+            $("#photos-status-icon").attr("class","status-done");
             setCookie("photoFilled", "True");
         } else {
-            $("#photos-status-icon").attr("src","/images/pencil.jpg");
+            $("#photos-status-icon").attr("class","status-edit");
             setCookie("photoFilled", "False");
         }
         setFinishedStatus();
