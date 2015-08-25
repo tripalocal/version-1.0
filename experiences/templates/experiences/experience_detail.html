@@ -38,9 +38,11 @@
             <div class="fixCenter">
                 <div class="stickem">
                     <div class="bookingBox">
+                        {% if experience.type == 'PRIVATE' %}
                         <div class="profile-lg">
                             <div style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
                         </div>
+                        {% endif %}
                         {% if LANGUAGE != "zh-CN" %}
                         {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
                         {%else%}
