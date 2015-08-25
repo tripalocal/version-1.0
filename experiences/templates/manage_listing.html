@@ -413,14 +413,15 @@
 
             // Set selection page listener.
             $("#proceed-button").click(function(e) {
-                if($("#menu-selection-left").attr("data-chosen") === "true" && $("#memu-selection-right").attr("data-chosen") === "false") {
+
+                if(window.PRICE_FORM_INDICATOR == "public") {
                     $("#price-form").css("display", "block");
                     $("#private-only-part").css("display", "block");
                     $("#selection-menu").css("display", "none");
                     window.PRICE_FORM_INDICATOR = "private";
                     postDatum(location.href, {'type': 'PRIVATE'})
                 }
-                else if($("#memu-selection-right").attr("data-chosen") === "true" && $("#menu-selection-left").attr("data-chosen") === "false" ) {
+                else if(window.PRICE_FORM_INDICATOR == "private") {
                     $("#price-form").css("display", "block");
                     $("#private-only-part").css("display", "none");
                     $("#selection-menu").css("display", "none");
@@ -434,17 +435,19 @@
             });
 
             $("#menu-selection-left").click(function(e) {
-                $("#menu-selection-left").css("background-image", "url('/images/private_selected.png')");
-                $("#menu-selection-right").css("background-image", "url('/images/public.png')");
+                $("#menu-selection-left").css("background-image", "url('/images/img/private_selected.png')");
+                $("#menu-selection-right").css("background-image", "url('/images/img/public.png')");
                 $("#menu-selection-left").attr("data-chosen","true");
                 $("#menu-selection-right").attr("data-chosen","false");
+                window.PRICE_FORM_INDICATOR = "private";
             });
 
             $("#menu-selection-right").click(function(e) {
-                $("#menu-selection-left").css("background-image", "url('/images/private.png')");
-                $("#menu-selection-right").css("background-image", "url('/images/public_selected.png')");
+                $("#menu-selection-left").css("background-image", "url('/images/img/private.png')");
+                $("#menu-selection-right").css("background-image", "url('/images/img/public_selected.png')");
                 $("#menu-selection-left").attr("data-chosen","false");
                 $("#menu-selection-right").attr("data-chosen","true");
+                window.PRICE_FORM_INDICATOR = "public";
             });
 
             $("#price-last-step").click(function() {
@@ -589,6 +592,14 @@
                 postDatum(location.href, {
                     'title': $('#id_title').val(),
                     'summary': $('#id_summary').val()
+                })
+            });
+
+            $('#id_title_other, #id_summary_other').focusout(function () {
+                checkOverviewFilled();
+                postDatum(location.href, {
+                    'title_other': $('#id_title_other').val(),
+                    'summary_other': $('#id_summary_other').val()
                 })
             });
 
@@ -781,14 +792,29 @@
                 postDatum(location.href, {'activity': $('#id_activity').val()});
             });
 
+            $("#id_activity_other").focusout(function () {
+                checkDetailFiled();
+                postDatum(location.href, {'activity_other': $('#id_activity_other').val()});
+            });
+
             $("#id_interaction").focusout(function () {
                 checkDetailFiled();
                 postDatum(location.href, {'interaction': $('#id_interaction').val()});
             });
 
+            $("#id_interaction_other").focusout(function () {
+                checkDetailFiled();
+                postDatum(location.href, {'interaction_other': $('#id_interaction_other').val()});
+            });
+
             $("#id_dress_code").focusout(function () {
                 checkDetailFiled();
                 postDatum(location.href, {'dress_code': $('#id_dress_code').val()});
+            });
+
+            $("#id_dress_code_other").focusout(function () {
+                checkDetailFiled();
+                postDatum(location.href, {'dress_code': $('#id_dress_code_other').val()});
             });
 
             $("#id_included_food_0, #id_included_food_1").click(function () {
@@ -808,14 +834,29 @@
                 postDatum(location.href, {'included_food_detail': $('#id_included_food_detail').val()});
             });
 
+            $("#id_included_food_detail_other").focusout(function () {
+                checkDetailFiled();
+                postDatum(location.href, {'included_food_detail_other': $('#id_included_food_detail_other').val()});
+            });
+
             $("#id_included_transport_detail").focusout(function () {
                 checkDetailFiled();
                 postDatum(location.href, {'included_transport_detail': $('#id_included_transport_detail').val()});
             });
 
+            $("#id_included_transport_detail_other").focusout(function () {
+                checkDetailFiled();
+                postDatum(location.href, {'included_transport_detail_other': $('#id_included_transport_detail_other').val()});
+            });
+
             $("#id_included_ticket_detail").focusout(function () {
                 checkDetailFiled();
                 postDatum(location.href, {'included_ticket_detail': $('#id_included_ticket_detail').val()});
+            });
+
+            $("#id_included_ticket_detail_other").focusout(function () {
+                checkDetailFiled();
+                postDatum(location.href, {'included_ticket_detail_other': $('#id_included_ticket_detail_other').val()});
             });
         }
 
@@ -1106,7 +1147,7 @@ function loadLocationForm(href) {
                 });
             }
         } else {
-            $("#steps-remaining").text(steps + " more step\n to submit");
+            $("#steps-remaining").text((5-steps) + " more step\n to submit");
         }
     }
 
