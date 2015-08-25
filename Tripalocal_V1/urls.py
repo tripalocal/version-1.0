@@ -109,6 +109,7 @@ urlpatterns = patterns('',
     url(r'^service_experiencedetail/$', 'experiences.resource.service_experiencedetail'),
     url(r'^update_files/$', 'experiences.resource.update_files'),
 
+    url(r'^custom_admin/$', superuser_required(ExperienceView.as_view()), name='custom_admin_index'),
     url(r'^custom_admin/booking$', superuser_required(BookingView.as_view()), name='admin_booking'),
    # url(r'^custom_admin/change_time/(?P<booking_id>\d+)$', BookingView.as_view()),
     url(r'^custom_admin/booking-archive/$', superuser_required(BookingArchiveView.as_view()), name='admin_booking_archive'),
