@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% load staticfiles %}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Experience list</title>
+    <link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet" type="text/css"/>
+    <link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet" type="text/css"/>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/admin_experience.js' %}"></script>
+
+</head>
+
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo"><img src="images/tripalocalLog.png" width="105" height="60"/></div>
+        <ul class="menu">
+            <li>Experiences</li>
+            <li><a href="#">Hosts</a></li>
+            <li><a href="/custom_admin/booking">Bookings</a></li>
+            <li><a href="/custom_admin/payment">Payment</a></li>
+        </ul>
+        <div class="account">Hi, {{user.username}} | <a href="#">Logout</a></div>
+    </div>
+    <div class="fullColumn">
+        <div class="operation"></div>
+        <ul class="subMenu">
+            <li>Experience List</li>
+            <li id="activated"><a href="#">Archived</a></li>
+            <li id="activated"><a href="/experiences/new/" target="_blank">+ Add New Experience</a></li>
+        </ul>
+        <div class="clear"></div>
+        <form action="" method="post"> {% csrf_token %}
+        <table border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td colspan="13" class="tableEdit">&nbsp;&nbsp;↓
+                    <input name="input" type="button" value="Delete"/>&nbsp;&nbsp;
+                    <input name="input" type="button" value="Archive"/>
+                </td>
+            </tr>
+            <tr>
+                <th scope="col">
+                    <span id="sprycheckbox1">
+                        <label>
+                            <input type="checkbox" name="checkbox1" id="checkbox1"/>
+                        </label>
+                    </span>
+                </th>
+                <th scope="col">ID</th>
+                <th scope="col">Experience Name</th>
+                <th scope="col">Commission</th>
+                <th scope="col">Status</th>
+                <th scope="col">Type</th>
+                <th scope="col">Host</th>
+                <th scope="col">Destination</th>
+                <th scope="col">Actions</th>
+            </tr>
+            {% for experience in experience_list %}
+            <tr>
+                <td>
+                    <span id="sprycheckbox2">
+                        <label>
+                            <input type="checkbox" name="checkbox2" id="checkbox2"/>
+                        </label>
+                    </span>
+                </td>
+                <td>{{experience.id}}</td>
+                <td><a href="{% url 'experiencedetail' pk=experience.id %}" target="_blank">{{experience.title}}</a></td>
+                <td id="td-commission-{{experience.id}}">
+                    <p>30%</p>
+                    <input id="input-commission-{{experience.id}}"/>
+                </td>
+                <td id="td-status-{{experience.id}}">
+                    <p>{{experience.status}}</p>
+                    <select name="select" id="select-status-{{experience.id}}">
+                        <option value="Draft">Draft</option>
+                        <option value="Submitted">Pending Review</option>
+                        <option value="Listed">Listed</option>
+                        <option value="Unlisted">Unlisted</option>
+                    </select>
+                </td>
+                <td>{{experience.type}}</td>
+                <td><p><a href="#">{{experience.hosts.all.0}}</a></p>
+                    <p>(<a href="#">Change</a>)</p>
+                </td>
+                <td>{{experience.city}}</td>
+                <td><p><a href="{% url 'manage_listing' exp_id=experience.id step='price' %}" target="_blank">Edit</a></p></td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    {% if is_paginated %}
+        <div class="pagination">
+            <span class="page-links">
+                {% if page_obj.has_previous %}
+                 <a href="{% url 'admin_experience' %}?page={{page_obj.previous_page_number}}">previous</a>
+                {% endif %}
+                <span class="page-current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="{% url 'admin_experience' %}?page={{page_obj.next_page_number}}">next</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+
+        </form>
+        </tr>
+    </div>
+    <div class="push"></div>
+</div>
+<div class="footer">© TRIPALOCAL Pty Ltd. All Rights Reserved, 2014</div>
+</body>
+</html>

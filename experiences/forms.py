@@ -110,6 +110,7 @@ class ExperienceForm(forms.Form):
     duration = forms.ChoiceField(choices=Duration, required=False)
     location = forms.ChoiceField(choices=Suburbs, required=False)
     changed_steps = forms.CharField(max_length=100, required=False)
+    user_id = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(ExperienceForm, self).__init__(*args, **kwargs)
@@ -308,6 +309,8 @@ class ExperienceLocationForm(forms.Form):
     suburb = forms.ChoiceField(required=False, choices=Suburbs)
     meetup_spot = forms.CharField(required=False, widget=forms.Textarea)
     meetup_spot_other = forms.CharField(required=False, widget=forms.Textarea)
+    dropoff_spot = forms.CharField(required=False, widget=forms.Textarea)
+    dropoff_spot_other = forms.CharField(required=False, widget=forms.Textarea)
 
     def __init__(self, *args, **kwargs):
         super(ExperienceLocationForm, self).__init__(*args, **kwargs)
@@ -399,6 +402,7 @@ class ExperienceSummaryForm(forms.Form):
 
     suburb = forms.ChoiceField(choices=Suburbs)
     meetup_spot = forms.CharField(widget=forms.Textarea)
+    dropoff_spot = forms.CharField(widget=forms.Textarea)
 
 class BookingForm(forms.Form):
     user_id = forms.CharField()
@@ -682,6 +686,7 @@ class CreateExperienceForm(forms.Form):
     dress_code = forms.CharField(widget=forms.Textarea)
     suburb = forms.ChoiceField(choices=Suburbs)
     meetup_spot = forms.CharField(widget=forms.Textarea)
+    dropoff_spot = forms.CharField(widget=forms.Textarea)
     status = forms.ChoiceField(choices=Status)
     experience_photo_1 = forms.ImageField(required = False)
     experience_photo_2 = forms.ImageField(required = False)
@@ -823,6 +828,7 @@ class ItineraryBookingForm(forms.Form):
             experience = Experience.objects.get(id=ids[i])
             experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
             experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
+            experience.dropoff_spot = get_experience_dropoff_spot(experience, settings.LANGUAGES[0][0])
 
             if not free:
                 subtotal_price = 0.0

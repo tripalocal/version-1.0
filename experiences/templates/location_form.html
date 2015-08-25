@@ -1,0 +1,81 @@
+{% load staticfiles %}
+
+<div id="form" class="calendar">
+    <ul id="myTab" class="nav nav-tabs">
+        {%if language == "cn" %}
+        <li class="active"><a id="location_tab" role="button" data-toggle="tab">中文（简体）</a></li>
+        <li><a id="location_other_tab" role="button" data-toggle="tab">English</a></li>
+        {%else%}
+        <li class="active"><a id="location_tab" role="button" data-toggle="tab">English</a></li>
+        <li><a id="location_other_tab" role="button" data-toggle="tab">中文（简体）</a></li>
+        {%endif%}
+    </ul>
+
+    <div id="location" class="form-info">
+        <p id="photo-heading"><strong>Location</strong></p><br><br><br>
+        <p id="location-details">
+          <span>Please specify the meet up and drop off location of your experience.</span>
+        </p>
+    </div>
+
+    <div class="section" id="section-add-location" style="height: 500px;">
+
+
+        <div id="meet-up-instruction" class="text-input">
+            <p id="meet-up-heading">Meet up instruction for confirmed guests</p>
+            {{ form.meetup_spot }}
+            {{ form.meetup_spot_other }}<br>
+        </div>
+
+
+        <div id="drop-off-instruction" class="text-input">
+            <p id="drop-off-heading">Drop off instruction for confirmed guests</p>
+            {{ form.dropoff_spot }}
+            {{ form.dropoff_spot_other }}
+        </div>
+
+
+        <div id="city" class="text-input">
+            <p id="city-heading">City</p>
+            {{ form.suburb }}
+        </div>
+    </div>
+    <div class="section" style="text-align:right;">
+        <input type="submit" value="Last Step" id="last-step" />
+    </div>
+    <!-- creating spare space  -->
+    <div class="creating-slot-button-active create-slot-detail">
+    </div>
+    <div class="creating-slot-button-active create-slot-detail">
+    </div>
+    <div class="creating-slot-button-active create-slot-detail">
+    </div>
+</div>
+
+<!-- Info bar -->
+<div class="info-bar">
+    <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="">
+    <div id="hint-msgs">
+        <p>
+            <span><strong>Meet up</strong></span><br>
+            <span>You can offer multiple meet</span><br>
+            <span>up spots or pick up travel-</span><br>
+            <span>lers from their accomonda-</span><br>
+            <span>tion. You can even offer</span><br>
+        </p>
+    </div>
+    <br>
+    <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="" style="display:none;">
+    <div id="hint-msgs" style="display:none;">
+        <p>
+            <span><strong>Drop off</strong></span><br>
+            <span>Let your traveller knows </span><br>
+            <span>where the experience will</span><br>
+            <span>end, would you be able to</span><br>
+            <span>take them back to their</span><br>
+            <span>accomodation? Or perhaps</span><br>
+            <span>a nearby station?</span><br>
+        </p>
+    </div>
+    <br>
+</div>

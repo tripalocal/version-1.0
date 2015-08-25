@@ -257,7 +257,7 @@ table tr .rowspan {
 	color: #C00;
 }
 
-#big_button {
+.big_button {
 	min-width:140px;
 	height:45px;
 	outline:none;
