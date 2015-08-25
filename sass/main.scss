@@ -3,8 +3,9 @@
   Author: Kemble Song
 */
 
-// Vendors
-
+// Vendor
+@import
+  'vendor/include-media';
 
 // Utilities & helpers
 @import
@@ -18,11 +19,27 @@
   'base/normalize',
   'base/typography',
   'base/base';
-  
-// Layout
 
+// Layout
+@import
+  'layout/header',
+  'layout/footer',
+  'layout/forms',
+  'layout/jumbotron',
+  'layout/stickem',
+  'layout/booking-box',
+  'layout/price-box',
+  'layout/experience-box',
+  'layout/carousel';
 
 // Components
-
-
-// Page specific styles
+@import
+  'components/buttons',
+  'components/dropdown',
+  'components/profile',
+  'components/modal',
+  'components/warning-sign',
+  'components/video',
+  'components/loading',
+  'components/icons',
+  'components/checkboxes';

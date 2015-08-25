@@ -6,11 +6,11 @@ In order to get rid of stash and unstashes, here is a better practice to customi
 3. Append `DEVELOPMENT = True` to the file if you would like turn off Mixpanel or other live server specific settings.
 
 	For example, if program crashes because of the use of `settings.MIXPANEL_TOKEN` and you don't have it on your localenviroment. Simply add
-	
-	`if not settings.DEVELOPMENT:` 
-	
+
+	`if not settings.DEVELOPMENT:`
+
 	before the code.
-	
+
 ## Organise static files
 
 ### Global static files
@@ -30,3 +30,8 @@ In Mac OS, do it like this:
 
 `DEFAULT_FILE_STORAGE=custom_storages.MediaStorage`
 `STATICFILES_STORAGE=custom_storages.StaticStorage`
+
+## Compiling Sass  
+(Make sure you have npm installed. Then install dependencies with `npm install`)  
+`gulp styles` will compile the sass code in `/sass` into a single `main.css`.  
+No need to upload the `/sass` directory to the live site.

@@ -1,11 +1,24 @@
 /*
-  Variables
+
+  Variables (global)
+
 */
 
 // Colours
+$off-white: #f7f7f7;
+$cyan: #3ECCCB;
+$light-grey: #ccc;
+$medium-grey: #999;
+$dark-grey: #666;
+$slate-grey: #333;
+$pink: #FF5E5E;
+$salmon: #FFC7C7;
 
+$base-color: $off-white;
+$primary-color: $cyan;
+$secondary-color: white;
 
 // Fonts
 @import url(http://fonts.googleapis.com/css?family=Exo:600);
-$font-stack-homepage: 'EXO', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$font-stack-body:  'Helvetica Neue', Helvetica, Arial, sans-serif;
+$font-stack-homepage: ('EXO', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif);
+$font-stack-body:  ('Helvetica Neue', 'Helvetica', 'Arial', sans-serif);

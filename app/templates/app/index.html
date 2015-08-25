@@ -10,13 +10,11 @@
     <meta name="keywords" content="私人导游，本土导游，境外旅游，澳洲旅行，个性化旅行线路"/>
     <meta name="description" content="本土客，一个提供个性化向导的旅行平台，拥有全球私人导游，搜罗海外本土特色旅行线路！本土客专注游客目的地、旅行线路，p2p出境游，分享游客旅行经验。全球游客发布目的地旅行线路，支持预订目的地线路，本土客当地人带你体验目的地旅行魅力，看最美丽的风景，吃最地道的美食，玩最刺激的活动，做最接地气的文化交流，让你体验一段真正属于自己风格的自由行。"/>
     {% endif %}
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.css" rel="stylesheet">
     <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/tripalocal_homepage.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/homepage.css' %}" rel="stylesheet">
 
     <!-- H1 google font -->
-    <link href='//fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>
+    <!--<link href='//fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>-->
 
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
@@ -55,47 +53,37 @@
         </div>
     </div>
 -->
-    <div class="home-menu-bar">
-        <ul class="home-menu menu">
-        {% if user.is_authenticated %}
-            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a></li>
-            <li><a href="{{GEO_POSTFIX}}accounts/logout/">{% trans "Log out" %}</a></li>
-            <li>{{ user.first_name }}</li>
-            <li><div class="profile-xs"><a href="{{GEO_POSTFIX}}myprofile"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div></li>
-        {% else %}
-            <li><a id="language_switch_topbar" class="home-language" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a></li>
-            <li><a href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></li>
-            <li><a href="{{GEO_POSTFIX}}accounts/login/?next={{ request.path }}">{% trans "Log in" %}</a></li>
-        {% endif %}
-        </ul>
-    </div>
 
     <div class="jumbotron">
-        <div class="container">
-            <div class="homepage-logo"></div>
-            <div class="notOnMobile"><br><br></div>
-            <form id="search_form" action="" method="post">
-                {% csrf_token %}
-                <table class="home-search">
-                    <tbody>
-                        <tr>
-                            <td class="search-location">
-                              <div id="id-city" class="ui selection dropdown">
-                                <input type="hidden" name="city" value="city">
-                                  <i class="dropdown icon"></i>
-                                  <div class="text">{% trans "City" %}</div>
-                                  <div id="city-menu" class="menu"></div>
-                              </div>
-                            </td>
-                            <td class="search-from">{{form.start_date}}</td>
-                            <td class="search-to">{{form.end_date}}</td>
-                            <td class="home-search-button"><input id="search-submit" type="submit" value="{% trans "Search" %}" name="search" class="btn btn-primary btn-sm btn-search"></td>
-                        </tr>
-                        <tr class="mobileOnly">
-                            <td class="home-search-button-mobile"><input id="search-submit-button" type="submit" value="{% trans "Search" %}" name="search" class="btn btn-primary btn-sm btn-search"></td>
-                        </tr>
-                    </tbody>
-                </table>
+      <div class="container">
+        <div class="homepage-logo"></div>
+          <form id="search_form" action="" method="post">
+            {% csrf_token %}
+
+              <div class="search-bar">
+                <div class="container-fluid">
+                  <div class="row">
+                    <div class="search-location col-sm-6">
+                      <div id="id-city" class="ui selection dropdown">
+                        <input type="hidden" name="city" value="city">
+                          <i class="dropdown icon"></i>
+                          <div class="text">{% trans "City" %}</div>
+                          <div id="city-menu" class="menu"></div>
+                      </div>
+                    </div>
+                    <div class="search-from col-sm-2">
+                      {{form.start_date}}
+                    </div>
+                    <div class="search-to col-sm-2">
+                      {{form.end_date}}
+                    </div>
+                    <div class="home-search-button col-sm-2">
+                      <input id="search-submit" type="submit" value="{% trans "Search" %}" name="search" class="btn btn-primary btn-search">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </form>
             <div>
             {%if LANGUAGE == "zh-CN"%}
@@ -107,65 +95,77 @@
         </div>
     </div>
 
-    <div class="exp-brief">
-        <div class="container">
-            <div id="exp-heading">
-                <h1 style="color:#666;">{% trans "Discover authentic experiences" %}</h1>
-                <p style="font-size:16px;color:#666;margin-bottom:45px">{%trans "Explore local places" %}</p>
-            </div>
+    <div class="tease-box">
 
-            <div class="tease-box">
+      <h1>{% trans "Discover authentic experiences" %}</h1>
+      <p>{%trans "Explore local places" %}</p>
+
+
+            <div class="container">
                 <div class="row">
                 {% for experience in featuredExperience %}
                     {% if forloop.first %}
-                    <div class="price-offer col4" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
-                        <a class="box_link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
-                            <div class="profile-featured">
-                                <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
-                            </div>
-                            <div class="priceBox">
-                                {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
-                            </div>
-                        </a>
+                    <div class="col-sm-4">
+                      <div class="price-offer" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
+                          <a class="box-link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
+                              <div class="profile-featured">
+                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
+                              </div>
+                              <div class="price-box">
+                                  {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
+                              </div>
+                          </a>
+                      </div>
                     </div>
+
                     {% endif %}
                 {% endfor %}
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter <= 1 %}
-                    <div class="city col4" style="background-image: linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url({{ MEDIA_URL }}city/{{ city }}.jpg);">
-                        <a class="box_link" href="{% url 'SearchView' city %}">
-                            <h1>{{ cityDisplayName }}</h1>
-                        </a>
+                    <div class="col-sm-4">
+                      <div class="city" style="background-image: linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                          <a class="box-link" href="{% url 'SearchView' city %}">
+                              <h1>{{ cityDisplayName }}</h1>
+                          </a>
+                      </div>
                     </div>
                     {% endif %}
                 {% endfor %}
-                <div class="custom-itinerary col4" style="background-image:url({% static 'app/img/homepage_banner.jpg' %});">
-                  <button class="btn btn-primary request-btn">{% trans 'Request a trip' %}</button>
+                <div class="col-sm-4">
+                  <div class="custom-itinerary" style="background-image:url({% static 'app/img/homepage_banner.jpg' %});">
+                    <button class="btn btn-primary request-btn">{% trans 'Request a trip' %}</button>
+                  </div>
                 </div>
+
                 </div>
 
                 <div class="row">
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 3 %}
-                    <div class="city col8" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
-                        <a class="box_link" href="{% url 'SearchView' city %}">
-                            <h1>{{ cityDisplayName }}</h1>
-                        </a>
+                    <div class="col-sm-8">
+                      <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                          <a class="box-link" href="{% url 'SearchView' city %}">
+                              <h1>{{ cityDisplayName }}</h1>
+                          </a>
+                      </div>
                     </div>
                     {% endif %}
                 {% endfor %}
                 {% for experience in featuredExperience %}
                     {% if forloop.counter == 2 %}
-                    <div class="price-offer col4" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
-                        <a class="box_link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
-                            <div class="profile-featured">
-                                <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
-                            </div>
-                            <div class="priceBox">
-                                {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
-                            </div>
-                        </a>
+                    <div class="col-sm-4">
+                      <div class="price-offer" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
+                          <a class="box-link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
+                              <div class="profile-featured">
+                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
+                              </div>
+                              <div class="price-box">
+                                  {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
+                              </div>
+                          </a>
+                      </div>
                     </div>
+
                     {% endif %}
                 {% endfor %}
                 </div>
@@ -173,42 +173,47 @@
                 <div class="row">
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 4%}
-                    <div class="city col4" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
-                        <a class="box_link" href="{% url 'SearchView' city %}">
-                            <h1>{{ cityDisplayName }}</h1>
-                        </a>
+                    <div class="col-sm-4">
+                      <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                          <a class="box-link" href="{% url 'SearchView' city %}">
+                              <h1>{{ cityDisplayName }}</h1>
+                          </a>
+                      </div>
                     </div>
+
                     {% endif %}
                 {% endfor %}
                 {% for experience in featuredExperience %}
                     {% if forloop.counter == 3 %}
-                    <div class="price-offer col4" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
-                        <a class="box_link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
-                            <div class="profile-featured">
-                                <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
-                            </div>
-                            <div class="priceBox">
-                                {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
-                            </div>
-                        </a>
+                    <div class="col-sm-4">
+                      <div class="price-offer" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
+                          <a class="box-link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
+                              <div class="profile-featured">
+                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
+                              </div>
+                              <div class="price-box">
+                                  {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
+                              </div>
+                          </a>
+                      </div>
                     </div>
+
                     {% endif %}
                 {% endfor %}
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 5%}
-                    <div class="city col4" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
-                        <a class="box_link" href="{% url 'SearchView' city %}">
-                            <h1>{{ cityDisplayName }}</h1>
-                        </a>
+                    <div class="col-sm-4">
+                      <div class="city " style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                          <a class="box-link" href="{% url 'SearchView' city %}">
+                              <h1>{{ cityDisplayName }}</h1>
+                          </a>
+                      </div>
                     </div>
+
                     {% endif %}
                 {% endfor %}
                 </div>
             </div>
-        </div>
-
-        <div style="clear:both;">
-        </div>
     </div>
 
     <div id="video-sec" class="video-box" style="background-image:url({{ MEDIA_URL }}homepage/video_poster-01.jpg)">
@@ -219,7 +224,7 @@
             <a style="cursor:pointer" id="enter_fullscreen"><img src="{{ MEDIA_URL }}homepage/play_btn.svg" width="75"></a>
         </div>
     </div>
-    <div id="video-fullscreen">
+    <div id="video-fullscreen" class="video-fullscreen">
         <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="{{ MEDIA_URL }}homepage/closeIcon-01.svg" width="30"></a>
         <div class="video-wrap">
             <video controls preload="metadata">
@@ -232,12 +237,12 @@
 
     <div class="community-box">
         <div class="container">
-            <h1 style="text-align:center;margin:47px;padding:0">{% trans "Our Community"%}</h1>
+            <h1>{% trans "Our Community"%}</h1>
             <div class="row">
-                <div class="col6 box" style="background-image:url(/images/homepage/travelling-01.jpg)">
+                <div class="col-sm-6 box" style="background-image:url(/images/homepage/travelling-01.jpg)">
                     <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>
                 </div>
-                <div class="col6 box" style="background-image:url(/images/homepage/hosting-01.jpg)">
+                <div class="col-sm-6 box" style="background-image:url(/images/homepage/hosting-01.jpg)">
                     <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>
                 </div>
             </div>

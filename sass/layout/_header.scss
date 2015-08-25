@@ -1,0 +1,25 @@
+/*
+
+  Header
+
+*/
+
+
+.navbar {
+  height: 60px;
+  background-color: white;
+  margin: 0;
+
+  .container-fluid {
+    height: inherit;
+  }
+
+  .navbar-right {
+    margin-right: 5px;
+    margin-left: 5px;
+  }
+
+  .navbar-btn {
+    margin-top: 12px;
+  }
+}

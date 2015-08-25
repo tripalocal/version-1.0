@@ -1,0 +1,279 @@
+/*
+
+  Experience details page
+
+*/
+
+@import
+  '../../vendor/include-media',
+  '../../utils/variables',
+  '../../utils/mixins',
+  '../../utils/functions',
+  '../../utils/placeholders';
+
+.jumbotron {
+  height: 220px;
+  background-position: center;
+  background-color: $light-grey;
+  @include media('>tablet') {
+    height: 400px;
+  }
+}
+
+// Center main
+.stickem-container {
+  padding: 30px 0px;
+  @include media('>desktop') {
+    width: 960px;
+  }
+  @include media('<=tablet') {
+    width: 100%;
+  }
+}
+
+.booking-box {
+  float: none;
+  margin: auto;
+  @include media('>=desktop') {
+    float: left;
+    margin: 0;
+  }
+}
+
+.description-box {
+  float: none;
+  width: 80%;
+  margin: 40px auto;
+  @include media('>=desktop') {
+    width: 600px;
+    float: right;
+  }
+
+  .col-md-3, .col-md-9, .col-sm-3, .col-sm-9 {
+    padding-left: 0;
+    margin-bottom: 15px;
+    margin-top: 15px;
+  }
+}
+
+.bio-box {
+  float: none;
+  width: 100%;
+  margin: auto;
+  padding-left: 30px;
+  @include media('>tablet') {
+    width: 720px;
+    float: right;
+  }
+}
+
+.review-box {
+  @extend .bio-box;
+  .reviewText {
+    margin-right: 60px;
+    float: right;
+    width: 480px;
+    min-height: 100px;
+    padding-top: 5px;
+    @include media('<=tablet') {
+      padding-left: 140px;
+      margin-right: 0;
+      float: none;
+    }
+  }
+  .reviewDate {
+    color: $medium-grey;
+    margin-top: 12px;
+  }
+}
+
+// Host bio box
+.experience-host {
+  background: white;
+  border: 1px solid $light-grey;
+  border-radius: 3px;
+  margin-top: 40px;
+  position: relative;
+
+  h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 3vw;
+    margin-top: 5vh;
+    display: block;
+  }
+}
+
+.experience-hostintro {
+  width: 100%;
+  height: 200px;
+  margin-top: 3vh;
+  margin-left: 3vw;
+  margin-right: 3vw;
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 3vh;
+}
+
+.experience-hostpic {
+  width: 120px;
+  height: 120px;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position: 50%;
+  border-radius: 50%;
+  float: left;
+  border: 1px solid #cccccc;
+  margin: 0;
+}
+
+.experience-hostinterests {
+  width: 450px;
+  margin-left: 20px;
+  float: left;
+  height: 150px;
+  position: relative;
+  overflow: hidden;
+  font-weight: normal;
+  span {
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+    color: $dark-grey;
+    line-height: 24px;
+  }
+}
+
+.gradientMask {
+  background-image: url(/images/gradientMask.png);
+  width: 100%;
+  position: absolute;
+  bottom: 0px;
+  height: 46px;
+}
+
+.show-more {
+  margin-top: 0px;
+  color: $primary-color;
+  float: left;
+  margin-left: 150px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.host-socialmedia {
+  height: 70px;
+  padding-top: 10px;
+  padding-left: 40px;
+
+  span {
+    display: block;
+    color: #666;
+  }
+  .followerNumber, .contactNumber {
+    font-size: 14px;
+  }
+  .Mobile, .review-title {
+    font-size: 10px;
+    margin-top: 1px;
+  }
+
+}
+.host-trust {
+  position: relative;
+  float: left;
+  margin-right: 90px;
+}
+
+.host-facebook,
+.host-instagram,
+.host-mobile,
+.host-review {
+  width: 100px;
+  height: 80px;
+  float: left;
+  border-radius: 3px;
+  margin: 0;
+  margin-left: 1vw;
+  padding-top: 5px;
+  padding-left: 5px;
+}
+
+.host-facebook .host-friend,
+.host-instagram .host-contact,
+.host-mobile .host-verified {
+  display: block;
+  font-size: 10px;
+  float: left;
+}
+
+
+// Review box
+.rating {
+  color: #FC0;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.review-box {
+  margin-top: 10px;
+  h2 {
+    float: left;
+    margin-top: 12px;
+    margin-right:20px;
+  }
+}
+
+.reviewList {
+  border-bottom: $light-grey 1px solid;
+  padding: 20px 0;
+  overflow: hidden;
+  width: 100%;
+
+  .profile-sm {
+    position: absolute;
+  }
+
+}
+
+.last {
+  border-bottom: none;
+}
+
+
+
+.review_paging_container {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  padding-left: 120px;
+}
+.review_paging {
+  width: 30px;
+  height: 30px;
+  border: 1px $light-grey solid;
+  display: inline-block;
+  text-align: center;
+  padding: 5px;
+  margin-right: 10px;
+  border-radius: 5px;
+}
+.review_paging_other {
+  color: $primary-color;
+  background: white;
+}
+.review_paging_current {
+  color: black;
+}
+
+// People also booked
+.also {
+  border-top: 1px solid $light-grey;
+  background-color: white;
+  padding: 30px 0px;
+
+}
+.experience-results {
+  width: 960px;
+  margin: 0 auto;
+  text-align: center;
+}

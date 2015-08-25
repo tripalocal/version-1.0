@@ -1,0 +1,25 @@
+/*
+
+  Price box
+
+*/
+
+.price-box {
+  background-color: rgba(10,10,10,0.8);
+  height: 40px;
+  margin-top: 150px;
+  position: absolute;
+  color: white;
+  font-weight: bold;
+  padding: 0px 20px;
+  padding-top: 5px;
+
+  span {
+    font-size: 28px;
+    padding: 5px;
+    margin-top: 10px;
+    font-weight: bold;
+    vertical-align: text-top;
+    line-height: 23px;
+  }
+}

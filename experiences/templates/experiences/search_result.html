@@ -8,10 +8,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.css" rel="stylesheet">
-    <link href="{% static 'experiences/content/tripalocal_search.css' %}" rel="stylesheet">
-    <link href="{% static 'experiences/content/tripalocal_search_async.css' %}" rel="stylesheet">
+
+    <!--<link href="{% static 'experiences/content/tripalocal_search.css' %}" rel="stylesheet">
+    <link href="{% static 'experiences/content/tripalocal_search_async.css' %}" rel="stylesheet">-->
+    <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
     <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
@@ -21,137 +21,131 @@
 {% block content %}
     <form id="search_form" action="{{GEO_POSTFIX}}s/melbourne/" method="post">
         {% csrf_token %}
-        <div class="basicSearch notOnMobile">
+        <div class="basic-search">
+          <div class="container">
             <div class="row">
-                <div class="fixCenter">
-                    <div class="dates">
-                        <div class="iconHeader">
-                            <div class="iconImage" id="date"></div>
-                            <div class="iconText">{%trans "Dates" %}</div>
-                        </div>
-                        <div class="formBoxes">
-                            <div class="ui selection dropdown">
-                                <input id="id_city" type="hidden" name="city" value="city">
-                                <i class="dropdown icon"></i>
-                                <div id="city_name" class="text">{%trans "City" %}</div>
-                                <div id="city-menu" class="menu"></div>
-                            </div>
-                            <div class="input-group startDate">
-                                {{form.start_date}}
-                            </div>
-                            <div class="input-group endDate">
-                                {{form.end_date}}
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="verticalBar">
-                    </div>
-                    <div class="people">
-                        <div class="iconHeader">
-                            <div class="iconImage" id="people">
-                            </div>
-                            <div class="iconText">{%trans "People"%}
-                            </div>
-                        </div>
-                        <div class="formBoxes">{{form.guest_number}}
-                        <script charset="utf-8" type="text/javascript">
-                            $('.ui.dropdown').dropdown();
-                        </script>
-                        </div>
-                    </div>
-
-                    <div class="verticalBar">
-                    </div>
-
-                    <div class="language">
-                        <div class="iconHeader">
-                            <div class="iconImage" id="language">
-                            </div>
-                            <div class="iconText">{%trans "Language"%}
-                            </div>
-                        </div>
-
-                        <div class="formBoxes">
-                            {{form.language}}
-                            <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
-                            <br>
-                            <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin-top:18px;">中文</label>
-                        </div>
-                    </div>
-
-                    <div class="verticalBar">
-                    </div>
-
-                    <div id="searchButton">
-                        <!--<input id="auto_update" type="checkbox" class="css-checkbox" ><label id="auto_update_label" for="checkbox-cn" class="css-label lite-x-cyan" style="margin:5px 0 15px 0;font-weight:normal">{% trans "Auto update" %}</label>-->
-                        <input class="btn-block btn btn-default" style="padding-bottom:25px; width:100px;" id="itinerary-search" type="submit" value="{% trans "Update" %}" name="{% trans "Search" %}">
-                    </div>
-                    <div id="itinerary-search-button">
-                    </div>
+              <div class="dates col-xs-4">
+                <div class="icon-header">
+                  <div class="icon-image" style="background-image: url({% static 'experiences/img/calendar.svg'%})"></div>
+                  <div class="icon-text">{% trans 'Dates' %}</div>
                 </div>
+                <div class="form-box">
+                  <div class="ui selection dropdown">
+                      <input id="id_city" type="hidden" name="city" value="city">
+                      <i class="dropdown icon"></i>
+                      <div id="city_name" class="text">{%trans "City" %}</div>
+                      <div id="city-menu" class="menu"></div>
+                  </div>
+                  <div class="input-group start-date">
+                      {{form.start_date}}
+                  </div>
+                  <div class="input-group end-date">
+                      {{form.end_date}}
+                  </div>
+                </div>
+              </div>
+
+              <div class="people col-xs-3">
+                <div class="icon-header">
+                  <div class="icon-image" style="background-image: url({% static 'experiences/img/group.svg' %})"></div>
+                  <div class="icon-text">{% trans 'People' %}</div>
+                </div>
+                <div class="form-box">
+                  {{form.guest_number}}
+                </div>
+              </div>
+
+              <div class="language col-xs-3">
+                <div class="icon-header">
+                  <div class="icon-image" style="background-image: url({% static 'experiences/img/discuss.svg'%})"></div>
+                  <div class="icon-text">{% trans 'Language' %}</div>
+                </div>
+                <div class="form-box">
+                  {{form.language}}
+                  <div class="checkbox">
+                    <label>
+                      <input id="language_English" type="checkbox" value="English" name="checkbox-eng">
+                      English
+                    </label>
+                  </div>
+                  <div class="checkbox">
+                    <label>
+                      <input id="language_Mandarin" type="checkbox" value="Chinese" name="checkbox-cn">
+                      中文
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-xs-2">
+                <input class="btn btn-default" id="itinerary-search" type="submit" value="{% trans "Update" %}" name="{% trans "Search" %}">
+              </div>
+
             </div>
+          </div>
         </div>
-        <div class="advanceSearch notOnMobile" id="optional_criteria_div" style="display:none;">
-            <div class="row" style="background-color:white;padding-bottom:10px">
-                <div class="fixCenter">
+
+        <div class="advanced-search" id="optional_criteria_div" style="display:none;">
+                <div class="container">
                     <div class="interests">
-                        <div class="iconHeader">
-                            <div class="iconImage" id="interests">
-                            </div>
-                            <div class="iconText">{%trans "Interests"%}
-                            </div>
+                        <div class="icon-header">
+                            <div class="icon-image" style="background-image: url({% static 'experiences/img/tag.svg' %})"></div>
+                            <div class="icon-text">{%trans "Interests"%}</div>
                         </div>
 
-                        <div class="formBoxes" id="tags_div">
+                        <div class="form-box" id="tags_div">
                             {{form.tags}}
                             {{form.all_tags}}
                         </div>
-                        <div class="formBoxes" id="only_tags">
+                        <div class="form-box" id="only_tags">
+                          <div class="checkbox">
                             {{ form.is_kids_friendly }}
-                            <label for="{{ form.is_kids_friendly.id_for_label }}"
-                                   class="css-label lite-cyan-check only-tag-label">
-                                {%trans "Kids friendly only"%}</label>
-
+                            <label for="{{ form.is_kids_friendly.id_for_label }}" class="only-tag-label">
+                                <input type="checkbox">
+                                {%trans "Kids friendly only"%}
+                            </label>
+                          </div>
+                          <div class="checkbox">
                             {{ form.is_host_with_cars }}
-                            <label for="{{ form.is_host_with_cars.id_for_label }}"
-                                   class="css-label lite-cyan-check only-tag-label">
-                                {%trans "Hosts with cars only"%}</label>
-
+                            <label for="{{ form.is_host_with_cars.id_for_label }}" class="only-tag-label">
+                                <input type="checkbox">
+                                {%trans "Hosts with cars only"%}
+                            </label>
+                          </div>
+                          <div class="checkbox">
                             {{ form.is_private_tours }}
-                            <label for="{{ form.is_private_tours.id_for_label }}"
-                                   class="css-label lite-cyan-check only-tag-label">
-                                {%trans "Private tours only"%}</label>
+                            <label for="{{ form.is_private_tours.id_for_label }}" class="only-tag-label">
+                                <input type="checkbox">
+                                {%trans "Private tours only"%}
+                            </label>
+                          </div>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
 
-        <div class="mobileSearch notOnDesktop">
+        <div class="mobile-search">
             <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>
             <img src="{{ MEDIA_URL }}search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
         </div>
     </form>
 
-    <div class="container-fluid searchresult">
+    <div class="search-result">
+      <div class="container">
         <div class="loading"><img src="{% static 'experiences/img/loading.gif' %}" width="64px" height="64px" class="ajax-loader"/></div>
-    	<div class="row">
-            <div class="fixCenter">
-                <div id="more-filters-div" class="notOnMobile">
-                    <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters" style="padding-bottom:25px; width:100px;float:left;margin-right:10px;">{%trans "More Filters" %}</button>
-                    <button class="btn-block btn btn-primary" id="apply_filters" type="button" value="Apply Filters" style="width:100px;display:none">{% trans "Apply Filters" %}</button>
-                    <div id="ajax-experience-count" style="position:relative;"></div>
-                </div>
-                <div id="experience-box" class="expBox">
-                    <div id="overlay"></div>
-                    <div id="ajax-experience-result"></div>
-                    <div class="expList custom-itinerary" style="background-image:url({% static 'experiences/img/searchpage_banner.jpg' %});">
-                      <button class="btn btn-primary request-btn">{% trans 'Request a trip'}</button>
-                    </div>
-                </div>
+        <div id="more-filters-div" class="more-filters">
+            <button class="btn btn-default" id="more_filters" type="button" value="More Filters" style="width:100px;float:left;margin-right:10px;">{%trans "More Filters" %}</button>
+            <button class="btn btn-primary" id="apply_filters" type="button" value="Apply Filters" style="width:100px;display:none;float:left;">{% trans "Apply Filters" %}</button>
+            <div id="ajax-experience-count" class="experience-count"></div>
+        </div>
+        <div class="container-fluid">
+            <div id="ajax-experience-result"></div>
+            <div class="expList custom-itinerary" style="background-image:url({% static 'experiences/img/searchpage_banner.jpg' %});">
+              <button class="btn btn-primary request-btn">{% trans 'Request a trip' %}</button>
             </div>
         </div>
+      </div>
     </div>
     <!-- /.container -->
 

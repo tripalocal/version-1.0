@@ -14,9 +14,15 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
 
     <link rel="icon" href="{% static 'app/img/favicon.ico'%}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
-    <link href="{% static 'app/content/tripalocal.min.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/tripalocal.css' %}" rel="stylesheet">
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />-->
+    <!--<link href="{% static 'app/content/tripalocal.min.css' %}" rel="stylesheet">-->
+    <!--<link href="{% static 'app/content/tripalocal.css' %}" rel="stylesheet">-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.css" rel="stylesheet">
+
+    <link href="{% static 'app/content/main.css' %}" rel="stylesheet">
     {%if LANGUAGE == "zh-CN"%}
     <link href="{% static 'app/content/tripalocal_cn.css' %}" rel="stylesheet">
     {%else%}
@@ -178,39 +184,48 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
     </script>
     <!-- End Modal -->
 
-    <div class="navBox">
-        <input type="hidden" id="user_email" value="{{user_email}}" readonly>
-        <table class="container-fluid" style="width:100%;">
-            <tbody>
-                <tr>
-                    <td class="header">
-                        <img class="hamburger notOnDesktop" src="{{ MEDIA_URL }}menu.svg" width="15" />
-                        <a class="brand" href="https://www.tripalocal.com{{GEO_POSTFIX}}"><img src="{{ MEDIA_URL }}img/tripalocal_Logo.png" width="115" height="39"></a>
-                    </td>
-                    <td class="navbar-collapse notOnMobile">
-                        {% include 'app/loginpartial.html' %}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+
+<!-- Header navbar -->
+    <div class="navbar navbar-static-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="https://www.tripalocal.com{{GEO_POSTFIX}}">
+            <img alt="Tripalocal" src="{{ MEDIA_URL }}img/tripalocal_Logo.png" width="115" height="39">
+          </a>
+        </div>
+        <div class="collapse navbar-collapse">
+          {% if user.is_authenticated %}
+          <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a>
+          <a type="button" class="btn btn-primary navbar-btn navbar-right" href="{{GEO_POSTFIX}}accounts/logout/">{% trans "Log out" %}</a>
+          <p class="navbar-text navbar-right">{{ user.first_name }}</p>
+          <div class="profile-navbar navbar-btn navbar-right"><a href="{{GEO_POSTFIX}}myprofile"><img src="{%if user.socialaccount_set.all%}http://graph.facebook.com/{% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40{% elif user.registereduser.image_url and user.registereduser.image_url.strip%}{{ MEDIA_URL }}{{user.registereduser.image_url}}{%else%} {{ MEDIA_URL }}profile_default.jpg {%endif%}"/></a></div>
+          {% else %}
+          <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right" href="https://www.tripalocal.com{%if LANGUAGE == "zh-CN"%}/{%else%}/cn/{%endif%}">{%if LANGUAGE == "zh-CN"%}English{%else%}中文{%endif%}</a>
+          <a type="button" class="btn btn-secondary navbar-btn navbar-right" href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a>
+          <a type="button" class="btn btn-secondary navbar-btn navbar-right" href="{{GEO_POSTFIX}}accounts/login/?next={{ request.path }}">{% trans "Log in" %}</a>
+        {% endif %}
+      </div>
+      </div>
     </div>
+
 {% block content %}{% endblock %}
 
     <div id="footer_div" class="footer">
         <div class="container">
-            <div class="fixCenter">
-                <div class="footer-wrapper">
-                    <ul class="footer-head">
-                        <li>
-                            <select id="id_language_select" class="btn btn-default dropdown-toggle">
-                                <option id="id_language_cn" value="cn">中文</option>
-                                <option id="id_language_en" value="en">English</option>
-                            </select>
-                        </li>
-                        <li class="footer-logo"></li>
-                    </ul>
+          <div class="col-sm-6">
+            <ul class="footer-head">
+                <li>
+                  <select id="id_language_select" class="form-control">
+                    <option id="id_language_cn" value="cn">中文</option>
+                    <option id="id_language_en" value="en">English</option>
+                  </select>
+                </li>
+                <li class="footer-logo"></li>
+            </ul>
+          </div>
 
-                    <div class="footer-body">
+
+                      <div class="col-xs-6 col-sm-2">
                         <ul class="footer-col company">
                             <li><h5>{% trans "Company" %}</h5></li>
                             <li><a href="{{GEO_POSTFIX}}aboutus">{% trans "About Us" %}</a></li>
@@ -219,11 +234,15 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                             <li><a href="{{GEO_POSTFIX}}privacypolicy">{% trans "Privacy Policy" %}</a></li>
                             <!--<li id="mixpanel" style="margin-top:20px"><a href="https://mixpanel.com/f/partner"><img src="//cdn.mxpnl.com/site_media/images/partner/badge_blue.png" alt="Mobile Analytics" /></a></li>-->
                         </ul>
+                      </div>
+                      <div class="col-xs-6 col-sm-2">
                         <ul class="footer-col travel">
                             <li><h5>{% trans "Travel" %}</h5></li>
                             <li><a href="{{GEO_POSTFIX}}refundpolicy">{% trans "Refund Policy" %}</a></li>
                             <!--<li><a href="{{GEO_POSTFIX}}mobileapps">{% trans "Mobile Apps" %}</a></li>-->
                         </ul>
+                      </div>
+                      <div class="col-sm-2">
                         <ul class="footer-col social">
                             <li><h5>{% trans "Social" %}</h5></li>
                             <li><a href="https://www.facebook.com/tripalocal">{% trans "Facebook" %}</a></li>
@@ -232,13 +251,12 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
                             <li><a href="https://www.twitter.com/tripalocal">{% trans "Weibo" %}</a></li>
                             <li><a href="https://www.twitter.com/tripalocal">{% trans "Wechat" %}</a></li>-->
                         </ul>
+                      </div>
                     </div>
-                </div>
-            </div>
+
             <div class="footer-line">
                 <p id="copyright"> &#169; Tripalocal Pty. Ltd. ABN 46 600 546 549</p>
             </div>
-        </div>
     </div>
 
 {% block scripts %}{% endblock %}
