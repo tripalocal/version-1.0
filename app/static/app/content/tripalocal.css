@@ -174,7 +174,7 @@ input[type=checkbox] { margin: 2px 10px 0 0; float: left;}
 .jumbotron {background-repeat:no-repeat; background-size:cover; padding:130px 0px 150px 0px; }
 .tease-box{margin:auto; width: 665px; height: 425px;background-repeat: no-repeat;background-position:center;}
 .support {height: 200px;background-repeat: no-repeat; background-position-y: 80px;background-position-x: center;background-position: center;}
-.homepage-logo{height: 240px;background-repeat: no-repeat;background-position: center;}
+.homepage-logo{height: 240px;background-repeat: no-repeat;background-position: center; background-size: contain;}
 .book-tease{  background-repeat:no-repeat; background-size:cover;}
 .footer-logo{height: 200px;width: 240px;background-position: center;background-repeat: no-repeat;}
 .melbourne, .sydney{display:none;float:left;}
@@ -186,6 +186,7 @@ input[type=checkbox] { margin: 2px 10px 0 0; float: left;}
 .home-menu { color:#fff; margin:20px 20px 0px 0px;}
 .home-menu li a {color: #fff;}
 }
+
 .listingImg {height: 200px;background-position: center;background-size: cover;}
 #your-reservation{padding-left: 6px; padding-right: 6px;}
 #save-and-exit-top{background:none;border:none;color:white;}
@@ -221,6 +222,7 @@ input[type=checkbox] { margin: 2px 10px 0 0; float: left;}
 	.melbourne a, .melbourne a:hover, .sydney a, .sydney a:hover{color:#333;}
 	.menu li{float:right; margin-left:10px; list-style:none;}
 	.menu li a{ color:#999;}
+  .home-menu li a {color: #fff;}
 	.expList h3 {font-size: 13px;}
 	.navbar-collapse {padding-right: 10px;padding-left: 0px;}
 	.experienceImg {height:150px;}

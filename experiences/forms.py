@@ -3,7 +3,7 @@ from bootstrap3_datetime.widgets import DateTimePicker
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 from datetime import *
-from calendar import monthrange 
+from calendar import monthrange
 from experiences.models import *
 from Tripalocal_V1 import settings
 import pytz, string, subprocess, json, random
@@ -30,7 +30,7 @@ Location = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Br
 
 Locations = [('Australia', [('Melbourne', _('Melbourne'), _('Victoria')), ('Sydney', _('Sydney'), _('New South Wales')),
                            ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
-                           ('Goldcoast', _('Gold coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
+                           ('Goldcoast', _('Gold Coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
                            ('Adelaide', _('Adelaide'), _('South Australia')),
                            ('Darwin', _('Darwin'), _('Northern Territory')),
                            ('Alicesprings', _('Alice Springs'), _('Northern Territory'))]),
@@ -375,7 +375,7 @@ class ExperienceSummaryForm(forms.Form):
     instant_booking_repeat_cycle_5 = forms.ChoiceField(choices=Repeat_Cycle)
     instant_booking_repeat_frequency_5 = forms.ChoiceField(choices=Repeat_Frequency)
     instant_booking_repeat_extra_information_5 = forms.CharField(max_length=50)
-    
+
     duration = forms.ChoiceField(choices=Duration)
     min_guest_number = forms.IntegerField(required=True)
     max_guest_number = forms.IntegerField(required=True)
@@ -435,16 +435,16 @@ class CreditCardField(forms.IntegerField):
         if value and (len(value) < 13 or len(value) > 16):
             raise forms.ValidationError("Please enter in a valid credit card number.")
         return super(CreditCardField, self).clean(value)
- 
+
 class CCExpWidget(forms.MultiWidget):
     """ Widget containing two select boxes for selecting the month and year"""
     def decompress(self, value):
         return [value.month, value.year] if value else [None, None]
- 
+
     def format_output(self, rendered_widgets):
         html = u' / '.join(rendered_widgets)
         return u'<span style="white-space: nowrap;">%s</span>' % html
- 
+
 class CCExpField(forms.MultiValueField):
     EXP_MONTH = [(x, x) for x in range(1, 13)]
     EXP_YEAR = [(x, x) for x in range(date.today().year, date.today().year + 15)]
@@ -452,7 +452,7 @@ class CCExpField(forms.MultiValueField):
         'invalid_month': u'Enter a valid month.',
         'invalid_year': u'Enter a valid year.',
     }
- 
+
     def __init__(self, *args, **kwargs):
         errors = self.default_error_messages.copy()
         if 'error_messages' in kwargs:
@@ -466,13 +466,13 @@ class CCExpField(forms.MultiValueField):
         super(CCExpField, self).__init__(fields, *args, **kwargs)
         self.widget = CCExpWidget(widgets =
             [fields[0].widget, fields[1].widget])
- 
+
     def clean(self, value):
         exp = super(CCExpField, self).clean(value)
         if date.today() > exp:
             raise forms.ValidationError("Invalid date.")
         return exp
- 
+
     def compress(self, data_list):
         if data_list:
             if data_list[1] in forms.fields.EMPTY_VALUES:
@@ -542,7 +542,7 @@ def check_coupon(coupon, experience_id, guest_number):
     else:
         #percentage, e.g., 30% discount --> percentage == -0.3
         price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
- 
+
     result = {"valid":True, "new_price":price}
     return result
 
@@ -652,7 +652,7 @@ class BookingConfirmationForm(forms.Form):
             ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,guest_number,
                          coupon_extra_information = coupon_extra_information, coupon = coupon,
                          payment_phone_number = payment_phone_number, stripe_token = stripeToken)
- 
+
         return cleaned
 
 class CreateExperienceForm(forms.Form):
@@ -855,7 +855,7 @@ class ItineraryBookingForm(forms.Form):
                 else:
                     #percentage, e.g., 30% discount --> percentage == -0.3
                     price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
- 
+
                 if price > 0:
                     payment = Payment()
                     #change price into cent
@@ -866,7 +866,7 @@ class ItineraryBookingForm(forms.Form):
 
             else:
                 success = True
- 
+
             if not success:
                 raise forms.ValidationError("Error: %s" % str(instance))
             else:
@@ -919,14 +919,14 @@ class ItineraryBookingForm(forms.Form):
                             break
 
                 if coupon:
-                    booking = Booking(user = user, experience= experience, guest_number = guest_number, 
+                    booking = Booking(user = user, experience= experience, guest_number = guest_number,
                                         datetime = local_timezone.localize(datetime.datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
-                                        submitted_datetime = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", 
+                                        submitted_datetime = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid",
                                         coupon_extra_information=coupon_extra_information,
                                         coupon=coupon,
                                         booking_extra_information=booking_extra_information)
                 else:
-                    booking = Booking(user = user, experience= experience, guest_number = guest_number, 
+                    booking = Booking(user = user, experience= experience, guest_number = guest_number,
                                         datetime = local_timezone.localize(datetime.datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
                 booking.save()
@@ -944,7 +944,7 @@ class ItineraryBookingForm(forms.Form):
                     payment.street2 = payment_street2 if payment_street2 is not None else ""
                     payment.city = payment_city if payment_city is not None else ""
                     payment.state = payment_state if payment_state is not None else ""
-                    payment.country = payment_country if payment_country is not None else "" 
+                    payment.country = payment_country if payment_country is not None else ""
                     payment.postcode = payment_postcode if payment_postcode is not None else ""
                     payment.phone_number = payment_phone_number if payment_phone_number is not None else ""
                     payment.save()
@@ -958,7 +958,7 @@ class ItineraryBookingForm(forms.Form):
                                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], #fail_silently=False,
                                 priority='now',
-                                html_message=loader.render_to_string('experiences/email_booking_requested_host.html', 
+                                html_message=loader.render_to_string('experiences/email_booking_requested_host.html',
                                                                         {'experience': experience,
                                                                         'booking':booking,
                                                                         'user_first_name':user.first_name,
@@ -970,9 +970,9 @@ class ItineraryBookingForm(forms.Form):
                     mail.send(subject=_('[Tripalocal] Your booking request is sent to the host'),  message='',
                                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                                 recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], #fail_silently=False,
-                                priority='now', 
+                                priority='now',
                                 html_message=loader.render_to_string('experiences/email_booking_requested_traveler.html',
-                                                                        {'experience': experience, 
+                                                                        {'experience': experience,
                                                                         'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                                         'booking':booking,
                                                                         'LANGUAGE':settings.LANGUAGE_CODE}))
@@ -986,46 +986,46 @@ class ItineraryBookingForm(forms.Form):
                         booking.coupon.save()
 
                     #send an email to the traveller
-                    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
                                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
-                                priority='now',  #fail_silently=False, 
+                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail],
+                                priority='now',  #fail_silently=False,
                                 html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':user,
                                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                                     'LANGUAGE':settings.LANGUAGE_CODE}))
-            
+
                     #schedule an email to the traveller one day before the experience
-                    mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                    mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
                                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
-                                priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
+                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail],
+                                priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
                                 html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':user, #not host --> need "my" phone number
                                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                                     'LANGUAGE':settings.LANGUAGE_CODE}))
-            
+
                     #schedule an email to the host one day before the experience
-                    mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+                    mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
                                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                                priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
+                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail],
+                                priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
                                 html_message=loader.render_to_string('experiences/email_reminder_host.html',
                                                                     {'experience': experience,
                                                                     'booking':booking,
                                                                     'user':user,
                                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                                     'LANGUAGE':settings.LANGUAGE_CODE}))
-                        
+
                     #schedule an email for reviewing the experience
-                    mail.send(subject=_('[Tripalocal] How was your experience?'), message='', 
+                    mail.send(subject=_('[Tripalocal] How was your experience?'), message='',
                                 sender=settings.DEFAULT_FROM_EMAIL,
-                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], 
-                                priority='high',  scheduled_time = booking.datetime + timedelta(days=1, hours=experience.duration), 
+                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail],
+                                priority='high',  scheduled_time = booking.datetime + timedelta(days=1, hours=experience.duration),
                                 html_message=loader.render_to_string('experiences/email_review_traveler.html',
                                                                     {'experience': experience,
                                                                     'booking':booking,
@@ -1034,10 +1034,10 @@ class ItineraryBookingForm(forms.Form):
                                                                     'LANGUAGE':settings.LANGUAGE_CODE}))
 
                     #send an email to the host
-                    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+                    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
                                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                                priority='now',  #fail_silently=False, 
+                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail],
+                                priority='now',  #fail_silently=False,
                                 html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
                                                                     {'experience': experience,
                                                                     'booking':booking,
@@ -1054,7 +1054,7 @@ class ItineraryBookingForm(forms.Form):
         Stripe's library as a standard ValidationError for proper feedback.
         """
         cleaned = super(ItineraryBookingForm, self).clean()
- 
+
         if not self.errors and (not 'Refresh' in self.data):
             card_number = self.cleaned_data["card_number"]
             exp_month = self.cleaned_data["expiration"].month
