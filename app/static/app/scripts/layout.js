@@ -36,6 +36,10 @@ $(document).ready(function () {
             }, 60000); // milliseconds
         }
 
+        $('#help-popup').on('hidden.bs.modal', function () {
+            mixpanel.track("closed popup01");
+        });
+
         $('.close-popup').click(function () {
             clearTimeout(popupTimmer);
             if (nClose) {
@@ -45,7 +49,7 @@ $(document).ready(function () {
             }
 
             $('#help-popup').modal('hide');
-            mixpanel.track("closed popup02");
+            mixpanel.track("closed popup01");
         });
 
         $('#help-no').click(function () {
