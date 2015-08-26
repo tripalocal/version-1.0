@@ -5,6 +5,8 @@
 
 // Vendor
 @import
+  'vendor/normalize'
+  'vendor/bootstrap',
   'vendor/include-media';
 
 // Utilities & helpers
@@ -16,7 +18,6 @@
 
 // Base
 @import
-  'base/normalize',
   'base/typography',
   'base/base';
 

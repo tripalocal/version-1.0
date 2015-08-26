@@ -5,6 +5,7 @@
 
 var gulp = require('gulp');
 var sass = require('gulp-sass');
+var minifyCss = require('gulp-minify-css');
 
 // Compile sass into css task
 gulp.task('styles', function() {
