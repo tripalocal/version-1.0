@@ -219,10 +219,6 @@
 
     $(document).ready(function(){
         mixpanel.track("viewed search page");
-        if($("#user_email").val())
-        {
-            mixpanel.identify($("#user_email").val());
-        }
 
         {% for k, v in locations %}
             var header = '<div class=\"header\">' + '{{ k }}' + '</div>';

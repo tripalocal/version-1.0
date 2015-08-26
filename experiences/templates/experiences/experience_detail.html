@@ -477,10 +477,6 @@ $(function(){
             {% else %}
             //mixpanel.track("Clicked on \"Request\"_cn");
             {% endif %}
-            if($("#user_email").val())
-            {
-                //mixpanel.identify($("#user_email").val());
-            }
             $("#experience_booking_form").submit();
         });
 
@@ -501,10 +497,7 @@ $(function(){
                 {% else %}
                 mixpanel.track("Clicked on \"Book_cn\"");
                 {% endif %}
-                if($("#user_email").val())
-                {
-                    mixpanel.identify($("#user_email").val());
-                }
+
                 $("#experience_booking_form").submit();
             });
         }
@@ -525,21 +518,6 @@ $(function(){
             }
         }
 
-        {% if LANGUAGE != "zh-CN" %}
-        // mixpanel.track("Viewed experience page_en");
-        {% else %}
-        // mixpanel.track("Viewed experience page_cn");
-        {% endif %}
-        if($("#user_email").val())
-        {
-            //mixpanel.identify($("#user_email").val());
-        }
-
-        //mixpanel.track("Viewed experience");
-        if($("#user_email").val())
-        {
-            mixpanel.identify($("#user_email").val());
-        }
 
         for(i=0;i<3;i++)
         {
@@ -661,11 +639,6 @@ $(function(){
         }
 
         $("#id_time").change();
-        mixpanel.track("changed date");
-        if($("#user_email").val())
-        {
-            //mixpanel.identify($("#user_email").val());
-        }
     })
 })
 
@@ -700,10 +673,6 @@ $(function(){
         {% else %}
         //mixpanel.track("Changed time_cn");
         {% endif %}
-        if($("#user_email").val())
-        {
-            //mixpanel.identify($("#user_email").val());
-        }
     })
 })
 
@@ -721,10 +690,6 @@ $(function(){
 
 
         mixpanel.track("changed number of people");
-        if($("#user_email").val())
-        {
-            //mixpanel.identify($("#user_email").val());
-        }
     })
 })
 

@@ -109,10 +109,6 @@ $(document).ready(function () {
     }
 
     $('#id_language_select').change(function () {
-        if ($("#user_email").val()) {
-            mixpanel.identify($("#user_email").val());
-        }
-
         var des_url = window.location.pathname;
 
         if ($(this).val() == "cn") {

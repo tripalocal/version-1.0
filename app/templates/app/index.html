@@ -18,8 +18,8 @@
     <!-- H1 google font -->
     <link href='//fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>
 
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
 
 	<script>
 		$(function() {
@@ -260,34 +260,11 @@
 {% endblock %}
 
 {% block scripts %}
-<script charset="utf-8" type="text/javascript">
 
-    $(document).ready(function() {
-      mixpanel.track("viewed homepage");
-      $(".request-btn").click(function() {
-        window.location.href="mailto:enquiries@tripalocal.com";
-        mixpanel.track("requested a trip from homepage");
-      });
-    });
-    $("#video-fullscreen").hide();
-    function getParameterByName(name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-            results = regex.exec(location.search);
-        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-    }
-    $(function()
-    {
-        var country, region, city, ip, longitude, latitude;
-        $(document).ready(function(){
-            $("#id_city").attr("class","btn btn-default dropdown-toggle homepage-city");
-            $("#id_start_date").attr("class","input-sm");
-            $("#id_end_date").attr("class","input-sm");
-            $("#id_start_date").attr("style","height:40px;");
-            $("#id_end_date").attr("style","height:40px;");
-            $("#id_start_date").attr("placeholder",'{%trans " From " %}');
-            $("#id_end_date").attr("placeholder",'{%trans " To " %}');
 
+    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/index.js' %}"></script>
+    <script charset="utf-8" type="text/javascript">
+        $(document).ready(function () {
             {% for k, v in locations %}
                 var header = '<div class=\"header\">' + '{{ k }}' + '</div>';
                 $('#city-menu').append(header);
@@ -301,72 +278,8 @@
 
             $('.ui.dropdown').dropdown();
 
-            //hide loginpartial on homepage
-            $(".navBox").attr("style","display:none");
-
-            $.getScript('//www.geoplugin.net/javascript.gp', function()
-            {
-                country = geoplugin_countryName();
-                region = geoplugin_region();
-                city = geoplugin_city();
-                ip = geoplugin_request();
-                latitude = geoplugin_latitude();
-                longitude = geoplugin_longitude();
-            });
-
-            $("#language_switch_topbar").click(function(){
-                if("{{LANGUAGE}}" == "zh-CN")
-                {
-                    mixpanel.track("switched language from top bar_cn");
-                }
-                else
-                {
-                    mixpanel.track("switched language from top bar");
-                }
-
-                if($("#user_email").val())
-                {
-                    mixpanel.identify($("#user_email").val());
-                }
-            });
-
-            $("#id_start_date").click(function(){
-                $("#id_start_date_picker").data("DateTimePicker").show();
-            });
-
-            $("#id_end_date").click(function(){
-                $("#id_end_date_picker").data("DateTimePicker").show();
-            });
+            $("#id_start_date").attr("placeholder", '{%trans " From " %}');
+            $("#id_end_date").attr("placeholder", '{%trans " To " %}');
         });
-
-        var utmId = getParameterByName('utm');
-        if(utmId)
-        {
-            initial_referrer = "utm"+utmId;
-        }
-        else
-        {
-            initial_referrer = document.referrer;
-        }
-
-        mixpanel.people.set({"Language":'{{LANGUAGE}}'});
-        mixpanel.people.set({"$initial_referrer": initial_referrer});
-        if($("#user_email").val())
-        {
-            mixpanel.identify($("#user_email").val());
-        }
-    });
-
-    var video = $("video").get(0);
-    $("#enter_fullscreen").click(function(){
-        $("#video-fullscreen").fadeIn();
-        mixpanel.track("viewed video");
-        video.play();
-    });
-
-    $("#exit_video").click(function(){
-        $("#video-fullscreen").fadeOut();
-        video.pause();
-    });
-</script>
+    </script>
 {% endblock %}
