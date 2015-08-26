@@ -1,0 +1,258 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-19 16:01+1000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: templates/account/email/email_confirmation_signup_message.html:69
+msgid "Please confirm your email address"
+msgstr "请确认您的邮箱地址"
+
+#: templates/account/email/email_confirmation_signup_message.html:70
+msgid ""
+"Click on the following link and you will be ready to explore the cities!"
+msgstr "请点击以下链接激活您的账户"
+
+#: templates/account/email/password_reset_key_message.html:73
+msgid "Forgot your password? No worries."
+msgstr "忘记密码了？没事儿！"
+
+#: templates/account/email/password_reset_key_message.html:74
+msgid ""
+"Click on the link below to reset your password. If you haven't requested "
+"this, please ignore this email."
+msgstr "点击下方链接重置您的密码。如果您没有申请密码重置，请忽略此邮件。"
+
+#: templates/account/email_confirm.html:12
+msgid "Email Confirmation"
+msgstr "确认邮箱"
+
+#: templates/account/email_confirm.html:82
+#, python-format
+msgid ""
+" To confirm <a href=\"mailto:%(email)s\">%(email)s</a> as your email "
+"address, please click on the button below. "
+msgstr ""
+"请点击下面按钮，以确定<a href=\"mailto:%(email)s\">%(email)s</a>是您的邮箱地"
+"址。"
+
+#: templates/account/email_confirm.html:103
+msgid "Confirm"
+msgstr "确定"
+
+#: templates/account/email_confirm.html:155
+#, python-format
+msgid ""
+"This e-mail confirmation link expired or is invalid. Please <a href="
+"\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+msgstr "该邮件确认链接无效。请<a href=\"%(email_url)s\"> 重新申请</a>."
+
+#: templates/account/login.html:46
+msgid "Remember me"
+msgstr "记住密码"
+
+#: templates/account/login.html:46
+msgid "Forgot Password?"
+msgstr "忘记密码？"
+
+#: templates/account/login.html:50
+msgid "Log In"
+msgstr "登录"
+
+#: templates/account/login.html:51
+#, python-format
+msgid "Don't have an account? <a href=\"%(signup_url)s\">Sign up</a>"
+msgstr "还没有注册？<a href=\"%(signup_url)s\">注册</a>"
+
+#: templates/account/login.html:58
+msgid "Wrong email or password"
+msgstr "错误邮件地址或密码"
+
+#: templates/account/login.html:74 account/login.html.py:91 account/signup.html:132
+#: templates/account/signup.html.py:148
+msgid "This can not be empty"
+msgstr "此为必填项"
+
+#: templates/account/login.html:77 account/signup.html:135
+msgid "Please enter a valid email"
+msgstr "请输入合法邮箱"
+
+#: templates/account/login.html:118 account/signup.html:218
+msgid "Email"
+msgstr "邮箱"
+
+#: templates/account/login.html:119 account/signup.html:219
+msgid "Password"
+msgstr "密码"
+
+#: templates/account/password_change.html:6 account/password_reset_from_key.html:21
+msgid "Change Password"
+msgstr "修改密码"
+
+#: templates/account/password_change.html:16
+msgid "My Listing"
+msgstr "我的体验"
+
+#: templates/account/password_change.html:17
+msgid "My Trip"
+msgstr "我的预订"
+
+#: templates/account/password_change.html:18
+msgid "My Profile"
+msgstr "个人信息"
+
+#: templates/account/password_change.html:19
+msgid "My Account"
+msgstr "账户管理"
+
+#: templates/account/password_change.html:27
+msgid "Setting"
+msgstr "账户管理"
+
+#: templates/account/password_change.html:33
+msgid "Change Your Password"
+msgstr "修改密码"
+
+#: templates/account/password_change.html:38
+msgid "You have successfully changed your password."
+msgstr "密码修改成功。"
+
+#: templates/account/password_change.html:46
+msgid "Old Password"
+msgstr "旧密码"
+
+#: templates/account/password_change.html:59
+msgid "New Password"
+msgstr "新密码"
+
+#: templates/account/password_change.html:70
+msgid "Repeat Password"
+msgstr "再次输入"
+
+#: templates/account/password_change.html:82
+msgid "Update Password"
+msgstr "修改密码"
+
+#: templates/account/password_reset.html:18 account/password_reset_done.html:11
+#: templates/account/password_reset_from_key_done.html:11
+msgid "Reset Password"
+msgstr "重置密码"
+
+#: templates/account/password_reset.html:19
+msgid ""
+"Enter the email address associated with your account, and we'll email you a "
+"link to reset your password."
+msgstr "请输入您的邮箱地址，我们将把密码重置链接发送给您"
+
+#: templates/account/password_reset.html:26
+msgid "Send Reset Link"
+msgstr "确定"
+
+#: templates/account/password_reset.html:38
+msgid "Email address"
+msgstr "邮箱"
+
+#: templates/account/password_reset_done.html:81
+msgid ""
+"We have sent you an e-mail. Please contact us if you do not receive it "
+"within a few minutes."
+msgstr "我们已经给您发送了邮件。如果您没有收到，请联系我们。"
+
+#: templates/account/password_reset_done.html:98
+msgid "Home page"
+msgstr "主页"
+
+#: templates/account/password_reset_from_key.html:21
+msgid "Bad Token"
+msgstr "无效令牌"
+
+#: templates/account/password_reset_from_key.html:25
+#, python-format
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a <a href=\"%(passwd_reset_url)s\">new password reset</"
+"a>."
+msgstr "该密码重置链接无效。请重新<a href=\"%(passwd_reset_url)s\">申请</a>。"
+
+#: templates/account/password_reset_from_key.html:31
+msgid "Change password"
+msgstr "修改密码"
+
+#: templates/account/password_reset_from_key.html:34
+#: templates/account/password_reset_from_key_done.html:78
+msgid "Your password is now changed."
+msgstr "密码修改成功"
+
+#: templates/account/password_reset_from_key_done.html:16
+#, python-format
+msgid ""
+"\n"
+"<!--%(currentdate)s-->\n"
+msgstr ""
+"\n"
+"<!--%(currentdate)s-->\n"
+
+#: templates/account/password_reset_from_key_done.html:80
+msgid "You password associated to "
+msgstr "您的"
+
+#: templates/account/password_reset_from_key_done.html:80
+msgid " has been changed."
+msgstr "密码修改成功。"
+
+#: templates/account/signup.html:110
+msgid "Tell me about Tripalocal news"
+msgstr "给我发送本土客的新活动"
+
+#: templates/account/signup.html:111
+#, python-format
+msgid ""
+"By signing up, I agree to Tripalocal's <a href=\"%(geo)stermsofservice"
+"\">Terms of Service</a>, <a href=\"%(geo)sprivacypolicy\">Privacy Policy</"
+"a>, <a href=\"%(geo)srefundpolicy\">Guest Refund Policy</a>"
+msgstr ""
+"我同意本土客的<a href=\"%(geo)stermsofservice\">服务条款</a>, <a href="
+"\"%(geo)sprivacypolicy\">隐私政策</a>, <a href=\"%(geo)srefundpolicy\">退款政"
+"策</a>."
+
+#: templates/account/signup.html:112
+msgid "Sign up"
+msgstr "注册"
+
+#: templates/account/signup.html:114
+#, python-format
+msgid "Already a Tripalocal member? <a href=\"%(login_url)s\">Log in</a>"
+msgstr "已经有本土客帐号？<a href=\"%(login_url)s\">登录</a>"
+
+#: templates/account/signup.html:182
+msgid "Invalid first name"
+msgstr "无效名字"
+
+#: templates/account/signup.html:203
+msgid "Invalid last name"
+msgstr "无效姓氏"
+
+#: templates/account/signup.html:220
+msgid "First Name"
+msgstr "名字"
+
+#: templates/account/signup.html:221
+msgid "Last Name"
+msgstr "姓氏"
+
+#: templates/account/signup.html:265
+msgid "sign up"
+msgstr "注册"

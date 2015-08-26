@@ -1,0 +1,619 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-26 11:53+1000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: allauth.py:14
+#, python-brace-format
+msgid "Password must be a minimum of {0} characters."
+msgstr "密码至少要{0}个字符"
+
+#: forms.py:20
+msgid "Password"
+msgstr "密码"
+
+#: forms.py:158
+msgid "first_name"
+msgstr "名字"
+
+#: forms.py:163 templates/app/myprofile.html:64
+#: templates/app/myprofile.html.py:107
+msgid "First Name"
+msgstr "名字"
+
+#: forms.py:164
+msgid "last_name"
+msgstr "姓氏"
+
+#: forms.py:169 templates/app/myprofile.html:72
+#: templates/app/myprofile.html.py:97
+msgid "Last Name"
+msgstr "姓氏"
+
+#: templates/app/aboutus.html:6
+msgid "Tripalocal | About Us"
+msgstr "关于本土客 | 关于我们"
+
+#: templates/app/aboutus.html:14 templates/app/aboutus.html.py:22
+#: templates/app/contactus.html:13
+msgid "About Tripalocal"
+msgstr "关于本土客"
+
+#: templates/app/aboutus.html:15 templates/app/contactus.html:14
+#: templates/app/contactus.html.py:21
+msgid "Contact Tripalocal"
+msgstr "联系本土客"
+
+#: templates/app/aboutus.html:16 templates/app/contactus.html:15
+#: templates/app/layout.html:138
+msgid "Terms of Service"
+msgstr "服务条款"
+
+#: templates/app/aboutus.html:17 templates/app/contactus.html:16
+#: templates/app/layout.html:139
+msgid "Privacy Policy"
+msgstr "隐私政策"
+
+#: templates/app/aboutus.html:18 templates/app/contactus.html:17
+msgid "Traveller Refund Policy"
+msgstr "旅行退款政策"
+
+#: templates/app/aboutus.html:24
+msgid ""
+"Based in Melbourne Australia, we are a team of passionate wanderlusts - our "
+"home is really in our bags. We are always seeking the most authentic local "
+"experiences wherever we go. There is no better way to travel than to step "
+"into the shoes of a local and appreciate it from their perspective. It is "
+"with this believe that Tripalocal was born."
+msgstr ""
+"Tripalocal本土客成立于澳大利亚。我们是一个对旅行充满激情的团队，每个人都是十"
+"足的旅行控——我们的家就装在我们的行李里。无论走到哪里，我们一直在 寻觅最富有风"
+"土人情的本土体验。最好的旅行体验就是涉足当地文化并从当地人的角 度来感受他们的"
+"城市。就是本着这样的理念，我们推出了本土客，通过互联网平台来 连接游客和当地"
+"人，从而改变旅行的方式。"
+
+#: templates/app/aboutus.html:25
+msgid ""
+"Our mission is to bring travel back to its roots: a discover of the people, "
+"culture and stories."
+msgstr "我们的宗旨是还原旅行的本质：挖掘当地人的故事和体验他们的文化。"
+
+#: templates/app/aboutus.html:26
+msgid ""
+"We hope to bring you on this journey with us. Go on, see it and experience "
+"it like a local!"
+msgstr "我们欢迎您加入到我们的行列，与我们一起寻找最原汁原味的旅行。"
+
+#: templates/app/contactus.html:6
+msgid "Tripalocal | Contact us"
+msgstr "本土客 | 联系我们"
+
+#: templates/app/contactus.html:22
+msgid ""
+"If you have any queries, feedback or requests, please feel free to contact "
+"us at anytime!"
+msgstr "如果你有疑问、反馈和需求，请随时联系我们！"
+
+#: templates/app/contactus.html:23
+#: templates/app/email_auto_registration.html:77
+msgid "Email:"
+msgstr "电子邮箱:"
+
+#: templates/app/email_auto_registration.html:75
+msgid "Here is your Tripalocal account"
+msgstr "你的 Tripalocal 本土客账号"
+
+#: templates/app/email_auto_registration.html:76
+msgid "Your account has been automatically created as follows:"
+msgstr "你的账号已自动生成："
+
+#: templates/app/email_auto_registration.html:78
+msgid "Temporary password:"
+msgstr "临时密码："
+
+#: templates/app/email_auto_registration.html:79
+msgid "Please login and change your password as soon as possible."
+msgstr "为安全起见，请尽快登录修改你的密码"
+
+#: templates/app/email_registration_successful.html:75
+msgid "Your account is ready!"
+msgstr "您的帐号已激活"
+
+#: templates/app/email_registration_successful.html:76
+msgid ""
+"Now you are part of the big family, travelling will never<br>\n"
+"                                                                                be "
+"the same.&nbsp;Let us show you around :)<br>\n"
+"                                                                                We "
+"are currently hosting in Melbourne and Sydney, please check them out! "
+msgstr ""
+"<a href=\"https://www.tripalocal.com/cn\" target=\"_blank\">本土客</a>带您体"
+"检最原汁原味的旅行!"
+
+#: templates/app/index.html:8
+msgid "Tripalocal | Experience it like a local"
+msgstr "本土客，个性出境游，本地导游，旅游攻略，私人导游，旅行，分享，发现"
+
+#: templates/app/index.html:48
+msgid "Tripalocal for Android"
+msgstr "本土客安卓手机应用"
+
+#: templates/app/index.html:54
+msgid "Install"
+msgstr "安装"
+
+#: templates/app/index.html:62 templates/app/loginpartial.html:19
+#: templates/app/loginpartial.html.py:52
+msgid "Log out"
+msgstr "退出"
+
+#: templates/app/index.html:80 templates/app/index.html.py:115
+#: templates/app/index.html:118 templates/app/loginpartial.html:60
+msgid "Sign up"
+msgstr "注册"
+
+#: templates/app/index.html:81 templates/app/loginpartial.html:61
+msgid "Log in"
+msgstr "登录"
+
+#: templates/app/index.html:99
+msgid "City"
+msgstr "城市"
+
+#: templates/app/index.html:105 templates/app/index.html.py:108
+msgid "Search"
+msgstr "搜索"
+
+#: templates/app/index.html:115 templates/app/index.html.py:118
+msgid " to get notified when we launch in more countries."
+msgstr "第一时间了解新增城市请"
+
+#: templates/app/index.html:117
+msgid "Tripalocal is currently available in Australia"
+msgstr ""
+
+#: templates/app/index.html:127
+msgid "Discover authentic experiences"
+msgstr "探索本土化的生活轨迹"
+
+#: templates/app/index.html:128
+msgid "Explore local places"
+msgstr "发现当地的吃喝玩乐"
+
+#: templates/app/index.html:141 templates/app/index.html.py:179
+#: templates/app/index.html:205
+msgid "From"
+msgstr ""
+
+#: templates/app/index.html:141 templates/app/index.html.py:179
+#: templates/app/index.html:205
+#, python-format
+msgid " %(currency)s/person "
+msgstr " %(currency)s/人 起"
+
+#: templates/app/index.html:157
+msgid "Request a trip"
+msgstr "订制行程"
+
+#: templates/app/index.html:230
+msgid "Travel with Tripalocal"
+msgstr "本土客带您去旅行"
+
+#: templates/app/index.html:231
+msgid "See how it works"
+msgstr "了解更多"
+
+#: templates/app/index.html:242
+msgid "Your browser does not support the video tag."
+msgstr "您的浏览器不支持video标签"
+
+#: templates/app/index.html:249
+msgid "Our Community"
+msgstr "我们的社区"
+
+#: templates/app/index.html:252
+msgid "Travelling"
+msgstr "旅行"
+
+#: templates/app/index.html:252 templates/app/index.html.py:255
+msgid "(Coming soon)"
+msgstr "(敬请期待)"
+
+#: templates/app/index.html:255
+msgid "Hosting"
+msgstr "领路"
+
+#: templates/app/index.html:288
+msgid " From "
+msgstr "到达日期"
+
+#: templates/app/index.html:289
+msgid " To "
+msgstr "离开日期"
+
+#: templates/app/layout.html:60
+msgid "Do you need help planning your trip to Australia and New Zealand?"
+msgstr "需要澳大利亚和新西兰的订制吗?"
+
+#: templates/app/layout.html:66
+msgid "NO"
+msgstr "暂不需要"
+
+#: templates/app/layout.html:69
+msgid "YES"
+msgstr "需要"
+
+#: templates/app/layout.html:74 templates/app/layout.html.py:93
+msgid "close"
+msgstr "关闭"
+
+#: templates/app/layout.html:77
+msgid "Tell us about your trip"
+msgstr "请告诉我们您的需求"
+
+#: templates/app/layout.html:79
+msgid "and we will get back to you within 48 hours"
+msgstr "我们会在48小时内给您答复"
+
+#: templates/app/layout.html:135
+msgid "Company"
+msgstr "公司"
+
+#: templates/app/layout.html:136
+msgid "About Us"
+msgstr "关于我们"
+
+#: templates/app/layout.html:137
+msgid "Contact Us"
+msgstr "联系我们"
+
+#: templates/app/layout.html:142
+msgid "Travel"
+msgstr "旅行"
+
+#: templates/app/layout.html:143
+msgid "Refund Policy"
+msgstr "退款政策"
+
+#: templates/app/layout.html:144
+msgid "Mobile Apps"
+msgstr "手机应用"
+
+#: templates/app/layout.html:147
+msgid "Social"
+msgstr "社交"
+
+#: templates/app/layout.html:148
+msgid "Facebook"
+msgstr ""
+
+#: templates/app/layout.html:149
+msgid "Twitter"
+msgstr ""
+
+#: templates/app/loginpartial.html:38 templates/app/mylisting.html:6
+#: templates/app/mylisting.html.py:15 templates/app/myprofile.html:15
+#: templates/app/myreservation.html:15 templates/app/mytrip.html:15
+msgid "My Listing"
+msgstr "我的体验"
+
+#: templates/app/loginpartial.html:39 templates/app/myreservation.html:6
+msgid "My Reservations"
+msgstr "体验预约记录"
+
+#: templates/app/loginpartial.html:45 templates/app/mylisting.html:16
+#: templates/app/myprofile.html:16 templates/app/myreservation.html:16
+#: templates/app/mytrip.html:6 templates/app/mytrip.html.py:16
+#: templates/app/mytrip.html:26 templates/app/mytrip.html.py:30
+msgid "My Trip"
+msgstr "我的预订"
+
+#: templates/app/loginpartial.html:50
+msgid "Edit Profile"
+msgstr "编辑个人信息"
+
+#: templates/app/loginpartial.html:51
+msgid "Account Settings"
+msgstr "账户设置"
+
+#: templates/app/mycalendar.html:42
+msgid "Your calendar has been successfully updated"
+msgstr ""
+
+#: templates/app/mycalendar.html:44
+msgid "Invalid input"
+msgstr ""
+
+#: templates/app/mylisting.html:17 templates/app/myprofile.html:6
+#: templates/app/myprofile.html.py:17 templates/app/myprofile.html:26
+#: templates/app/myreservation.html:17 templates/app/mytrip.html:17
+msgid "My Profile"
+msgstr "个人信息"
+
+#: templates/app/mylisting.html:18 templates/app/myprofile.html:18
+#: templates/app/myreservation.html:18 templates/app/mytrip.html:18
+msgid "My Account"
+msgstr "账户管理"
+
+#: templates/app/mylisting.html:27 templates/app/myreservation.html:27
+msgid "Managing Listing"
+msgstr "我的体验"
+
+#: templates/app/mylisting.html:30 templates/app/myreservation.html:30
+#: templates/app/myreservation.html:36
+msgid "My Reservation"
+msgstr "体验预约记录"
+
+#: templates/app/mylisting.html:36
+msgid "All listings"
+msgstr "我的体验"
+
+#: templates/app/mylisting.html:45
+msgid "Not Published"
+msgstr "未发布"
+
+#: templates/app/mylisting.html:47
+msgid "Published"
+msgstr "已发布"
+
+#: templates/app/mylisting.html:51
+msgid "Edit draft"
+msgstr "继续编辑"
+
+#: templates/app/mylisting.html:53
+msgid "Update listing"
+msgstr "更新信息"
+
+#: templates/app/mylisting.html:58
+msgid "You have not hosted any experience."
+msgstr "您还没有任何体验。"
+
+#: templates/app/myprofile.html:32
+msgid "Basic"
+msgstr "基本信息"
+
+#: templates/app/myprofile.html:42
+msgid ""
+"Clear frontal face photos are an important way for hosts and<br>\n"
+"                                                                    guests "
+"to learn about each other. It's not much fun to host a <br>\n"
+"                                                                    landscape! "
+"Please upload a photo that clearly shows your face.<br>\n"
+"                                                                    Please "
+"make sure your image is under 1MB."
+msgstr ""
+"上传清晰的正面照能让其他用户更好的了解您。<br>我们并不推荐使用风景照作为头"
+"像。<br>请上传一张您的清晰正面照。<br>照片应小于1MB。"
+
+#: templates/app/myprofile.html:50
+msgid "No file chosen"
+msgstr "未选择文件"
+
+#: templates/app/myprofile.html:53
+msgid "Choose File"
+msgstr "选择文件"
+
+#: templates/app/myprofile.html:83 templates/app/myprofile.html.py:88
+#: templates/app/myprofile.html:116 templates/app/myprofile.html.py:121
+msgid ""
+"This is only shared once you have a confirmed booking with <br>\n"
+"                                                                    another "
+"Tripalocal user. We only display your initial in public."
+msgstr ""
+"其他本土客用户只有在体验订单确认后才会知道您全名。<br>在公共页面上我们只显示"
+"您姓氏的缩写。"
+
+#: templates/app/myprofile.html:130
+msgid "Email Address"
+msgstr "电子邮箱"
+
+#: templates/app/myprofile.html:137
+msgid "Your email address will not be disclosed."
+msgstr "我们不会公布您的电子邮箱。"
+
+#: templates/app/myprofile.html:144
+msgid "Local Mobile Number"
+msgstr "当地手机号码"
+
+#: templates/app/myprofile.html:151
+msgid ""
+"This information will be available to people who have booked your<br> "
+"experience."
+msgstr ""
+"其他本土客用户只有在体验订单确认后才会知道您全名。<br> 在公共页面上我们只显示"
+"您姓氏的缩写。"
+
+#: templates/app/myprofile.html:159
+msgid "Bio"
+msgstr "自我简介"
+
+#: templates/app/myprofile.html:165
+msgid ""
+" Tripalocal is all about like minded people doing things together.<br>\n"
+"                                    Your profile will help people understand "
+"your style and personal-<br>\n"
+"                                    ity."
+msgstr ""
+"本土客的宗旨是让志同道合的人一起做一些有意义的事情。<br>您的资料能够帮助用户"
+"了解您的风格和个性。"
+
+#: templates/app/myprofile.html:170
+msgid ""
+"It's like having friends all over the world to show you around, or<br>\n"
+"                                    vice versa. What type of people would "
+"you like to meet up with? "
+msgstr ""
+"就好像是有着世界各地的朋友能够带您参观不同的地方，<br>反之就好像是您为来自世"
+"界各地的朋友介绍某个地方。你会想遇到什么样的人呢？"
+
+#: templates/app/myprofile.html:178
+msgid "Save"
+msgstr "保存"
+
+#: templates/app/myreservation.html:69
+msgid "Booked"
+msgstr "已确认"
+
+#: templates/app/myreservation.html:73
+msgid "Pending"
+msgstr "待确认"
+
+#: templates/app/myreservation.html:74
+msgid "-Please check your email"
+msgstr "-请查看您的电子邮箱"
+
+#: templates/app/myreservation.html:78 templates/app/myreservation.html:141
+#: templates/app/mytrip.html:58
+msgid "Cancelled"
+msgstr "已取消"
+
+#: templates/app/myreservation.html:84 templates/app/myreservation.html:87
+#: templates/app/myreservation.html:148 templates/app/myreservation.html:152
+msgid "with"
+msgstr "和"
+
+#: templates/app/myreservation.html:85 templates/app/myreservation.html:87
+msgid "from"
+msgstr "来自"
+
+#: templates/app/myreservation.html:87
+msgid "'s"
+msgstr "的"
+
+#: templates/app/myreservation.html:94
+msgid "+ Add a note"
+msgstr "添加备注"
+
+#: templates/app/myreservation.html:104
+msgid "Past Reservation"
+msgstr "以往预约"
+
+#: templates/app/myreservation.html:137
+msgid "Completed"
+msgstr "已完成"
+
+#: templates/app/myreservation.html:150 templates/app/myreservation.html:153
+msgid "in"
+msgstr "在"
+
+#: templates/app/mytrip.html:56
+msgid "Confirmed"
+msgstr "已确认"
+
+#: templates/app/mytrip.html:60
+msgid "Requested"
+msgstr "已预订"
+
+#: templates/app/mytrip.html:63
+msgid "with "
+msgstr "与"
+
+#: templates/app/mytrip.html:78
+msgid "Meet up location: "
+msgstr "会合地点: "
+
+#: templates/app/mytrip.html:79
+msgid "Map"
+msgstr "地图"
+
+#: templates/app/mytrip.html:89
+msgid "You have not booked any trips."
+msgstr "您还没有预订任何体验。"
+
+#: templates/app/registration_successful.html:11
+msgid "Successful Registration"
+msgstr "注册成功"
+
+#: templates/app/registration_successful.html:77
+msgid "Thank you for your confirmation"
+msgstr "感谢您的确认激活"
+
+#: templates/app/registration_successful.html:78
+msgid " Your account associate with %(account_email)s is now activated. "
+msgstr "您用 %(user_email)注册的账户已经激活。"
+
+#: templates/app/registration_successful.html:95
+msgid "Show me around"
+msgstr "去主页逛逛"
+
+#: views.py:146
+msgid "Melbourne"
+msgstr "墨尔本"
+
+#: views.py:146
+msgid "Sydney"
+msgstr "悉尼"
+
+#: views.py:146
+msgid "Gold Coast"
+msgstr "黄金海岸"
+
+#: views.py:146
+msgid "Cairns"
+msgstr "凯恩斯"
+
+#: views.py:146
+msgid "Adelaide"
+msgstr "阿德莱德"
+
+#: views.py:246
+msgid "[Tripalocal] Successfully registered"
+msgstr "【本土客】 您的帐户已经成功激活"
+
+#~ msgid "Close"
+#~ msgstr "关闭"
+
+#~ msgid "Weibo"
+#~ msgstr "微博"
+
+#~ msgid "Wechat"
+#~ msgstr "微信"
+
+#~ msgid "Step into the Shoes of Locals"
+#~ msgstr "踏入当地人的生活"
+
+#~ msgid "Melbourne, VIC"
+#~ msgstr "墨尔本, 维多利亚州"
+
+#~ msgid "Sydney, NSW"
+#~ msgstr "悉尼, 新南威尔士州"
+
+#~ msgid "Brisbane, QLD"
+#~ msgstr "布里斯班, 昆士兰州"
+
+#~ msgid "Cairns, QLD"
+#~ msgstr "凯恩斯, 昆士兰州"
+
+#~ msgid "Gold coast, QLD"
+#~ msgstr "黄金海岸, 昆士兰州"
+
+#~ msgid "Hobart, TAS"
+#~ msgstr "霍巴特, 塔斯马尼亚州'"
+
+#~ msgid "Adelaide, SA"
+#~ msgstr "阿德莱德, 南澳"
+
+#~ msgid "Greater South Australia"
+#~ msgstr "南澳其他地区"
+
+#~ msgid "Greater New South Wales"
+#~ msgstr "新南威尔士州其他地区"
+
+#~ msgid "Greater Queensland"
+#~ msgstr "昆士兰州其他地区"
+
+#~ msgid "AUD/person"
+#~ msgstr "澳元/人"
