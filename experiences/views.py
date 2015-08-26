@@ -647,7 +647,7 @@ class ExperienceDetailView(DetailView):
                 return context
 
         if not experience.status.lower() == "listed":
-            if self.request.user.id != experience.hosts.all()[0].id:
+            if self.request.user.id != experience.hosts.all()[0].id and not self.request.user.is_superuser:
                 # other user, experience not published
                 context['listed'] = False
                 return context
@@ -1705,6 +1705,11 @@ def new_experience(request):
             first_step = 'price'
             return redirect(reverse('manage_listing', kwargs={'exp_id': experience.id, 'step': first_step}))
     else:
+        if request.user.is_superuser:
+            data = {}
+            data['user_id'] = request.user.username
+            form = ExperienceForm(data=data)
+            return render_to_response('new_experience.html', {'form': form}, context)
         return render_to_response('new_experience.html', {'form': form}, context)
 
 def manage_listing_price(request, experience, context):
@@ -1876,10 +1881,7 @@ def manage_listing_photo(request, experience, context):
             for photo_index in photo_list:
                 photo_indexes = photo_indexes + photo_index  + ','
         data['photo_indexes'] = photo_indexes
-
         form = ExperiencePhotoForm(data)
-
-
         return render_to_response('photo_form.html', {'form': form}, context)
 
     elif request.method == 'POST':
