@@ -1719,7 +1719,6 @@ def manage_listing_price(request, experience, context):
         data['currency'] = experience.currency
         if experience.price != None:
             data['price_with_booking_fee'] = round(float(experience.price) * (1.00 + settings.COMMISSION_PERCENT), 2)
-        print(data['dynamic_price'])
         form = ExperiencePriceForm(initial=data)
 
         return render_to_response('price_form.html', {'form': form}, context)
@@ -1728,7 +1727,6 @@ def manage_listing_price(request, experience, context):
         if form.is_valid():
             if 'dynamic_price' in form.data:
                 experience.dynamic_price = form.cleaned_data['dynamic_price']
-
             if 'min_guest_number' in form.data:
                 experience.guest_number_min = form.cleaned_data['min_guest_number']
             if 'max_guest_number' in form.data:
@@ -1744,7 +1742,6 @@ def manage_listing_price(request, experience, context):
 
             # todo: add to chinese db
             experience.save()
-            print(experience.dynamic_price)
             return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
@@ -1911,6 +1908,8 @@ def manage_listing_photo(request, experience, context):
 
                 if field_name in request.FILES:
                     file = request.FILES[field_name]
+                    if file._size > EXPERIENCE_IMAGE_SIZE_LIMIT:
+                            raise forms.ValidationError(_('Image size exceeds the limit'))
                     extension = '.jpg'
                     filename = 'experience' + str(experience.id) + '_' + str(index) + extension
                     dir_name = 'experiences/' + str(experience.id) + '/'
@@ -1921,6 +1920,7 @@ def manage_listing_photo(request, experience, context):
                         photo = Photo(name=filename, directory=dir_name,
                                       image=dir_name + filename, experience=experience)
                         photo.save()
+
                     for chunk in request.FILES[field_name].chunks():
                         destination.write(chunk)
                         destination.close()
@@ -1972,7 +1972,6 @@ def manage_listing_calendar(request, experience, context):
     if request.method == 'GET':
         return render_to_response('calendar_form.html', {}, {})
     elif request.method == 'POST':
-        print(request.POST['chosen_slot'])
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
     pass
 

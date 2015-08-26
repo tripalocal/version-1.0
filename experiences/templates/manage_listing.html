@@ -414,18 +414,20 @@
             // Set selection page listener.
             $("#proceed-button").click(function(e) {
 
-                if(window.PRICE_FORM_INDICATOR == "public") {
+                if(window.PRICE_FORM_INDICATOR == "private") {
                     $("#price-form").css("display", "block");
                     $("#private-only-part").css("display", "block");
                     $("#selection-menu").css("display", "none");
                     window.PRICE_FORM_INDICATOR = "private";
+                    $("#type-indicator").text("private");
                     postDatum(location.href, {'type': 'PRIVATE'})
                 }
-                else if(window.PRICE_FORM_INDICATOR == "private") {
+                else if(window.PRICE_FORM_INDICATOR == "public") {
                     $("#price-form").css("display", "block");
                     $("#private-only-part").css("display", "none");
                     $("#selection-menu").css("display", "none");
                     window.PRICE_FORM_INDICATOR = "public";
+                    $("#type-indicator").text("public");
                     postDatum(location.href, {'type': 'NONPRIVATE'})
                 }
                 else {
@@ -513,6 +515,7 @@
             $("#price-form").css("display", "block");
             $("#private-only-part").css("display", "none");
             $("#selection-menu").css("display", "none");
+            $("#type-indicator").text("public");
             window.PRICE_FORM_INDICATOR = "public";
         }
 
@@ -520,6 +523,7 @@
             $("#price-form").css("display", "block");
             $("#private-only-part").css("display", "block");
             $("#selection-menu").css("display", "none");
+            $("#type-indicator").text("public");
             window.PRICE_FORM_INDICATOR = "private";
         }
 
