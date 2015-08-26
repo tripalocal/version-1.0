@@ -48,6 +48,7 @@ class Experience(models.Model):
     status = models.CharField(max_length=50)
 
     tags = models.ManyToManyField(ExperienceTag, related_name='experience_tags')
+   # commission = models.FloatField(default=0.3)
 
     def __str__(self):
         t = get_experience_title(self, settings.LANGUAGES[0][0])
