@@ -90,7 +90,13 @@ th h3{margin: 2px}
 .profile-xs {width:35px;height:35px; float:left; margin-top:-7px; overflow:hidden;}
 .profile-xs img{height:50px;}
 .profile-lg, .profile-md, .profile-sm, .profile-xs, .profile-featured{background-color: #FFF;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border-radius: 100px; overflow: hidden; position: relative;}
-.profile-lg img, .profile-md img, .profile-sm img, .profile-xs img, .profile-featured img{border-radius: 100px;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border: #CCC solid 1px;}
+.profile-lg img, .profile-md img, .profile-sm img, .profile-xs img, .profile-featured img{border-radius: 100px;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border: #CCC solid 1px;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;}
 
 .autosize-profile-img{height: 140px;width: 140px;border-radius: 100px;background-size: cover;border:1px #CCC solid;position: relative;top: 5px;left: 5px;}
 .btn-lg, .btn-group-lg>.btn { font-weight:bold; font-size: 14px;line-height: 1.33;border-radius: 3px; width:100%;}
@@ -267,7 +273,7 @@ input[type=checkbox] { margin: 2px 10px 0 0; float: left;}
 .rightInterface{float: right;width: 700px;background-color: #FFF;border: #CCC 1px solid;-moz-border-radius: 5px;-webkit-border-radius: 5px;-khtml-border-radius: 5px;border-radius: 5px;padding: 20px;}
 .rightInterface p{margin-bottom:10px}
 .social-icon{width:65px;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border-radius: 100px;}
-.social-icon span {width:30px; height:30px; background-size:120px 60px; display:block; margin: 0px -5px;}
+.social-icon span {width:30px; height:30px; background-size:120px 60px; display:block; margin: -15px -3px;}
 
 .stickem-container {  position: relative;}
 .stickit {    position: fixed;    top: 0px;    padding-top: 150px;}
