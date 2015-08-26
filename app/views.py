@@ -6,18 +6,16 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, loader
 from datetime import *
-from django import forms
 from django.views.decorators.http import require_POST
 from experiences.forms import Locations
 from django.contrib.auth import authenticate, login
 from allauth.account.signals import password_reset, user_signed_up, user_logged_in
 from allauth.account.views import PasswordResetFromKeyDoneView
 from django.dispatch import receiver
-from app.forms import SubscriptionForm, HomepageSearchForm, UserProfileForm, UserCalendarForm
+from app.forms import HomepageSearchForm, UserProfileForm, UserCalendarForm
 from app.models import *
-from django.core.mail import send_mail
 from django.contrib import messages
-import string, random, pytz, base64, subprocess, os, geoip2.database, PIL, requests
+import string, random, pytz, subprocess, geoip2.database, requests
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, saveProfileImage, getBGImageURL, getProfileImage
@@ -723,6 +721,12 @@ def track_user_login(ip, sociallogin, user):
 def email_custom_trip(request):
     email = request.POST.get("email", "Blank")
     message = request.POST.get("message", "Blank")
-    send_mail("Trip suggestion from " + email,  message, "enquiries@tripalocal.com",
-              ["enquiries@tripalocal.com"], fail_silently=False)
+
+    mail.send(
+        'enquiries@tripalocal.com',
+        'enquiries@tripalocal.com',
+        subject="Trip suggestion from " + email,
+        message=message,
+    )
+
     return HttpResponse(json.dumps({}))
