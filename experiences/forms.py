@@ -222,6 +222,7 @@ class ExperiencePriceForm(forms.Form):
     price = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     price_with_booking_fee = forms.DecimalField(required=False, max_digits=6, decimal_places=2, min_value=1)
     dynamic_price = forms.CharField(max_length=100, required=False)
+    currency = forms.ChoiceField(choices=Currency)
 
     def __init__(self, *args, **kwargs):
         super(ExperiencePriceForm, self).__init__(*args, **kwargs)
