@@ -83,15 +83,6 @@ textarea {
   height: 40px;
 }
 
-/* Fix for scrollbars being displayed in older browser versions */
-body.modal-open, .modal-open .navbar-fixed-top, .modal-open .navbar-fixed-bottom {
-    margin-right: 0;
-}
-
-.modal {
-    overflow-y: auto;
-}
-/****************/
 
 @media (max-width: 767px) {
   .help .col-xs-6 {
