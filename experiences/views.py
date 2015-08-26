@@ -1890,12 +1890,10 @@ def manage_listing_photo(request, experience, context):
             index = request.POST['delete_file']
             extension = '.jpg'
             filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-            dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
-            # Delete in file system.
-            os.remove(dirname + filename)
-            # Delete record in database.
+
             photo = Photo.objects.filter(name=filename)
             if photo.__len__() == 1:
+                photo[0].image.delete()
                 photo[0].delete()
                 return HttpResponse(json.dumps({'success': True, 'data': 'delete_image', 'index':index}), content_type='application/json')
             else:
@@ -1904,9 +1902,6 @@ def manage_listing_photo(request, experience, context):
         if form.is_valid():
             for index in range(1, 10):
                 field_name = 'experience_photo_' + str(index)
-                dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
-                if not os.path.isdir(dirname):
-                    os.mkdir(dirname)
 
                 if field_name in request.FILES:
                     file = request.FILES[field_name]
@@ -1915,27 +1910,27 @@ def manage_listing_photo(request, experience, context):
                     extension = '.jpg'
                     filename = 'experience' + str(experience.id) + '_' + str(index) + extension
                     dir_name = 'experiences/' + str(experience.id) + '/'
-                    destination = open(dirname + filename, 'wb+')
+
+                    photos = Photo.objects.filter(name=filename)
+                    if len(photos) != 0:
+                        photo = photos[0]
+                        photos[0].image.delete()
+                    else:
+                        photo = Photo(name=filename, directory=dir_name, experience=experience)
 
 
-                    if Photo.objects.filter(name=filename).__len__() == 0:
-                        photo = Photo(name=filename, directory=dir_name,
-                                      image=dir_name + filename, experience=experience)
-                        photo.save()
+                    photo.image = file
+                    photo.save()
 
-                    for chunk in request.FILES[field_name].chunks():
-                        destination.write(chunk)
-                        destination.close()
 
                         #create the corresponding thumbnail (force .jpg)
-                        basewidth = 400
-                        img = Image.open(dirname + filename)
-                        wpercent = (basewidth/float(img.size[0]))
-                        hsize = int((float(img.size[1])*float(wpercent)))
-                        img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-                        img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
+                        # basewidth = 400
+                        # img = Image.open(dirname + filename)
+                        # wpercent = (basewidth/float(img.size[0]))
+                        # hsize = int((float(img.size[1])*float(wpercent)))
+                        # img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+                        # img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
 
-            # todo: add to chinese db
             experience.save()
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
