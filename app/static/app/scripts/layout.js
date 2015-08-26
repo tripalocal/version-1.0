@@ -30,10 +30,13 @@ $(document).ready(function () {
         var nClose = parseInt($.cookie("closePopup"), 10);
 
         if (!nClose || nClose < 3) {
-            popupTimmer = setTimeout(function () {
-                $('#help-popup').modal('show');
-                mixpanel.track("saw popup01");
-            }, 60000); // milliseconds
+            if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
+              popupTimmer = setTimeout(function () {
+                  $('#help-popup').modal('show');
+                  mixpanel.track("saw popup01");
+              }, 60000); // milliseconds
+            }
+
         }
 
         $('#help-popup').on('hidden.bs.modal', function () {

@@ -131,6 +131,7 @@
 }
 
 .custom-itinerary {
+  background-image:url('../img/searchpage_banner.jpg');
   background-color: white;
   background-size: contain;
   background-repeat: no-repeat;
