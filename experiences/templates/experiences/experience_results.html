@@ -7,11 +7,13 @@
     <div id="experience-results">
         {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
         {% if forloop.counter == 5 %}
-        <div class="expList custom-itinerary" >
+        <div class="expList custom-itinerary-searchpage" >
+          <form action="mailto:enquiries@tripalocal.com">
           <button class="btn btn-primary request-btn">{% trans "Request a trip" %}</button>
+          </form>
         </div>
         {% endif %}
-        
+
         <div class="expList">
             <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
                 <div class="listingImg" style="background-image:url({{ MEDIA_URL }}{{ BGImageURL }});">

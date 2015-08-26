@@ -193,11 +193,7 @@
     $(document).ready(function(){
         $("#footer_div").hide();
 
-        mixpanel.track("Payment");
-        if($("#user_email").val())
-        {
-            mixpanel.identify($("#user_email").val());
-        }
+        mixpanel.track("completed payment");
 
         id = (new Date()).toISOString()+Math.floor((Math.random() * 1000) + 1);
         ga('require', 'ecommerce');

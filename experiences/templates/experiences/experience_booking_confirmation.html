@@ -363,10 +363,6 @@
 $(function(){
     $(document).ready(function(){
         mixpanel.track("checkout");
-        if($("#user_email").val())
-        {
-            mixpanel.identify($("#user_email").val());
-        }
 
         $("#id_promo_code").attr("class", "form-control");
         $("#id_card_number").attr("class", "form-control");
@@ -409,11 +405,6 @@ $(function(){
             {
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
                 {
-                    if($("#user_email").val())
-                    {
-                        //mixpanel.identify($("#user_email").val());
-                    }
-
                     if({{total_price}}>0.00)
                     {
                         // Open Checkout with further options
