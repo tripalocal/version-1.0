@@ -1908,6 +1908,8 @@ def manage_listing_photo(request, experience, context):
 
                 if field_name in request.FILES:
                     file = request.FILES[field_name]
+                    if file._size > EXPERIENCE_IMAGE_SIZE_LIMIT:
+                            raise forms.ValidationError(_('Image size exceeds the limit'))
                     extension = '.jpg'
                     filename = 'experience' + str(experience.id) + '_' + str(index) + extension
                     dir_name = 'experiences/' + str(experience.id) + '/'
@@ -1918,6 +1920,7 @@ def manage_listing_photo(request, experience, context):
                         photo = Photo(name=filename, directory=dir_name,
                                       image=dir_name + filename, experience=experience)
                         photo.save()
+
                     for chunk in request.FILES[field_name].chunks():
                         destination.write(chunk)
                         destination.close()
