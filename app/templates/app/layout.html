@@ -57,21 +57,21 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content help" style="background-image:url('{% static 'app/img/nightlight_web.jpg' %}')">
                 <div id="popup-page-1">
-                    <h1>{% trans "Do you need help planning your trip?" %}</h1>
+                    <h1>{% trans "Do you need help planning your trip to Australia and New Zealand?" %}</h1>
 
                     <div class="modal-body">
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-xs-6" style="float:left;">
-                                    <button class="btn btn-primary" id="help-yes">{% trans "YES" %}</button>
+                                  <button class="btn btn-secondary" id="help-no">{% trans "NO" %}</button>
                                 </div>
                                 <div class="col-xs-6" style="float:left;">
-                                    <button class="btn btn-primary" id="help-no">{% trans "NO" %}</button>
+                                  <button class="btn btn-primary" id="help-yes">{% trans "YES" %}</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <a class="close-popup">{% trans "Close" %}</a>
+                    <a class="close-popup">{% trans "close" %}</a>
                 </div>
                 <div id="popup-page-2" hidden="true">
                     <h1>{% trans "Tell us about your trip" %}</h1>
