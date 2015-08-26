@@ -598,7 +598,9 @@ def service_search(request, format=None):
         keywords = criteria['keywords']
         language = "Mandarin,English"
 
-        guest_number = 5 #temp fix
+        if keywords is not None and len(keywords) == 0:
+            keywords = None
+
         if int(guest_number) == 0:
             itinerary = get_itinerary(start_datetime, end_datetime, None, city, language, keywords, mobile=True)
         else:
