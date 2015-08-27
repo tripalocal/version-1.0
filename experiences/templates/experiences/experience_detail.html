@@ -169,8 +169,8 @@
                                 <h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Overview" %}</h3>
                             </div>
 							<div class="col-sm-9 col-xs-12">
-								{{ experience.description }}<br>
-								{{ experience.interaction }}
+								{{ experience.description|linebreaks }}<br>
+								{{ experience.interaction|linebreaks }}
 							</div>
 						</div>
 
@@ -179,7 +179,7 @@
 								<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Activities" %}</h3>
 							</div>
 							<div class="col-sm-9 col-xs-12">
-								{{ experience.activity }}
+								{{ experience.activity|linebreaks }}
 							</div>
 						</div>
 						<div class="row" style="border-bottom:1px solid #CCCCCC;">
@@ -187,7 +187,7 @@
 								<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "What to wear" %}</h3>
 							</div>
 							<div class="col-sm-9 col-xs-12">
-								{{ experience.dress }}
+								{{ experience.dress|linebreaks }}
 							</div>
 						</div>
 						{% for w in experience.whatsincluded %}
