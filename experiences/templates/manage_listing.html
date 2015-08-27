@@ -445,6 +445,7 @@
                     $("#selection-menu").css("display", "none");
                     window.PRICE_FORM_INDICATOR = "private";
                     $("#type-indicator").text("private");
+                    $("#group-size-section").css("display", "block");
                     postDatum(location.href, {'type': 'PRIVATE'})
                 }
                 else if(window.PRICE_FORM_INDICATOR == "public") {
@@ -453,6 +454,7 @@
                     $("#selection-menu").css("display", "none");
                     window.PRICE_FORM_INDICATOR = "public";
                     $("#type-indicator").text("public");
+                    $("#group-size-section").css("display", "none");
                     postDatum(location.href, {'type': 'NONPRIVATE'})
                 }
                 else {
@@ -541,6 +543,7 @@
             $("#private-only-part").css("display", "none");
             $("#selection-menu").css("display", "none");
             $("#type-indicator").text("public");
+            $("#group-size-section").css("display", "none");
             window.PRICE_FORM_INDICATOR = "public";
         }
 
@@ -549,6 +552,7 @@
             $("#private-only-part").css("display", "block");
             $("#selection-menu").css("display", "none");
             $("#type-indicator").text("private");
+            $("#group-size-section").css("display", "block");
             window.PRICE_FORM_INDICATOR = "private";
         }
 
@@ -1163,13 +1167,17 @@ function loadLocationForm(href) {
 
             }
             checkPhotoFiled();
-            signal.fadeIn("slow");
+            signal.fadeIn(5000);
             signal.text("Saved...");
-            signal.fadeOut("slow");
+            signal.fadeOut(5000, function() {
+                signal.fadeIn(1000);
+                signal.text("All Changes Saved...");
+                signal.fadeOut(6000);
+            });
         }).fail(function () {
-            signal.fadeIn("slow");
+            signal.fadeIn(5000);
             signal.text("Update Failed");
-            signal.fadeOut("slow");
+            signal.fadeOut(5000);
         });
     }
 
@@ -1185,9 +1193,14 @@ function loadLocationForm(href) {
             contentType: false,
             type: 'POST',
             success: function () {
-                signal.fadeIn("slow");
+                signal.fadeIn(5000);
                 signal.text("Saved...");
-                signal.fadeOut("slow");
+                signal.fadeOut(5000, function() {
+                signal.fadeIn(1000);
+                signal.text("All Changes Saved...");
+                signal.fadeOut(6000);
+            });
+
                 $('#id_experience_photo_gif_' + index).attr("style", "display:none;");
                 changeToReplaceStyle('photo-preview-div-'+index);
                 registerEventForImagePanel('photo-preview-div-'+index);

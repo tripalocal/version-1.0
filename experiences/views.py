@@ -2184,6 +2184,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                     i += 1
                     continue
 
+                if not experience.currency:
+                    experience.currency = 'aud'
                 experience.dollarsign = DollarSign[experience.currency.upper()]
                 experience.currency = str(dict(Currency)[experience.currency.upper()])
 
