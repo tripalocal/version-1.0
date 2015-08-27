@@ -25,7 +25,7 @@
         <div id="ajax-update-signal"></div>
         <button name="" id="save-and-exit-top" disabled></button>
     </div>
-
+<input id="upload_status" value="{{experience_finished}}" style="display: none"/>
     <div class="left-side-bar">
         <ul class="form-nav">
             <li class="list-menu">Essential</li>
@@ -60,7 +60,7 @@
   // Sticky top
   $(document).ready(function() {
     var stickyNavTop = $('.back_button').offset().top;
-
+    var uploadStatus = $("#upload_status").val();
     var stickyNav = function(){
       var scrollTop = $(window).scrollTop();
 
@@ -72,7 +72,34 @@
     };
 
     stickyNav();
+    console.log(uploadStatus);
+    if(uploadStatus[0] == "1") {
+        setCookie("priceFilled", "True");
+    } else {
+        setCookie("priceFilled", "False");
+    }
+    if(uploadStatus[1] == "1") {
+        setCookie("overFilled", "True");
+    } else {
+        setCookie("overFilled", "False");
+    }
+    if(uploadStatus[2] == "1") {
+        setCookie("detailFilled", "True");
+    } else {
+        setCookie("detailFilled", "False");
+    }
+    if(uploadStatus[3] == "1") {
+        setCookie("photoFilled", "True");
+    } else {
+        setCookie("photoFilled", "True");
+    }
+    if(uploadStatus[4] == "1") {
+        setCookie("locationFilled", "True");
+    } else {
+        setCookie("locationFilled", "False");
+    }
 
+    setFinishedStatus();
     $(window).scroll(function() {
       stickyNav();
     });
@@ -191,7 +218,6 @@
     function nextStepBinding(step) {
         $("#next-step").click(function (e) {
             e.preventDefault();
-
             activeTab(step);
             var href = stepToHref(location.href, step);
             history.pushState({}, 'Edit Experience', href);
@@ -202,7 +228,6 @@
     function lastStepBinding(step) {
         $("#last-step").click(function (e) {
             e.preventDefault();
-
             activeTab(step);
             var href = stepToHref(location.href, step);
             history.pushState({}, 'Edit Experience', href);
@@ -562,7 +587,7 @@
             setupPriceForm();
             setListenerForPriceForm();
             choosePriceFormStatus();
-           // setDynamicPrice();
+            checkPriceFormFilled();
         }).fail(function () {
             $('#ajax-listing-form').text("Sorry but there was an error.");
         });
@@ -673,32 +698,12 @@
             });
         }
 
-        function checkOverviewFilled() {
-            var checkBoxFiled = false;
-            var inputBoxFiled = false;
-            $('input[type="checkbox"]').each(function() {
-                if ($(this).is(':checked')) {
-                    checkBoxFiled = true;
-                }
-            });
-            if($("#id_summary").val() != '' && $("#id_title").val() != '')
-                inputBoxFiled = true;
-
-            if(inputBoxFiled && checkBoxFiled) {
-                $("#overview-status-icon").attr("class","status-done");
-                setCookie("overFilled", "True");
-            } else {
-                $("#overview-status-icon").attr("class","status-edit");
-                setCookie("overFilled", "False");
-            }
-            setFinishedStatus();
-        }
-
         $.get(href).done(function (response) {
             $('#ajax-listing-form').html($(response));
         }).done(function () {
             setupOverviewForm();
             setListenerForOverviewForm();
+            checkOverviewFilled();
         }).fail(function () {
             $('#ajax-listing-form').text("Sorry but there was an error.");
         });
@@ -864,23 +869,6 @@
             });
         }
 
-        function checkDetailFiled() {
-            var filled = true;
-            $('textarea').each(function() {
-                if ($(this).val() === '' && $(this).attr("id") != "popup-form-details") {
-                    filled = false;
-                }
-            });
-
-            if(filled) {
-                $("#details-status-icon").attr("class","status-done");
-                setCookie("detailFilled", "True");
-            } else {
-                $("#details-status-icon").attr("class","status-edit");
-                setCookie("detailFilled", "False");
-            }
-            setFinishedStatus();
-        }
 
         $.get(href).done(function (response) {
             $('#ajax-listing-form').html($(response));
@@ -888,6 +876,7 @@
             setupDetailForm();
             setListenerForDetailForm();
             setListenerForPostingDetail();
+            checkDetailFiled();
         }).fail(function () {
             $('#ajax-listing-form').text("Sorry but there was an error.");
         });
@@ -998,6 +987,7 @@
             setupPhotoForm();
             setListenerForPhotoForm();
             setListenerForPostingPhoto();
+            checkPhotoFiled();
         }).fail(function () {
             $('#ajax-listing-form').text("Sorry but there was an error.");
         });
@@ -1078,6 +1068,7 @@ function loadLocationForm(href) {
             $("#id_dropoff_spot_other").attr("style","display:none;");
             setListenerForLocationForm();
             setListenerForPostingLocation();
+            checkLocationFiled();
         }).fail(function () {
             $('#ajax-listing-form').text("Sorry but there was an error.");
         });
@@ -1256,7 +1247,7 @@ function loadLocationForm(href) {
     }
 
     function checkPhotoFiled() {
-        if($("#photo-preview-div-1").css("background-image") != '' && $("#photo-preview-div-1").css("background-image") != 'none') {
+        if($("#photo-preview-div-1").attr("style")!="") {
             $("#photos-status-icon").attr("class","status-done");
             setCookie("photoFilled", "True");
         } else {
@@ -1269,11 +1260,9 @@ function loadLocationForm(href) {
 
     function checkLocationFiled() {
         var filled = true;
-        $('textarea').each(function() {
-            if ($(this).val() === '' && $(this).attr("id") != "popup-form-details") {
-                filled = false;
-            }
-        });
+        if($("#id_meetup_spot").val() === '' || $("#id_dropoff_spot").val() === '') {
+            filled = false;
+        }
 
         if(filled) {
             $("#location-status-icon").attr("src","/images/done.jpg");
@@ -1286,9 +1275,57 @@ function loadLocationForm(href) {
         setFinishedStatus();
     }
 
+    function checkDetailFiled() {
+        var filled = true;
+        if($("#id_included_food_detail").val() === '' || $("#id_included_transport_detail").val() === '' || $("#id_included_ticket_detail").val() === '' || $("#id_activity").val() === '' ) {
+            filled = false;
+        }
+
+        if(filled) {
+            $("#details-status-icon").attr("class","status-done");
+            setCookie("detailFilled", "True");
+        } else {
+            $("#details-status-icon").attr("class","status-edit");
+            setCookie("detailFilled", "False");
+    }
+    setFinishedStatus();
+    }
+
+    function checkOverviewFilled() {
+        var checkBoxFiled = false;
+        var inputBoxFiled = false;
+        $('input[type="checkbox"]').each(function() {
+            if ($(this).is(':checked')) {
+                checkBoxFiled = true;
+            }
+            });
+            if($("#id_summary").val() != '' && $("#id_title").val() != '') {
+                inputBoxFiled = true;
+            }
+
+        if(inputBoxFiled && checkBoxFiled) {
+        $("#overview-status-icon").attr("class","status-done");
+        setCookie("overFilled", "True");
+        } else {
+        $("#overview-status-icon").attr("class","status-edit");
+        setCookie("overFilled", "False");
+        }
+        setFinishedStatus();
+    }
+
+    function checkPriceFormFilled() {
+       if($("#id_price").val() != '' && $("#id_price_with_booking_fee").val() != '') {
+           $("#pricing-status-icon").attr("class","status-done");
+           setCookie("priceFilled", "True");
+       }
+       else {
+           $("#pricing-status-icon").attr("class","status-edit");
+           setCookie("priceFilled", "False");
+       }
+        setFinishedStatus();
+    }
     $(document).ready(function () {
         $('body').attr('id', 'background-white');
-
         loadForm(location.href);
         activeTab(hrefToStepName(location.href));
 

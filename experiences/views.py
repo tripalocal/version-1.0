@@ -1682,7 +1682,9 @@ def new_experience(request):
                                     city=form.cleaned_data['location'],
                                     language="english;",
                                     guest_number_max=10,
-                                    guest_number_min=1
+                                    guest_number_min=1,
+                                    status='Draft',
+                                    currency='aud'
                                     )
             experience.save()
             user_id = None
@@ -1977,6 +1979,39 @@ def manage_listing_calendar(request, experience, context):
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
     pass
 
+def check_upload_filled(experience):
+    result = ''
+    # check pricing.
+    if experience.price:
+        result+='1'
+    else:
+        result+='0'
+    #check overview.
+    if get_experience_title(experience, LANG_EN) and get_experience_description(experience, LANG_EN):
+        result+='1'
+    else:
+        result+='0'
+    #check detail.
+    if get_experience_activity(experience, LANG_EN) and get_experience_whatsincluded(experience, LANG_EN):
+        result+='1'
+    else:
+        result+='0'
+    #check photo.
+    photos = Photo.objects.filter(experience_id = experience.id)
+    for index in range(len(photos)):
+        photo_index = photos[index].name.split('_')[-1].split('.')[0]
+        if photo_index == '1':
+            result+='1'
+
+    if result.__len__() == 3:
+        result+='0'
+    #check location
+    if get_experience_meetup_spot(experience, LANG_EN) and get_experience_dropoff_spot(experience, LANG_EN):
+        result+='1'
+    else:
+        result+='0'
+    return result
+
 def manage_listing(request, exp_id, step, ):
     experience = get_object_or_404(Experience, pk=exp_id)
     if not request.user.is_superuser:
@@ -1990,6 +2025,7 @@ def manage_listing(request, exp_id, step, ):
     context['experience_title_cn'] = experience_title_cn
     context['experience_title_en'] = experience_title_en
     context['experience'] = experience
+    context['experience_finished'] = check_upload_filled(experience)
 
     if request.is_ajax():
         if step == 'price':
