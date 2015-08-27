@@ -68,7 +68,7 @@
 	max-height: 400px;
 	opacity:1;
 	z-index:1000;
-	overflow:scroll;
+	overflow:hidden;
 }
 .modal-inner{
 	float:none;
