@@ -91,7 +91,7 @@
     if(uploadStatus[3] == "1") {
         setCookie("photoFilled", "True");
     } else {
-        setCookie("photoFilled", "True");
+        setCookie("photoFilled", "False");
     }
     if(uploadStatus[4] == "1") {
         setCookie("locationFilled", "True");
@@ -1166,18 +1166,17 @@ function loadLocationForm(href) {
                 changeToAddNewStyle('photo-preview-div-'+index);
 
             }
-            checkPhotoFiled();
-            signal.fadeIn(5000);
+            signal.fadeIn(500);
             signal.text("Saved...");
-            signal.fadeOut(5000, function() {
-                signal.fadeIn(1000);
+            signal.fadeOut(6000, function() {
+                signal.fadeIn(5000);
                 signal.text("All Changes Saved...");
                 signal.fadeOut(6000);
             });
         }).fail(function () {
-            signal.fadeIn(5000);
+            signal.fadeIn(500);
             signal.text("Update Failed");
-            signal.fadeOut(5000);
+            signal.fadeOut(6000);
         });
     }
 
@@ -1193,10 +1192,10 @@ function loadLocationForm(href) {
             contentType: false,
             type: 'POST',
             success: function () {
-                signal.fadeIn(5000);
+                signal.fadeIn(500);
                 signal.text("Saved...");
-                signal.fadeOut(5000, function() {
-                signal.fadeIn(1000);
+                signal.fadeOut(6000, function() {
+                signal.fadeIn(500);
                 signal.text("All Changes Saved...");
                 signal.fadeOut(6000);
             });
@@ -1260,7 +1259,7 @@ function loadLocationForm(href) {
     }
 
     function checkPhotoFiled() {
-        if($("#photo-preview-div-1").attr("style")!="") {
+        if($("#photo-preview-div-1").attr("style") != "") {
             $("#photos-status-icon").attr("class","status-done");
             setCookie("photoFilled", "True");
         } else {
