@@ -1,14 +1,11 @@
+from django.core.files.storage import default_storage as storage
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
-from django.db.models import Q
-from django.views.decorators.csrf import csrf_protect
-from experiences.models import *
-from django.core.mail import send_mail
-from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
 from experiences.forms import *
 from datetime import *
-import pytz, string, os, json, math, PIL, xlsxwriter, time, sys
+import pytz, string, os, json, math, PIL
 from django.template import RequestContext, loader
 from django.contrib.auth.models import User
 from Tripalocal_V1 import settings
@@ -1892,12 +1889,10 @@ def manage_listing_photo(request, experience, context):
             index = request.POST['delete_file']
             extension = '.jpg'
             filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-            dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
-            # Delete in file system.
-            os.remove(dirname + filename)
-            # Delete record in database.
+
             photo = Photo.objects.filter(name=filename)
             if photo.__len__() == 1:
+                photo[0].image.delete()
                 photo[0].delete()
                 return HttpResponse(json.dumps({'success': True, 'data': 'delete_image', 'index':index}), content_type='application/json')
             else:
@@ -1906,9 +1901,6 @@ def manage_listing_photo(request, experience, context):
         if form.is_valid():
             for index in range(1, 10):
                 field_name = 'experience_photo_' + str(index)
-                dirname = settings.MEDIA_ROOT + '/experiences/' + str(experience.id) + '/'
-                if not os.path.isdir(dirname):
-                    os.mkdir(dirname)
 
                 if field_name in request.FILES:
                     file = request.FILES[field_name]
@@ -1917,27 +1909,40 @@ def manage_listing_photo(request, experience, context):
                     extension = '.jpg'
                     filename = 'experience' + str(experience.id) + '_' + str(index) + extension
                     dir_name = 'experiences/' + str(experience.id) + '/'
-                    destination = open(dirname + filename, 'wb+')
+
+                    photos = Photo.objects.filter(name=filename)
+                    if len(photos) != 0:
+                        photo = photos[0]
+                        photos[0].image.delete()
+                    else:
+                        photo = Photo(name=filename, directory=dir_name, experience=experience)
 
 
-                    if Photo.objects.filter(name=filename).__len__() == 0:
-                        photo = Photo(name=filename, directory=dir_name,
-                                      image=dir_name + filename, experience=experience)
-                        photo.save()
+                    photo.image = file
+                    photo.save()
 
-                    for chunk in request.FILES[field_name].chunks():
-                        destination.write(chunk)
-                        destination.close()
 
-                        #create the corresponding thumbnail (force .jpg)
-                        basewidth = 400
-                        img = Image.open(dirname + filename)
-                        wpercent = (basewidth/float(img.size[0]))
-                        hsize = int((float(img.size[1])*float(wpercent)))
-                        img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-                        img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
+                    #create the corresponding thumbnail (force .jpg)
+                    basewidth = 400
+                    thumb_file_name = 'thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg'
 
-            # todo: add to chinese db
+                    if storage.exists(thumb_file_name):
+                        storage.delete(thumb_file_name)
+                    try:
+                        f = storage.open(dir_name + filename, 'rb')
+                        img = Image.open(f)
+                        f_thumb = storage.open(thumb_file_name, "wb")
+                        wpercent = (basewidth / float(img.size[0]))
+                        hsize = int((float(img.size[1]) * float(wpercent)))
+                        img1 = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
+                        img1.save(f_thumb, "JPEG")
+                        f_thumb.close()
+                    except Exception as e:
+                        print(e)
+                        return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+
+
+
             experience.save()
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 

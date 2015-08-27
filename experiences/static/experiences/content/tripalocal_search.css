@@ -135,6 +135,7 @@
   background-color: white;
   background-size: contain;
   background-repeat: no-repeat;
+  background-position: center;
   display: inline-block;
   position: relative;
   height: 373px;
@@ -147,13 +148,13 @@
 
 .request-btn {
   position: absolute;
-  bottom: 45px;
+  bottom: 30px;
   left: 0;
   right: 0;
   margin-left: auto;
   margin-right: auto;
   width: 210px;
-  height: 45px;
+  height: 55px;
 }
 
 @media only screen and (max-width: 767px) {
@@ -188,7 +189,7 @@
         width: 120%;
         margin: 0 -10%;
     }
-    .custom-itinerary {
+    .custom-itinerary-searchpage {
       display: none;
     }
 /*
