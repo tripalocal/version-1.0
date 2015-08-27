@@ -1921,7 +1921,6 @@ def manage_listing_photo(request, experience, context):
                     photo.image = file
                     photo.save()
 
-
                     #create the corresponding thumbnail (force .jpg)
                     basewidth = 400
                     thumb_file_name = 'thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg'
