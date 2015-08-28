@@ -118,7 +118,7 @@ def home(request):
         if not settings.DEVELOPMENT: 
             if settings.LANGUAGES[0][0] != "zh":
                 try:
-                    reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+                    reader = geoip2.database.Reader(path.join(settings.STATIC_ROOT, 'GeoLite2-City.mmdb'))
                     response = reader.city(ip)
                     country = response.country.name
                     reader.close()
