@@ -5,11 +5,15 @@
 {% block head %}
     {% load staticfiles %}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
+    {% if experience.type != "Multi-hosts" %}
     {% if LANGUAGE != "zh-CN" %}
     <title>{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</title>
     {%else%}
     <title>{% trans "with" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "Experience" %}{{ experience.title }}</title>
     {%endif%}
+    {% else %}
+    <title>{{ experience.title }}</title>
+    {% endif %}
     <link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 {% endblock %}
