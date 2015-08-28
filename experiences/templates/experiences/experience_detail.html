@@ -188,7 +188,7 @@
 							<div class="col-sm-3 col-xs-12">
 								<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Activities" %}</h3>
 							</div>
-							<div class="col-sm-9 col-xs-12">
+							<div class="col-sm-9 col-xs-12" id="div_experience_activity">
 								{{ experience.activity|linebreaks }}
 							</div>
 						</div>
@@ -418,9 +418,14 @@
 
 $(function(){
     $(document).ready(function(){
-      mixpanel.track("viewed an experience");
+        mixpanel.track("viewed an experience");
         if(screen.width > 767){
             $(document.body).stickem();
+        }
+
+        if($("#div_experience_activity").text().length>0)
+        {
+            $("#div_experience_activity")[0].innerHTML = $("#div_experience_activity").text().substring(1).replace(/(?:\r\n|\r|\n)/g, '<br />');
         }
 
         ids=['host_bio','id_experience_activity','id_experience_dress','id_experience_description']
