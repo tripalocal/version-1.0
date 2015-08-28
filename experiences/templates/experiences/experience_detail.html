@@ -43,10 +43,12 @@
                             <div style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
                         </div>
                         {% endif %}
+                        {% if experience.type != "Multi-hosts" %}
                         {% if LANGUAGE != "zh-CN" %}
                         {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
                         {%else%}
                         {% trans "with" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "Reservation" %}
+                        {%endif%}
                         {%endif%}
                         <br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
                         <div class="row" style="width:200px;margin-top:10px">
@@ -155,10 +157,14 @@
                     {% if experience.type == "RECOMMENDED" %}
                     <div class="recommended-label">{% trans "Recommended" %}</div>
                     {% endif %}
+                    {% if experience.type != "Multi-hosts" %}
                     {% if LANGUAGE != "zh-CN" %}
                     <h2 style="font-weight:bold">{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}
                     {% else %}
                     <h2 style="font-weight:bold">{% trans "with" %}{% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}{% trans "Experience" %}{{ experience.title }}
+                    {% endif %}
+                    {% else %}
+                    <h2 style="font-weight:bold">{{ experience.title }}
                     {% endif %}
                     <br><small style="font-size:14px">{{experience.duration}} {% trans "hrs" %} &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
                     </h2>
@@ -193,7 +199,7 @@
 						{% for w in experience.whatsincluded %}
 						<div class="row">
 							<div class="col-sm-3 col-xs-12" style="margin-bottom:0;">
-								<h3 style="color:grey;margin-top:0;line-height:1.5;">{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%else%}交通{%endif%}{%endif%}:</h3>
+								<h3 style="color:grey;margin-top:0;line-height:1.5;">{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%elif w.item.lower == "transport"%}交通{%elif w.item.lower == "accommodation"%}住宿{%elif w.item.lower == "private guide"%}私人导游{%endif%}{%endif%}:</h3>
 							</div>
 							<div class="col-sm-9 col-xs-12" style="margin-bottom:0;">
 								{{w.details}}
