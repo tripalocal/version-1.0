@@ -10,7 +10,7 @@
 {% block content %}
 
     <div class="tab_area">
-        <div class="fixCenter">
+        <div class="container">
             <div class="tab_item">
                 <a href="{{GEO_POSTFIX}}mylisting">{% trans "My Listing" %}</a>
                 <a href="#" id="active-tab">{% trans "My Trip" %}</a>
@@ -21,9 +21,9 @@
     </div>
 
 	<div class="row row-area">
-    	<div class="content-area fixCenter">
+    	<div class="content-area container">
     		<div class="leftsubMenu">
-    			<p>{% trans "My Trip" %}</p>    
+    			<p>{% trans "My Trip" %}</p>
     		</div>
 
 			<div class="rightInterface">
@@ -43,7 +43,7 @@
 				            		    </td>
 				            		    <td>
 				            			    <div id="time" style="margin-left:28px; color:#858585;"><div class="icon" style="margin-left:5px;"></div>{{booking.datetime|date:'H:i'}}<!--local time of event--></div>
-				            		    </td> 
+				            		    </td>
 				            		    <td>
 				             			    <div id="people" style="margin-left:28px; margin-right:28px; color:#858585;"><div class="icon" style="margin-left:-10px;"></div>{{booking.guest_number}}<!--number of tickets--></div>
 				            		    </td>
@@ -86,7 +86,7 @@
 				    	</table>
 			    	{% endfor %}
                 {% empty %}
-                <p>{% trans "You have not booked any trips." %}</p>   
+                <p>{% trans "You have not booked any trips." %}</p>
 		    	{% endfor %}
     		</div>
     	</div>

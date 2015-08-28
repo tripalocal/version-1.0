@@ -5,7 +5,7 @@
 
 // Vendor
 @import
-  'vendor/normalize'
+  'vendor/normalize',
   'vendor/bootstrap',
   'vendor/include-media';
 
@@ -31,7 +31,8 @@
   'layout/booking-box',
   'layout/price-box',
   'layout/experience-box',
-  'layout/carousel';
+  'layout/carousel',
+  'layout/settings';
 
 // Components
 @import

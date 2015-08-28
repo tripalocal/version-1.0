@@ -5,11 +5,11 @@
 */
 
 // Sizes
-$xxs: 32px;
+$xxs: 38px;
 $xs: 50px;
-$sm: 100px;
+$sm: 80px;
 $md: 130px;
-$lg: 170px;
+$lg: 150px;
 
 // Abstract profile class
 %profile {
@@ -22,7 +22,9 @@ $lg: 170px;
     position: absolute;
     left: 0;
     right: 0;
-    margin: 0 auto;
+    top: 0;
+    bottom: 0;
+    margin: auto;
   }
 }
 
@@ -32,7 +34,7 @@ $lg: 170px;
   width: $lg;
   height: $lg;
   img {
-    height: $lg;
+    height: ($lg + 50);
   }
 }
 
@@ -41,7 +43,7 @@ $lg: 170px;
   width: $md;
   height: $md;
   img {
-    height: $md;
+    height: ($md+ 20);
   }
 }
 
@@ -50,7 +52,7 @@ $lg: 170px;
   width: $sm;
   height: $sm;
   img {
-    height: $sm;
+    height: ($sm + 10);
   }
 }
 
@@ -59,7 +61,7 @@ $lg: 170px;
   width: $xs;
   height: $xs;
   img {
-    height: $xs;
+    height: ($xs+ 5);
   }
 }
 

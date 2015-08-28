@@ -10,7 +10,7 @@
 {% block content %}
 
     <div class="tab_area">
-        <div class="fixCenter">
+        <div class="container">
             <div class="tab_item">
                 <a href="{{GEO_POSTFIX}}mylisting">{% trans "My Listing" %}</a>
                 <a href="{{GEO_POSTFIX}}mytrip">{% trans "My Trip" %}</a>
@@ -21,9 +21,9 @@
     </div>
 
 	<div class="row row-area">
-    	<div class="content-area fixCenter">
+    	<div class="content-area container">
     		<div class="leftsubMenu">
-    			<p>{% trans "My Profile" %}</p>    
+    			<p>{% trans "My Profile" %}</p>
     		</div>
 
             <form id="my_profile_form" method="post" action="" enctype="multipart/form-data">
@@ -35,7 +35,7 @@
                         <tr>
                             <td>
           	                    <div class="profile-lg void-profile">
-                                    <img src="{{MEDIA_URL}}{{image_url}}" width="200px" height="200px">
+                                    <img src="{{MEDIA_URL}}{{image_url}}" height="200px">
                                 </div>
                             </td>
                             <td>
@@ -180,7 +180,7 @@
             </form>
         </div>
     </div>
-		        
+
 {% endblock %}
 
 {% block scripts %}
@@ -200,7 +200,7 @@
 
             if (window.FileReader) {
                 input = document.getElementById('id_image');
-                if (input && input.files && input.files[0]) 
+                if (input && input.files && input.files[0])
                 {
                     file = input.files[0];
                     if(file.size > 1048576)
@@ -215,7 +215,7 @@
                 }
             }
 
-            if(valid) 
+            if(valid)
             {
                 $("form").submit();
             }
