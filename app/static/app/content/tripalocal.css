@@ -95,14 +95,8 @@ th h3{margin: 2px}
 .profile-sm img{height: 100px;}
 .profile-xs {width:35px;height:35px; float:left; margin-top:-7px; overflow:hidden;}
 .profile-xs img{height:50px;}
-.profile-lg, .profile-md, .profile-sm, .profile-xs, .profile-featured{background-color: #FFF;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border-radius: 100px; overflow: hidden; position: relative;}
-.profile-lg img, .profile-md img, .profile-sm img, .profile-xs img, .profile-featured img{border-radius: 100px;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border: #CCC solid 1px;
-  position: absolute;
-  margin: auto;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;}
+.profile-lg, .profile-md, .profile-sm, .profile-xs, .profile-featured{background-color: #FFF;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border-radius: 100px;}
+.profile-lg img, .profile-md img, .profile-sm img, .profile-xs img, .profile-featured img{border-radius: 100px;-moz-border-radius: 100px;-webkit-border-radius: 100px;-khtml-border-radius: 100px;border: #CCC solid 1px;}
 
 .autosize-profile-img{height: 140px;width: 140px;border-radius: 100px;background-size: cover;border:1px #CCC solid;position: relative;top: 5px;left: 5px;}
 .btn-lg, .btn-group-lg>.btn { font-weight:bold; font-size: 14px;line-height: 1.33;border-radius: 3px; width:100%;}

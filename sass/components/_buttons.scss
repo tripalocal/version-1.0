@@ -1,0 +1,35 @@
+/*
+
+  Buttons
+
+*/
+
+.btn-primary {
+  background-color: $primary-color;
+  color: white;
+  border-color: $primary-color;
+  &:hover {
+    background-color: darken($primary-color, 20%);
+    border-color: darken($primary-color, 20%);
+  }
+}
+
+.btn-secondary {
+  background-color: $secondary-color;
+  color: $medium-grey;
+  border-color: $secondary-color;
+  &:hover {
+    background-color: darken($secondary-color, 20%);
+    border-color: darken($secondary-color, 20%);
+  }
+}
+
+.btn-clear {
+  background-color: transparent;
+  border-color: transparent;
+  color: black;
+  &:hover {
+    border-color: black;
+    color: black;
+  }
+}

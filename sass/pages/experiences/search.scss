@@ -1,0 +1,169 @@
+/*
+
+  Search page
+  aka experience_result.html
+
+*/
+
+@import
+  '../../vendor/include-media',
+  '../../utils/variables',
+  '../../utils/mixins',
+  '../../utils/functions',
+  '../../utils/placeholders';
+
+
+// Search form
+
+.basic-search {
+  display: none;
+  @include media('>tablet') {
+    display: block;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top: 1px solid $light-grey;
+    border-bottom: 1px solid $light-grey;
+  }
+}
+
+.icon-header {
+  float: left;
+  margin-top: 15px;
+}
+
+.dates {
+  border-right: 1px solid $light-grey;
+  .form-box {
+    width: 200px;
+  }
+
+  .start-date {
+    margin-right: 10px;
+  }
+
+  .start-date, .end-date {
+    display: inline-block;
+    margin-top: 10px;
+  }
+
+  .date {
+    width: 93px;
+  }
+}
+
+.people {
+  border-right: 1px solid $light-grey;
+  .form-box {
+    width: 120px;
+    margin-top: 15px;
+  }
+
+}
+
+.language {
+  border-right: 1px solid $light-grey;
+
+}
+
+// Advanced search
+.advanced-search {
+  background-color: white;
+  border-bottom: 1px solid $light-grey;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  .container {
+    width: 960px;
+  }
+}
+
+.interests {
+  .icon-header {
+    float: left;
+  }
+  .form-box {
+    float: left;
+    margin-left: 15px;
+  }
+  #tags_div {
+    width: 640px;
+  }
+  #only_tags {
+    width: 190px;
+  }
+}
+
+.more-filters {
+  display: none;
+  @include media('>tablet') {
+    display: block;
+    margin-top: 10px;
+    width: 100%;
+    height: 50px;
+  }
+}
+
+// Mobile search
+.mobile-search {
+  @include media('>tablet') {
+    display: none;
+  }
+}
+
+// Search results
+.experience-count {
+  position: relative;
+  label {
+    position: absolute;
+    right: 0;
+  }
+}
+.search-result {
+  padding-bottom: 50px;
+  .container {
+    @include media('<tablet') {
+      text-align: center;
+      padding: 0;
+    }
+  }
+  .container-fluid {
+    @include media('<tablet') {
+      padding: 0;
+    }
+  }
+  .experience-results {
+    width: 960px;
+    margin: 0 auto;
+    @include media('<tablet') {
+      width: 100%;
+    }
+  }
+}
+
+// Custom itenerary banner
+.custom-itinerary {
+  display: none;
+  @include media('>tablet') {
+    background-color: white;
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+    position: relative;
+    height: 373px;
+    width: 300px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: $light-grey;
+    border-radius: 3px;
+  }
+}
+
+.request-btn {
+  position: absolute;
+  bottom: 45px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 210px;
+  height: 45px;
+}
