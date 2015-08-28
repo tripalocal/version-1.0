@@ -118,14 +118,15 @@ def home(request):
         if not settings.DEVELOPMENT: 
             if settings.LANGUAGES[0][0] != "zh":
                 try:
-                    reader = geoip2.database.Reader(path.join(settings.STATIC_ROOT, 'GeoLite2-City.mmdb'))
+                    reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
                     response = reader.city(ip)
                     country = response.country.name
                     reader.close()
                     if country.lower() in ['china']:
                         return HttpResponseRedirect('/cn/')
                 except Exception:
-                    reader.close()
+                    if reader is not None:
+                        reader.close()
 
                 if request.LANGUAGE_CODE.startswith("zh"):
                     return HttpResponseRedirect('/cn/')
@@ -607,7 +608,7 @@ def track_user_signup(ip, sociallogin, user):
 
     reader = None
     try:
-        reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+        reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
         country = response.country.name
         region = response.subdivisions.most_specific.name
