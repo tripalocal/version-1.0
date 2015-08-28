@@ -116,7 +116,12 @@ $(document).ready(function () {
             window.location.href = "https://www.tripalocal.com/cn" + des_url;
         } else {
             mixpanel.track("switched language from footer_cn");
-            window.location.href = "https://www.tripalocal.com" + des_url.substring(3);
+            if (window.location.href.indexOf(".cn") > -1) {
+                window.location.href = "https://www.tripalocal.com" + des_url;
+            }
+            else {
+                window.location.href = "https://www.tripalocal.com" + des_url.substring(3);
+            }
         }
     });
 
