@@ -7,7 +7,7 @@
     <div id="experience-results" class="experience-results">
         {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
         {% if forloop.counter == 5 %}
-        <div class="expList custom-itinerary-searchpage" >
+        <div class="expList custom-itinerary" >
           <form action="mailto:enquiries@tripalocal.com">
           <button class="btn btn-primary request-btn">{% trans "Request a trip" %}</button>
           </form>

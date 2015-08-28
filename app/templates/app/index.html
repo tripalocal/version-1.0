@@ -16,8 +16,8 @@
     <!-- H1 google font -->
     <!--<link href='//fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>-->
 
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
 
 	<script>
 		$(function() {
@@ -36,23 +36,6 @@
 {% endblock %}
 
 {% block content %}
-<!--
-    <div id="mobileTag">
-        <div id="closeTag" style="width:10%"><img src="/images/homepage/closeIcon-01.svg" width="14"></div>
-        <div id="appIcon" style="width:70px; text-align:left;position:relative">
-            <img src="/images/homepage/appIcon-01.jpg" width="60" >
-    
-            <span style="position:absolute;left:80px;">
-                <h3 style="margin-bottom:5px;font-weight:bold">{% trans "Tripalocal for Android" %}</h3>
-                <img src="/images/homepage/rating-01.svg" width="110"><span style="color:#ccc;  vertical-align: middle;"> (24,812)</span>
-            </span>
-        </div>
-
-        <div id="appInstall" style="width:20%">
-            <a type="submit" class=" btn btn-primary">{% trans "Install" %}</a>
-        </div>
-    </div>
--->
 
     <div class="jumbotron">
       <div class="container">
@@ -100,41 +83,48 @@
       <h1>{% trans "Discover authentic experiences" %}</h1>
       <p>{%trans "Explore local places" %}</p>
 
-
             <div class="container">
                 <div class="row">
-                {% for experience in featuredExperience %}
-                    {% if forloop.first %}
-                    <div class="col-sm-4">
-                      <div class="price-offer" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
-                          <a class="box-link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
-                              <div class="profile-featured">
-                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
-                              </div>
-                              <div class="price-box">
-                                  {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
-                              </div>
-                          </a>
-                      </div>
-                    </div>
+                    {% for experience in featuredExperience %}
+                        {% if forloop.first %}
+                            <div class="col-sm-4">
+                                <div class="price-offer"
+                                     style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
+                                    <a class="box-link"
+                                       href="{{ GEO_POSTFIX }}experience/{{ experience.experience.id }}">
+                                        <div class="profile-featured">
+                                            <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240"
+                                                 height="240">
+                                        </div>
+                                        <div class="price-box">
+                                            {% trans "From" %} {{ experience.experience.dollarsign }}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span>
+                                            {% blocktrans with currency=experience.experience.currency %} {{ currency }}
+                                                /person {% endblocktrans %}
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
 
-                    {% endif %}
-                {% endfor %}
-                {% for city, cityDisplayName in cityList %}
-                    {% if forloop.counter <= 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    {% for city, cityDisplayName in cityList %}
+                        {% if forloop.counter <= 1 %}
+                            <div class="col-sm-4">
+                                <div class="city"
+                                     style="background-image: linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                                    <a class="box-link" href="{% url 'SearchView' city %}">
+                                        <h1>{{ cityDisplayName }}</h1>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                     <div class="col-sm-4">
-                      <div class="city" style="background-image: linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url({{ MEDIA_URL }}city/{{ city }}.jpg);">
-                          <a class="box-link" href="{% url 'SearchView' city %}">
-                              <h1>{{ cityDisplayName }}</h1>
-                          </a>
-                      </div>
+                        <div class="custom-itinerary"
+                             style="background-image:url({% static 'app/img/homepage_banner.jpg' %});">
+                            <button class="btn btn-primary request-btn">{% trans 'Request a trip' %}</button>
+                        </div>
                     </div>
-                    {% endif %}
-                {% endfor %}
-                <div class="col-sm-4">
-                  <div class="custom-itinerary" style="background-image:url({% static 'app/img/homepage_banner.jpg' %});">
-                    <button class="btn btn-primary request-btn">{% trans 'Request a trip' %}</button>
-                  </div>
                 </div>
 
                 <div class="row">
@@ -220,7 +210,7 @@
             <a style="cursor:pointer" id="enter_fullscreen"><img src="{{ MEDIA_URL }}homepage/play_btn.svg" width="75"></a>
         </div>
     </div>
-    <div id="video-fullscreen" class="video-fullscreen">
+    <div id="video-fullscreen">
         <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="{{ MEDIA_URL }}homepage/closeIcon-01.svg" width="30"></a>
         <div class="video-wrap">
             <video controls preload="metadata">

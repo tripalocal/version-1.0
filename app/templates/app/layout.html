@@ -22,7 +22,7 @@
     {%else%}
     <link href="{% static 'app/content/tripalocal_en.css' %}" rel="stylesheet">
     {%endif%}
-    <link href="{% static 'app/content/tripalocal_xs.css' %}" rel="stylesheet">
+{#    <link href="{% static 'app/content/tripalocal_xs.css' %}" rel="stylesheet">#}
 
     {% if form %}
         {{ form.media }}
@@ -127,54 +127,55 @@
       </div>
     </div>
 
-{% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 
     <div id="footer_div" class="footer">
         <div class="container">
-          <div class="col-sm-6">
-            <ul class="footer-head">
-                <li>
-                  <select id="id_language_select" class="form-control">
-                    <option id="id_language_cn" value="cn">中文</option>
-                    <option id="id_language_en" value="en">English</option>
-                  </select>
-                </li>
-                <li class="footer-logo"></li>
-            </ul>
-          </div>
-
-
-                      <div class="col-xs-6 col-sm-2">
-                        <ul class="footer-col company">
-                            <li><h5>{% trans "Company" %}</h5></li>
-                            <li><a href="{{GEO_POSTFIX}}aboutus">{% trans "About Us" %}</a></li>
-                            <li><a href="{{GEO_POSTFIX}}contactus">{% trans "Contact Us" %}</a></li>
-                            <li><a href="{{GEO_POSTFIX}}termsofservice">{% trans "Terms of Service" %}</a></li>
-                            <li><a href="{{GEO_POSTFIX}}privacypolicy">{% trans "Privacy Policy" %}</a></li>
-                        </ul>
-                      </div>
-                      <div class="col-xs-6 col-sm-2">
-                        <ul class="footer-col travel">
-                            <li><h5>{% trans "Travel" %}</h5></li>
-                            <li><a href="{{GEO_POSTFIX}}refundpolicy">{% trans "Refund Policy" %}</a></li>
-                            <!--<li><a href="{{GEO_POSTFIX}}mobileapps">{% trans "Mobile Apps" %}</a></li>-->
-                        </ul>
-                      </div>
-                      <div class="col-sm-2">
-                        <ul class="footer-col social">
-                            <li><h5>{% trans "Social" %}</h5></li>
-                            <li><a href="https://www.facebook.com/tripalocal">{% trans "Facebook" %}</a></li>
-                            <li><a href="https://www.twitter.com/tripalocal">{% trans "Twitter" %}</a></li>
-                        </ul>
-                      </div>
-                    </div>
-
-            <div class="footer-line">
-                <p id="copyright"> &#169; Tripalocal Pty. Ltd. ABN 46 600 546 549</p>
+            <div class="col-sm-6">
+                <ul class="footer-head">
+                    <li>
+                        <select id="id_language_select" class="form-control">
+                            <option id="id_language_cn" value="cn">中文</option>
+                            <option id="id_language_en" value="en">English</option>
+                        </select>
+                    </li>
+                    <li class="footer-logo"></li>
+                </ul>
             </div>
 
 
+            <div class="col-xs-6 col-sm-2">
+                <ul class="footer-col company">
+                    <li><h5>{% trans "Company" %}</h5></li>
+                    <li><a href="{{ GEO_POSTFIX }}aboutus">{% trans "About Us" %}</a></li>
+                    <li><a href="{{ GEO_POSTFIX }}contactus">{% trans "Contact Us" %}</a></li>
+                    <li><a href="{{ GEO_POSTFIX }}termsofservice">{% trans "Terms of Service" %}</a></li>
+                    <li><a href="{{ GEO_POSTFIX }}privacypolicy">{% trans "Privacy Policy" %}</a></li>
+                </ul>
+            </div>
 
+            <div class="col-xs-6 col-sm-2">
+                <ul class="footer-col travel">
+                    <li><h5>{% trans "Travel" %}</h5></li>
+                    <li><a href="{{ GEO_POSTFIX }}refundpolicy">{% trans "Refund Policy" %}</a></li>
+                </ul>
+            </div>
+
+            <div class="col-sm-2">
+                <ul class="footer-col social">
+                    <li><h5>{% trans "Social" %}</h5></li>
+                    <li><a href="https://www.facebook.com/tripalocal">{% trans "Facebook" %}</a></li>
+                    <li><a href="https://www.twitter.com/tripalocal">{% trans "Twitter" %}</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-line">
+            <p id="copyright"> &#169; Tripalocal Pty. Ltd. ABN 46 600 546 549</p>
+        </div>
+    </div>
+
+    {% block scripts %}{% endblock %}
 
 
 </body>
