@@ -108,14 +108,14 @@ h1 {
       }
     }
 
-    .input-sm {
-      border-top: 0;
-      border-bottom: 0;
-      width: 105px;
+    #id_end_date {
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
     }
 
     .home-search-button {
       padding: 3px;
+      border-radius: 2px;
     }
 
     .btn-search {

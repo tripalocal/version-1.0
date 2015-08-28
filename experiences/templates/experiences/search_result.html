@@ -134,16 +134,17 @@
     <div class="search-result">
       <div class="container">
         <div class="loading"><img src="{% static 'experiences/img/loading.gif' %}" width="64px" height="64px" class="ajax-loader"/></div>
-        <div id="more-filters-div" class="more-filters">
-            <button class="btn btn-default" id="more_filters" type="button" value="More Filters" style="width:100px;float:left;margin-right:10px;">{%trans "More Filters" %}</button>
-            <button class="btn btn-primary" id="apply_filters" type="button" value="Apply Filters" style="width:100px;display:none;float:left;">{% trans "Apply Filters" %}</button>
-            <div id="ajax-experience-count" class="experience-count"></div>
-        </div>
+
         <div class="container-fluid">
-            <div id="ajax-experience-result"></div>
-            <div class="expList custom-itinerary" style="background-image:url({% static 'experiences/img/searchpage_banner.jpg' %});">
-              <button class="btn btn-primary request-btn">{% trans 'Request a trip' %}</button>
-            </div>
+          <div id="more-filters-div" class="more-filters">
+              <button class="btn btn-default" id="more_filters" type="button" value="More Filters" style="width:100px;float:left;margin-right:10px;">{%trans "More Filters" %}</button>
+              <button class="btn btn-primary" id="apply_filters" type="button" value="Apply Filters" style="width:100px;display:none;float:left;">{% trans "Apply Filters" %}</button>
+              <div id="ajax-experience-count" class="experience-count"></div>
+          </div>
+          <div id="ajax-experience-result"></div>
+          <div class="expList custom-itinerary" style="background-image:url({% static 'experiences/img/searchpage_banner.jpg' %});">
+            <button class="btn btn-primary request-btn">{% trans 'Request a trip' %}</button>
+          </div>
         </div>
       </div>
     </div>

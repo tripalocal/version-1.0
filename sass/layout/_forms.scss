@@ -18,6 +18,19 @@
   }
 }
 
+.input-sm {
+  width: 105px;
+  border: 0;
+  border-radius: 0;
+  border-left: $light-grey 1px solid;
+  height: 40px !important;
+  padding: 0;
+  text-align: center;
+}
+.input-group-addon {
+  display: none;
+}
+
 // Tags
 .tag-box {
   float: left;
