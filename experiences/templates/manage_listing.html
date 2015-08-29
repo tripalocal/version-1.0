@@ -149,8 +149,13 @@
                 }
 
                 for (i = min; i < max; i++) {
-                    if ($("#dynamic_price_input_" + i).val().length > 0) {
+                    if ($("#dynamic_price_input_" + i).val().length > 0 && $("#dynamic_price_input_" + i).val().match(/^[0-9]+$/)) {
                         $("#id_dynamic_price").val($("#id_dynamic_price").val() + $("#dynamic_price_input_" + i).val() + ',');
+                    }
+                    else {
+                        alert("Make sure valid input. Price pr person should be integer and not empty");
+                        $("#dynamic_price_input_" + i).val(0);
+                        break;
                     }
                 }
 
@@ -192,6 +197,9 @@
                     $("#dynamic_price_div_" + i).attr("style", "");
                     $("#dynamic_price_input_" + i).css("background-color", "rgb(255, 255, 255)").css("border", "1px solid #AAA");
                     $("#dynamic_price_with_fee_input_" + i).css("background-color", "rgb(245, 245, 245)").css("border", "0px").prop('disabled', true);
+                    $("#dynamic_price_input_" + i).val(hostGet);
+                    $("#dynamic_price_with_fee_input_" + i).val(customerPay);
+                    $("#commission-price-" + i).text(Math.round((customerPay - hostGet).toFixed(2),0));
                 }
                 for (i = max; i < 10; i++) {
                     $("#dynamic_price_div_" + i).attr("style", "display:none;");
