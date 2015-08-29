@@ -553,9 +553,10 @@ def has_dress_in_other_lang(exp, activity, lang):
     dress_set = exp.experiencedress_set.filter(language=lang)
     if len(dress_set) > 0:
         dress = dress_set[0]
-        if dress.dress == '':
+        if dress.dress is None or dress.dress == '':
             return False
-        return True
+        else:
+            return True
     else:
         return False
 

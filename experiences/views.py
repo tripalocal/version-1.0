@@ -1,28 +1,23 @@
+from io import BytesIO
 from django.core.files.storage import default_storage as storage
-from django.shortcuts import render, get_object_or_404, render_to_response, redirect
+from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
 from experiences.forms import *
 from datetime import *
-import pytz, string, os, json, math, PIL
+import pytz, os, json, math, PIL
 from django.template import RequestContext, loader
-from django.contrib.auth.models import User
 from Tripalocal_V1 import settings
 from decimal import Decimal
 from django import forms
-from django.core.files.uploadedfile import SimpleUploadedFile, File
-from django.contrib import messages
 from tripalocal_messages.models import Aliases
 from app.forms import SubscriptionForm
 from mixpanel import Mixpanel
 from dateutil.relativedelta import relativedelta
 from django.db import connections
 from app.models import *
-from django.contrib.auth.decorators import user_passes_test, login_required
-from django.core.files.storage import FileSystemStorage
 from PIL import Image
-from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext as _
 from post_office import mail
 from collections import OrderedDict
@@ -1898,6 +1893,9 @@ def manage_listing_photo(request, experience, context):
             photo = Photo.objects.filter(name=filename)
             if photo.__len__() == 1:
                 photo[0].image.delete()
+                thumb_file_name = 'thumbnails/experiences/' + filename
+                storage.delete(thumb_file_name)
+
                 photo[0].delete()
                 return HttpResponse(json.dumps({'success': True, 'data': 'delete_image', 'index':index}), content_type='application/json')
             else:
@@ -1938,13 +1936,13 @@ def manage_listing_photo(request, experience, context):
                         f_thumb = storage.open(thumb_file_name, "wb")
                         wpercent = (basewidth / float(img.size[0]))
                         hsize = int((float(img.size[1]) * float(wpercent)))
-                        img1 = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
-                        img1.save(f_thumb, "JPEG")
+                        img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
+                        img_out = BytesIO()
+                        img.save(img_out, format='JPEG')
+                        f_thumb.write(img_out.getvalue())
                         f_thumb.close()
-                    except Exception as e:
-                        print(e)
+                    except:
                         return HttpResponse(json.dumps({'success': False}), content_type='application/json')
-
 
 
             experience.save()

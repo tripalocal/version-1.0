@@ -18,16 +18,16 @@ from django.contrib import messages
 import string, random, pytz, subprocess, geoip2.database, requests
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
-from experiences.views import SearchView, saveProfileImage, getBGImageURL, getProfileImage
+from experiences.views import SearchView, getBGImageURL, getProfileImage
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment, get_experience_title, get_experience_meetup_spot
 from experiences.forms import Currency, DollarSign, email_account_generator
 from django.utils.translation import ugettext_lazy as _
 from post_office import mail
 from django.contrib.auth.models import User
-from os import path
+from django import forms
 from tripalocal_messages.models import Aliases, Users
-import json
+import json, os
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
@@ -118,14 +118,15 @@ def home(request):
         if not settings.DEVELOPMENT: 
             if settings.LANGUAGES[0][0] != "zh":
                 try:
-                    reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+                    reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
                     response = reader.city(ip)
                     country = response.country.name
                     reader.close()
                     if country.lower() in ['china']:
                         return HttpResponseRedirect('/cn/')
                 except Exception:
-                    reader.close()
+                    if reader is not None:
+                        reader.close()
 
                 if request.LANGUAGE_CODE.startswith("zh"):
                     return HttpResponseRedirect('/cn/')
@@ -395,20 +396,15 @@ def myprofile(request):
         form = UserProfileForm(request.POST, request.FILES)
         if form.is_valid():
             profile.phone_number = form.cleaned_data['phone_number']
-            profile.save()
             save_user_bio(profile, form.cleaned_data['bio'], settings.LANGUAGES[0][0])
-
-            #save the profile image
             if 'image' in request.FILES:
                 saveProfileImage(request.user, profile, request.FILES['image'])
+            profile.save()
 
     #display the original/updated data
     data={"first_name":request.user.first_name, "last_name":request.user.last_name, "email":request.user.email}
-    photo={}
     if profile.image_url:
         context["image_url"] = profile.image_url
-        #photo["image"] = SimpleUploadedFile(settings.MEDIA_ROOT+'/'+profile.image_url,
-        #                                    File(open(settings.MEDIA_ROOT+'/'+profile.image_url, 'rb')).read())
     else:
         context["image_url"] = "hosts/no_img.jpg"
 
@@ -612,7 +608,7 @@ def track_user_signup(ip, sociallogin, user):
 
     reader = None
     try:
-        reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+        reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
         country = response.country.name
         region = response.subdivisions.most_specific.name
@@ -716,6 +712,26 @@ def track_user_login(ip, sociallogin, user):
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
         mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
         mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+
+
+def saveProfileImage(user, profile, image_file):
+    content_type = image_file.content_type.split('/')[0]
+    if content_type == "image":
+        if image_file._size > PROFILE_IMAGE_SIZE_LIMIT:
+            raise forms.ValidationError(_('Image size exceeds the limit'))
+    else:
+        raise forms.ValidationError(_('File type is not supported'))
+
+    dirname = 'hosts/' + str(user.id) + '/'
+
+    name, extension = os.path.splitext(image_file.name)
+    extension = extension.lower()
+    if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
+        filename = ('host' + str(user.id) + '_1_' + user.first_name.title().strip() + user.last_name[:1].title() + extension).encode('ascii', 'ignore').decode('ascii')
+        profile.image.delete()
+        profile.image_url = dirname + filename
+        profile.image = image_file
+        profile.save()
 
 @require_POST
 def email_custom_trip(request):

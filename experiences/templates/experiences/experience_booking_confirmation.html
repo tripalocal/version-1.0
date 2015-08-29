@@ -329,7 +329,7 @@
                     {% endif %}
                 {% endfor %})">
                     <div class="profile-md checkout-profile">
-                        <img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" width="240" height="240">
+                        <img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" height="240">
                     </div>
                 </div>
                 <div class="checkoutBox checkoutInfo">

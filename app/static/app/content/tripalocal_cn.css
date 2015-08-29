@@ -1,10 +1,10 @@
 .icon{background-image:url(../img/icons.gif);}
-.searchbar{background-image:url(/cn/images/searchbar.jpg);}
+.searchbar{background-image:url(/images/searchbar.jpg);}
 .custom-itinerary{ background-image: url(../img/homepage_banner_cn.jpg);}
 .custom-itinerary-searchpage{}
 
 @media all and (min-width: 768px) {
-.jumbotron {background-image:url(/cn/images/melbourne.jpg);}
+.jumbotron {background-image:url(/images/melbourne.jpg);}
 .tease-box{background-image:url(../img/exps_l.jpg);}
 .support {background-image: url(../img/support_logos_l.jpg);}
 .homepage-logo{background-image:url(../img/homepageLogo_cn.png);}
@@ -15,7 +15,7 @@
 .rev03{background-image:url(../img/rev03.jpg)}
 }
 @media all and (max-width: 767px) {
-.jumbotron {background-image:url(/cn/images/melbourne_s.jpg);}
+.jumbotron {background-image:url(/images/melbourne_s.jpg);}
 .tease-box{background-image:url(../img/exps_s.jpg);}
 .support {background-image: url(../img/support_logos_s.jpg);}
 .homepage-logo{background-image:url(../img/homepageLogo_cn.png);}
