@@ -52,6 +52,7 @@
       <!--<div id="ajax-update-signal"></div>-->
       <div id="ajax-listing-form"></div>
     </div>
+    <input id="experience-status" value="{{experience_status}}" style="display: none"/>
 </form>
 {% endblock %}
 
@@ -98,7 +99,10 @@
     } else {
         setCookie("locationFilled", "False");
     }
-
+    var expStatus = $("#experience-status").val();
+    if(expStatus == "Listed" || expStatus == "Unlisted") {
+        setCookie("isSubmited", "True");
+    }
     setFinishedStatus();
     $(window).scroll(function() {
       stickyNav();
@@ -1165,6 +1169,7 @@ function loadLocationForm(href) {
                     if($(this).text() == "Click to submit") {
                         setCookie("isSubmited", "True");
                         $("#steps-remaining").text("Submitted");
+                        postDatum(location.href, {'submit_form': "True"})
                     }
                 });
             }

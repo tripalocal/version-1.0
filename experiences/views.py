@@ -2033,8 +2033,13 @@ def manage_listing(request, exp_id, step, ):
     context['experience_title_en'] = experience_title_en
     context['experience'] = experience
     context['experience_finished'] = check_upload_filled(experience)
+    context['experience_status'] = experience.status
 
     if request.is_ajax():
+        # Check submit operation.
+        if 'submit_form' in request.POST:
+            experience.status = 'Submitted'
+            experience.save()
         if step == 'price':
             return manage_listing_price(request, experience, context)
         elif step == 'overview':
