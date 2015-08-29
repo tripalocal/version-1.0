@@ -1902,7 +1902,7 @@ def manage_listing_photo(request, experience, context):
                 return HttpResponse(json.dumps({'success': False}), content_type='application/json')
 
         if form.is_valid():
-            for index in range(1, 10):
+            for index in range(1, 11):
                 field_name = 'experience_photo_' + str(index)
 
                 if field_name in request.FILES:
