@@ -33,15 +33,15 @@ $(document).ready(function () {
     if ($(window).width() > 520) {
         var nClose = parseInt($.cookie("closePopup"), 10);
 
-        //if (!nClose || nClose < 3) {
+        if (!nClose || nClose < 3) {
             if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
               popupTimmer = setTimeout(function () {
                   $('#help-popup').modal('show');
                   mixpanel.track("saw popup01");
-              }, 5000); // milliseconds
+              }, 15000); // milliseconds
             }
 
-        //}
+        }
 
         $('#help-popup').on('hidden.bs.modal', function () {
             mixpanel.track("closed popup01");
