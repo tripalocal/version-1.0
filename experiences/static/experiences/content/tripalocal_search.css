@@ -121,13 +121,13 @@
 .header {
   height: auto;
   font-style: normal;
-  color: rgb(200, 200, 200);
+  color: #999999;
 }
 .ui.dropdown .menu > .header {
   text-transform: none;
   font-weight: normal;
   font-size: 13px;
-  color: rgb(200, 200, 200);
+  color: #999999;
 }
 
 .custom-itinerary-searchpage {
