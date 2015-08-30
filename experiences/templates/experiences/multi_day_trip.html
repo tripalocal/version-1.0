@@ -18,34 +18,36 @@
 {%endblock%}
 
 {% block content %}
-<div id="response-to-update-multiple">
-    <div id="experience-results">
-        {% for experience in experienceList %}
-        {% if forloop.counter == 5 %}
-        <div class="expList custom-itinerary-searchpage" >
-          <form action="mailto:enquiries@tripalocal.com">
-          <button class="btn btn-primary request-btn">{% trans "Request a trip" %}</button>
-          </form>
-        </div>
-        {% endif %}
+<div class="fixCenter">
+	<div id="response-to-update-multiple">
+		<div id="experience-results">
+			{% for experience in experienceList %}
+			{% if forloop.counter == 5 %}
+			<div class="expList custom-itinerary-searchpage" >
+			  <form action="mailto:enquiries@tripalocal.com">
+			  <button class="btn btn-primary request-btn">{% trans "Request a trip" %}</button>
+			  </form>
+			</div>
+			{% endif %}
 
-        <div class="expList">
-            <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
-                <div class="listingImg" style="background-image:url({{ MEDIA_URL }}{{ experience.image }});">
-                    <div class="priceBox">
-                        {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
-                    </div>
-                </div>
-            </a>
-            <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ experience.title }} </h3></a>
+			<div class="expList">
+				<a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
+					<div class="listingImg" style="background-image:url({{ MEDIA_URL }}{{ experience.image }});">
+						<div class="priceBox">
+							{% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
+						</div>
+					</div>
+				</a>
+				<a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ experience.title }} </h3></a>
 
-            <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
+				<p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
 
-            <div class="listingFooter">
-                {%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+				<div class="listingFooter">
+					{%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
 </div>
 {%endblock%}
