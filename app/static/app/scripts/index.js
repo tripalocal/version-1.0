@@ -1,7 +1,7 @@
 $(document).ready(function () {
     mixpanel.track("viewed homepage");
     $(".request-btn").click(function () {
-        window.location.href = "mailto:enquiries@tripalocal.com";
+        window.location.href = "https://www.tripalocal.com/multidaytrip/";
         mixpanel.track("requested a trip from homepage");
     });
 
