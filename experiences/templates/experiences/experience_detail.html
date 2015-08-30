@@ -425,7 +425,7 @@ $(function(){
 
         if($("#div_experience_activity").text().length>0)
         {
-           $("#div_experience_activity")[0].innerHTML = $("#div_experience_activity")[0].innerHTML.replace('&lt;strong&gt;','<strong>','g').replace('&lt;/strong&gt;','</strong>','g');
+           $("#div_experience_activity")[0].innerHTML = $("#div_experience_activity")[0].innerHTML.replace(/&lt;strong&gt;/g,"<strong>").replace(/&lt;\/strong&gt;/g,"</strong>");
         }
 
         ids=['host_bio','id_experience_activity','id_experience_dress','id_experience_description']
