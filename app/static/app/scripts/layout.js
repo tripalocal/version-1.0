@@ -12,12 +12,16 @@ function create_post(email, message) {
         success: function (json) {
             $('#popup-form-details').val('');
             $('#popup-form-email').val('');
-            $('#results').html("<p class=''>Thank you for you suggestion.</p>");
+            $('#results').html("<br><p class='popup-result'>Sent!</p>");
             $.cookie("closePopup", 3, {path: '/'});
         },
 
         error: function (xhr, errmsg, err) {
-            $('#results').html("<p class=''>Oops! We have encountered an error.</p>");
+            $('#results').html("<br><p class='popup-result'>Error sending, please <span class='try-again'>try again</span></p>");
+            $('.try-again').click( function() {
+              $('#results').html("<br>");
+              $('#popup-send').show();
+            });
         }
     });
 }
@@ -73,6 +77,8 @@ $(document).ready(function () {
             mixpanel.track("selected Yes from popup01");
         });
 
+
+
         $('#custom-trip-form').on('submit', function (event) {
             event.preventDefault();
 
@@ -81,17 +87,26 @@ $(document).ready(function () {
             message = $('#popup-form-details').val();
 
             if (!message || !email) {
-                $('#results').html("<p class=''>Please fill all fields.</p>");
+                $('#results').html("<p class='popup-result'>Please fill in all fields.</p>");
             } else {
                 var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
                 if (regex.test(email)) {
-                    alert('Thanks.');
+                    $('#popup-send').hide();
                     create_post(email, message);
                 } else {
-                    $('#results').html("<p class=''>Email Invalid.</p>");
+                    $('#popup-send').hide();
+                    $('#results').html("<br><p class='popup-result'>Invalid email, please <span class='try-again'>try again</span></p>");
+                    $('.try-again').click( function() {
+                      $('#results').html("<br>");
+                      $('#popup-form-email').val('');
+                      $('#popup-send').show();
+                    });
                 }
             }
         });
+
+
+
     }
 
     var des_url = window.location.pathname;
