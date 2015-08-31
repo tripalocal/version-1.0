@@ -54,9 +54,9 @@
                         <br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
                         <div class="row" style="width:200px;margin-top:10px">
                         {% if LANGUAGE != "zh-CN" %}
-                            <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%}<br><p>
+                            <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%}<br><p>
                         {%else%}
-                            <label>{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><label>{{experience.currency}}</label><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%}<br><p>
+                            <label>{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><label>{{experience.currency}}</label><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%}<br><p>
                         {%endif%}
                         </div>
                         <form id="experience_booking_form" method="post" action="">
