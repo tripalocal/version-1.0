@@ -25,7 +25,7 @@ class Experience(models.Model):
     repeat_frequency = models.IntegerField()
     repeat_extra_information = models.CharField(max_length=50)
     allow_instant_booking = models.BooleanField(default=False)
-    duration = models.IntegerField()
+    duration = models.FloatField()
 
     guest_number_max = models.IntegerField()
     guest_number_min = models.IntegerField()
@@ -48,7 +48,7 @@ class Experience(models.Model):
     status = models.CharField(max_length=50)
 
     tags = models.ManyToManyField(ExperienceTag, related_name='experience_tags')
-   # commission = models.FloatField(default=0.3)
+    commission = models.FloatField(default=0.3)
 
     def __str__(self):
         t = get_experience_title(self, settings.LANGUAGES[0][0])
@@ -82,6 +82,19 @@ class Experience(models.Model):
             # self.meetup_spot = exp_i18n.meetup_spot
             # self.dropoff_spot = exp_i18n.dropoff_spot
 
+    def new_experience_i18n_info(self, **kwargs):
+        self._new_experience_i18n_info('zh')
+        self._new_experience_i18n_info('en')
+
+
+    def _new_experience_i18n_info(self, language, **kwargs):
+        ExperienceTitle.objects.create(experience=self, language=language)
+        ExperienceDescription.objects.create(experience=self, language=language)
+        ExperienceActivity.objects.create(experience=self, language=language)
+        ExperienceDress.objects.create(experience=self, language=language)
+        ExperienceInteraction.objects.create(experience=self, language=language)
+        ExperienceMeetupSpot.objects.create(experience=self, language=language)
+        ExperienceDropoffSpot.objects.create(experience=self, language=language)
 
     def change_status(self, new_status=None):
         self.status = new_status

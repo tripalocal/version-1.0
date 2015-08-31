@@ -26,12 +26,9 @@
     <p style="postion:relative;top:50px;">{% trans "The experience has not be approved. Only you can see it now." %}</p>
     {%endif%}
 
-    <div class="jumbotron" style="background-image:url(
-		{% for photo in experience.photo_set.all %}
-            {% if forloop.first %}
-				{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}  
-            {% endif %}
-        {% endfor %})">
+    <div class="jumbotron experienceImg" style="background-image:url(
+				{{ MEDIA_URL }}{{cover_photo.directory}}{{cover_photo.name}}
+            )">
 	</div>
 
     <div class="container stickem-container">
@@ -58,7 +55,7 @@
                         </div>
                         <form id="experience_booking_form" method="post" action="">
                             {% csrf_token %}
-                        
+
                             {% for field in form.hidden_fields %}
                                 {{ field }}
                             {% endfor %}
@@ -66,7 +63,7 @@
                             <div>{% trans "No. of Guests" %} &nbsp;&nbsp;
                                 <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none;"/>
                                 <input type="text" id="guest_number_max" name="{{experience.guest_number_max}}" disabled="disabled" style="display:none;"/>
-                                {% for op in available_options %} 
+                                {% for op in available_options %}
                                     <p id="seat_left_{{forloop.counter0}}" style="display:none;"> {{op.available_seat}} </p>
                                 {% endfor %}
                                 {{form.guest_number}}
@@ -80,11 +77,11 @@
                                 </thead>
 
                                 {% for op in available_options %}
-                                    <p id="date_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.date_string}} </p> 
+                                    <p id="date_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.date_string}} </p>
                                 {% endfor %}
 
-                                {% for op in available_options %} 
-                                    <p id="time_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.time_string}} </p> 
+                                {% for op in available_options %}
+                                    <p id="time_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.time_string}} </p>
                                 {% endfor %}
 
                                 {% for op in available_options %}
@@ -102,9 +99,9 @@
                                         </td>
                                         <td class="people-list">
                                             {% if user.is_authenticated %}
-                                                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" />  
+                                                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" />
                                             {% else %}
-                                                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/> 
+                                                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -120,9 +117,9 @@
                                     </td>
                                     <td class="people-list">
                                     {% if user.is_authenticated %}
-                                        <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" />  
+                                        <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" />
                                     {% else %}
-                                        <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/> 
+                                        <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/>
                                     {% endif %}
                                     </td>
                                 </tr>
@@ -269,7 +266,7 @@
                     <div id="experience-hostinterests" class="experience-hostinterests">
                         <div class="gradientMask"></div>
                         <span id="host_bio">{{host_bio}}</span>
-                    </div>      
+                    </div>
                     {% if host_bio|length > 200 %}
                     <div id="bio_show_more" value="More" class="show-more">+ {% trans "More" %}</div>
                     {% endif %}
@@ -302,7 +299,7 @@
                 </div>
                 {% endif %}
                 {% endif %}
-                {% endfor %} 
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -390,7 +387,7 @@
                                         {% endwith %}"
                                  height="240">
 						</div>
-          
+
                         <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
                         <div class="listing-footer">
                             <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
@@ -405,7 +402,7 @@
 {%else%}
     <p>{% trans "The experience has expired, or has not been approved." %}</p>
 {%endif%}
-{% endblock %} 
+{% endblock %}
 
 {% block scripts %}
 
@@ -622,7 +619,7 @@ $(function(){
 
 $(function(){
     $("#id_date").change(function(){
-        selected_date = $("#id_date option:selected").text().trim();     
+        selected_date = $("#id_date option:selected").text().trim();
 
         $("#id_time").html('');
 
