@@ -77,7 +77,10 @@ $(document).ready(function () {
             $('#popup-page-2').show();
             mixpanel.track("selected Yes from popup01");
         });
-
+        
+        $('#multidaytrip-link').click(function() {
+          mixpanel.track("checked out designed multi-day from pop up box");
+        });
 
 
         $('#custom-trip-form').on('submit', function (event) {
