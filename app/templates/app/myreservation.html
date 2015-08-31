@@ -10,7 +10,7 @@
 {% block content %}
 
     <div class="tab_area">
-        <div class="fixCenter">
+        <div class="container">
             <div class="tab_item">
                 <a href="#" class="firstTabItem" id="active-tab">{% trans "My Listing" %}</a>
                 <a href="{{GEO_POSTFIX}}mytrip">{% trans "My Trip" %}</a>
@@ -21,8 +21,8 @@
     </div>
 
 	<div class="row row-area">
-    	<div class="content-area fixCenter">
-    		<div class="left-nav-box">
+    	<div class="content-area container">
+    		<div class="leftsubMenu">
     		    <p>
                     <a href="{{GEO_POSTFIX}}mylisting">{% trans "Managing Listing" %}</a>
                 </p>
@@ -31,7 +31,7 @@
                 </p>
             </div>
 
-			<div class="right-content-box" style="padding:0px;">
+			<div class="rightInterface">
 		        <div class="right-content-box-header">
                     <p class="right-content-box-heading">{% trans "My Reservation" %}</p>
                 </div>
@@ -95,11 +95,11 @@
                             </div>
                         </div>
                     </div>
-                </div> 
+                </div>
 		    	{% endfor %}
     		</div>
 
-            <div class="right-content-box" id="completed-reservation">
+            <div class="rightInterface" id="completed-reservation">
 		        <div class="right-content-box-header">
                     <p class="right-content-box-heading">{% trans "Past Reservation" %}</p>
                 </div>
@@ -141,11 +141,11 @@
                                 <p>{% trans "Cancelled" %}</p>
                             </div>
                             {% endif %}
-                        
+
                             <p class="reservation-info-position">
                                 <span id="highlighted">{{reservation.experience_title}}</span></br>
                                 {%if LANGUAGE != "zh-CN"%}
-                                {% trans "with" %} 
+                                {% trans "with" %}
                                 <span id="highlighted">{{reservation.guest_first_name|title}} {{reservation.guest_last_name|title|slice:":1"}}.</span>
                                 {% trans "in" %} {{reservation.experience_city}}
                                 {%else%}
@@ -155,7 +155,7 @@
                             </p>
                         </div>
                     </div>
-                </div> 
+                </div>
 		    	{% endfor %}
     		</div>
     	</div>

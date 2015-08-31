@@ -54,13 +54,17 @@ class UserProfileForm(forms.Form):
     last_name=forms.CharField(required = False)
     email=forms.EmailField(required = False)
     phone_number = forms.CharField(required = False)
-    bio = forms.CharField(widget=forms.Textarea, required = False)
+    bio = forms.CharField(widget=forms.Textarea(attrs = {'class':'form-control'}), required = False)
 
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
         self.fields['first_name'].widget.attrs['readonly'] = True
+        self.fields['first_name'].widget.attrs['class'] = 'form-control'
         self.fields['last_name'].widget.attrs['readonly'] = True
+        self.fields['last_name'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['readonly'] = True
+        self.fields['email'].widget.attrs['class'] = 'form-control'
+        self.fields['phone_number'].widget.attrs['class'] = 'form-control'
 
 class BookingRequestXLSForm(forms.Form):
     file = forms.FileField()

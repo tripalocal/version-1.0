@@ -42,4 +42,5 @@ venv/
 /static/
 local_settings.py
 GeoLite2-City.mmdb
+node_modules/
 

@@ -1,0 +1,27 @@
+/*
+
+  Sticky items
+
+*/
+
+.stickem-container {
+  position: relative;
+}
+
+.stickit {
+  position: fixed;
+  top: 0;
+  padding-top: 150px;
+}
+
+.stickit-end {
+  bottom: 50px;
+  position: absolute;
+}
+
+@include media('<desktop') {
+  .stickit {
+    position: relative;
+    padding-top: 0;
+  }
+}

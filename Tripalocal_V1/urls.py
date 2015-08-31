@@ -4,6 +4,7 @@ Definition of urls for Tripalocal_V1.
 from datetime import datetime
 from django.conf.urls import patterns, url
 from app.forms import BootstrapAuthenticationForm, SubscriptionForm
+from django.views.generic import TemplateView
 
 from experiences.models import Experience
 from experiences.views import *
@@ -115,5 +116,5 @@ urlpatterns = patterns('',
     url(r'^custom_admin/booking-archive/$', superuser_required(BookingArchiveView.as_view()), name='admin_booking_archive'),
     url(r'^custom_admin/payment/$', superuser_required(PaymentView.as_view()), name='admin_payment'),
     url(r'^custom_admin/experience/$', superuser_required(ExperienceView.as_view()), name='admin_experience'),
-
+    url(r'^wechat/item1/$', TemplateView.as_view(template_name="app/wechat_item1.html")),
 )

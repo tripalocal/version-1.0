@@ -10,7 +10,7 @@
 {% block content %}
 
     <div class="tab_area">
-        <div class="fixCenter">
+        <div class="container">
             <div class="tab_item">
                 <a href="{{GEO_POSTFIX}}mylisting">{% trans "My Listing" %}</a>
                 <a href="{{GEO_POSTFIX}}mytrip">{% trans "My Trip" %}</a>
@@ -21,7 +21,7 @@
     </div>
 
 	<div class="row row-area">
-    	<div class="content-area fixCenter">
+    	<div class="content-area container">
     		<div class="leftsubMenu">
     			<p>{% trans "My Profile" %}</p>
     		</div>
@@ -35,7 +35,7 @@
                         <tr>
                             <td>
           	                    <div class="profile-lg void-profile">
-                                    <img src="{{MEDIA_URL}}{{image_url}}" width="200px" height="200px">
+                                    <img src="{{MEDIA_URL}}{{image_url}}" height="200px">
                                 </div>
                             </td>
                             <td>
@@ -45,9 +45,9 @@
                                                                     Please make sure your image is under 1MB.{% endblocktrans %}
                                 </div>
                                 {%if form.files.image%}
-                                <input id="uploadImage_1" placeholder="{{form.files.image.name}}" class="uploadImage" disabled="disabled" />
+                                <input class="form-control" id="uploadImage_1" placeholder="{{form.files.image.name}}" class="uploadImage" disabled="disabled" />
                                 {%else%}
-                                <input id="uploadImage_1" placeholder="{% trans "No file chosen" %}" class="uploadImage" disabled="disabled" />
+                                <input class="form-control" id="uploadImage_1" placeholder="{% trans "No file chosen" %}" class="uploadImage" disabled="disabled" />
                                 {%endif%}
                                 <div class="fileUpload btn btn-primary">
                                     <img alt="" src="{% static 'app/img/camera.gif' %}"><span>{% trans "Choose File" %}</span>
@@ -180,7 +180,7 @@
             </form>
         </div>
     </div>
-		        
+
 {% endblock %}
 
 {% block scripts %}
@@ -200,7 +200,7 @@
 
             if (window.FileReader) {
                 input = document.getElementById('id_image');
-                if (input && input.files && input.files[0]) 
+                if (input && input.files && input.files[0])
                 {
                     file = input.files[0];
                     if(file.size > 1048576)
@@ -215,7 +215,7 @@
                 }
             }
 
-            if(valid) 
+            if(valid)
             {
                 $("form").submit();
             }

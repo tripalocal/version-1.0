@@ -10,7 +10,8 @@
     {%else%}
     <title>{% trans "with" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "Experience" %}{{ experience.title }}</title>
     {%endif%}
-    <link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">
+    <!--<link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">-->
+    <link href="{% static 'experiences/content/experience-detail.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 {% endblock %}
 
@@ -30,11 +31,10 @@
             )">
 	</div>
 
-    <div class="container-fluid experience stickem-container">
-        <div class="row">
-            <div class="fixCenter">
+    <div class="container stickem-container">
+	    <div class="row">
                 <div class="stickem">
-                    <div class="bookingBox">
+                    <div class="booking-box">
                         {% if experience.type == 'PRIVATE' %}
                         <div class="profile-lg">
                             <div style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
@@ -119,27 +119,27 @@
                                     {% if user.is_authenticated %}
                                         <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" />
                                     {% else %}
-                                        <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '/accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
+                                        <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '/accounts/login/?next=/experience/{{experience.id}}';"/>
                                     {% endif %}
                                     </td>
                                 </tr>
                             </table>
 
-                            <div class="save_to_wishlist_button">
+                            <div class="save-to-wishlist">
                             {% if not in_wishlist %}
                                 {% if user.is_authenticated %}
                                 <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_not_added"></div>
                                 {% else %}
                                 <div id="save_to_wishlist_icon" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';" class="save_to_wishlist_not_added"></div>
                                 {%endif%}
-                                <div id="save_to_wishlist_description">
-                                    <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;">{% trans "Save to Wishlist" %}</h3>
+                                <div id="save_to_wishlist_description" class="description">
+                                    <h3 id="wishlist_head">{% trans "Save to Wishlist" %}</h3>
                                     <p id="wishlist_p">Save now, plan later</p>
                                 </div>
                             {% else %}
                                 <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_added"></div>
-                                <div id="save_to_wishlist_description">
-                                    <h3 id="wishlist_head" style="margin-top:4px; padding-bottom:0px;">{% trans "Saved to Wishlist" %}</h3>
+                                <div id="save_to_wishlist_description" class="description">
+                                    <h3 id="wishlist_head">{% trans "Saved to Wishlist" %}</h3>
                                     <p id="wishlist_p"></p>
                                 </div>
                             {% endif %}
@@ -148,7 +148,7 @@
                     </div>
                 </div>
 
-                <div class="desBox">
+                <div class="description-box">
                     {% if experience.type == "RECOMMENDED" %}
                     <div class="recommended-label">{% trans "Recommended" %}</div>
                     {% endif %}
@@ -160,47 +160,55 @@
                     <br><small style="font-size:14px">{{experience.duration}} {% trans "hrs" %} &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
                     </h2>
 
-                    <div class="container" style="text-align:left;">
-                        <div class="row" style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;">
-                            <div class="col-sm-3 col-xs-12">
-                                <h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Overview" %}</h3>
-                            </div>
-							<div class="col-sm-9 col-xs-12">
+                    <div class="container-fluid" style="text-align:left;">
+						<div class="row" style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;">
+							<div class="col-sm-3">
+								<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Overview" %}</h3>
+							</div>
+							<div class="col-sm-9">
+                <p>
 								{{ experience.description|linebreaks }}<br>
 								{{ experience.interaction|linebreaks }}
+                </p>
 							</div>
 						</div>
 
 						<div class="row" style="border-bottom:1px solid #CCCCCC;">
-							<div class="col-sm-3 col-xs-12">
+							<div class="col-sm-3">
 								<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Activities" %}</h3>
 							</div>
-							<div class="col-sm-9 col-xs-12">
+							<div class="col-sm-9">
+                <p>
 								{{ experience.activity|linebreaks }}
+                </p>
 							</div>
 						</div>
 						<div class="row" style="border-bottom:1px solid #CCCCCC;">
-							<div class="col-sm-3 col-xs-12">
+							<div class="col-sm-3">
 								<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "What to wear" %}</h3>
 							</div>
-							<div class="col-sm-9 col-xs-12">
+							<div class="col-sm-9">
+                <p>
 								{{ experience.dress|linebreaks }}
+                </p>
 							</div>
 						</div>
 						{% for w in experience.whatsincluded %}
 						<div class="row">
-							<div class="col-sm-3 col-xs-12" style="margin-bottom:0;">
+							<div class="col-sm-3" style="margin-bottom:0;">
 								<h3 style="color:grey;margin-top:0;line-height:1.5;">{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%else%}交通{%endif%}{%endif%}:</h3>
 							</div>
-							<div class="col-sm-9 col-xs-12" style="margin-bottom:0;">
-								{{w.details}}
+							<div class="col-sm-9" style="margin-bottom:0;">
+								<p>
+                {{w.details}}
+                </p>
 							</div>
 						</div>
 						{% endfor %}
 						<div class="row" style="border-bottom:1px solid #CCCCCC;height: 10px;">
-							<div class="col-sm-3 col-xs-12">
+							<div class="col-sm-3">
 							</div>
-							<div class="col-sm-9 col-xs-12">
+							<div class="col-sm-9">
 							</div>
 						</div>
 					</div>
@@ -245,13 +253,13 @@
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 
     {% if experience.type != "NONPRIVATE" %}
-    <div class="experinence-host desBox">
-        <div id="experinence-host-container">
-            <p>{% trans "About the host," %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</p>
+    <div class="row">
+    <div class="experience-host bio-box">
+
+            <h2>{% trans "About the host," %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</h2>
             <div id="experience-hostintro" class="experience-hostintro">
                 <div class="experience-hostpic profile-lg" style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;"></div>
                 <div>
@@ -260,7 +268,7 @@
                         <span id="host_bio">{{host_bio}}</span>
                     </div>
                     {% if host_bio|length > 200 %}
-                    <div id="bio_show_more" value="More">+ {% trans "More" %}</div>
+                    <div id="bio_show_more" value="More" class="show-more">+ {% trans "More" %}</div>
                     {% endif %}
                 </div>
             </div>
@@ -287,7 +295,7 @@
                 <div class="host-mobile">
                     <div class="mobilelogo"></div>
                     <span class="Mobile">{% trans "Phone" %}</span>
-                    <span class="host-verfied">{% trans "Verified" %}</span>
+                    <span class="host-verified">{% trans "Verified" %}</span>
                 </div>
                 {% endif %}
                 {% endif %}
@@ -299,10 +307,9 @@
 
     <div class="container-fluid review">
         <div class="row">
-    		<div class="fixCenter">
-                <div class="reviewBox" style="margin-top:50px">
+                <div class="review-box" style="margin-top:50px">
                 {% if experience.review_set.count %}
-                    <h2>{{ experience.review_set.count }}{% trans "review(s)" %} </h2>
+                    <h2>{{ experience.review_set.count }}{% trans " Review(s)" %} </h2>
                     <div class="rating">
                     {% for r in "12345" %}
                         {% if forloop.counter <= experience_rate %}
@@ -322,9 +329,9 @@
                         <div class="reviewList">
                     {% endif %}
                         {%if review.user.registereduser.image_url != None and review.user.registereduser.image_url != ''%}
-                            <div class="profile-md"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" width="240" height="240"></div>
+                            <div class="profile-sm"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" height="240"></div>
                         {%else%}
-                            <div class="profile-md"><img src="{{ MEDIA_URL }}img/profile_default.jpg" width="240" height="240"></div>
+                            <div class="profile-md"><img src="{{ MEDIA_URL }}img/profile_default.jpg" height="240"></div>
                         {%endif%}
                             <div class="reviewText">{{review.comment}}
                                 <div class="reviewDate">
@@ -351,21 +358,20 @@
                 {% endif %}
                 </div>
     		</div>
-		</div>
     </div>
-
+</div>
     <div class="container-fluid also" style="border-top: 1px solid #CCCCCC; background-color:#FFF;">
-    	<div class="row">
-            <div class="fixCenter">
-                <div class="expBox">
-                    <h2 style="font-weight:bold">{% trans "People also booked" %}</h2>
+    	<div class="container">
+        <h2 style="font-weight:bold">{% trans "People also booked" %}</h2>
+                <div class="experience-results">
+
                     {% for related_experience, added_to_wishlist in related_experiences %}
                     {% if forloop.counter0 < 3 %}
-                    <div class="expList">
+                    <div class="exp-box">
                         <label id="related_experience_id_{{forloop.counter0}}" style="display:none;">{{related_experience.id}}</label>
                         <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}">
-                            <div class="listingImg" style="background-image:url({% for photo in related_experience.photo_set.all %}{% if forloop.first %} {{ MEDIA_URL }}{{photo.directory}}{{photo.name}} {%endif%}{%endfor%});">
-                                <div class="priceBox">
+                            <div class="listing-img" style="background-image:url({% for photo in related_experience.photo_set.all %}{% if forloop.first %} {{ MEDIA_URL }}{{photo.directory}}{{photo.name}} {%endif%}{%endfor%});">
+                                <div class="price-box">
                                 {% trans "From" %} {{related_experience.dollarsign}}<span>{{ related_experience.price|mul:1.429|floatformat:"0" }}</span> {{related_experience.currency}} {% trans "/person" %}
                                 </div>
                             </div>
@@ -379,11 +385,11 @@
                                                 {{ MEDIA_URL }}img/profile_default.jpg
                                             {% endif %}
                                         {% endwith %}"
-                                 width="240" height="240">
+                                 height="240">
 						</div>
 
                         <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
-                        <div class="listingFooter">
+                        <div class="listing-footer">
                             <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
                             <div>{{ related_experience.duration }} {% trans "hrs" %} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
                         </div>
@@ -391,9 +397,8 @@
                     {% endif %}
                     {% endfor %}
                 </div>
-            </div>
         </div>
-    </div>
+            </div>
 {%else%}
     <p>{% trans "The experience has expired, or has not been approved." %}</p>
 {%endif%}

@@ -4,20 +4,20 @@
 <div id="response-to-update-multiple">
     <label id="experience-count" class="expCount">{{ length }} {% trans "Experiences" %} &#8226; {{ city_display_name }}</label>
 
-    <div id="experience-results">
+    <div id="experience-results" class="experience-results">
         {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
         {% if forloop.counter == 5 %}
-        <div class="expList custom-itinerary-searchpage" >
+        <div class="exp-box custom-itinerary-searchpage" >
           <form action="mailto:enquiries@tripalocal.com">
           <button class="btn btn-primary request-btn">{% trans "Request a trip" %}</button>
           </form>
         </div>
         {% endif %}
 
-        <div class="expList">
+        <div class="exp-box">
             <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
-                <div class="listingImg" style="background-image:url({{ MEDIA_URL }}{{ BGImageURL }});">
-                    <div class="priceBox">
+                <div class="listing-img" style="background-image:url({{ MEDIA_URL }}{{ BGImageURL }});">
+                    <div class="price-box">
                         {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
                     </div>
                 </div>
@@ -29,7 +29,7 @@
 
             <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
 
-            <div class="listingFooter">
+            <div class="listing-footer">
                 <a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a>
                 {{ experience.duration }} hrs &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
             </div>

@@ -1,0 +1,24 @@
+/*
+
+  Checkboxes
+
+*/
+
+input[type=checkbox].css-checkbox {
+    position: absolute;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    width: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+}
+
+.lite-cyan-check {
+  background-image: url(http://csscheckbox.com/checkboxes/lite-cyan-check.png);
+}
+
+.lite-x-cyan {
+  background-image: url(http://csscheckbox.com/checkboxes/lite-x-cyan.png);
+}

@@ -1,5 +1,12 @@
 /*Sign up / Log in page*/
 
+.content {
+    width: auto;
+    margin-left: 2.5vw;
+    margin-right: 2.5vw;
+    padding-top: 3vh;
+}
+
 .signup_box {
   max-height: 400px;
   max-height: 80vh;
@@ -231,6 +238,14 @@
 .profile-lg img {
   width: auto;
   position: absolute;
+}
+
+.btn-lg {
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 1.33;
+  border-radius: 3px;
+  width: 100%;
 }
 /**
 @media screen and (min-width: 910px) and (max-width: 1072px) {

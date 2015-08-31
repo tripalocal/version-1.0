@@ -1,0 +1,28 @@
+/*
+
+  Typography
+
+*/
+
+// Headings
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+h3 {
+  font-size: 14px;
+}
+
+// Links
+a {
+  text-decoration: none;
+  color: $primary-color;
+  &:hover {
+    text-decoration: none;
+    color: darken($primary-color, 20%);
+  }
+}
