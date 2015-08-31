@@ -68,7 +68,7 @@ Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Bri
 Currency = (('AUD',_('AUD')),('NZD',_('NZD')),) #('CNY',_('CNY')),
 DollarSign = {'AUD':'$','NZD':'$'} #'CNY':'￥',
 
-Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted'))
+Status = (('Submitted', 'Pending Review'), ('Listed','Listed'), ('Unlisted','Unlisted'))
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
