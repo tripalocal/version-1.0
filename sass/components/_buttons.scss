@@ -26,10 +26,10 @@
 
 .btn-clear {
   background-color: transparent;
-  border-color: transparent;
-  color: black;
+  border-color: $medium-grey;
+  color: $medium-grey;
   &:hover {
-    border-color: black;
-    color: black;
+    border-color: $medium-grey;
+    color: $medium-grey;
   }
 }

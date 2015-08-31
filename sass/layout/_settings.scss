@@ -2,6 +2,7 @@
 
   User settings pages
   eg. mylisting, mytrip, myprofile, myaccount, etc.
+
 */
 
 .content-area {
@@ -42,7 +43,7 @@
   border: $light-grey 1px solid;
   @include border-radius(5px);
   padding: 20px;
-
+  margin-bottom: 20px;
   p {
     margin-bottom: 10px;
   }
@@ -55,4 +56,10 @@
   border: $light-grey 1px solid;
   @include border-radius(5px);
   padding: 15px;
+  a {
+    color: $dark-grey;
+    &:hover {
+      color: $primary-color;
+    }
+  }
 }

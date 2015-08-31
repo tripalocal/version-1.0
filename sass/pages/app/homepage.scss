@@ -56,10 +56,12 @@ h1 {
   .homepage-logo {
     height: 190px;
     margin: 0 auto;
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
 
     @include media('>tablet') {
+      height: 240px;
       margin-top: 80px;
       margin-bottom: 50px;
     }
