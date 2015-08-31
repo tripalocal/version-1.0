@@ -455,7 +455,7 @@ def service_wishlist(request):
                 experiences.append({'id':experience.id,
                                     'title':get_experience_title(experience, settings.LANGUAGES[0][0]),
                                     'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
-                                    'price':experience_fee_calculator(exp_price),
+                                    'price':experience_fee_calculator(exp_price, experience.commission),
                                     'language':experience.language,
                                     'duration':experience.duration,
                                     'photo_url':photo_url,
@@ -820,7 +820,7 @@ def service_experience(request, format=None):
         dynamic_price = []
         if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             dynamic_price = experience.dynamic_price.split(",")
-            dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
+            dynamic_price = [experience_fee_calculator(float(x), experience.commission) for x in dynamic_price if x]
 
         experience_images = []
         photos = experience.photo_set.all()
@@ -835,7 +835,7 @@ def service_experience(request, format=None):
                          'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
                          'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
                          'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
-                         'experience_price':experience_fee_calculator(float(experience.price)),
+                         'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
                          'experience_currency': str(dict(Currency)[experience.currency.upper()]),
                          'experience_dollarsign': DollarSign[experience.currency.upper()],
                          'experience_dynamic_price':dynamic_price,
@@ -907,7 +907,7 @@ def service_experiencedetail(request, format=None):
         dynamic_price = []
         if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             dynamic_price = experience.dynamic_price.split(",")
-            dynamic_price = [experience_fee_calculator(float(x)) for x in dynamic_price if x]
+            dynamic_price = [experience_fee_calculator(float(x), experience.commission) for x in dynamic_price if x]
 
         experience_images = []
         photos = experience.photo_set.all()
@@ -922,7 +922,7 @@ def service_experiencedetail(request, format=None):
                          'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
                          'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
                          'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
-                         'experience_price':experience_fee_calculator(float(experience.price)),
+                         'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
                          'experience_currency': str(dict(Currency)[experience.currency.upper()]),
                          'experience_dollarsign': DollarSign[experience.currency.upper()],
                          'experience_dynamic_price':dynamic_price,
