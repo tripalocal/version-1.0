@@ -630,6 +630,18 @@ class ExperienceDetailView(DetailView):
         available_options = []
         available_date = ()
 
+        # Photo with minimum index will be cover photo.
+        min_index = 11
+        cover_photo = None
+        # Get cover photo index.
+        for photo in experience.photo_set.all():
+            # Get photo index:
+            index = int(photo.name.split("_")[1].split(".")[0])
+            if index < min_index:
+                min_index = index
+                cover_photo = photo
+        context['cover_photo'] = cover_photo
+
         if experience.end_datetime < datetime.utcnow().replace(tzinfo=pytz.UTC):
             if self.request.user.id != experience.hosts.all()[0].id:
                 # other user, experience already expired

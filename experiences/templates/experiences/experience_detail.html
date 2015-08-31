@@ -26,11 +26,8 @@
     {%endif%}
 
     <div class="jumbotron experienceImg" style="background-image:url(
-		{% for photo in experience.photo_set.all %}
-            {% if forloop.first %}
-				{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}
-            {% endif %}
-        {% endfor %})">
+				{{ MEDIA_URL }}{{cover_photo.directory}}{{cover_photo.name}}
+            )">
 	</div>
 
     <div class="container-fluid experience stickem-container">
