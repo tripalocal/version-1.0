@@ -1222,15 +1222,18 @@ function loadLocationForm(href) {
             }
             signal.fadeIn(500);
             signal.text("Saved...");
-            signal.fadeOut(6000, function() {
-                signal.fadeIn(5000);
-                signal.text("All Changes Saved...");
-                signal.fadeOut(6000);
+            signal.fadeOut(1000, function() {
+                signal.fadeIn(1000);
+                signal.text("All Changes Saved.");
+                //signal.fadeOut(6000);
             });
         }).fail(function () {
             signal.fadeIn(500);
             signal.text("Update Failed");
-            signal.fadeOut(6000);
+            signal.fadeOut(3000, function() {
+                signal.fadeIn(1000);
+                signal.text("All Changes Saved.");
+            });
         });
     }
 
