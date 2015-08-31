@@ -52,6 +52,7 @@
       <!--<div id="ajax-update-signal"></div>-->
       <div id="ajax-listing-form"></div>
     </div>
+    <input id="experience-status" value="{{experience_status}}" style="display: none"/>
 </form>
 {% endblock %}
 
@@ -98,7 +99,10 @@
     } else {
         setCookie("locationFilled", "False");
     }
-
+    var expStatus = $("#experience-status").val();
+    if(expStatus == "Listed" || expStatus == "Unlisted") {
+        setCookie("isSubmited", "True");
+    }
     setFinishedStatus();
     $(window).scroll(function() {
       stickyNav();
@@ -106,6 +110,7 @@
   });
 
     window.PRICE_FORM_INDICATOR = "none";
+    window.COMMISSION_PERCENT = 1.429;
 
 
     function setCookie(key, value) {
@@ -148,8 +153,13 @@
                 }
 
                 for (i = min; i < max; i++) {
-                    if ($("#dynamic_price_input_" + i).val().length > 0) {
+                    if ($("#dynamic_price_input_" + i).val().length > 0 && $("#dynamic_price_input_" + i).val().match(/^[0-9]+$/)) {
                         $("#id_dynamic_price").val($("#id_dynamic_price").val() + $("#dynamic_price_input_" + i).val() + ',');
+                    }
+                    else {
+                        alert("Make sure valid input. Price pr person should be integer and not empty");
+                        $("#dynamic_price_input_" + i).val(0);
+                        break;
                     }
                 }
 
@@ -180,17 +190,20 @@
                     $("#dynamic_price_with_fee_input_" + i).css("background-color", "rgb(245, 245, 245)").css("border", "0px");
 
                     if(i<min-1) {
-                        var hostGet = Math.round(pivotHostGet * (min) / (i+1));
-                        var customerPay = (pivotCustomerPay * (min) / (i+1)).toFixed(2);
+                        var hostGet = Math.round(pivotHostGet * (min) / (i+1),0);
+                        var customerPay = Math.round((pivotCustomerPay * (min) / (i+1)).toFixed(2),0);
                         $("#dynamic_price_input_" + i).val(hostGet);
                         $("#dynamic_price_with_fee_input_" + i).val(customerPay);
-                        $("#commission-price-" + i).text((customerPay - hostGet).toFixed(2));
+                        $("#commission-price-" + i).text(Math.round((customerPay - hostGet).toFixed(2),0));
                     }
                 }
                 for (i = min; i < max; i++) {
                     $("#dynamic_price_div_" + i).attr("style", "");
                     $("#dynamic_price_input_" + i).css("background-color", "rgb(255, 255, 255)").css("border", "1px solid #AAA");
-                    $("#dynamic_price_with_fee_input_" + i).css("background-color", "rgb(255, 255, 255)").css("border", "1px solid #AAA");
+                    $("#dynamic_price_with_fee_input_" + i).css("background-color", "rgb(245, 245, 245)").css("border", "0px").prop('disabled', true);
+                    $("#dynamic_price_input_" + i).val(hostGet);
+                    $("#dynamic_price_with_fee_input_" + i).val(customerPay);
+                    $("#commission-price-" + i).text(Math.round((customerPay - hostGet).toFixed(2),0));
                 }
                 for (i = max; i < 10; i++) {
                     $("#dynamic_price_div_" + i).attr("style", "display:none;");
@@ -241,12 +254,14 @@
                 $("#dynamic_price_input_" + i).keyup(function (e) {
                     i = e.target.id.substr(-1, 1);
                     var hostIncome = Math.round($("#dynamic_price_input_" + i).val());
-                    var customerPay = (hostIncome * 1.429 * 1.000 + 0.0).toFixed(2);
-                    if (typeof hostIncome === 'number' && isValidNumber(hostIncome)) {
+                    var customerPay = (hostIncome * window.COMMISSION_PERCENT * 1.000 + 0.0).toFixed(2);
+                    var customerPay = Math.round(customerPay,0);
+                    if (typeof hostIncome === 'number' && (String(hostIncome).match(/^[0-9]+$/))) {
                         $("#dynamic_price_with_fee_input_" + i).val(customerPay);
-                        $("#commission-price-" + i).text((customerPay - hostIncome).toFixed(2));
+                        $("#commission-price-" + i).text(Math.round((customerPay - hostIncome).toFixed(2),0));
                     }
                     else {
+                        alert("You must input an integer.");
                         $("#dynamic_price_with_fee_input_" + i).val("0");
                         $("#commission-price-" + i).text("0");
                         $("#dynamic_price_input_" + i).val("0");
@@ -260,27 +275,27 @@
                     }
                 });
 
-                $("#dynamic_price_with_fee_input_" + i).keyup(function (e) {
-                    i = e.target.id.substr(-1, 1);
-                    var customerPay = parseFloat(($("#dynamic_price_with_fee_input_" + i).val()));
-                    var hostIncome = Math.round((customerPay - 0.0) / (1.429 * 1.000));
-                    if (typeof customerPay === 'number' && isValidNumber(customerPay)) {
-                        $("#dynamic_price_input_" + i).val(hostIncome);
-                        $("#commission-price-" + i).text((customerPay-hostIncome).toFixed(2));
-                    }
-                    else {
-                        $("#dynamic_price_with_fee_input_" + i).val("0");
-                        $("#commission-price-" + i).text("0");
-                        $("#dynamic_price_input_" + i).val("0");
-                    }
-                });
-
-                $("#dynamic_price_with_fee_input_" + i).focusout(function () {
-                    if (updateDynamicPrice()) {
-                        collectDynamicPrices();
-                        postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
-                    }
-                });
+//                $("#dynamic_price_with_fee_input_" + i).keyup(function (e) {
+//                    i = e.target.id.substr(-1, 1);
+//                    var customerPay = parseFloat(($("#dynamic_price_with_fee_input_" + i).val()));
+//                    var hostIncome = Math.round((customerPay - 0.0) / (window.COMMISSION_PERCENT * 1.000));
+//                    if (typeof customerPay === 'number' && isValidNumber(customerPay)) {
+//                        $("#dynamic_price_input_" + i).val(hostIncome);
+//                        $("#commission-price-" + i).text((customerPay-hostIncome).toFixed(2));
+//                    }
+//                    else {
+//                        $("#dynamic_price_with_fee_input_" + i).val("0");
+//                        $("#commission-price-" + i).text("0");
+//                        $("#dynamic_price_input_" + i).val("0");
+//                    }
+//                });
+//
+//                $("#dynamic_price_with_fee_input_" + i).focusout(function () {
+//                    if (updateDynamicPrice()) {
+//                        collectDynamicPrices();
+//                        postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
+//                    }
+//                });
             }
         }
 
@@ -291,7 +306,7 @@
             for (i = min; i < max; i++) {
                 if(i < dynamicPrices.length) {
                     $("#dynamic_price_input_" + i).val(dynamicPrices[i]);
-                    $("#dynamic_price_with_fee_input_" + i).val((dynamicPrices[i] * 1.429 * 1.000 + 0.0 ).toFixed(2));
+                    $("#dynamic_price_with_fee_input_" + i).val(Math.round((dynamicPrices[i] * window.COMMISSION_PERCENT * 1.000 + 0.0 ).toFixed(2), 0));
                 } else {
                     $("#dynamic_price_input_" + i).val(0);
                     $("#dynamic_price_with_fee_input_" + i).val(0);
@@ -341,19 +356,26 @@
                 postDatum(location.href, {'currency': $('#id_currency').val()})
             });
 
-            $('#id_price, #id_price_with_booking_fee').focusout(function () {
+            $("#id_price_with_booking_fee").prop('disabled', true).css("background-color", "rgb(245, 245, 245)").css("border", "0px");
+
+            $('#id_price').focusout(function () {
                 if (updateDynamicPrice()) {
-                    postDatum(location.href, {
-                        'price': $('#id_price').val(),
-                        'dynamic_price': $('#id_dynamic_price').val()
-                    });
+                    if($('#id_price').val().match(/^[0-9]+$/)) {
+                        postDatum(location.href, {
+                            'price': $('#id_price').val(),
+                            'dynamic_price': $('#id_dynamic_price').val()
+                        });
+                    } else {
+                      alert("You must input an integer.");
+                    }
                 }
                 checkPriceFormFilled();
             });
 
             $("#id_price").keyup(function () {
                 var hostIncome = parseInt($("#id_price").val());
-                var customerPay = parseFloat(hostIncome * 1.429 * 1.000 + 0.0).toFixed(2);
+                var customerPay = parseFloat(hostIncome * window.COMMISSION_PERCENT * 1.000 + 0.0).toFixed(2);
+                var customerPay = Math.round(customerPay, 0)
                 if (typeof hostIncome === 'number' && isValidNumber(hostIncome)) {
                     $("#id_price_with_booking_fee").val(customerPay);
                     $("#commission-price").text((customerPay - hostIncome).toFixed(2));
@@ -361,27 +383,28 @@
                     checkPriceFormFilled();
                 }
                 else {
+                    alert("You must input an integer.");
                     $("#id_price").val("0");
                     $("#commission-price").text("0");
                     $("#id_price_with_booking_fee").val("0");
                 }
             });
 
-            $("#id_price_with_booking_fee").keyup(function () {
-                var customerPay = parseFloat($("#id_price_with_booking_fee").val());
-                var hostIncome = Math.round((customerPay - 0.0) / (1.429 * 1.000));
-                if (typeof customerPay === 'number' && isValidNumber(customerPay)) {
-                    $("#id_price").val(hostIncome);
-                    $("#commission-price").text((customerPay - hostIncome).toFixed(2));
-                    setDynamicPriceInputDisplay();
-                    checkPriceFormFilled();
-                }
-                else {
-                    $("#id_price").val("");
-                    $("#commission-price").text("0");
-                    $("#id_price_with_booking_fee").val("");
-                }
-            });
+//            $("#id_price_with_booking_fee").keyup(function () {
+//                var customerPay = parseFloat($("#id_price_with_booking_fee").val());
+//                var hostIncome = Math.round((customerPay - 0.0) / (window.COMMISSION_PERCENT * 1.000));
+//                if (typeof customerPay === 'number' && isValidNumber(customerPay)) {
+//                    $("#id_price").val(hostIncome);
+//                    $("#commission-price").text((customerPay - hostIncome).toFixed(2));
+//                    setDynamicPriceInputDisplay();
+//                    checkPriceFormFilled();
+//                }
+//                else {
+//                    $("#id_price").val("");
+//                    $("#commission-price").text("0");
+//                    $("#id_price_with_booking_fee").val("");
+//                }
+//            });
 
             $("#add_dynamic_price").click(function () {
                 $("#add_dynamic_price").attr("style", "display:none;");
@@ -491,7 +514,7 @@
         function setupPriceForm() {
             var price = parseFloat($("#id_price").val());
             if (typeof price === 'number' && isValidNumber(price)) {
-                var customerPay = parseInt(Math.round(price * 1.429 * 1.000 + 0.0));
+                var customerPay = parseInt(Math.round(price * window.COMMISSION_PERCENT * 1.000 + 0.0));
                 var hostIncome = parseInt($("#id_price").val());
                 $("#id_price_with_booking_fee").val(customerPay);
                 $("#commission-price").text(customerPay - hostIncome);
@@ -505,8 +528,8 @@
                 var max = parseInt($("#id_max_guest_number").val());
                 for (i = min; i < max; i++) {
                     $("#dynamic_price_input_" + (i)).val(price[i-min+1]);
-                    $("#commission-price-" + (i)).text((parseFloat(price[i-min+1]) * 1.429 * 1.000 + 0.0 - price[i-min+1]).toFixed(2));
-                    $("#dynamic_price_with_fee_input_" + (i)).val(Math.round(parseFloat(price[i-min+1]) * 1.429 * 1.000 + 0.0));
+                    $("#commission-price-" + (i)).text(Math.round((parseFloat(price[i-min+1]) * window.COMMISSION_PERCENT * 1.000 + 0.0 - price[i-min+1]).toFixed(2),0));
+                    $("#dynamic_price_with_fee_input_" + (i)).val(Math.round(parseFloat(price[i-min+1]) * window.COMMISSION_PERCENT * 1.000 + 0.0, 0));
                 }
 
                 $("#add_dynamic_price").attr("style", "display:none;");
@@ -926,7 +949,7 @@
 
                 $("#id_experience_photo_" + i).attr("class", "upload");
                 $("#id_experience_photo_" + i).change(function (e) {
-                    i = e.target.id.substr(-1, 1);
+                    i = e.target.id.split("_").pop();
                     string = $("#id_experience_photo_" + i).val();
                     index = -1;
                     index = string.lastIndexOf("\\");
@@ -1146,6 +1169,7 @@ function loadLocationForm(href) {
                     if($(this).text() == "Click to submit") {
                         setCookie("isSubmited", "True");
                         $("#steps-remaining").text("Submitted");
+                        postDatum(location.href, {'submit_form': "True"})
                     }
                 });
             }

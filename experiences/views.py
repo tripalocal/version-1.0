@@ -32,9 +32,10 @@ LANG_CN = settings.LANGUAGES[1][0]
 LANG_EN = settings.LANGUAGES[0][0]
 GEO_POSTFIX = settings.GEO_POSTFIX
 
-def experience_fee_calculator(price):
+def experience_fee_calculator(price, commission_rate):
     if type(price)==int or type(price) == float:
-        return round(price*(1.00+settings.COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+        COMMISSION_PERCENT = round(commission_rate/(1-commission_rate),3)
+        return round(price*(1.00+COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
 
     return price
 
@@ -604,6 +605,7 @@ class ExperienceDetailView(DetailView):
             else:
                 subtotal_price = float(experience.price)*float(form.data['guest_number'])
 
+            COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
             return render(request, 'experiences/experience_booking_confirmation.html',
                           {'form': form, #'eid':self.object.id,
                            'experience': experience,
@@ -611,9 +613,9 @@ class ExperienceDetailView(DetailView):
                            'guest_number':form.data['guest_number'],
                            'date':form.data['date'],
                            'time':form.data['time'],
-                           'subtotal_price':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),0),
-                           'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
-                           'total_price': experience_fee_calculator(subtotal_price),
+                           'subtotal_price':round(subtotal_price*(1.00+COMMISSION_PERCENT),0),
+                           'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
+                           'total_price': experience_fee_calculator(subtotal_price, experience.commission),
                            'user_email':request.user.email,
                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                            'LANGUAGE':settings.LANGUAGE_CODE
@@ -811,9 +813,9 @@ def experience_booking_confirmation(request):
                 subtotal_price = float(experience.price)*float(form.data['guest_number'])
         else:
             subtotal_price = float(experience.price)*float(form.data['guest_number'])
-
-        total_price = experience_fee_calculator(subtotal_price)
-        subtotal_price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT),0)
+        COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
+        total_price = experience_fee_calculator(subtotal_price, experience.commission)
+        subtotal_price = round(subtotal_price*(1.00+COMMISSION_PERCENT),0)
 
         if 'Refresh' in request.POST:
             #get coupon information
@@ -849,7 +851,7 @@ def experience_booking_confirmation(request):
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':subtotal_price,
                                                                            'experience_price':experience_price,
-                                                                           'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
+                                                                           'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': total_price,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
@@ -884,7 +886,7 @@ def experience_booking_confirmation(request):
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':subtotal_price,
                                                                            'experience_price':experience_price,
-                                                                           'service_fee':round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
+                                                                           'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': total_price,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
@@ -1143,7 +1145,8 @@ def create_experience(request, id=None):
             experience = Experience()
 
         # Get payment calculation parameter.
-        context['COMMISSION_PERCENT'] = settings.COMMISSION_PERCENT
+        COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
+        context['COMMISSION_PERCENT'] = COMMISSION_PERCENT
         context['STRIPE_PRICE_PERCENT'] = settings.STRIPE_PRICE_PERCENT
         context['STRIPE_PRICE_FIXED'] = settings.STRIPE_PRICE_FIXED
 
@@ -1532,12 +1535,13 @@ def update_booking(id, accepted, user):
                     subtotal_price = float(experience.price)*float(booking.guest_number)
 
                 #refund_amount does not include process fee: the transaction can't be undone
-                refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT),0)
+                COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
+                refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT),0)
 
                 if extra_fee <= -1:
-                    refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT), 0) + extra_fee
+                    refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT), 0) + extra_fee
                 if extra_fee < 0 and extra_fee > -1:
-                    refund_amount = round(subtotal_price*(1+settings.COMMISSION_PERCENT), 0) * (1+extra_fee)
+                    refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT), 0) * (1+extra_fee)
 
                 success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
             else:
@@ -1716,8 +1720,9 @@ def manage_listing_price(request, experience, context):
         data['dynamic_price'] = experience.dynamic_price
         data['type'] = experience.type
         data['currency'] = experience.currency
+        COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
         if experience.price != None:
-            data['price_with_booking_fee'] = round(float(experience.price) * (1.00 + settings.COMMISSION_PERCENT), 2)
+            data['price_with_booking_fee'] = round(float(experience.price) * (1.00 + COMMISSION_PERCENT), 2)
         form = ExperiencePriceForm(initial=data)
 
         return render_to_response('price_form.html', {'form': form}, context)
@@ -1894,7 +1899,7 @@ def manage_listing_photo(request, experience, context):
                 return HttpResponse(json.dumps({'success': False}), content_type='application/json')
 
         if form.is_valid():
-            for index in range(1, 10):
+            for index in range(1, 11):
                 field_name = 'experience_photo_' + str(index)
 
                 if field_name in request.FILES:
@@ -2024,8 +2029,13 @@ def manage_listing(request, exp_id, step, ):
     context['experience_title_en'] = experience_title_en
     context['experience'] = experience
     context['experience_finished'] = check_upload_filled(experience)
+    context['experience_status'] = experience.status
 
     if request.is_ajax():
+        # Check submit operation.
+        if 'submit_form' in request.POST:
+            experience.status = 'Submitted'
+            experience.save()
         if step == 'price':
             return manage_listing_price(request, experience, context)
         elif step == 'overview':
