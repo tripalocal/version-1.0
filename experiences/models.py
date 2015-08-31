@@ -25,7 +25,7 @@ class Experience(models.Model):
     repeat_frequency = models.IntegerField()
     repeat_extra_information = models.CharField(max_length=50)
     allow_instant_booking = models.BooleanField(default=False)
-    duration = models.IntegerField()
+    duration = models.FloatField()
 
     guest_number_max = models.IntegerField()
     guest_number_min = models.IntegerField()
