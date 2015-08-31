@@ -82,6 +82,19 @@ class Experience(models.Model):
             # self.meetup_spot = exp_i18n.meetup_spot
             # self.dropoff_spot = exp_i18n.dropoff_spot
 
+    def new_experience_i18n_info(self, **kwargs):
+        self._new_experience_i18n_info('zh')
+        self._new_experience_i18n_info('en')
+
+
+    def _new_experience_i18n_info(self, language, **kwargs):
+        ExperienceTitle.objects.create(experience=self, language=language)
+        ExperienceDescription.objects.create(experience=self, language=language)
+        ExperienceActivity.objects.create(experience=self, language=language)
+        ExperienceDress.objects.create(experience=self, language=language)
+        ExperienceInteraction.objects.create(experience=self, language=language)
+        ExperienceMeetupSpot.objects.create(experience=self, language=language)
+        ExperienceDropoffSpot.objects.create(experience=self, language=language)
 
     def change_status(self, new_status=None):
         self.status = new_status

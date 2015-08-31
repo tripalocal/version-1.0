@@ -1695,6 +1695,7 @@ def new_experience(request):
                                     currency='aud'
                                     )
             experience.save()
+            experience.new_experience_i18n_info()
             user_id = None
             host = None
             if request.user.is_superuser:
