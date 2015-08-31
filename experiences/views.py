@@ -2145,7 +2145,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
     if request.is_ajax():
         # Add all experiences that belong to the specified city to a new list
         # alongside a list with all the number of reviews
-        experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed")
+        experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(type__iexact="multi-hosts")
 
         if is_kids_friendly:
             experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
