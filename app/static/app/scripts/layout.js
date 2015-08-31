@@ -34,7 +34,8 @@ $(document).ready(function () {
         var nClose = parseInt($.cookie("closePopup"), 10);
 
         if (!nClose || nClose < 3) {
-            if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
+            if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
+                $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
               popupTimmer = setTimeout(function () {
                   $('#help-popup').modal('show');
                   mixpanel.track("saw popup01");
