@@ -1,0 +1,301 @@
+/*
+  Homepage
+  aka index.html
+*/
+
+@import
+  '../../vendor/include-media',
+  '../../utils/variables',
+  '../../utils/mixins',
+  '../../utils/functions',
+  '../../utils/placeholders';
+
+
+// Headings
+h1 {
+  font-family: $font-stack-homepage;
+  font-weight: 600;
+}
+
+// Top navigation bar, aka header
+.navbar {
+  @include linearGradient(rgba(black, 0.7), transparent);
+  position: absolute;
+  width: 100%;
+  border: 0;
+
+  .navbar-brand {
+    display: none;
+  }
+
+  .btn-clear {
+    background-color: transparent;
+    border-color: white;
+    color: white;
+    &:hover {
+      background-color: transparentize(black, 0.7);
+      border-color: white;
+      color: white;
+    }
+  }
+
+  .btn-secondary {
+    background-color: $primary-color;
+    color: white;
+    border-color: $primary-color;
+    &:hover {
+      background-color: darken($primary-color, 20%);
+      border-color: darken($primary-color, 20%);
+    }
+  }
+}
+
+// Brand logo with centred search bar
+.jumbotron {
+
+  .homepage-logo {
+    height: 190px;
+    margin: 0 auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    @include media('>tablet') {
+      height: 240px;
+      margin-top: 80px;
+      margin-bottom: 50px;
+    }
+
+  }
+
+  .bootstrap-datetimepicker-widget {
+    top: 0;
+    left: 0;
+    width: 250px;
+    padding: 4px;
+    margin-top: 1px;
+    z-index: 99999;
+    border-radius: 4px;
+  }
+
+  .search-bar {
+    width: 225px;
+    height: 95px;
+    margin: auto;
+    background-color: rgba(black, 0.5);
+    @include border-radius(6px);
+    @include media('>tablet') {
+      width: 620px;
+      height: 47px;
+    }
+
+    .search-location {
+      padding: 3px;
+      @include media('>tablet') {
+        padding-right: 0;
+      }
+    }
+
+    .search-from, .search-to {
+      display: none;
+      overflow: hidden;
+      padding: 3px;
+      @include media('>tablet') {
+        display: block;
+        margin: 0;
+        padding-left: 0;
+        padding-right: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+
+    #id_end_date {
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+
+    .home-search-button {
+      padding: 3px;
+      border-radius: 2px;
+    }
+
+    .btn-search {
+      width: 100%;
+      height: 40px;
+    }
+
+  }
+
+  p {
+    margin-top: 15px;
+    color: white;
+  }
+
+  @include media('>tablet') {
+    height: 590px;
+  }
+}
+
+// Tease box
+.tease-box {
+  text-align: center;
+  background: none;
+  @include media('>tablet') {
+    padding: 65px 0;
+  }
+
+  h1 {
+    color: $dark-grey;
+  }
+
+  p {
+    font-size: 16px;
+    color: $dark-grey;
+    margin-bottom: 45px;
+  }
+
+  .profile-featured {
+      width:66px;
+      height:66px;
+      float:none;
+      position: absolute;
+      margin:70px 117px;
+      @include media('<=tablet') {
+        margin: 70px auto;
+        position: relative;
+      }
+      img {
+        width:62px;
+        height:62px;
+        margin: 2px auto;
+      }
+    }
+
+  .row {
+    @include media('>tablet') {
+      padding-top: 15px;
+      padding-bottom: 15px;
+    }
+  }
+
+  .col-sm-4, .col-sm-8 {
+    @include media('<=tablet') {
+      padding: 0;
+    }
+  }
+
+  .price-offer, .city {
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 220px;
+    position: relative;
+
+    h1 {
+      color: white;
+      font-weight: normal;
+      position: absolute;
+      margin: 0;
+      line-height: 210px;
+      text-align: center;
+      width: 100%;
+      height: 100%;
+      transition: background-color 0.4s;
+    }
+
+    @include media('>tablet') {
+
+    }
+  }
+
+  .price-box {
+    top:0;
+    margin-top: 170px;
+  }
+
+  .box-link {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .custom-itinerary {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: white;
+    position: relative;
+    height: 220px;
+    @include media('>tablet') {
+      border-style: solid;
+      border-width: 1px;
+      border-color: $light-grey;
+      border-radius: 3px;
+    }
+    .request-btn {
+      position: absolute;
+      bottom: 14px;
+      left: 0;
+      right: 0;
+      margin-left: auto;
+      margin-right: auto;
+      width: 210px;
+      height: 45px;
+
+      @include media('>tablet', '<desktop') {
+        width: 150px;
+        bottom: 30px;
+      }
+    }
+  }
+}
+
+// Video box
+.video-box {
+  display: none;
+  @include media('>tablet') {
+    width: 100%;
+    height: 575px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    display: table;
+  }
+}
+
+.video-overlay{
+  color: white;
+  text-align: center;
+  margin: auto;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+// Community box
+.community-box {
+  position: relative;
+  margin: auto;
+  text-align: center;
+  padding-bottom: 40px;
+
+  h1 {
+    margin: 47px;
+    text-align: center;
+    padding: 0;
+  }
+
+  .box {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 330px;
+
+    a {
+      margin-top: 260px;
+      width: 140px;
+    }
+  }
+}

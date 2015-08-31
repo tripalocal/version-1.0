@@ -183,7 +183,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                             'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
                             'language':experience.language, 'host':host.first_name + ' ' + host.last_name,
                             'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated,
-                            'price':experience_fee_calculator(exp_price),
+                            'price':experience_fee_calculator(exp_price, experience.commission),
                             'currency':str(dict(Currency)[experience.currency.upper()]),
                             'dollarsign':DollarSign[experience.currency.upper()],'dates':{},
                             'photo_url':photo_url}

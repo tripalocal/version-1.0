@@ -53,8 +53,8 @@ Guest_Number_Min = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6',
 
 Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
-Duration = (('1', '1'),('1.5', '1.5'),('2', '2'),('2.5', '2.5'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
-('11', '11'),('12', '12'),('24', '1 day'),('48', '2 days'),('72', '3 days'),('96', '4 days'),('120', '5 days'),('144', '6 days'),('168', '7 days'),('192', '8 days'),
+Duration = (('1', '1 hour'),('1.5', '1.5 hours'),('2', '2 hours'),('2.5', '2.5 hours'),('3', '3 hours'),('4', '4 hours'),('5', '5 hours'),('6', '6 hours'),('7', '7 hours'),('8', '8 hours'),('9', '9 hours'),('10', '10 hours'),
+('11', '11 hours'),('12', '12 hours'),('24', '1 day'),('48', '2 days'),('72', '3 days'),('96', '4 days'),('120', '5 days'),('144', '6 days'),('168', '7 days'),('192', '8 days'),
 ('216', '9 days'),('240', '10 days'))
 
 Included = (('Yes', ''),('No', ''),)
@@ -68,7 +68,7 @@ Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Bri
 Currency = (('AUD',_('AUD')),('NZD',_('NZD')),) #('CNY',_('CNY')),
 DollarSign = {'AUD':'$','NZD':'$'} #'CNY':'￥',
 
-Status = (('Submitted', 'Submitted'), ('Listed','Listed'), ('Unlisted','Unlisted'))
+Status = (('Submitted', 'Pending Review'), ('Listed','Listed'), ('Unlisted','Unlisted'))
 
 PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 

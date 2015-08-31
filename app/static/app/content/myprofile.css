@@ -38,3 +38,8 @@
 .fileUpload input.upload {	position: absolute;	top: 0;	right: 0;	margin: 0;	padding: 0;	font-size: 20px;	cursor: pointer;	opacity: 0;	filter: alpha(opacity=0);}
 .fileUpload span {}
 input.uploadImage {    width:150px;    height:35px;}
+
+#id_login, #id_password, #id_password1, #id_email, #id_first_name, #id_last_name {
+    width: 25vw;
+    height: 34px;
+}

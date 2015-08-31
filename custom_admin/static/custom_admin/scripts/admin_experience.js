@@ -72,7 +72,7 @@ var presentationUtil = {
             currentValue.text("");
         } else {
             currentUI.css("display", "none");
-            currentValue.text(currentUI.val());
+            currentValue.text(helper.mapStatusToDisplay(currentUI.val()));
         }
     }
 }
@@ -107,9 +107,21 @@ var helper = {
             case "Draft":
                 return "black";
             case "Submitted":
-                return "yellow";
+                return "red";
         }
-    }
+    },
+    mapStatusToDisplay: function(status) {
+        switch (status) {
+            case "Listed":
+                return "Listed";
+            case "Unlisted":
+                return "Unlisted";
+            case "Draft":
+                return "Draft";
+            case "Submitted":
+                return "Pending Review";
+        }
+    },
 }
 
 

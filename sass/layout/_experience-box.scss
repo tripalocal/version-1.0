@@ -1,0 +1,62 @@
+/*
+
+  Experience box
+
+*/
+
+.exp-box {
+  float: left;
+  width: 100%;
+  margin: 20px 20px 20px 0px;
+  text-align: left;
+
+  @include media('>tablet') {
+    width: 300px;
+  }
+
+  h3 {
+    font-size: 15px;
+    color: black;
+    font-weight: normal;
+    @include media('<tablet') {
+      margin-left: 30px;
+    }
+  }
+  p {
+    @include media('<tablet') {
+      margin-left: 30px;
+    }
+  }
+
+  .profile-sm {
+    width: 65px;
+    height: 65px;
+    float: right;
+    margin-left: 15px;
+    @include media('<tablet') {
+      margin-right: 30px;
+    }
+  }
+
+  .listing-img {
+    height: 200px;
+    background-position: center;
+    background-size: cover;
+    width: 120%;
+    margin: 0;
+    @include media('>tablet') {
+      width: auto;
+    }
+  }
+
+  .listing-footer {
+    border-top: #CCC solid 1px;
+    font-size: 12px;
+    padding-top: 5px;
+    color: #666;
+    @include media('<tablet') {
+      margin-left: 30px;
+      margin-right: 30px;
+    }
+  }
+}

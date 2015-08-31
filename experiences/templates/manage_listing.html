@@ -143,8 +143,8 @@
 
     function updateDynamicPrice() {
         if ($("#id_max_guest_number").val().length > 0 && $("#id_min_guest_number").val().length > 0) {
-            max = parseInt($("#id_max_guest_number").val());
-            min = parseInt($("#id_min_guest_number").val());
+            var max = parseInt($("#id_max_guest_number").val());
+            var min = parseInt($("#id_min_guest_number").val());
 
             if (max >= min && min >= 1 && min <= 10 && max >= 1 && max <= 10) {
                 $("#id_dynamic_price").val($("#id_price").val() + ',');
@@ -157,9 +157,10 @@
                         $("#id_dynamic_price").val($("#id_dynamic_price").val() + $("#dynamic_price_input_" + i).val() + ',');
                     }
                     else {
-                        alert("Make sure valid input. Price pr person should be integer and not empty");
+                        //alert("Make sure valid input. Price pr person should be integer and not empty");
                         $("#dynamic_price_input_" + i).val(0);
-                        break;
+                        $("#id_dynamic_price").val($("#id_dynamic_price").val() + $("#dynamic_price_input_" + i).val() + ',');
+                        //break;
                     }
                 }
 
@@ -171,10 +172,26 @@
     }
 
     function setDynamicPriceInputDisplay() {
-        if ($("#id_max_guest_number").val().length > 0 && $("#id_min_guest_number").val().length > 0) {
-            max = parseInt($("#id_max_guest_number").val());
-            min = parseInt($("#id_min_guest_number").val());
+        var dynamicPrice = $("#id_dynamic_price").val().split(",");
+        dynamicPrice.pop();
+        if(dynamicPrice.length == 0) {
+            $("#add_dynamic_price").attr("style", "");
+            $("#cancel_dynamic_price").attr("style", "display:none;");
+            $("#dynamic_price_div").attr("style", "display:none;");
+            for (i = 1; i < 10; i++) {
+                $("#dynamic_price_input_" + i).val("");
+                $("#dynamic_price_with_fee_input_" + i).val("");
+                $("#dynamic_price_div_" + i).attr("style", "display:none;");
+            }
 
+        }
+
+        else if ($("#id_max_guest_number").val().length > 0 && $("#id_min_guest_number").val().length > 0) {
+            var max = parseInt($("#id_max_guest_number").val());
+            var min = parseInt($("#id_min_guest_number").val());
+            var dynamicPrice = $("#id_dynamic_price").val().split(",");
+            dynamicPrice.pop();
+            console.log(dynamicPrice);
             if (max >= min && min >= 1 && min <= 10 && max >= 1 && max <= 10) {
                 // Set the row before min.
                 i = min-1;
@@ -197,13 +214,27 @@
                         $("#commission-price-" + i).text(Math.round((customerPay - hostGet).toFixed(2),0));
                     }
                 }
+
+
                 for (i = min; i < max; i++) {
-                    $("#dynamic_price_div_" + i).attr("style", "");
-                    $("#dynamic_price_input_" + i).css("background-color", "rgb(255, 255, 255)").css("border", "1px solid #AAA");
-                    $("#dynamic_price_with_fee_input_" + i).css("background-color", "rgb(245, 245, 245)").css("border", "0px").prop('disabled', true);
-                    $("#dynamic_price_input_" + i).val(hostGet);
-                    $("#dynamic_price_with_fee_input_" + i).val(customerPay);
-                    $("#commission-price-" + i).text(Math.round((customerPay - hostGet).toFixed(2),0));
+                    if(dynamicPrice.length == max - min) {
+                        $("#dynamic_price_div_" + i).attr("style", "");
+                        $("#dynamic_price_input_" + i).css("background-color", "rgb(255, 255, 255)").css("border", "1px solid #AAA");
+                        $("#dynamic_price_with_fee_input_" + i).css("background-color", "rgb(245, 245, 245)").css("border", "0px").prop('disabled', true);
+                        var dynamicHostGet = dynamicPrice[i-min];
+                        var dynamicCustomerPay = (dynamicHostGet * window.COMMISSION_PERCENT * 1.000 + 0.0).toFixed(2);
+                        var dynamicCustomerPay = Math.round(dynamicCustomerPay,0);
+                        $("#dynamic_price_input_" + i).val(dynamicHostGet);
+                        $("#dynamic_price_with_fee_input_" + i).val(dynamicCustomerPay);
+                        $("#commission-price-" + i).text(Math.round((dynamicCustomerPay - dynamicHostGet).toFixed(2),0));
+                    } else {
+                        $("#dynamic_price_div_" + i).attr("style", "");
+                        $("#dynamic_price_input_" + i).css("background-color", "rgb(255, 255, 255)").css("border", "1px solid #AAA");
+                        $("#dynamic_price_with_fee_input_" + i).css("background-color", "rgb(245, 245, 245)").css("border", "0px").prop('disabled', true);
+                        $("#dynamic_price_input_" + i).val(hostGet);
+                        $("#dynamic_price_with_fee_input_" + i).val(customerPay);
+                        $("#commission-price-" + i).text(Math.round((customerPay - hostGet).toFixed(2),0));
+                    }
                 }
                 for (i = max; i < 10; i++) {
                     $("#dynamic_price_div_" + i).attr("style", "display:none;");
@@ -270,8 +301,8 @@
 
                 $("#dynamic_price_input_" + i).focusout(function () {
                     if (updateDynamicPrice()) {
-                        collectDynamicPrices();
-                        postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
+                        var dynamicPrice = collectDynamicPrices();
+                        postDatum(location.href, {'dynamic_price': dynamicPrice})
                     }
                 });
 
@@ -410,12 +441,11 @@
                 $("#add_dynamic_price").attr("style", "display:none;");
                 $("#cancel_dynamic_price").attr("style", "");
                 $("#dynamic_price_div").attr("style", "");
-                setDynamicPriceInputDisplay();
                 for (i = 1; i < 10; i++) {
                     $("#dynamic_price_input_" + i).val($("#id_price").val());
                     $("#dynamic_price_with_fee_input_" + i).val($("#id_price_with_booking_fee").val());
                 }
-
+                setDynamicPriceInputDisplay();
                 if (updateDynamicPrice()) {
                     postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
                 }
@@ -432,7 +462,7 @@
                 }
 
                 if (updateDynamicPrice()) {
-                    postDatum(location.href, {'dynamic_price': $('#id_dynamic_price').val()})
+                    postDatum(location.href, {'dynamic_price': ""})
                 }
             });
 
@@ -587,11 +617,11 @@
         }
 
         function collectDynamicPrices() {
-            var dynamicPrices = [];
+            var dynamicPrices = '';
             var min = parseInt($("#id_min_guest_number").val());
             var max = parseInt($("#id_max_guest_number").val());
             for(var i=min; i<max; i++) {
-                dynamicPrices.push($("#dynamic_price_input_" + i).val());
+                dynamicPrices = dynamicPrices + ($("#dynamic_price_input_" + i).val()) + ",";
             }
             return dynamicPrices;
         }
@@ -1192,15 +1222,18 @@ function loadLocationForm(href) {
             }
             signal.fadeIn(500);
             signal.text("Saved...");
-            signal.fadeOut(6000, function() {
-                signal.fadeIn(5000);
-                signal.text("All Changes Saved...");
-                signal.fadeOut(6000);
+            signal.fadeOut(1000, function() {
+                signal.fadeIn(1000);
+                signal.text("All Changes Saved.");
+                //signal.fadeOut(6000);
             });
         }).fail(function () {
             signal.fadeIn(500);
             signal.text("Update Failed");
-            signal.fadeOut(6000);
+            signal.fadeOut(3000, function() {
+                signal.fadeIn(1000);
+                signal.text("All Changes Saved.");
+            });
         });
     }
 

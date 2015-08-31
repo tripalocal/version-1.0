@@ -1,0 +1,76 @@
+/*
+
+  Profile
+
+*/
+
+// Sizes
+$xxs: 38px;
+$xs: 50px;
+$sm: 80px;
+$md: 130px;
+$lg: 150px;
+
+// Abstract profile class
+%profile {
+  overflow: hidden;
+  position: relative;
+  background-color: white;
+  @include border-radius(100px);
+  img {
+    border: 1px $medium-grey solid;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+  }
+}
+
+// Implementations
+.profile-lg {
+  @extend %profile;
+  width: $lg;
+  height: $lg;
+  img {
+    height: ($lg + 50);
+  }
+}
+
+.profile-md {
+  @extend %profile;
+  width: $md;
+  height: $md;
+  img {
+    height: ($md+ 20);
+  }
+}
+
+.profile-sm {
+  @extend %profile;
+  width: $sm;
+  height: $sm;
+  img {
+    height: ($sm + 10);
+  }
+}
+
+.profile-xs {
+  @extend %profile;
+  width: $xs;
+  height: $xs;
+  img {
+    height: ($xs+ 5);
+  }
+}
+
+.profile-navbar {
+  @extend %profile;
+  width: $xxs;
+  height: $xxs;
+  margin-right: 8px;
+  img {
+    height: $xs;
+  }
+}

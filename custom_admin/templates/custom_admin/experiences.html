@@ -74,7 +74,11 @@
                     <input id="input-commission-{{experience.id}}"/>
                 </td>
                 <td id="td-status-{{experience.id}}">
+                    {% if experience.status == 'Submitted'%}
+                    <p style="color: red">Pending Review</p>
+                    {% else %}
                     <p>{{experience.status}}</p>
+                    {% endif %}
                     <select name="select" id="select-status-{{experience.id}}">
                         <option value="Draft">Draft</option>
                         <option value="Submitted">Pending Review</option>

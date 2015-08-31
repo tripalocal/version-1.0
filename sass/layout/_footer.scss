@@ -1,0 +1,98 @@
+/*
+  Footer
+*/
+
+.footer {
+  clear: both;
+  background-color: #333;
+  padding-bottom: 20px;
+  padding-top: 50px;
+
+  h5 {
+    color: white;
+    margin-top: 0;
+    font-size: 18px;
+  }
+
+  a {
+    color: $medium-grey;
+    margin-bottom: 4px;
+    &:hover {
+      color: #ddd;
+    }
+  }
+
+  .caret {
+    float: right;
+    position: relative;
+    top: 7px;
+  }
+}
+
+.footer-head {
+  margin-left: 30px;
+  list-style: none;
+  text-align: center;
+  select {
+    height: 50px;
+    width: 210px;
+    margin: auto;
+    border-radius: 0;
+  }
+}
+
+.footer-logo {
+  background-size: 210px;
+  background-repeat: no-repeat;
+  margin: auto;
+  background-position: 45% 45%;
+  height: 175px;
+  @include media('<=tablet') {
+    display: none;
+  }
+}
+
+.footer-body {
+  float: right;
+  width: 500px;
+  margin-left: 50px;
+  text-align: center;
+}
+
+.footer-col {
+  width: 180px;
+  list-style: none;
+  text-align: left;
+
+}
+
+.footer-line {
+  width: 940px;
+  border-top: 1px $medium-grey solid;
+  clear: both;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+  p {
+    color: $medium-grey;
+  }
+}
+
+
+.footer hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #858585;
+  margin: 1em 0;
+  padding: 0;
+}
+
+
+.footer-col li:first-child {
+  margin: 0 0 13px;
+}
+
+.footer-col li {
+  margin: 6px 0;
+}

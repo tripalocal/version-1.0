@@ -1,5 +1,7 @@
 .icon{background-image:url(../img/icons.gif);}
 .searchbar{background-image:url(/images/img/searchbar.jpg);}
+.custom-itinerary{background-image: url(../img/homepage_banner.jpg)}
+.custom-itinerary-searchpage{}
 
 @media all and (min-width: 768px) {
 .jumbotron {background-image:url(/images/img/melbourne.jpg);}
