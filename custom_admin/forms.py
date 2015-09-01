@@ -38,7 +38,7 @@ class ExperienceUploadForm(forms.Form):
 
     def clean_status(self):
         data = self.cleaned_data['status']
-        if data not in EXPERIENCE_STATUS_CHOICES:
+        if data and data not in EXPERIENCE_STATUS_CHOICES:
             raise forms.ValidationError("You have wrong choice!")
         return data
 

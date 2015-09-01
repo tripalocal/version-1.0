@@ -43,6 +43,10 @@ class ExperienceView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def _manipulate_post_status(self, request, experience, **kwargs):
         experience.change_status(kwargs['form'].cleaned_data['status'])
 
+    def _manipulate_post_commission(self, request, experience, **kwargs):
+        experience.update_commission(kwargs['form'].cleaned_data['commission'])
+        return {'commission': kwargs['form'].cleaned_data['commission']}
+
 class BookingView(AjaxDisptcherProcessorMixin, BookingInfoMixin, MailSupportMixin, AdminCommonOperation, ListView):
     model = Booking
     template_name = 'custom_admin/bookings.html'
