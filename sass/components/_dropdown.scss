@@ -20,7 +20,7 @@
 }
 
 .light-color {
-  color: $light-grey;
+  color: $medium-grey;
   margin-left: 3px;
   font-weight: normal;
 }
@@ -44,7 +44,7 @@
   text-transform: none;
   font-weight: normal;
   font-size: 14px;
-  color: rgb(200, 200, 200);
+  color: $medium-grey;
 }
 
 .ui.selection.dropdown {
