@@ -56,12 +56,12 @@
 
 .save_to_wishlist_not_added {
   @extend %wishlist-icon;
-  background-image: url("/images/heart_large_red.svg");
+  background-image: url("../img/heart_large_red.svg");
 }
 
 .save_to_wishlist_added {
   @extend %wishlist-icon;
-  background-image: url("/images/heart_large_filled.svg");
+  background-image: url("../img/heart_large_filled.svg");
 }
 
 %wishlist-related-icon {
