@@ -1,6 +1,5 @@
 $(document).ready(function() {
     initDOMPresentation();
-    alert("heol");
     domCommEvents.setListener();
     domPresentationEvents.setListner();
 });
