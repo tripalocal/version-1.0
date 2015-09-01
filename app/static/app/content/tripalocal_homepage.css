@@ -52,7 +52,7 @@ h1{
   height: 44px;
   padding-left: 15px;
   line-height: 1.5;
-  color: #9B9B9B;
+  color: #999999;
   border: none;
   border-radius: 3px 0 0 3px;
 }
@@ -64,7 +64,7 @@ h1{
 }
 
 .light-color {
-  color: rgb(200, 200, 200);
+  color: #999999;
   margin-left: 3px;
   font-weight: normal;
 }
@@ -87,13 +87,13 @@ h1{
 .header {
   height: auto;
   font-style: normal;
-  color: rgb(200, 200, 200);
+  color: #999999;
 }
 .ui.dropdown .menu > .header {
   text-transform: none;
   font-weight: normal;
   font-size: 14px;
-  color: rgb(200, 200, 200);
+  color: #999999;
 }
 
 @media only screen and (max-width: 767px) {

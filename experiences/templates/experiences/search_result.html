@@ -219,7 +219,7 @@
             $('#city-menu').append(header);
             {% for id, name, state in v %}
                 var city = '<div class=\"item\" data-value=' + '{{ id }}' +
-                        ' data-text=' + '{{ name }}' + '>' + '{{ name }} ' +
+                        ' data-text=\"' + '{{ name }}\"' + '>' + '{{ name }} ' +
                         '<span class=\"light-color\">' + '{{ state }}' + '</span></div>';
                 $('#city-menu').append(city);
             {% endfor %}

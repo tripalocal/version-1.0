@@ -5,11 +5,15 @@
 {% block head %}
     {% load staticfiles %}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
+    {% if experience.type != "Multi-hosts" %}
     {% if LANGUAGE != "zh-CN" %}
     <title>{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</title>
     {%else%}
     <title>{% trans "with" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "Experience" %}{{ experience.title }}</title>
     {%endif%}
+    {% else %}
+    <title>{{ experience.title }}</title>
+    {% endif %}
     <!--<link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">-->
     <link href="{% static 'experiences/content/experience-detail.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
@@ -40,17 +44,19 @@
                             <div style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
                         </div>
                         {% endif %}
+                        {% if experience.type != "Multi-hosts" %}
                         {% if LANGUAGE != "zh-CN" %}
                         {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
                         {%else%}
                         {% trans "with" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "Reservation" %}
                         {%endif%}
+                        {%endif%}
                         <br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
                         <div class="row" style="width:200px;margin-top:10px">
                         {% if LANGUAGE != "zh-CN" %}
-                            <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {{ experience.duration }} {% trans "hours" %}<br><p>
+                            <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%}<br><p>
                         {%else%}
-                            <label>{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><label>{{experience.currency}}</label><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {{ experience.duration }} {% trans "hours" %}<br><p>
+                            <label>{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><label>{{experience.currency}}</label><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%}<br><p>
                         {%endif%}
                         </div>
                         <form id="experience_booking_form" method="post" action="">
@@ -152,10 +158,14 @@
                     {% if experience.type == "RECOMMENDED" %}
                     <div class="recommended-label">{% trans "Recommended" %}</div>
                     {% endif %}
+                    {% if experience.type != "Multi-hosts" %}
                     {% if LANGUAGE != "zh-CN" %}
                     <h2 style="font-weight:bold">{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}
                     {% else %}
                     <h2 style="font-weight:bold">{% trans "with" %}{% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}{% trans "Experience" %}{{ experience.title }}
+                    {% endif %}
+                    {% else %}
+                    <h2 style="font-weight:bold">{{ experience.title }}
                     {% endif %}
                     <br><small style="font-size:14px">{{experience.duration}} {% trans "hrs" %} &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
                     </h2>
@@ -177,7 +187,7 @@
 							<div class="col-sm-3">
 								<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Activities" %}</h3>
 							</div>
-							<div class="col-sm-9">
+							<div class="col-sm-9 col-xs-12" id="div_experience_activity">
                 <p>
 								{{ experience.activity|linebreaks }}
                 </p>
@@ -195,8 +205,8 @@
 						</div>
 						{% for w in experience.whatsincluded %}
 						<div class="row">
-							<div class="col-sm-3" style="margin-bottom:0;">
-								<h3 style="color:grey;margin-top:0;line-height:1.5;">{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%else%}交通{%endif%}{%endif%}:</h3>
+							<div class="col-sm-3 col-xs-12" style="margin-bottom:0;">
+								<h3 style="color:grey;margin-top:0;line-height:1.5;">{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%elif w.item.lower == "transport"%}交通{%elif w.item.lower == "accommodation"%}住宿{%elif w.item.lower == "private guide"%}旅游达人{%endif%}{%endif%}:</h3>
 							</div>
 							<div class="col-sm-9" style="margin-bottom:0;">
 								<p>
@@ -255,7 +265,7 @@
             </div>
     </div>
 
-    {% if experience.type != "NONPRIVATE" %}
+    {% if experience.type == "PRIVATE" %}
     <div class="row">
     <div class="experience-host bio-box">
 
@@ -410,9 +420,14 @@
 
 $(function(){
     $(document).ready(function(){
-      mixpanel.track("viewed an experience");
+        mixpanel.track("viewed an experience");
         if(screen.width > 767){
             $(document.body).stickem();
+        }
+
+        if($("#div_experience_activity").text().length>0)
+        {
+           $("#div_experience_activity")[0].innerHTML = $("#div_experience_activity")[0].innerHTML.replace(/&lt;strong&gt;/g,"<strong>").replace(/&lt;\/strong&gt;/g,"</strong>");
         }
 
         ids=['host_bio','id_experience_activity','id_experience_dress','id_experience_description']

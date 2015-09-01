@@ -1,0 +1,53 @@
+{% extends "app/layout.html" %}
+{% load staticfiles %}
+{% load mathfilters %}
+{% load i18n %}
+
+{%block head %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.css" rel="stylesheet">
+    <link href="{% static 'experiences/content/tripalocal_search.css' %}" rel="stylesheet">
+    <link href="{% static 'experiences/content/tripalocal_search_async.css' %}" rel="stylesheet">
+    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+{%endblock%}
+
+{% block content %}
+<div class="fixCenter">
+	<div id="response-to-update-multiple">
+		<div id="experience-results">
+			{% for experience in experienceList %}
+			{% if forloop.counter == 5 %}
+			<div class="expList custom-itinerary-searchpage" >
+			  <form action="mailto:enquiries@tripalocal.com">
+			  <button class="btn btn-primary request-btn">{% trans "Request a trip" %}</button>
+			  </form>
+			</div>
+			{% endif %}
+
+			<div class="expList">
+				<a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
+					<div class="listingImg" style="background-image:url({{ MEDIA_URL }}{{ experience.image }});">
+						<div class="priceBox">
+							{% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
+						</div>
+					</div>
+				</a>
+				<a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ experience.title }} </h3></a>
+
+				<p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
+
+				<div class="listingFooter">
+					{%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+{%endblock%}

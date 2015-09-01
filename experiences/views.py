@@ -1761,7 +1761,6 @@ def manage_listing_price(request, experience, context):
             experience.save()
             return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
-
 def manage_listing_overview(request, experience, context):
     if request.method == 'GET':
         data = {}
@@ -1797,7 +1796,6 @@ def manage_listing_overview(request, experience, context):
 
         experience.save()
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
-
 
 def manage_listing_detail(request, experience, context):
     if request.method == 'GET':
@@ -1873,7 +1871,6 @@ def manage_listing_detail(request, experience, context):
             experience.save()
 
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
-
 
 def manage_listing_photo(request, experience, context):
 
@@ -1960,7 +1957,6 @@ def manage_listing_photo(request, experience, context):
 
             experience.save()
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
-
 
 def manage_listing_location(request, experience, context):
     if request.method == 'GET':
@@ -2069,7 +2065,6 @@ def manage_listing(request, exp_id, step, ):
     else:
         return render_to_response('manage_listing.html', context)
 
-
 def manage_listing_continue(request, exp_id):
     exp = get_object_or_404(Experience, pk=exp_id)
 
@@ -2104,8 +2099,6 @@ def manage_listing_continue(request, exp_id):
         return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
 
     return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
-
-
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
                is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
@@ -2155,11 +2148,11 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed")
 
         if is_kids_friendly:
-                experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
+            experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
         if is_host_with_cars:
-                experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
+            experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
         if is_private_tours:
-                experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
+            experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
 
         i = 0
         while i < len(experienceList):
@@ -2309,11 +2302,11 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
     context = RequestContext(request, {
                             'city' : city,
-        'city_display_name':city_display_name if city_display_name is not None else city.title(),
-        'length':len(cityExperienceList),
-        'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
-        'cityList':cityList,
-        'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'city_display_name':city_display_name if city_display_name is not None else city.title(),
+                            'length':len(cityExperienceList),
+                            'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
+                            'cityList':cityList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
                             'locations' : Locations,
                             'LANGUAGE':settings.LANGUAGE_CODE,
                             'GEO_POSTFIX': GEO_POSTFIX,
@@ -2581,7 +2574,6 @@ def itinerary_booking_confirmation(request):
         #form = BookingConfirmationForm()
         return HttpResponseRedirect(GEO_POSTFIX)
 
-
 def set_response_exp_includes(data, includes):
     for index in range(len(includes)):
         if includes[index].item == "Food":
@@ -2600,7 +2592,6 @@ def set_response_exp_includes(data, includes):
             else:
                 data['included_ticket'] = "No"
 
-
 def set_response_exp_includes_detail(data, includes):
     for index in range(len(includes)):
         if includes[index].item == "Food":
@@ -2609,7 +2600,6 @@ def set_response_exp_includes_detail(data, includes):
             data['included_transport_detail'] = includes[index].details
         elif includes[index].item == "Ticket":
             data['included_ticket_detail'] = includes[index].details
-
 
 def set_response_exp_includes_detail_other_lang(data, includes):
     for index in range(len(includes)):
@@ -2627,4 +2617,34 @@ def itinerary_booking_successful(request):
 
     return render(request,'experiences/itinerary_booking_successful.html',{})
 
+def multi_day_trip(request):
+    experienceList = Experience.objects.filter(status='Listed', type='Multi-hosts')
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
 
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+
+        # Format title & Description
+        experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
+        t = get_experience_title(experience, settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/multi_day_trip.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)

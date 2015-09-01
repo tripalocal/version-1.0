@@ -31,7 +31,7 @@
 
             <div class="listing-footer">
                 <a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a>
-                {{ experience.duration }} hrs &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
+                {%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
             </div>
         </div>
         {% endfor %}

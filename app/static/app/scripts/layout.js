@@ -12,12 +12,16 @@ function create_post(email, message) {
         success: function (json) {
             $('#popup-form-details').val('');
             $('#popup-form-email').val('');
-            $('#results').html("<p class=''>Thank you for you suggestion.</p>");
+            $('#results').html("<br><p class='popup-result'>Sent!</p>");
             $.cookie("closePopup", 3, {path: '/'});
         },
 
         error: function (xhr, errmsg, err) {
-            $('#results').html("<p class=''>Oops! We have encountered an error.</p>");
+            $('#results').html("<br><p class='popup-result'>Error sending, please <span class='try-again'>try again</span></p>");
+            $('.try-again').click( function() {
+              $('#results').html("<br>");
+              $('#popup-send').show();
+            });
         }
     });
 }
@@ -30,7 +34,8 @@ $(document).ready(function () {
         var nClose = parseInt($.cookie("closePopup"), 10);
 
         if (!nClose || nClose < 3) {
-            if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
+            if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
+                $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
               popupTimmer = setTimeout(function () {
                   $('#help-popup').modal('show');
                   mixpanel.track("saw popup01");
@@ -72,6 +77,11 @@ $(document).ready(function () {
             $('#popup-page-2').show();
             mixpanel.track("selected Yes from popup01");
         });
+        
+        $('#multidaytrip-link').click(function() {
+          mixpanel.track("checked out designed multi-day from pop up box");
+        });
+
 
         $('#custom-trip-form').on('submit', function (event) {
             event.preventDefault();
@@ -81,17 +91,26 @@ $(document).ready(function () {
             message = $('#popup-form-details').val();
 
             if (!message || !email) {
-                $('#results').html("<p class=''>Please fill all fields.</p>");
+                $('#results').html("<p class='popup-result'>Please fill in all fields.</p>");
             } else {
                 var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
                 if (regex.test(email)) {
-                    alert('Thanks.');
+                    $('#popup-send').hide();
                     create_post(email, message);
                 } else {
-                    $('#results').html("<p class=''>Email Invalid.</p>");
+                    $('#popup-send').hide();
+                    $('#results').html("<br><p class='popup-result'>Invalid email, please <span class='try-again'>try again</span></p>");
+                    $('.try-again').click( function() {
+                      $('#results').html("<br>");
+                      $('#popup-form-email').val('');
+                      $('#popup-send').show();
+                    });
                 }
             }
         });
+
+
+
     }
 
     var des_url = window.location.pathname;
@@ -116,7 +135,12 @@ $(document).ready(function () {
             window.location.href = "https://www.tripalocal.com/cn" + des_url;
         } else {
             mixpanel.track("switched language from footer_cn");
-            window.location.href = "https://www.tripalocal.com" + des_url.substring(3);
+            if (window.location.href.indexOf(".cn") > -1) {
+                window.location.href = "https://www.tripalocal.com" + des_url;
+            }
+            else {
+                window.location.href = "https://www.tripalocal.com" + des_url.substring(3);
+            }
         }
     });
 

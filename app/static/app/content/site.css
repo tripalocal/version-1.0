@@ -22,9 +22,10 @@ textarea {
 }
 .help {
   width: 650px;
-  height: 420px;
+  height: 450px;
   background-size: cover;
   background-repeat: no-repeat;
+  background-color: #333;
   position: relative;
   z-index: 1000;
 }
@@ -39,7 +40,7 @@ textarea {
   text-align: center;
 }
 .help p {
-  color: #999;
+  color: #ccc;
   text-align: center;
 
 }
@@ -63,7 +64,7 @@ textarea {
   position: absolute;
   bottom: 15px;
   left: 232px;
-  color: #999;
+  color: #ccc;
   font-weight: lighter;
   cursor: pointer;
 }
@@ -78,11 +79,23 @@ textarea {
   max-width: 350px;
 }
 
+.try-again {
+  color: #3cc;
+  font-weight: bold;
+  cursor: pointer;
+}
+.try-again:hover {
+  color: rgb(84,156,156);
+  font-weight: bold;
+}
 .popup-form-submit {
   width: 350px;
   height: 40px;
 }
-
+.popup-result {
+  color: white !important;
+  font-weight: bold;
+}
 
 @media (max-width: 767px) {
   .help .col-xs-6 {

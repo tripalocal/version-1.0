@@ -673,7 +673,7 @@ def track_user_login(ip, sociallogin, user):
     mp.people_set(user.email, {"IP":ip})
 
     try:
-        reader = geoip2.database.Reader(path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+        reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
         country = response.country.name
         region = response.subdivisions.most_specific.name
