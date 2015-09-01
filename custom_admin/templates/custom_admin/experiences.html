@@ -70,7 +70,7 @@
                 <td>{{experience.id}}</td>
                 <td><a href="{% url 'experiencedetail' pk=experience.id %}" target="_blank">{{experience.title}}</a></td>
                 <td id="td-commission-{{experience.id}}">
-                    <p>{{experience.commission}}</p>
+                    <p>{% widthratio experience.commission 1 100 %}%</p>
                     <input id="input-commission-{{experience.id}}"/>
                 </td>
                 <td id="td-status-{{experience.id}}">
@@ -87,7 +87,7 @@
                     </select>
                 </td>
                 <td>{{experience.type}}</td>
-                <td><p><a href="#">{{experience.hosts.all.0}}</a></p>
+                <td><p><a href="/myprofile?user_id={{experience.hosts.all.0.id}}" target="_blank">{{experience.hosts.all.0}}</a></p>
                     <p>(<a href="#">Change</a>)</p>
                 </td>
                 <td>{{experience.city}}</td>

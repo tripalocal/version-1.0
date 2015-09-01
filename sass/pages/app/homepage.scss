@@ -156,18 +156,15 @@ h1 {
   }
 
   .profile-featured {
-      width:62px;
-      height:62px;
+      width:64px;
+      height:64px;
       float: none;
       margin: 70px auto;
       position: relative;
       img {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 0;
-        left: 0;
-        height: 66px;
+        position: relative;
+        height: 64px;
+        width: 64px;
         margin: auto;
       }
     }

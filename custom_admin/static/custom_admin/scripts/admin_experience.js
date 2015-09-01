@@ -63,10 +63,13 @@ var domCommEvents = {
             var currentInput = $(this);
             var object_id = helper.getLineIdByElementId(currentInput.attr("id"));
             currentInput.focusout(function() {
+                if(isNaN(currentInput.val()) || !currentInput.val()) {
+                    currentInput.val("30");
+                }
                 href = location.href,
                 datum = {
                     "operation": "post_commission",
-                    "commission": currentInput.val(),
+                    "commission": parseFloat(currentInput.val())/100,
                     "object_id": object_id,
                 };
                 successCallback = helper.genaralSuccessNotification;
@@ -104,12 +107,13 @@ var presentationUtil = {
         var currentValue = currentTd.children("p");
         // Hide current UI.
         if(currentUI.css("display") == "none") {
+            var commissionDisplay = currentValue.text();
             currentUI.css("display", "block");
-            currentUI.val(currentValue.text());
+            currentUI.val(commissionDisplay.substring(0, commissionDisplay.length - 1));
             currentValue.text("");
         } else {
             currentUI.css("display", "none");
-            currentValue.text(currentUI.val());
+            currentValue.text(currentUI.val()+"%");
         }
     }
 }
