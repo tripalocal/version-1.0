@@ -277,3 +277,39 @@
   margin: 0 auto;
   text-align: center;
 }
+
+// Save to wishlist
+%wishlist-icon {
+  height: 27px;
+  width: 27px;
+  background-repeat: no-repeat;
+  float: left;
+  margin-top: 5px;
+}
+
+%wishlist-related-icon {
+  position: relative;
+  float: left;
+  width: 27px;
+  height: 27px;
+  background-repeat: no-repeat;
+}
+.save_to_wishlist_not_added {
+  @extend %wishlist-icon;
+  background-image: url("../img/heart_large_red.svg");
+}
+
+.save_to_wishlist_added {
+  @extend %wishlist-icon;
+  background-image: url("../img/heart_large_filled.svg");
+}
+
+.save_to_wishlist_related {
+  @extend %wishlist-related-icon;
+  background-image: url("../img/heart_small_red.svg");
+}
+
+.saved_to_wishlist_related {
+  @extend %wishlist-related-icon;
+  background-image: url("../img/heart_small_filled.svg");
+}
