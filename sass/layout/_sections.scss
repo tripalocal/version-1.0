@@ -1,0 +1,40 @@
+/*
+  Sections
+  Commonly used layout components in static pages
+*/
+
+.left-nav-box {
+  margin-top: 30px;
+  width: 220px;
+  border: $light-grey 1px solid;
+  border-radius: 5px;
+  float: left;
+  padding-bottom: 5px;
+  background-color: white;
+  padding: 20px;
+  a {
+    color: $slate-grey;
+  }
+  a:hover {
+    color: black;
+  }
+}
+
+.right-content-box {
+  margin-top: 30px;
+  border: $light-grey 1px solid;
+  border-radius: 5px;
+  width: 720px;
+  height: auto;
+  padding: 0;
+  float: right;
+  background-color: #fff;
+  padding: 20px;
+}
+.right-content-box-header {
+  background-color: transparent;
+}
+.right-content-box-heading {
+  padding-left: 15px;
+  padding-top: 15px;
+}
