@@ -1,0 +1,54 @@
+/*
+  Banners
+
+*/
+
+// Custom itinerary homepage
+.custom-itinerary {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: white;
+  position: relative;
+  height: 220px;
+  @include media('>tablet') {
+    border-style: solid;
+    border-width: 1px;
+    border-color: $light-grey;
+    border-radius: 3px;
+  }
+  .request-btn {
+    position: absolute;
+    bottom: 14px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: 210px;
+    height: 45px;
+
+    @include media('>tablet', '<desktop') {
+      width: 150px;
+      bottom: 30px;
+    }
+  }
+}
+
+// Custom itinerary search page
+.custom-itinerary-searchpage {
+  display: none;
+  @include media('>tablet') {
+    background-image: url(../img/searchpage_banner.jpg);
+    background-color: white;
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+    position: relative;
+    height: 373px;
+    width: 300px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: $light-grey;
+    border-radius: 3px;
+  }
+}

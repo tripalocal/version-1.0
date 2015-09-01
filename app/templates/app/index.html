@@ -22,7 +22,7 @@
 	<script>
 		$(function() {
 			$("#slideshow > div:gt(0)").hide();
-			setInterval(function() { 
+			setInterval(function() {
 			  $('#slideshow > div:first')
 			    .fadeOut(1000)
 			    .next()
@@ -76,7 +76,7 @@
             {%endif%}
             </div>
         </div>
-    </div> 
+    </div>
 
     <div class="tease-box">
 
@@ -93,7 +93,7 @@
                                     <a class="box-link"
                                        href="{{ GEO_POSTFIX }}experience/{{ experience.experience.id }}">
                                         <div class="profile-featured">
-                                            <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240"
+                                            <img src="{{ MEDIA_URL }}{{ experience.hostImage }}"
                                                  height="240">
                                         </div>
                                         <div class="price-box">
@@ -145,7 +145,7 @@
                       <div class="price-offer" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
                           <a class="box-link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
                               <div class="profile-featured">
-                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
+                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" height="240">
                               </div>
                               <div class="price-box">
                                   {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
@@ -175,7 +175,7 @@
                       <div class="price-offer" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
                           <a class="box-link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
                               <div class="profile-featured">
-                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" width="240" height="240">
+                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" height="240">
                               </div>
                               <div class="price-box">
                                   {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
@@ -203,14 +203,14 @@
     </div>
 
     <div id="video-sec" class="video-box" style="background-image:url({{ MEDIA_URL }}homepage/video_poster-01.jpg)">
-        <div class="video-overlay" >
+        <div class="video-overlay">
             <h1 style="font-size:32px;font-family:'EXO', Helvertica, sans-serif;">{% trans "Travel with Tripalocal" %}</h1>
             <p style="font-size:16px;">{% trans "See how it works" %}</p>
             <br><br>
             <a style="cursor:pointer" id="enter_fullscreen"><img src="{{ MEDIA_URL }}homepage/play_btn.svg" width="75"></a>
         </div>
     </div>
-    <div id="video-fullscreen">
+    <div id="video-fullscreen" class="video-fullscreen">
         <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="{{ MEDIA_URL }}homepage/closeIcon-01.svg" width="30"></a>
         <div class="video-wrap">
             <video controls preload="metadata">
@@ -225,11 +225,15 @@
         <div class="container">
             <h1>{% trans "Our Community"%}</h1>
             <div class="row">
-                <div class="col-sm-6 box" style="background-image:url(/images/homepage/travelling-01.jpg)">
+                <div class="col-sm-6">
+                  <div class="box" style="background-image:url(/images/homepage/travelling-01.jpg)">
                     <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>
+                  </div>
                 </div>
-                <div class="col-sm-6 box" style="background-image:url(/images/homepage/hosting-01.jpg)">
+                <div class="col-sm-6">
+                  <div class="box" style="background-image:url(/images/homepage/hosting-01.jpg)">
                     <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>
+                  </div>
                 </div>
             </div>
         </div>
