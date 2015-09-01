@@ -612,7 +612,7 @@ class BookingConfirmationForm(forms.Form):
 
             dt = self.cleaned_data['date']
             tm = self.cleaned_data['time']
-            bk_dt = local_timezone.localize(datetime.datetime(dt.year, dt.month, dt.day, tm.hour, tm.minute)).astimezone(pytz.timezone("UTC"))
+            bk_dt = local_timezone.localize(datetime(dt.year, dt.month, dt.day, tm.hour, tm.minute)).astimezone(pytz.timezone("UTC"))
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
                                        end_datetime__gt = bk_dt,
                                        start_datetime__lt = bk_dt)
@@ -872,8 +872,8 @@ class ItineraryBookingForm(forms.Form):
                 #save the booking record
                 #user = User.objects.get(id=self.cleaned_data['user_id']) #moved outside of the for loop
                 host = experience.hosts.all()[0]
-                date = pytz.timezone(settings.TIME_ZONE).localize(datetime.datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
-                time = pytz.timezone(settings.TIME_ZONE).localize(datetime.datetime.strptime(times[i].split(":")[0].strip(), "%H"))
+                date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
+                time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
                 local_timezone = pytz.timezone(settings.TIME_ZONE)
 
                 is_instant_booking = False
@@ -912,22 +912,22 @@ class ItineraryBookingForm(forms.Form):
                                 is_instant_booking = True
                                 break
                     else:
-                        booking_datetime = local_timezone.localize(datetime.datetime(date.year, date.month, date.day, time.hour, time.minute))
+                        booking_datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute))
                         if ib_start <= booking_datetime and booking_datetime <= ib_end:
                             is_instant_booking = True
                             break
 
                 if coupon:
                     booking = Booking(user = user, experience= experience, guest_number = guest_number,
-                                        datetime = local_timezone.localize(datetime.datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
-                                        submitted_datetime = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid",
+                                        datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
+                                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid",
                                         coupon_extra_information=coupon_extra_information,
                                         coupon=coupon,
                                         booking_extra_information=booking_extra_information)
                 else:
                     booking = Booking(user = user, experience= experience, guest_number = guest_number,
-                                        datetime = local_timezone.localize(datetime.datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
-                                        submitted_datetime = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
+                                        datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
+                                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
                 booking.save()
                 #add the user to the guest list
                 if user not in experience.guests.all():
@@ -981,7 +981,7 @@ class ItineraryBookingForm(forms.Form):
                     booking.save()
                     if booking.coupon_id != None and booking.coupon.promo_code.startswith("once"):
                         #the coupon can be used once, make it unavailable
-                        booking.coupon.end_datetime = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)
+                        booking.coupon.end_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC)
                         booking.coupon.save()
 
                     #send an email to the traveller
@@ -1068,8 +1068,8 @@ class ItineraryBookingForm(forms.Form):
             dates.remove('')
             times.remove('')
 
-            date_start = pytz.timezone(settings.TIME_ZONE).localize(datetime.datetime.strptime(dates[0].strip() + " " + times[0].split(":")[0].strip(), "%Y/%m/%d %H"))
-            date_end = pytz.timezone(settings.TIME_ZONE).localize(datetime.datetime.strptime(dates[len(dates)-1].strip() + " " + times[len(dates)-1].split(":")[0].strip(), "%Y/%m/%d %H"))
+            date_start = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[0].strip() + " " + times[0].split(":")[0].strip(), "%Y/%m/%d %H"))
+            date_end = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[len(dates)-1].strip() + " " + times[len(dates)-1].split(":")[0].strip(), "%Y/%m/%d %H"))
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
                                        end_datetime__gt = date_end,
                                        start_datetime__lt = date_start)
