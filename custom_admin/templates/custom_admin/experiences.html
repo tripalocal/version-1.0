@@ -70,7 +70,7 @@
                 <td>{{experience.id}}</td>
                 <td><a href="{% url 'experiencedetail' pk=experience.id %}" target="_blank">{{experience.title}}</a></td>
                 <td id="td-commission-{{experience.id}}">
-                    <p>30%</p>
+                    <p>{{experience.commission}}</p>
                     <input id="input-commission-{{experience.id}}"/>
                 </td>
                 <td id="td-status-{{experience.id}}">
