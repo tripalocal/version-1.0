@@ -2,7 +2,7 @@
 Definition of views.
 """
 
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, get_object_or_404
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, loader
 from datetime import *
@@ -385,7 +385,12 @@ def mytrip(request):
     else:
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "mytrip")
 
-def myprofile(request):
+def myprofile(request, **kwargs):
+    if 'user_id' in request.GET:
+        if not request.user.is_superuser:
+            return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "myprofile")
+        request.user = get_object_or_404(User, pk=request.GET['user_id'])
+
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "myprofile")
 
