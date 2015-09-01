@@ -32,12 +32,12 @@ $(document).ready(function () {
         }
     });
 
-    $("#id_start_date").click(function () {
-        $("#id_start_date_picker").data("DateTimePicker").show();
+    $(function () {
+        $("#id_start_date").datetimepicker();
     });
 
-    $("#id_end_date").click(function () {
-        $("#id_end_date_picker").data("DateTimePicker").show();
+    $(function () {
+        $("#id_end_date").datetimepicker();
     });
 
     var utmId = getParameterByName('utm');

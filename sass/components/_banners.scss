@@ -38,7 +38,6 @@
 .custom-itinerary-searchpage {
   display: none;
   @include media('>tablet') {
-    background-image: url(../img/searchpage_banner.jpg);
     background-color: white;
     background-size: contain;
     background-repeat: no-repeat;
