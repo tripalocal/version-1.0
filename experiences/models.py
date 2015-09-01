@@ -100,6 +100,10 @@ class Experience(models.Model):
         self.status = new_status
         self.save()
 
+    def update_commission(self, commission):
+        self.commission = commission
+        self.save()
+
     class Meta:
         ordering = ['id']
 
