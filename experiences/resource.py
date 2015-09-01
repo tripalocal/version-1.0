@@ -165,7 +165,7 @@ def saveBookingRequest(booking_request):
         profile.save()
 
         cursor = connections['default'].cursor()
-        cursor.execute("Insert into account_emailaddress (user_id,email,verified,primary) values (%s, %s, %s, %s)", 
+        cursor.execute("Insert into account_emailaddress (user_id,email,verified,`primary`) values (%s, %s, %s, %s)", 
                        [user.id, email, 1, 1])
 
         username = user.username

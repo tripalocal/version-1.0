@@ -6,3 +6,9 @@ body {
   background-color: $base-color;
   font-family: $font-stack-body;
 }
+
+.container {
+  @include media('>tablet') {
+    width: 960px;
+  }
+}
