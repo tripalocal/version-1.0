@@ -63,6 +63,9 @@ var domCommEvents = {
             var currentInput = $(this);
             var object_id = helper.getLineIdByElementId(currentInput.attr("id"));
             currentInput.focusout(function() {
+                if(isNaN(currentInput.val()) || !currentInput.val()) {
+                    currentInput.val("0.3");
+                }
                 href = location.href,
                 datum = {
                     "operation": "post_commission",
