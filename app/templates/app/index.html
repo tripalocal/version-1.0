@@ -120,8 +120,7 @@
                         {% endif %}
                     {% endfor %}
                     <div class="col-sm-4">
-                        <div class="custom-itinerary"
-                             style="background-image:url({% static 'app/img/homepage_banner.jpg' %});">
+                        <div class="custom-itinerary">
                             <button class="btn btn-primary request-btn">{% trans 'Request a trip' %}</button>
                         </div>
                     </div>
@@ -245,6 +244,7 @@
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/index.js' %}"></script>
     <script charset="utf-8" type="text/javascript">
+    $("#video-fullscreen").hide();
         $(document).ready(function () {
             {% for k, v in locations %}
                 var header = '<div class=\"header\">' + '{{ k }}' + '</div>';
@@ -261,6 +261,14 @@
 
             $("#id_start_date").attr("placeholder", '{%trans " From " %}');
             $("#id_end_date").attr("placeholder", '{%trans " To " %}');
+            $(".request-btn").click(function () {
+              {% if LANGUAGE == "zh-CN" %}
+                window.location.href = "https://www.tripalocal.com/cn/multidaytrip"
+              {%else%}
+                window.location.href = "https://www.tripalocal.com/multidaytrip/";
+              {%endif%}
+                mixpanel.track("checked out designed multi-day from homepage");
+            });
         });
     </script>
 {% endblock %}

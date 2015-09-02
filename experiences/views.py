@@ -2286,6 +2286,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                     formattedTitleList.insert(counter, t[:27] + "...")
                 else:
                     formattedTitleList.insert(counter, t)
+                if float(experience.duration).is_integer():
+                    experience.duration = int(experience.duration)
                 i += 1
 
         if not settings.DEVELOPMENT:
