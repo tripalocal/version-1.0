@@ -19,6 +19,7 @@ $lg: 150px;
   @include border-radius(100px);
   img {
     border: 1px $medium-grey solid;
+    border-radius: 100px;
     position: absolute;
     left: 0;
     right: 0;
@@ -34,7 +35,7 @@ $lg: 150px;
   width: $lg;
   height: $lg;
   img {
-    height: ($lg + 50);
+    height: $lg;
   }
 }
 
@@ -43,7 +44,7 @@ $lg: 150px;
   width: $md;
   height: $md;
   img {
-    height: ($md+ 20);
+    height: $md;
   }
 }
 
@@ -52,7 +53,7 @@ $lg: 150px;
   width: $sm;
   height: $sm;
   img {
-    height: ($sm + 10);
+    height: $sm;
   }
 }
 
@@ -61,7 +62,7 @@ $lg: 150px;
   width: $xs;
   height: $xs;
   img {
-    height: ($xs+ 5);
+    height: $xs;
   }
 }
 
