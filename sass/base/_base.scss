@@ -9,6 +9,6 @@ body {
 
 .container {
   @include media('>tablet') {
-    width: 960px;
+    width: 970px;
   }
 }
