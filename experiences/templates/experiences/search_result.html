@@ -12,6 +12,9 @@
     <!--<link href="{% static 'experiences/content/tripalocal_search.css' %}" rel="stylesheet">
     <link href="{% static 'experiences/content/tripalocal_search_async.css' %}" rel="stylesheet">-->
     <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
+    <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
     <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
@@ -142,7 +145,7 @@
               <div id="ajax-experience-count" class="experience-count"></div>
           </div>
           <div id="ajax-experience-result"></div>
-       
+
         </div>
       </div>
     </div>
@@ -232,7 +235,8 @@
 
         $("#id_city").addClass("locationSelection");
         $("#id_city").val("{{city}}");
-
+        $('#id_start_date').addClass("form-control");
+        $('#id_end_date').addClass("form-control");
         language = $("#id_language").val().split(",");
         for(i=0;i<language.length;i++)
         {
@@ -295,8 +299,10 @@
         $(".input-group-addon").attr("style","padding:0px; border:0px;");
         $(".glyphicon-calendar").hide();
 
-        $("#id_start_date").click(function(){
-            $("#id_start_date_picker").data("DateTimePicker").show();  
+        $(function () {
+            $("#id_start_date").datetimepicker({
+              format: 'YYYY-MM-DD'
+            });
         });
 
        $("#id_start_date, #id_end_date").focusout(function () {
@@ -305,8 +311,10 @@
             }
         });
 
-        $("#id_end_date").click(function(){
-            $("#id_end_date_picker").data("DateTimePicker").show();
+        $(function () {
+            $("#id_end_date").datetimepicker({
+              format: 'YYYY-MM-DD'
+            });
         });
 
         $("#id_guest_number").change(function () {

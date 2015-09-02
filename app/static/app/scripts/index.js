@@ -33,11 +33,15 @@ $(document).ready(function () {
     });
 
     $(function () {
-        $("#id_start_date").datetimepicker();
+        $("#id_start_date").datetimepicker({
+          format: 'YYYY-MM-DD'
+        });
     });
 
     $(function () {
-        $("#id_end_date").datetimepicker();
+        $("#id_end_date").datetimepicker({
+          format: 'YYYY-MM-DD'
+        });
     });
 
     var utmId = getParameterByName('utm');
