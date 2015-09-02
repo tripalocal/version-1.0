@@ -1,23 +1,22 @@
+from datetime import *
+from calendar import monthrange
+import string
+import json
+import random
+
 from django import forms
 from bootstrap3_datetime.widgets import DateTimePicker
 from django.utils.safestring import mark_safe
-from django.contrib.auth.models import User
-from datetime import *
-from calendar import monthrange
+from experiences.constant import *
 from experiences.models import *
 from Tripalocal_V1 import settings
-import pytz, string, subprocess, json, random
-from django.core.mail import send_mail
+from experiences.telstra_sms_api import send_sms
+import pytz
 from django.template import loader
-from tripalocal_messages.models import Aliases, Users
+from tripalocal_messages.models import Aliases
 from django.utils.translation import ugettext as _
-from allauth.socialaccount.signals import pre_social_login, social_account_added
-from django.dispatch import receiver
 from django.db import connections
 from app.models import RegisteredUser
-from mixpanel import Mixpanel
-import geoip2.database
-from os import path
 from post_office import mail
 
 Type = (('PRIVATE', _('Private')),('NONPRIVATE', _('NonPrivate')),('RECOMMENDED', _('Recommended')),)
@@ -1044,7 +1043,12 @@ class ItineraryBookingForm(forms.Form):
                                                                     'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                                     'LANGUAGE':settings.LANGUAGE_CODE}))
 
-                pass
+
+                exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+                customer_phone_num = payment.phone_number
+                exp_datetime = booking.datetime.strftime(_("%H:%M %-d %b %Y"))
+                send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, user)
+
 
     def clean(self):
         """
@@ -1097,6 +1101,19 @@ class ItineraryBookingForm(forms.Form):
                          payment_street1,payment_street2,payment_city,payment_state,payment_country,payment_postcode,payment_phone_number)
 
         return cleaned
+
+
+def send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, customer):
+    registered_user = RegisteredUser.objects.get(user_id=host.id)
+    host_phone_num = registered_user.phone_number
+
+    if host_phone_num:
+        msg = _('%s' % REQUEST_SENT_NOTIFY_HOST).format(customer.first_name, exp_title, exp_datetime, customer.first_name)
+        send_sms(host_phone_num, msg)
+
+    if customer_phone_num:
+        msg = _('%s' % REQUEST_SENT_NOTIFY_CUSTOMER).format(host.first_name, exp_title, exp_datetime)
+        send_sms(customer_phone_num, msg)
 
 class SearchForm(forms.Form):
     start_date = forms.DateTimeField(required=False)

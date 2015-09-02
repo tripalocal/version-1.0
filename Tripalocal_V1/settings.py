@@ -290,11 +290,11 @@ EMAIL_BACKEND = 'post_office.EmailBackend' #'django.core.mail.backends.smtp.Emai
 
 STRIPE_SECRET_KEY = environ.get(
     "STRIPE_SECRET_KEY",
-    "sk_test_"
+    "sk_test_38pjDStAp63uEXWnO2Hw8FvO"
 )
 STRIPE_PUBLIC_KEY = environ.get(
     "STRIPE_PUBLIC_KEY",
-    "pk_test_"
+    "pk_test_W9jgaSX9w9vrewiQIl5gE5l4"
 )
 
 STRIPE_PRICE_PERCENT = 0.000 #0.029

@@ -1108,3 +1108,18 @@ msgstr "私人团"
 
 #~ msgid "Sorry but there was an error."
 #~ msgstr "请稍后再试"
+
+msgid "%H:%M %-d %b %Y"
+msgstr "%Y年%-m月%-d日 %H:%M"
+
+msgid "Tripalocal: {} has requested your {} on {}. Please respond within 48 hours or {} will be refunded"
+msgstr "本土客:{}对您的{}发出了请求，预定的出发时间为{}，请在48小时内回复，否则系统会自动退款给{}"
+
+msgid "Tripalocal: You have requested {}'s {} at {}, further information will be provided shortly."
+msgstr "本土客: 您对{}的{}的请求已经成功发送，时间是{}，我们会在稍后提供给您更详尽的旅程信息。"
+
+msgid "Tripalocal: Your booking for {exp_title} with {host_name} at {exp_datetime} has been confirmed."
+msgstr "本土客: 您预订的和{host_name}在{exp_datetime}的{exp_title}已经被成功确认。"
+
+msgid "Tripalocal: You have a confirmed booking request for {exp_title} sent by {customer_name} at {exp_datetime}."
+msgstr "本土客: 您已经成功确认了和{customer_name}在{exp_datetime}的{exp_title}的订单。"

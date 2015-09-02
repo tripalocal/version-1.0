@@ -23,6 +23,7 @@ from post_office import mail
 from collections import OrderedDict
 from django.http import Http404
 from django.core.urlresolvers import reverse
+from experiences.constant import  *
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -1447,6 +1448,11 @@ def update_booking(id, accepted, user):
                 booking.coupon.end_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC)
                 booking.coupon.save()
 
+            exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+            customer_phone_num = booking.payment.phone_number
+            exp_datetime = booking.datetime.strftime(_("%H:%M %-d %b %Y"))
+            send_booking_confirmed_sms(exp_datetime, exp_title, host, customer_phone_num, user)
+
             #send an email to the traveller
             mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
                       sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
@@ -1508,12 +1514,6 @@ def update_booking(id, accepted, user):
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
             email_template = 'experiences/email_booking_confirmed_host.html'
             booking_success = True
-            #return render(request, 'email_booking_confirmed_host.html',
-            #              {'experience': experience,
-            #                'booking':booking,
-            #                'user':guest,
-            #                'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-            #                'webpage':True})
 
         elif accepted == "no":
 
@@ -1587,12 +1587,6 @@ def update_booking(id, accepted, user):
                 email_template = 'experiences/email_booking_cancelled_host.html'
                 booking_success = True
 
-                #return render(request, 'email_booking_cancelled_host.html',
-                #               {'experience': experience,
-                #                'booking':booking,
-                #                'user':guest,
-                #                'experience_url': 'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                #                'webpage':True})
             else:
                 #TODO
                 #ask the host to try again, or contact us
@@ -1607,6 +1601,22 @@ def update_booking(id, accepted, user):
         result={'booking_success':booking_success}
 
     return result
+
+
+def send_booking_confirmed_sms(exp_datetime, exp_title, host, customer_phone_num, customer):
+    registered_user = RegisteredUser.objects.get(user_id=host.id)
+    host_phone_num = registered_user.phone_number
+
+    if host_phone_num:
+        msg = _('%s' % BOOKING_CONFIRMED_NOTIFY_HOST).format(exp_title=exp_title, customer_name=customer.first_name,
+                                                             exp_datetime=exp_datetime)
+        send_sms(host_phone_num, msg)
+
+    if customer_phone_num:
+        msg = _('%s' % BOOKING_CONFIRMED_NOTIFY_CUSTOMER).format(exp_title=exp_title, host_name=host.first_name,
+                                                                 exp_datetime=exp_datetime)
+        send_sms(customer_phone_num, msg)
+
 
 def booking_accepted(request, id=None):
     #TODO
