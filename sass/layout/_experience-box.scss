@@ -36,6 +36,9 @@
     @include media('<tablet') {
       margin-right: 30px;
     }
+    img {
+      height: 68px;
+    }
   }
 
   .listing-img {

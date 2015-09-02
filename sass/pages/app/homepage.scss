@@ -156,8 +156,8 @@ h1 {
   }
 
   .profile-featured {
-      width:64px;
-      height:64px;
+      width:65px;
+      height:65px;
       float: none;
       margin: 70px auto;
       position: relative;
@@ -166,6 +166,7 @@ h1 {
         height: 64px;
         width: 64px;
         margin: auto;
+        border-radius: 100px;
       }
     }
 
