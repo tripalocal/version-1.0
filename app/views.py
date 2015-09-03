@@ -2,12 +2,12 @@
 Definition of views.
 """
 
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, get_object_or_404
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, loader
 from datetime import *
 from django.views.decorators.http import require_POST
-from experiences.forms import Locations
+from experiences.forms import Locations, Location
 from django.contrib.auth import authenticate, login
 from allauth.account.signals import password_reset, user_signed_up, user_logged_in
 from allauth.account.views import PasswordResetFromKeyDoneView
@@ -35,12 +35,17 @@ PRIVATE_IPS_PREFIX = ('10.', '172.', '192.', '127.')
 
 GEO_POSTFIX = settings.GEO_POSTFIX
 
+ALL_CITIES = (('Melbourne', _('Melbourne')), ('Sydney', _('Sydney')), ('Brisbane', _('Brisbane')),
+              ('Cairns', _('Cairns')),
+              ('Goldcoast', _('Gold Coast')), ('Hobart', _('Hobart')), ('Adelaide', _('Adelaide')),
+              ('Darwin', _('Darwin')), ('Alicesprings', _('Alice Springs')),
+              ('Christchurch', _('Christchurch')), ('Queenstown', _('Queenstown')),
+              ('Auckland', _('Auckland')), ('Wellington', _('Wellington')),)
+
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
 
 def home(request):
-    """Renders the home page."""
-
     context = RequestContext(request)
     if request.method == 'POST':
         form = HomepageSearchForm(request.POST)
@@ -59,46 +64,6 @@ def home(request):
                                              end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
             else:
                 return SearchView(request, form.data['city'])
-
-            #mp = Mixpanel(settings.MIXPANEL_TOKEN)
-            #try:
-            #    Subscription.objects.get(email = form.data['email'])
-            #    messages.add_message(request, messages.INFO, 'It seems you already subscribed. Thank you.')
-            #except Subscription.DoesNotExist:
-            #    ref = request.GET.get('ref')
-            #    ref_link=id_generator(size=8)
-
-            #    try:
-            #        ref_by = Subscription.objects.get(ref_link = ref)
-            #        new_sub = Subscription(email = form.data['email'], subscribed_datetime = datetime.utcnow().replace(tzinfo=pytz.utc), ref_by = ref_by.email, ref_link=ref_link)
-            #        #send an email to the referal
-            #        counter = len(Subscription.objects.filter(ref_by = ref_by.email))
-
-            #        if count <= 5:
-            #            if counter%5 < 4: # i.e., (count+1)%5==0
-            #                mp.track(ref_by.email, 'Referred a friend')
-            #                mail.send('[Tripalocal] Someone has signed up because of you!', '', 'Tripalocal <enquiries@tripalocal.com>',
-            #                            [ref_by.email], fail_silently=False,
-            #                            html_message=loader.render_to_string('app/email_new_referral.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link, 'counter':counter%5+1, 'left':5-1-counter%5}))
-            #            else:
-            #                mp.track(ref_by.email, 'Qualified for a free experience')
-            #                mail.send('[Tripalocal] Free experience!', '', 'Tripalocal <enquiries@tripalocal.com>',
-            #                            [ref_by.email], fail_silently=False,
-            #                            html_message=loader.render_to_string('app/email_free_experience.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_by.ref_link}))
-            #    except Subscription.DoesNotExist:
-            #        new_sub = Subscription(email = form.data['email'], subscribed_datetime = datetime.utcnow().replace(tzinfo=pytz.utc), ref_link=ref_link)
-            #    finally:
-            #        new_sub.save()
-            #        #send an email to the new subscriber
-            #        #mp.people_set(form.data['email'], {"$email": form.data['email']})
-            #        #mp.track(form.data['email'], 'Entered email address at prelaunch')
-            #        data = "{'event': 'Opened welcome email','properties': {'token': '" + settings.MIXPANEL_TOKEN + "', 'distinct_id': '" + form.data['email'] + "'}}"
-            #        mail.send('[Tripalocal] Welcome', '', 'Tripalocal <enquiries@tripalocal.com>',
-            #                    [form.data['email']], fail_silently=False,
-            #                    html_message=loader.render_to_string('app/email_welcome.html',
-            #                                                         {'ref_url':'http://www.tripalocal.com?ref='+ref_link, 'data':base64.b64encode(data.encode('utf-8')).decode('utf-8')}))
-            #        #messages.add_message(request, messages.INFO, 'Thank you for subscribing.')
-            #        return render_to_response('app/welcome.html', {'ref_url':'http://www.tripalocal.com?ref='+ref_link}, context)
     else:
         form = HomepageSearchForm()
 
@@ -144,7 +109,9 @@ def home(request):
         featuredExperienceList[i].currency = str(dict(Currency)[featuredExperienceList[i].currency.upper()])
         featuredExperience.append({"experience":featuredExperienceList[i],"background":BGImages[i],"hostImage":profileImages[i]})
 
-    featuredCityList = [('Melbourne', _('Melbourne')),('Sydney', _('Sydney')),('Goldcoast',_('Gold Coast')),('Cairns',_('Cairns')),('Adelaide',_('Adelaide'))]
+    random_city_ids = random.sample(range(len(ALL_CITIES)), 5)
+    featuredCityList = [ALL_CITIES[i] for i in random_city_ids]
+    # featuredCityList = [('Melbourne', _('Melbourne')),('Sydney', _('Sydney')),('Goldcoast',_('Gold Coast')),('Cairns',_('Cairns')),('Adelaide',_('Adelaide'))]
 
     context = RequestContext(request, {
         'featuredExperience': featuredExperience,
@@ -385,7 +352,12 @@ def mytrip(request):
     else:
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "mytrip")
 
-def myprofile(request):
+def myprofile(request, **kwargs):
+    if 'user_id' in request.GET:
+        if not request.user.is_superuser:
+            return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "myprofile")
+        request.user = get_object_or_404(User, pk=request.GET['user_id'])
+
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "myprofile")
 

@@ -5,11 +5,13 @@
 {% block head %}
     {% load staticfiles %}
     <title>Edit Experience</title>
+    <link href="{% static 'app/content/tripalocal.css' %}" rel="stylesheet"/>
+    <link href="{% static 'app/content/tripalocal_xs.css' %}" rel="stylesheet"/>
     <link href="{% static 'experiences/content/manage_listing.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
-<form id="add_experience_price_form" action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+<input id="add_experience_price_form" action="" method="post" enctype="multipart/form-data">{% csrf_token %}
 {# leave here just for styling placehoder #}
     <div class="back_button">
         {% if language == "cn" %}
@@ -53,6 +55,8 @@
       <div id="ajax-listing-form"></div>
     </div>
     <input id="experience-status" value="{{experience_status}}" style="display: none"/>
+    <input id="experience-commission" value="{{experience.commission}}" style="display: none"/>
+
 </form>
 {% endblock %}
 
@@ -108,9 +112,11 @@
       stickyNav();
     });
   });
+    var commissionRate = parseFloat($("#experience-commission").val());
+
 
     window.PRICE_FORM_INDICATOR = "none";
-    window.COMMISSION_PERCENT = 1.429;
+    window.COMMISSION_PERCENT = (1/(1-commissionRate)).toFixed(3);
 
 
     function setCookie(key, value) {

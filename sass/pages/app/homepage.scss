@@ -156,19 +156,17 @@ h1 {
   }
 
   .profile-featured {
-      width:66px;
-      height:66px;
-      float:none;
-      position: absolute;
-      margin:70px 117px;
-      @include media('<=tablet') {
-        margin: 70px auto;
-        position: relative;
-      }
+      width:64px;
+      height:64px;
+      float: none;
+      margin: 70px auto;
+      position: relative;
       img {
-        width:62px;
-        height:62px;
-        margin: 2px auto;
+        position: relative;
+        height: 64px;
+        width: 64px;
+        margin: auto;
+        border-radius: 100px;
       }
     }
 
@@ -188,6 +186,7 @@ h1 {
   .price-offer, .city {
     background-size: cover;
     background-repeat: no-repeat;
+    background-position: center;
     height: 220px;
     position: relative;
 
@@ -208,6 +207,12 @@ h1 {
     }
   }
 
+  .city {
+    h1:hover{
+      background-color: RGBA(0, 0, 0, 0.2);
+    }
+  }
+
   .price-box {
     top:0;
     margin-top: 170px;
@@ -221,35 +226,6 @@ h1 {
     left: 0;
   }
 
-  .custom-itinerary {
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-color: white;
-    position: relative;
-    height: 220px;
-    @include media('>tablet') {
-      border-style: solid;
-      border-width: 1px;
-      border-color: $light-grey;
-      border-radius: 3px;
-    }
-    .request-btn {
-      position: absolute;
-      bottom: 14px;
-      left: 0;
-      right: 0;
-      margin-left: auto;
-      margin-right: auto;
-      width: 210px;
-      height: 45px;
-
-      @include media('>tablet', '<desktop') {
-        width: 150px;
-        bottom: 30px;
-      }
-    }
-  }
 }
 
 // Video box
@@ -292,7 +268,6 @@ h1 {
     background-repeat: no-repeat;
     background-position: center;
     height: 330px;
-
     a {
       margin-top: 260px;
       width: 140px;

@@ -5,4 +5,16 @@
 body {
   background-color: $base-color;
   font-family: $font-stack-body;
+  overflow-x: hidden;
+}
+
+.container {
+  @include media('>tablet') {
+    width: 970px;
+  }
+}
+
+.fixCenter {
+  width: 960px;
+  margin: auto;
 }

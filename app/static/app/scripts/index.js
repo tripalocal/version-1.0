@@ -1,11 +1,8 @@
 $(document).ready(function () {
     mixpanel.track("viewed homepage");
-    $(".request-btn").click(function () {
-        window.location.href = "https://www.tripalocal.com/multidaytrip/";
-        mixpanel.track("checked out designed multi-day from homepage");
-    });
 
-    $("#video-fullscreen").hide();
+
+    
     function getParameterByName(name) {
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
         var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -32,12 +29,16 @@ $(document).ready(function () {
         }
     });
 
-    $("#id_start_date").click(function () {
-        $("#id_start_date_picker").data("DateTimePicker").show();
+    $(function () {
+        $("#id_start_date").datetimepicker({
+          format: 'YYYY-MM-DD'
+        });
     });
 
-    $("#id_end_date").click(function () {
-        $("#id_end_date_picker").data("DateTimePicker").show();
+    $(function () {
+        $("#id_end_date").datetimepicker({
+          format: 'YYYY-MM-DD'
+        });
     });
 
     var utmId = getParameterByName('utm');
