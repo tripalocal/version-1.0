@@ -1099,8 +1099,8 @@ class ItineraryBookingForm(forms.Form):
         return cleaned
 
 class SearchForm(forms.Form):
-    start_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    end_date = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    start_date = forms.DateTimeField(required=False)
+    end_date = forms.DateTimeField(required=False)
     guest_number = forms.ChoiceField(choices=Guest_Number, widget=forms.Select(attrs={'class':'ui dropdown smaller-box'}), required=False)
     city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'class':'ui dropdown'}), required=True)
     language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")

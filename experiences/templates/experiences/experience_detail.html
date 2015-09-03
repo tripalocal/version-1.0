@@ -41,7 +41,7 @@
                     <div class="booking-box">
                         {% if experience.type == 'PRIVATE' %}
                         <div class="profile-lg">
-                            <div style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
+                            <div style="background:url({{ MEDIA_URL }}{{ host_image|urlencode }}); no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
                         </div>
                         {% endif %}
                         {% if experience.type != "Multi-hosts" %}
@@ -223,11 +223,11 @@
 						</div>
 					</div>
 
-                    <div id="carousel_box" class="container">
+                    <div id="carousel_box">
                         <br>
                         <div id="myCarousel" class="carousel " data-ride="carousel">
                             <!-- Indicators -->
-                            <ol class="carousel-indicators" style="bottom: -25px;">
+                            <ol class="carousel-indicators" style="position:absolute; bottom: -45px;">
                             {% for photo in experience.photo_set.all %}
                                 {% if forloop.counter0 == 0 %}
 				                <li data-target="#myCarousel" data-slide-to="{{forloop.counter0}}" class="active"></li>
@@ -271,7 +271,7 @@
 
             <h2>{% trans "About the host," %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</h2>
             <div id="experience-hostintro" class="experience-hostintro">
-                <div class="experience-hostpic profile-lg" style="background:url({{ MEDIA_URL }}{{ host_image }}) no-repeat; background-size:cover; background-position:center;"></div>
+                <div class="experience-hostpic profile-lg" style="background:url({{ MEDIA_URL }}{{ host_image|urlencode }}); no-repeat; background-size:cover; background-position:center;"></div>
                 <div>
                     <div id="experience-hostinterests" class="experience-hostinterests">
                         <div class="gradientMask"></div>

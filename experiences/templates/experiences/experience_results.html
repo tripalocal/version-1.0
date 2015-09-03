@@ -25,7 +25,7 @@
             <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ formattedTitle }} </h3></a>
 
             <div class="profile-sm"
-                style="background:url({{ MEDIA_URL }}{{ profileImageURL }}) no-repeat; background-size:cover; background-position:center;"></div>
+                style="background:url({{ MEDIA_URL }}{{ profileImageURL|urlencode }}) no-repeat; background-size:cover; background-position:center;"></div>
 
             <p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
 

@@ -3,13 +3,15 @@
 {% load i18n %}
 
 {% block head %}
+  {% load staticfiles %}
     <title>{% trans "Booking Confirmation" %}</title>
+    <link rel="stylesheet" href="{% static 'experiences/content/checkout.css' %}">
     <script src="https://checkout.stripe.com/checkout.js"></script>
 {% endblock %}
 
 {% block content %}
     <div class="container-fluid experience">
-        <div class="fixCenter">
+        <div class="container">
             <div class="checkoutBox">
                 <form id="category_form" method="post" action="{{GEO_POSTFIX}}experience_booking_confirmation/">
                     {% csrf_token %}
@@ -20,7 +22,7 @@
                     </div>
 
                     <div style="display:inline-block;">
-                        <h2 style="padding-left: 20px;font-weight:bold;margin-top:15px">{% trans "Payment Details" %}</h2>
+                        <h2 style="font-weight:bold;margin-top:15px">{% trans "Payment Details" %}</h2>
                     </div>
 
                     <div class="row">
@@ -321,8 +323,8 @@
                 </form>
             </div>
 
-            <div class="expList checkoutDetails">
-                <div class="listingImg" style="background-image:url(
+            <div class="exp-box checkoutDetails">
+                <div class="listing-img" style="background-image:url(
 		        {% for photo in experience.photo_set.all %}
                     {% if forloop.first %}
 				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}

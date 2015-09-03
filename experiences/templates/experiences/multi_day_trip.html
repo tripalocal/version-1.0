@@ -15,7 +15,7 @@
 {%endblock%}
 
 {% block content %}
-<div class="container">
+<div class="container" style="width: 990px;">
 	<div id="response-to-update-multiple">
 		<div id="experience-results">
 			{% for experience in experienceList %}
@@ -40,7 +40,7 @@
 				<p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
 
 				<div class="listing-footer">
-					{%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
+					{%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
 				</div>
 			</div>
 			{% endfor %}
