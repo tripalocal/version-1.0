@@ -259,11 +259,11 @@ msgstr "我们会在48小时内给您答复"
 
 #: templates/app/layout.html:79
 msgid "or check out some of our "
-msgstr ""
+msgstr "或者浏览"
 
 #: templates/app/layout.html:85
 msgid "most popular trips"
-msgstr ""
+msgstr "最热门路线"
 
 #: templates/app/layout.html:90
 msgid "Please tell us more details"
