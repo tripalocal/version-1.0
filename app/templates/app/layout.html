@@ -124,14 +124,14 @@
                    href="https://www.tripalocal.com{% if LANGUAGE == "zh-CN" %}{{ request.path|slice:"3:" }}{% else %}/cn{{ request.path }}{% endif %}">
                     {% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a>
 
-                <a type="button" class="btn btn-primary navbar-btn navbar-right"
+                <a type="button" class="btn btn-secondary navbar-btn navbar-right"
                    href="{{ GEO_POSTFIX }}accounts/logout/">{% trans "Log out" %}</a>
                 <p class="navbar-text navbar-right">{{ user.first_name }}</p>
-                <div class="profile-navbar navbar-btn navbar-right" id="id_profile_div"><a
-                        href="{{ GEO_POSTFIX }}myprofile"><img
-                        src="{% if user.socialaccount_set.all %}http://graph.facebook.com/
-                            {% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40
-                            {% elif user.registereduser.image_url and user.registereduser.image_url.strip %}{{ MEDIA_URL }}{{ user.registereduser.image_url }}{% else %} {{ MEDIA_URL }}profile_default.jpg {% endif %}"/></a>
+                <div class="profile-navbar navbar-btn navbar-right" id="id_profile_div" style="background:url({% if user.socialaccount_set.all %}http://graph.facebook.com/
+                    {% for u in user.socialaccount_set.all %}{% if forloop.first %}{{ u.uid }}{% endif %}{% endfor %}/picture?width=40&height=40
+                    {% elif user.registereduser.image_url and user.registereduser.image_url.strip %}{{ MEDIA_URL }}{{ user.registereduser.image_url }}{% else %} {{ MEDIA_URL }}profile_default.jpg {% endif %});
+                    background-size: cover; background-repeat: no-repeat; background-position:center;"><a style="display:block; width:38px; height:38px; border-radius:100px;"
+                        href="{{ GEO_POSTFIX }}myprofile"></a>
                 </div>
             {% else %}
                 <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right"
