@@ -5,6 +5,7 @@
 body {
   background-color: $base-color;
   font-family: $font-stack-body;
+  overflow-x: hidden;
 }
 
 .container {
