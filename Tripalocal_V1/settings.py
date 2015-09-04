@@ -185,6 +185,8 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'storages',
+    'kombu.transport.django',
+    'djcelery',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -319,6 +321,8 @@ POST_OFFICE = {
 GEO_POSTFIX = "/"
 
 DEVELOPMENT = False
+
+BROKER_URL = 'django://'
 
 # AWS S3
 AWS_STORAGE_BUCKET_NAME = 'tripalocal-static'

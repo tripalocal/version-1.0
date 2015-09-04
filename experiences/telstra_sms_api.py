@@ -33,7 +33,7 @@ def get_auth_token():
         return stored_token
 
 
-def send_sms(phone_num, msg=None):
+def send_sms(phone_num, msg):
     token = get_auth_token()
     headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
     payload = {'to': phone_num, 'body': msg}

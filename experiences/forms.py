@@ -8,6 +8,7 @@ from django import forms
 from bootstrap3_datetime.widgets import DateTimePicker
 from django.utils.safestring import mark_safe
 from experiences.constant import *
+from experiences.tasks import schedule_sms
 from experiences.models import *
 from Tripalocal_V1 import settings
 from experiences.telstra_sms_api import send_sms
@@ -1109,11 +1110,16 @@ def send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, 
 
     if host_phone_num:
         msg = _('%s' % REQUEST_SENT_NOTIFY_HOST).format(customer.first_name, exp_title, exp_datetime, customer.first_name)
+        # Todo: schedule sms for host
+        # schedule_sms.apply_async([host_phone_num, msg], eta=datetime.utcnow() + timedelta(minutes=3))
         send_sms(host_phone_num, msg)
 
     if customer_phone_num:
         msg = _('%s' % REQUEST_SENT_NOTIFY_CUSTOMER).format(host.first_name, exp_title, exp_datetime)
+        # Todo: schedule sms customer
+        # schedule_sms.apply_async([customer_phone_num, msg], eta=datetime.utcnow() + timedelta(minutes=2))
         send_sms(customer_phone_num, msg)
+
 
 class SearchForm(forms.Form):
     start_date = forms.DateTimeField(required=False)
