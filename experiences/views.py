@@ -1516,6 +1516,10 @@ def update_booking(id, accepted, user):
             booking_success = True
 
         elif accepted == "no":
+            exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+            customer_phone_num = booking.payment.phone_number
+            exp_datetime = booking.datetime.strftime(_("%H:%M %-d %b %Y"))
+            send_booking_cancelled_sms(exp_datetime, exp_title, host, customer_phone_num, user)
 
             extra_fee = 0.00
             free = False
@@ -1614,6 +1618,21 @@ def send_booking_confirmed_sms(exp_datetime, exp_title, host, customer_phone_num
 
     if customer_phone_num:
         msg = _('%s' % BOOKING_CONFIRMED_NOTIFY_CUSTOMER).format(exp_title=exp_title, host_name=host.first_name,
+                                                                 exp_datetime=exp_datetime)
+        send_sms(customer_phone_num, msg)
+
+
+def send_booking_cancelled_sms(exp_datetime, exp_title, host, customer_phone_num, customer):
+    registered_user = RegisteredUser.objects.get(user_id=host.id)
+    host_phone_num = registered_user.phone_number
+
+    if host_phone_num:
+        msg = _('%s' % BOOKING_CANCELLED_NOTIFY_HOST).format(exp_title=exp_title, customer_name=customer.first_name,
+                                                             exp_datetime=exp_datetime)
+        send_sms(host_phone_num, msg)
+
+    if customer_phone_num:
+        msg = _('%s' % BOOKING_CANCELLED_NOTIFY_CUSTOMER).format(exp_title=exp_title, host_name=host.first_name,
                                                                  exp_datetime=exp_datetime)
         send_sms(customer_phone_num, msg)
 

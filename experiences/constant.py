@@ -4,3 +4,8 @@ REQUEST_SENT_NOTIFY_CUSTOMER = "Tripalocal: You have requested {}'s {} at {}, fu
 
 BOOKING_CONFIRMED_NOTIFY_CUSTOMER = "Tripalocal: Your booking for {exp_title} with {host_name} at {exp_datetime} has been confirmed."
 BOOKING_CONFIRMED_NOTIFY_HOST = "Tripalocal: You have a confirmed booking request for {exp_title} sent by {customer_name} at {exp_datetime}."
+
+BOOKING_CANCELLED_NOTIFY_CUSTOMER = "Tripalocal: Your booking request for {exp_title} at {exp_datetime} with " \
+                                    "{host_name} has been cancelled. Refund is on the way."
+
+BOOKING_CANCELLED_NOTIFY_HOST = "Tripalocal: {customer_name}'s booking request for {exp_title} at {exp_datetime} has been cancelled."

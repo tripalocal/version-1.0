@@ -1123,3 +1123,10 @@ msgstr "本土客: 您预订的和{host_name}在{exp_datetime}的{exp_title}已�
 
 msgid "Tripalocal: You have a confirmed booking request for {exp_title} sent by {customer_name} at {exp_datetime}."
 msgstr "本土客: 您已经成功确认了和{customer_name}在{exp_datetime}的{exp_title}的订单。"
+
+
+msgid "Tripalocal: Your booking request for {exp_title} at {exp_datetime} with {host_name} has been cancelled. Refund is on the way."
+msgstr "本土客: 您预订的和{host_name}的在{exp_datetime}的{exp_title}的订单已经被取消。退款通常会在3个工作日内到达您的账户（个别银行可能需要最多10个工作日）。"
+
+msgid "Tripalocal: {customer_name}'s booking request for {exp_title} at {exp_datetime} has been cancelled."
+msgstr "本土客:{customer_name}预订的在{exp_datetime}的{exp_title}的订单已经被取消。"
