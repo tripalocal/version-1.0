@@ -5,36 +5,37 @@
 {% block head %}
     {% load staticfiles %}
     <title>Edit Experience</title>
+    <link href="{% static 'experiences/content/manage-listing-unsorted.css' %}" rel="stylesheet"/>
     <link href="{% static 'experiences/content/manage-listing.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
-<input id="add_experience_price_form" action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+<input type="hidden" id="add_experience_price_form" action="" method="post" enctype="multipart/form-data">{% csrf_token %}
 {# leave here just for styling placehoder #}
-    <div class="back_button">
+    <div class="status-bar">
         {% if language == "cn" %}
-            <a id="nav-left" href="{% url 'mylisting' %}" target="_blank">&larr; {{ experience_title_cn.title }}</a>
-            <a id="nav-right" href="/experience/{{ experience.id }}/" target="_blank"><span class="button_icon">
+            <a id="nav-left" class="nav-left" href="{% url 'mylisting' %}" target="_blank">&larr; {{ experience_title_cn.title }}</a>
+            <a id="nav-right" class="nav-right" href="/experience/{{ experience.id }}/" target="_blank"><span class="button_icon">
             <img src="/images/icon/eye.svg"></span>Preview Listing</a>
         {% else %}
-            <a id="nav-left" href="{% url 'mylisting' %}" target="_blank">&larr; {{ experience_title_en.title }}</a>
-            <a id="nav-right" href="/experience/{{ experience.id }}/" target="_blank"><span class="button_icon">
+            <a id="nav-left" class="nav-left" href="{% url 'mylisting' %}" target="_blank">&larr; {{ experience_title_en.title }}</a>
+            <a id="nav-right" class="nav-right" href="/experience/{{ experience.id }}/" target="_blank"><span class="button_icon">
             <img src="/images/icon/eye.svg"></span>Preview Listing</a>
         {% endif %}
 
-        <div id="ajax-update-signal"></div>
+        <div id="ajax-update-signal" class="ajax-update-signal"></div>
         <button name="" id="save-and-exit-top" disabled></button>
     </div>
 <input id="upload_status" value="{{experience_finished}}" style="display: none"/>
     <div class="left-side-bar">
         <ul class="form-nav">
-            <li class="list-menu">Essential</li>
+            <li class="list-menu">Basics</li>
 {#            <li><a class="list-tab" id="calendar-tab"><strong>Calender</strong></a>#}
 {#                <img src="/images/icon/done.jpg" alt="" class="modify-icon" id="calender-status-icon"></li>#}
             <li><a class="list-tab" id="price-tab"><strong>Pricing</strong></a>
                 <span class="modify-icon" id="pricing-status-icon"></span>
             </li>
-            <li class="list-menu">Description</li>
+            <li class="list-menu" style="margin-top:30px">Description</li>
             <li><a class="list-tab" id="overview-tab"><strong>Overview</strong></a>
                 <div class="modify-icon" id="overview-status-icon"></div></li>
             <li><a class="list-tab" id="detail-tab"><strong>Details</strong></a>
@@ -43,7 +44,7 @@
                 <div class="modify-icon" id="photos-status-icon"></div></li>
             <li><a class="list-tab" id="location-tab"><strong>Location</strong></a>
                 <div class="modify-icon" id="location-status-icon"></div></li>
-      </ul>
+        </ul>
 
       <!-- Steps Remaining -->
       <p id="steps-remaining">5 more steps<br>until publish!</p>
@@ -60,21 +61,13 @@
 
 {%block scripts%}
 <script charset="utf-8" type="text/javascript">
+
   // Sticky top
   $(document).ready(function() {
-    var stickyNavTop = $('.back_button').offset().top;
+    $('.footer').hide();
+
     var uploadStatus = $("#upload_status").val();
-    var stickyNav = function(){
-      var scrollTop = $(window).scrollTop();
 
-      if (scrollTop > stickyNavTop) {
-        $('.back_button').addClass('sticky');
-      } else {
-        $('.back_button').removeClass('sticky');
-      }
-    };
-
-    stickyNav();
     console.log(uploadStatus);
     if(uploadStatus[0] == "1") {
         setCookie("priceFilled", "True");
@@ -106,9 +99,6 @@
         setCookie("isSubmited", "True");
     }
     setFinishedStatus();
-    $(window).scroll(function() {
-      stickyNav();
-    });
   });
     var commissionRate = parseFloat($("#experience-commission").val());
 
@@ -1197,10 +1187,10 @@ function loadLocationForm(href) {
             if (getCookie("isSubmited") === "True") {
                 $("#steps-remaining").text("Submitted");
             } else {
-                $("#steps-remaining").text("Click to submit");
-                $("#steps-remaining").css("cursor", "pointer");
+                $("#steps-remaining").text("Submit for Review");
+                $("#steps-remaining").css({"cursor":"pointer", "color": "white", "background-color":"#33cccc", "border":"0"});
                 $("#steps-remaining").click(function() {
-                    if($(this).text() == "Click to submit") {
+                    if($(this).text() == "Submit for Review") {
                         setCookie("isSubmited", "True");
                         $("#steps-remaining").text("Submitted");
                         postDatum(location.href, {'submit_form': "True"})
@@ -1225,7 +1215,7 @@ function loadLocationForm(href) {
 
             }
             signal.fadeIn(500);
-            signal.text("Saved...");
+            signal.text("Saving...");
             signal.fadeOut(1000, function() {
                 signal.fadeIn(1000);
                 signal.text("All Changes Saved.");

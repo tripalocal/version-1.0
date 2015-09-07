@@ -1,6 +1,6 @@
 {% load staticfiles %}
 
-<div id="form" class="calendar">
+<div id="form" class="form-body">
     <ul id="myTab" class="nav nav-tabs">
         {%if language == "cn" %}
         <li class="active"><a id="location_tab" role="button" data-toggle="tab">中文（简体）</a></li>
@@ -11,7 +11,7 @@
         {%endif%}
     </ul>
 
-    <div id="location" class="form-info">
+    <div id="location" class="form-hint">
         <p id="photo-heading"><strong>Location</strong></p><br><br><br>
         <p id="location-details">
           <span>Please specify the meet up and drop off location of your experience.</span>
@@ -61,7 +61,8 @@
             <span>You can offer multiple meet</span><br>
             <span>up spots or pick up travel-</span><br>
             <span>lers from their accomonda-</span><br>
-            <span>tion. You can even offer</span><br>
+            <span>tion. You can even offer to</span><br>
+            <span>pick them up personally</span><br>
         </p>
     </div>
     <br>

@@ -1,6 +1,6 @@
 {% load staticfiles %}
 
-<div id='detail-form' class="calendar">
+<div id='detail-form' class="form-body">
     <ul id="myTab" class="nav nav-tabs">
         {%if language == "cn" %}
         <li class="active"><a id="detail_tab" role="button" data-toggle="tab">中文（简体）</a></li>
@@ -17,12 +17,10 @@
                 <div id="location">
                     <p id="photo-heading"><strong>What's included</strong></p><br><br><br>
                     <p id="location-details">
-                        <span>Please specify what</span><br>
-                        <span>exactly you are offer-</span><br>
-                        <span>ing, if no, please</span><br>
-                        <span>specify how much it</span><br>
-                        <span>will roughly cost for</span><br>
-                        <span>your guest</span><br>
+                        <span>Please specify anything</span><br>
+                        <span>inclusive, or otherwise</span><br>
+                        <span>how much it will cost</span><br>
+                        <span>your guest.</span><br>
                     </p>
                 </div>
 
@@ -110,7 +108,7 @@
 </div>
 
 <!-- Info bar -->
-<div class="info-bar" style="width:300px;">
+<div class="info-bar">
     <img src= "{% static 'experiences/img/bubble-icon.png' %}" alt="">
     <div id="hint-msgs">
         <p>
@@ -144,7 +142,7 @@
             <span>Will there be a lot of walking</span><br>
             <span>involved?</span><br>
             <span>What will the locals wear?</span><br>
-            <span>your guests?</span><br>
+            <span>What should your guests wear?</span><br>
             <span>Please write as a paragraph.</span><br>
         </p>
     </div>
@@ -162,4 +160,3 @@
     </div>
     <br>
 </div>
-

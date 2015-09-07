@@ -5,7 +5,7 @@
 */
 
 .list-experience {
-  background: url(/images/searchbar.jpg) no-repeat;
+  background: url(../img/searchbar.jpg) no-repeat;
   background-size: cover;
   height: 320px;
   border-top: 1px solid #CCCCCC;
