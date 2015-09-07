@@ -24,6 +24,10 @@ from collections import OrderedDict
 from django.http import Http404
 from django.core.urlresolvers import reverse
 from experiences.constant import  *
+from experiences.tasks import schedule_sms
+from experiences.telstra_sms_api import send_sms
+
+
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -1412,6 +1416,27 @@ def create_experience(request, id=None):
 
     return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
 
+
+def schedule_review_sms(customer_phone_num, host_name, review_schedule_time):
+    if customer_phone_num:
+        msg = _('%s' % REVIEW_NOTIFY_CUSTOMER).format(host_name=host_name)
+        schedule_sms.apply_async([customer_phone_num, msg], eta=review_schedule_time)
+
+
+def schedule_reminder_sms(guest, host, exp_title, customer_phone_num, reminder_scheduled_time, exp_datetime):
+    registered_user = RegisteredUser.objects.get(user_id=host.id)
+    host_phone_num = registered_user.phone_number
+
+    if host_phone_num:
+        msg = _('%s' % REMINDER_NOTIFY_HOST).format(exp_title=exp_title, customer_name=guest.first_name, exp_datetime=exp_datetime)
+        schedule_sms.apply_async([host_phone_num, msg], eta=reminder_scheduled_time)
+
+    if customer_phone_num:
+        msg = _('%s' % REMINDER_NOTIFY_CUSTOMER).format(exp_title=exp_title, host_name=host.first_name, exp_datetime=exp_datetime)
+        schedule_sms.apply_async([customer_phone_num, msg], eta=reminder_scheduled_time)
+
+
+
 def update_booking(id, accepted, user):
     if id and accepted:
         booking = get_object_or_404(Booking, pk=id)
@@ -1451,7 +1476,7 @@ def update_booking(id, accepted, user):
             exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
             customer_phone_num = booking.payment.phone_number
             exp_datetime = booking.datetime.strftime(_("%H:%M %-d %b %Y"))
-            send_booking_confirmed_sms(exp_datetime, exp_title, host, customer_phone_num, user)
+            send_booking_confirmed_sms(exp_datetime, exp_title, host, customer_phone_num, guest)
 
             #send an email to the traveller
             mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
@@ -1464,6 +1489,10 @@ def update_booking(id, accepted, user):
                                                             'user':guest, #not host --> need "my" phone number
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
+
+
+            reminder_scheduled_time = booking.datetime - timedelta(days=1)
+            schedule_reminder_sms(guest, host, exp_title, customer_phone_num, reminder_scheduled_time, exp_datetime)
 
             #schedule an email to the traveller one day before the experience
             mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
@@ -1488,7 +1517,10 @@ def update_booking(id, accepted, user):
                                                             'user':guest,
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
-                  
+
+            review_scheduled_time = booking.datetime + timedelta(hours=experience.duration+1)
+            schedule_review_sms(customer_phone_num, host.first_name, review_scheduled_time)
+
             #schedule an email for reviewing the experience
             mail.send(subject=_('[Tripalocal] How was your experience?'), message='',
                       sender=settings.DEFAULT_FROM_EMAIL,
@@ -1519,7 +1551,7 @@ def update_booking(id, accepted, user):
             exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
             customer_phone_num = booking.payment.phone_number
             exp_datetime = booking.datetime.strftime(_("%H:%M %-d %b %Y"))
-            send_booking_cancelled_sms(exp_datetime, exp_title, host, customer_phone_num, user)
+            send_booking_cancelled_sms(exp_datetime, exp_title, host, customer_phone_num, guest)
 
             extra_fee = 0.00
             free = False

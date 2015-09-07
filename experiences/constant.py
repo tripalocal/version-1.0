@@ -7,5 +7,11 @@ BOOKING_CONFIRMED_NOTIFY_HOST = "Tripalocal: You have a confirmed booking reques
 
 BOOKING_CANCELLED_NOTIFY_CUSTOMER = "Tripalocal: Your booking request for {exp_title} at {exp_datetime} with " \
                                     "{host_name} has been cancelled. Refund is on the way."
-
 BOOKING_CANCELLED_NOTIFY_HOST = "Tripalocal: {customer_name}'s booking request for {exp_title} at {exp_datetime} has been cancelled."
+
+REVIEW_NOTIFY_CUSTOMER = "Tripalocal: How was your experience with {host_name}? Please leave a review for your host to help out another traveller planning their perfect trip."
+
+REMINDER_NOTIFY_HOST = "Tripalocal: You've got one booking for {exp_title} with {customer_name} at {exp_datetime} coming soon."
+REMINDER_NOTIFY_CUSTOMER = "Tripalocal: Your booking for {exp_title} with {host_name} at {exp_datetime} is coming soon."
+
+MESSAGE_NOTIFY = "Tripalocal: {sender_name}"

@@ -1112,14 +1112,10 @@ def send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, 
 
     if host_phone_num:
         msg = _('%s' % REQUEST_SENT_NOTIFY_HOST).format(customer.first_name, exp_title, exp_datetime, customer.first_name)
-        # Todo: schedule sms for host
-        # schedule_sms.apply_async([host_phone_num, msg], eta=datetime.utcnow() + timedelta(minutes=3))
         send_sms(host_phone_num, msg)
 
     if customer_phone_num:
         msg = _('%s' % REQUEST_SENT_NOTIFY_CUSTOMER).format(host.first_name, exp_title, exp_datetime)
-        # Todo: schedule sms customer
-        # schedule_sms.apply_async([customer_phone_num, msg], eta=datetime.utcnow() + timedelta(minutes=2))
         send_sms(customer_phone_num, msg)
 
 
