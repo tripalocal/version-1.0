@@ -1048,7 +1048,7 @@ class ItineraryBookingForm(forms.Form):
 
 
                 exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
-                customer_phone_num = payment.phone_number
+                customer_phone_num = payment_phone_number
                 exp_datetime = booking.datetime.strftime(_("%H:%M %-d %b %Y"))
                 send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, user)
 
