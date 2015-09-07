@@ -964,7 +964,7 @@ def service_myprofile(request, format=None):
         profile = user.registereduser
         if request.method == "GET":
             result={'id':user.id, 'first_name':user.first_name, 'last_name':user.last_name, 'email':user.email,
-                     'image':user.registereduser.image_url,'phone_number':profile.phone_number,
+                     'image':user.registereduser.image_url,'phone_number':profile.phone_number if profile.phone_number is not None else "",
                      'bio':get_user_bio(profile, settings.LANGUAGES[0][0]),'rate':profile.rate}
             return Response(result, status=status.HTTP_200_OK)
         elif request.method == "POST":

@@ -590,6 +590,9 @@ class ExperienceDetailView(DetailView):
             experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
             experience_price = experience.price
 
+            if float(experience.duration).is_integer():
+                experience.duration = int(experience.duration)
+
             guest_number = int(form.data['guest_number'])
             subtotal_price = 0.0
             if experience.dynamic_price and type(experience.dynamic_price) == str:
@@ -674,6 +677,9 @@ class ExperienceDetailView(DetailView):
         context['available_options'] = available_options
         uid = self.request.user.id if self.request.user.is_authenticated() else None
         context['form'] = BookingForm(available_date, experience.id, uid)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
 
         rate = 0.0
         counter = 0
