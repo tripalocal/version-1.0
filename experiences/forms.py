@@ -3,6 +3,7 @@ from calendar import monthrange
 import string
 import json
 import random
+from dateutil.tz import tzlocal
 
 from django import forms
 from bootstrap3_datetime.widgets import DateTimePicker
@@ -1049,8 +1050,9 @@ class ItineraryBookingForm(forms.Form):
 
                 exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
                 customer_phone_num = payment_phone_number
-                exp_datetime = booking.datetime.strftime(_("%H:%M %-d %b %Y"))
-                send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, user)
+                exp_datetime_local = booking.datetime.astimezone(tzlocal())
+                exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
+                send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
 
 
     def clean(self):

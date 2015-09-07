@@ -1481,8 +1481,10 @@ def update_booking(id, accepted, user):
 
             exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
             customer_phone_num = booking.payment.phone_number
-            exp_datetime = booking.datetime.strftime(_("%H:%M %-d %b %Y"))
-            send_booking_confirmed_sms(exp_datetime, exp_title, host, customer_phone_num, guest)
+            exp_datetime_local = booking.datetime.astimezone(tzlocal())
+            exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
+
+            send_booking_confirmed_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
 
             #send an email to the traveller
             mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
@@ -1498,7 +1500,7 @@ def update_booking(id, accepted, user):
 
 
             reminder_scheduled_time = booking.datetime - timedelta(days=1)
-            schedule_reminder_sms(guest, host, exp_title, customer_phone_num, reminder_scheduled_time, exp_datetime)
+            schedule_reminder_sms(guest, host, exp_title, customer_phone_num, reminder_scheduled_time, exp_datetime_local_str)
 
             #schedule an email to the traveller one day before the experience
             mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
@@ -1556,8 +1558,9 @@ def update_booking(id, accepted, user):
         elif accepted == "no":
             exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
             customer_phone_num = booking.payment.phone_number
-            exp_datetime = booking.datetime.strftime(_("%H:%M %-d %b %Y"))
-            send_booking_cancelled_sms(exp_datetime, exp_title, host, customer_phone_num, guest)
+            exp_datetime_local = booking.datetime.astimezone(tzlocal())
+            exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
+            send_booking_cancelled_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
 
             extra_fee = 0.00
             free = False
