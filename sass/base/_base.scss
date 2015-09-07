@@ -9,8 +9,8 @@ body {
 }
 
 .container {
-  @include media('>tablet') {
-    width: 970px;
+  @include media('>=desktop') {
+    width: 990px;
   }
 }
 
