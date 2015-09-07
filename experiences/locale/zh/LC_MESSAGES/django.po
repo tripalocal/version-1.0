@@ -1141,3 +1141,6 @@ msgstr "本土客: 您预订的和{host_name}的在{exp_datetime}的{exp_title}�
 
 msgid "Tripalocal: {sender_name}"
 msgstr "本土客:{sender_name}"
+
+msgid "Tripalocal: It's been 24 hours since {guest_name} reached out. Please confirm or decline the request as soon as possible."
+msgstr "本土客：{guest_name}给您发送的订单请求已经超过24个小时，请尽快确认或拒绝。"

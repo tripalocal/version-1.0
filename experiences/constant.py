@@ -15,3 +15,5 @@ REMINDER_NOTIFY_HOST = "Tripalocal: You've got one booking for {exp_title} with 
 REMINDER_NOTIFY_CUSTOMER = "Tripalocal: Your booking for {exp_title} with {host_name} at {exp_datetime} is coming soon."
 
 MESSAGE_NOTIFY = "Tripalocal: {sender_name}"
+
+REQUEST_REMIND_HOST = "Tripalocal: It's been 24 hours since {guest_name} reached out. Please confirm or decline the request as soon as possible."

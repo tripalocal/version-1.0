@@ -9,7 +9,8 @@ from django import forms
 from bootstrap3_datetime.widgets import DateTimePicker
 from django.utils.safestring import mark_safe
 from experiences.constant import *
-from experiences.tasks import schedule_sms
+from experiences.tasks import schedule_sms, schedule_sms_if_no_confirmed
+from experiences.constant import *
 from experiences.models import *
 from Tripalocal_V1 import settings
 from experiences.telstra_sms_api import send_sms
@@ -759,6 +760,16 @@ class CustomItineraryForm(forms.Form):
         self.fields['language'].widget.attrs['readonly'] = True
         self.fields['language'].widget = forms.HiddenInput()
 
+
+def schedule_request_reminder_sms(booking_id, host_id, guest_name, schedule_time):
+    registered_user = RegisteredUser.objects.get(user_id=host_id)
+    host_phone_num = registered_user.phone_number
+
+    if host_phone_num:
+        msg = _('%s' % REQUEST_REMIND_HOST).format(guest_name=guest_name)
+        schedule_sms_if_no_confirmed.apply_async([host_phone_num, msg, booking_id], eta=schedule_time)
+
+
 class ItineraryBookingForm(forms.Form):
     user_id = forms.CharField()
     experience_id = forms.CharField(widget=forms.Textarea)
@@ -1053,6 +1064,8 @@ class ItineraryBookingForm(forms.Form):
                 exp_datetime_local = booking.datetime.astimezone(tzlocal())
                 exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
                 send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
+                schedule_request_reminder_sms(booking.id, host.id, user.first_name,
+                                              booking.datetime + timedelta(days=1))
 
 
     def clean(self):
