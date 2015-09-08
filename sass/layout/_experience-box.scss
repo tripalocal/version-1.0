@@ -31,10 +31,14 @@
   .profile-sm {
     width: 65px;
     height: 65px;
+    border: 1px solid $light-grey;
     float: right;
     margin-left: 15px;
     @include media('<tablet') {
       margin-right: 30px;
+    }
+    img {
+      height: 68px;
     }
   }
 
@@ -42,7 +46,7 @@
     height: 200px;
     background-position: center;
     background-size: cover;
-    width: 120%;
+    width: 100%;
     margin: 0;
     @include media('>tablet') {
       width: auto;

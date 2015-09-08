@@ -13,9 +13,6 @@
     <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/homepage.css' %}" rel="stylesheet">
 
-    <!-- H1 google font -->
-    <!--<link href='//fonts.googleapis.com/css?family=Exo:600,600italic' rel='stylesheet' type='text/css'>-->
-
     <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
 
@@ -120,8 +117,7 @@
                         {% endif %}
                     {% endfor %}
                     <div class="col-sm-4">
-                        <div class="custom-itinerary"
-                             style="background-image:url({% static 'app/img/homepage_banner.jpg' %});">
+                        <div class="custom-itinerary">
                             <button class="btn btn-primary request-btn">{% trans 'Request a trip' %}</button>
                         </div>
                     </div>
@@ -226,12 +222,12 @@
             <h1>{% trans "Our Community"%}</h1>
             <div class="row">
                 <div class="col-sm-6">
-                  <div class="box" style="background-image:url(/images/homepage/travelling-01.jpg)">
+                  <div class="box" style="background-image:url({{ MEDIA_URL }}homepage/travelling-01.jpg)">
                     <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>
                   </div>
                 </div>
                 <div class="col-sm-6">
-                  <div class="box" style="background-image:url(/images/homepage/hosting-01.jpg)">
+                  <div class="box" style="background-image:url({{ MEDIA_URL }}homepage/hosting-01.jpg)">
                     <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>
                   </div>
                 </div>
@@ -245,6 +241,7 @@
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/index.js' %}"></script>
     <script charset="utf-8" type="text/javascript">
+    $("#video-fullscreen").hide();
         $(document).ready(function () {
             {% for k, v in locations %}
                 var header = '<div class=\"header\">' + '{{ k }}' + '</div>';
@@ -261,6 +258,14 @@
 
             $("#id_start_date").attr("placeholder", '{%trans " From " %}');
             $("#id_end_date").attr("placeholder", '{%trans " To " %}');
+            $(".request-btn").click(function () {
+              {% if LANGUAGE == "zh-CN" %}
+                window.location.href = "https://www.tripalocal.com/cn/multidaytrip"
+              {%else%}
+                window.location.href = "https://www.tripalocal.com/multidaytrip/";
+              {%endif%}
+                mixpanel.track("checked out designed multi-day from homepage");
+            });
         });
     </script>
 {% endblock %}
