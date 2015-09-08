@@ -1,9 +1,12 @@
 """
 Definition of views.
 """
-from app.wechat_payment.weixin_pay import UnifiedOrderPay
+from time import gmtime
+from time import strftime
+from app.wechat_payment.api import UnifiedOrderPay, JsAPIOrderPay
+from django.core.urlresolvers import reverse
 
-from django.shortcuts import render, render_to_response, get_object_or_404
+from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, loader
 from datetime import *
@@ -28,6 +31,7 @@ from post_office import mail
 from django.contrib.auth.models import User
 from django import forms
 from tripalocal_messages.models import Aliases, Users
+from urllib.parse import quote_plus
 import json, os
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -721,8 +725,29 @@ def email_custom_trip(request):
     return HttpResponse(json.dumps({}))
 
 
+def create_wx_trade_no(mch_id):
+    system_time = strftime("%Y%m%d%H%M%S", gmtime())
+    trade_no = 'wx' + mch_id + system_time
+    N = 32 - len(trade_no)
+    trade_no += ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
+    return trade_no
+
+
 def wechat_item(request):
-    pay = UnifiedOrderPay(appid, mch_id, api_key)
-    print(pay.post(body="贡献一分钱", out_trade_no="wx983e4a34aa76e3c41416149262", total_fee="1",
-                   spbill_create_ip="127.0.0.1", notify_url="http://www.xxxxxx.com/demo/notify_url.php"))
-    return render_to_response('wechat_item.html')
+    pay = JsAPIOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY, settings.WECHAT_APPSECRET)
+    # Todo: need to encode url
+    code = request.GET.get('code', None)
+    #先判断request.GET中是否有code参数，如果没有，需要使用create_oauth_url_for_code函数获取OAuth2授权地址后重定向到该地址并取得code值
+    oauth_url = pay.create_oauth_url_for_code(quote_plus(request.build_absolute_uri()))
+    #重定向到oauth_url后，获得code值
+    if code:
+        print('code:', code)
+        out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
+        json_pay_info = pay.post_prepaid("testtttt", out_trade_no, "2",
+                       "127.0.0.1", request.get_full_path(), code)
+        print('json_pay_info', json_pay_info)
+        context = RequestContext(request, json_pay_info)
+        return render_to_response('app/wechat_item1.html', context)
+    else:
+        print('no code redirect')
+        return redirect(oauth_url)
