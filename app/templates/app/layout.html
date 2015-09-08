@@ -68,6 +68,17 @@
                                   <button class="btn btn-primary" id="help-yes">{% trans "YES" %}</button>
                                 </div>
                             </div>
+                            <div class="row">
+                              <br>
+                              <p>
+                              {% trans "or check out some of our " %}
+                              {%if LANGUAGE == "zh-CN"%}
+                              <a id="multidaytrip-link" href="https://www.tripalocal.com/cn/multidaytrip/">
+                              {%else%}
+                              <a id="multidaytrip-link" href="https://www.tripalocal.com/multidaytrip/">
+                              {%endif%}
+                              {% trans "most popular trips" %}</a></p>
+                            </div>
                         </div>
                     </div>
                     <a class="close-popup">{% trans "close" %}</a>

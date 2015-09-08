@@ -30,6 +30,9 @@ from allauth.socialaccount.models import SocialLogin, SocialToken, SocialApp
 from allauth.socialaccount.helpers import complete_social_login
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
+from experiences.constant import  *
+from experiences.telstra_sms_api import send_sms
+
 
 if settings.LANGUAGE_CODE.lower() != "zh-cn":
     from allauth.socialaccount.providers.facebook.views import fb_complete_login
@@ -1048,6 +1051,23 @@ def service_message(request, format=None):
             #            priority='now',
             #            html_message=loader.render_to_string('app/email_new_messages.html', 
             #                                                    {}))
+
+            receiver = RegisteredUser.objects.get(user_id=messages[0]['receiver_id'])
+            receiver_phone_num = receiver.phone_number
+            sender_name = request.user.first_name
+
+            if receiver_phone_num:
+                sms_content = ""
+                for msg in messages:
+                    sms_content += msg['msg_content']
+                    sms_content += ". "
+
+                if len(sms_content) > 140:
+                    sms_content = sms_content[:140]
+                sms_header = _('%s' % MESSAGE_NOTIFY).format(sender_name=sender_name)
+
+                send_sms(receiver_phone_num, sms_header + sms_content)
+
             return Response(msg_ids, status=status.HTTP_200_OK)
 
     except Exception as err:
