@@ -1,6 +1,7 @@
 """
 Definition of views.
 """
+from app.wechat_payment.weixin_pay import UnifiedOrderPay
 
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
@@ -718,3 +719,10 @@ def email_custom_trip(request):
     )
 
     return HttpResponse(json.dumps({}))
+
+
+def wechat_item(request):
+    pay = UnifiedOrderPay(appid, mch_id, api_key)
+    print(pay.post(body="贡献一分钱", out_trade_no="wx983e4a34aa76e3c41416149262", total_fee="1",
+                   spbill_create_ip="127.0.0.1", notify_url="http://www.xxxxxx.com/demo/notify_url.php"))
+    return render_to_response('wechat_item.html')
