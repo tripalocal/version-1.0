@@ -64,21 +64,7 @@ a:hover {
   position: fixed;
   width: 100%;
 }
-.info-bar {
-  float: left;
-  background-color: #fff;
-  padding-right: 20px;
-  padding-top: 40px;
-  width: 350px;
-  margin-top: 100px;
-  padding-left: 30px;
-  padding-bottom: 50px;
-}
-.info-bar img {
-  float: left;
-  padding-right: 20px;
-  padding-top: 10px;
-}
+
 #instant-booking-text {
   float: left;
   padding-top: 10px;
@@ -819,10 +805,7 @@ input[type=checkbox].css-checkbox:checked + label.css-label {
   width: 225px;
   cursor: pointer;
 }
-#menu-operation-bar {
-  margin-top: 30px;
-  text-align: center;
-}
+
 
 /*list-experience.html*/
 .jumbotron-list-experience {

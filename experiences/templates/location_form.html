@@ -11,7 +11,7 @@
         {%endif%}
     </ul>
 
-    <div id="location" class="form-hint">
+    <div id="location" class="form-info">
         <p id="photo-heading"><strong>Location</strong></p><br><br><br>
         <p id="location-details">
           <span>Please specify the meet up and drop off location of your experience.</span>
@@ -53,29 +53,26 @@
 </div>
 
 <!-- Info bar -->
-<div class="info-bar">
+<div class="form-hint">
     <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="">
-    <div id="hint-msgs">
-        <p>
-            <span><strong>Meet up</strong></span><br>
-            <span>You can offer multiple meet</span><br>
-            <span>up spots or pick up travel-</span><br>
-            <span>lers from their accomonda-</span><br>
-            <span>tion. You can even offer to</span><br>
-            <span>pick them up personally</span><br>
-        </p>
+    <div id="hint-msgs" class="hint-box">
+
+            <h3>Meet up</h3>
+          <p>
+            You can offer multiple meet up spots or pick up travellers
+            from their accomondation. You can even offer to
+            pick them up personally.
+          </p>
     </div>
     <br>
-    <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="" style="display:none;">
-    <div id="hint-msgs" style="display:none;">
-        <p>
-            <span><strong>Drop off</strong></span><br>
-            <span>Let your traveller knows </span><br>
-            <span>where the experience will</span><br>
-            <span>end, would you be able to</span><br>
-            <span>take them back to their</span><br>
-            <span>accomodation? Or perhaps</span><br>
-            <span>a nearby station?</span><br>
+    <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="">
+    <div id="hint-msgs" class="hint-box">
+
+            <h3>Drop off</h3>
+          <p>
+            Let your travellers know where the experience will end,
+            would you be able to take them back to theiraccomodation?
+            Or perhaps a nearby station?
         </p>
     </div>
     <br>

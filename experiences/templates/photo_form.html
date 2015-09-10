@@ -1,7 +1,7 @@
 {% load staticfiles %}
 
 <div id="photo-form" class="form-body">
-  <div id="location" class="form-hint">
+  <div id="location" class="form-info">
       <p id="photo-heading"><strong>Add a photo or two!</strong></p><br><br><br>
       <p id="location-details">
         <span>Or three, or more! Guests love photos that highlight the features of your experiences.
@@ -140,22 +140,17 @@
 
 
 <!-- Info bar -->
-<div class="info-bar">
+<div class="form-hint">
     <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="">
-    <div id="hint-msgs">
-        <p>
-            <span><strong>Photos</strong></span><br>
-            <span>Landscape photos work the</span><br>
-            <span>best with your listing page.</span><br>
-            <span>It's always a good idea to</span><br>
-            <span>include yourself in the</span><br>
-            <span>photo to provide travellers with a</span><br>
-            <span>preview of what they can</span><br>
-            <span>expect.</span><br>
-            <span>Show off your personality!</span><br>
-            <span>Sometimes someone will</span><br>
-            <span>choose you as their host just</span><br>
-            <span>because you are different.</span>
+    <div id="hint-msgs" class="hint-box">
+
+            <h3>Photos</h3>
+            <p>
+            Landscape photos work the best with your listing page.
+            It's always a good idea to include yourself in the
+            photo to provide travellers with a preview of what they can expect.
+            Show off your personality! Sometimes someone will choose you as
+            their host just because you are different.
         </p>
     </div>
     <br>
