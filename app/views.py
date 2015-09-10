@@ -733,21 +733,23 @@ def create_wx_trade_no(mch_id):
     return trade_no
 
 
-def wechat_item(request):
+def wechat_product(request):
     pay = JsAPIOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY, settings.WECHAT_APPSECRET)
-    # Todo: need to encode url
     code = request.GET.get('code', None)
-    #先判断request.GET中是否有code参数，如果没有，需要使用create_oauth_url_for_code函数获取OAuth2授权地址后重定向到该地址并取得code值
+    product_id = request.GET.get('id', None)
+    print("redirect url" + quote_plus(request.build_absolute_uri()))
     oauth_url = pay.create_oauth_url_for_code(quote_plus(request.build_absolute_uri()))
-    #重定向到oauth_url后，获得code值
+
     if code:
         print('code:', code)
         out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
-        json_pay_info = pay.post_prepaid("testtttt", out_trade_no, "2",
+        product_title = "Product " + str(product_id) + "test"
+        json_pay_info = pay.post_prepaid(product_title, out_trade_no, "2",
                        "127.0.0.1", request.get_full_path(), code)
         print('json_pay_info', json_pay_info)
         context = RequestContext(request, json_pay_info)
-        return render_to_response('app/wechat_item1.html', context)
+        return render_to_response('app/wechat_product.html', context)
     else:
         print('no code redirect')
+        # 重定向到oauth_url后，获得code值
         return redirect(oauth_url)
