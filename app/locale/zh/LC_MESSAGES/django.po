@@ -599,6 +599,31 @@ msgstr "凯恩斯"
 msgid "Adelaide"
 msgstr "阿德莱德"
 
+msgid "Brisbane"
+msgstr "布里斯班"
+
+msgid "Hobart"
+msgstr "霍巴特"
+
+msgid "Darwin"
+msgstr "达尔文"
+
+msgid "Auckland"
+msgstr "奥克兰"
+
+msgid "Wellington"
+msgstr "惠灵顿"
+
+msgid "Queenstown"
+msgstr "皇后镇"
+
+msgid "Christchurch"
+msgstr "克赖斯特彻奇(基督城)"
+
+msgid "Alice Springs"
+msgstr "艾利斯斯普林斯"
+
+
 #: views.py:247
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 您的帐户已经成功激活"

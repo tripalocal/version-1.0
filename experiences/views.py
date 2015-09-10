@@ -23,6 +23,11 @@ from post_office import mail
 from collections import OrderedDict
 from django.http import Http404
 from django.core.urlresolvers import reverse
+from experiences.constant import  *
+from experiences.tasks import schedule_sms
+from experiences.telstra_sms_api import send_sms
+
+
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -177,7 +182,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         photos = experience.photo_set.all()
         if photos is not None and len(photos) > 0:
             photo_url = photos[0].directory+photos[0].name
-        experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]), 
+        experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]),
                             'meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]), 'rate': rate,
                             'duration':experience.duration, 'city':experience.city,
                             'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
@@ -585,6 +590,9 @@ class ExperienceDetailView(DetailView):
             experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
             experience_price = experience.price
 
+            if float(experience.duration).is_integer():
+                experience.duration = int(experience.duration)
+
             guest_number = int(form.data['guest_number'])
             subtotal_price = 0.0
             if experience.dynamic_price and type(experience.dynamic_price) == str:
@@ -669,6 +677,9 @@ class ExperienceDetailView(DetailView):
         context['available_options'] = available_options
         uid = self.request.user.id if self.request.user.is_authenticated() else None
         context['form'] = BookingForm(available_date, experience.id, uid)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
 
         rate = 0.0
         counter = 0
@@ -951,8 +962,8 @@ def saveProfileImage(user, profile, image_file):
 
         subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
 
-def updateExperience(experience, id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, guest_number_min, 
-                   guest_number_max, price, currency, duration, city, status, language, dynamic_price, 
+def updateExperience(experience, id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, guest_number_min,
+                   guest_number_max, price, currency, duration, city, status, language, dynamic_price,
                    title, description, activity, interaction, dress, meetup_spot, lan, lan2=None):
     experience.id = id
     experience.start_datetime = start_datetime
@@ -1411,6 +1422,27 @@ def create_experience(request, id=None):
 
     return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
 
+
+def schedule_review_sms(customer_phone_num, host_name, review_schedule_time):
+    if customer_phone_num:
+        msg = _('%s' % REVIEW_NOTIFY_CUSTOMER).format(host_name=host_name)
+        schedule_sms.apply_async([customer_phone_num, msg], eta=review_schedule_time)
+
+
+def schedule_reminder_sms(guest, host, exp_title, customer_phone_num, reminder_scheduled_time, exp_datetime):
+    registered_user = RegisteredUser.objects.get(user_id=host.id)
+    host_phone_num = registered_user.phone_number
+
+    if host_phone_num:
+        msg = _('%s' % REMINDER_NOTIFY_HOST).format(exp_title=exp_title, customer_name=guest.first_name, exp_datetime=exp_datetime)
+        schedule_sms.apply_async([host_phone_num, msg], eta=reminder_scheduled_time)
+
+    if customer_phone_num:
+        msg = _('%s' % REMINDER_NOTIFY_CUSTOMER).format(exp_title=exp_title, host_name=host.first_name, exp_datetime=exp_datetime)
+        schedule_sms.apply_async([customer_phone_num, msg], eta=reminder_scheduled_time)
+
+
+
 def update_booking(id, accepted, user):
     if id and accepted:
         booking = get_object_or_404(Booking, pk=id)
@@ -1447,11 +1479,18 @@ def update_booking(id, accepted, user):
                 booking.coupon.end_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC)
                 booking.coupon.save()
 
+            exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+            customer_phone_num = booking.payment.phone_number
+            exp_datetime_local = booking.datetime.astimezone(tzlocal())
+            exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
+
+            send_booking_confirmed_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
+
             #send an email to the traveller
-            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
                       sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                      recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
-                      priority='now',  #fail_silently=False, 
+                      recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail],
+                      priority='now',  #fail_silently=False,
                       html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
                                                             {'experience': experience,
                                                             'booking':booking,
@@ -1459,30 +1498,37 @@ def update_booking(id, accepted, user):
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
 
+
+            reminder_scheduled_time = booking.datetime - timedelta(days=1)
+            schedule_reminder_sms(guest, host, exp_title, customer_phone_num, reminder_scheduled_time, exp_datetime_local_str)
+
             #schedule an email to the traveller one day before the experience
-            mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+            mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
                       sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                      recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
-                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
+                      recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail],
+                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
                       html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'user':guest, #not host --> need "my" phone number
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
-            
+
             #schedule an email to the host one day before the experience
-            mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+            mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
                       sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
-                      recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
+                      recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail],
+                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
                       html_message=loader.render_to_string('experiences/email_reminder_host.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'user':guest,
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
-                  
+
+            review_scheduled_time = booking.datetime + timedelta(hours=experience.duration+1)
+            schedule_review_sms(customer_phone_num, host.first_name, review_scheduled_time)
+
             #schedule an email for reviewing the experience
             mail.send(subject=_('[Tripalocal] How was your experience?'), message='',
                       sender=settings.DEFAULT_FROM_EMAIL,
@@ -1496,10 +1542,10 @@ def update_booking(id, accepted, user):
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
 
             #send an email to the host
-            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
                       sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
-                      recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                      priority='now',  #fail_silently=False, 
+                      recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail],
+                      priority='now',  #fail_silently=False,
                       html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
                                                             {'experience': experience,
                                                             'booking':booking,
@@ -1508,14 +1554,13 @@ def update_booking(id, accepted, user):
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
             email_template = 'experiences/email_booking_confirmed_host.html'
             booking_success = True
-            #return render(request, 'email_booking_confirmed_host.html',
-            #              {'experience': experience,
-            #                'booking':booking,
-            #                'user':guest,
-            #                'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-            #                'webpage':True})
 
         elif accepted == "no":
+            exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+            customer_phone_num = booking.payment.phone_number
+            exp_datetime_local = booking.datetime.astimezone(tzlocal())
+            exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
+            send_booking_cancelled_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
 
             extra_fee = 0.00
             free = False
@@ -1563,7 +1608,7 @@ def update_booking(id, accepted, user):
                 booking.status = "rejected"
                 booking.save()
                 #send an email to the traveller
-                mail.send(subject=_('[Tripalocal] Your experience is cancelled'), message='', 
+                mail.send(subject=_('[Tripalocal] Your experience is cancelled'), message='',
                           sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                           recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail],
                           priority='now',  #fail_silently=False,
@@ -1574,10 +1619,10 @@ def update_booking(id, accepted, user):
                                                                 'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                                 'LANGUAGE':settings.LANGUAGE_CODE}))
                 #send an email to the host
-                mail.send(subject=_('[Tripalocal] Cancellation confirmed'), message='', 
+                mail.send(subject=_('[Tripalocal] Cancellation confirmed'), message='',
                           sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
-                          recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                          priority='now',  #fail_silently=False, 
+                          recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail],
+                          priority='now',  #fail_silently=False,
                           html_message=loader.render_to_string('experiences/email_booking_cancelled_host.html',
                                                                 {'experience': experience,
                                                                  'booking':booking,
@@ -1587,12 +1632,6 @@ def update_booking(id, accepted, user):
                 email_template = 'experiences/email_booking_cancelled_host.html'
                 booking_success = True
 
-                #return render(request, 'email_booking_cancelled_host.html',
-                #               {'experience': experience,
-                #                'booking':booking,
-                #                'user':guest,
-                #                'experience_url': 'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                #                'webpage':True})
             else:
                 #TODO
                 #ask the host to try again, or contact us
@@ -1607,6 +1646,37 @@ def update_booking(id, accepted, user):
         result={'booking_success':booking_success}
 
     return result
+
+
+def send_booking_confirmed_sms(exp_datetime, exp_title, host, customer_phone_num, customer):
+    registered_user = RegisteredUser.objects.get(user_id=host.id)
+    host_phone_num = registered_user.phone_number
+
+    if host_phone_num:
+        msg = _('%s' % BOOKING_CONFIRMED_NOTIFY_HOST).format(exp_title=exp_title, customer_name=customer.first_name,
+                                                             exp_datetime=exp_datetime)
+        send_sms(host_phone_num, msg)
+
+    if customer_phone_num:
+        msg = _('%s' % BOOKING_CONFIRMED_NOTIFY_CUSTOMER).format(exp_title=exp_title, host_name=host.first_name,
+                                                                 exp_datetime=exp_datetime)
+        send_sms(customer_phone_num, msg)
+
+
+def send_booking_cancelled_sms(exp_datetime, exp_title, host, customer_phone_num, customer):
+    registered_user = RegisteredUser.objects.get(user_id=host.id)
+    host_phone_num = registered_user.phone_number
+
+    if host_phone_num:
+        msg = _('%s' % BOOKING_CANCELLED_NOTIFY_HOST).format(exp_title=exp_title, customer_name=customer.first_name,
+                                                             exp_datetime=exp_datetime)
+        send_sms(host_phone_num, msg)
+
+    if customer_phone_num:
+        msg = _('%s' % BOOKING_CANCELLED_NOTIFY_CUSTOMER).format(exp_title=exp_title, host_name=host.first_name,
+                                                                 exp_datetime=exp_datetime)
+        send_sms(customer_phone_num, msg)
+
 
 def booking_accepted(request, id=None):
     #TODO
@@ -2102,7 +2172,7 @@ def manage_listing_continue(request, exp_id):
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
                is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
-    
+
     form = SearchForm()
     form.data = form.data.copy()
     form.data['city'] = city.title()
@@ -2282,8 +2352,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 # Format title & Description
                 experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
                 t = get_experience_title(experience, settings.LANGUAGES[0][0])
-                if (t != None and len(t) > 30):
-                    formattedTitleList.insert(counter, t[:27] + "...")
+                if (t != None and len(t) > 40):
+                    formattedTitleList.insert(counter, t[:37] + "...")
                 else:
                     formattedTitleList.insert(counter, t)
                 if float(experience.duration).is_integer():

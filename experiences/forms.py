@@ -1,23 +1,25 @@
+from datetime import *
+from calendar import monthrange
+import string
+import json
+import random
+from dateutil.tz import tzlocal
+
 from django import forms
 from bootstrap3_datetime.widgets import DateTimePicker
 from django.utils.safestring import mark_safe
-from django.contrib.auth.models import User
-from datetime import *
-from calendar import monthrange
+from experiences.constant import *
+from experiences.tasks import schedule_sms, schedule_sms_if_no_confirmed
+from experiences.constant import *
 from experiences.models import *
 from Tripalocal_V1 import settings
-import pytz, string, subprocess, json, random
-from django.core.mail import send_mail
+from experiences.telstra_sms_api import send_sms
+import pytz
 from django.template import loader
-from tripalocal_messages.models import Aliases, Users
+from tripalocal_messages.models import Aliases
 from django.utils.translation import ugettext as _
-from allauth.socialaccount.signals import pre_social_login, social_account_added
-from django.dispatch import receiver
 from django.db import connections
 from app.models import RegisteredUser
-from mixpanel import Mixpanel
-import geoip2.database
-from os import path
 from post_office import mail
 
 Type = (('PRIVATE', _('Private')),('NONPRIVATE', _('NonPrivate')),('RECOMMENDED', _('Recommended')),)
@@ -758,6 +760,16 @@ class CustomItineraryForm(forms.Form):
         self.fields['language'].widget.attrs['readonly'] = True
         self.fields['language'].widget = forms.HiddenInput()
 
+
+def schedule_request_reminder_sms(booking_id, host_id, guest_name, schedule_time):
+    registered_user = RegisteredUser.objects.get(user_id=host_id)
+    host_phone_num = registered_user.phone_number
+
+    if host_phone_num:
+        msg = _('%s' % REQUEST_REMIND_HOST).format(guest_name=guest_name)
+        schedule_sms_if_no_confirmed.apply_async([host_phone_num, msg, booking_id], eta=schedule_time)
+
+
 class ItineraryBookingForm(forms.Form):
     user_id = forms.CharField()
     experience_id = forms.CharField(widget=forms.Textarea)
@@ -953,28 +965,29 @@ class ItineraryBookingForm(forms.Form):
 
                 if not is_instant_booking:
                     # send an email to the host
-                    mail.send(subject=_('[Tripalocal] ') + user.first_name + _(' has requested your experience'), message='',
-                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], #fail_silently=False,
-                                priority='now',
-                                html_message=loader.render_to_string('experiences/email_booking_requested_host.html',
-                                                                        {'experience': experience,
-                                                                        'booking':booking,
-                                                                        'user_first_name':user.first_name,
-                                                                        'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                        'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
-                                                                        'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no',
-                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
-                    # send an email to the traveler
-                    mail.send(subject=_('[Tripalocal] Your booking request is sent to the host'),  message='',
-                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], #fail_silently=False,
-                                priority='now',
-                                html_message=loader.render_to_string('experiences/email_booking_requested_traveler.html',
-                                                                        {'experience': experience,
-                                                                        'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                        'booking':booking,
-                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
+                    if not settings.DEVELOPMENT:
+                        mail.send(subject=_('[Tripalocal] ') + user.first_name + _(' has requested your experience'), message='',
+                                    sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+                                    recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], #fail_silently=False,
+                                    priority='now',
+                                    html_message=loader.render_to_string('experiences/email_booking_requested_host.html',
+                                                                            {'experience': experience,
+                                                                            'booking':booking,
+                                                                            'user_first_name':user.first_name,
+                                                                            'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                            'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
+                                                                            'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no',
+                                                                            'LANGUAGE':settings.LANGUAGE_CODE}))
+                        # send an email to the traveler
+                        mail.send(subject=_('[Tripalocal] Your booking request is sent to the host'),  message='',
+                                    sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                                    recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail], #fail_silently=False,
+                                    priority='now',
+                                    html_message=loader.render_to_string('experiences/email_booking_requested_traveler.html',
+                                                                            {'experience': experience,
+                                                                            'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                            'booking':booking,
+                                                                            'LANGUAGE':settings.LANGUAGE_CODE}))
                 else:
                     #instant booking
                     booking.status = "accepted"
@@ -984,67 +997,76 @@ class ItineraryBookingForm(forms.Form):
                         booking.coupon.end_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC)
                         booking.coupon.save()
 
-                    #send an email to the traveller
-                    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
-                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail],
-                                priority='now',  #fail_silently=False,
-                                html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
+                    if not settings.DEVELOPMENT:
+                        #send an email to the traveller
+                        mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
+                                    sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                                    recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail],
+                                    priority='now',  #fail_silently=False,
+                                    html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
+                                                                        {'experience': experience,
+                                                                        'booking':booking,
+                                                                        'user':user,
+                                                                        'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
 
-                    #schedule an email to the traveller one day before the experience
-                    mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
-                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail],
-                                priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
-                                html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user, #not host --> need "my" phone number
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
+                        #schedule an email to the traveller one day before the experience
+                        mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
+                                    sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
+                                    recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail],
+                                    priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
+                                    html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
+                                                                        {'experience': experience,
+                                                                        'booking':booking,
+                                                                        'user':user, #not host --> need "my" phone number
+                                                                        'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
 
-                    #schedule an email to the host one day before the experience
-                    mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
-                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail],
-                                priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
-                                html_message=loader.render_to_string('experiences/email_reminder_host.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
+                        #schedule an email to the host one day before the experience
+                        mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
+                                    sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+                                    recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail],
+                                    priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
+                                    html_message=loader.render_to_string('experiences/email_reminder_host.html',
+                                                                        {'experience': experience,
+                                                                        'booking':booking,
+                                                                        'user':user,
+                                                                        'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
 
-                    #schedule an email for reviewing the experience
-                    mail.send(subject=_('[Tripalocal] How was your experience?'), message='',
-                                sender=settings.DEFAULT_FROM_EMAIL,
-                                recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail],
-                                priority='high',  scheduled_time = booking.datetime + timedelta(days=1, hours=experience.duration),
-                                html_message=loader.render_to_string('experiences/email_review_traveler.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                    'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id),
-                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
+                        #schedule an email for reviewing the experience
+                        mail.send(subject=_('[Tripalocal] How was your experience?'), message='',
+                                    sender=settings.DEFAULT_FROM_EMAIL,
+                                    recipients = [Aliases.objects.filter(destination__contains=user.email)[0].mail],
+                                    priority='high',  scheduled_time = booking.datetime + timedelta(days=1, hours=experience.duration),
+                                    html_message=loader.render_to_string('experiences/email_review_traveler.html',
+                                                                        {'experience': experience,
+                                                                        'booking':booking,
+                                                                        'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                        'review_url':settings.DOMAIN_NAME + '/reviewexperience/' + str(experience.id),
+                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
 
-                    #send an email to the host
-                    mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
-                                sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
-                                recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail],
-                                priority='now',  #fail_silently=False,
-                                html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
-                                                                    {'experience': experience,
-                                                                    'booking':booking,
-                                                                    'user':user,
-                                                                    'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
-                                                                    'LANGUAGE':settings.LANGUAGE_CODE}))
+                        #send an email to the host
+                        mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
+                                    sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
+                                    recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail],
+                                    priority='now',  #fail_silently=False,
+                                    html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
+                                                                        {'experience': experience,
+                                                                        'booking':booking,
+                                                                        'user':user,
+                                                                        'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
 
-                pass
+
+                exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+                customer_phone_num = payment_phone_number
+                exp_datetime_local = booking.datetime.astimezone(tzlocal())
+                exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
+                send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
+                schedule_request_reminder_sms(booking.id, host.id, user.first_name,
+                                              booking.datetime + timedelta(days=1))
+
 
     def clean(self):
         """
@@ -1097,6 +1119,20 @@ class ItineraryBookingForm(forms.Form):
                          payment_street1,payment_street2,payment_city,payment_state,payment_country,payment_postcode,payment_phone_number)
 
         return cleaned
+
+
+def send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, customer):
+    registered_user = RegisteredUser.objects.get(user_id=host.id)
+    host_phone_num = registered_user.phone_number
+
+    if host_phone_num:
+        msg = _('%s' % REQUEST_SENT_NOTIFY_HOST).format(customer.first_name, exp_title, exp_datetime, customer.first_name)
+        send_sms(host_phone_num, msg)
+
+    if customer_phone_num:
+        msg = _('%s' % REQUEST_SENT_NOTIFY_CUSTOMER).format(host.first_name, exp_title, exp_datetime)
+        send_sms(customer_phone_num, msg)
+
 
 class SearchForm(forms.Form):
     start_date = forms.DateTimeField(required=False)

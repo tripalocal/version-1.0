@@ -1108,3 +1108,39 @@ msgstr "私人团"
 
 #~ msgid "Sorry but there was an error."
 #~ msgstr "请稍后再试"
+
+msgid "%H:%M %-d %b %Y"
+msgstr "%Y年%-m月%-d日 %H:%M"
+
+msgid "Tripalocal: {} has requested your {} on {}. Please respond within 48 hours or {} will be refunded"
+msgstr "本土客:{}对您的{}发出了请求，预定的出发时间为{}，请在48小时内回复，否则系统会自动退款给{}"
+
+msgid "Tripalocal: You have requested {}'s {} at {}, further information will be provided shortly."
+msgstr "本土客: 您对{}的{}的请求已经成功发送，时间是{}，我们会在稍后提供给您更详尽的旅程信息。"
+
+msgid "Tripalocal: Your booking for {exp_title} with {host_name} at {exp_datetime} has been confirmed."
+msgstr "本土客: 您预订的和{host_name}在{exp_datetime}的{exp_title}已经被成功确认。"
+
+msgid "Tripalocal: You have a confirmed booking request for {exp_title} sent by {customer_name} at {exp_datetime}."
+msgstr "本土客: 您已经成功确认了和{customer_name}在{exp_datetime}的{exp_title}的订单。"
+
+msgid "Tripalocal: Your booking request for {exp_title} at {exp_datetime} with {host_name} has been cancelled. Refund is on the way."
+msgstr "本土客: 您预订的和{host_name}的在{exp_datetime}的{exp_title}的订单已经被取消。退款通常会在3个工作日内到达您的账户（个别银行可能需要最多10个工作日）。"
+
+msgid "Tripalocal: {customer_name}'s booking request for {exp_title} at {exp_datetime} has been cancelled."
+msgstr "本土客:{customer_name}预订的在{exp_datetime}的{exp_title}的订单已经被取消。"
+
+msgid "Tripalocal: How was your experience with {host_name}? Please leave a review for your host to help out another traveller planning their perfect trip."
+msgstr "本土客: 您对和{host_name}的体验之旅有什么感想， 请留下对领路人的评价，以帮助其他用户计划他们的路线。"
+
+msgid "Tripalocal: You've got one booking for {exp_title} with {customer_name} at {exp_datetime} coming soon."
+msgstr "本土客:{customer_name}预订的在{exp_datetime}的{exp_title}即将开始。"
+
+msgid "Tripalocal: Your booking for {exp_title} with {host_name} at {exp_datetime} is coming soon."
+msgstr "本土客: 您预订的和{host_name}的在{exp_datetime}的{exp_title}即将开始。"
+
+msgid "Tripalocal: {sender_name}"
+msgstr "本土客:{sender_name}"
+
+msgid "Tripalocal: It's been 24 hours since {guest_name} reached out. Please confirm or decline the request as soon as possible."
+msgstr "本土客：{guest_name}给您发送的订单请求已经超过24个小时，请尽快确认或拒绝。"
