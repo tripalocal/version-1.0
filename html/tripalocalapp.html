@@ -15,6 +15,9 @@
 </head>
 
 <body>
+  <div class="wechat-redirect">
+    <p>请在浏览器中打开这个这个页面 <span class="arrow">&uarr;</span></p>
+  </div>
   <div class="header">
     <img class="logo" src="img/logo.png" alt="logo">
     <img class="mobiles" src="img/mobiles.png" alt="mobiles">
@@ -22,7 +25,7 @@
 
   <div class="links">
     <div class="container">
-      <a class="badge" href="itmss://itunes.apple.com/cn/app/ben-tu-ke/id1023198122?mt=8"><img src="img/app-store-badge_zh.png" height="40px"></a>
+      <a class="badge app-store" href="itmss://itunes.apple.com/cn/app/ben-tu-ke/id1023198122?mt=8"><img src="img/app-store-badge_zh.png" height="40px"></a>
       <a class="badge" href="?utm=b15"><img src="img/play-store-badge_zh.png" height="40px"></a>
     </div>
   </div>
@@ -33,7 +36,7 @@
 
   <div class="links">
     <div class="container">
-      <a class="badge" href="itmss://itunes.apple.com/cn/app/ben-tu-ke/id1023198122?mt=8"><img src="img/app-store-badge_zh.png" height="40px"></a>
+      <a class="badge app-store" href="itmss://itunes.apple.com/cn/app/ben-tu-ke/id1023198122?mt=8"><img src="img/app-store-badge_zh.png" height="40px"></a>
       <a class="badge" href="?utm=b15"><img src="img/play-store-badge_zh.png" height="40px"></a>
     </div>
   </div>
@@ -56,5 +59,12 @@
         {
             window.location.href = "https://www.tripalocal.com/apk/tripalocal_v1.0_1_" + utmId + ".apk";
         }
+
+        var isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+        $('.app-store').click(function() {
+          if (isWeChat) {
+            $('.wechat-redirect').slideDown('slow');
+          }
+        });
     });
 </script>
