@@ -23,8 +23,17 @@ h1 {
   position: absolute;
   width: 100%;
   border: 0;
+  color: white;
+
+  a {
+    color: white;
+  }
 
   .navbar-brand {
+    display: none;
+  }
+
+  .main-menu {
     display: none;
   }
 

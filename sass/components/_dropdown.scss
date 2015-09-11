@@ -78,3 +78,10 @@
     max-height: none;
   }
 }
+.dropdown-menu > li > a {
+  color: $dark-grey;
+}
+.dropdown-menu > li > a:hover {
+  background-color: white;
+  color: $primary-color;
+}

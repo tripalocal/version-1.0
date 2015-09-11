@@ -5,7 +5,7 @@
 */
 
 // Sizes
-$xxs: 38px;
+$xxs: 34px;
 $xs: 50px;
 $sm: 80px;
 $md: 130px;
@@ -70,7 +70,6 @@ $lg: 150px;
   @extend %profile;
   width: $xxs;
   height: $xxs;
-  margin-right: 8px;
   img {
     height: $xs;
   }

@@ -4,14 +4,42 @@
 
 */
 
-
 .navbar {
-  height: 60px;
   background-color: white;
   margin: 0;
+  font-size: 14px;
+  color: $dark-grey;
+  height: 50px;
+  text-align: center;
 
-  .container-fluid {
-    height: inherit;
+  a {
+    color: $dark-grey;
+  }
+
+  .navbar-btn {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .main-menu {
+    font-weight: 500;
+    display: inline-block;
+    float: none;
+    vertical-align: top;
+    a {
+      padding: 15px 0 0 0;
+      margin: 0 20px 15px 20px;
+    }
+    a:hover, a:focus {
+      background-color: white;
+      border-bottom: 3px solid $primary-color;
+    }
+  }
+
+  .navbar-brand {
+    padding: 8px 15px 5px 15px;
   }
 
   .navbar-right {
@@ -19,11 +47,21 @@
     margin-left: 5px;
   }
 
-  .navbar-btn {
-    margin-top: 12px;
-  }
   .navbar-text {
-    margin-top: 19px;
-    color: $medium-grey;
+    margin-left: 15px;
+    margin-right: 10px;
+  }
+  
+  .dropdown-toggle {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+}
+
+@media (min-width: 768px) {
+  ul.nav li.dropdown:hover > ul.dropdown-menu {
+    display: block;
+    margin: 0;
   }
 }
