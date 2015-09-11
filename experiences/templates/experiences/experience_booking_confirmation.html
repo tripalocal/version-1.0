@@ -404,7 +404,6 @@ $(function(){
                         });
 
         $("#submit_booking").bind("click", function(e) {
-            e.preventDefault();
             if ($("#isAgreementSelected").is(':checked'))
             {
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
@@ -429,11 +428,13 @@ $(function(){
                 }
                 else
                 {
+                    e.preventDefault();
                     $("#id_coupon_term_condition").attr("style","width:480px; display:inline-block; margin-bottom:10px;");
                 }
             }
             else
             {
+                e.preventDefault();
                 $("#id_term_condition").attr("style","display:inline-block;");
             }
 

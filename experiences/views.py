@@ -939,7 +939,7 @@ def experience_booking_confirmation(request):
 
                 if total_price > 0.0:
                     #not free
-                    response = client.UnionpayClient(config).pay(int(total_price*100),order_id, channel_type='07',
+                    response = client.UnionpayClient(config).pay(int(total_price*100),order_id, channel_type='07',#currency_code=CurrencyCode[experience.currency.upper()],
                                                                  front_url='http://' + settings.ALLOWED_HOSTS[0] + '/experience_booking_successful/?experience_id=' + str(experience.id)
                                                                  + '&guest_number=' + form.data['guest_number']
                                                                  + '&booking_datetime=' + form.data['date'].strip()+form.data['time'].strip()
@@ -1652,7 +1652,13 @@ def update_booking(id, accepted, user):
                 if extra_fee < 0 and extra_fee > -1:
                     refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT), 0) * (1+extra_fee)
 
-                success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
+                if payment.charge_id.startswith('ch_'):
+                    #stripe
+                    success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
+                else:
+                    #union pay
+                    #TODO
+                    success = True
             else:
                 success = True
 
@@ -2786,7 +2792,6 @@ def unionpay_payment_callback(request):
 
             if ret.get('respCode', '') == '00':
                 #success
-                #logger.debug("success")
                 bk = Booking.objects.filter(booking_extra_information=ret['orderId'], status="requested")
                 if bk is not None and len(bk)>0:
                     bk = bk[0]
@@ -2795,11 +2800,19 @@ def unionpay_payment_callback(request):
 
                     payment = Payment()
                     payment.charge_id = ret['queryId']
+                    payment.street1 = ret['txnTime']
                     payment.booking_id = bk.id
                     payment.save()
 
                     bk.payment_id = payment.id
                     bk.save()
+
+                    experience = Experience.objects.get(id=bk.experience_id)
+                    user = User.objects.get(id=bk.user_id)
+                    bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+                    send_booking_email_verification(bk, experience, user, 
+                                                    instant_booking(experience, bk.datetime.date(), bk.datetime.time()))
+                logger.debug("success"+str(ret['orderId']))
                 pass
             else:
                 #failure
