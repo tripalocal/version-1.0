@@ -4,6 +4,32 @@
 
 */
 
+.list-experience {
+  background: url(../img/searchbar.jpg) no-repeat;
+  background-size: cover;
+  height: 320px;
+  border-top: 1px solid #CCCCCC;
+  border-bottom: 1px solid #CCCCCC;
+}
+.list-experience-header {
+  height: 100%;
+  text-align: center;
+  vertical-align: middle;
+}
+.jumbotron-list-experience .list-experience-header p {
+  color: black;
+  font-family: 'EXO', sans-serif;
+}
+.list-experience-body {
+  background-color: #F7F7F7;
+  height: 480px;
+}
+.list-experience-body p {
+  font-family: 'EXO', sans-serif;
+  font-size: 23px;
+  color: #5E5E5E;
+  float: left;
+}
 
 .list-experience-body {
   width: 900px;
