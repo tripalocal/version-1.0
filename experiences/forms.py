@@ -1,4 +1,4 @@
-from datetime import *
+﻿from datetime import *
 from calendar import monthrange
 import string
 import json
@@ -572,7 +572,7 @@ class BookingConfirmationForm(forms.Form):
     phone_number = forms.CharField(max_length=15, required=True)
 
     coupon_extra_information = forms.CharField(max_length=500, required=False)
-    booking_extra_information = forms.BooleanField(required=False)
+    booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
     price_paid = forms.DecimalField(max_digits=6, decimal_places=2, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -600,7 +600,7 @@ class BookingConfirmationForm(forms.Form):
         cleaned = super(BookingConfirmationForm, self).clean()
         local_timezone = pytz.timezone(settings.TIME_ZONE)
 
-        if not self.errors and (not 'Refresh' in self.data):
+        if not self.errors and ('Refresh' not in self.data):
             stripeToken = self.data["stripeToken"] if "stripeToken" in self.data else None
             #card_number = self.cleaned_data["card_number"]
             #exp_month = self.cleaned_data["expiration"].month
@@ -610,7 +610,7 @@ class BookingConfirmationForm(forms.Form):
 
             extra_fee = 0.00
             free = False
-            self.cleaned_data['price_paid'] = 0.0
+            self.cleaned_data['price_paid'] = -1.0
 
             dt = self.cleaned_data['date']
             tm = self.cleaned_data['time']
@@ -622,6 +622,7 @@ class BookingConfirmationForm(forms.Form):
             if len(cp)>0:
                 valid = check_coupon(cp[0], experience.id, self.cleaned_data['guest_number'])
                 if valid['valid']:
+                    self.cleaned_data['price_paid'] = valid['new_price']
                     rules = json.loads(cp[0].rules)
                     if type(rules["extra_fee"]) == int or type(rules["extra_fee"]) == float:
                         extra_fee = rules["extra_fee"]
@@ -632,7 +633,6 @@ class BookingConfirmationForm(forms.Form):
 
             user = User.objects.get(id=self.cleaned_data['user_id'])
             guest_number = int(self.cleaned_data["guest_number"])
-            booking_extra_information="Need Chinese Translation" if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information'] else ""
             coupon_extra_information=self.cleaned_data['coupon_extra_information'],
             coupon=cp[0] if len(cp)>0 else None
             payment_street1 = self.cleaned_data['street1']
@@ -650,9 +650,32 @@ class BookingConfirmationForm(forms.Form):
             dates.append(dt.strftime("%Y/%m/%d"))
             times.append(tm.strftime("%H"))
 
-            ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,guest_number,
-                         coupon_extra_information = coupon_extra_information, coupon = coupon,
-                         payment_phone_number = payment_phone_number, stripe_token = stripeToken)
+            if 'Stripe' in self.data:
+                booking_extra_information="Need Chinese Translation" if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information'] else ""
+                ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,guest_number,
+                             coupon_extra_information = coupon_extra_information, coupon = coupon,
+                             payment_phone_number = payment_phone_number, stripe_token = stripeToken)
+            elif 'UnionPay' in self.data:
+                booking_extra_information=self.cleaned_data['booking_extra_information']
+                if coupon:
+                    st = "paid" if valid['valid'] and valid['new_price']==0.0 else 'requested'
+                    booking = Booking(user = user, experience= experience, guest_number = guest_number,
+                                        datetime = bk_dt,
+                                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status=st,
+                                        coupon_extra_information=coupon_extra_information,
+                                        coupon=coupon,
+                                        booking_extra_information=booking_extra_information)
+                else:
+                    booking = Booking(user = user, experience= experience, guest_number = guest_number,
+                                        datetime = bk_dt,
+                                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="requested",
+                                        booking_extra_information=booking_extra_information)
+                booking.save()
+                #add the user to the guest list
+                if user not in experience.guests.all():
+                #experience.guests.add(user)
+                    cursor = connections['default'].cursor()
+                    cursor.execute("Insert into experiences_experience_guests (experience_id,user_id) values (%s, %s)", [experience.id, user.id])
 
         return cleaned
 
@@ -760,7 +783,6 @@ class CustomItineraryForm(forms.Form):
         self.fields['language'].widget.attrs['readonly'] = True
         self.fields['language'].widget = forms.HiddenInput()
 
-
 def schedule_request_reminder_sms(booking_id, host_id, guest_name, schedule_time):
     registered_user = RegisteredUser.objects.get(user_id=host_id)
     host_phone_num = registered_user.phone_number
@@ -769,6 +791,50 @@ def schedule_request_reminder_sms(booking_id, host_id, guest_name, schedule_time
         msg = _('%s' % REQUEST_REMIND_HOST).format(guest_name=guest_name)
         schedule_sms_if_no_confirmed.apply_async([host_phone_num, msg, booking_id], eta=schedule_time)
 
+def instant_booking(experience, bk_date, bk_time):
+    is_instant_booking = False
+    local_timezone = pytz.timezone(settings.TIME_ZONE)
+    instant_bookings = experience.instantbookingtimeperiod_set.all()
+    for ib in instant_bookings:
+        ib_start = ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+        ib_end = ib.end_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+        if ib.repeat:
+            if ib.repeat_cycle.lower() == "daily":
+                if (ib_start.date() - bk_date).days % ib.repeat_frequency == 0:
+                    # for daily repeated time periods, the start and end time must be in the same day
+                    if not (ib_start.hour <= bk_time.hour and bk_time.hour <= ib_end.hour):
+                        # not a match: hour
+                        continue
+                    is_instant_booking = True
+                    break
+            elif ib.repeat_cycle.lower() == "weekly":
+                weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+                monday1 = (bk_date.date()-timedelta(days=bk_date.weekday()))
+                monday2 = (ib_start.date() - timedelta(days=ib_start.date().weekday()))
+                if ib.repeat_extra_information.find(weekdays[bk_date.weekday()])>=0 and ((monday1-monday2)/7).days%ib.repeat_frequency == 0:
+                    # for weekly repeated time periods, the start and end time must be in the same day
+                    if not (ib_start.hour <= bk_time.hour and bk_time.hour <= ib_end.hour):
+                        # not a match: hour
+                        continue
+                    is_instant_booking = True
+                    break
+            elif ib.repeat_cycle.lower() == "monthly":
+                if bk_date.day >= ib_start.date().day and bk_date.day <= ib_end.date().day and (bk_date.month - ib_start.month)%ib.repeat_frequency == 0:
+                    if bk_date.day == ib_start.date().day and ib_start.hour > bk_time.hour:
+                        # not a match: hour
+                        continue
+                    if bk_date.day == ib_end.date().day and ib_end.hour < bk_time.hour:
+                        # not a match: hour
+                        continue
+                    is_instant_booking = True
+                    break
+        else:
+            booking_datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute))
+            if ib_start <= booking_datetime and booking_datetime <= ib_end:
+                is_instant_booking = True
+                break
+
+    return is_instant_booking
 
 class ItineraryBookingForm(forms.Form):
     user_id = forms.CharField()
@@ -796,7 +862,7 @@ class ItineraryBookingForm(forms.Form):
     phone_number = forms.CharField(max_length=15, required=False)
 
     coupon_extra_information = forms.CharField(max_length=500, required=False)
-    booking_extra_information = forms.BooleanField(required=False)
+    booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
 
     def __init__(self, *args, **kwargs):
         super(ItineraryBookingForm, self).__init__(*args, **kwargs)
@@ -884,61 +950,22 @@ class ItineraryBookingForm(forms.Form):
                 #save the booking record
                 #user = User.objects.get(id=self.cleaned_data['user_id']) #moved outside of the for loop
                 host = experience.hosts.all()[0]
-                date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
-                time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
+                bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
+                bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
                 local_timezone = pytz.timezone(settings.TIME_ZONE)
 
-                is_instant_booking = False
-                instant_bookings = experience.instantbookingtimeperiod_set.all()
-                for ib in instant_bookings:
-                    ib_start = ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
-                    ib_end = ib.end_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
-                    if ib.repeat:
-                        if ib.repeat_cycle.lower() == "daily":
-                            if (ib_start.date() - date).days % ib.repeat_frequency == 0:
-                                # for daily repeated time periods, the start and end time must be in the same day
-                                if not (ib_start.hour <= time.hour and time.hour <= ib_end.hour):
-                                    # not a match: hour
-                                    continue
-                                is_instant_booking = True
-                                break
-                        elif ib.repeat_cycle.lower() == "weekly":
-                            weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-                            monday1 = (date.date()-timedelta(days=date.weekday()))
-                            monday2 = (ib_start.date() - timedelta(days=ib_start.date().weekday()))
-                            if ib.repeat_extra_information.find(weekdays[date.weekday()])>=0 and ((monday1-monday2)/7).days%ib.repeat_frequency == 0:
-                                # for weekly repeated time periods, the start and end time must be in the same day
-                                if not (ib_start.hour <= time.hour and time.hour <= ib_end.hour):
-                                    # not a match: hour
-                                    continue
-                                is_instant_booking = True
-                                break
-                        elif ib.repeat_cycle.lower() == "monthly":
-                            if date.day >= ib_start.date().day and date.day <= ib_end.date().day and (date.month - ib_start.month)%ib.repeat_frequency == 0:
-                                if date.day == ib_start.date().day and ib_start.hour > time.hour:
-                                    # not a match: hour
-                                    continue
-                                if date.day == ib_end.date().day and ib_end.hour < time.hour:
-                                    # not a match: hour
-                                    continue
-                                is_instant_booking = True
-                                break
-                    else:
-                        booking_datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute))
-                        if ib_start <= booking_datetime and booking_datetime <= ib_end:
-                            is_instant_booking = True
-                            break
+                is_instant_booking = instant_booking(experience, bk_date, bk_time)
 
                 if coupon:
                     booking = Booking(user = user, experience= experience, guest_number = guest_number,
-                                        datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
+                                        datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid",
                                         coupon_extra_information=coupon_extra_information,
                                         coupon=coupon,
                                         booking_extra_information=booking_extra_information)
                 else:
                     booking = Booking(user = user, experience= experience, guest_number = guest_number,
-                                        datetime = local_timezone.localize(datetime(date.year, date.month, date.day, time.hour, time.minute)).astimezone(pytz.timezone("UTC")),
+                                        datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
                 booking.save()
                 #add the user to the guest list
@@ -1120,7 +1147,6 @@ class ItineraryBookingForm(forms.Form):
 
         return cleaned
 
-
 def send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, customer):
     registered_user = RegisteredUser.objects.get(user_id=host.id)
     host_phone_num = registered_user.phone_number
@@ -1132,7 +1158,6 @@ def send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, 
     if customer_phone_num:
         msg = _('%s' % REQUEST_SENT_NOTIFY_CUSTOMER).format(host.first_name, exp_title, exp_datetime)
         send_sms(customer_phone_num, msg)
-
 
 class SearchForm(forms.Form):
     start_date = forms.DateTimeField(required=False)

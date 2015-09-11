@@ -118,4 +118,5 @@ urlpatterns = patterns('',
     url(r'^custom_admin/experience/$', superuser_required(ExperienceView.as_view()), name='admin_experience'),
     url(r'^multidaytrip/$','experiences.views.multi_day_trip'),
     url(r'^wechat/item1/$', TemplateView.as_view(template_name="app/wechat_item1.html")),
+    url(r'^unionpay_payment_callback/$','experiences.views.unionpay_payment_callback'),
 )
