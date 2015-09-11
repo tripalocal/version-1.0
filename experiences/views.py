@@ -892,7 +892,7 @@ def experience_booking_confirmation(request):
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
 
-        elif 'Stripe' in request.POST:
+        elif 'Stripe' in request.POST or 'stripeToken' in request.POST:
             #submit the form
             display_error = True
             if form.is_valid():
@@ -969,6 +969,10 @@ def experience_booking_confirmation(request):
                                                                            'total_price': total_price,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
+        else:
+            #TODO
+            #submit name missing in IE
+            return HttpResponseRedirect(GEO_POSTFIX)
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()
