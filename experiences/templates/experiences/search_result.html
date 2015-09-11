@@ -136,7 +136,6 @@
 
     <div class="search-result">
       <div class="container">
-        <div class="loading"><img src="{% static 'experiences/img/loading.gif' %}" width="64px" height="64px" class="ajax-loader"/></div>
 
         <div class="container-fluid">
           <div id="more-filters-div" class="more-filters">
@@ -144,6 +143,7 @@
               <button class="btn btn-primary" id="apply_filters" type="button" value="Apply Filters" style="width:100px;display:none;float:left;">{% trans "Apply Filters" %}</button>
               <div id="ajax-experience-count" class="experience-count"></div>
           </div>
+          <div class="loading"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
           <div id="ajax-experience-result"></div>
 
         </div>

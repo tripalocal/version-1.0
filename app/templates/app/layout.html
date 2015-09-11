@@ -129,7 +129,7 @@
           </a>
         </div>
 
-        <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right" style="min-width: 75px; margin-left:15px;"
+        <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right" style="min-width: 75px;"
         href="https://www.tripalocal.com{% if LANGUAGE == "zh-CN" %}{{ request.path|slice:"3:" }}{% else %}/cn{{ request.path }}{% endif %}">
         {% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}
         </a>
@@ -148,9 +148,8 @@
                         href="{{ GEO_POSTFIX }}myprofile"></a>
                 </div>
           </li>
-          <li><p class="navbar-text">{{ user.first_name }}</p></li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="background-color:transparent;"><span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="background-color:transparent;">{{ user.first_name }}<span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a href="{{ GEO_POSTFIX }}mylisting">{% trans 'My Listing' %}</a></li>
               <li><a href="{{ GEO_POSTFIX }}myreservation">{% trans 'My Reservations' %}</a></li>
