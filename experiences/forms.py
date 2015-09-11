@@ -651,7 +651,7 @@ class BookingConfirmationForm(forms.Form):
             dates.append(dt.strftime("%Y/%m/%d"))
             times.append(tm.strftime("%H"))
 
-            if 'Stripe' in self.data:
+            if 'Stripe' in self.data or 'stripeToken' in self.data:
                 booking_extra_information="Need Chinese Translation" if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information'] else ""
                 ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,guest_number,
                              coupon_extra_information = coupon_extra_information, coupon = coupon,
