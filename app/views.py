@@ -3,13 +3,15 @@ Definition of views.
 """
 from time import gmtime
 from time import strftime
-from app.wechat_payment.api import UnifiedOrderPay, JsAPIOrderPay
+from app.wechat_payment.api import JsAPIOrderPay
+from app.wechat_payment.utils import dict_to_xml
 from django.core.urlresolvers import reverse
 
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, loader
 from datetime import *
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from experiences.forms import Locations, Location
 from django.contrib.auth import authenticate, login
@@ -33,6 +35,8 @@ from django import forms
 from tripalocal_messages.models import Aliases, Users
 from urllib.parse import quote_plus
 import json, os
+import xmltodict
+
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
@@ -743,9 +747,13 @@ def wechat_product(request):
     if code:
         print('code:', code)
         out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
+        notify_path = reverse('wechat_payment_notify', kwargs={'id': str(product_id)})
+        print(notify_path)
+        notify_url = request.build_absolute_uri(notify_path)
+        print('notify_url', notify_url)
         product_title = "Product " + str(product_id) + "test"
         json_pay_info = pay.post_prepaid(product_title, out_trade_no, "2",
-                       "127.0.0.1", request.get_full_path(), code)
+                       "127.0.0.1", notify_url, code)
         print('json_pay_info', json_pay_info)
         context = RequestContext(request, json_pay_info)
         return render_to_response('app/wechat_product.html', context)
@@ -753,3 +761,19 @@ def wechat_product(request):
         print('no code redirect')
         # 重定向到oauth_url后，获得code值
         return redirect(oauth_url)
+
+
+@csrf_exempt
+def wechat_payment_notify(request, id):
+    print('product id:', id)
+    print('notify_post', request.body)
+    if (request.body):
+        notify_info = xmltodict.parse(request.body.decode("utf-8"))['xml']
+        print('notify_info', notify_info)
+
+        if (notify_info.get('return_code', None)) == 'SUCCESS':
+            xml = dict_to_xml({'return_code': 'SUCCESS', 'return_msg': 'OK'})
+            return HttpResponse(xml)
+        return HttpResponse('')
+    else:
+        return HttpResponse('')

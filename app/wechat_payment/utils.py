@@ -24,14 +24,17 @@ def calculate_sign(params, api_key):
     return hashlib.md5(encoded_url).hexdigest().upper()
 
 
-def dict_to_xml(params, sign):
+def dict_to_xml(params, sign=None):
     xml = ["<xml>",]
     for (k, v) in params.items():
         if (v.isdigit()):
             xml.append('<%s>%s</%s>' % (k, v, k))
         else:
             xml.append('<%s><![CDATA[%s]]></%s>' % (k, v, k))
-    xml.append('<sign><![CDATA[%s]]></sign></xml>' % sign)
+    if sign:
+        xml.append('<sign><![CDATA[%s]]></sign></xml>' % sign)
+    else:
+        xml.append('</xml>')
     return ''.join(xml)
 
 
