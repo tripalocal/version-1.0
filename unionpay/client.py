@@ -55,15 +55,15 @@ class UnionpayClient(object):
         return cur_trade_time.strftime('%Y%m%d%H%M%S')
 
     def post(self, addr, data, **kwargs):
-        data.update(signature=urlencode({'signature': data['signature']})[10:])
-        request_data = Signer.simple_urlencode(data)
-        response = requests.post(
-            addr, data=request_data, timeout=self.timeout, verify=self.verify)
+        if type(data['signature']) is bytes:
+            data.update(signature=data['signature'].decode("utf-8"))
+        #request_data = Signer.simple_urlencode(data)
+        response = requests.post(addr, data=data, timeout=self.timeout, verify=self.verify)
         if response.status_code != requests.codes.ok:
             msg = "[UPACP]request error: %s, reason: %s" \
                 % (response.status_code, response.reason)
             raise error.UnionpayError(msg)
-        return response.content
+        return response.content.decode("utf-8")
 
     def async_post(self, addr, data, **kwargs):
         pass
@@ -71,7 +71,7 @@ class UnionpayClient(object):
     def send_packet(self, addr, data, **kwargs):
         raw_content = self.post(addr, data)
         data = self.signer.parse_arguments(raw_content)
-        if data.respCode != '00':
+        if data['respCode'] != '00':
             msg = '[UPACP]respCode: %s orderid: %s' % (
                 data['respCode'], data['orderId'])
             raise error.UnionpayError(msg)
@@ -97,7 +97,7 @@ class UnionpayClient(object):
             'txnSubType': '01',
             'bizType': biz_type,
             'channelType': channel_type,
-            'backUrl': self.config.backend_url,
+            'backUrl': self.config.backend_url_payment,
             'accessType': '0',
             'merId': self.config.merchant_id,
             'orderId': order_id,
@@ -130,8 +130,37 @@ class UnionpayClient(object):
     def revoke(self):
         pass
 
-    def refund(self):
-        pass
+    def refund(self, txnamt, orderId, origQryId, biz_type="000201", channel_type='07', **kwargs):
+        '''
+        @txnamt:            trade money amount
+        @orderId:           trade id
+        @origQryId:         original trade query id
+        @biz_type:          idk
+        @channel_type:      trade channel: 07-DESKTOP, 08-MOBILE
+        @front_url:         browser jump url
+        '''
+        data = {
+            'version': self.version,
+            'encoding': self.encoding,
+            'signMethod': self.signMethod,
+            'txnType': TradeType.refund,
+            'txnSubType': '00',
+            'bizType': biz_type,
+            'channelType': channel_type,
+            'backUrl': self.config.backend_url_refund,
+            'accessType': '0',
+            'merId': self.config.merchant_id,
+            'origQryId': origQryId,
+            'orderId': orderId,
+            'txnTime': self.get_txn_time(),
+            'txnAmt': txnamt
+        }
+
+        data = self.signer.filter_params(data)
+        sign_result = self.signer.sign(data)
+        if not sign_result:
+            raise error.UnionpayError('Sign data error')
+        return self.send_packet(self.config.back_trans_url, data)
 
     def auth(self):
         pass

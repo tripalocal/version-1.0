@@ -11,7 +11,8 @@ x509_filepath: /home/ubuntu/Tripalocal_V1/unionpay/pem/verify_sign_acp.cer
 # digest method
 digest_method: sha1
 # notify url for back notify from unionpay
-backend_url: https://www.tripalocal.com/unionpay_payment_callback/
+backend_url_payment: https://www.tripalocal.com/unionpay_payment_callback/
+backend_url_refund: https://www.tripalocal.com/unionpay_refund_callback/
 # unionpay trade address
 app_trans_url: https://101.231.204.80:5000/gateway/api/appTransReq.do
 front_trans_url: https://101.231.204.80:5000/gateway/api/frontTransReq.do

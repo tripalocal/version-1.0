@@ -118,6 +118,7 @@ urlpatterns = patterns('',
     url(r'^custom_admin/experience/$', superuser_required(ExperienceView.as_view()), name='admin_experience'),
     url(r'^multidaytrip/$','experiences.views.multi_day_trip'),
     url(r'^unionpay_payment_callback/$','experiences.views.unionpay_payment_callback'),
+    url(r'^unionpay_refund_callback/$','experiences.views.unionpay_refund_callback'),
     url(r'^wechat/product/$', 'app.views.wechat_product', name='wechat_product'),
     url(r'^wechat/(?P<id>\d+)/notify/$', 'app.views.wechat_payment_notify', name='wechat_payment_notify'),
 )

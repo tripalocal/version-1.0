@@ -1612,12 +1612,6 @@ def update_booking(id, accepted, user):
             booking_success = True
 
         elif accepted == "no":
-            exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
-            customer_phone_num = booking.payment.phone_number
-            exp_datetime_local = booking.datetime.astimezone(tzlocal())
-            exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
-            send_booking_cancelled_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
-
             extra_fee = 0.00
             free = False
 
@@ -1661,14 +1655,29 @@ def update_booking(id, accepted, user):
                     success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
                 else:
                     #union pay
-                    #TODO
-                    success = True
+                    config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
+                    response = client.UnionpayClient(config).refund(int(refund_amount*100),
+                                                         payment.booking.booking_extra_information.replace("Tripalocal","UPRefund"),
+                                                         payment.charge_id, '000201', '07')
+
+                    success = True if response['respCode'] == '00' else False
+                    if success:
+                        booking.refund_id=response['queryId']
+                        booking.save()
             else:
                 success = True
 
             if success:
                 booking.status = "rejected"
                 booking.save()
+
+                #send SMS
+                exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+                customer_phone_num = booking.payment.phone_number
+                exp_datetime_local = booking.datetime.astimezone(tzlocal())
+                exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
+                send_booking_cancelled_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
+                
                 #send an email to the traveller
                 mail.send(subject=_('[Tripalocal] Your experience is cancelled'), message='',
                           sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
@@ -2813,7 +2822,33 @@ def unionpay_payment_callback(request):
                     send_booking_email_verification(bk, experience, user, 
                                                     instant_booking(experience, bk.datetime.date(), bk.datetime.time()))
                     sms_notification(bk, experience, user, payment.phone_number)
-                logger.debug("success"+str(ret['orderId']))
+                logger.debug("payment success:"+str(ret['orderId']))
+                pass
+            else:
+                #failure
+                #TODO
+                #logger.debug("failure")
+                pass
+        except Exception as err:
+            logger.debug(err)
+
+@csrf_exempt
+def unionpay_refund_callback(request):
+    import logging
+    logger = logging.getLogger("Tripalocal_V1")
+    #logger.debug(request.POST)
+
+    ret = request.POST
+
+    if ret is not None:
+        try:
+            config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
+            s = signer.Signer.getSigner(config)
+            s.validate(ret)
+
+            if ret.get('respCode', '') == '00':
+                #success
+                logger.debug("refund success:"+ret['queryId'])
                 pass
             else:
                 #failure
