@@ -319,7 +319,8 @@
                                 {% trans "If you cancel within 2 calendar days in advance, you will be charged a 100 percent cancellation fee." %}</p>
                         </div>
                     </div>
-                    <input type="submit" id="submit_booking" name="Request to Book" value="{% trans "Book Now" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:140px;"/>
+                    <input type="submit" id="submit_booking" name="Stripe" value="{% trans "Credit card/Alipay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>
+                    <input type="submit" id="submit_booking_unionpay" name="UnionPay" value="{% trans "Union Pay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>
                 </form>
             </div>
 
@@ -388,7 +389,7 @@ $(function(){
         $("#id_expiration_1 :nth-child(2)").prop('selected', true);
 
         var handler = StripeCheckout.configure({
-                            key: 'pk_test_W9jgaSX9w9vrewiQIl5gE5l4',
+                            key: 'pk_live_62VE04d61Te70oh7IB7dqfjm',
                             image: '/images/tripalocal_Logo.png',
                             locale: '{{LANGUAGE}}',
                             token: function(token) {
@@ -403,7 +404,6 @@ $(function(){
                         });
 
         $("#submit_booking").bind("click", function(e) {
-            e.preventDefault();
             if ($("#isAgreementSelected").is(':checked'))
             {
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
@@ -423,16 +423,18 @@ $(function(){
                     }
                     else
                     {
-                        $("#category_form").submit();
+                        //$("#category_form").submit();
                     }
                 }
                 else
                 {
+                    e.preventDefault();
                     $("#id_coupon_term_condition").attr("style","width:480px; display:inline-block; margin-bottom:10px;");
                 }
             }
             else
             {
+                e.preventDefault();
                 $("#id_term_condition").attr("style","display:inline-block;");
             }
 
