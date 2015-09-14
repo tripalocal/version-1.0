@@ -120,4 +120,5 @@ urlpatterns = patterns('',
     url(r'^unionpay_payment_callback/$','experiences.views.unionpay_payment_callback'),
     url(r'^wechat/product/$', 'app.views.wechat_product', name='wechat_product'),
     url(r'^wechat/(?P<id>\d+)/notify/$', 'app.views.wechat_payment_notify', name='wechat_payment_notify'),
+    url(r'^wechat/generate_order/$', 'app.views.generate_order', name='wechat_generate_order'),
 )

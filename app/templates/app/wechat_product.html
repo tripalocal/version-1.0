@@ -17,26 +17,42 @@
     <h2>产品名称：{{ product_title }}</h2>
 
     <h3>价格：¥{{ product_price }} </h3>
-    <button class="btn btn-primary" type="button" onclick="callpay()">微信支付</button>
+    <button class="btn btn-primary" type="button" onclick="invokePayment()">微信支付</button>
 </div>
 </body>
 
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
-<script type="text/javascript">
 
-    function jsApiCall(){
+<script type="text/javascript">
+    function invokePayment() {
+        href = window.location.host + '/wechat/generate_order/';
+        $.post(href, {
+            'code': '{{ request.GET.code }}',
+            'id': '{{ request.GET.id }}',
+            'phone_num': '123123123',
+            'email': 'yehalsfj'
+        }).done(function (result) {
+            callpay(result);
+        }).fail(function (error) {
+            alert(error);
+        });
+    }
+
+    function jsApiCall(json_pay_info){
         WeixinJSBridge.invoke(
             'getBrandWCPayRequest',
             {
-                "appId":"{{ appId }}",
-                "timeStamp": "{{ timeStamp }}",
-                "nonceStr": "{{ nonceStr }}",
-                "package": "{{ package }}",
+                "appId": json_pay_info.appId,
+                "timeStamp": json_pay_info.timeStamp,
+                "nonceStr": json_pay_info.nonceStr,
+                "package": json_pay_info.package,
                 "signType": "MD5",
-                "paySign": "{{ paySign }}"
+                "paySign": json_pay_info.paySign
             },
             function(res){
                 if (res.err_msg == "get_brand_wcpay_request：ok") {
+{#                    Todo: jump to payment successful page.#}
                 } else {
 {#                    alert(res.err_msg);#}
                 }
@@ -44,7 +60,7 @@
         );
     }
 
-    function callpay() {
+    function callpay(json_pay_info) {
         if (typeof WeixinJSBridge == "undefined"){
             if( document.addEventListener ) {
                 document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
@@ -53,7 +69,7 @@
                 document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
             }
         } else {
-            jsApiCall();
+            jsApiCall(json_pay_info);
         }
     }
 </script>
