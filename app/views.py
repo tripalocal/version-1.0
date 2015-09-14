@@ -754,7 +754,7 @@ def wechat_product(request):
         # print(notify_path)
         notify_url = request.build_absolute_uri(notify_path)
         # print('notify_url', notify_url)
-        price_in_cents = int(product.price) * 100
+        price_in_cents = int(product.price * 100)
         json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(price_in_cents),
                                          "127.0.0.1", notify_url, code)
         # print('json_pay_info', json_pay_info)
