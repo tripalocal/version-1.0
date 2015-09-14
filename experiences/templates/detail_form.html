@@ -1,6 +1,6 @@
 {% load staticfiles %}
 
-<div id='detail-form' class="calendar">
+<div id='detail-form' class="form-body">
     <ul id="myTab" class="nav nav-tabs">
         {%if language == "cn" %}
         <li class="active"><a id="detail_tab" role="button" data-toggle="tab">中文（简体）</a></li>
@@ -14,15 +14,13 @@
     <div id="myTabContent" class="tab-content">
         <div class="tab-pane fade in active" id="english">
             <div class="section" id="section-included">
-                <div id="location">
+                <div id="location" class="form-info">
                     <p id="photo-heading"><strong>What's included</strong></p><br><br><br>
                     <p id="location-details">
-                        <span>Please specify what</span><br>
-                        <span>exactly you are offer-</span><br>
-                        <span>ing, if no, please</span><br>
-                        <span>specify how much it</span><br>
-                        <span>will roughly cost for</span><br>
-                        <span>your guest</span><br>
+                        <span>Please specify anything</span><br>
+                        <span>inclusive, or otherwise</span><br>
+                        <span>how much it will cost</span><br>
+                        <span>your guest.</span><br>
                     </p>
                 </div>
 
@@ -110,56 +108,51 @@
 </div>
 
 <!-- Info bar -->
-<div class="info-bar" style="width:300px;">
+<div class="form-hint">
     <img src= "{% static 'experiences/img/bubble-icon.png' %}" alt="">
-    <div id="hint-msgs">
-        <p>
-            <span><strong>Activity</strong></span><br>
-            <span>This is where you write</span><br>
-            <span>of your experience.</span><br>
-            <span>Where would you take your</span><br>
-            <span>guests to?</span><br>
-            <span>What would you do with</span><br>
-            <span>your guests?</span><br>
-            <span>Please write as first person.</span><br>
+    <div id="hint-msgs" class="hint-box" style="margin-bottom: 150px">
+
+          <h3>What's included</h3>
+          <p>
+            If a cost is included, simply describe what is it.
+            If a cost is not included, please give
+          a best estimate to how much it may cost,
+          or if it's not required.
+          </p>
+    </div>
+    <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="">
+    <div id="hint-msgs" class="hint-box">
+
+          <h3>Activity</h3>
+          <p>
+          This is where you write of your experience.
+          Where would you take your guests to?
+          What would you do with your guests?
+          Please write as first person.
         </p>
     </div>
     <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="">
-    <div id="hint-msgs">
-        <p>
-            <span><strong>Interaction</strong></span><br>
-            <span>How much would you inter-</span><br>
-            <span>act with your guests?</span><br>
-            <span>What's your communication</span><br>
-            <span>style?</span><br>
-            <span>Please write as a paragraph.</span><br>
+    <div id="hint-msgs" class="hint-box">
+
+          <h3>Interaction</h3>
+          <p>
+            How much would you interact with your guests?
+            What's your communication style?
+            Please write as a paragraph.
         </p>
     </div>
     <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="">
-    <div id="hint-msgs">
-        <p>
-            <span><strong>Appropriate dress</strong></span><br>
-            <span>What will the weather be</span><br>
-            <span>like?</span><br>
-            <span>Will there be a lot of walking</span><br>
-            <span>involved?</span><br>
-            <span>What will the locals wear?</span><br>
-            <span>your guests?</span><br>
-            <span>Please write as a paragraph.</span><br>
+    <div id="hint-msgs" class="hint-box">
+
+            <h3>Appropriate dress</h3>
+            <p>
+            What will the weather be like?
+            Will there be a lot of walking involved?
+            What will the locals wear?
+            What should your guests wear?
+            Please write as a paragraph.
         </p>
     </div>
-    <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="">
-    <div id="hint-msgs">
-        <p>
-            <span><strong>What's included</strong></span><br>
-            <span>If a cost is included, simply</span><br>
-            <span>describe what is it. If a cost</span><br>
-            <span>is not included, please give</span><br>
-            <span>a best estimate to how</span><br>
-            <span>much it may cost, or if it's</span><br>
-            <span>not required.</span><br>
-        </p>
-    </div>
+
     <br>
 </div>
-

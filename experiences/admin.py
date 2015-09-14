@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.conf.urls import patterns
-from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon
+from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon, WechatProduct, WechatBooking
 from experiences.views import create_experience
 from app.models import RegisteredUser
 from allauth.socialaccount.models import SocialAccount
@@ -22,6 +22,8 @@ admin.site.register(RegisteredUser)
 admin.site.register(Review)
 admin.site.register(Booking)
 admin.site.register(Coupon)
+admin.site.register(WechatProduct)
+admin.site.register(WechatBooking)
 #admin.site.register(Email)
 #admin.site.register(SocialAccount)
 
