@@ -24,7 +24,7 @@ class WeiXinPay(object):
     def set_params(self, **kwargs):
         self.params = {}
         for (k, v) in kwargs.items():
-            self.params[k] = v
+            self.params[k] = smart_str(v)
 
         self.params["nonce_str"] = random_str(32)
         if self.trade_type:

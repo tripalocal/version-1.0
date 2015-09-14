@@ -777,7 +777,7 @@ def wechat_payment_notify(request, id):
 
         if (notify_info.get('return_code', None)) == 'SUCCESS' and 'out_trade_no' in notify_info:
             product = WechatProduct.objects.get(pk=id)
-            if not WechatBooking.objects.get(trade_no=notify_info['out_trade_no']):
+            if len(WechatBooking.objects.filter(trade_no=notify_info['out_trade_no'])) > 0:
                 booking = WechatBooking(product=product, trade_no=notify_info['out_trade_no'])
                 booking.save()
             xml = dict_to_xml({'return_code': 'SUCCESS', 'return_msg': 'OK'})
