@@ -12,11 +12,11 @@
 </head>
 
 <body>
-<h2>产品名称：{{ product_title }}</h2>
-
-<p>价格：{{ product_price }} 澳元</p>
 
 <div style="text-align:center;">
+    <h2>产品名称：{{ product_title }}</h2>
+
+    <h3>价格：¥{{ product_price }} </h3>
     <button class="btn btn-primary" type="button" onclick="callpay()">微信支付</button>
 </div>
 </body>
@@ -38,7 +38,7 @@
             function(res){
                 if (res.err_msg == "get_brand_wcpay_request：ok") {
                 } else {
-                    alert(res.err_msg);
+{#                    alert(res.err_msg);#}
                 }
             }
         );
