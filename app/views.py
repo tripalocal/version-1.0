@@ -754,11 +754,13 @@ def wechat_product(request):
         # print(notify_path)
         notify_url = request.build_absolute_uri(notify_path)
         # print('notify_url', notify_url)
-        json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(product.price),
+        price_in_cents = int(product.price) * 100
+        json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(price_in_cents),
                                          "127.0.0.1", notify_url, code)
         # print('json_pay_info', json_pay_info)
         context = RequestContext(request, json_pay_info)
-        return render_to_response('app/wechat_product.html', context)
+        return render_to_response('app/wechat_product.html',
+                                  {'product_title': product.title, 'product_price': product.price}, context)
     else:
         # print('no code redirect')
         # 重定向到oauth_url后，获得code值

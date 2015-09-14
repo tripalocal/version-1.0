@@ -150,7 +150,7 @@ class JsAPIOrderPay(UnifiedOrderPay):
             print('openid', open_id)
             if open_id:
                 #直接调用基类的post方法查询prepay_id，如果成功，返回一个字典
-                unified_order = self.post(body, out_trade_no, total_fee, spbill_create_ip, notify_url, openid=open_id, fee_type='AUD')
+                unified_order = self.post(body, out_trade_no, total_fee, spbill_create_ip, notify_url, openid=open_id)
                 # print('unified_order', unified_order)
                 if unified_order:
                     prepay_id = unified_order.get("prepay_id", None)
