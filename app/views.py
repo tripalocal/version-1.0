@@ -744,23 +744,25 @@ def wechat_product(request):
     product_id = request.GET.get('id', None)
     product = get_object_or_404(WechatProduct, pk=product_id, valid=True)
 
-    # print("redirect url" + quote_plus(request.build_absolute_uri()))
+    print("redirect url" + quote_plus(request.build_absolute_uri()))
     oauth_url = pay.create_oauth_url_for_code(quote_plus(request.build_absolute_uri()))
 
     if code:
-        # print('code:', code)
+        print('code:', code)
         out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
         notify_path = reverse('wechat_payment_notify', kwargs={'id': str(product_id)})
         # print(notify_path)
         notify_url = request.build_absolute_uri(notify_path)
-        # print('notify_url', notify_url)
-        json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(product.price),
+        print('notify_url', notify_url)
+        price_in_cents = int(product.price * 100)
+        json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(price_in_cents),
                                          "127.0.0.1", notify_url, code)
-        # print('json_pay_info', json_pay_info)
+        print('json_pay_info', json_pay_info)
         context = RequestContext(request, json_pay_info)
-        return render_to_response('app/wechat_product.html', context)
+        return render_to_response('app/wechat_product.html',
+                                  {'product_title': product.title, 'product_price': product.price}, context)
     else:
-        # print('no code redirect')
+        print('no code redirect')
         # 重定向到oauth_url后，获得code值
         return redirect(oauth_url)
 
@@ -773,10 +775,11 @@ def wechat_payment_notify(request, id):
         notify_info = xmltodict.parse(request.body.decode("utf-8"))['xml']
         # print('notify_info', notify_info)
 
-        if (notify_info.get('return_code', None)) == 'SUCCESS':
+        if (notify_info.get('return_code', None)) == 'SUCCESS' and 'out_trade_no' in notify_info:
             product = WechatProduct.objects.get(pk=id)
-            booking = WechatBooking(product=product, trade_no=notify_info['out_trade_no'])
-            booking.save()
+            if len(WechatBooking.objects.filter(trade_no=notify_info['out_trade_no'])) == 0:
+                booking = WechatBooking(product=product, trade_no=notify_info['out_trade_no'])
+                booking.save()
             xml = dict_to_xml({'return_code': 'SUCCESS', 'return_msg': 'OK'})
             return HttpResponse(xml)
         return HttpResponse('')

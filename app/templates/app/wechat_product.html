@@ -6,15 +6,19 @@
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="{% static 'app/content/main.css' %}" rel="stylesheet">
 
     <title>微信支付安全支付</title>
 </head>
 
 <body>
-<h2>Product 1</h2>
 
-<p>Blah blah blah...</p>
-<button type="button" onclick="callpay()">Buy</button>
+<div style="text-align:center;">
+    <h2>产品名称：{{ product_title }}</h2>
+
+    <h3>价格：¥{{ product_price }} </h3>
+    <button class="btn btn-primary" type="button" onclick="callpay()">微信支付</button>
+</div>
 </body>
 
 <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
@@ -34,7 +38,7 @@
             function(res){
                 if (res.err_msg == "get_brand_wcpay_request：ok") {
                 } else {
-                    alert(res.err_msg);
+{#                    alert(res.err_msg);#}
                 }
             }
         );

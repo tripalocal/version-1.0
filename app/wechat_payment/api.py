@@ -34,7 +34,7 @@ class WeiXinPay(object):
     def post_xml(self):
         sign = calculate_sign(self.params, self.api_key)
         xml = dict_to_xml(self.params, sign)
-        response = post_xml(self.url, xml)
+        response = post_xml(self.url, xml.encode('utf-8'))
         return xml_to_dict(response.text)
 
     def valiate_xml(self, xml):
@@ -150,11 +150,11 @@ class JsAPIOrderPay(UnifiedOrderPay):
             print('openid', open_id)
             if open_id:
                 #直接调用基类的post方法查询prepay_id，如果成功，返回一个字典
-                unified_order = self.post(body, out_trade_no, total_fee, spbill_create_ip, notify_url, openid=open_id, fee_type='AUD')
-                # print('unified_order', unified_order)
+                unified_order = self.post(body, out_trade_no, total_fee, spbill_create_ip, notify_url, openid=open_id)
+                print('unified_order', unified_order)
                 if unified_order:
                     prepay_id = unified_order.get("prepay_id", None)
-                    # print('prepay_id:', prepay_id)
+                    print('prepay_id:', prepay_id)
                     if prepay_id:
                         return self._get_json_js_api_params(prepay_id)
         return None

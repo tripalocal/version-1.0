@@ -11,7 +11,7 @@ def smart_str(v):
     return s
 
 def format_url(params, api_key=None):
-    url = "&".join(['%s=%s' % (key, smart_str(params[key])) for key in sorted(params) if params[key]])
+    url = "&".join(['%s=%s' % (key, params[key]) for key in sorted(params) if params[key]])
     if api_key:
         url = '%s&key=%s' % (url, api_key)
     return url
