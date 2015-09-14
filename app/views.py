@@ -775,10 +775,11 @@ def wechat_payment_notify(request, id):
         notify_info = xmltodict.parse(request.body.decode("utf-8"))['xml']
         # print('notify_info', notify_info)
 
-        if (notify_info.get('return_code', None)) == 'SUCCESS':
+        if (notify_info.get('return_code', None)) == 'SUCCESS' and 'out_trade_no' in notify_info:
             product = WechatProduct.objects.get(pk=id)
-            booking = WechatBooking(product=product, trade_no=notify_info['out_trade_no'])
-            booking.save()
+            if not WechatBooking.objects.get(trade_no=notify_info['out_trade_no']):
+                booking = WechatBooking(product=product, trade_no=notify_info['out_trade_no'])
+                booking.save()
             xml = dict_to_xml({'return_code': 'SUCCESS', 'return_msg': 'OK'})
             return HttpResponse(xml)
         return HttpResponse('')
