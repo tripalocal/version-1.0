@@ -2802,20 +2802,17 @@ def unionpay_payment_callback(request):
                     bk.status="paid"
                     bk.save()
 
-                    payment = Payment()
+                    payment = bk.payment
                     payment.charge_id = ret['queryId']
                     payment.street1 = ret['txnTime']
-                    payment.booking_id = bk.id
                     payment.save()
-
-                    bk.payment_id = payment.id
-                    bk.save()
 
                     experience = Experience.objects.get(id=bk.experience_id)
                     user = User.objects.get(id=bk.user_id)
                     bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
                     send_booking_email_verification(bk, experience, user, 
                                                     instant_booking(experience, bk.datetime.date(), bk.datetime.time()))
+                    sms_notification(bk, experience, user, payment.phone_number)
                 logger.debug("success"+str(ret['orderId']))
                 pass
             else:

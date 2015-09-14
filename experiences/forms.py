@@ -668,12 +668,24 @@ class BookingConfirmationForm(forms.Form):
                                         booking_extra_information=booking_extra_information)
                     if valid['valid'] and valid['new_price']==0.0:
                         send_booking_email_verification(booking, experience, user, instant_booking(experience,dt,tm))
+                        sms_notification(booking, experience, user, self.cleaned_data['phone_number'])
+                        
                 else:
                     booking = Booking(user = user, experience= experience, guest_number = guest_number,
                                         datetime = bk_dt,
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="requested",
                                         booking_extra_information=booking_extra_information)
                 booking.save()
+
+                if not coupon or not valid['valid'] or valid['new_price'] > 0.0:
+                    payment = Payment()
+                    payment.booking_id = booking.id
+                    payment.phone_number = self.cleaned_data['phone_number']
+                    payment.save()
+
+                    booking.payment_id = payment.id
+                    booking.save()
+
                 #add the user to the guest list
                 if user not in experience.guests.all():
                 #experience.guests.add(user)
@@ -994,15 +1006,7 @@ class ItineraryBookingForm(forms.Form):
                     booking.save()
 
                 send_booking_email_verification(booking, experience, user, is_instant_booking)
-
-                exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
-                customer_phone_num = payment_phone_number
-                exp_datetime_local = booking.datetime.astimezone(tzlocal())
-                exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
-                send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
-                schedule_request_reminder_sms(booking.id, host.id, user.first_name,
-                                              booking.datetime + timedelta(days=1))
-
+                sms_notification(booking, experience, user, payment_phone_number)
 
     def clean(self):
         """
@@ -1151,6 +1155,15 @@ def send_booking_email_verification(booking, experience, user, is_instant_bookin
                                                             'user':user,
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
+
+def sms_notification(booking, experience, user, phone_number):
+    exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+    customer_phone_num = phone_number
+    exp_datetime_local = booking.datetime.astimezone(tzlocal())
+    exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
+    host = experience.hosts.all()[0]
+    send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
+    schedule_request_reminder_sms(booking.id, host.id, user.first_name, booking.datetime + timedelta(days=1))
 
 def send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, customer):
     registered_user = RegisteredUser.objects.get(user_id=host.id)
