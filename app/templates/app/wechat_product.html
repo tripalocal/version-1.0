@@ -13,11 +13,23 @@
 
 <body>
 
-<div style="text-align:center;">
+<div style="width:80%; margin: 0 auto; text-align: left;">
+
     <h2>产品名称：{{ product_title }}</h2>
 
     <h3>价格：¥{{ product_price }} </h3>
-    <button class="btn btn-primary" type="button" onclick="invokePayment()">微信支付</button>
+
+    <p>请填写任意联系方式</p>
+
+    <form>
+        <input class="form-control" id='email' type="text" placeholder="电子邮件"><br>
+        <input class="form-control" id='phone-num' type="text" placeholder="电话号码"><br>
+
+        <div style="text-align: center">
+            <button class="btn btn-primary" type="button" onclick="invokePayment()">微信支付</button>
+        </div>
+    </form>
+
 </div>
 </body>
 
@@ -26,45 +38,51 @@
 
 <script type="text/javascript">
     function invokePayment() {
-        href = window.location.host + '/wechat/generate_order/';
-        $.post(href, {
-            'code': '{{ request.GET.code }}',
-            'id': '{{ request.GET.id }}',
-            'phone_num': '123123123',
-            'email': 'yehalsfj'
-        }).done(function (result) {
-            callpay(result);
-        }).fail(function (error) {
-            alert(error);
-        });
+        var emailText = $('#email').val();
+        var phoneNumberText = $('#phone-num').val();
+
+        if (emailText || phoneNumberText) {
+            $.post('/wechat/generate_order/', {
+                'code': '{{ request.GET.code }}',
+                'id': '{{ request.GET.id }}',
+                'phone_num': phoneNumberText,
+                'email': emailText
+            }).done(function (result) {
+                callpay(result);
+            }).fail(function (error) {
+                alert('出错了，请联系我们');
+            });
+        } else {
+            alert('请填写您的联系方式')
+        }
     }
 
-    function jsApiCall(json_pay_info){
+    function jsApiCall(json_pay_info) {
         WeixinJSBridge.invoke(
-            'getBrandWCPayRequest',
-            {
-                "appId": json_pay_info.appId,
-                "timeStamp": json_pay_info.timeStamp,
-                "nonceStr": json_pay_info.nonceStr,
-                "package": json_pay_info.package,
-                "signType": "MD5",
-                "paySign": json_pay_info.paySign
-            },
-            function(res){
-                if (res.err_msg == "get_brand_wcpay_request：ok") {
-{#                    Todo: jump to payment successful page.#}
-                } else {
-{#                    alert(res.err_msg);#}
+                'getBrandWCPayRequest',
+                {
+                    "appId": json_pay_info.appId,
+                    "timeStamp": json_pay_info.timeStamp,
+                    "nonceStr": json_pay_info.nonceStr,
+                    "package": json_pay_info.package,
+                    "signType": "MD5",
+                    "paySign": json_pay_info.paySign
+                },
+                function (res) {
+                    if (res.err_msg == "get_brand_wcpay_request：ok") {
+                        {#                    Todo: jump to payment successful page.#}
+                    } else {
+                        alert(res.err_msg);
+                    }
                 }
-            }
         );
     }
 
     function callpay(json_pay_info) {
-        if (typeof WeixinJSBridge == "undefined"){
-            if( document.addEventListener ) {
+        if (typeof WeixinJSBridge == "undefined") {
+            if (document.addEventListener) {
                 document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
-            } else if ( document.attachEvent ) {
+            } else if (document.attachEvent) {
                 document.attachEvent('WeixinJSBridgeReady', jsApiCall);
                 document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
             }

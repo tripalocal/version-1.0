@@ -746,9 +746,10 @@ def wechat_product(request):
 
     oauth_url = pay.create_oauth_url_for_code(quote_plus(request.build_absolute_uri()))
 
-    if code:
+    if True:
+        context = RequestContext(request)
         return render_to_response('app/wechat_product.html',
-                                  {'product_title': product.title, 'product_price': product.price})
+                                  {'product_title': product.title, 'product_price': product.price}, context)
     else:
         print('no code redirect')
         # 重定向到oauth_url后，获得code值
@@ -758,6 +759,7 @@ def wechat_product(request):
 @csrf_exempt
 def generate_order(request):
     pay = JsAPIOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY, settings.WECHAT_APPSECRET)
+    print('ingenerate_order', request.POST)
     code = request.POST.get('code', None)
     product_id = request.POST.get('id', None)
     phone_num = request.POST.get('phone_num', '')
@@ -766,8 +768,12 @@ def generate_order(request):
     product = get_object_or_404(WechatProduct, pk=product_id, valid=True)
 
     out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
-    notify_path = reverse('wechat_payment_notify', kwargs={'id': product_id, 'phone_num': phone_num, 'email': email})
+    notify_path = reverse('wechat_payment_notify', kwargs={'id': product_id})
     notify_url = request.build_absolute_uri(notify_path)
+    params = {'phone_num': phone_num, 'email': email}
+    qs = '&'.join([t for t in params])
+    notify_url = '?'.join((notify_url, qs))
+    print('notify_url', notify_url)
     price_in_cents = int(product.price * 100)
     json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(price_in_cents),
                                      "127.0.0.1", notify_url, code)
