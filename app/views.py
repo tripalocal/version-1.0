@@ -26,7 +26,8 @@ from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, getBGImageURL, getProfileImage
 from allauth.account.signals import email_confirmed, password_changed
-from experiences.models import Booking, Experience, Payment, get_experience_title, get_experience_meetup_spot
+from experiences.models import Booking, Experience, Payment, get_experience_title, get_experience_meetup_spot, \
+    WechatProduct, WechatBooking
 from experiences.forms import Currency, DollarSign, email_account_generator
 from django.utils.translation import ugettext_lazy as _
 from post_office import mail
@@ -741,37 +742,41 @@ def wechat_product(request):
     pay = JsAPIOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY, settings.WECHAT_APPSECRET)
     code = request.GET.get('code', None)
     product_id = request.GET.get('id', None)
-    print("redirect url" + quote_plus(request.build_absolute_uri()))
+    product = get_object_or_404(WechatProduct, pk=product_id, valid=True)
+
+    # print("redirect url" + quote_plus(request.build_absolute_uri()))
     oauth_url = pay.create_oauth_url_for_code(quote_plus(request.build_absolute_uri()))
 
     if code:
-        print('code:', code)
+        # print('code:', code)
         out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
         notify_path = reverse('wechat_payment_notify', kwargs={'id': str(product_id)})
-        print(notify_path)
+        # print(notify_path)
         notify_url = request.build_absolute_uri(notify_path)
-        print('notify_url', notify_url)
-        product_title = "Product " + str(product_id) + "test"
-        json_pay_info = pay.post_prepaid(product_title, out_trade_no, "2",
-                       "127.0.0.1", notify_url, code)
-        print('json_pay_info', json_pay_info)
+        # print('notify_url', notify_url)
+        json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(product.price),
+                                         "127.0.0.1", notify_url, code)
+        # print('json_pay_info', json_pay_info)
         context = RequestContext(request, json_pay_info)
         return render_to_response('app/wechat_product.html', context)
     else:
-        print('no code redirect')
+        # print('no code redirect')
         # 重定向到oauth_url后，获得code值
         return redirect(oauth_url)
 
 
 @csrf_exempt
 def wechat_payment_notify(request, id):
-    print('product id:', id)
-    print('notify_post', request.body)
+    # print('product id:', id)
+    # print('notify_post', request.body)
     if (request.body):
         notify_info = xmltodict.parse(request.body.decode("utf-8"))['xml']
-        print('notify_info', notify_info)
+        # print('notify_info', notify_info)
 
         if (notify_info.get('return_code', None)) == 'SUCCESS':
+            product = WechatProduct.objects.get(pk=id)
+            booking = WechatBooking(product=product, trade_no=notify_info['out_trade_no'])
+            booking.save()
             xml = dict_to_xml({'return_code': 'SUCCESS', 'return_msg': 'OK'})
             return HttpResponse(xml)
         return HttpResponse('')

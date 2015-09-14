@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from datetime import datetime
+from django.utils import timezone
 from allauth.socialaccount.models import SocialAccount
 import hashlib
 from Tripalocal_V1 import settings
@@ -13,6 +14,25 @@ from Tripalocal_V1 import settings
 class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
     language = models.CharField(max_length=2)
+
+
+class WechatProduct(models.Model):
+    title = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    valid = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+
+
+class WechatBooking(models.Model):
+    product = models.ForeignKey(WechatProduct)
+    datetime = models.DateTimeField(default=timezone.now, blank=True)
+    trade_no = models.CharField(max_length=64)
+
+    def __str__(self):
+        return self.trade_no
+
 
 class Experience(models.Model):
     type = models.CharField(max_length=50)
