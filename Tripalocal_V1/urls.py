@@ -119,7 +119,7 @@ urlpatterns = patterns('',
     url(r'^multidaytrip/$','experiences.views.multi_day_trip'),
     url(r'^unionpay_payment_callback/$','experiences.views.unionpay_payment_callback'),
     url(r'^wechat/product/$', 'app.views.wechat_product', name='wechat_product'),
-                       url(r'^wechat/(?P<id>\d+)/(?P<email>\d+)/(?P<phone_num>\d+)/notify/$',
+   url(r'^wechat/(?P<id>\d+)/(?P<email>.+)/(?P<phone_num>.+)/notify/$',
                            'app.views.wechat_payment_notify', name='wechat_payment_notify'),
     url(r'^wechat/generate_order/$', 'app.views.generate_order', name='wechat_generate_order'),
 )

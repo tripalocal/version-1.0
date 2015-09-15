@@ -70,7 +70,7 @@
                 },
                 function (res) {
                     if (res.err_msg == "get_brand_wcpay_request：ok") {
-                        location.href =
+{#                        window.location.href = window.location.href + 'wechat_payment_success/'#}
                     } else {
                         alert(res.err_msg);
                     }
