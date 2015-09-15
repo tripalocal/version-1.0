@@ -1170,6 +1170,10 @@ def create_experience(request, id=None):
             if experience.price is None:
                 experience.price = Decimal.from_float(0.0)
 
+            if experience.commission is not None and experience.commission > 0:
+                COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
+            else:
+                COMMISSION_PERCENT = settings.COMMISSION_PERCENT
             data = {"id":experience.id,
                 "host":experience.hosts.all()[0].email,
                 "host_first_name":experience.hosts.all()[0].first_name,
@@ -1188,7 +1192,7 @@ def create_experience(request, id=None):
                 "guest_number_min":experience.guest_number_min,
                 "guest_number_max":experience.guest_number_max,
                 "price":round(experience.price,2),
-                "price_with_booking_fee":round(experience.price*Decimal.from_float(1.00+settings.COMMISSION_PERCENT), 0)*Decimal.from_float(1.00+settings.STRIPE_PRICE_PERCENT)+Decimal.from_float(settings.STRIPE_PRICE_FIXED),
+                "price_with_booking_fee":round(experience.price*Decimal.from_float(1.00+COMMISSION_PERCENT), 0)*Decimal.from_float(1.00+settings.STRIPE_PRICE_PERCENT)+Decimal.from_float(settings.STRIPE_PRICE_FIXED),
                 "currency":experience.currency.upper(),
                 "duration":experience.duration,
                 "included_food":included_food,

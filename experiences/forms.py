@@ -536,14 +536,15 @@ def check_coupon(coupon, experience_id, guest_number):
     else:
         subtotal_price = float(experience.price)*float(guest_number)
 
+    COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
     if extra_fee == 0.00:
-        price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+        price = round(subtotal_price*(1.00+COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
     elif extra_fee >= 1.00 or extra_fee <= -1.00:
         #absolute value
-        price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)+extra_fee, 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+        price = round(subtotal_price*(1.00+COMMISSION_PERCENT)+extra_fee, 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
     else:
         #percentage, e.g., 30% discount --> percentage == -0.3
-        price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+        price = round(subtotal_price*(1.00+COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
 
     result = {"valid":True, "new_price":price}
     return result
@@ -939,14 +940,15 @@ class ItineraryBookingForm(forms.Form):
                 else:
                     subtotal_price = float(experience.price)*float(guest_number)
 
+                COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
                 if extra_fee == 0.00:
-                    price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+                    price = round(subtotal_price*(1.00+COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
                 elif extra_fee >= 1.00 or extra_fee <= -1.00:
                     #absolute value
-                    price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT)+extra_fee, 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+                    price = round(subtotal_price*(1.00+COMMISSION_PERCENT)+extra_fee, 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
                 else:
                     #percentage, e.g., 30% discount --> percentage == -0.3
-                    price = round(subtotal_price*(1.00+settings.COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+                    price = round(subtotal_price*(1.00+COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
 
                 if price > 0:
                     payment = Payment()
