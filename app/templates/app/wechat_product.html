@@ -58,6 +58,13 @@
     }
 
     function jsApiCall(json_pay_info) {
+        var origin = '';
+        if (!window.location.origin) {
+            origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+        } else {
+            origin = window.location.origin
+        }
+
         WeixinJSBridge.invoke(
                 'getBrandWCPayRequest',
                 {
@@ -70,7 +77,7 @@
                 },
                 function (res) {
                     if (res.err_msg == "get_brand_wcpay_request：ok") {
-{#                        window.location.href = window.location.href + 'wechat_payment_success/'#}
+                        window.location = origin + '/wechat_payment_success/'
                     } else {
                         alert(res.err_msg);
                     }
