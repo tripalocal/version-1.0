@@ -746,7 +746,7 @@ def wechat_product(request):
 
     oauth_url = pay.create_oauth_url_for_code(quote_plus(request.build_absolute_uri()))
 
-    if True:
+    if code:
         context = RequestContext(request)
         return render_to_response('app/wechat_product.html',
                                   {'product_title': product.title, 'product_price': product.price}, context)
