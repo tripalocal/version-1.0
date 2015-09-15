@@ -15,6 +15,9 @@ class ExperienceAdmin(admin.ModelAdmin):
         )
         return my_urls + urls
 
+class WechatBookingAdmin(admin.ModelAdmin):
+     list_display = ('product', 'email', 'phone_num', 'paid')
+
 admin.site.register(Experience, ExperienceAdmin)
 admin.site.register(Photo)
 admin.site.register(WhatsIncluded)
@@ -23,7 +26,7 @@ admin.site.register(Review)
 admin.site.register(Booking)
 admin.site.register(Coupon)
 admin.site.register(WechatProduct)
-admin.site.register(WechatBooking)
+admin.site.register(WechatBooking, WechatBookingAdmin)
 #admin.site.register(Email)
 #admin.site.register(SocialAccount)
 
