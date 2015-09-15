@@ -76,8 +76,6 @@
                     "paySign": json_pay_info.paySign
                 },
                 function (res) {
-                    alert(res.err_msg);
-
                     if (res.err_msg == "get_brand_wcpay_request:ok") {
                         window.location = origin + '/wechat_payment_success/';
                     } else {
