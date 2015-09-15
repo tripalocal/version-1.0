@@ -13,47 +13,88 @@
 
 <body>
 
-<div style="text-align:center;">
+<div style="width:80%; margin: 0 auto; text-align: left;">
+
     <h2>产品名称：{{ product_title }}</h2>
 
     <h3>价格：¥{{ product_price }} </h3>
-    <button class="btn btn-primary" type="button" onclick="callpay()">微信支付</button>
+
+    <p>请填写任意联系方式</p>
+
+    <form>
+        <input class="form-control" id='email' type="text" placeholder="电子邮件"><br>
+        <input class="form-control" id='phone-num' type="text" placeholder="电话号码"><br>
+
+        <div style="text-align: center">
+            <button class="btn btn-primary" type="button" onclick="invokePayment()">微信支付</button>
+        </div>
+    </form>
+
 </div>
 </body>
 
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
-<script type="text/javascript">
 
-    function jsApiCall(){
+<script type="text/javascript">
+    function invokePayment() {
+        var emailText = $('#email').val();
+        var phoneNumberText = $('#phone-num').val();
+
+        if (emailText || phoneNumberText) {
+            $.post('/wechat/generate_order/', {
+                'code': '{{ request.GET.code }}',
+                'id': '{{ request.GET.id }}',
+                'phone_num': phoneNumberText,
+                'email': emailText
+            }).done(function (result) {
+                callpay(result);
+            }).fail(function (error) {
+                alert('出错了，请联系我们');
+            });
+        } else {
+            alert('请填写您的联系方式')
+        }
+    }
+
+    function jsApiCall(json_pay_info) {
+        var origin = '';
+        if (!window.location.origin) {
+            origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+        } else {
+            origin = window.location.origin
+        }
+
         WeixinJSBridge.invoke(
-            'getBrandWCPayRequest',
-            {
-                "appId":"{{ appId }}",
-                "timeStamp": "{{ timeStamp }}",
-                "nonceStr": "{{ nonceStr }}",
-                "package": "{{ package }}",
-                "signType": "MD5",
-                "paySign": "{{ paySign }}"
-            },
-            function(res){
-                if (res.err_msg == "get_brand_wcpay_request：ok") {
-                } else {
-{#                    alert(res.err_msg);#}
+                'getBrandWCPayRequest',
+                {
+                    "appId": json_pay_info.appId,
+                    "timeStamp": json_pay_info.timeStamp,
+                    "nonceStr": json_pay_info.nonceStr,
+                    "package": json_pay_info.package,
+                    "signType": "MD5",
+                    "paySign": json_pay_info.paySign
+                },
+                function (res) {
+                    if (res.err_msg == "get_brand_wcpay_request:ok") {
+                        window.location = origin + '/wechat_payment_success/';
+                    } else {
+                        alert(res.err_msg);
+                    }
                 }
-            }
         );
     }
 
-    function callpay() {
-        if (typeof WeixinJSBridge == "undefined"){
-            if( document.addEventListener ) {
+    function callpay(json_pay_info) {
+        if (typeof WeixinJSBridge == "undefined") {
+            if (document.addEventListener) {
                 document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
-            } else if ( document.attachEvent ) {
+            } else if (document.attachEvent) {
                 document.attachEvent('WeixinJSBridgeReady', jsApiCall);
                 document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
             }
         } else {
-            jsApiCall();
+            jsApiCall(json_pay_info);
         }
     }
 </script>

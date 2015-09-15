@@ -29,6 +29,8 @@ class WechatBooking(models.Model):
     product = models.ForeignKey(WechatProduct)
     datetime = models.DateTimeField(default=timezone.now, blank=True)
     trade_no = models.CharField(max_length=64)
+    phone_num = models.CharField(max_length=15, default='')
+    email = models.CharField(max_length=25, default='')
 
     def __str__(self):
         return self.trade_no

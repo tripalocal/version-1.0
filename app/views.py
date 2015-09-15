@@ -13,7 +13,7 @@ from django.template import RequestContext, loader
 from datetime import *
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from experiences.forms import Locations, Location
+from experiences.forms import Locations
 from django.contrib.auth import authenticate, login
 from allauth.account.signals import password_reset, user_signed_up, user_logged_in
 from allauth.account.views import PasswordResetFromKeyDoneView
@@ -744,21 +744,10 @@ def wechat_product(request):
     product_id = request.GET.get('id', None)
     product = get_object_or_404(WechatProduct, pk=product_id, valid=True)
 
-    print("redirect url" + quote_plus(request.build_absolute_uri()))
     oauth_url = pay.create_oauth_url_for_code(quote_plus(request.build_absolute_uri()))
 
     if code:
-        print('code:', code)
-        out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
-        notify_path = reverse('wechat_payment_notify', kwargs={'id': str(product_id)})
-        # print(notify_path)
-        notify_url = request.build_absolute_uri(notify_path)
-        print('notify_url', notify_url)
-        price_in_cents = int(product.price * 100)
-        json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(price_in_cents),
-                                         "127.0.0.1", notify_url, code)
-        print('json_pay_info', json_pay_info)
-        context = RequestContext(request, json_pay_info)
+        context = RequestContext(request)
         return render_to_response('app/wechat_product.html',
                                   {'product_title': product.title, 'product_price': product.price}, context)
     else:
@@ -768,9 +757,29 @@ def wechat_product(request):
 
 
 @csrf_exempt
-def wechat_payment_notify(request, id):
-    # print('product id:', id)
-    # print('notify_post', request.body)
+def generate_order(request):
+    pay = JsAPIOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY, settings.WECHAT_APPSECRET)
+    print('ingenerate_order', request.POST)
+    code = request.POST.get('code', None)
+    product_id = request.POST.get('id', None)
+    phone_num = request.POST.get('phone_num', '')
+    email = request.POST.get('email', '')
+
+    product = get_object_or_404(WechatProduct, pk=product_id, valid=True)
+
+    out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
+    notify_path = reverse('wechat_payment_notify', kwargs={'id': product_id, 'phone_num': phone_num, 'email': email})
+    notify_url = request.build_absolute_uri(notify_path)
+    print('notify_url', notify_url)
+    price_in_cents = int(product.price * 100)
+    json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(price_in_cents),
+                                     "127.0.0.1", notify_url, code)
+    print('json_pay_info', json_pay_info)
+    return HttpResponse(json.dumps(json_pay_info), content_type='application/json')
+
+
+@csrf_exempt
+def wechat_payment_notify(request, id, email, phone_num):
     if (request.body):
         notify_info = xmltodict.parse(request.body.decode("utf-8"))['xml']
         # print('notify_info', notify_info)
@@ -778,7 +787,8 @@ def wechat_payment_notify(request, id):
         if (notify_info.get('return_code', None)) == 'SUCCESS' and 'out_trade_no' in notify_info:
             product = WechatProduct.objects.get(pk=id)
             if len(WechatBooking.objects.filter(trade_no=notify_info['out_trade_no'])) == 0:
-                booking = WechatBooking(product=product, trade_no=notify_info['out_trade_no'])
+                booking = WechatBooking(product=product, trade_no=notify_info['out_trade_no'], phone_num=phone_num,
+                                        email=email)
                 booking.save()
             xml = dict_to_xml({'return_code': 'SUCCESS', 'return_msg': 'OK'})
             return HttpResponse(xml)
