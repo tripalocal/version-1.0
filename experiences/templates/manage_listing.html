@@ -611,7 +611,7 @@
         }
 
         function collectDynamicPrices() {
-            var dynamicPrices = '';
+            var dynamicPrices = parseInt($("#id_price").val()) + ",";
             var min = parseInt($("#id_min_guest_number").val());
             var max = parseInt($("#id_max_guest_number").val());
             for(var i=min; i<max; i++) {
