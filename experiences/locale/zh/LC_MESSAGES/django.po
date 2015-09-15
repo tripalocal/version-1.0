@@ -497,17 +497,17 @@ msgstr "和"
 #: templates/experiences/email_booking_requested_traveler.html:94
 #: templates/experiences/experience_booking_successful_requested.html:113
 msgid " of your "
-msgstr ""
+msgstr "个"
 
 #: templates/experiences/email_booking_requested_traveler.html:94
 #: templates/experiences/experience_booking_successful_requested.html:113
 msgid "friends"
-msgstr "个朋友"
+msgstr "朋友"
 
 #: templates/experiences/email_booking_requested_traveler.html:94
 #: templates/experiences/experience_booking_successful_requested.html:113
 msgid "friend"
-msgstr "个朋友"
+msgstr "朋友"
 
 #: templates/experiences/email_booking_requested_traveler.html:94
 #: templates/experiences/experience_booking_successful_requested.html:113
