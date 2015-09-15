@@ -771,12 +771,13 @@ def generate_order(request):
     notify_path = reverse('wechat_payment_notify', kwargs={'id': product_id})
     notify_url = request.build_absolute_uri(notify_path)
     params = {'phone_num': phone_num, 'email': email}
-    qs = '&'.join([t for t in params])
+    qs = '&'.join(['%s=%s' % (key, params[key]) for key in params])
     notify_url = '?'.join((notify_url, qs))
     print('notify_url', notify_url)
     price_in_cents = int(product.price * 100)
     json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(price_in_cents),
                                      "127.0.0.1", notify_url, code)
+    print('json_pay_info', json_pay_info)
     return HttpResponse(json.dumps(json_pay_info), content_type='application/json')
 
 
