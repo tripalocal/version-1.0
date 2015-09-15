@@ -768,11 +768,8 @@ def generate_order(request):
     product = get_object_or_404(WechatProduct, pk=product_id, valid=True)
 
     out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
-    notify_path = reverse('wechat_payment_notify', kwargs={'id': product_id})
+    notify_path = reverse('wechat_payment_notify', kwargs={'id': product_id, 'phone_num': phone_num, 'email': email})
     notify_url = request.build_absolute_uri(notify_path)
-    params = {'phone_num': phone_num, 'email': email}
-    qs = '&'.join(['%s=%s' % (key, params[key]) for key in params])
-    notify_url = '?'.join((notify_url, qs))
     print('notify_url', notify_url)
     price_in_cents = int(product.price * 100)
     json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(price_in_cents),
@@ -782,7 +779,7 @@ def generate_order(request):
 
 
 @csrf_exempt
-def wechat_payment_notify(request, id):
+def wechat_payment_notify(request, id, email, phone_num):
     if (request.body):
         notify_info = xmltodict.parse(request.body.decode("utf-8"))['xml']
         # print('notify_info', notify_info)
@@ -790,8 +787,6 @@ def wechat_payment_notify(request, id):
         if (notify_info.get('return_code', None)) == 'SUCCESS' and 'out_trade_no' in notify_info:
             product = WechatProduct.objects.get(pk=id)
             if len(WechatBooking.objects.filter(trade_no=notify_info['out_trade_no'])) == 0:
-                phone_num = request.POST.get('phone_num', '')
-                email = request.POST.get('email', '')
                 booking = WechatBooking(product=product, trade_no=notify_info['out_trade_no'], phone_num=phone_num,
                                         email=email)
                 booking.save()
