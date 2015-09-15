@@ -806,6 +806,7 @@ def experience_booking_successful(request, experience=None, guest_number=None, b
     if is_instant_booking:
         template = 'experiences/experience_booking_successful_confirmed.html'
 
+    experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
     return render(request,template,{'experience': experience,
                                     'price_paid':price_paid,
                                     'guest_number':guest_number,

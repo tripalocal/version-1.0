@@ -1061,6 +1061,7 @@ class ItineraryBookingForm(forms.Form):
         return cleaned
 
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
+    host = experience.hosts.all()[0]
     if not is_instant_booking:
         # send an email to the host
         if not settings.DEVELOPMENT:
