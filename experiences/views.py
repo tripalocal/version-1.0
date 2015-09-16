@@ -745,6 +745,8 @@ class ExperienceDetailView(DetailView):
             related_experiences[i].title = get_experience_title(related_experiences[i], settings.LANGUAGES[0][0])
             related_experiences[i].description = get_experience_description(related_experiences[i], settings.LANGUAGES[0][0])
             setExperienceDisplayPrice(related_experiences[i])
+            if float(related_experiences[i].duration).is_integer():
+                related_experiences[i].duration = int(related_experiences[i].duration)
 
         related_experiences_added_to_wishlist = []
 
