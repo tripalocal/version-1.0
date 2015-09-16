@@ -343,6 +343,10 @@ if 'STATICFILES_STORAGE' in os.environ:
     STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE')
     STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
 
+WECHAT_APPID = 'wx57aaa750d440d0d8'
+WECHAT_APPSECRET = '84ecdc9ed6d5ad17b9c029d27b51a65a'
+WECHAT_MCH_ID = '1266572301'
+WECHAT_API_KEY = '34Ds769dYJ458Pd6J387g298RvD78674'
 
 # Customized settings should always be put at the bottom
 if os.environ.get('ENV_MODE') == 'DEVELOPMENT':

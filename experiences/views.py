@@ -26,8 +26,9 @@ from django.core.urlresolvers import reverse
 from experiences.constant import  *
 from experiences.tasks import schedule_sms
 from experiences.telstra_sms_api import send_sms
-
-
+from unionpay import client, signer
+from unionpay.util.helper import load_config, make_order_id
+from django.views.decorators.csrf import csrf_exempt
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -182,7 +183,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         photos = experience.photo_set.all()
         if photos is not None and len(photos) > 0:
             photo_url = photos[0].directory+photos[0].name
-        experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]), 
+        experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]),
                             'meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]), 'rate': rate,
                             'duration':experience.duration, 'city':experience.city,
                             'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
@@ -744,6 +745,8 @@ class ExperienceDetailView(DetailView):
             related_experiences[i].title = get_experience_title(related_experiences[i], settings.LANGUAGES[0][0])
             related_experiences[i].description = get_experience_description(related_experiences[i], settings.LANGUAGES[0][0])
             setExperienceDisplayPrice(related_experiences[i])
+            if float(related_experiences[i].duration).is_integer():
+                related_experiences[i].duration = int(related_experiences[i].duration)
 
         related_experiences_added_to_wishlist = []
 
@@ -778,9 +781,21 @@ class ExperienceDetailView(DetailView):
 
 EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 
-def experience_booking_successful(request, experience, guest_number, booking_datetime, price_paid, is_instant_booking=False):
+@csrf_exempt
+def experience_booking_successful(request, experience=None, guest_number=None, booking_datetime=None, price_paid=None, is_instant_booking=False, *args, **kwargs):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
+
+    if (request.GET is None or len(request.GET) == 0) and experience is None:
+        return HttpResponseRedirect(GEO_POSTFIX)
+
+    data = request.GET
+    if experience is None and data is not None:
+        experience = Experience.objects.get(id=data['experience_id'])
+        guest_number = int(data['guest_number'])
+        booking_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['booking_datetime'], "%Y-%m-%d%H:%M"))
+        price_paid = float(data['price_paid'])
+        is_instant_booking = True if data['is_instant_booking'] == "True" else False
 
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
     mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
@@ -793,6 +808,7 @@ def experience_booking_successful(request, experience, guest_number, booking_dat
     if is_instant_booking:
         template = 'experiences/experience_booking_successful_confirmed.html'
 
+    experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
     return render(request,template,{'experience': experience,
                                     'price_paid':price_paid,
                                     'guest_number':guest_number,
@@ -879,7 +895,7 @@ def experience_booking_confirmation(request):
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
 
-        else:
+        elif 'Stripe' in request.POST or 'stripeToken' in request.POST:
             #submit the form
             display_error = True
             if form.is_valid():
@@ -913,6 +929,53 @@ def experience_booking_confirmation(request):
                                                                            'total_price': total_price,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
+        elif 'UnionPay' in request.POST:
+            display_error = True
+            order_id = make_order_id('Tripalocal')
+            form.data = form.data.copy()
+            form.data['booking_extra_information'] = order_id
+            if form.is_valid():
+                config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
+                bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
+                bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
+                total_price = form.cleaned_data['price_paid'] if form.cleaned_data['price_paid'] != -1.0 else total_price
+
+                if total_price > 0.0:
+                    #not free
+                    response = client.UnionpayClient(config).pay(int(total_price*100),order_id, channel_type='07',#currency_code=CurrencyCode[experience.currency.upper()],
+                                                                 front_url='http://' + settings.ALLOWED_HOSTS[0] + '/experience_booking_successful/?experience_id=' + str(experience.id)
+                                                                 + '&guest_number=' + form.data['guest_number']
+                                                                 + '&booking_datetime=' + form.data['date'].strip()+form.data['time'].strip()
+                                                                 + '&price_paid=' + str(total_price)
+                                                                 + '&is_instant_booking=' + str(instant_booking(experience,bk_date,bk_time)))
+                    return HttpResponse(response)
+                else:
+                    #free
+                    return experience_booking_successful(request,
+                                                         experience,
+                                                         int(form.data['guest_number']),
+                                                         datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
+                                                         form.cleaned_data['price_paid'],
+                                                         instant_booking(experience,bk_date,bk_time))
+
+            else:
+                return render_to_response('experiences/experience_booking_confirmation.html', {'form': form,
+                                                                           'user_email':request.user.email,
+                                                                           'display_error':display_error,
+                                                                           'experience': experience,
+                                                                           'guest_number':form.data['guest_number'],
+                                                                           'date':form.data['date'],
+                                                                           'time':form.data['time'],
+                                                                           'subtotal_price':subtotal_price,
+                                                                           'experience_price':experience_price,
+                                                                           'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
+                                                                           'total_price': total_price,
+                                                                           'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                                                           'LANGUAGE':settings.LANGUAGE_CODE}, context)
+        else:
+            #TODO
+            #submit name missing in IE
+            return HttpResponseRedirect(GEO_POSTFIX)
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()
@@ -962,8 +1025,8 @@ def saveProfileImage(user, profile, image_file):
 
         subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
 
-def updateExperience(experience, id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, guest_number_min, 
-                   guest_number_max, price, currency, duration, city, status, language, dynamic_price, 
+def updateExperience(experience, id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, guest_number_min,
+                   guest_number_max, price, currency, duration, city, status, language, dynamic_price,
                    title, description, activity, interaction, dress, meetup_spot, lan, lan2=None):
     experience.id = id
     experience.start_datetime = start_datetime
@@ -1109,6 +1172,10 @@ def create_experience(request, id=None):
             if experience.price is None:
                 experience.price = Decimal.from_float(0.0)
 
+            if experience.commission is not None and experience.commission > 0:
+                COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
+            else:
+                COMMISSION_PERCENT = settings.COMMISSION_PERCENT
             data = {"id":experience.id,
                 "host":experience.hosts.all()[0].email,
                 "host_first_name":experience.hosts.all()[0].first_name,
@@ -1127,7 +1194,7 @@ def create_experience(request, id=None):
                 "guest_number_min":experience.guest_number_min,
                 "guest_number_max":experience.guest_number_max,
                 "price":round(experience.price,2),
-                "price_with_booking_fee":round(experience.price*Decimal.from_float(1.00+settings.COMMISSION_PERCENT), 0)*Decimal.from_float(1.00+settings.STRIPE_PRICE_PERCENT)+Decimal.from_float(settings.STRIPE_PRICE_FIXED),
+                "price_with_booking_fee":round(experience.price*Decimal.from_float(1.00+COMMISSION_PERCENT), 0)*Decimal.from_float(1.00+settings.STRIPE_PRICE_PERCENT)+Decimal.from_float(settings.STRIPE_PRICE_FIXED),
                 "currency":experience.currency.upper(),
                 "duration":experience.duration,
                 "included_food":included_food,
@@ -1422,12 +1489,10 @@ def create_experience(request, id=None):
 
     return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
 
-
 def schedule_review_sms(customer_phone_num, host_name, review_schedule_time):
     if customer_phone_num:
         msg = _('%s' % REVIEW_NOTIFY_CUSTOMER).format(host_name=host_name)
         schedule_sms.apply_async([customer_phone_num, msg], eta=review_schedule_time)
-
 
 def schedule_reminder_sms(guest, host, exp_title, customer_phone_num, reminder_scheduled_time, exp_datetime):
     registered_user = RegisteredUser.objects.get(user_id=host.id)
@@ -1440,8 +1505,6 @@ def schedule_reminder_sms(guest, host, exp_title, customer_phone_num, reminder_s
     if customer_phone_num:
         msg = _('%s' % REMINDER_NOTIFY_CUSTOMER).format(exp_title=exp_title, host_name=host.first_name, exp_datetime=exp_datetime)
         schedule_sms.apply_async([customer_phone_num, msg], eta=reminder_scheduled_time)
-
-
 
 def update_booking(id, accepted, user):
     if id and accepted:
@@ -1487,10 +1550,10 @@ def update_booking(id, accepted, user):
             send_booking_confirmed_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
 
             #send an email to the traveller
-            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
                       sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                      recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
-                      priority='now',  #fail_silently=False, 
+                      recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail],
+                      priority='now',  #fail_silently=False,
                       html_message=loader.render_to_string('experiences/email_booking_confirmed_traveler.html',
                                                             {'experience': experience,
                                                             'booking':booking,
@@ -1503,22 +1566,22 @@ def update_booking(id, accepted, user):
             schedule_reminder_sms(guest, host, exp_title, customer_phone_num, reminder_scheduled_time, exp_datetime_local_str)
 
             #schedule an email to the traveller one day before the experience
-            mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+            mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
                       sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
-                      recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail], 
-                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1), 
+                      recipients = [Aliases.objects.filter(destination__contains=guest.email)[0].mail],
+                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
                       html_message=loader.render_to_string('experiences/email_reminder_traveler.html',
                                                             {'experience': experience,
                                                             'booking':booking,
                                                             'user':guest, #not host --> need "my" phone number
                                                             'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
-            
+
             #schedule an email to the host one day before the experience
-            mail.send(subject=_('[Tripalocal] Booking reminder'), message='', 
+            mail.send(subject=_('[Tripalocal] Booking reminder'), message='',
                       sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
-                      recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1),  
+                      recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail],
+                      priority='high',  scheduled_time = booking.datetime - timedelta(days=1),
                       html_message=loader.render_to_string('experiences/email_reminder_host.html',
                                                             {'experience': experience,
                                                             'booking':booking,
@@ -1542,10 +1605,10 @@ def update_booking(id, accepted, user):
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
 
             #send an email to the host
-            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
+            mail.send(subject=_('[Tripalocal] Booking confirmed'), message='',
                       sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
-                      recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                      priority='now',  #fail_silently=False, 
+                      recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail],
+                      priority='now',  #fail_silently=False,
                       html_message=loader.render_to_string('experiences/email_booking_confirmed_host.html',
                                                             {'experience': experience,
                                                             'booking':booking,
@@ -1556,12 +1619,6 @@ def update_booking(id, accepted, user):
             booking_success = True
 
         elif accepted == "no":
-            exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
-            customer_phone_num = booking.payment.phone_number
-            exp_datetime_local = booking.datetime.astimezone(tzlocal())
-            exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
-            send_booking_cancelled_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
-
             extra_fee = 0.00
             free = False
 
@@ -1600,15 +1657,36 @@ def update_booking(id, accepted, user):
                 if extra_fee < 0 and extra_fee > -1:
                     refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT), 0) * (1+extra_fee)
 
-                success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
+                if payment.charge_id.startswith('ch_'):
+                    #stripe
+                    success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
+                else:
+                    #union pay
+                    config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
+                    response = client.UnionpayClient(config).refund(int(refund_amount*100),
+                                                         payment.booking.booking_extra_information.replace("Tripalocal","UPRefund"),
+                                                         payment.charge_id, '000201', '07')
+
+                    success = True if response['respCode'] == '00' else False
+                    if success:
+                        booking.refund_id=response['queryId']
+                        booking.save()
             else:
                 success = True
 
             if success:
                 booking.status = "rejected"
                 booking.save()
+
+                #send SMS
+                exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+                customer_phone_num = booking.payment.phone_number
+                exp_datetime_local = booking.datetime.astimezone(tzlocal())
+                exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
+                send_booking_cancelled_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
+                
                 #send an email to the traveller
-                mail.send(subject=_('[Tripalocal] Your experience is cancelled'), message='', 
+                mail.send(subject=_('[Tripalocal] Your experience is cancelled'), message='',
                           sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
                           recipients=[Aliases.objects.filter(destination__contains=guest.email)[0].mail],
                           priority='now',  #fail_silently=False,
@@ -1619,10 +1697,10 @@ def update_booking(id, accepted, user):
                                                                 'experience_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
                                                                 'LANGUAGE':settings.LANGUAGE_CODE}))
                 #send an email to the host
-                mail.send(subject=_('[Tripalocal] Cancellation confirmed'), message='', 
+                mail.send(subject=_('[Tripalocal] Cancellation confirmed'), message='',
                           sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=guest.email)[0].mail + '>',
-                          recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail], 
-                          priority='now',  #fail_silently=False, 
+                          recipients=[Aliases.objects.filter(destination__contains=host.email)[0].mail],
+                          priority='now',  #fail_silently=False,
                           html_message=loader.render_to_string('experiences/email_booking_cancelled_host.html',
                                                                 {'experience': experience,
                                                                  'booking':booking,
@@ -1647,7 +1725,6 @@ def update_booking(id, accepted, user):
 
     return result
 
-
 def send_booking_confirmed_sms(exp_datetime, exp_title, host, customer_phone_num, customer):
     registered_user = RegisteredUser.objects.get(user_id=host.id)
     host_phone_num = registered_user.phone_number
@@ -1662,7 +1739,6 @@ def send_booking_confirmed_sms(exp_datetime, exp_title, host, customer_phone_num
                                                                  exp_datetime=exp_datetime)
         send_sms(customer_phone_num, msg)
 
-
 def send_booking_cancelled_sms(exp_datetime, exp_title, host, customer_phone_num, customer):
     registered_user = RegisteredUser.objects.get(user_id=host.id)
     host_phone_num = registered_user.phone_number
@@ -1676,7 +1752,6 @@ def send_booking_cancelled_sms(exp_datetime, exp_title, host, customer_phone_num
         msg = _('%s' % BOOKING_CANCELLED_NOTIFY_CUSTOMER).format(exp_title=exp_title, host_name=host.first_name,
                                                                  exp_datetime=exp_datetime)
         send_sms(customer_phone_num, msg)
-
 
 def booking_accepted(request, id=None):
     #TODO
@@ -2172,7 +2247,7 @@ def manage_listing_continue(request, exp_id):
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
                is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
-    
+
     form = SearchForm()
     form.data = form.data.copy()
     form.data['city'] = city.title()
@@ -2352,8 +2427,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 # Format title & Description
                 experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
                 t = get_experience_title(experience, settings.LANGUAGES[0][0])
-                if (t != None and len(t) > 30):
-                    formattedTitleList.insert(counter, t[:27] + "...")
+                if (t != None and len(t) > 40):
+                    formattedTitleList.insert(counter, t[:37] + "...")
                 else:
                     formattedTitleList.insert(counter, t)
                 if float(experience.duration).is_integer():
@@ -2720,3 +2795,72 @@ def multi_day_trip(request):
                             'GEO_POSTFIX': GEO_POSTFIX,
               })
     return render_to_response(template, {}, context)
+
+@csrf_exempt
+def unionpay_payment_callback(request):
+    import logging
+    logger = logging.getLogger("Tripalocal_V1")
+    #logger.debug(request.POST)
+
+    ret = request.POST
+
+    if ret is not None:
+        try:
+            config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
+            s = signer.Signer.getSigner(config)
+            s.validate(ret)
+
+            if ret.get('respCode', '') == '00':
+                #success
+                bk = Booking.objects.filter(booking_extra_information=ret['orderId'], status="requested")
+                if bk is not None and len(bk)>0:
+                    bk = bk[0]
+                    bk.status="paid"
+                    bk.save()
+
+                    payment = bk.payment
+                    payment.charge_id = ret['queryId']
+                    payment.street1 = ret['txnTime']
+                    payment.save()
+
+                    experience = Experience.objects.get(id=bk.experience_id)
+                    user = User.objects.get(id=bk.user_id)
+                    bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+                    send_booking_email_verification(bk, experience, user, 
+                                                    instant_booking(experience, bk.datetime.date(), bk.datetime.time()))
+                    sms_notification(bk, experience, user, payment.phone_number)
+                logger.debug("payment success:"+str(ret['orderId']))
+                pass
+            else:
+                #failure
+                #TODO
+                #logger.debug("failure")
+                pass
+        except Exception as err:
+            logger.debug(err)
+
+@csrf_exempt
+def unionpay_refund_callback(request):
+    import logging
+    logger = logging.getLogger("Tripalocal_V1")
+    #logger.debug(request.POST)
+
+    ret = request.POST
+
+    if ret is not None:
+        try:
+            config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
+            s = signer.Signer.getSigner(config)
+            s.validate(ret)
+
+            if ret.get('respCode', '') == '00':
+                #success
+                logger.debug("refund success:"+ret['queryId'])
+                pass
+            else:
+                #failure
+                #TODO
+                #logger.debug("failure")
+                pass
+        except Exception as err:
+            logger.debug(err)

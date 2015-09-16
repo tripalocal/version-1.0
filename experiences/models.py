@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from datetime import datetime
+from django.utils import timezone
 from allauth.socialaccount.models import SocialAccount
 import hashlib
 from Tripalocal_V1 import settings
@@ -13,6 +14,25 @@ from Tripalocal_V1 import settings
 class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
     language = models.CharField(max_length=2)
+
+class WechatProduct(models.Model):
+    title = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    valid = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+
+class WechatBooking(models.Model):
+    product = models.ForeignKey(WechatProduct)
+    datetime = models.DateTimeField(default=timezone.now, blank=True)
+    trade_no = models.CharField(max_length=64)
+    phone_num = models.CharField(max_length=15, default='')
+    email = models.CharField(max_length=25, default='')
+    paid = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.trade_no
 
 class Experience(models.Model):
     type = models.CharField(max_length=50)
@@ -271,10 +291,11 @@ class Booking(models.Model):
 
     def _calculate_full_price(self, price):
         if type(price)==int or type(price) == float:
-            return round(price*(1.00+settings.COMMISSION_PERCENT)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2)
-
-
-
+            if self.experience.commission is not None and self.experience.commission > 0:
+                COMMISSION_PERCENT = round(self.experience.commission/(1-self.experience.commission),3)
+            else:
+                COMMISSION_PERCENT = settings.COMMISSION_PERCENT
+            return round(price*(1.00+COMMISSION_PERCENT)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED,2)
 
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):
@@ -450,13 +471,11 @@ def get_experience_tags(experience, language):
 def get_experience_whatsincluded(experience, language):
     return WhatsIncluded.objects.filter(experience = experience, language = language)
 
-
 # add new or update experience title
 def set_exp_title_all_langs(exp, title, lang, other_lang):
     set_exp_title(exp, title, lang)
     if not has_title_in_other_lang(exp, title, other_lang):
         set_exp_title(exp, title, other_lang)
-
 
 def has_title_in_other_lang(exp, title, lang):
     title_set = exp.experiencetitle_set.filter(language=lang)
@@ -468,7 +487,6 @@ def has_title_in_other_lang(exp, title, lang):
     else:
         return False
 
-
 def set_exp_title(exp, title, lang):
     title_set = exp.experiencetitle_set.filter(language=lang)
     if len(title_set) > 0:
@@ -478,12 +496,10 @@ def set_exp_title(exp, title, lang):
         exp_title = ExperienceTitle(experience=exp, title=title, language=lang)
         exp_title.save()
 
-
 def set_exp_desc_all_langs(exp, desc, lang, other_lang):
     set_exp_description(exp, desc, lang)
     if not has_desc_in_other_lang(exp, desc, other_lang):
         set_exp_description(exp, desc, other_lang)
-
 
 def has_desc_in_other_lang(exp, activity, lang):
     desc_set = exp.experiencedescription_set.filter(language=lang)
@@ -495,7 +511,6 @@ def has_desc_in_other_lang(exp, activity, lang):
     else:
         return False
 
-
 def set_exp_description(exp, desc, lang):
     description_set = exp.experiencedescription_set.filter(language=lang)
     if len(description_set) > 0:
@@ -505,12 +520,10 @@ def set_exp_description(exp, desc, lang):
         exp_desc = ExperienceDescription(experience=exp, description=desc, language=lang)
         exp_desc.save()
 
-
 def set_exp_activity_all_langs(exp, activity, lang, other_lang):
     set_exp_activity(exp, activity, lang)
     if not has_activity_in_other_lang(exp, activity, other_lang):
         set_exp_activity(exp, activity, other_lang)
-
 
 def has_activity_in_other_lang(exp, activity, lang):
     activity_set = exp.experienceactivity_set.filter(language=lang)
@@ -522,7 +535,6 @@ def has_activity_in_other_lang(exp, activity, lang):
     else:
         return False
 
-
 def set_exp_activity(exp, activity, lang):
     activity_set = exp.experienceactivity_set.filter(language=lang)
     if len(activity_set) > 0:
@@ -532,12 +544,10 @@ def set_exp_activity(exp, activity, lang):
         exp_activity = ExperienceActivity(experience=exp, activity=activity, language=lang)
         exp_activity.save()
 
-
 def set_exp_interaction_all_langs(exp, activity, lang, other_lang):
     set_exp_interaction(exp, activity, lang)
     if not has_interaction_in_other_lang(exp, activity, other_lang):
         set_exp_interaction(exp, activity, other_lang)
-
 
 def has_interaction_in_other_lang(exp, activity, lang):
     interaction_set = exp.experienceinteraction_set.filter(language=lang)
@@ -549,7 +559,6 @@ def has_interaction_in_other_lang(exp, activity, lang):
     else:
         return False
 
-
 def set_exp_interaction(exp, interaction, lang):
     interaction_set = exp.experienceinteraction_set.filter(language=lang)
     if len(interaction_set) > 0:
@@ -559,12 +568,10 @@ def set_exp_interaction(exp, interaction, lang):
         exp_interaction = ExperienceInteraction(experience=exp, interaction=interaction, language=lang)
         exp_interaction.save()
 
-
 def set_exp_dress_all_langs(exp, activity, lang, other_lang):
     set_exp_dress(exp, activity, lang)
     if not has_dress_in_other_lang(exp, activity, other_lang):
         set_exp_dress(exp, activity, other_lang)
-
 
 def has_dress_in_other_lang(exp, activity, lang):
     dress_set = exp.experiencedress_set.filter(language=lang)
@@ -577,7 +584,6 @@ def has_dress_in_other_lang(exp, activity, lang):
     else:
         return False
 
-
 def set_exp_dress(exp, dress, lang):
     dress_set = exp.experiencedress_set.filter(language=lang)
     if len(dress_set) > 0:
@@ -586,7 +592,6 @@ def set_exp_dress(exp, dress, lang):
     else:
         exp_dress = ExperienceDress(experience=exp, dress=dress, language=lang)
         exp_dress.save()
-
 
 def set_experience_includes(experience, item, is_include, lang):
     include_set = experience.whatsincluded_set.filter(item=item, language=lang)
@@ -603,7 +608,6 @@ def set_exp_includes_detail_all_langs(exp, item, detail, lang, other_lang):
     if not has_includes_detail_in_other_lang(exp, item, detail, other_lang):
         set_exp_includes_detail(exp, item, detail, other_lang)
 
-
 def has_includes_detail_in_other_lang(exp, item, detail, lang):
     include_set = exp.whatsincluded_set.filter(item=item, language=lang)
     if len(include_set) > 0:
@@ -613,7 +617,6 @@ def has_includes_detail_in_other_lang(exp, item, detail, lang):
         return True
     else:
         return False
-
 
 def set_exp_includes_detail(exp, item, detail, lang):
     include_set = exp.whatsincluded_set.filter(item=item, language=lang)
@@ -625,7 +628,6 @@ def set_exp_includes_detail(exp, item, detail, lang):
         exp_include = WhatsIncluded(item=item, details=detail, language=lang, experience=exp)
         exp_include.save()
 
-
 def set_exp_meetup_spot(exp, meetup_spot, lang):
     meetup_spot_set = exp.experiencemeetupspot_set.filter(language=lang)
     if len(meetup_spot_set) > 0:
@@ -636,7 +638,6 @@ def set_exp_meetup_spot(exp, meetup_spot, lang):
         exp_meetup_spot = ExperienceMeetupSpot(meetup_spot=meetup_spot, language=lang, experience=exp)
         exp_meetup_spot.save()
 
-
 def set_exp_dropoff_spot(exp, dropoff_spot, lang):
     dropoff_spot_set = exp.experiencedropoffspot_set.filter(language=lang)
     if len(dropoff_spot_set) > 0:
@@ -646,7 +647,6 @@ def set_exp_dropoff_spot(exp, dropoff_spot, lang):
     else:
         exp_dropoff_spot = ExperienceDropoffSpot(dropoff_spot=dropoff_spot, language=lang, experience=exp)
         exp_dropoff_spot.save()
-
 
 def has_meetup_spot_in_other_lang(exp, lang):
     meetup_spot_set = exp.experiencemeetupspot_set.filter(language=lang)
@@ -668,12 +668,10 @@ def has_dropoff_spot_in_other_lang(exp, lang):
     else:
         return False
 
-
 def set_exp_meetup_spot_all_langs(exp, meetup_spot, lang, other_lang):
     set_exp_meetup_spot(exp, meetup_spot, lang)
     if not has_meetup_spot_in_other_lang(exp, other_lang):
         set_exp_meetup_spot(exp, meetup_spot, other_lang)
-
 
 def set_exp_dropoff_spot_all_langs(exp, meetup_spot, lang, other_lang):
     set_exp_dropoff_spot(exp, meetup_spot, lang)
