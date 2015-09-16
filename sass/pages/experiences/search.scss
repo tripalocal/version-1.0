@@ -22,7 +22,9 @@
   padding-bottom: 20px;
   border-top: 1px solid $light-grey;
   border-bottom: 1px solid $light-grey;
-
+  .container {
+    padding: 0;
+  }
 }
 
 .form-control {
@@ -68,7 +70,7 @@
   width: 150px;
   height: 30px;
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 7px;
 }
 
 .language {
@@ -83,6 +85,9 @@
   border-bottom: 1px solid $light-grey;
   padding-top: 20px;
   padding-bottom: 20px;
+  .container {
+    padding: 0;
+  }
 }
 
 .interests {
@@ -131,17 +136,13 @@
       padding: 0;
     }
   }
-  .container-fluid {
-    @include media('<tablet') {
-      padding: 0;
-    }
-  }
-  .experience-results {
-    width: 960px;
-    margin: 0 auto;
-    @include media('<tablet') {
-      width: 100%;
-    }
+}
+
+.experience-results {
+  width: 960px;
+  margin: 0 auto;
+  @include media('<=tablet') {
+    width: 100%;
   }
 }
 

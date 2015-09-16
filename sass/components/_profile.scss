@@ -13,7 +13,7 @@ $lg: 150px;
 
 // Abstract profile class
 %profile {
-  overflow: hidden;
+  //overflow: hidden;
   position: relative;
   background-color: white;
   @include border-radius(100px);
@@ -88,4 +88,10 @@ $lg: 150px;
   position: relative;
   top: 5px;
   left: 5px;
+}
+
+.profile-frame-sm {
+  @extend %profile;
+  width: ($sm + 6px);
+  height: ($sm + 6px);
 }

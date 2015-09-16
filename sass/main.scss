@@ -23,6 +23,19 @@
   'base/typography',
   'base/base';
 
+// Components
+@import
+  'components/buttons',
+  'components/dropdown',
+  'components/profile',
+  'components/modal',
+  'components/warning-sign',
+  'components/video',
+  'components/loading',
+  'components/icons',
+  'components/checkboxes',
+  'components/banners';
+
 // Layout
 @import
   'layout/header',
@@ -36,16 +49,3 @@
   'layout/carousel',
   'layout/settings',
   'layout/sections';
-
-// Components
-@import
-  'components/buttons',
-  'components/dropdown',
-  'components/profile',
-  'components/modal',
-  'components/warning-sign',
-  'components/video',
-  'components/loading',
-  'components/icons',
-  'components/checkboxes',
-  'components/banners';

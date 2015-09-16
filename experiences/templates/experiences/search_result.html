@@ -29,7 +29,7 @@
             <div class="row">
 
               <div class="col-sm-6">
-                <div class="row" style="vertical-align: middle;">
+                <div style="vertical-align: middle;">
                   <h3 class="field-header"> {% trans 'Location' %}</h3>
                   <div class="ui selection dropdown">
                       <input id="id_city" type="hidden" name="city" value="city">
@@ -52,7 +52,7 @@
                   </div>
                 </div>
 
-                <div class="row" style="vertical-align: middle; padding-top: 10px;">
+                <div style="vertical-align: middle; padding-top: 10px;">
                   <h3 class="field-header" style="margin-right: 8px;"> {% trans 'Group size' %} </h3>
                   <div class="start-date">
                       {{form.start_date}}
@@ -65,7 +65,7 @@
               </div>
 
               <div class ="col-sm-6">
-                <div class="row" style="vertical-align: middle;">
+                <div style="vertical-align: middle;">
                   <div class="checkbox-primary">
                     <div class="checkbox-inline">
                       {{ form.is_kids_friendly }}
@@ -94,7 +94,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="row" style="padding-top:15px; vertical-align:middle">
+                <div style="padding-top:15px; vertical-align:middle">
                   <h3 class="field-header">{% trans "Interests: food &amp; wine, education, history &amp; culture, architecture" %}<span class="three-dots">...</span> <a class="more-filters-btn" style="cursor:pointer;">{% trans 'edit' %}</a></h3>
                 </div>
               </div>
@@ -105,7 +105,7 @@
 
         <div class="advanced-search" id="optional_criteria_div" style="display:none;">
                 <div class="container">
-                    <div class="row interests">
+                    <div class="interests">
                         <div class="icon-header">
                             <div class="icon-image" style="background-image: url({% static 'experiences/img/tag.svg' %})"></div>
                             <div class="icon-text">{%trans "Interests"%}</div>
@@ -128,8 +128,6 @@
 
     <div class="search-result">
       <div class="container">
-
-        <div class="container-fluid">
           <div id="more-filters-div" class="more-filters">
               <button class="btn btn-default more-filters-btn" id="more_filters" type="button" value="More Filters" style="width:100px;float:left;margin-right:10px;">{%trans "More Filters" %}</button>
               <button class="btn btn-primary" id="apply_filters" type="button" value="Apply Filters" style="width:100px;display:none;float:left;">{% trans "Apply Filters" %}</button>
@@ -137,8 +135,6 @@
           </div>
           <div class="loading"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
           <div id="ajax-experience-result"></div>
-
-        </div>
       </div>
     </div>
     <!-- /.container -->
