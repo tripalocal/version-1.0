@@ -164,20 +164,25 @@ h1 {
     margin-bottom: 45px;
   }
 
-  .profile-featured {
-      width:64px;
-      height:64px;
-      float: none;
-      margin: 70px auto;
-      position: relative;
-      img {
-        position: relative;
-        height: 64px;
-        width: 64px;
-        margin: auto;
-        border-radius: 100px;
-      }
-    }
+  .profile-frame-sm {
+    width:66px;
+    height:66px;
+    float: none;
+    margin: 70px auto;
+    position: relative;
+  }
+
+  .profile-sm {
+      width:60px;
+      height:60px;
+      border: 1px $medium-grey solid;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+  }
 
   .row {
     @include media('>tablet') {

@@ -89,9 +89,8 @@
                                      style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
                                     <a class="box-link"
                                        href="{{ GEO_POSTFIX }}experience/{{ experience.experience.id }}">
-                                        <div class="profile-featured">
-                                            <img src="{{ MEDIA_URL }}{{ experience.hostImage }}"
-                                                 height="240">
+                                        <div class="profile-frame-sm">
+                                            <div class="profile-sm" style="background-image:url({{ MEDIA_URL }}{{ experience.hostImage }});"></div>
                                         </div>
                                         <div class="price-box">
                                             {% trans "From" %} {{ experience.experience.dollarsign }}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span>
@@ -140,9 +139,10 @@
                     <div class="col-sm-4">
                       <div class="price-offer" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
                           <a class="box-link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
-                              <div class="profile-featured">
-                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" height="240">
-                              </div>
+                            <div class="profile-frame-sm">
+                                <div class="profile-sm" style="background-image:url({{ MEDIA_URL }}{{ experience.hostImage }});"></div>
+                            </div>
+
                               <div class="price-box">
                                   {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
                               </div>
@@ -170,9 +170,10 @@
                     <div class="col-sm-4">
                       <div class="price-offer" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
                           <a class="box-link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
-                              <div class="profile-featured">
-                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" height="240">
-                              </div>
+                            <div class="profile-frame-sm">
+                                <div class="profile-sm" style="background-image:url({{ MEDIA_URL }}{{ experience.hostImage }});"></div>
+                            </div>
+
                               <div class="price-box">
                                   {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
                               </div>
@@ -223,12 +224,12 @@
             <div class="row">
                 <div class="col-sm-6">
                   <div class="box" style="background-image:url({{ MEDIA_URL }}homepage/travelling-01.jpg)">
-                    <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>
+                    <a class=" btn btn-danger">{% trans "Travelling" %}</a>
                   </div>
                 </div>
                 <div class="col-sm-6">
                   <div class="box" style="background-image:url({{ MEDIA_URL }}homepage/hosting-01.jpg)">
-                    <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>
+                    <a class=" btn btn-primary">{% trans "Hosting" %}</a>
                   </div>
                 </div>
             </div>

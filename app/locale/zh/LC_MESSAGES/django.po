@@ -215,7 +215,7 @@ msgstr "我们的社区"
 
 #: templates/app/index.html:229
 msgid "Travelling"
-msgstr "旅行"
+msgstr "旅行心得"
 
 #: templates/app/index.html:229 templates/app/index.html.py:234
 msgid "(Coming soon)"
@@ -223,7 +223,7 @@ msgstr "(敬请期待)"
 
 #: templates/app/index.html:234
 msgid "Hosting"
-msgstr "领路"
+msgstr "旅游达人"
 
 #: templates/app/index.html:262
 msgid " From "
@@ -623,6 +623,11 @@ msgstr "克赖斯特彻奇(基督城)"
 msgid "Alice Springs"
 msgstr "艾利斯斯普林斯"
 
+msgid "Australia"
+msgstr "澳大利亚"
+
+msgid "New Zealand"
+msgstr "新西兰"
 
 #: views.py:247
 msgid "[Tripalocal] Successfully registered"
