@@ -8,14 +8,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
+    <link href="{% static 'experiences/content/multi_day_trip.css' %}" rel="stylesheet">
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
     <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 {%endblock%}
 
 {% block content %}
-<div class="search-result">
+<!--<div class="search-result">
 	<div id="response-to-update-multiple">
 		<div class="container" id="experience-results">
 			{% for experience in experienceList %}
@@ -46,5 +46,75 @@
 			{% endfor %}
 		</div>
 	</div>
+</div>-->
+
+<div class="jumbotron top">
+  <h1>Large text</h1>
+  <p>Smaller text</p>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="exp-box">
+        <div class="listing-img" style="background-image:url({% static 'experiences/img/travelling-01.jpg'%})">
+        </div>
+        <h1>Bigger text</h1>
+        <p>Smaller text</p>
+        <div class="price-box-sm">
+          <p>Some text</p>
+          <p style="margin-bottom:0;">Some text</p>
+          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+        </div>
+        <div class="price-box-sm">
+          <p>Some text</p>
+          <p style="margin-bottom:0;">Some text</p>
+          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="exp-box">
+        <div class="listing-img" style="background-image:url({% static 'experiences/img/travelling-01.jpg'%})">
+        </div>
+        <h1>Bigger text</h1>
+        <p>Smaller text</p>
+        <div class="price-box-sm">
+          <p>Some text</p>
+          <p style="margin-bottom:0;">Some text</p>
+          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+        </div>
+        <div class="price-box-sm">
+          <p >Some text</p>
+          <p style="margin-bottom:0">Some text</p>
+          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="exp-box">
+        <div class="listing-img" style="background-image:url({% static 'experiences/img/travelling-01.jpg'%})">
+        </div>
+        <h1>Bigger text</h1>
+        <p>Smaller text</p>
+        <div class="price-box-sm">
+          <p>Some text</p>
+          <p style="margin-bottom:0;">Some text</p>
+          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+        </div>
+        <div class="price-box-sm">
+          <p>Some text</p>
+          <p style="margin-bottom:0;">Some text</p>
+          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="jumbotron bottom">
+  <h1>Large text</h1>
+  <p>Smaller text</p>
+  <a class="btn btn-primary">Button text</a>
 </div>
 {%endblock%}
