@@ -15,6 +15,7 @@
     <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
     <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
@@ -299,22 +300,37 @@
         $(".input-group-addon").attr("style","padding:0px; border:0px;");
         $(".glyphicon-calendar").hide();
 
-        $(function () {
-            $("#id_start_date").datetimepicker({
-              format: 'YYYY-MM-DD'
+        if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
+            $(function () {
+                $("#id_start_date").datetimepicker({
+                    format: 'YYYY-MM-DD', locale: 'zh-CN'
+                });
             });
-        });
 
-       $("#id_start_date, #id_end_date").focusout(function () {
+            $(function () {
+                $("#id_end_date").datetimepicker({
+                    format: 'YYYY-MM-DD', locale: 'zh-CN'
+                });
+            });
+        }
+        else {
+            $(function () {
+                $("#id_start_date").datetimepicker({
+                    format: 'YYYY-MM-DD'
+                });
+            });
+
+            $(function () {
+                $("#id_end_date").datetimepicker({
+                    format: 'YYYY-MM-DD'
+                });
+            });
+        }
+
+        $("#id_start_date, #id_end_date").focusout(function () {
             if ($("#id_start_date").val() != "" && $("#id_end_date").val() != "") {
                 $("#itinerary-search").click();
             }
-        });
-
-        $(function () {
-            $("#id_end_date").datetimepicker({
-              format: 'YYYY-MM-DD'
-            });
         });
 
         $("#id_guest_number").change(function () {
