@@ -482,7 +482,7 @@ msgstr "取消预约"
 #: templates/experiences/email_booking_requested_traveler.html:93
 #: templates/experiences/experience_booking_successful_requested.html:112
 msgid "Your booking request has been sent to "
-msgstr "【本土客】 您的预约已经发送"
+msgstr "【本土客】 您的预约已经发送给"
 
 #: templates/experiences/email_booking_requested_traveler.html:94
 #: templates/experiences/experience_booking_successful_requested.html:113
@@ -512,7 +512,7 @@ msgstr "朋友"
 #: templates/experiences/email_booking_requested_traveler.html:94
 #: templates/experiences/experience_booking_successful_requested.html:113
 msgid " have requested to experience "
-msgstr " 预约了以下体验"
+msgstr "预约了以下体验"
 
 #: templates/experiences/email_booking_requested_traveler.html:114
 #: templates/experiences/experience_booking_successful_confirmed.html:140
