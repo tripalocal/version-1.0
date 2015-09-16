@@ -174,9 +174,9 @@
 
 
         <ul class="nav navbar-nav main-menu">
-          <li><a href="#">{% trans 'Travel with Locals' %}</a></li>
+          <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
           <li><a href="#">{% trans 'Experiences' %}</a></li>
-          <li><a href="#">{% trans 'Itineraries' %}</a></li>
+          <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
         </ul>
 
       </div>
@@ -264,6 +264,7 @@
 
 
     $(document).ready(function () {
+      $("a[href*='" + location.pathname + "']").addClass("current");
         var popupTimmer;
 
         if ($(window).width() > 520) {
