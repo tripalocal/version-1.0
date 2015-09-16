@@ -280,7 +280,6 @@
                                     <p style="padding-top:10px;">{% trans "Destination mobile number" %}</p>
                                     <div class="navbar-form" role="search">
                                         <div class="form-group">
-                                            <input class="form-control" style="width:62px;margin-right:10px;float:left">
                                             {{ form.phone_number }}
                                         </div>
                                     </div>
@@ -289,8 +288,7 @@
                                     <p style="padding-top:10px;">{% trans "Roaming mobile number" %}</p>
                                     <div class="navbar-form" role="search">
                                         <div class="form-group">
-                                            <input class="form-control" style="width:62px;margin-right:10px;float:left">
-                                            <input id="id_roaming_number" maxlength="15" name="phone_number" type="text" class="form-control">
+                                            <input id="id_roaming_number" maxlength="15" type="text" class="form-control">
                                         </div>
                                     </div>
                                 </td>
@@ -320,7 +318,7 @@
                         </div>
                     </div>
                     <input type="submit" id="submit_booking" name="Stripe" value="{% trans "Credit card/Alipay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>
-                    <input type="submit" id="submit_booking_unionpay" name="UnionPay" value="{% trans "Union Pay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>
+                    <!--<input type="submit" id="submit_booking_unionpay" name="UnionPay" value="{% trans "Union Pay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>-->
                 </form>
             </div>
 
@@ -387,7 +385,18 @@ $(function(){
         $("#id_country").attr("class", "btn btn-default dropdown-toggle");
 
         $("#id_expiration_1 :nth-child(2)").prop('selected', true);
-
+/*
+        phone = $("#id_phone_number").val();
+        if(phone)
+        {
+            phone = phone.split(',');
+            if(phone.length>1)
+            {
+                $("#id_phone_number").val(phone[0]);
+                $("#id_roaming_number").val(phone[1]);
+            }
+        }
+*/
         var handler = StripeCheckout.configure({
                             key: 'pk_live_62VE04d61Te70oh7IB7dqfjm',
                             image: '/images/tripalocal_Logo.png',
@@ -408,6 +417,27 @@ $(function(){
             {
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
                 {
+                    phone1=$("#id_phone_number").val();
+                    phone2=$("#id_roaming_number").val();
+                    if(phone1)
+                    {
+                        if(phone2)
+                        {
+                            //$("#id_phone_number").val(phone1+','+phone2);
+                        }
+                    }
+                    else if(phone2)
+                    {
+                        $("#id_phone_number").val(phone2);
+                    }
+                    else
+                    {
+                        //must leave at least one number
+                        $("#id_phone_number").css("border-color","red");
+                        $("#id_roaming_number").css("border-color","red");
+                        e.preventDefault();
+                        return;
+                    }
                     if({{total_price}}>0.00)
                     {
                         // Open Checkout with further options
