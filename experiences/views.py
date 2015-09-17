@@ -192,7 +192,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                             'price':experience_fee_calculator(exp_price, experience.commission),
                             'currency':str(dict(Currency)[experience.currency.upper()]),
                             'dollarsign':DollarSign[experience.currency.upper()],'dates':{},
-                            'photo_url':photo_url}
+                            'photo_url':photo_url, 'type':experience.type}
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []
@@ -2553,11 +2553,11 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
                 if mobile:
                     exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
                                 'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
-                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url']}
+                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'type':experience['type']}
                 else:
                     exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
                                 'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
-                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'timeslots':experience['dates'][dt_string]}
+                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'type':experience['type'],'timeslots':experience['dates'][dt_string]}
 
                 while counter < len(day_dict['experiences']):#find the correct rank
                     if experience['rate'] > day_dict['experiences'][counter]['rate']:
