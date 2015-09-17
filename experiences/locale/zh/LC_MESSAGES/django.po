@@ -949,7 +949,7 @@ msgstr "国庆拼假游澳洲，嗨玩袋鼠考拉国"
 
 #: templates/experiences/multi_day_trip.html:32
 msgid "3 Day Trip"
-msgstr "3日路线"
+msgstr "3日私人精品游"
 
 #: templates/experiences/multi_day_trip.html:33
 msgid "Melbourne or Sydney"
@@ -969,7 +969,7 @@ msgstr "包括全部住宿"
 
 #: templates/experiences/multi_day_trip.html:50
 msgid "7 Day Trip"
-msgstr "7日路线"
+msgstr "7日私人精品游"
 
 #: templates/experiences/multi_day_trip.html:51
 msgid "Melbourne + Sydney"
@@ -984,7 +984,7 @@ msgstr "查看路线"
 
 #: templates/experiences/multi_day_trip.html:68
 msgid "10 Day Trip"
-msgstr "10日路线"
+msgstr "10日私人精品游"
 
 #: templates/experiences/multi_day_trip.html:69
 msgid "Melbourne + Sydney + Gold Coast"
