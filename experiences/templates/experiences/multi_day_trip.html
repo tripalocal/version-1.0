@@ -12,45 +12,14 @@
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
     <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+	<title>{% trans "Tripalocal | Most popular trips" %}</title>
 {%endblock%}
 
 {% block content %}
-<!--<div class="search-result">
-	<div id="response-to-update-multiple">
-		<div class="container" id="experience-results">
-			{% for experience in experienceList %}
-			{% if forloop.counter == 5 %}
-			<div class="exp-box custom-itinerary-searchpage" >
-			  <form action="mailto:enquiries@tripalocal.com">
-			  <button class="btn btn-primary request-btn">{% trans "Request a trip" %}</button>
-			  </form>
-			</div>
-			{% endif %}
-
-			<div class="exp-box">
-				<a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
-					<div class="listing-img" style="background-image:url({{ MEDIA_URL }}{{ experience.image }});">
-						<div class="price-box">
-							{% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
-						</div>
-					</div>
-				</a>
-				<a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ experience.title }} </h3></a>
-
-				<p style="overflow-y:hidden; height:100px">{{ experience.description }}</p>
-
-				<div class="listing-footer">
-					{%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
-				</div>
-			</div>
-			{% endfor %}
-		</div>
-	</div>
-</div>-->
 
 <div class="jumbotron top">
-  <h1>Large text</h1>
-  <p>Smaller text</p>
+  <h1>{% trans "Authentic local experiences" %}</h1>
+  <p>{% trans "Check our most popular trips" %}</p>
 </div>
 
 <div class="container">
@@ -59,17 +28,17 @@
       <div class="exp-box">
         <div class="listing-img" style="background-image:url({% static 'experiences/img/travelling-01.jpg'%})">
         </div>
-        <h1>Bigger text</h1>
-        <p>Smaller text</p>
+        <h1>{% trans "3 Day Trip" %}</h1>
+        <p>{% trans "Melbourne or Sydney" %}</p>
         <div class="price-box-sm">
-          <p>Some text</p>
-          <p style="margin-bottom:0;">Some text</p>
-          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+          <p>{% trans "Include accommodation for one night" %}</p>
+          <p style="margin-bottom:0;">AU $688</p>
+          <p><a href="{{GEO_POSTFIX}}experience/651/">{% trans "Melbourne" %}</a> / <a href="{{GEO_POSTFIX}}experience/661/">{% trans "Sydney" %}</a></p>
         </div>
         <div class="price-box-sm">
-          <p>Some text</p>
-          <p style="margin-bottom:0;">Some text</p>
-          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+          <p>{% trans "Include accommodation for two nights" %}</p>
+          <p style="margin-bottom:0;">AU $1088</p>
+          <p><a href="{{GEO_POSTFIX}}experience/701/">{% trans "Melbourne" %}</a> / <a href="{{GEO_POSTFIX}}experience/711/">{% trans "Sydney" %}</a></p>
         </div>
       </div>
     </div>
@@ -77,17 +46,17 @@
       <div class="exp-box">
         <div class="listing-img" style="background-image:url({% static 'experiences/img/travelling-01.jpg'%})">
         </div>
-        <h1>Bigger text</h1>
-        <p>Smaller text</p>
+        <h1>{% trans "7 Day Trip" %}</h1>
+        <p>{% trans "Melbourne + Sydney" %}</p>
         <div class="price-box-sm">
-          <p>Some text</p>
-          <p style="margin-bottom:0;">Some text</p>
-          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+          <p>{% trans "Include accommodation for one night" %}</p>
+          <p style="margin-bottom:0;">AU $1822</p>
+          <p><a href="{{GEO_POSTFIX}}experience/681/">{% trans "Check details" %}</a></p>
         </div>
         <div class="price-box-sm">
-          <p >Some text</p>
-          <p style="margin-bottom:0">Some text</p>
-          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+          <p>{% trans "Include accommodation for six nights" %}</p>
+          <p style="margin-bottom:0">AU $2822</p>
+          <p><a href="{{GEO_POSTFIX}}experience/731/">{% trans "Check details" %}</a></p>
         </div>
       </div>
     </div>
@@ -95,17 +64,17 @@
       <div class="exp-box">
         <div class="listing-img" style="background-image:url({% static 'experiences/img/travelling-01.jpg'%})">
         </div>
-        <h1>Bigger text</h1>
-        <p>Smaller text</p>
+        <h1>{% trans "7 Day Trip" %}</h1>
+        <p>{% trans "Melbourne + Sydney + Gold Coast" %}</p>
         <div class="price-box-sm">
-          <p>Some text</p>
-          <p style="margin-bottom:0;">Some text</p>
-          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+          <p>{% trans "Include accommodation for one night" %}</p>
+          <p style="margin-bottom:0;">AU $2632</p>
+          <p><a href="{{GEO_POSTFIX}}experience/691/">{% trans "Check details" %}</a></p>
         </div>
         <div class="price-box-sm">
-          <p>Some text</p>
-          <p style="margin-bottom:0;">Some text</p>
-          <p><a href="#">Link</a> / <a href="#">Link</a></p>
+          <p>{% trans "Include accommodation for nine nights" %}</p>
+          <p style="margin-bottom:0;">AU $3993</p>
+          <p><a href="{{GEO_POSTFIX}}experience/771/">{% trans "Check details" %}</a></p>
         </div>
       </div>
     </div>
@@ -113,8 +82,8 @@
 </div>
 
 <div class="jumbotron bottom">
-  <h1>Large text</h1>
-  <p>Smaller text</p>
-  <a class="btn btn-primary">Button text</a>
+  <h1>{% trans "Prefer a personally tailored trip?" %}</h1>
+  <p>{% trans "Please contact our lovely custom service"%}</p>
+  <a class="btn btn-primary">{% trans "Help me plan my trip" %}</a>
 </div>
 {%endblock%}
