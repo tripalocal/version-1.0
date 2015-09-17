@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 13:11+1000\n"
+"POT-Creation-Date: 2015-09-17 13:59+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -202,47 +202,47 @@ msgstr "澳元"
 msgid "NZD"
 msgstr "新西兰元"
 
-#: forms.py:806 forms.py:1174 forms.py:1178 resource.py:1067 views.py:1494
+#: forms.py:807 forms.py:1176 forms.py:1180 resource.py:1067 views.py:1494
 #: views.py:1502 views.py:1506 views.py:1733 views.py:1738 views.py:1747
 #: views.py:1752
 #, python-format
 msgid "%s"
 msgstr ""
 
-#: forms.py:1068
+#: forms.py:1070
 msgid "[Tripalocal] "
 msgstr "【本土客】 "
 
-#: forms.py:1068
+#: forms.py:1070
 msgid " has requested your experience"
 msgstr " 预约了您的体验"
 
-#: forms.py:1069 forms.py:1082 forms.py:1102 forms.py:1114 forms.py:1126
-#: forms.py:1150 resource.py:219 resource.py:243 resource.py:255
+#: forms.py:1071 forms.py:1084 forms.py:1104 forms.py:1116 forms.py:1128
+#: forms.py:1152 resource.py:219 resource.py:243 resource.py:255
 #: resource.py:267 views.py:1554 views.py:1570 views.py:1582 views.py:1609
 #: views.py:1690 views.py:1701
 msgid "Tripalocal <"
 msgstr "本土客 <"
 
-#: forms.py:1081
+#: forms.py:1083
 msgid "[Tripalocal] Your booking request is sent to the host"
 msgstr "【本土客】 您的预约已经发送"
 
-#: forms.py:1101 forms.py:1149 resource.py:218 resource.py:242 views.py:1553
+#: forms.py:1103 forms.py:1151 resource.py:218 resource.py:242 views.py:1553
 #: views.py:1608
 msgid "[Tripalocal] Booking confirmed"
 msgstr "【本土客】 预订确认"
 
-#: forms.py:1113 forms.py:1125 resource.py:254 resource.py:266 views.py:1569
+#: forms.py:1115 forms.py:1127 resource.py:254 resource.py:266 views.py:1569
 #: views.py:1581
 msgid "[Tripalocal] Booking reminder"
 msgstr "【本土客】 预订提醒"
 
-#: forms.py:1137 resource.py:230 views.py:1596
+#: forms.py:1139 resource.py:230 views.py:1596
 msgid "[Tripalocal] How was your experience?"
 msgstr "【本土客】 您对我们的体验还满意吗？"
 
-#: forms.py:1164 views.py:1685
+#: forms.py:1166 views.py:1685
 msgid "%H:%M %d %b %Y"
 msgstr "%Y年%-m月%d日 %H:%M"
 
@@ -958,7 +958,6 @@ msgid "Include accommodation for two nights"
 msgstr "包括2晚住宿"
 
 #: templates/experiences/multi_day_trip.html:49
-#: templates/experiences/multi_day_trip.html:67
 msgid "7 Day Trip"
 msgstr "7日路线"
 
@@ -976,6 +975,10 @@ msgstr "查看路线"
 #: templates/experiences/multi_day_trip.html:57
 msgid "Include accommodation for six nights"
 msgstr "包括6晚住宿"
+
+#: templates/experiences/multi_day_trip.html:67
+msgid "10 Day Trip"
+msgstr "10日路线"
 
 #: templates/experiences/multi_day_trip.html:68
 msgid "Melbourne + Sydney + Gold Coast"
