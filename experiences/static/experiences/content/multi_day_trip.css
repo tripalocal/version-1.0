@@ -1,0 +1,64 @@
+h1 {
+  font-size: 32px;
+}
+
+.jumbotron {
+  padding-top: 100px;
+  color: white;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.jumbotron a {
+  min-width: 200px;
+  border-radius: 3px;
+}
+
+.top {
+  background: linear-gradient(
+     rgba(0, 0, 0, 0.3),
+     rgba(0, 0, 0, 0.3)
+   ),
+   url(../img/experience61_1.jpg);
+}
+
+.bottom {
+  background: linear-gradient(
+     rgba(0, 0, 0, 0.3),
+     rgba(0, 0, 0, 0.3)
+   ),
+   url(/images/city/Melbourne.jpg);
+}
+
+.container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.exp-box {
+  text-align: center;
+  background-color: white;
+  padding-bottom: 20px;
+  border-radius: 3px;
+}
+
+.exp-box p {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.price-box-sm {
+  width: 120px;
+  height: 80px;
+  border: 1px solid #ccc;
+  text-align: center;
+  display: inline-block;
+  padding: 5px 10px 5px 10px;
+  margin: 0 10px 0 10px;
+  border-radius: 3px;
+}
+
+.price-box-sm p {
+  font-weight: normal;
+}
