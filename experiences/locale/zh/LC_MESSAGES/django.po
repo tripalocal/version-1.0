@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 13:59+1000\n"
+"POT-Creation-Date: 2015-09-17 15:44+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -100,8 +100,8 @@ msgstr "奥克兰, 新西兰"
 msgid "Wellington, NZ"
 msgstr "惠灵顿, 新西兰"
 
-#: forms.py:33 templates/experiences/multi_day_trip.html:36
-#: templates/experiences/multi_day_trip.html:41
+#: forms.py:33 templates/experiences/multi_day_trip.html:37
+#: templates/experiences/multi_day_trip.html:42
 msgid "Melbourne"
 msgstr "墨尔本"
 
@@ -109,8 +109,8 @@ msgstr "墨尔本"
 msgid "Victoria"
 msgstr "维多利亚州"
 
-#: forms.py:33 templates/experiences/multi_day_trip.html:36
-#: templates/experiences/multi_day_trip.html:41
+#: forms.py:33 templates/experiences/multi_day_trip.html:37
+#: templates/experiences/multi_day_trip.html:42
 msgid "Sydney"
 msgstr "悉尼"
 
@@ -249,6 +249,10 @@ msgstr "%Y年%-m月%d日 %H:%M"
 #: resource.py:195
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 注册成功"
+
+#: templates/experiences/add_experience_summary.html:160
+msgid "prev step"
+msgstr ""
 
 #: templates/experiences/coupon_voyagerp100.html:9
 msgid ""
@@ -932,71 +936,69 @@ msgid "Tripalocal | Most popular trips"
 msgstr "本土客精品路线"
 
 #: templates/experiences/multi_day_trip.html:21
-msgid "Authentic local experiences"
-msgstr "最原汁原味的体验"
+msgid "Tripalocal"
+msgstr "本土客"
 
 #: templates/experiences/multi_day_trip.html:22
-msgid "Check our most popular trips"
-msgstr "浏览我们最受欢迎的路线"
+msgid "Authentic local experiences"
+msgstr "最原汁原味的旅行"
 
-#: templates/experiences/multi_day_trip.html:31
+#: templates/experiences/multi_day_trip.html:23
+msgid "Check our most popular trips"
+msgstr "国庆拼假游澳洲，嗨玩袋鼠考拉国"
+
+#: templates/experiences/multi_day_trip.html:32
 msgid "3 Day Trip"
 msgstr "3日路线"
 
-#: templates/experiences/multi_day_trip.html:32
+#: templates/experiences/multi_day_trip.html:33
 msgid "Melbourne or Sydney"
 msgstr "墨尔本或悉尼"
 
-#: templates/experiences/multi_day_trip.html:34
-#: templates/experiences/multi_day_trip.html:52
-#: templates/experiences/multi_day_trip.html:70
+#: templates/experiences/multi_day_trip.html:35
+#: templates/experiences/multi_day_trip.html:53
+#: templates/experiences/multi_day_trip.html:71
 msgid "Include accommodation for one night"
 msgstr "包括1晚住宿"
 
-#: templates/experiences/multi_day_trip.html:39
-msgid "Include accommodation for two nights"
-msgstr "包括2晚住宿"
+#: templates/experiences/multi_day_trip.html:40
+#: templates/experiences/multi_day_trip.html:58
+#: templates/experiences/multi_day_trip.html:76
+msgid "Include all accommodation"
+msgstr "包括全部住宿"
 
-#: templates/experiences/multi_day_trip.html:49
+#: templates/experiences/multi_day_trip.html:50
 msgid "7 Day Trip"
 msgstr "7日路线"
 
-#: templates/experiences/multi_day_trip.html:50
+#: templates/experiences/multi_day_trip.html:51
 msgid "Melbourne + Sydney"
 msgstr "墨尔本 + 悉尼"
 
-#: templates/experiences/multi_day_trip.html:54
-#: templates/experiences/multi_day_trip.html:59
-#: templates/experiences/multi_day_trip.html:72
-#: templates/experiences/multi_day_trip.html:77
+#: templates/experiences/multi_day_trip.html:55
+#: templates/experiences/multi_day_trip.html:60
+#: templates/experiences/multi_day_trip.html:73
+#: templates/experiences/multi_day_trip.html:78
 msgid "Check details"
 msgstr "查看路线"
 
-#: templates/experiences/multi_day_trip.html:57
-msgid "Include accommodation for six nights"
-msgstr "包括6晚住宿"
-
-#: templates/experiences/multi_day_trip.html:67
+#: templates/experiences/multi_day_trip.html:68
 msgid "10 Day Trip"
 msgstr "10日路线"
 
-#: templates/experiences/multi_day_trip.html:68
+#: templates/experiences/multi_day_trip.html:69
 msgid "Melbourne + Sydney + Gold Coast"
 msgstr "墨尔本 + 悉尼 + 黄金海岸"
 
-#: templates/experiences/multi_day_trip.html:75
-msgid "Include accommodation for nine nights"
-msgstr "包括9晚住宿"
-
-#: templates/experiences/multi_day_trip.html:85
-msgid "Prefer a personally tailored trip?"
-msgstr "想要一个量身定制的假期"
-
 #: templates/experiences/multi_day_trip.html:86
+msgid "Prefer a personally tailored trip?"
+msgstr "想要一个量身定制的假期吗？"
+
+#: templates/experiences/multi_day_trip.html:87
 msgid "Please contact our lovely custom service"
 msgstr "请咨询我们的私人订制服务"
 
-#: templates/experiences/multi_day_trip.html:87
+#: templates/experiences/multi_day_trip.html:88
 msgid "Help me plan my trip"
 msgstr "帮我定制行程"
 
@@ -1175,6 +1177,15 @@ msgstr "领路人自驾"
 #: views.py:2300
 msgid "Private group"
 msgstr "私人团"
+
+#~ msgid "Include accommodation for two nights"
+#~ msgstr "包括2晚住宿"
+
+#~ msgid "Include accommodation for six nights"
+#~ msgstr "包括6晚住宿"
+
+#~ msgid "Include accommodation for nine nights"
+#~ msgstr "包括9晚住宿"
 
 #~ msgid "Book Now"
 #~ msgstr "预订"

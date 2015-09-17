@@ -18,8 +18,9 @@
 {% block content %}
 
 <div class="jumbotron top">
+  <h1>{% trans "Tripalocal" %}</h1>
   <h1>{% trans "Authentic local experiences" %}</h1>
-  <p>{% trans "Check our most popular trips" %}</p>
+  <h2>{% trans "Check our most popular trips" %}</h2>
 </div>
 
 <div class="container">
@@ -36,7 +37,7 @@
           <p><a href="{{GEO_POSTFIX}}experience/651/">{% trans "Melbourne" %}</a> / <a href="{{GEO_POSTFIX}}experience/661/">{% trans "Sydney" %}</a></p>
         </div>
         <div class="price-box-sm">
-          <p>{% trans "Include accommodation for two nights" %}</p>
+          <p>{% trans "Include all accommodation" %}</p>
           <p style="margin-bottom:0;">AU $1088</p>
           <p><a href="{{GEO_POSTFIX}}experience/701/">{% trans "Melbourne" %}</a> / <a href="{{GEO_POSTFIX}}experience/711/">{% trans "Sydney" %}</a></p>
         </div>
@@ -54,7 +55,7 @@
           <p><a href="{{GEO_POSTFIX}}experience/681/">{% trans "Check details" %}</a></p>
         </div>
         <div class="price-box-sm">
-          <p>{% trans "Include accommodation for six nights" %}</p>
+          <p>{% trans "Include all accommodation" %}</p>
           <p style="margin-bottom:0">AU $2822</p>
           <p><a href="{{GEO_POSTFIX}}experience/731/">{% trans "Check details" %}</a></p>
         </div>
@@ -72,7 +73,7 @@
           <p><a href="{{GEO_POSTFIX}}experience/691/">{% trans "Check details" %}</a></p>
         </div>
         <div class="price-box-sm">
-          <p>{% trans "Include accommodation for nine nights" %}</p>
+          <p>{% trans "Include all accommodation" %}</p>
           <p style="margin-bottom:0;">AU $3993</p>
           <p><a href="{{GEO_POSTFIX}}experience/771/">{% trans "Check details" %}</a></p>
         </div>
@@ -84,6 +85,17 @@
 <div class="jumbotron bottom">
   <h1>{% trans "Prefer a personally tailored trip?" %}</h1>
   <p>{% trans "Please contact our lovely custom service"%}</p>
-  <a class="btn btn-primary">{% trans "Help me plan my trip" %}</a>
+  <button id="show_popup" class="btn btn-primary">{% trans "Help me plan my trip" %}</button>
 </div>
 {%endblock%}
+
+{% block scripts %}
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $('#show_popup').click(function(e) {
+            $('#help-popup').modal('show');
+        });
+    })
+</script>
+{% endblock %}
+
