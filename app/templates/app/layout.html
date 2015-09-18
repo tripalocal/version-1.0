@@ -446,4 +446,10 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
 <!--End of Zopim Live Chat Script-->
 {%endif%}
 
+<script type="text/javascript">
+    var utmId = getParameterByName('utm');
+    if (utmId) {
+        mixpanel.track("utm"+utmId);
+    }
+</script>
 </html>
