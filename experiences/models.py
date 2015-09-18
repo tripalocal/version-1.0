@@ -300,6 +300,16 @@ class Photo(models.Model):
     image = models.ImageField(upload_to=upload_path)
     experience = models.ForeignKey(Experience)
 
+
+class ProductPhoto(models.Model):
+    def upload_path(self, name):
+        return 'products/{0}/{1}.jpg'.format(str(self.product.id), self.name)
+
+    name = models.CharField(max_length=50, blank=False)
+    image = models.ImageField(upload_to=upload_path)
+    product = models.ForeignKey(Product, related_name='photos')
+
+
 class Review(models.Model):
     user = models.ForeignKey(User)
     experience = models.ForeignKey(Experience)

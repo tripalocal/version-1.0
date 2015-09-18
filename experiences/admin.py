@@ -3,7 +3,7 @@ from django.conf.urls import patterns
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon, WechatProduct, WechatBooking, \
-    Product, ProductI18n, Provider
+    Product, ProductI18n, Provider, ProductPhoto
 from experiences.views import create_experience
 from app.models import RegisteredUser
 from allauth.socialaccount.models import SocialAccount
@@ -36,11 +36,16 @@ class ProductI18nInline(admin.StackedInline):
     extra = 0
 
 
+class ProductPhotoInline(admin.TabularInline):
+    model = ProductPhoto
+    extra = 3
+
+
 class ProductAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Product summary', {
             'fields': (
-                'provider', 'duration_in_min', 'min_group_size', 'book_in_advance', 'instant_booking',
+                'duration_in_min', 'min_group_size', 'book_in_advance', 'instant_booking',
                 'free_translation',
                 'order_on_holiday')
         }),
@@ -49,7 +54,7 @@ class ProductAdmin(admin.ModelAdmin):
         }),
     )
 
-    inlines = [ProductI18nInline]
+    inlines = [ProductPhotoInline, ProductI18nInline]
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
@@ -81,6 +86,7 @@ class ProviderAdmin(admin.ModelAdmin):
         if not request.user.is_superuser:
             self.exclude.append('user')
         return super(ProviderAdmin, self).get_form(request, obj, **kwargs)
+
 
 
 # Re-register UserAdmin
