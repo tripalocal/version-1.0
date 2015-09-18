@@ -36,7 +36,7 @@ In Mac OS, do it like this:
 (Make sure you have npm installed. Then install dependencies with `npm install`)  
 
 - `gulp styles` will compile the sass code in `/sass` into a single `main.css` along with page specific sass files and placed in their respective folders minified.  
-- `gulp` will run an even listener that autocompiles your sass stylesheets every time you save.  
+- `gulp` will run an event listener that auto-compiles your sass stylesheets every time you save.  
 
 No need to upload the `/sass` directory to the live site.
 
@@ -46,5 +46,18 @@ The architecture of the stylesheets cascades as follows:
 
 When implementing new UI components, have a look at what can be used from Bootstrap's docs, followed by components/layouts in our sass library, and then finally in the page specific styles.  
 
-** It is best practice to define reusable components, and of course, reuse them.**  
-Partial files begin with an underscore and will be ignored by the compiler. List them in main.scss to be compiled.
+**It is best practice to define reusable components, and of course, reuse them.**  
+
+Partial files begin with an underscore and will be ignored by the compiler. Import them into `main.scss` to be compiled.
+
+Put page specific scss files in their respective folder in `/sass/pages`. These will be compiled and placed in their static folders.  
+
+Make sure you include the following imports at the top if you want to use sass variables and mixins:  
+````
+@import
+  '../../vendor/include-media',
+  '../../utils/variables',
+  '../../utils/mixins',
+  '../../utils/functions',
+  '../../utils/placeholders';
+````

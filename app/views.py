@@ -1,13 +1,19 @@
 """
 Definition of views.
 """
+from time import gmtime
+from time import strftime
+from app.wechat_payment.api import JsAPIOrderPay
+from app.wechat_payment.utils import dict_to_xml
+from django.core.urlresolvers import reverse
 
-from django.shortcuts import render, render_to_response, get_object_or_404
+from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.template import RequestContext, loader
 from datetime import *
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from experiences.forms import Locations, Location
+from experiences.forms import Locations
 from django.contrib.auth import authenticate, login
 from allauth.account.signals import password_reset, user_signed_up, user_logged_in
 from allauth.account.views import PasswordResetFromKeyDoneView
@@ -20,14 +26,18 @@ from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, getBGImageURL, getProfileImage
 from allauth.account.signals import email_confirmed, password_changed
-from experiences.models import Booking, Experience, Payment, get_experience_title, get_experience_meetup_spot
+from experiences.models import Booking, Experience, Payment, get_experience_title, get_experience_meetup_spot, \
+    WechatProduct, WechatBooking
 from experiences.forms import Currency, DollarSign, email_account_generator
 from django.utils.translation import ugettext_lazy as _
 from post_office import mail
 from django.contrib.auth.models import User
 from django import forms
 from tripalocal_messages.models import Aliases, Users
+from urllib.parse import quote_plus
 import json, os
+import xmltodict
+
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
@@ -718,3 +728,72 @@ def email_custom_trip(request):
     )
 
     return HttpResponse(json.dumps({}))
+
+
+def create_wx_trade_no(mch_id):
+    system_time = strftime("%Y%m%d%H%M%S", gmtime())
+    trade_no = 'wx' + mch_id + system_time
+    N = 32 - len(trade_no)
+    trade_no += ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
+    return trade_no
+
+
+def wechat_product(request):
+    pay = JsAPIOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY, settings.WECHAT_APPSECRET)
+    code = request.GET.get('code', None)
+    product_id = request.GET.get('id', None)
+    product = get_object_or_404(WechatProduct, pk=product_id, valid=True)
+
+    oauth_url = pay.create_oauth_url_for_code(quote_plus(request.build_absolute_uri()))
+
+    if code:
+        context = RequestContext(request)
+        return render_to_response('app/wechat_product.html',
+                                  {'product_title': product.title, 'product_price': product.price}, context)
+    else:
+        print('no code redirect')
+        # 重定向到oauth_url后，获得code值
+        return redirect(oauth_url)
+
+
+@csrf_exempt
+def generate_order(request):
+    pay = JsAPIOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY, settings.WECHAT_APPSECRET)
+    print('ingenerate_order', request.POST)
+    code = request.POST.get('code', None)
+    product_id = request.POST.get('id', None)
+    phone_num = request.POST.get('phone_num', '')
+    email = request.POST.get('email', '')
+
+    product = get_object_or_404(WechatProduct, pk=product_id, valid=True)
+
+    out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
+    booking = WechatBooking(product=product, trade_no=out_trade_no, phone_num=phone_num,
+                                        email=email)
+    booking.save()
+
+    notify_url = request.build_absolute_uri(reverse('wechat_payment_notify'))
+
+    price_in_cents = int(product.price * 100)
+    json_pay_info = pay.post_prepaid(product.title, out_trade_no, str(price_in_cents),
+                                     "127.0.0.1", notify_url, code)
+    print('json_pay_info', json_pay_info)
+    return HttpResponse(json.dumps(json_pay_info), content_type='application/json')
+
+
+@csrf_exempt
+def wechat_payment_notify(request):
+    if (request.body):
+        notify_info = xmltodict.parse(request.body.decode("utf-8"))['xml']
+
+        if (notify_info.get('return_code', None)) == 'SUCCESS' and 'out_trade_no' in notify_info:
+            bookings = WechatBooking.objects.filter(trade_no=notify_info['out_trade_no'])
+            if len(bookings) == 1:
+                booking = bookings[0]
+                booking.paid = True
+                booking.save()
+            xml = dict_to_xml({'return_code': 'SUCCESS', 'return_msg': 'OK'})
+            return HttpResponse(xml)
+        return HttpResponse('')
+    else:
+        return HttpResponse('')

@@ -91,7 +91,7 @@
 												                    <tr>
 													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
 													                        <h1 style="text-align: center;"><font size="5">{% trans "Your booking request has been sent to "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}</font></h1>
-														                    <p style="text-align: center;">{% trans "You "%}{%if guest_number > 1 %}{% trans "and"%}{{guest_number|sub:1}}{% trans " of your "%}{%if guest_number > 2%}{% trans "friends"%}{%else%}{% trans "friend"%}{%endif%}{%endif%}{% trans " have requested to experience "%}<br>
+														                    <p style="text-align: center;">{% trans "You "%}{%if guest_number > 1 %}{% trans "and "%}{{guest_number|sub:1}}{% trans " of your "%}{%if guest_number > 2%}{% trans "friends"%}{%else%}{% trans "friend"%}{%endif%}{%endif%}{% trans " have requested to experience "%}<br>
                                                                                 <a href="{{experience_url}}" target="_blank"><span style="line-height:21px; text-align:center">{{experience.title}}</span></a><br>
                                                                                 {% trans "on "%}<strong>{% if LANGUAGE != "zh-CN"%}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{%endif%}</strong>{% trans " at "%}<strong>{{ booking.datetime|date:'H:i' }}</strong>
                                                                             </p>

@@ -1,0 +1,239 @@
+/*
+  Manage listing & related pages
+  aka. Uploading Process
+*/
+
+@import
+  '../../vendor/include-media',
+  '../../utils/variables',
+  '../../utils/mixins',
+  '../../utils/functions',
+  '../../utils/placeholders';
+
+////////////// Header bar
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+
+.button_icon {
+    position: relative;
+    margin-right: 5px;
+    line-height: 1.5;
+
+    img {
+        position: absolute;
+        bottom: -5px;
+        left: -30px;
+    }
+}
+
+.ajax-update-signal {
+	color: $light-grey;
+	display: inline-block;
+  float: left;
+  margin-left: 15px;
+}
+
+.status-bar {
+  border-top: 1px solid $light-grey;
+  background-color: $dark-grey;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 100%;
+  z-index: 10;
+  clear: both;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  a {
+    background-color: transparent;
+    color: white;
+  }
+}
+
+/////////////////////////// Side bar
+
+.form-nav {
+    padding-top: 20px;
+    padding-bottom: 15px;
+}
+
+.form-nav li {
+    margin-bottom: 20px;
+    list-style: none;
+}
+
+.left-side-bar {
+  float: left;
+  background-color: white;
+  padding-right: 20px;
+  position: relative;
+  width: 189px;
+  position: fixed;
+  top: 101px;
+  left: 0;
+  z-index: 2;
+}
+
+.list-menu {
+    position: relative;
+    padding: 0;
+    color: $medium-grey;
+}
+
+.list-tab {
+  color: $dark-grey;
+  margin-left: 40px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  margin-left: 0;
+}
+
+.active-tab {
+  @extend .list-tab;
+  color: $primary-color;
+}
+.modify-icon {
+    top: 0;
+}
+
+.status-done, .status-edit {
+    position: absolute;
+    height: 30px;
+    width: 30px;
+    background-repeat: no-repeat;
+    right: 15px;
+    display: inline-block;
+}
+
+.status-done {
+    background-image: url('/images/icon/done.jpg');
+}
+
+.status-edit {
+    background-image: url('/images/icon/pencil.jpg');
+}
+
+/////////////////////////////////// Content
+
+.form-content {
+  display: inline-block;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.form-info {
+  width: 200px;
+  height: 400px;
+  text-align: left;
+  padding: 15px;
+  h3 {
+    font-weight: bold;
+    color: $slate-grey;
+  }
+}
+
+.form-hint {
+  float: left;
+  height: 100%;
+  background-color: white;
+  padding-right: 20px;
+  padding-top: 40px;
+  width: 350px;
+  margin-top: 100px;
+  padding-left: 30px;
+  padding-bottom: 50px;
+  img {
+    float: left;
+    margin-top: 35px;
+  }
+}
+
+.hint-box {
+  width: 240px;
+  float: left;
+  padding-left: 15px;
+  h3 {
+    color: $medium-grey;
+  }
+  p {
+    color: $medium-grey;
+  }
+}
+
+.form-body {
+  background-color: $off-white;
+  border-left: 1px solid $light-grey;
+  border-right: 1px solid $light-grey;
+  height: 100%;
+  width: 645px;
+  z-index: 0;
+  float: left;
+  margin-top: 100px;
+  margin-left: 190px;
+}
+
+.section {
+  border-bottom: 1px solid $light-grey;
+  height: 100%;
+}
+
+/////////////////////////////// Photo Form
+.fileUpload img {
+    position: absolute;
+    bottom: 0px;
+    left: 10px;
+}
+
+.fileUpload span {
+    position: absolute;
+    left: 50px;
+    bottom: 3px;
+}
+.upload {
+  display: none;
+}
+//////////////////////////////// Price Form
+#menu-selection-left {
+    width: 226px;
+    height: 278px;
+    background: rgb(247, 247, 247);
+    background-image: url('/images/img/private.png');
+    background-size: cover;
+}
+
+#menu-selection-right {
+    width: 226px;
+    height: 278px;
+    background: rgb(247, 247, 247);
+    background-image: url('/images/img/public.png');
+    background-size: cover;
+}
+
+#menu-operation-bar {
+  margin-top: 30px;
+  text-align: center;
+}
+
+//////////////////////////// Location Form
+
+.text-input {
+    width: 320px;
+    float: left;
+    padding-left: 50px;
+    padding-top: 30px;
+}
+
+.text-input textarea {
+    width: 350px;
+    height: 100px;
+}
+
+.text-input p {
+    color: #999;
+}

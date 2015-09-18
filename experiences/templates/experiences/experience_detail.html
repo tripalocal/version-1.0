@@ -266,7 +266,7 @@
     </div>
 
     {% if experience.type == "PRIVATE" %}
-    <div class="row">
+    <div class="container-fluid">
     <div class="experience-host bio-box">
 
             <h2>{% trans "About the host," %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</h2>
@@ -316,7 +316,6 @@
     {%endif%}
 
     <div class="container-fluid review">
-        <div class="row">
                 <div class="review-box" style="margin-top:50px">
                 {% if experience.review_set.count %}
                     <h2>{{ experience.review_set.count }}{% trans " Review(s)" %} </h2>
@@ -368,7 +367,6 @@
                 {% endif %}
                 </div>
     		</div>
-    </div>
 </div>
     <div class="container-fluid also" style="border-top: 1px solid #CCCCCC; background-color:#FFF;">
     	<div class="container">

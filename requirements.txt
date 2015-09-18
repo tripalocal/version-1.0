@@ -39,3 +39,7 @@ billiard==3.3.0.20
 celery==3.1.18
 django-celery==3.1.16
 kombu==3.0.26
+xmltodict==0.9.2
+pyOpenSSL==0.15.1
+PyYAML==3.11
+openpyxl==2.2.6

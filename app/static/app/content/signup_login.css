@@ -1,5 +1,10 @@
 /*Sign up / Log in page*/
 
+input {
+  min-height: 25px;
+  padding-left: 10px;
+}
+
 .content {
     width: auto;
     margin-left: 2.5vw;

@@ -1,13 +1,13 @@
 {% load staticfiles %}
 
 <!--Selection Panel-->
-<div id="selection-menu" class="calendar">
+<div id="selection-menu" class="form-body">
     <div class="section" id="section-selection-menu">
-        <div id="menu-title">
-            <p><strong>Pricing</strong></p>
+        <div id="menu-title" class="form-info" style="width: 100%; height:auto;">
+            <h3>Pricing</h3>
 
             <p id="menu-title-description">Do you allow anyone to book your experience or would you like to host for
-                private booking only?</p>
+                private groups only?</p>
         </div>
         <div id="menu-selection-left">
 
@@ -27,7 +27,7 @@
 
 
 <!-- Price Panel-->
-<div id="price-form" class="calendar" style="display: none">
+<div id="price-form" class="form-body" style="display: none">
     <div class="section" id="section-add-price">
         <div class="section" id="price-section-header">
             <p>This is a <strong id="type-indicator">public</strong> experience <a id="change-pricing-type-button">&nbsp;&nbsp;&nbsp;Change</a></p>
@@ -48,8 +48,8 @@
         <div id="group-size-section" style="display: block">
             <p id="group-size-heading">Group size</p>
             <br>
-            {{ form.min_guest_number }}
             <p id="group-size-min">Min</p>
+            {{ form.min_guest_number }}
             {{ form.max_guest_number }}
             <p id="group-size-max">Max</p>
             <br><br><br>
@@ -351,10 +351,10 @@
 </div>
 
 <!-- Info bar -->
-<div class="info-bar" style="display: none">
+<div class="form-hint" style="display: none">
     <img src="{% static 'experiences/img/bubble-icon.png' %}" alt="">
 
-    <div id="hint-msgs">
+    <div id="hint-msgs" class="hint-box">
         <p>
             <span><strong>Group size</strong></span><br>
             <span>A lot of our customers travel</span><br>
