@@ -33,7 +33,8 @@ class UserAdmin(UserAdmin):
 
 class ProductI18nInline(admin.StackedInline):
     model = ProductI18n
-    extra = 0
+    verbose_name = "Product detail"
+    extra = 1
 
 
 class ProductPhotoInline(admin.TabularInline):

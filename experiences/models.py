@@ -13,6 +13,7 @@ class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
     language = models.CharField(max_length=2)
 
+
 class WechatProduct(models.Model):
     title = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=6, decimal_places=2)
@@ -217,6 +218,7 @@ class Experience(models.Model):
 
     class Meta:
         ordering = ['id']
+
 
 class ExperienceI18n(models.Model):
     title = models.CharField(max_length=100, null=True)
