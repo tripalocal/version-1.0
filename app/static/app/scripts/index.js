@@ -29,18 +29,6 @@ $(document).ready(function () {
         }
     });
 
-    $(function () {
-        $("#id_start_date").datetimepicker({
-          format: 'YYYY-MM-DD'
-        });
-    });
-
-    $(function () {
-        $("#id_end_date").datetimepicker({
-          format: 'YYYY-MM-DD'
-        });
-    });
-
     var utmId = getParameterByName('utm');
     if (utmId) {
         initial_referrer = "utm" + utmId;
@@ -56,6 +44,33 @@ $(document).ready(function () {
 
     mixpanel.people.set({"Language": language});
     mixpanel.people.set({"$initial_referrer": initial_referrer});
+
+    if (language == "zh-CN") {
+        $(function () {
+            $("#id_start_date").datetimepicker({
+                format: 'YYYY-MM-DD', locale: 'zh-CN'
+            });
+        });
+
+        $(function () {
+            $("#id_end_date").datetimepicker({
+                format: 'YYYY-MM-DD', locale: 'zh-CN'
+            });
+        });
+    }
+    else {
+        $(function () {
+            $("#id_start_date").datetimepicker({
+                format: 'YYYY-MM-DD'
+            });
+        });
+
+        $(function () {
+            $("#id_end_date").datetimepicker({
+                format: 'YYYY-MM-DD'
+            });
+        });
+    }
 
     var video = $("video").get(0);
     $("#enter_fullscreen").click(function () {

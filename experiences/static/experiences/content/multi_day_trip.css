@@ -1,0 +1,71 @@
+h1 {
+  font-size: 32px;
+  font-family: 'Exo', 'Helvetica', 'Arial', sans-serif;
+}
+
+.jumbotron {
+  padding-top: 120px;
+  color: white;
+}
+
+.jumbotron h1 {
+  font-size: 32px;
+  font-family: 'Exo', 'Helvetica', 'Arial', sans-serif;
+  margin-bottom: 30px;
+}
+
+.jumbotron p {
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.jumbotron button {
+  min-width: 200px;
+  height: 42px;
+  border-radius: 3px;
+}
+
+.top {
+  background: linear-gradient(
+     rgba(0, 0, 0, 0.3),
+     rgba(0, 0, 0, 0.3)
+   ),
+   url(../img/experience61_1.jpg) no-repeat center;
+   background-size: cover;
+}
+
+.bottom {
+  background-position: center;
+  background-size: cover;
+}
+
+.container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.exp-box {
+  text-align: center;
+  background-color: white;
+  padding-bottom: 20px;
+  border-radius: 3px;
+}
+
+.exp-box p {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.price-box-sm {
+  width: 120px;
+  border: 1px solid #ccc;
+  text-align: center;
+  display: inline-block;
+  padding: 5px 10px 5px 10px;
+  margin: 0 10px 0 10px;
+  border-radius: 3px;
+}
+
+.price-box-sm p {
+  font-weight: normal;
+}

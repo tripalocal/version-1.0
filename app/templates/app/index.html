@@ -240,6 +240,9 @@
 {% block scripts %}
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+    {%if LANGUAGE == "zh-CN"%}
+    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+    {%endif%}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/index.js' %}"></script>
     <script charset="utf-8" type="text/javascript">
     $("#video-fullscreen").hide();
