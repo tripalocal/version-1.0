@@ -43,18 +43,6 @@ class ProductPhotoInline(admin.TabularInline):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    fieldsets = (
-        ('Product summary', {
-            'fields': (
-                'duration_in_min', 'min_group_size', 'book_in_advance', 'instant_booking',
-                'free_translation',
-                'order_on_holiday')
-        }),
-        ('Pricing rule', {
-            'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
-        }),
-    )
-
     inlines = [ProductPhotoInline, ProductI18nInline]
 
     def get_queryset(self, request):
@@ -64,9 +52,34 @@ class ProductAdmin(admin.ModelAdmin):
         return qs.filter(provider=request.user.provider)
 
     def get_form(self, request, obj=None, **kwargs):
-        self.exclude = []
+        fieldsets = (
+            ('Admin', {'fields': ('provider',)}),
+            ('Product summary', {
+                'fields': (
+                    'duration_in_min', 'min_group_size', 'book_in_advance', 'instant_booking',
+                    'free_translation',
+                    'order_on_holiday')
+            }),
+            ('Pricing rule', {
+                'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
+            }),
+        )
+
+        fieldsets2 = (
+            ('Product summary', {
+                'fields': (
+                    'duration_in_min', 'min_group_size', 'book_in_advance', 'instant_booking',
+                    'free_translation',
+                    'order_on_holiday')
+            }),
+            ('Pricing rule', {
+                'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
+            }),
+        )
         if not request.user.is_superuser:
-            self.exclude.append('provider')
+            self.fieldsets = fieldsets2
+        else:
+            self.fieldsets = fieldsets
         return super(ProductAdmin, self).get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
