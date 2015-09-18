@@ -241,6 +241,12 @@
         });
     }
 
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
 
     $(document).ready(function () {
         var popupTimmer;
@@ -370,6 +376,11 @@
                 $('#id_menu').attr('hide', 'true');
             }
         });
+
+        var utmId = getParameterByName('utm');
+        if (utmId) {
+            mixpanel.track("utm"+utmId);
+        }
     });
 
     </script>
@@ -446,10 +457,4 @@ type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
 <!--End of Zopim Live Chat Script-->
 {%endif%}
 
-<script type="text/javascript">
-    var utmId = getParameterByName('utm');
-    if (utmId) {
-        mixpanel.track("utm"+utmId);
-    }
-</script>
 </html>
