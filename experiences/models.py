@@ -4,11 +4,9 @@ from django.http import Http404
 from django.db import models
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _
 from datetime import datetime
 from django.utils import timezone
 from allauth.socialaccount.models import SocialAccount
-import hashlib
 from Tripalocal_V1 import settings
 
 class ExperienceTag(models.Model):
@@ -23,6 +21,7 @@ class WechatProduct(models.Model):
     def __str__(self):
         return self.title
 
+
 class WechatBooking(models.Model):
     product = models.ForeignKey(WechatProduct)
     datetime = models.DateTimeField(default=timezone.now, blank=True)
@@ -33,6 +32,98 @@ class WechatBooking(models.Model):
 
     def __str__(self):
         return self.trade_no
+
+
+class Provider(models.Model):
+    user = models.OneToOneField(User, null=True)
+    company = models.CharField(max_length=100)
+    website = models.CharField(max_length=50, blank=True)
+    email = models.CharField(max_length=30, blank=True)
+    phone_number = models.CharField(max_length=15, blank=True)
+
+    def __str__(self):
+        return self.company
+
+
+class Product(models.Model):
+    NORMAL = 'NORMAL'
+    AGE_PRICE = 'AGE'
+    DYNAMIC = 'DYNAMIC'
+
+    PRICE_CHOICES = (
+        (NORMAL, 'Normal price per person'),
+        (AGE_PRICE, 'Price for different age group'),
+        (DYNAMIC, 'Dynamic price'),
+    )
+
+    provider = models.ForeignKey(Provider)
+    price_type = models.CharField(max_length=6, choices=PRICE_CHOICES, default=NORMAL,
+                                  help_text="Only one of the price type will take effact.")
+    normal_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    dynamic_price = models.CharField(max_length=100, blank=True)
+    adult_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    adult_age = models.IntegerField(blank=True, null=True, help_text="Above what age should pay adult price.")
+
+    duration_in_min = models.IntegerField(blank=True, null=True, help_text="How long will it be in minutes?")
+    min_group_size = models.IntegerField(blank=True, null=True)
+    book_in_advance = models.IntegerField(blank=True, null=True)
+    instant_booking = models.TextField(blank=True)
+    free_translation = models.BooleanField(default=False)
+    order_on_holiday = models.BooleanField(default=False, help_text="If supplier take order during weekend and holiday "
+                                                                    "particularly instant order during holiday")
+
+    def __str__(self):
+        t = self.get_product_title(settings.LANGUAGES[0][0])
+        return str(self.id) + '--' + t
+
+    def get_product_title(self, lang):
+        if self.producti18n_set is not None and len(self.producti18n_set.all()) > 0:
+            t = self.producti18n_set.filter(language=lang)
+            if len(t)>0:
+                return t[0].title
+            else:
+                return self.producti18n_set.all()[0].title
+        else:
+            return ''
+
+
+class ProductI18n(models.Model):
+    EN = 'en'
+    ZH = 'zh'
+
+    LANG_CHOICES = (
+        (EN, 'English'),
+        (ZH, '中文'),
+    )
+
+    language = models.CharField(max_length=3, choices=LANG_CHOICES, default=EN)
+    product = models.ForeignKey(Product)
+    title = models.CharField(max_length=100)
+    location = models.TextField(blank=True)
+    background_info = models.TextField(blank=True)
+    description = models.TextField(blank=True)
+    service = models.TextField(blank=True)
+    highlights = models.TextField(blank=True)
+    schedule = models.TextField(blank=True)
+    ticket_use_instruction = models.TextField(blank=True)
+    refund_policy = models.TextField(blank=True)
+    notice = models.TextField(blank=True)
+    tips = models.TextField(blank=True)
+    whats_included = models.TextField(blank=True,
+                                      help_text="What's included in the price (pickup/meal/drink/certificate/photo)")
+    pickup_detail = models.TextField(blank=True)
+    combination_options = models.TextField(blank=True,
+                                           help_text="Combination option (for example the client can tick to choose "
+                                                     "whether to add translator or driver into the tour, and we can "
+                                                     "set standard price for different durations of such service "
+                                                     "provided)")
+    insurance = models.TextField(blank=True)
+    disclaimer = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.title
+
 
 class Experience(models.Model):
     type = models.CharField(max_length=50)
