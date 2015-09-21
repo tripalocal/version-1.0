@@ -31,7 +31,7 @@
           <div class="container">
             <div class="row">
 
-              <div class="col-sm-6">
+              <div class="col-md-6 top-field">
                 <div style="vertical-align: middle;">
                   <h3 class="field-header"> {% trans 'Location' %}</h3>
                   <div class="ui selection dropdown">
@@ -56,7 +56,7 @@
                 </div>
 
                 <div style="vertical-align: middle; padding-top: 10px;">
-                  <h3 class="field-header" style="margin-right: 8px;"> {% trans 'Group size' %} </h3>
+                  <h3 class="field-header" style="margin-right: 45px;"> {% trans 'Date' %} </h3>
                   <div class="start-date">
                       {{form.start_date}}
                   </div>
@@ -67,7 +67,7 @@
                 </div>
               </div>
 
-              <div class ="col-sm-6">
+              <div class ="col-md-6 bottom-field">
                 <div style="vertical-align: middle;">
                   <div class="checkbox-primary">
                     <div class="checkbox-inline">
@@ -123,10 +123,6 @@
             </div>
         </div>
 
-        <div class="mobile-search">
-            <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>
-            <img src="{{ MEDIA_URL }}search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
-        </div>
     </form>
 
     <div class="search-result">

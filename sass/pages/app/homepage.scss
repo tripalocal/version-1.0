@@ -29,7 +29,7 @@ h1 {
     color: white;
   }
 
-  .navbar-brand {
+  .navbar-header {
     display: none;
   }
 
@@ -37,10 +37,45 @@ h1 {
     display: none;
   }
 
+  .navbar-collapse {
+    background-color: transparent;
+    border: 0;
+  }
+
+  .navbar-right {
+    @include media('<tablet') {
+      display: inline-block;
+      float: right;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    @include media('<phone') {
+      float: none;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  .nav {
+    > li {
+      @include media('<tablet') {
+        display: inline-block;
+        position: relative;
+        float: left;
+      }
+    }
+  }
+
   .btn-clear {
     background-color: transparent;
     border-color: white;
     color: white;
+    @include media('<tablet') {
+      margin-top: 10px;
+    }
+    @include media('<phone') {
+      display: none;
+    }
     &:hover {
       background-color: transparentize(black, 0.7);
       border-color: white;
@@ -59,16 +94,29 @@ h1 {
   }
 }
 
+@media (max-width: 767px) {
+  .navbar-nav .open .dropdown-menu {
+      background-color: white;
+      position: absolute;
+      right: 0;
+      left: auto;
+    }
+  .navbar-nav>li>a {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+}
+
 // Brand logo with centred search bar
 .jumbotron {
 
   .homepage-logo {
-    height: 190px;
+    height: 200px;
     margin: 0 auto;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-
+    margin-top: 20px;
     @include media('>tablet') {
       height: 240px;
       margin-top: 80px;
@@ -216,9 +264,6 @@ h1 {
       transition: background-color 0.4s;
     }
 
-    @include media('>tablet') {
-
-    }
   }
 
   .city {

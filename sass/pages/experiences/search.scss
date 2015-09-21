@@ -24,6 +24,12 @@
   border-bottom: 1px solid $light-grey;
   .container {
     padding: 0;
+    @include media('<desktop') {
+      width: 430px;
+    }
+    @include media('<phone') {
+      width: 300px;
+    }
   }
 }
 
@@ -61,6 +67,11 @@
     }
 }
 
+.ui.dropdown.smaller-box.selection, .checkbox-inline {
+  @include media('<phone') {
+    display: none;
+  }
+}
 
 .checkbox-primary {
   padding: 5px;
@@ -73,9 +84,10 @@
   margin-right: 7px;
 }
 
-.language {
-  border-right: 1px solid $light-grey;
-
+.top-field {
+  @include media('<desktop') {
+    margin-bottom: 15px;
+  }
 }
 
 // Advanced search
@@ -87,6 +99,12 @@
   padding-bottom: 20px;
   .container {
     padding: 0;
+  }
+}
+
+.bottom-field {
+  @include media('<desktop') {
+    display: none;
   }
 }
 
@@ -104,18 +122,11 @@
 
 .more-filters {
   display: none;
-  @include media('>tablet') {
+  @include media('>=desktop') {
     display: block;
     margin-top: 20px;
     width: 100%;
     height: 50px;
-  }
-}
-
-// Mobile search
-.mobile-search {
-  @include media('>tablet') {
-    display: none;
   }
 }
 
@@ -138,11 +149,10 @@
   }
 }
 
-.experience-results {
-  width: 960px;
-  margin: 0 auto;
-  @include media('<=tablet') {
-    width: 100%;
+.exp-box {
+  @include media('>tablet', '<desktop') {
+    margin-right: 30px;
+    margin-left: 30px;
   }
 }
 
