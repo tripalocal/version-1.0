@@ -8,6 +8,8 @@ from datetime import datetime
 from django.utils import timezone
 from allauth.socialaccount.models import SocialAccount
 from Tripalocal_V1 import settings
+from polymorphic import PolymorphicModel
+
 
 class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
@@ -44,6 +46,8 @@ class Provider(models.Model):
 
     def __str__(self):
         return self.company
+
+
 
 
 class Product(models.Model):
@@ -126,7 +130,11 @@ class ProductI18n(models.Model):
         return self.title
 
 
-class Experience(models.Model):
+class AbstractExperience(PolymorphicModel):
+    pass
+
+
+class Experience(AbstractExperience):
     type = models.CharField(max_length=50)
     language = models.CharField(max_length=50)
 
@@ -300,7 +308,7 @@ class Photo(models.Model):
     name = models.CharField(max_length=50)
     directory = models.CharField(max_length=50)
     image = models.ImageField(upload_to=upload_path)
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
 
 
 class ProductPhoto(models.Model):
@@ -314,7 +322,7 @@ class ProductPhoto(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(User)
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
     comment = models.TextField()
     rate = models.IntegerField()
     datetime = models.DateTimeField()
@@ -340,7 +348,7 @@ class Booking(models.Model):
     coupon = models.ForeignKey(Coupon)
     coupon_extra_information = models.TextField()
     guest_number = models.IntegerField()
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
     datetime = models.DateTimeField()
     status = models.CharField(max_length=50)
     submitted_datetime = models.DateTimeField()
@@ -780,3 +788,4 @@ def set_exp_dropoff_spot_all_langs(exp, meetup_spot, lang, other_lang):
     set_exp_dropoff_spot(exp, meetup_spot, lang)
     if not has_dropoff_spot_in_other_lang(exp, other_lang):
         set_exp_dropoff_spot(exp, meetup_spot, other_lang)
+
