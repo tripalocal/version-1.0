@@ -3,7 +3,7 @@ from django.conf.urls import patterns
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon, WechatProduct, WechatBooking, \
-    Product, ProductI18n, Provider, ProductPhoto
+    NewProduct, NewProductI18n, Provider, Photo
 from experiences.views import create_experience
 from app.models import RegisteredUser
 from allauth.socialaccount.models import SocialAccount
@@ -32,13 +32,13 @@ class UserAdmin(UserAdmin):
 
 
 class ProductI18nInline(admin.StackedInline):
-    model = ProductI18n
+    model = NewProductI18n
     verbose_name = "Product detail"
     extra = 1
 
 
 class ProductPhotoInline(admin.TabularInline):
-    model = ProductPhoto
+    model = Photo
     extra = 3
 
 
@@ -116,7 +116,7 @@ admin.site.register(Booking)
 admin.site.register(Coupon)
 admin.site.register(WechatProduct)
 admin.site.register(WechatBooking, WechatBookingAdmin)
-admin.site.register(Product, ProductAdmin)
+admin.site.register(NewProduct, ProductAdmin)
 admin.site.register(Provider, ProviderAdmin)
 #admin.site.register(Email)
 #admin.site.register(SocialAccount)
