@@ -223,9 +223,7 @@
 						</div>
 					</div>
 
-                    <div id="carousel_box">
-                        <br>
-                        <div id="myCarousel" class="carousel " data-ride="carousel">
+                        <div id="myCarousel" class="carousel slide" data-ride="carousel">
                             <!-- Indicators -->
                             <ol class="carousel-indicators" style="position:absolute; bottom: -45px;">
                             {% for photo in experience.photo_set.all %}
@@ -261,7 +259,6 @@
                             </a>
                         </div>
                     </div>
-                </div>
             </div>
     </div>
 
@@ -385,16 +382,17 @@
                             </div>
                         </a>
                         <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
-                        <div class="profile-sm">
-                            <img src="{% with related_experience.hosts.all|first as host %}
-                                            {% if host.registereduser.image_url %}
+                        <div class="profile-frame-sm">
+                        <div class="profile-sm"
+                             style="background-image:url({% with related_experience.hosts.all|first as host %}
+                                        {% if host.registereduser.image_url %}
                                                 {{ MEDIA_URL }}{{ host.registereduser.image_url }}
                                             {% else %}
                                                 {{ MEDIA_URL }}img/profile_default.jpg
                                             {% endif %}
-                                        {% endwith %}"
-                                 height="240">
-						</div>
+                                        {% endwith %})">
+                                      </div>
+						            </div>
 
                         <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
                         <div class="listing-footer">

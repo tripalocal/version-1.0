@@ -56,6 +56,12 @@ h1 {
   font-weight: 500;
 }
 
+@media (max-width: 767px) {
+  .exp-box h3, .exp-box p {
+     margin-left: 0;
+  }
+}
+
 .price-box-sm {
   width: 120px;
   border: 1px solid #ccc;

@@ -3,7 +3,7 @@ from django.conf.urls import patterns
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon, WechatProduct, WechatBooking, \
-    Product, ProductI18n, Provider, ProductPhoto
+    NewProduct, NewProductI18n, Provider, Photo
 from experiences.views import create_experience
 from app.models import RegisteredUser
 from allauth.socialaccount.models import SocialAccount
@@ -32,29 +32,17 @@ class UserAdmin(UserAdmin):
 
 
 class ProductI18nInline(admin.StackedInline):
-    model = ProductI18n
+    model = NewProductI18n
     verbose_name = "Product detail"
     extra = 1
 
 
 class ProductPhotoInline(admin.TabularInline):
-    model = ProductPhoto
+    model = Photo
     extra = 3
 
 
 class ProductAdmin(admin.ModelAdmin):
-    fieldsets = (
-        ('Product summary', {
-            'fields': (
-                'duration_in_min', 'min_group_size', 'book_in_advance', 'instant_booking',
-                'free_translation',
-                'order_on_holiday')
-        }),
-        ('Pricing rule', {
-            'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
-        }),
-    )
-
     inlines = [ProductPhotoInline, ProductI18nInline]
 
     def get_queryset(self, request):
@@ -64,9 +52,34 @@ class ProductAdmin(admin.ModelAdmin):
         return qs.filter(provider=request.user.provider)
 
     def get_form(self, request, obj=None, **kwargs):
-        self.exclude = []
+        fieldsets = (
+            ('Admin', {'fields': ('provider',)}),
+            ('Product summary', {
+                'fields': (
+                    'duration_in_min', 'min_group_size', 'book_in_advance', 'instant_booking',
+                    'free_translation',
+                    'order_on_holiday')
+            }),
+            ('Pricing rule', {
+                'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
+            }),
+        )
+
+        fieldsets2 = (
+            ('Product summary', {
+                'fields': (
+                    'duration_in_min', 'min_group_size', 'book_in_advance', 'instant_booking',
+                    'free_translation',
+                    'order_on_holiday')
+            }),
+            ('Pricing rule', {
+                'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
+            }),
+        )
         if not request.user.is_superuser:
-            self.exclude.append('provider')
+            self.fieldsets = fieldsets2
+        else:
+            self.fieldsets = fieldsets
         return super(ProductAdmin, self).get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
@@ -103,7 +116,7 @@ admin.site.register(Booking)
 admin.site.register(Coupon)
 admin.site.register(WechatProduct)
 admin.site.register(WechatBooking, WechatBookingAdmin)
-admin.site.register(Product, ProductAdmin)
+admin.site.register(NewProduct, ProductAdmin)
 admin.site.register(Provider, ProviderAdmin)
 #admin.site.register(Email)
 #admin.site.register(SocialAccount)

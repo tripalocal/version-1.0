@@ -118,49 +118,78 @@
 <!-- Header navbar -->
     <div class="navbar navbar-static-top">
       <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-items" aria-expanded="false">
+        <div class="navbar-header navbar-default">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-collapse" aria-expanded="false">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="https://www.tripalocal.com{{GEO_POSTFIX}}">
-            <img alt="Tripalocal" src="{{ MEDIA_URL }}img/tripalocal_Logo.png" width="115" height="39">
+            {% if LANGUAGE == "zh-CN" %}
+            <img alt="Tripalocal" src="{{ MEDIA_URL }}img/top_logo-cn.svg" width="115" height="39">
+            {% else %}
+            <img alt="Tripalocal" src="{{ MEDIA_URL }}img/top_logo-en.svg" width="115" height="39">
+            {% endif %}
           </a>
         </div>
-        <div class="collapse navbar-collapse" id="menu-items">
-            {% if user.is_authenticated %}
-                <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right"
-                   href="https://www.tripalocal.com{% if LANGUAGE == "zh-CN" %}{{ request.path|slice:"3:" }}{% else %}/cn{{ request.path }}{% endif %}">
-                    {% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a>
 
-                <a type="button" class="btn btn-secondary navbar-btn navbar-right"
-                   href="{{ GEO_POSTFIX }}accounts/logout/">{% trans "Log out" %}</a>
-                <p class="navbar-text navbar-right">{{ user.first_name }}</p>
-                <div class="profile-navbar navbar-btn navbar-right" id="id_profile_div"
-                     style="background:url({% if user.socialaccount_set.all %}
-                         http://graph.facebook.com/{{ user.socialaccount_set.all.0.uid }}/picture?width=40&height=40
-                     {% elif user.registereduser.image_url and user.registereduser.image_url.strip %}
-                         {{ MEDIA_URL }}{{ user.registereduser.image_url }}
-                     {% else %}
-                         {{ MEDIA_URL }}img/profile_default.jpg
-                     {% endif %});
-                    background-size: cover; background-repeat: no-repeat; background-position:center;"><a style="display:block; width:38px; height:38px; border-radius:100px;"
-                        href="{{ GEO_POSTFIX }}myprofile"></a>
-                </div>
-            {% else %}
-                <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right"
-                   href="https://www.tripalocal.com{% if LANGUAGE == "zh-CN" %}{{ request.path|slice:"3:" }}{% else %}/cn{{ request.path }}{% endif %}">
-                    {% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a>
-                <a type="button" class="btn btn-secondary navbar-btn navbar-right"
-                   href="{{ GEO_POSTFIX }}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a>
-                <a type="button" class="btn btn-secondary navbar-btn navbar-right"
-                   href="{{ GEO_POSTFIX }}accounts/login/?next={{ request.path }}">{% trans "Log in" %}</a>
-            {% endif %}
+          <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right" style="min-width: 75px;"
+          href="https://www.tripalocal.com{% if LANGUAGE == "zh-CN" %}{{ request.path|slice:"3:" }}{% else %}/cn{{ request.path }}{% endif %}">
+          {% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}
+          </a>
+
+          {% if user.is_authenticated %}
+          <ul class="nav navbar-nav navbar-right">
+            <li><div class="navbar-btn profile-navbar" id="id_profile_div"
+                       style="background:url({% if user.socialaccount_set.all %}
+                           http://graph.facebook.com/{{ user.socialaccount_set.all.0.uid }}/picture?width=40&height=40
+                       {% elif user.registereduser.image_url and user.registereduser.image_url.strip %}
+                           {{ MEDIA_URL }}{{ user.registereduser.image_url }}
+                       {% else %}
+                           {{ MEDIA_URL }}img/profile_default.jpg
+                       {% endif %});
+                      background-size: cover; background-repeat: no-repeat; background-position:center; margin-top: 8px; margin-bottom: 8px;"><a style="display:block; width:34px; height:34px; border-radius:100px;"
+                          href="{{ GEO_POSTFIX }}myprofile"></a>
+                  </div>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="background-color:transparent;">{{ user.first_name }}<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ GEO_POSTFIX }}mylisting">{% trans 'My Listing' %}</a></li>
+                <li><a href="{{ GEO_POSTFIX }}myreservation">{% trans 'My Reservations' %}</a></li>
+                <li role="separator" class="divider"></li>
+                <li style="position: relative; text-align: center;"><span class="bus-icon"></span><a href="{{ GEO_POSTFIX }}mytrip">{% trans 'My Trips' %}</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="{{ GEO_POSTFIX }}myprofile">{% trans 'Edit Profile' %}</a></li>
+                <li><a href="{{ GEO_POSTFIX }}accounts/password/change/">{% trans 'Account Settings' %}</a></li>
+                <li><a href="{{ GEO_POSTFIX }}accounts/logout/">{% trans "Logout" %}</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          {% else %}
+          <a type="button" class="btn btn-secondary navbar-btn navbar-right"
+             href="{{ GEO_POSTFIX }}accounts/login/?next={{ request.path }}">{% trans "Login" %}
+          </a>
+          <a type="button" class="btn btn-secondary navbar-btn navbar-right"
+             href="{{ GEO_POSTFIX }}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}
+          </a>
+          {% endif %}
+
+        <div class="collapse navbar-collapse" id="main-menu-collapse">
+          <ul class="nav navbar-nav main-menu">
+            <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
+            <li><a href="#">{% trans 'Experiences' %}</a></li>
+            <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
+            <li class="visible-xs"><a href="{{ GEO_POSTFIX }}myprofile">{% trans 'My Profile' %}</a></li>
+            <li class="visible-xs"><a href="https://www.tripalocal.com{% if LANGUAGE == 'zh-CN' %}{{ request.path|slice:'3:' }}{% else %}/cn{{ request.path }}{% endif %}" style="border: 0;">{% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a></li>
+          </ul>
         </div>
+
       </div>
     </div>
+
 
     {% block content %}{% endblock %}
 
@@ -177,7 +206,6 @@
                     <li class="footer-logo"></li>
                 </ul>
             </div>
-
 
             <div class="col-xs-6 col-sm-2">
                 <ul class="footer-col company">
@@ -250,6 +278,7 @@
     }
 
     $(document).ready(function () {
+      $("a[href*='" + location.pathname + "']").addClass("current");
         var popupTimmer;
 
         if ($(window).width() > 520) {
@@ -313,7 +342,7 @@
                 message = $('#popup-form-details').val();
 
                 if (!message || !email) {
-                    $('#results').html("<p class='popup-result'>{% trans 'Please fill in all fields.' &}</p>");
+                    $('#results').html("<p class='popup-result'>{% trans 'Please fill in all fields.' %}</p>");
                 } else {
                     var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
                     if (regex.test(email)) {
