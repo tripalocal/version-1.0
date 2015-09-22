@@ -187,6 +187,7 @@ INSTALLED_APPS = (
     'storages',
     'kombu.transport.django',
     'djcelery',
+    'polymorphic',
 )
 
 # A sample logging configuration. The only tangible logging

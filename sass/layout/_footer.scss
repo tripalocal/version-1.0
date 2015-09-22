@@ -30,9 +30,10 @@
 }
 
 .footer-head {
-  margin-left: 30px;
-  list-style: none;
   text-align: center;
+  @include media('<tablet') {
+    padding-bottom: 20px;
+  }
   select {
     height: 50px;
     width: 210px;
@@ -67,7 +68,6 @@
 }
 
 .footer-line {
-  width: 940px;
   border-top: 1px $medium-grey solid;
   clear: both;
   margin: auto;

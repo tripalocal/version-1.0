@@ -16,14 +16,25 @@
 // Search form
 
 .basic-search {
-  display: none;
-  @include media('>tablet') {
-    display: block;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border-top: 1px solid $light-grey;
-    border-bottom: 1px solid $light-grey;
+  color: $dark-grey;
+  display: block;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-top: 1px solid $light-grey;
+  border-bottom: 1px solid $light-grey;
+  .container {
+    padding: 0;
+    @include media('<desktop') {
+      width: 430px;
+    }
+    @include media('<phone') {
+      width: 300px;
+    }
   }
+}
+
+.form-control {
+  height: 30px;
 }
 
 .icon-header {
@@ -31,82 +42,91 @@
   margin-top: 15px;
 }
 
-.dates {
-  border-right: 1px solid $light-grey;
-  .form-box {
-    width: 200px;
-  }
+.ui.selection.dropdown {
+  min-height: 0;
+  height: 30px;
+  width: 210px;
+  line-height: 0.7;
+  color: inherit;
+  margin-right: 10px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+.ui.dropdown>.dropdown.icon {
+  line-height: inherit;
+}
 
-  .start-date {
-    margin-right: 10px;
-  }
-
-  .start-date, .end-date {
+.start-date, .end-date {
     display: inline-block;
-    width: 92px;
-    margin-top: 10px;
-  }
+    vertical-align: middle;
+    width: 100px;
+    height: 30px;
+    margin-right: 5px;
+    input {
+      border-radius: 3px;
+    }
+}
 
-  .date {
-    width: 93px;
+.ui.dropdown.smaller-box.selection, .checkbox-inline {
+  @include media('<phone') {
+    display: none;
   }
 }
 
-.people {
-  border-right: 1px solid $light-grey;
-  .form-box {
-    width: 120px;
-    margin-top: 15px;
-  }
-
+.checkbox-primary {
+  padding: 5px;
+  background-color: rgb(226, 226, 226);
+  border: 1px solid $light-grey;
+  border-radius: 3px;
+  width: 150px;
+  height: 30px;
+  display: inline-block;
+  margin-right: 7px;
 }
 
-.language {
-  border-right: 1px solid $light-grey;
-
+.top-field {
+  @include media('<desktop') {
+    margin-bottom: 15px;
+  }
 }
 
 // Advanced search
 .advanced-search {
+  color: $dark-grey;
   background-color: white;
   border-bottom: 1px solid $light-grey;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 20px;
+  padding-bottom: 20px;
   .container {
-    width: 960px;
+    padding: 0;
+  }
+}
+
+.bottom-field {
+  @include media('<desktop') {
+    display: none;
   }
 }
 
 .interests {
+  height: 70px;
   .icon-header {
-    float: left;
+    display: inline-block;
   }
   .form-box {
-    float: left;
-    margin-left: 15px;
-  }
-  #tags_div {
-    width: 640px;
-  }
-  #only_tags {
-    width: 190px;
+    display:inline-block;
+    margin-left: 20px;
+    width: 900px;
   }
 }
 
 .more-filters {
   display: none;
-  @include media('>tablet') {
+  @include media('>=desktop') {
     display: block;
     margin-top: 20px;
     width: 100%;
     height: 50px;
-  }
-}
-
-// Mobile search
-.mobile-search {
-  @include media('>tablet') {
-    display: none;
   }
 }
 
@@ -127,17 +147,12 @@
       padding: 0;
     }
   }
-  .container-fluid {
-    @include media('<tablet') {
-      padding: 0;
-    }
-  }
-  .experience-results {
-    width: 960px;
-    margin: 0 auto;
-    @include media('<tablet') {
-      width: 100%;
-    }
+}
+
+.exp-box {
+  @include media('>tablet', '<desktop') {
+    margin-right: 30px;
+    margin-left: 30px;
   }
 }
 
