@@ -2421,40 +2421,40 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                                     rateList.insert(counter, rate)
                                 break
 
-                cityExperienceList.insert(counter, experience)
-                cityExperienceReviewList.insert(counter, getNReviews(experience.id))
-                # Fetch BGImageURL
-                BGImageURL = getBGImageURL(experience.id)
-                if (BGImageURL):
-                    BGImageURLList.insert(counter, BGImageURL)
+            cityExperienceList.insert(counter, experience)
+            cityExperienceReviewList.insert(counter, getNReviews(experience.id))
+            # Fetch BGImageURL
+            BGImageURL = getBGImageURL(experience.id)
+            if (BGImageURL):
+                BGImageURLList.insert(counter, BGImageURL)
+            else:
+                BGImageURLList.insert(counter, "default_experience_background.jpg")
+
+            if type != 'product':
+                # Fetch profileImageURL
+                profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+                if (profileImageURL):
+                    profileImageURLList.insert(counter, profileImageURL)
                 else:
-                    BGImageURLList.insert(counter, "default_experience_background.jpg")
+                    profileImageURLList.insert(counter, "profile_default.jpg")
 
-                if type != 'product':
-                    # Fetch profileImageURL
-                    profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
-                    if (profileImageURL):
-                        profileImageURLList.insert(counter, profileImageURL)
-                    else:
-                        profileImageURLList.insert(counter, "profile_default.jpg")
+            # Format title & Description
+            if type == 'product':
+                experience.description = experience.get_product_description(settings.LANGUAGES[0][0])
+                t = experience.get_product_title(settings.LANGUAGES[0][0])
+            else:
+                experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
+                t = get_experience_title(experience, settings.LANGUAGES[0][0])
 
-                # Format title & Description
-                if type == 'product':
-                    experience.description = experience.get_product_description(settings.LANGUAGES[0][0])
-                    t = experience.get_product_title(settings.LANGUAGES[0][0])
-                else:
-                    experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
-                    t = get_experience_title(experience, settings.LANGUAGES[0][0])
+            if float(experience.duration).is_integer():
+                experience.duration = int(experience.duration)
 
-                if float(experience.duration).is_integer():
-                    experience.duration = int(experience.duration)
+            if (t != None and len(t) > 40):
+                formattedTitleList.insert(counter, t[:37] + "...")
+            else:
+                formattedTitleList.insert(counter, t)
 
-                if (t != None and len(t) > 40):
-                    formattedTitleList.insert(counter, t[:37] + "...")
-                else:
-                    formattedTitleList.insert(counter, t)
-
-                i += 1
+            i += 1
 
         if not settings.DEVELOPMENT:
             mp = Mixpanel(settings.MIXPANEL_TOKEN)
