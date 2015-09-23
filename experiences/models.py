@@ -241,6 +241,8 @@ class NewProduct(AbstractExperience):
     )
 
     provider = models.ForeignKey(Provider)
+    city = models.CharField(max_length=50)
+    language = models.CharField(max_length=50, default="english")
     price_type = models.CharField(max_length=6, choices=PRICE_CHOICES, default=NORMAL,
                                   help_text="Only one of the price type will take effact.")
     normal_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
@@ -251,6 +253,7 @@ class NewProduct(AbstractExperience):
 
     duration_in_min = models.IntegerField(blank=True, null=True, help_text="How long will it be in minutes?")
     min_group_size = models.IntegerField(blank=True, null=True)
+    max_group_size = models.IntegerField(blank=True, null=True)
     book_in_advance = models.IntegerField(blank=True, null=True)
     instant_booking = models.TextField(blank=True)
     free_translation = models.BooleanField(default=False)

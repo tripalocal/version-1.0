@@ -2246,7 +2246,7 @@ def manage_listing_continue(request, exp_id):
     return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
-               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
+               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False,  type='experience'):
 
     form = SearchForm()
     form.data = form.data.copy()
@@ -2288,46 +2288,54 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             break
 
     if request.is_ajax():
+        if type == 'product':
+            experienceList = NewProduct.objects.filter(city__iexact=city)
+        else:
+            experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(
+                type__iexact="multi-hosts")
+
         # Add all experiences that belong to the specified city to a new list
         # alongside a list with all the number of reviews
-        experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(type__iexact="multi-hosts")
+        # experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(type__iexact="multi-hosts")
 
-        if is_kids_friendly:
-            experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
-        if is_host_with_cars:
-            experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
-        if is_private_tours:
-            experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
+            if is_kids_friendly:
+                experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
+            if is_host_with_cars:
+                experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
+            if is_private_tours:
+                experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
 
         i = 0
         while i < len(experienceList):
             experience = experienceList[i]
+            if type != 'product':
 
-            setExperienceDisplayPrice(experience)
+                setExperienceDisplayPrice(experience)
 
-            if start_date is not None and experience.end_datetime < start_date :
-                i += 1
-                continue
+                if start_date is not None and experience.end_datetime < start_date :
+                    i += 1
+                    continue
 
-            if end_date is not None and experience.start_datetime > end_date:
-                i += 1
-                continue
+                if end_date is not None and experience.start_datetime > end_date:
+                    i += 1
+                    continue
 
-            if guest_number is not None and len(guest_number) > 0 and experience.guest_number_max < int(guest_number):
-                i += 1
-                continue
+                # todo: guest_number should be working
+                if guest_number is not None and len(guest_number) > 0 and experience.guest_number_max < int(guest_number):
+                    i += 1
+                    continue
 
-                experience_tags = get_experience_tags(experience, settings.LANGUAGES[0][0])
-                if keywords is not None and len(keywords) > 0 and experience_tags is not None and len(experience_tags) > 0:
-                    tags = keywords.strip().split(",")
-                    match = False
-                    for tag in tags:
-                        if tag.strip() in experience_tags:
-                            match = True
-                            break
-                    if not match:
-                        i += 1
-                        continue
+                    experience_tags = get_experience_tags(experience, settings.LANGUAGES[0][0])
+                    if keywords is not None and len(keywords) > 0 and experience_tags is not None and len(experience_tags) > 0:
+                        tags = keywords.strip().split(",")
+                        match = False
+                        for tag in tags:
+                            if tag.strip() in experience_tags:
+                                match = True
+                                break
+                        if not match:
+                            i += 1
+                            continue
 
             if language is not None and len(language) > 0 and experience.language is not None and len(experience.language) > 0:
                 experience_language = experience.language.split(";")
