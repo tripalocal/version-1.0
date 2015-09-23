@@ -1,4 +1,4 @@
-"""
+﻿"""
 Definition of views.
 """
 from time import gmtime
