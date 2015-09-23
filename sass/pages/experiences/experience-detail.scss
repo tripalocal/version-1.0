@@ -149,6 +149,9 @@
   }
   @include media('<tablet') {
     margin-top: 25px;
+    margin-left: 0;
+    width: 100%;
+    padding-right: 15px;
   }
 }
 
@@ -173,7 +176,9 @@
   height: 70px;
   padding-top: 10px;
   padding-left: 40px;
-
+  @include media('<tablet') {
+    padding-left: 0;
+  }
   span {
     display: block;
     color: #666;
@@ -191,6 +196,9 @@
   position: relative;
   float: left;
   margin-right: 90px;
+  @include media('<phone') {
+    margin-right: 15px;
+  }
 }
 
 .host-facebook,
@@ -229,6 +237,9 @@
     float: left;
     margin-top: 12px;
     margin-right:20px;
+  }
+  @include media('<phone') {
+    padding-left: 0;
   }
 }
 
