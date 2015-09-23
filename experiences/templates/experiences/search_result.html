@@ -337,8 +337,8 @@
 
         $('#itinerary-search').on('click', function (event) {
             event.preventDefault();
-            var href = cityToHref(location.href, $("#id_city").val());
-
+{#            var href = cityToHref(location.href, $("#id_city").val());#}
+            var href = '{{GEO_POSTFIX}}{{ type }}/' + $("#id_city").val() + '/';
             history.pushState({}, 'City', href);
             loadExperienceList(href);
         });
@@ -356,7 +356,7 @@
     });
 
     $("#id_city").change(function(e){
-{#        $("#search_form")[0].action = "{{GEO_POSTFIX}}s/" + $("#id_city").val() + "/";#}
+        $("#search_form")[0].action = "{{GEO_POSTFIX}}s/" + $("#id_city").val() + "/";
         $("#itinerary-search").click();
     });
 

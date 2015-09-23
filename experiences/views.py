@@ -2246,7 +2246,7 @@ def manage_listing_continue(request, exp_id):
     return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
-               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False,  type='experience'):
+               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False,  type='s'):
 
     form = SearchForm()
     form.data = form.data.copy()
@@ -2478,6 +2478,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                             'locations' : Locations,
                             'LANGUAGE':settings.LANGUAGE_CODE,
                             'GEO_POSTFIX': GEO_POSTFIX,
+                            'type': type,
         })
     return render_to_response(template, {'form': form}, context)
 
