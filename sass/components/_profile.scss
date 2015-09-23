@@ -52,6 +52,15 @@ $lg: 150px;
   @extend %profile;
   width: $sm;
   height: $sm;
+  border: 1px solid $light-grey;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  background-position: center;
+  background-size: contain;
   img {
     height: $sm;
   }

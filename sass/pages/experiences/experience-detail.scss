@@ -115,6 +115,9 @@
   margin-right: 3vw;
   border-bottom: 1px solid #cccccc;
   padding-bottom: 3vh;
+  @include media('<tablet') {
+    height: 350px;
+  }
 }
 
 .experience-hostpic {
@@ -143,6 +146,9 @@
     padding: 0;
     color: $dark-grey;
     line-height: 24px;
+  }
+  @include media('<tablet') {
+    margin-top: 25px;
   }
 }
 
