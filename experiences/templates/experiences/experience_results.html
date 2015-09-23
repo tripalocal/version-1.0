@@ -5,7 +5,7 @@
     <label id="experience-count" class="expCount">{{ length }} {% trans "Experiences" %} &#8226; {{ city_display_name }}</label>
 
     <div id="experience-results" class="experience-results">
-        {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
+        {% for experience, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
         {% if forloop.counter == 5 %}
         <div class="exp-box custom-itinerary-searchpage" >
           <form action="mailto:enquiries@tripalocal.com">

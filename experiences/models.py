@@ -261,7 +261,7 @@ class NewProduct(AbstractExperience):
     children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     adult_age = models.IntegerField(blank=True, null=True, help_text="Above what age should pay adult price.")
 
-    duration_in_min = models.IntegerField(blank=True, null=True, help_text="How long will it be in minutes?")
+    duration = models.FloatField(blank=True, null=True, help_text="How long will it be in hour?")
     min_group_size = models.IntegerField(blank=True, null=True)
     max_group_size = models.IntegerField(blank=True, null=True)
     book_in_advance = models.IntegerField(blank=True, null=True)
@@ -283,6 +283,17 @@ class NewProduct(AbstractExperience):
                 return self.newproducti18n_set.all()[0].title
         else:
             return ''
+
+    def get_product_description(self, language):
+        if self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
+            t = self.newproducti18n_set.filter(language=language)
+            if len(t)>0:
+                return t[0].description
+            else:
+                return self.newproducti18n_set.all()[0].description
+        else:
+            return None
+
 
 class NewProductI18n(models.Model):
     EN = 'en'

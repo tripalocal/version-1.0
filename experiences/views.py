@@ -2350,16 +2350,19 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                     i += 1
                     continue
 
-                if not experience.currency:
-                    experience.currency = 'aud'
-                experience.dollarsign = DollarSign[experience.currency.upper()]
-                experience.currency = str(dict(Currency)[experience.currency.upper()])
+            if not experience.currency:
+                experience.currency = 'aud'
+            experience.dollarsign = DollarSign[experience.currency.upper()]
+            experience.currency = str(dict(Currency)[experience.currency.upper()])
 
-                rate = 0.0
-                counter = 0
+            rate = 0.0
+            counter = 0
 
-                photoset = experience.photo_set.all()
+            photoset = experience.photo_set.all()
+            if type != 'product':
+
                 image_url = experience.hosts.all()[0].registereduser.image_url
+
                 if photoset!= None and len(photoset) > 0 and image_url != None and len(image_url) > 0:
                     for review in experience.review_set.all():
                         rate += review.rate
@@ -2426,21 +2429,31 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                     BGImageURLList.insert(counter, BGImageURL)
                 else:
                     BGImageURLList.insert(counter, "default_experience_background.jpg")
-                # Fetch profileImageURL
-                profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
-                if (profileImageURL):
-                    profileImageURLList.insert(counter, profileImageURL)
-                else:
-                    profileImageURLList.insert(counter, "profile_default.jpg")
+
+                if type != 'product':
+                    # Fetch profileImageURL
+                    profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+                    if (profileImageURL):
+                        profileImageURLList.insert(counter, profileImageURL)
+                    else:
+                        profileImageURLList.insert(counter, "profile_default.jpg")
+
                 # Format title & Description
-                experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
-                t = get_experience_title(experience, settings.LANGUAGES[0][0])
+                if type == 'product':
+                    experience.description = experience.get_product_description(settings.LANGUAGES[0][0])
+                    t = experience.get_product_title(settings.LANGUAGES[0][0])
+                else:
+                    experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
+                    t = get_experience_title(experience, settings.LANGUAGES[0][0])
+
+                if float(experience.duration).is_integer():
+                    experience.duration = int(experience.duration)
+
                 if (t != None and len(t) > 40):
                     formattedTitleList.insert(counter, t[:37] + "...")
                 else:
                     formattedTitleList.insert(counter, t)
-                if float(experience.duration).is_integer():
-                    experience.duration = int(experience.duration)
+
                 i += 1
 
         if not settings.DEVELOPMENT:
@@ -2459,7 +2472,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                             'city' : city,
                             'city_display_name':city_display_name if city_display_name is not None else city.title(),
                             'length':len(cityExperienceList),
-                            'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
+                            'cityExperienceList' : zip(cityExperienceList, formattedTitleList, BGImageURLList, profileImageURLList),
                             'cityList':cityList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
                             'locations' : Locations,
