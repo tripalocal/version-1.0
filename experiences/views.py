@@ -522,7 +522,7 @@ def getAvailableOptions(experience, available_options, available_date):
                     i += experience.guest_number_max
 
             if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
-                if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
+                if (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                     instant_booking = False
                     #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
                     #instantbooking_i: skip the periods already checked
@@ -569,7 +569,7 @@ def getAvailableOptions(experience, available_options, available_date):
     return available_date
 
 class ExperienceDetailView(DetailView):
-    model = Experience
+    model = AbstractExperience
     template_name = 'experiences/experience_detail.html'
     #context_object_name = 'experience'
 
@@ -585,7 +585,7 @@ class ExperienceDetailView(DetailView):
             form.data['user_id'] = request.user.id
             form.data['first_name'] = request.user.first_name
             form.data['last_name'] = request.user.last_name
-            experience = Experience.objects.get(id=form.data['experience_id'])
+            experience = AbstractExperience.objects.get(id=form.data['experience_id'])
             experience.dollarsign = DollarSign[experience.currency.upper()]
             #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
             experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
@@ -632,7 +632,7 @@ class ExperienceDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ExperienceDetailView, self).get_context_data(**kwargs)
-        experience = context['experience']
+        experience = context['experience'] if 'experience' in context else context['newproduct']
         sdt = experience.start_datetime
         last_sdt = pytz.timezone('UTC').localize(datetime.min)
         local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -662,7 +662,12 @@ class ExperienceDetailView(DetailView):
                 return context
 
         if not experience.status.lower() == "listed":
-            if self.request.user.id != experience.hosts.all()[0].id and not self.request.user.is_superuser:
+            if type(experience) is NewProduct:
+                owner_id = experience.provider.user.id
+            else:
+                owner_id = experience.hosts.all()[0].id
+
+            if self.request.user.id != owner_id and not self.request.user.is_superuser:
                 # other user, experience not published
                 context['listed'] = False
                 return context
@@ -695,12 +700,13 @@ class ExperienceDetailView(DetailView):
         if self.request.user.is_authenticated():
             context["user_email"] = self.request.user.email
 
-        context["host_bio"] = get_user_bio(experience.hosts.all()[0].registereduser, settings.LANGUAGES[0][0])
-        host_image = experience.hosts.all()[0].registereduser.image_url
-        if host_image == None or len(host_image) == 0:
-            context['host_image'] = 'profile_default.jpg'
-        else:
-            context['host_image'] = host_image
+        if type(experience) is Experience:
+            context["host_bio"] = get_user_bio(experience.hosts.all()[0].registereduser, settings.LANGUAGES[0][0])
+            host_image = experience.hosts.all()[0].registereduser.image_url
+            if host_image == None or len(host_image) == 0:
+                context['host_image'] = 'profile_default.jpg'
+            else:
+                context['host_image'] = host_image
 
         context['in_wishlist'] = False
         wishlist = self.request.user.registereduser.wishlist.all() if self.request.user.is_authenticated() else None
@@ -767,12 +773,14 @@ class ExperienceDetailView(DetailView):
 
         experience.dollarsign = DollarSign[experience.currency.upper()]
         experience.currency = str(dict(Currency)[experience.currency.upper()])
-        experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
-        experience.description = get_experience_description(experience, settings.LANGUAGES[0][0])
-        experience.activity = get_experience_activity(experience, settings.LANGUAGES[0][0])
-        experience.interaction = get_experience_interaction(experience, settings.LANGUAGES[0][0])
-        experience.dress = get_experience_dress(experience, settings.LANGUAGES[0][0])
-        experience.whatsincluded = get_experience_whatsincluded(experience, settings.LANGUAGES[0][0])
+        
+        if type(experience) is Experience:
+            experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+            experience.description = get_experience_description(experience, settings.LANGUAGES[0][0])
+            experience.activity = get_experience_activity(experience, settings.LANGUAGES[0][0])
+            experience.interaction = get_experience_interaction(experience, settings.LANGUAGES[0][0])
+            experience.dress = get_experience_dress(experience, settings.LANGUAGES[0][0])
+            experience.whatsincluded = get_experience_whatsincluded(experience, settings.LANGUAGES[0][0])
 
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE

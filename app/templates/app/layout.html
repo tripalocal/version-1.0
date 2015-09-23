@@ -235,6 +235,7 @@
 
         <div class="footer-line">
             <p id="copyright"> &#169; Tripalocal Pty. Ltd. ABN 46 600 546 549</p>
+            <p id="copyright">滇ICP备15003066号-3</p>
         </div>
     </div>
 
@@ -269,6 +270,12 @@
         });
     }
 
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
 
     $(document).ready(function () {
       $("a[href*='" + location.pathname + "']").addClass("current");
@@ -399,6 +406,11 @@
                 $('#id_menu').attr('hide', 'true');
             }
         });
+
+        var utmId = getParameterByName('utm');
+        if (utmId) {
+            mixpanel.track("utm"+utmId);
+        }
     });
 
     </script>
