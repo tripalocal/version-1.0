@@ -240,9 +240,19 @@ class NewProduct(AbstractExperience):
         (DYNAMIC, 'Dynamic price'),
     )
 
+    LISTED = 'Listed'
+    UNLISTED = 'Unlisted'
+
+    STATUS_CHOICES = (
+        (LISTED, 'Listed'),
+        (UNLISTED, 'Unlisted'),
+    )
+
     provider = models.ForeignKey(Provider)
     city = models.CharField(max_length=50)
     language = models.CharField(max_length=50, default="english")
+    currency = models.CharField(max_length=10, default="aud")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=UNLISTED)
     price_type = models.CharField(max_length=6, choices=PRICE_CHOICES, default=NORMAL,
                                   help_text="Only one of the price type will take effact.")
     normal_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
