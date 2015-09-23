@@ -223,44 +223,41 @@
 						</div>
 					</div>
 
-                        <div id="myCarousel" class="carousel slide" data-ride="carousel">
-                            <!-- Indicators -->
-                            <ol class="carousel-indicators" style="position:absolute; bottom: -45px;">
-                            {% for photo in experience.photo_set.all %}
-                                {% if forloop.counter0 == 0 %}
-				                <li data-target="#myCarousel" data-slide-to="{{forloop.counter0}}" class="active"></li>
-                                {% else %}
-                                <li data-target="#myCarousel" data-slide-to="{{forloop.counter0}}" class="active"></li>
-                                {% endif %}
-                            {% endfor %}
-                            </ol>
+        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+          <!-- Indicators -->
+          <ol class="carousel-indicators" style="position:absolute; bottom: -45px;">
+            {% for photo in experience.photo_set.all %} {% if forloop.counter0 == 0 %}
+            <li data-target="#myCarousel" data-slide-to="{{forloop.counter0}}" class="active"></li>
+            {% else %}
+            <li data-target="#myCarousel" data-slide-to="{{forloop.counter0}}"></li>
+            {% endif %} {% endfor %}
+          </ol>
 
-                            <!-- Wrapper for slides -->
-                            <div class="carousel-inner" role="listbox">
-                            {% for photo in experience.photo_set.all %}
-                                {% if forloop.counter == 1 %}
-                                <div class="item active">
-				                {%else%}
-                                <div class="item">
-                                {% endif %}
-                                    <img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}" alt="Chania" width="460" height="345">
-                                </div>
-                            {% endfor %}
-                            </div>
-
-                            <!-- Left and right controls -->
-                            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev" style="background:none">
-                                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next" style="background:none">
-                                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </div>
-                    </div>
+          <!-- Wrapper for slides -->
+          <div class="carousel-inner" role="listbox">
+            {% for photo in experience.photo_set.all %} {% if forloop.counter == 1 %}
+            <div class="item active">
+            {%else%}
+            <div class="item">
+            {% endif %}
+              <img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}" alt="Chania">
             </div>
+            {% endfor %}
+          </div>
+
+          <!-- Left and right controls -->
+          <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev" style="background:none">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next" style="background:none">
+            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
+      </div>
     </div>
+  </div>
 
     {% if experience.type == "PRIVATE" %}
     <div class="container-fluid">
@@ -335,9 +332,9 @@
                         <div class="reviewList">
                     {% endif %}
                         {%if review.user.registereduser.image_url != None and review.user.registereduser.image_url != ''%}
-                            <div class="profile-sm"><img src="{{ MEDIA_URL }}{{review.user.registereduser.image_url}}" height="240"></div>
+                            <div class="profile-frame-sm" style="float:left;"><div class="profile-sm" style="background-image:src({{ MEDIA_URL }}{{review.user.registereduser.image_url}})"></div></div>
                         {%else%}
-                            <div class="profile-md"><img src="{{ MEDIA_URL }}img/profile_default.jpg" height="240"></div>
+                            <div class="profile-frame-sm" style="float:left;"><div class="profile-sm" style="background-image:src({{ MEDIA_URL }}img/profile_default.jpg)"></div></div>
                         {%endif%}
                             <div class="reviewText">{{review.comment}}
                                 <div class="reviewDate">
@@ -354,21 +351,20 @@
                 {% endif %}
                 {% endfor%}
                 {% if experience.review_set.count > 3 %}
-                        <div class="review_paging_container">
+                    <div class="review_paging_container">
                 {% for review in experience.review_set.all|dictsortreversed:"datetime" %}
                     {% if forloop.counter|mod:3 == 1 %}
                             <div id="review_page_{{forloop.counter|div:3|add:1}}" class="review_paging">{{forloop.counter|div:3|add:1}}</div>
                     {% endif %}
                 {% endfor%}
-                        </div>
+                    </div>
                 {% endif %}
                 </div>
     		</div>
 </div>
-    <div class="container-fluid also" style="border-top: 1px solid #CCCCCC; background-color:#FFF;">
+    <div class="also" style="border-top: 1px solid #CCCCCC; background-color:#FFF;">
     	<div class="container">
         <h2 style="font-weight:bold">{% trans "People also booked" %}</h2>
-                <div class="experience-results">
 
                     {% for related_experience, added_to_wishlist in related_experiences %}
                     {% if forloop.counter0 < 3 %}
@@ -383,7 +379,7 @@
                         </a>
                         <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
                         <div class="profile-frame-sm">
-                        <div class="profile-sm"
+                          <div class="profile-sm"
                              style="background-image:url({% with related_experience.hosts.all|first as host %}
                                         {% if host.registereduser.image_url %}
                                                 {{ MEDIA_URL }}{{ host.registereduser.image_url }}
@@ -391,19 +387,18 @@
                                                 {{ MEDIA_URL }}img/profile_default.jpg
                                             {% endif %}
                                         {% endwith %})">
-                                      </div>
+                          </div>
 						            </div>
 
                         <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
                         <div class="listing-footer">
-                            <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}"></div>
+                            <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}></div>
                             <div>{%if related_experience.duration < 24 %}{{related_experience.duration}} {% trans "hrs" %}{%else%}{{related_experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
                         </div>
                     </div>
                     {% endif %}
                     {% endfor %}
-                </div>
-        </div>
+                  </div>
             </div>
 {%else%}
     <p>{% trans "The experience has expired, or has not been approved." %}</p>

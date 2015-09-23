@@ -25,7 +25,7 @@
 {%endblock%}
 
 {% block content %}
-    <form id="search_form" action="{{GEO_POSTFIX}}s/melbourne/" method="post">
+    <form id="search_form" action="{{GEO_POSTFIX}}{{ request.path }}" method="post">
         {% csrf_token %}
         <div class="basic-search">
           <div class="container">
@@ -162,6 +162,14 @@
         }
 
         return temp.substr(temp.lastIndexOf("/") + 1);
+    }
+
+    function cityToHref(href, city) {
+        if (href.substr(-1) === '/') {
+            temp = href.substr(0, href.length - 1);
+        }
+
+        return temp.substr(0, temp.lastIndexOf("/") + 1) + city + '/';
     }
 
     function loadExperienceList(href) {
@@ -327,10 +335,10 @@
             $("#itinerary-search").click()
         });
 
-
         $('#itinerary-search').on('click', function (event) {
             event.preventDefault();
-            var href = '{{GEO_POSTFIX}}s/' + $("#id_city").val() + '/';
+            var href = cityToHref(location.href, $("#id_city").val());
+
             history.pushState({}, 'City', href);
             loadExperienceList(href);
         });
@@ -348,7 +356,7 @@
     });
 
     $("#id_city").change(function(e){
-        $("#search_form")[0].action = "{{GEO_POSTFIX}}s/" + $("#id_city").val() + "/";
+{#        $("#search_form")[0].action = "{{GEO_POSTFIX}}s/" + $("#id_city").val() + "/";#}
         $("#itinerary-search").click();
     });
 

@@ -44,6 +44,14 @@
   @include border-radius(5px);
   padding: 20px;
   margin-bottom: 20px;
+  @include media('<desktop') {
+    display: block;
+    float: none;
+  }
+  @include media('<tablet') {
+    width: 80%;
+    margin: auto;
+  }
   p {
     margin-bottom: 10px;
   }
@@ -56,6 +64,15 @@
   border: $light-grey 1px solid;
   @include border-radius(5px);
   padding: 15px;
+  @include media('<desktop') {
+    display: block;
+    float: none;
+    margin-bottom: 20px;
+  }
+  @include media('<tablet') {
+    width: 30%;
+    margin: 0 auto 20px auto;
+  }
   a {
     color: $dark-grey;
     &:hover {
