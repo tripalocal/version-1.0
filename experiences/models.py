@@ -248,8 +248,8 @@ class NewProduct(AbstractExperience):
         (UNLISTED, 'Unlisted'),
     )
 
-    start_datetime = models.DateTimeField()
-    end_datetime = models.DateTimeField()
+    start_datetime = models.DateTimeField(null=True)
+    end_datetime = models.DateTimeField(null=True)
     provider = models.ForeignKey(Provider)
     city = models.CharField(max_length=50)
     language = models.CharField(max_length=50, default="english")
