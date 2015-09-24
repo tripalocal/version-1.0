@@ -257,7 +257,8 @@ class NewProduct(AbstractExperience):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=UNLISTED)
     price_type = models.CharField(max_length=6, choices=PRICE_CHOICES, default=NORMAL,
                                   help_text="Only one of the price type will take effact.")
-    normal_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    commission = models.FloatField(default=0.3)
     dynamic_price = models.CharField(max_length=100, blank=True)
     adult_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
@@ -295,7 +296,6 @@ class NewProduct(AbstractExperience):
         else:
             return None
 
-
 class NewProductI18n(models.Model):
     EN = 'en'
     ZH = 'zh'
@@ -318,7 +318,7 @@ class NewProductI18n(models.Model):
     refund_policy = models.TextField(blank=True)
     notice = models.TextField(blank=True)
     tips = models.TextField(blank=True)
-    whats_included = models.TextField(blank=True,
+    whatsincluded = models.TextField(blank=True,
                                       help_text="What's included in the price (pickup/meal/drink/certificate/photo)")
     pickup_detail = models.TextField(blank=True)
     combination_options = models.TextField(blank=True,
