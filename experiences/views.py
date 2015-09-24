@@ -1855,12 +1855,12 @@ def setExperienceDisplayPrice(experience):
             experience.price = dp[4-experience.guest_number_min]
 
 def setProductDisplayPrice(experience):
-    if experience.price_type == NewProduct.NORMAL:
-        experience.price = experience.price
-    elif experience.price_type == NewProduct.AGE_PRICE:
-        experience.price = experience.children_price
-    else:
-        setExperienceDisplayPrice(experience)
+    # if experience.price_type == NewProduct.NORMAL:
+    #     experience.price = experience.price
+    # elif experience.price_type == NewProduct.AGE_PRICE:
+    #     experience.price = experience.children_price
+    # else:
+    setExperienceDisplayPrice(experience)
 
 def new_experience(request):
     context = RequestContext(request)
