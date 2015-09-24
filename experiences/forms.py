@@ -608,7 +608,7 @@ class BookingConfirmationForm(forms.Form):
             #exp_month = self.cleaned_data["expiration"].month
             #exp_year = self.cleaned_data["expiration"].year
             #cvv = self.cleaned_data["cvv"]
-            experience = Experience.objects.get(id=self.cleaned_data['experience_id'])
+            experience = AbstractExperience.objects.get(id=self.cleaned_data['experience_id'])
 
             extra_fee = 0.00
             free = False
@@ -919,10 +919,13 @@ class ItineraryBookingForm(forms.Form):
                 free = True
                 booking_extra_information = card_number
 
-            experience = Experience.objects.get(id=ids[i])
-            experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
-            experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
-            experience.dropoff_spot = get_experience_dropoff_spot(experience, settings.LANGUAGES[0][0])
+            experience = AbstractExperience.objects.get(id=ids[i])
+            if type(experience) == Experience:
+                experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+                experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
+                experience.dropoff_spot = get_experience_dropoff_spot(experience, settings.LANGUAGES[0][0])
+            else:
+                experience.title = experience.get_product_title(settings.LANGUAGES[0][0])
 
             if not free:
                 subtotal_price = 0.0
@@ -966,7 +969,7 @@ class ItineraryBookingForm(forms.Form):
             else:
                 #save the booking record
                 #user = User.objects.get(id=self.cleaned_data['user_id']) #moved outside of the for loop
-                host = experience.hosts.all()[0]
+                host = get_host(experience)
                 bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
                 bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
                 local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -986,7 +989,7 @@ class ItineraryBookingForm(forms.Form):
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
                 booking.save()
                 #add the user to the guest list
-                if user not in experience.guests.all():
+                if type(experience) == Experience and user not in experience.guests.all():
                 #experience.guests.add(user)
                     cursor = connections['default'].cursor()
                     cursor.execute("Insert into experiences_experience_guests (experience_id,user_id) values (%s, %s)", [experience.id, user.id])
@@ -1062,8 +1065,14 @@ class ItineraryBookingForm(forms.Form):
 
         return cleaned
 
+def get_host(experience):
+    if type(experience) == Experience:
+        return experience.hosts.all()[0]
+    else:
+        return experience.provider.user
+
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
-    host = experience.hosts.all()[0]
+    host = get_host(experience)
     if not is_instant_booking:
         # send an email to the host
         if not settings.DEVELOPMENT:
@@ -1160,11 +1169,14 @@ def send_booking_email_verification(booking, experience, user, is_instant_bookin
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
 
 def sms_notification(booking, experience, user, phone_number):
-    exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+    if type(experience) == Experience:
+        exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+    else:
+        exp_title = experience.get_product_title(settings.LANGUAGE_CODE)
     customer_phone_num = phone_number
     exp_datetime_local = booking.datetime.astimezone(tzlocal())
     exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
-    host = experience.hosts.all()[0]
+    host = get_host(experience)
     send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
     schedule_request_reminder_sms(booking.id, host.id, user.first_name, booking.datetime + timedelta(days=1))
 

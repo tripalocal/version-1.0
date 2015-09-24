@@ -51,36 +51,36 @@ class ProductAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(provider=request.user.provider)
 
-    def get_form(self, request, obj=None, **kwargs):
-        fieldsets = (
-            ('Admin', {'fields': ('provider', 'status',)}),
-            ('Product summary', {
-                'fields': (
-                    'city', 'duration', 'min_group_size', 'max_group_size', 'book_in_advance', 'instant_booking',
-                    'free_translation',
-                    'order_on_holiday')
-            }),
-            ('Pricing rule', {
-                'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
-            }),
-        )
-
-        fieldsets2 = (
-            ('Product summary', {
-                'fields': (
-                    'city', 'duration', 'min_group_size', 'max_group_size', 'book_in_advance', 'instant_booking',
-                    'free_translation',
-                    'order_on_holiday')
-            }),
-            ('Pricing rule', {
-                'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
-            }),
-        )
-        if not request.user.is_superuser:
-            self.fieldsets = fieldsets2
-        else:
-            self.fieldsets = fieldsets
-        return super(ProductAdmin, self).get_form(request, obj, **kwargs)
+    # def get_form(self, request, obj=None, **kwargs):
+        # fieldsets = (
+        #     ('Admin', {'fields': ('provider', 'status',)}),
+        #     ('Product summary', {
+        #         'fields': (
+        #             'city', 'duration', 'min_group_size', 'max_group_size', 'book_in_advance', 'instant_booking',
+        #             'free_translation',
+        #             'order_on_holiday')
+        #     }),
+        #     ('Pricing rule', {
+        #         'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
+        #     }),
+        # )
+        #
+        # fieldsets2 = (
+        #     ('Product summary', {
+        #         'fields': (
+        #             'city', 'duration', 'min_group_size', 'max_group_size', 'book_in_advance', 'instant_booking',
+        #             'free_translation',
+        #             'order_on_holiday')
+        #     }),
+        #     ('Pricing rule', {
+        #         'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
+        #     }),
+        # )
+        # if not request.user.is_superuser:
+        #     self.fieldsets = fieldsets2
+        # else:
+        #     self.fieldsets = fieldsets
+        # return super(ProductAdmin, self).get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:

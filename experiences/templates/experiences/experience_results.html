@@ -24,10 +24,16 @@
             </a>
             <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ formattedTitle }} </h3></a>
 
-            <div class="profile-frame-sm">
-            <div class="profile-sm"
-                style="background:url({{ MEDIA_URL }}{{ profileImageURL|urlencode }}) no-repeat; background-size:cover; background-position:center;"></div>
-            </div>
+            {% if profileImageURL %}
+                <div class="profile-frame-sm">
+                    <div class="profile-sm"
+                         style="background:url(
+                                 {{ MEDIA_URL }}{{ profileImageURL|urlencode }}) no-repeat; background-size:cover;
+                                 background-position:center;"></div>
+                </div>
+            {% endif %}
+
+
             <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ experience.description }}</p>
 
             <div class="listing-footer">
