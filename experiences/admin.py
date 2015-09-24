@@ -3,11 +3,12 @@ from django.conf.urls import patterns
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon, WechatProduct, WechatBooking, \
-    NewProduct, NewProductI18n, Provider, Photo
+    NewProduct, NewProductI18n, Provider
 from experiences.views import create_experience
 from app.models import RegisteredUser
 from allauth.socialaccount.models import SocialAccount
 from post_office.models import Email
+import os
 
 class ExperienceAdmin(admin.ModelAdmin):
     def get_urls(self):
@@ -87,6 +88,24 @@ class ProductAdmin(admin.ModelAdmin):
             obj.provider = request.user.provider
         super(ProductAdmin, self).save_model(request, obj, form, change)
 
+    def save_formset(self, request, form, formset, change):
+        if request.FILES and len(request.FILES) > 0 and formset.prefix == 'photo_set':
+            instances = formset.save(commit=False)
+            for obj in formset.deleted_objects:
+                obj.delete()
+            i = 0
+            for instance in instances:
+                photo = request.FILES['photo_set-' + str(i) + '-image']
+                name, extension = os.path.splitext(photo.name)
+                id = instance.experience.id
+                instance.name = "experience" + str(id) + "_" + str(i+1) + extension
+                instance.directory = "experiences/" + str(id) + "/"
+                instance.image = instance.directory + instance.name
+                instance.save()
+                i += 1
+            formset.save_m2m()
+        else:
+            super(ProductAdmin, self).save_formset(request, form, formset, change)
 
 class ProviderAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
