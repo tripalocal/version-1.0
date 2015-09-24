@@ -329,9 +329,11 @@
 				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}
                     {% endif %}
                 {% endfor %})">
+                {% if experience.hosts %}
                     <div class="profile-md checkout-profile">
                         <img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" height="240">
                     </div>
+                {% endif %}
                 </div>
                 <div class="checkoutBox checkoutInfo">
                     <h3 style="font-weight:bold;">{{ experience.title }}</h3>
@@ -398,7 +400,7 @@ $(function(){
         }
 */
         var handler = StripeCheckout.configure({
-                            key: 'pk_live_62VE04d61Te70oh7IB7dqfjm',
+                            key: 'pk_test_W9jgaSX9w9vrewiQIl5gE5l4',
                             image: '/images/tripalocal_Logo.png',
                             locale: '{{LANGUAGE}}',
                             token: function(token) {

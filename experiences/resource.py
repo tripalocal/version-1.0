@@ -12,7 +12,7 @@ from app.models import *
 from post_office import mail
 from Tripalocal_V1 import settings
 from tripalocal_messages.models import Aliases, Users
-from experiences.forms import email_account_generator, ExperienceForm, ItineraryBookingForm, check_coupon, Currency, DollarSign
+from experiences.forms import *
 from django.db import connections
 from django.template import loader, RequestContext, Context
 from django.template.loader import get_template
@@ -213,7 +213,7 @@ def saveBookingRequest(booking_request):
     if user not in experience.guests.all():
         experience.guests.add(user)
 
-    host = experience.hosts.all()[0]
+    host = get_host(experience)
     #send an email to the traveller
     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
@@ -462,7 +462,7 @@ def service_wishlist(request):
                                     'language':experience.language,
                                     'duration':experience.duration,
                                     'photo_url':photo_url,
-                                    'host_image':experience.hosts.all()[0].registereduser.image_url})
+                                    'host_image':get_host(experience).registereduser.image_url})
 
             return Response(experiences,status=status.HTTP_200_OK)
 
@@ -635,7 +635,7 @@ def service_mytrip(request, format=None):
         bks = []
         for booking in bookings:
             payment = booking.payment if booking.payment_id != None else Payment()
-            host = booking.experience.hosts.all()[0]
+            host = get_host(booking.experience)
             phone_number = host.registereduser.phone_number
 
             photo_url = ''
@@ -800,7 +800,7 @@ def service_experience(request, format=None):
         included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
         included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
 
-        host = experience.hosts.all()[0]
+        host = get_host(experience)
         host_image = host.registereduser.image_url
         host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
 
@@ -887,7 +887,7 @@ def service_experiencedetail(request, format=None):
         included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
         included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
 
-        host = experience.hosts.all()[0]
+        host = get_host(experience)
         host_image = host.registereduser.image_url
         host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
 
@@ -1140,7 +1140,7 @@ def service_email(request, format=None):
         exp_urls = []
 
         for exp in exps:
-            host = exp.hosts.all()[0]
+            host = get_host(exp)
             if host not in hosts:
                 hosts.append(host)
                 exp_urls.append([])
