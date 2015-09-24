@@ -329,9 +329,11 @@
 				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}
                     {% endif %}
                 {% endfor %})">
+                {% if experience.hosts %}
                     <div class="profile-md checkout-profile">
                         <img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" height="240">
                     </div>
+                {% endif %}
                 </div>
                 <div class="checkoutBox checkoutInfo">
                     <h3 style="font-weight:bold;">{{ experience.title }}</h3>

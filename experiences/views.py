@@ -588,7 +588,10 @@ class ExperienceDetailView(DetailView):
             experience = AbstractExperience.objects.get(id=form.data['experience_id'])
             experience.dollarsign = DollarSign[experience.currency.upper()]
             #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
-            experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+            if type(experience) == Experience:
+                experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+            else:
+                experience.title = experience.get_product_title(settings.LANGUAGES[0][0])
             experience_price = experience.price
 
             if float(experience.duration).is_integer():
