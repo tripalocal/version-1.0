@@ -175,7 +175,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         if len(experience.instantbookingtimeperiod_set.all()) > 0 or len(experience.blockouttimeperiod_set.all()) > 0:
             calendar_updated = True
 
-        host = experience.hosts.all()[0]
+        host = get_host(experience)
         exp_price = float(experience.price)
         if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
@@ -659,7 +659,7 @@ class ExperienceDetailView(DetailView):
         context['cover_photo'] = cover_photo
 
         if experience.end_datetime < datetime.utcnow().replace(tzinfo=pytz.UTC):
-            if self.request.user.id != experience.hosts.all()[0].id:
+            if self.request.user.id != get_host(experience).id:
                 # other user, experience already expired
                 context['expired'] = True
                 return context
@@ -669,10 +669,7 @@ class ExperienceDetailView(DetailView):
                 return context
 
         if not experience.status.lower() == "listed":
-            if type(experience) is NewProduct:
-                owner_id = experience.provider.user.id
-            else:
-                owner_id = experience.hosts.all()[0].id
+            owner_id = get_host(experience).id
 
             if self.request.user.id != owner_id and not self.request.user.is_superuser:
                 # other user, experience not published
@@ -708,8 +705,8 @@ class ExperienceDetailView(DetailView):
             context["user_email"] = self.request.user.email
 
         if type(experience) is Experience:
-            context["host_bio"] = get_user_bio(experience.hosts.all()[0].registereduser, settings.LANGUAGES[0][0])
-            host_image = experience.hosts.all()[0].registereduser.image_url
+            context["host_bio"] = get_user_bio(get_host(experience).registereduser, settings.LANGUAGES[0][0])
+            host_image = get_host(experience).registereduser.image_url
             if host_image == None or len(host_image) == 0:
                 context['host_image'] = 'profile_default.jpg'
             else:
@@ -828,17 +825,21 @@ def experience_booking_successful(request, experience=None, guest_number=None, b
         is_instant_booking = True if data['is_instant_booking'] == "True" else False
 
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
+    mp.track(request.user.email, 'Sent request to '+ get_host(experience).first_name)
 
     if not settings.DEVELOPMENT:
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
+        mp.track(request.user.email, 'Sent request to '+ get_host(experience).first_name)
 
     template = 'experiences/experience_booking_successful_requested.html'
     if is_instant_booking:
         template = 'experiences/experience_booking_successful_confirmed.html'
 
-    experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+    if type(experience) == Experience:
+        experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+    else:
+        experience.title = experience.get_product_title(settings.LANGUAGES[0][0])
+
     return render(request,template,{'experience': experience,
                                     'price_paid':price_paid,
                                     'guest_number':guest_number,
@@ -859,11 +860,14 @@ def experience_booking_confirmation(request):
     # A HTTP POST?
     if request.method == 'POST':
         form = BookingConfirmationForm(request.POST)
-        experience = Experience.objects.get(id=form.data['experience_id'])
+        experience = AbstractExperience.objects.get(id=form.data['experience_id'])
         experience.dollarsign = DollarSign[experience.currency.upper()]
         #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
-        experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
-        experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
+        if type(experience) == Experience:
+            experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+            experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
+        else:
+            experience.title = experience.get_product_title(settings.LANGUAGES[0][0])
 
         guest_number = int(form.data['guest_number'])
         subtotal_price = 0.0
@@ -1164,8 +1168,8 @@ def create_experience(request, id=None):
             experience = get_object_or_404(Experience, pk=id)
             if experience.currency is None:
                 experience.currency = 'aud'
-            host = experience.hosts.all()[0]
-            registerUser = experience.hosts.all()[0].registereduser
+            host = get_host(experience)
+            registerUser = host.registereduser
             list = experience.whatsincluded_set.filter(item="Food", language=settings.LANGUAGES[0][0])
             if len(list) > 0:
                 if list[0].included:
@@ -1207,9 +1211,9 @@ def create_experience(request, id=None):
             else:
                 COMMISSION_PERCENT = settings.COMMISSION_PERCENT
             data = {"id":experience.id,
-                "host":experience.hosts.all()[0].email,
-                "host_first_name":experience.hosts.all()[0].first_name,
-                "host_last_name":experience.hosts.all()[0].last_name,
+                "host":get_host(experience).email,
+                "host_first_name":get_host(experience).first_name,
+                "host_last_name":get_host(experience).last_name,
                 "host_bio": get_user_bio(registerUser, settings.LANGUAGES[0][0]),
                 "host_image":registerUser.image,
                 "host_image_url":registerUser.image_url,
@@ -1556,7 +1560,7 @@ def update_booking(id, accepted, user):
         experience = Experience.objects.get(id=booking.experience_id)
         experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
         experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
-        if not experience.hosts.all()[0].id == user.id:
+        if not get_host(experience).id == user.id:
             booking_success = False
             result={'booking_success':booking_success, 'error':'only the host can accept/reject the booking'}
             return result
@@ -1836,7 +1840,7 @@ def tagsOnly(tag, exp):
     return tag in experience_tags
 
 def getProfileImage(experience):
-    profileImage = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+    profileImage = RegisteredUser.objects.get(user_id=get_host(experience).id).image_url
     if profileImage:
         return profileImage
     else:
@@ -1852,7 +1856,7 @@ def setExperienceDisplayPrice(experience):
 
 def setProductDisplayPrice(experience):
     if experience.price_type == NewProduct.NORMAL:
-        experience.price = experience.normal_price
+        experience.price = experience.price
     elif experience.price_type == NewProduct.AGE_PRICE:
         experience.price = experience.children_price
     else:
@@ -2214,7 +2218,7 @@ def check_upload_filled(experience):
 def manage_listing(request, exp_id, step, ):
     experience = get_object_or_404(Experience, pk=exp_id)
     if not request.user.is_superuser:
-        if not request.user in experience.hosts.all():
+        if request.user.id != get_host(experience).id:
             raise Http404("Sorry, but you can only edit your own experience.")
 
     experience_title_cn = get_object_or_404(ExperienceTitle, experience_id=exp_id, language='zh')
@@ -2400,7 +2404,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
             photoset = experience.photo_set.all()
             if type != 'product':
-                image_url = experience.hosts.all()[0].registereduser.image_url
+                image_url = get_host(experience).registereduser.image_url
 
                 if photoset!= None and len(photoset) > 0 and image_url != None and len(image_url) > 0:
                     for review in experience.review_set.all():
@@ -2471,7 +2475,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
             if type != 'product':
                 # Fetch profileImageURL
-                profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+                profileImageURL = RegisteredUser.objects.get(user_id=get_host(experience).id).image_url
                 if (profileImageURL):
                     profileImageURLList.insert(counter, profileImageURL)
                 else:
