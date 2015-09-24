@@ -248,6 +248,8 @@ class NewProduct(AbstractExperience):
         (UNLISTED, 'Unlisted'),
     )
 
+    start_datetime = models.DateTimeField(null=True)
+    end_datetime = models.DateTimeField(null=True)
     provider = models.ForeignKey(Provider)
     city = models.CharField(max_length=50)
     language = models.CharField(max_length=50, default="english")
@@ -260,10 +262,9 @@ class NewProduct(AbstractExperience):
     adult_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     adult_age = models.IntegerField(blank=True, null=True, help_text="Above what age should pay adult price.")
-
-    duration_in_min = models.IntegerField(blank=True, null=True, help_text="How long will it be in minutes?")
-    min_group_size = models.IntegerField(blank=True, null=True)
-    max_group_size = models.IntegerField(blank=True, null=True)
+    duration = models.FloatField(blank=True, null=True, help_text="How long will it be in hours?")
+    guest_number_min = models.IntegerField(blank=True, null=True)
+    guest_number_max = models.IntegerField(blank=True, null=True)
     book_in_advance = models.IntegerField(blank=True, null=True)
     instant_booking = models.TextField(blank=True)
     free_translation = models.BooleanField(default=False)
@@ -283,6 +284,17 @@ class NewProduct(AbstractExperience):
                 return self.newproducti18n_set.all()[0].title
         else:
             return ''
+
+    def get_product_description(self, language):
+        if self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
+            t = self.newproducti18n_set.filter(language=language)
+            if len(t)>0:
+                return t[0].description
+            else:
+                return self.newproducti18n_set.all()[0].description
+        else:
+            return None
+
 
 class NewProductI18n(models.Model):
     EN = 'en'
@@ -363,7 +375,7 @@ class InstantBookingTimePeriod(models.Model):
     repeat_cycle = models.CharField(max_length=50)
     repeat_frequency = models.IntegerField()
     repeat_extra_information = models.CharField(max_length=50)
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
 
 class BlockOutTimePeriod(models.Model):
     start_datetime = models.DateTimeField()
@@ -373,7 +385,7 @@ class BlockOutTimePeriod(models.Model):
     repeat_cycle = models.CharField(max_length=50)
     repeat_frequency = models.IntegerField()
     repeat_extra_information = models.CharField(max_length=50)
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
 
 class WhatsIncluded(models.Model):
     item = models.CharField(max_length=50)

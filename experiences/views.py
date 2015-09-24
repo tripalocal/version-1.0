@@ -522,7 +522,7 @@ def getAvailableOptions(experience, available_options, available_date):
                     i += experience.guest_number_max
 
             if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
-                if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
+                if (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                     instant_booking = False
                     #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
                     #instantbooking_i: skip the periods already checked
@@ -569,7 +569,7 @@ def getAvailableOptions(experience, available_options, available_date):
     return available_date
 
 class ExperienceDetailView(DetailView):
-    model = Experience
+    model = AbstractExperience
     template_name = 'experiences/experience_detail.html'
     #context_object_name = 'experience'
 
@@ -585,7 +585,7 @@ class ExperienceDetailView(DetailView):
             form.data['user_id'] = request.user.id
             form.data['first_name'] = request.user.first_name
             form.data['last_name'] = request.user.last_name
-            experience = Experience.objects.get(id=form.data['experience_id'])
+            experience = AbstractExperience.objects.get(id=form.data['experience_id'])
             experience.dollarsign = DollarSign[experience.currency.upper()]
             #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
             experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
@@ -632,7 +632,7 @@ class ExperienceDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ExperienceDetailView, self).get_context_data(**kwargs)
-        experience = context['experience']
+        experience = context['experience'] if 'experience' in context else context['newproduct']
         sdt = experience.start_datetime
         last_sdt = pytz.timezone('UTC').localize(datetime.min)
         local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -662,7 +662,12 @@ class ExperienceDetailView(DetailView):
                 return context
 
         if not experience.status.lower() == "listed":
-            if self.request.user.id != experience.hosts.all()[0].id and not self.request.user.is_superuser:
+            if type(experience) is NewProduct:
+                owner_id = experience.provider.user.id
+            else:
+                owner_id = experience.hosts.all()[0].id
+
+            if self.request.user.id != owner_id and not self.request.user.is_superuser:
                 # other user, experience not published
                 context['listed'] = False
                 return context
@@ -695,12 +700,13 @@ class ExperienceDetailView(DetailView):
         if self.request.user.is_authenticated():
             context["user_email"] = self.request.user.email
 
-        context["host_bio"] = get_user_bio(experience.hosts.all()[0].registereduser, settings.LANGUAGES[0][0])
-        host_image = experience.hosts.all()[0].registereduser.image_url
-        if host_image == None or len(host_image) == 0:
-            context['host_image'] = 'profile_default.jpg'
-        else:
-            context['host_image'] = host_image
+        if type(experience) is Experience:
+            context["host_bio"] = get_user_bio(experience.hosts.all()[0].registereduser, settings.LANGUAGES[0][0])
+            host_image = experience.hosts.all()[0].registereduser.image_url
+            if host_image == None or len(host_image) == 0:
+                context['host_image'] = 'profile_default.jpg'
+            else:
+                context['host_image'] = host_image
 
         context['in_wishlist'] = False
         wishlist = self.request.user.registereduser.wishlist.all() if self.request.user.is_authenticated() else None
@@ -767,12 +773,14 @@ class ExperienceDetailView(DetailView):
 
         experience.dollarsign = DollarSign[experience.currency.upper()]
         experience.currency = str(dict(Currency)[experience.currency.upper()])
-        experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
-        experience.description = get_experience_description(experience, settings.LANGUAGES[0][0])
-        experience.activity = get_experience_activity(experience, settings.LANGUAGES[0][0])
-        experience.interaction = get_experience_interaction(experience, settings.LANGUAGES[0][0])
-        experience.dress = get_experience_dress(experience, settings.LANGUAGES[0][0])
-        experience.whatsincluded = get_experience_whatsincluded(experience, settings.LANGUAGES[0][0])
+        
+        if type(experience) is Experience:
+            experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+            experience.description = get_experience_description(experience, settings.LANGUAGES[0][0])
+            experience.activity = get_experience_activity(experience, settings.LANGUAGES[0][0])
+            experience.interaction = get_experience_interaction(experience, settings.LANGUAGES[0][0])
+            experience.dress = get_experience_dress(experience, settings.LANGUAGES[0][0])
+            experience.whatsincluded = get_experience_whatsincluded(experience, settings.LANGUAGES[0][0])
 
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE
@@ -2246,7 +2254,7 @@ def manage_listing_continue(request, exp_id):
     return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
-               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False,  type='experience'):
+               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False,  type='s'):
 
     form = SearchForm()
     form.data = form.data.copy()
@@ -2350,16 +2358,19 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                     i += 1
                     continue
 
-                if not experience.currency:
-                    experience.currency = 'aud'
-                experience.dollarsign = DollarSign[experience.currency.upper()]
-                experience.currency = str(dict(Currency)[experience.currency.upper()])
+            if not experience.currency:
+                experience.currency = 'aud'
+            experience.dollarsign = DollarSign[experience.currency.upper()]
+            experience.currency = str(dict(Currency)[experience.currency.upper()])
 
-                rate = 0.0
-                counter = 0
+            rate = 0.0
+            counter = 0
 
-                photoset = experience.photo_set.all()
+            photoset = experience.photo_set.all()
+            if type != 'product':
+
                 image_url = experience.hosts.all()[0].registereduser.image_url
+
                 if photoset!= None and len(photoset) > 0 and image_url != None and len(image_url) > 0:
                     for review in experience.review_set.all():
                         rate += review.rate
@@ -2418,30 +2429,40 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                                     rateList.insert(counter, rate)
                                 break
 
-                cityExperienceList.insert(counter, experience)
-                cityExperienceReviewList.insert(counter, getNReviews(experience.id))
-                # Fetch BGImageURL
-                BGImageURL = getBGImageURL(experience.id)
-                if (BGImageURL):
-                    BGImageURLList.insert(counter, BGImageURL)
-                else:
-                    BGImageURLList.insert(counter, "default_experience_background.jpg")
+            cityExperienceList.insert(counter, experience)
+            cityExperienceReviewList.insert(counter, getNReviews(experience.id))
+            # Fetch BGImageURL
+            BGImageURL = getBGImageURL(experience.id)
+            if (BGImageURL):
+                BGImageURLList.insert(counter, BGImageURL)
+            else:
+                BGImageURLList.insert(counter, "default_experience_background.jpg")
+
+            if type != 'product':
                 # Fetch profileImageURL
                 profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
                 if (profileImageURL):
                     profileImageURLList.insert(counter, profileImageURL)
                 else:
                     profileImageURLList.insert(counter, "profile_default.jpg")
-                # Format title & Description
+
+            # Format title & Description
+            if type == 'product':
+                experience.description = experience.get_product_description(settings.LANGUAGES[0][0])
+                t = experience.get_product_title(settings.LANGUAGES[0][0])
+            else:
                 experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
                 t = get_experience_title(experience, settings.LANGUAGES[0][0])
-                if (t != None and len(t) > 40):
-                    formattedTitleList.insert(counter, t[:37] + "...")
-                else:
-                    formattedTitleList.insert(counter, t)
-                if float(experience.duration).is_integer():
-                    experience.duration = int(experience.duration)
-                i += 1
+
+            if float(experience.duration).is_integer():
+                experience.duration = int(experience.duration)
+
+            if (t != None and len(t) > 40):
+                formattedTitleList.insert(counter, t[:37] + "...")
+            else:
+                formattedTitleList.insert(counter, t)
+
+            i += 1
 
         if not settings.DEVELOPMENT:
             mp = Mixpanel(settings.MIXPANEL_TOKEN)
@@ -2459,12 +2480,13 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                             'city' : city,
                             'city_display_name':city_display_name if city_display_name is not None else city.title(),
                             'length':len(cityExperienceList),
-                            'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
+                            'cityExperienceList' : zip(cityExperienceList, formattedTitleList, BGImageURLList, profileImageURLList),
                             'cityList':cityList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
                             'locations' : Locations,
                             'LANGUAGE':settings.LANGUAGE_CODE,
                             'GEO_POSTFIX': GEO_POSTFIX,
+                            'type': type,
         })
     return render_to_response(template, {'form': form}, context)
 

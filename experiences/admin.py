@@ -56,7 +56,7 @@ class ProductAdmin(admin.ModelAdmin):
             ('Admin', {'fields': ('provider', 'status',)}),
             ('Product summary', {
                 'fields': (
-                    'city', 'duration_in_min', 'min_group_size', 'max_group_size', 'book_in_advance', 'instant_booking',
+                    'city', 'duration', 'min_group_size', 'max_group_size', 'book_in_advance', 'instant_booking',
                     'free_translation',
                     'order_on_holiday')
             }),
@@ -68,7 +68,7 @@ class ProductAdmin(admin.ModelAdmin):
         fieldsets2 = (
             ('Product summary', {
                 'fields': (
-                    'city', 'duration_in_min', 'min_group_size', 'max_group_size', 'book_in_advance', 'instant_booking',
+                    'city', 'duration', 'min_group_size', 'max_group_size', 'book_in_advance', 'instant_booking',
                     'free_translation',
                     'order_on_holiday')
             }),
