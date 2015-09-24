@@ -633,6 +633,9 @@ class ExperienceDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ExperienceDetailView, self).get_context_data(**kwargs)
         experience = context['experience'] if 'experience' in context else context['newproduct']
+        if 'experience' not in context:
+            context['experience'] = experience
+            experience.type="PRODUCT"
         sdt = experience.start_datetime
         last_sdt = pytz.timezone('UTC').localize(datetime.min)
         local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -781,6 +784,21 @@ class ExperienceDetailView(DetailView):
             experience.interaction = get_experience_interaction(experience, settings.LANGUAGES[0][0])
             experience.dress = get_experience_dress(experience, settings.LANGUAGES[0][0])
             experience.whatsincluded = get_experience_whatsincluded(experience, settings.LANGUAGES[0][0])
+        else:
+            if experience.newproducti18n_set is not None and len(experience.newproducti18n_set.all()) > 0:
+                t = experience.newproducti18n_set.filter(language=settings.LANGUAGES[0][0])
+                if len(t)>0:
+                    t = t[0]
+                else:
+                    t = experience.newproducti18n_set.all()[0]
+
+                experience.title = t.title
+                experience.description = t.description
+                experience.highlights = t.highlights
+                experience.tips = t.tips
+                experience.pickup_detail = t.pickup_detail
+                experience.refund_policy = t.refund_policy
+                experience.whatsincluded = t.whatsincluded
 
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE
