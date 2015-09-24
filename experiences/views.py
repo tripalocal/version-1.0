@@ -29,6 +29,7 @@ from experiences.telstra_sms_api import send_sms
 from unionpay import client, signer
 from unionpay.util.helper import load_config, make_order_id
 from django.views.decorators.csrf import csrf_exempt
+import itertools
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -1849,6 +1850,14 @@ def setExperienceDisplayPrice(experience):
         elif experience.guest_number_min <= 4:
             experience.price = dp[4-experience.guest_number_min]
 
+def setProductDisplayPrice(experience):
+    if experience.price_type == NewProduct.NORMAL:
+        experience.price = experience.normal_price
+    elif experience.price_type == NewProduct.AGE_PRICE:
+        experience.price = experience.children_price
+    else:
+        setExperienceDisplayPrice(experience)
+
 def new_experience(request):
     context = RequestContext(request)
     form = ExperienceForm()
@@ -2318,7 +2327,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
     if request.is_ajax():
         if type == 'product':
-            experienceList = NewProduct.objects.filter(city__iexact=city)
+            experienceList = NewProduct.objects.filter(city__iexact=city, status__iexact="listed")
         else:
             experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(
                 type__iexact="multi-hosts")
@@ -2337,34 +2346,36 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         i = 0
         while i < len(experienceList):
             experience = experienceList[i]
-            if type != 'product':
+            if type == 'product':
+                setProductDisplayPrice(experience)
 
+            else:
                 setExperienceDisplayPrice(experience)
+                experience_tags = get_experience_tags(experience, settings.LANGUAGES[0][0])
+                if keywords is not None and len(keywords) > 0 and len(experience_tags) > 0:
+                    tags = keywords.strip().split(",")
+                    match = False
+                    for tag in tags:
+                        if tag.strip() in experience_tags:
+                            match = True
+                            break
+                    if not match:
+                        i += 1
+                        continue
 
-                if start_date is not None and experience.end_datetime < start_date :
-                    i += 1
-                    continue
+            if start_date is not None and experience.end_datetime < start_date :
+                i += 1
+                continue
 
-                if end_date is not None and experience.start_datetime > end_date:
-                    i += 1
-                    continue
+            if end_date is not None and experience.start_datetime > end_date:
+                i += 1
+                continue
 
-                # todo: guest_number should be working
-                if guest_number is not None and len(guest_number) > 0 and experience.guest_number_max < int(guest_number):
-                    i += 1
-                    continue
+            if guest_number is not None and len(guest_number) > 0 and \
+                    experience.guest_number_max  and experience.guest_number_max < int(guest_number):
+                i += 1
+                continue
 
-                    experience_tags = get_experience_tags(experience, settings.LANGUAGES[0][0])
-                    if keywords is not None and len(keywords) > 0 and experience_tags is not None and len(experience_tags) > 0:
-                        tags = keywords.strip().split(",")
-                        match = False
-                        for tag in tags:
-                            if tag.strip() in experience_tags:
-                                match = True
-                                break
-                        if not match:
-                            i += 1
-                            continue
 
             if language is not None and len(language) > 0 and experience.language is not None and len(experience.language) > 0:
                 experience_language = experience.language.split(";")
@@ -2389,7 +2400,6 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
             photoset = experience.photo_set.all()
             if type != 'product':
-
                 image_url = experience.hosts.all()[0].registereduser.image_url
 
                 if photoset!= None and len(photoset) > 0 and image_url != None and len(image_url) > 0:
@@ -2489,9 +2499,9 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
             if request.user.is_authenticated():
-                mp.track(request.user.email,"Viewed " + city.title() + " search page");
+                mp.track(request.user.email,"Viewed " + city.title() + " search page")
             #else:
-            #    mp.track("","Viewed " + city.title() + " search page");
+            #    mp.track("","Viewed " + city.title() + " search page")
 
         template = 'experiences/experience_results.html'
     else:
@@ -2501,7 +2511,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                             'city' : city,
                             'city_display_name':city_display_name if city_display_name is not None else city.title(),
                             'length':len(cityExperienceList),
-                            'cityExperienceList' : zip(cityExperienceList, formattedTitleList, BGImageURLList, profileImageURLList),
+                            'cityExperienceList' : itertools.zip_longest(cityExperienceList, formattedTitleList, BGImageURLList, profileImageURLList),
                             'cityList':cityList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
                             'locations' : Locations,
