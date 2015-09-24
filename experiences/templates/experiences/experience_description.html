@@ -1,0 +1,111 @@
+{% load mathfilters %}
+{% load i18n %}
+
+            <div class="description-box">
+                {% if experience.type and experience.type == "RECOMMENDED" %}
+                <div class="recommended-label">{% trans "Recommended" %}</div>
+                {% endif %}
+                {% if experience.type and experience.type != "Multi-hosts" %}
+                {% if LANGUAGE != "zh-CN" %}
+                <h2 style="font-weight:bold">{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}
+                {% else %}
+                <h2 style="font-weight:bold">{% trans "with" %}{% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}{% trans "Experience" %}{{ experience.title }}
+                {% endif %}
+                {% else %}
+                <h2 style="font-weight:bold">{{ experience.title }}
+                {% endif %}
+                <br><small style="font-size:14px">{%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
+                </h2>
+
+                <div class="container-fluid" style="text-align:left;">
+					<div class="row" style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;">
+						<div class="col-sm-3">
+							<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Overview" %}</h3>
+						</div>
+						<div class="col-sm-9">
+                            <p>
+								{{ experience.description|linebreaks }}<br>
+								{{ experience.interaction|linebreaks }}
+                            </p>
+						</div>
+					</div>
+
+					<div class="row" style="border-bottom:1px solid #CCCCCC;">
+						<div class="col-sm-3">
+							<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Activities" %}</h3>
+						</div>
+						<div class="col-sm-9 col-xs-12" id="div_experience_activity">
+                            <p>
+								{{ experience.activity|linebreaks }}
+                            </p>
+						</div>
+					</div>
+
+					<div class="row" style="border-bottom:1px solid #CCCCCC;">
+						<div class="col-sm-3">
+							<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "What to wear" %}</h3>
+						</div>
+						<div class="col-sm-9">
+                            <p>
+							{{ experience.dress|linebreaks }}
+                            </p>
+						</div>
+					</div>
+
+					{% for w in experience.whatsincluded %}
+					<div class="row">
+						<div class="col-sm-3 col-xs-12" style="margin-bottom:0;">
+							<h3 style="color:grey;margin-top:0;line-height:1.5;">{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%elif w.item.lower == "transport"%}交通{%elif w.item.lower == "accommodation"%}住宿{%elif w.item.lower == "private guide"%}旅游达人{%endif%}{%endif%}:</h3>
+						</div>
+						<div class="col-sm-9" style="margin-bottom:0;">
+							<p>
+                                {{w.details}}
+                            </p>
+						</div>
+					</div>
+					{% endfor %}
+
+					<div class="row" style="border-bottom:1px solid #CCCCCC;height: 10px;">
+						<div class="col-sm-3">
+						</div>
+						<div class="col-sm-9">
+						</div>
+					</div>
+				</div>
+
+                <div id="myCarousel" class="carousel slide" data-ride="carousel">
+                    <!-- Indicators -->
+                    <ol class="carousel-indicators" style="position:absolute; bottom: -45px;">
+                    {% for photo in experience.photo_set.all %}
+                    {% if forloop.counter0 == 0 %}
+                        <li data-target="#myCarousel" data-slide-to="{{forloop.counter0}}" class="active"></li>
+                    {% else %}
+                     <li data-target="#myCarousel" data-slide-to="{{forloop.counter0}}"></li>
+                    {% endif %}
+                    {% endfor %}
+                    </ol>
+
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner" role="listbox">
+                    {% for photo in experience.photo_set.all %}
+                    {% if forloop.counter == 1 %}
+                        <div class="item active">
+                    {%else%}
+                        <div class="item">
+                    {% endif %}
+                            <img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}" alt="Chania">
+                        </div>
+                    {% endfor %}
+                    </div>
+
+                    <!-- Left and right controls -->
+                    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev" style="background:none">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next" style="background:none">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
