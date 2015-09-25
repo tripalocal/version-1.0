@@ -1,5 +1,5 @@
 ﻿/*personal info page*/
-.void-profile{margin-left:80px; margin-right:80px; margin-top:0px;}
+.void-profile{margin: 0 auto; }
 .bio{background-color:#f7f7f7; border-bottom:#CCC 1px solid; border-top:#CCC 1px solid;}
 .bioText{float: right;width: 400px;margin-top: 32px;}
 .bioBox .profile-lg {float:left;}
@@ -34,12 +34,17 @@
 .bio-text-position2{margin-left:20px; margin-top:10px;}
 .mg-r-20{margin-right:20px;}
 .text_grey {color: #CCCCCC;font-size: 11px;}
-.fileUpload {	position: relative;	overflow: hidden;	margin: 0px 5px 0px 5px;  padding-top:5px;  width:140px;    height:40px;}
+.fileUpload {	position: relative;	overflow: hidden;	margin: 0;  padding-top:5px;  width:140px;    height:35px;}
 .fileUpload input.upload {	position: absolute;	top: 0;	right: 0;	margin: 0;	padding: 0;	font-size: 20px;	cursor: pointer;	opacity: 0;	filter: alpha(opacity=0);}
-.fileUpload span {}
-input.uploadImage {    width:150px;    height:35px;}
+input.uploadImage {    width:140px;    height:35px;}
 
-#id_login, #id_password, #id_password1, #id_email, #id_first_name, #id_last_name {
-    width: 25vw;
-    height: 34px;
+
+.rightInterface {
+	padding: 30px;
+}
+
+#uploadImage_1 {
+	width: 140px;
+	display: inline-block;
+	margin-bottom: 5px;
 }
