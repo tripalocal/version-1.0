@@ -5,7 +5,7 @@
 {% block head %}
     {% load staticfiles %}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
-    {% if experience.type != "PRODUCT" and experience.type != "Multi-hosts" %}
+    {% if experience.type == 'PRIVATE' %}
     {% if LANGUAGE != "zh-CN" %}
     <title>{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</title>
     {%else%}
