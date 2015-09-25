@@ -749,6 +749,13 @@ class ExperienceDetailView(DetailView):
                 if len(related_experiences)>=3:
                     break
 
+        if len(related_experiences)<3:
+            queryset = Experience.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").order_by('?')[:3]
+            for exp in queryset:
+                related_experiences.append(exp)
+                if len(related_experiences)>=3:
+                    break
+
         for i in range(0,len(related_experiences)):
             related_experiences[i].dollarsign = DollarSign[related_experiences[i].currency.upper()]
             related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
