@@ -14,8 +14,8 @@ In order to get rid of stash and unstashes, here is a better practice to customi
 ## Organise static files
 
 ### Global static files
-1. Global static files go into `/images/css`, `/images/js`, `/images/img`.
-2. Reference using `{{ MEDIA_URL }}img/tripalocal_Logo.png`
+1. Global static files go into `/global_static/css`, `/global_static/js`, `/global_static/img`.
+2. Reference using `{% static 'img/top_logo-cn.svg' %}`
 
 ### App specific static files
 1. App specific files go into `<app_name>/static/<app_name>/...`.
