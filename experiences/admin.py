@@ -4,10 +4,11 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon, WechatProduct, WechatBooking, \
     NewProduct, NewProductI18n, Provider
-from experiences.views import create_experience
+from experiences.views import create_experience, saveExperienceImage
 from app.models import RegisteredUser
 from allauth.socialaccount.models import SocialAccount
 from post_office.models import Email
+from Tripalocal_V1 import settings
 import os
 
 class ExperienceAdmin(admin.ModelAdmin):
@@ -98,10 +99,18 @@ class ProductAdmin(admin.ModelAdmin):
                 photo = request.FILES['photo_set-' + str(i) + '-image']
                 name, extension = os.path.splitext(photo.name)
                 id = instance.experience.id
-                instance.name = "experience" + str(id) + "_" + str(i+1) + extension
+
+                dirname = settings.MEDIA_ROOT + '/experiences/' + str(id) + '/'
+                if not os.path.isdir(dirname):
+                    os.mkdir(dirname)
+
+                saveExperienceImage(instance.experience, photo, dirname, extension, i+1)
+
+                instance.name = 'experience' + str(id) + '_' + str(i+1) + extension
                 instance.directory = "experiences/" + str(id) + "/"
                 instance.image = instance.directory + instance.name
                 instance.save()
+
                 i += 1
             formset.save_m2m()
         else:

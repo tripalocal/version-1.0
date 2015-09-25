@@ -1059,6 +1059,40 @@ def saveProfileImage(user, profile, image_file):
 
         subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
 
+def saveExperienceImage(experience, photo, dirname, extension, index):
+    filename = 'experience' + str(experience.id) + '_' + str(index) + extension
+    destination = open(dirname + filename, 'wb+')
+    for chunk in photo.chunks():
+        destination.write(chunk)
+    destination.close()
+
+    #copy to the other website -- folder+file
+    if settings.LANGUAGES[0][0] == "en":
+        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/experiences/' + str(experience.id) + '/'
+    elif settings.LANGUAGES[0][0] == "zh":
+        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/experiences/' + str(experience.id) + '/'
+
+    if not os.path.isdir(dirname_other):
+        os.mkdir(dirname_other)
+    #subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
+
+    #create the corresponding thumbnail (force .jpg)
+    basewidth = 400
+    img = Image.open(dirname + filename)
+    wpercent = (basewidth/float(img.size[0]))
+    hsize = int((float(img.size[1])*float(wpercent)))
+    img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+    img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
+
+    #copy to the other website -- folder+file
+    if settings.LANGUAGES[0][0] == "en":
+        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
+    elif settings.LANGUAGES[0][0] == "zh":
+        dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/thumbnails/experiences/'
+    if not os.path.isdir(dirname_other):
+        os.mkdir(dirname_other)
+    #subprocess.Popen(['cp',settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg', dirname_other + 'experience' + str(experience.id) + '_' + str(index) + '.jpg'])
+
 def updateExperience(experience, id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, guest_number_min,
                    guest_number_max, price, currency, duration, city, status, language, dynamic_price,
                    title, description, activity, interaction, dress, meetup_spot, lan, lan2=None):
@@ -1370,38 +1404,7 @@ def create_experience(request, id=None):
                     name, extension = os.path.splitext(request.FILES['experience_photo_'+str(index)].name)
                     extension = extension.lower()
                     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
-                        filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-                        destination = open(dirname + filename, 'wb+')
-                        for chunk in request.FILES['experience_photo_'+str(index)].chunks():
-                            destination.write(chunk)
-                        destination.close()
-
-                        #copy to the other website -- folder+file
-                        if settings.LANGUAGES[0][0] == "en":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/experiences/' + str(experience.id) + '/'
-                        elif settings.LANGUAGES[0][0] == "zh":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/experiences/' + str(experience.id) + '/'
-
-                        if not os.path.isdir(dirname_other):
-                            os.mkdir(dirname_other)
-                        subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
-
-                        #create the corresponding thumbnail (force .jpg)
-                        basewidth = 400
-                        img = Image.open(dirname + filename)
-                        wpercent = (basewidth/float(img.size[0]))
-                        hsize = int((float(img.size[1])*float(wpercent)))
-                        img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-                        img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
-
-                        #copy to the other website -- folder+file
-                        if settings.LANGUAGES[0][0] == "en":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
-                        elif settings.LANGUAGES[0][0] == "zh":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/thumbnails/experiences/'
-                        if not os.path.isdir(dirname_other):
-                            os.mkdir(dirname_other)
-                        subprocess.Popen(['cp',settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg', dirname_other + 'experience' + str(experience.id) + '_' + str(index) + '.jpg'])
+                        saveExperienceImage(experience, content, dirname, extension, index)
 
                         name = 'experience' + str(experience.id) + '_' + str(index)
                         if not len(experience.photo_set.filter(name__startswith=name))>0:
@@ -1855,11 +1858,11 @@ def setExperienceDisplayPrice(experience):
             experience.price = dp[4-experience.guest_number_min]
 
 def setProductDisplayPrice(experience):
-    # if experience.price_type == NewProduct.NORMAL:
-    #     experience.price = experience.price
-    # elif experience.price_type == NewProduct.AGE_PRICE:
-    #     experience.price = experience.children_price
-    # else:
+    #if experience.price_type == NewProduct.NORMAL:
+    #    experience.price = experience.price
+    #elif experience.price_type == NewProduct.AGE_PRICE:
+    #    experience.price = experience.children_price
+    #else:
     setExperienceDisplayPrice(experience)
 
 def new_experience(request):
