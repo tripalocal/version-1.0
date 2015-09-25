@@ -694,3 +694,9 @@ msgstr "不支持该文件类型"
 
 #~ msgid "AUD/person"
 #~ msgstr "澳元/人"
+
+msgid "Travel with Locals"
+msgstr "旅游达人"
+
+msgid "Itineraries"
+msgstr "精品路线"

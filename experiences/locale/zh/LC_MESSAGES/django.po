@@ -1284,3 +1284,15 @@ msgstr "私人团"
 #~ "confirm or decline the request as soon as possible."
 #~ msgstr ""
 #~ "本土客：{guest_name}给您发送的订单请求已经超过24个小时，请尽快确认或拒绝。"
+
+msgid "Highlights"
+msgstr "特色推荐"
+
+msgid "Tips"
+msgstr "贴心提示"
+
+msgid "Pick up details"
+msgstr "接送详情"
+
+msgid "Refund policy"
+msgstr "退改政策"
