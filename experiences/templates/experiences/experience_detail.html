@@ -43,7 +43,7 @@
                         <div style="background:url({{ MEDIA_URL }}{{ host_image|urlencode }}); no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
                     </div>
                     {% endif %}
-                    {% if experience.type != "PRODUCT" and experience.type != "Multi-hosts" %}
+                    {% if experience.type == 'PRIVATE' %}
                     {% if LANGUAGE != "zh-CN" %}
                     {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
                     {%else%}
