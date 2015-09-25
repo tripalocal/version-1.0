@@ -94,8 +94,7 @@
                                         </div>
                                         <div class="price-box">
                                             {% trans "From" %} {{ experience.experience.dollarsign }}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span>
-                                            {% blocktrans with currency=experience.experience.currency %} {{ currency }}
-                                                /person {% endblocktrans %}
+                                            {% blocktrans with currency=experience.experience.currency %} {{ currency }}/person {% endblocktrans %}
                                         </div>
                                     </a>
                                 </div>
