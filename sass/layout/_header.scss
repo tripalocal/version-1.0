@@ -4,26 +4,85 @@
 
 */
 
-
 .navbar {
-  height: 60px;
   background-color: white;
   margin: 0;
+  font-size: 14px;
+  color: $dark-grey;
+  height: 50px;
+  text-align: center;
 
-  .container-fluid {
-    height: inherit;
+  a {
+    color: $dark-grey;
+  }
+
+  .navbar-btn {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .main-menu {
+    font-weight: 500;
+    display: inline-block;
+    float: none;
+    vertical-align: top;
+    a {
+      padding: 15px 0 0 0;
+      margin: 0 20px 12px 20px;
+      border-bottom: 3px solid white;
+    }
+    a:hover, a:focus, .current {
+      background-color: white;
+      border-color: $primary-color;
+    }
+  }
+
+  .navbar-brand {
+    display: block;
+    padding: 8px 15px 5px 15px;
+    @include media('<tablet') {
+      margin-left: auto;
+      margin-right: auto;
+      width: 115px;
+      float: none;
+      padding-left: 0;
+    }
   }
 
   .navbar-right {
     margin-right: 5px;
     margin-left: 5px;
+    @include media('<tablet') {
+      display: none;
+    }
   }
 
-  .navbar-btn {
-    margin-top: 12px;
-  }
   .navbar-text {
-    margin-top: 19px;
-    color: $medium-grey;
+    margin-left: 15px;
+    margin-right: 10px;
+  }
+  .caret {
+    margin-left: 10px;
+  }
+
+  .navbar-toggle {
+    color: $light-grey;
+  }
+}
+
+.navbar-default, .navbar-collapse {
+  background-color: white;
+}
+
+.navbar-collapse {
+  border-bottom: 1px solid $light-grey;
+}
+
+@media (min-width: 768px) {
+  ul.nav li.dropdown:hover > ul.dropdown-menu {
+    display: block;
+    margin: 0;
   }
 }

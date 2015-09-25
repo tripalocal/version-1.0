@@ -8,6 +8,10 @@ body {
   overflow-x: hidden;
 }
 
+li {
+  list-style: none;
+}
+
 .container {
   @include media('>=desktop') {
     width: 990px;

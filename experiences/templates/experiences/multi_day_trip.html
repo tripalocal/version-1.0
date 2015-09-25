@@ -20,12 +20,12 @@
 <div class="jumbotron top">
   <h1>{% trans "Tripalocal" %}</h1>
   <h1>{% trans "Authentic local experiences" %}</h1>
-  <h2>{% trans "Check our most popular trips" %}</h2>
+  <p>{% trans "Check our most popular trips" %}</p>
 </div>
 
 <div class="container">
   <div class="row">
-    <div class="col-sm-4">
+    <div class="col-md-4">
       <div class="exp-box">
         <div class="listing-img" style="background-image:url({% static 'experiences/img/travelling-01.jpg'%})">
         </div>
@@ -43,7 +43,7 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-md-4">
       <div class="exp-box">
         <div class="listing-img" style="background-image:url({{ MEDIA_URL }}city/Sydney.jpg)">
         </div>
@@ -61,7 +61,7 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-md-4">
       <div class="exp-box">
         <div class="listing-img" style="background-image:url({{ MEDIA_URL }}city/Brisbane.jpg)">
         </div>
@@ -98,4 +98,3 @@
     })
 </script>
 {% endblock %}
-

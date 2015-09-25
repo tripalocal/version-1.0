@@ -27,12 +27,20 @@
     position: relative;
     top: 7px;
   }
+
+  .container {
+    @include media('<tablet') {
+      width: 300px;
+    }
+  }
 }
 
 .footer-head {
-  margin-left: 30px;
-  list-style: none;
   text-align: center;
+  @include media('<tablet') {
+    padding-bottom: 20px;
+    padding-left: 0;
+  }
   select {
     height: 50px;
     width: 210px;
@@ -59,15 +67,7 @@
   text-align: center;
 }
 
-.footer-col {
-  width: 180px;
-  list-style: none;
-  text-align: left;
-
-}
-
 .footer-line {
-  width: 940px;
   border-top: 1px $medium-grey solid;
   clear: both;
   margin: auto;
@@ -78,16 +78,15 @@
   }
 }
 
-
-.footer hr {
-  display: block;
-  height: 1px;
-  border: 0;
-  border-top: 1px solid #858585;
-  margin: 1em 0;
-  padding: 0;
+.social {
+  @include media('<tablet') {
+    display: none;
+  }
 }
 
+.footer-col {
+  padding-left: 0;
+}
 
 .footer-col li:first-child {
   margin: 0 0 13px;

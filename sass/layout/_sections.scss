@@ -18,6 +18,10 @@
   a:hover {
     color: black;
   }
+  @include media ('<tablet') {
+    float: none;
+    margin: 15px auto;
+  }
 }
 
 .right-content-box {
@@ -30,6 +34,14 @@
   float: right;
   background-color: #fff;
   padding: 20px;
+  @include media('<tablet') {
+    float: none;
+    width: 90%;
+    margin: 15px auto;
+  }
+  @include media('<phone') {
+    width: 100%;
+  }
 }
 .right-content-box-header {
   background-color: transparent;

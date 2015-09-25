@@ -53,7 +53,8 @@ Guest_Number = (('1', '1' + _(' Guest')),('2', '2' + _(' Guests')),('3', '3' + _
 
 Guest_Number_Min = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
-Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
+Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
+                    ('11', '11'),('12', '12'),('13', '13'),('14', '14'),('15', '15'),('16', '16'),('17', '17'),('18', '18'),('19', '19'),('20', '20'),)
 
 Duration = (('1', '1 hour'),('1.5', '1.5 hours'),('2', '2 hours'),('2.5', '2.5 hours'),('3', '3 hours'),('4', '4 hours'),('5', '5 hours'),('6', '6 hours'),('7', '7 hours'),('8', '8 hours'),('9', '9 hours'),('10', '10 hours'),
 ('11', '11 hours'),('12', '12 hours'),('24', '1 day'),('48', '2 days'),('72', '3 days'),('96', '4 days'),('120', '5 days'),('144', '6 days'),('168', '7 days'),('192', '8 days'),
@@ -84,7 +85,7 @@ Country = (('Australia', 'Australia'),('China', 'China'),('Afghanistan', 'Afghan
 ('Sint Maarten', 'Sint Maarten'),('Slovakia', 'Slovakia'),('Slovenia', 'Slovenia'),('Solomon Islands', 'Solomon Islands'),('Somalia', 'Somalia'),('South Africa', 'South Africa'),('South Korea', 'South Korea'),('South Sudan', 'South Sudan'),('Spain ', 'Spain '),('Sri Lanka', 'Sri Lanka'),('Sudan', 'Sudan'),('Suriname', 'Suriname'),('Swaziland ', 'Swaziland '),('Sweden', 'Sweden'),('Switzerland', 'Switzerland'),('Syria', 'Syria'),('Taiwan, China', 'Taiwan, China'),('Tajikistan', 'Tajikistan'),('Tanzania', 'Tanzania'),('Thailand ', 'Thailand '),('Timor-Leste', 'Timor-Leste'),('Togo', 'Togo'),('Tonga', 'Tonga'),('Trinidad and Tobago', 'Trinidad and Tobago'),('Tunisia', 'Tunisia'),('Turkey', 'Turkey'),('Turkmenistan', 'Turkmenistan'),
 ('Tuvalu', 'Tuvalu'),('Uganda', 'Uganda'),('Ukraine', 'Ukraine'),('United Arab Emirates', 'United Arab Emirates'),('United Kingdom', 'United Kingdom'),('Uruguay', 'Uruguay'),('Uzbekistan', 'Uzbekistan'),('Vanuatu', 'Vanuatu'),('Venezuela', 'Venezuela'),('Vietnam', 'Vietnam'),('Yemen', 'Yemen'),('Zambia', 'Zambia'),('Zimbabwe ', 'Zimbabwe '),)
 
-Tags = "Food & wine, Education, History & culture, Architecture, For couples, Photography worthy, Livability research, Kids friendly, Outdoor & nature, Shopping, Sports & leisure, Host with car, Extreme fun, Events, Health & beauty, Private group"
+Tags = "Food & wine, Education, History & culture, Architecture, For couples, Photography worthy, Livability research, Outdoor & nature, Shopping, Sports & leisure, Extreme fun, Events, Health & beauty"
 
 if settings.LANGUAGE_CODE.lower()=="zh-cn":
     Country = (('China', 'China'),('Australia', 'Australia'),('Afghanistan', 'Afghanistan'),('Albania', 'Albania'),('Algeria', 'Algeria'),('Andorra', 'Andorra'),('Angola', 'Angola'),('Antigua and Barbuda', 'Antigua and Barbuda'),('Argentina', 'Argentina'),('Armenia', 'Armenia'),('Aruba', 'Aruba'),('Austria', 'Austria'),('Azerbaijan', 'Azerbaijan'),('Bahamas', 'Bahamas'),('Bahrain', 'Bahrain'),('Bangladesh', 'Bangladesh'),('Barbados', 'Barbados'),('Belarus', 'Belarus'),('Belgium', 'Belgium'),('Belize', 'Belize'),('Benin', 'Benin'),('Bhutan', 'Bhutan'),('Bolivia', 'Bolivia'),('Bosnia and Herzegovina', 'Bosnia and Herzegovina'),('Botswana', 'Botswana'),('Brazil', 'Brazil'),('Brunei ', 'Brunei '),('Bulgaria', 'Bulgaria'),('Burkina Faso', 'Burkina Faso'),
@@ -608,7 +609,7 @@ class BookingConfirmationForm(forms.Form):
             #exp_month = self.cleaned_data["expiration"].month
             #exp_year = self.cleaned_data["expiration"].year
             #cvv = self.cleaned_data["cvv"]
-            experience = Experience.objects.get(id=self.cleaned_data['experience_id'])
+            experience = AbstractExperience.objects.get(id=self.cleaned_data['experience_id'])
 
             extra_fee = 0.00
             free = False
@@ -919,10 +920,13 @@ class ItineraryBookingForm(forms.Form):
                 free = True
                 booking_extra_information = card_number
 
-            experience = Experience.objects.get(id=ids[i])
-            experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
-            experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
-            experience.dropoff_spot = get_experience_dropoff_spot(experience, settings.LANGUAGES[0][0])
+            experience = AbstractExperience.objects.get(id=ids[i])
+            if type(experience) == Experience:
+                experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+                experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
+                experience.dropoff_spot = get_experience_dropoff_spot(experience, settings.LANGUAGES[0][0])
+            else:
+                experience.title = experience.get_product_title(settings.LANGUAGES[0][0])
 
             if not free:
                 subtotal_price = 0.0
@@ -966,7 +970,7 @@ class ItineraryBookingForm(forms.Form):
             else:
                 #save the booking record
                 #user = User.objects.get(id=self.cleaned_data['user_id']) #moved outside of the for loop
-                host = experience.hosts.all()[0]
+                host = get_host(experience)
                 bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
                 bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
                 local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -986,7 +990,7 @@ class ItineraryBookingForm(forms.Form):
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
                 booking.save()
                 #add the user to the guest list
-                if user not in experience.guests.all():
+                if type(experience) == Experience and user not in experience.guests.all():
                 #experience.guests.add(user)
                     cursor = connections['default'].cursor()
                     cursor.execute("Insert into experiences_experience_guests (experience_id,user_id) values (%s, %s)", [experience.id, user.id])
@@ -1062,8 +1066,14 @@ class ItineraryBookingForm(forms.Form):
 
         return cleaned
 
+def get_host(experience):
+    if type(experience) == Experience:
+        return experience.hosts.all()[0]
+    else:
+        return experience.provider.user
+
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
-    host = experience.hosts.all()[0]
+    host = get_host(experience)
     if not is_instant_booking:
         # send an email to the host
         if not settings.DEVELOPMENT:
@@ -1160,11 +1170,14 @@ def send_booking_email_verification(booking, experience, user, is_instant_bookin
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
 
 def sms_notification(booking, experience, user, phone_number):
-    exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+    if type(experience) == Experience:
+        exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+    else:
+        exp_title = experience.get_product_title(settings.LANGUAGE_CODE)
     customer_phone_num = phone_number
     exp_datetime_local = booking.datetime.astimezone(tzlocal())
     exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
-    host = experience.hosts.all()[0]
+    host = get_host(experience)
     send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
     schedule_request_reminder_sms(booking.id, host.id, user.first_name, booking.datetime + timedelta(days=1))
 

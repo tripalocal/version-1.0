@@ -81,3 +81,14 @@
   @extend %wishlist-related-icon;
   background-image: url("../img/heart_small_filled.svg");
 }
+
+.bus-icon {
+  background-image: url(../img/bus.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 27px;
+  height: 27px;
+  position: absolute;
+  left: 20px;
+}

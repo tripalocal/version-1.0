@@ -1,0 +1,46 @@
+{% extends "app/layout.html" %}
+{% load staticfiles %}
+{% load mathfilters %}
+{% load i18n %}
+
+{% block head %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
+    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+    <title>{%trans "Discover" %} {{ city_display_name }}</title>
+{% endblock %}
+
+{% block content %}
+<form id="search_form" action="{{GEO_POSTFIX}}s/melbourne/" method="post">
+    {% csrf_token %}
+    <div class="basic-search">
+      <div class="container">
+        <h3 class="field-header"> {% trans 'Location' %}</h3>
+        <div class="ui selection dropdown">
+            <input id="id_city" type="hidden" name="city" value="city">
+            <i class="dropdown icon"></i>
+            <div id="city_name" class="text">{%trans "City" %}</div>
+            <div id="city-menu" class="menu"></div>
+        </div>
+      </div>
+    </div>
+</form>
+
+<div class="search-result">
+  <div class="container">
+      <div class="loading"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
+      <div id="ajax-experience-result"></div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+
+{% endblock %}
