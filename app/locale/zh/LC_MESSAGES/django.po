@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-25 13:34+1000\n"
+"POT-Creation-Date: 2015-09-25 15:52+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -291,11 +291,11 @@ msgstr "账户设置"
 
 #: templates/app/layout.html:166
 msgid "Logout"
-msgstr ""
+msgstr "退出"
 
 #: templates/app/layout.html:173
 msgid "Login"
-msgstr ""
+msgstr "登录"
 
 #: templates/app/layout.html:182
 msgid "Travel with Locals"
@@ -475,7 +475,7 @@ msgstr "我们不会公布您的电子邮箱。"
 msgid "Local Mobile Number"
 msgstr "当地手机号码"
 
-#: templates/app/myprofile.html:90
+#: templates/app/myprofile.html:88
 msgid ""
 "This information will be available to people who have booked your<br> "
 "experience."
@@ -483,11 +483,11 @@ msgstr ""
 "其他本土客用户只有在体验订单确认后才会知道您全名。<br> 在公共页面上我们只显示"
 "您姓氏的缩写。"
 
-#: templates/app/myprofile.html:97
+#: templates/app/myprofile.html:95
 msgid "Bio"
 msgstr "自我简介"
 
-#: templates/app/myprofile.html:102
+#: templates/app/myprofile.html:100
 msgid ""
 " Tripalocal is all about like minded people doing things together.\n"
 "\t\t\t\t\t\t\t\t\t\t\t\tYour profile will help people understand your style "
@@ -496,7 +496,7 @@ msgstr ""
 "本土客的宗旨是让志同道合的人一起做一些有意义的事情。<br>您的资料能够帮助用户"
 "了解您的风格和个性。"
 
-#: templates/app/myprofile.html:106
+#: templates/app/myprofile.html:104
 msgid ""
 "It's like having friends all over the world to show you around, or\n"
 "\t\t\t\t\t\t\t\t\t\t\t\tvice versa. What type of people would you like to "
@@ -505,7 +505,7 @@ msgstr ""
 "就好像是有着世界各地的朋友能够带您参观不同的地方，<br>反之就好像是您为来自世"
 "界各地的朋友介绍某个地方。你会想遇到什么样的人呢？"
 
-#: templates/app/myprofile.html:111
+#: templates/app/myprofile.html:109
 msgid "Save"
 msgstr "保存"
 
@@ -730,12 +730,3 @@ msgstr "不支持该文件类型"
 
 #~ msgid "Greater Queensland"
 #~ msgstr "昆士兰州其他地区"
-
-#~ msgid "AUD/person"
-#~ msgstr "澳元/人"
-
-msgid "Travel with Locals"
-msgstr "旅游达人"
-
-msgid "Itineraries"
-msgstr "精品路线"
