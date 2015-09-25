@@ -95,10 +95,12 @@ class ProductAdmin(admin.ModelAdmin):
             for obj in formset.deleted_objects:
                 obj.delete()
             i = 0
+
             for instance in instances:
+                id = instance.experience.id
+                i = len(Photo.objects.filter(experience_id=id))
                 photo = request.FILES['photo_set-' + str(i) + '-image']
                 name, extension = os.path.splitext(photo.name)
-                id = instance.experience.id
 
                 saveExperienceImage(instance.experience, photo, extension, i+1)
 
