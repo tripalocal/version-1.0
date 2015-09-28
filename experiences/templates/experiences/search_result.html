@@ -9,18 +9,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--<link href="{% static 'experiences/content/tripalocal_search.css' %}" rel="stylesheet">
-    <link href="{% static 'experiences/content/tripalocal_search_async.css' %}" rel="stylesheet">-->
     <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
-    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
-    {%if LANGUAGE == "zh-CN"%}
-    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
-    {%endif%}
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
     <title>{%trans "Discover" %} {{ city_display_name }}</title>
 {%endblock%}
 
@@ -141,6 +131,16 @@
 {% endblock %}
 
 {% block scripts %}
+  <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+  {%if LANGUAGE == "zh-CN"%}
+  <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+  {%endif%}
+  <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+  <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+  <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+
+
 <script charset="utf-8" type="text/javascript">
 	$(document).ajaxStart(function() {
 		$(".loading").show();

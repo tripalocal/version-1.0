@@ -4,7 +4,6 @@
 
 {% block head %}
     {% load staticfiles %}
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
     {% if experience.type == 'PRIVATE' %}
     {% if LANGUAGE != "zh-CN" %}
     <title>{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</title>
@@ -16,7 +15,6 @@
     {% endif %}
     <!--<link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">-->
     <link href="{% static 'experiences/content/experience-detail.css' %}" rel="stylesheet">
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -313,7 +311,8 @@
 {% endblock %}
 
 {% block scripts %}
-
+<script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
+<script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 <script charset="utf-8" type="text/javascript">
 
 $(function(){
