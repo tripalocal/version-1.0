@@ -184,9 +184,11 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         photos = experience.photo_set.all()
         if photos is not None and len(photos) > 0:
             photo_url = photos[0].directory+photos[0].name
+
         experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]),
                             'meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]), 'rate': rate,
-                            'duration':experience.duration, 'city':experience.city,
+                            'duration':int(experience.duration) if float(experience.duration).is_integer() else experience.duration,
+                            'city':experience.city,
                             'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
                             'language':experience.language, 'host':host.first_name + ' ' + host.last_name,
                             'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated,
@@ -2682,6 +2684,7 @@ def custom_itinerary(request):
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
 
     context = RequestContext(request)
+    context['LANGUAGE'] = settings.LANGUAGE_CODE
     form = CustomItineraryForm()
 
     if request.method == 'POST':
