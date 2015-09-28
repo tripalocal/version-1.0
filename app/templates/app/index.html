@@ -198,16 +198,16 @@
             </div>
     </div>
 
-    <div id="video-sec" class="video-box" style="background-image:url({{ MEDIA_URL }}homepage/video_poster-01.jpg)">
+    <div id="video-sec" class="video-box" style="background-image:url({% static 'img/homepage/video_poster-01.jpg' %})">
         <div class="video-overlay">
             <h1 style="font-size:32px;font-family:'EXO', Helvertica, sans-serif;">{% trans "Travel with Tripalocal" %}</h1>
             <p style="font-size:16px;">{% trans "See how it works" %}</p>
             <br><br>
-            <a style="cursor:pointer" id="enter_fullscreen"><img src="{{ MEDIA_URL }}homepage/play_btn.svg" width="75"></a>
+            <a style="cursor:pointer" id="enter_fullscreen"><img src="{% static 'img/homepage/play_btn.svg' %}" width="75"></a>
         </div>
     </div>
     <div id="video-fullscreen" class="video-fullscreen">
-        <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="{{ MEDIA_URL }}homepage/closeIcon-01.svg" width="30"></a>
+        <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="{% static 'img/homepage/closeIcon-01.svg' %}" width="30"></a>
         <div class="video-wrap">
             <video controls preload="metadata">
                 <source src="http://bponlinewoc2264.ngcdn.telstra.com/pd_chief/chief_preview/Tripalocal%20Delivery_1.mp4" type="video/mp4">
@@ -222,12 +222,12 @@
             <h1>{% trans "Our Community"%}</h1>
             <div class="row">
                 <div class="col-sm-6">
-                  <div class="box" style="background-image:url({{ MEDIA_URL }}homepage/travelling-01.jpg)">
+                  <div class="box" style="background-image:url({% static 'img/homepage/travelling-01.jpg' %})">
                     <a class=" btn btn-danger">{% trans "Travelling" %}</a>
                   </div>
                 </div>
                 <div class="col-sm-6">
-                  <div class="box" style="background-image:url({{ MEDIA_URL }}homepage/hosting-01.jpg)">
+                  <div class="box" style="background-image:url({% static 'img/homepage/hosting-01.jpg' %}">
                     <a class=" btn btn-primary">{% trans "Hosting" %}</a>
                   </div>
                 </div>
