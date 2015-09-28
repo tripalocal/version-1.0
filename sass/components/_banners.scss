@@ -52,3 +52,14 @@
     border-radius: 3px;
   }
 }
+
+.bottom-qr {
+  position: fixed;
+  bottom: 40px;
+  right: 10px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 64px;
+  height: 64px;
+}
