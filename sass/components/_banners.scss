@@ -62,4 +62,7 @@
   background-size: contain;
   width: 64px;
   height: 64px;
+  @include media('<tablet') {
+    display: none;
+  }
 }

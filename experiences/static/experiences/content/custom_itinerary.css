@@ -17,27 +17,20 @@
 
 .destination_city {
     display: inline-block;
-    float: left;
-    margin-left: 60px;
     border: solid 1px #676767;
     border-radius: 2px;
-    top: -15px;
     position: relative;
     width: 300px;
     text-align: center;
     padding: 5px;
-    height: auto !important;
 }
 
 #id_start_datetime_picker_day_1 {
-    float: left;
-    width: 150px;
-    margin-left: 70px;
     padding-right: 10px;
+    display: inline-block;
 }
 
 #guest_number_div .people {
-    margin-top: 30px;
     position: relative;
     top: 20px;
     left: 20px;
@@ -60,9 +53,9 @@
 }
 
 #language_div {
-    margin-top: 50px;
+    margin-top: 20px;
     margin-right: 60px;
-    margin-left: 10px;
+    margin-left: 20px;
 }
 
 #checkout {
@@ -72,8 +65,7 @@
 .language-choice-checkbox {
     width: 100px;
     float: left;
-    margin-top: 45px;
-    margin-left: 6px;
+    margin-top: 20px;
 }
 
 .language-choice-checkbox input[type=checkbox] {
@@ -176,7 +168,7 @@
 }
 
 #optional_criteria_container {
-    width: 940px;
+    width: 960px;
     margin: auto;
 }
 
@@ -230,6 +222,7 @@
     border: 0px;
     background-color: transparent;
     margin: 0 5px;
+    height:auto;
 }
 
 .itinerary-remove-button {
@@ -341,16 +334,14 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     background: url(/images/icon/dropdown-button.png) no-repeat;
-    float: left;
-    width: 180px;
-    background-position: 140px 5px;
+    width: 210px;
+    background-position: 180px 5px;
     border: 1px solid #D3D3D3;
     background-color: #FFF;
     border-radius: 5px;
     padding: 5px;
     color: #5E5E5E;
     padding-left: 20px;
-    margin-left: 120px;
 }
 
 #guest_number_div select {
@@ -380,8 +371,7 @@
     position: relative;
     margin-bottom: -10px;
     float: left;
-    margin-top: 35px;
-    margin-right: 25px;
+    margin-left: 25px;
 }
 
 .money-icon {
