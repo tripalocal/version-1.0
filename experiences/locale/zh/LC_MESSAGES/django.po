@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-25 13:36+1000\n"
+"POT-Creation-Date: 2015-09-25 16:16+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -202,9 +202,9 @@ msgstr "澳元"
 msgid "NZD"
 msgstr "新西兰元"
 
-#: forms.py:808 forms.py:1189 forms.py:1193 resource.py:1067 views.py:1531
-#: views.py:1539 views.py:1543 views.py:1770 views.py:1775 views.py:1784
-#: views.py:1789
+#: forms.py:808 forms.py:1189 forms.py:1193 resource.py:1067 views.py:1538
+#: views.py:1546 views.py:1550 views.py:1777 views.py:1782 views.py:1791
+#: views.py:1796
 #, python-format
 msgid "%s"
 msgstr ""
@@ -219,8 +219,8 @@ msgstr " 预约了您的体验"
 
 #: forms.py:1081 forms.py:1094 forms.py:1114 forms.py:1126 forms.py:1138
 #: forms.py:1162 resource.py:219 resource.py:243 resource.py:255
-#: resource.py:267 views.py:1591 views.py:1607 views.py:1619 views.py:1646
-#: views.py:1727 views.py:1738
+#: resource.py:267 views.py:1598 views.py:1614 views.py:1626 views.py:1653
+#: views.py:1734 views.py:1745
 msgid "Tripalocal <"
 msgstr "本土客 <"
 
@@ -228,21 +228,21 @@ msgstr "本土客 <"
 msgid "[Tripalocal] Your booking request is sent to the host"
 msgstr "【本土客】 您的预约已经发送"
 
-#: forms.py:1113 forms.py:1161 resource.py:218 resource.py:242 views.py:1590
-#: views.py:1645
+#: forms.py:1113 forms.py:1161 resource.py:218 resource.py:242 views.py:1597
+#: views.py:1652
 msgid "[Tripalocal] Booking confirmed"
 msgstr "【本土客】 预订确认"
 
-#: forms.py:1125 forms.py:1137 resource.py:254 resource.py:266 views.py:1606
-#: views.py:1618
+#: forms.py:1125 forms.py:1137 resource.py:254 resource.py:266 views.py:1613
+#: views.py:1625
 msgid "[Tripalocal] Booking reminder"
 msgstr "【本土客】 预订提醒"
 
-#: forms.py:1149 resource.py:230 views.py:1633
+#: forms.py:1149 resource.py:230 views.py:1640
 msgid "[Tripalocal] How was your experience?"
 msgstr "【本土客】 您对我们的体验还满意吗？"
 
-#: forms.py:1179 views.py:1722
+#: forms.py:1179 views.py:1729
 msgid "%H:%M %d %b %Y"
 msgstr "%Y年%-m月%d日 %H:%M"
 
@@ -934,7 +934,7 @@ msgstr "%(currency)s/人 起"
 
 #: templates/experiences/experience_results.html:41
 msgid "Public"
-msgstr ""
+msgstr "非私人团"
 
 #: templates/experiences/multi_day_trip.html:15
 msgid "Tripalocal | Most popular trips"
@@ -1013,11 +1013,11 @@ msgstr "行程亮点"
 
 #: templates/experiences/product_description.html:34
 msgid "Tips"
-msgstr "小贴士"
+msgstr "贴心提示"
 
 #: templates/experiences/product_description.html:45
 msgid "Pickup detail"
-msgstr "接送"
+msgstr "接送详情"
 
 #: templates/experiences/product_description.html:56
 msgid "Refund policy"
@@ -1122,7 +1122,7 @@ msgstr "探索"
 #: templates/experiences/search_result.html:36
 #: templates/experiences/supplier_search.html:24
 msgid "Location"
-msgstr ""
+msgstr "目的地"
 
 #: templates/experiences/search_result.html:77
 msgid "Kids friendly only"
@@ -1170,39 +1170,39 @@ msgstr "更新"
 msgid "Cancel"
 msgstr "取消"
 
-#: views.py:1022 views.py:1399 views.py:1432 views.py:2111
+#: views.py:1029 views.py:1406 views.py:1439 views.py:2118
 msgid "Image size exceeds the limit"
 msgstr "图片大小超过上限"
 
-#: views.py:1024 views.py:1401 views.py:1434
+#: views.py:1031 views.py:1408 views.py:1441
 msgid "File type is not supported"
 msgstr "不支持的文件类型"
 
-#: views.py:1340
+#: views.py:1347
 msgid "Experience with the same Id already exists"
 msgstr "该Id已分配给其他体验"
 
-#: views.py:1585
+#: views.py:1592
 msgid "%H:%M %-d %b %Y"
 msgstr "%Y年%-m月%-d日 %H:%M"
 
-#: views.py:1726
+#: views.py:1733
 msgid "[Tripalocal] Your experience is cancelled"
 msgstr "【本土客】 您预订的体验已经取消"
 
-#: views.py:1737
+#: views.py:1744
 msgid "[Tripalocal] Cancellation confirmed"
 msgstr "【本土客】 确认取消"
 
-#: views.py:2347
+#: views.py:2354
 msgid "Kids Friendly"
 msgstr "亲子夏令营"
 
-#: views.py:2349
+#: views.py:2356
 msgid "Host with Car"
 msgstr "领路人自驾"
 
-#: views.py:2351
+#: views.py:2358
 msgid "Private group"
 msgstr "私人团"
 
@@ -1321,15 +1321,3 @@ msgstr "私人团"
 #~ "confirm or decline the request as soon as possible."
 #~ msgstr ""
 #~ "本土客：{guest_name}给您发送的订单请求已经超过24个小时，请尽快确认或拒绝。"
-
-msgid "Highlights"
-msgstr "特色推荐"
-
-msgid "Tips"
-msgstr "贴心提示"
-
-msgid "Pick up details"
-msgstr "接送详情"
-
-msgid "Refund policy"
-msgstr "退改政策"
