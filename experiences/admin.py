@@ -95,21 +95,14 @@ class ProductAdmin(admin.ModelAdmin):
             for obj in formset.deleted_objects:
                 obj.delete()
             i = 0
+
             for instance in instances:
+                id = instance.experience.id
+                i = len(Photo.objects.filter(experience_id=id))
                 photo = request.FILES['photo_set-' + str(i) + '-image']
                 name, extension = os.path.splitext(photo.name)
-                id = instance.experience.id
 
-                dirname = settings.MEDIA_ROOT + '/experiences/' + str(id) + '/'
-                if not os.path.isdir(dirname):
-                    os.mkdir(dirname)
-
-                saveExperienceImage(instance.experience, photo, dirname, extension, i+1)
-
-                instance.name = 'experience' + str(id) + '_' + str(i+1) + extension
-                instance.directory = "experiences/" + str(id) + "/"
-                instance.image = instance.directory + instance.name
-                instance.save()
+                saveExperienceImage(instance.experience, photo, extension, i+1)
 
                 i += 1
             formset.save_m2m()

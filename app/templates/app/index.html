@@ -77,8 +77,8 @@
 
     <div class="tease-box">
 
-      <h1>{% trans "Discover authentic experiences" %}</h1>
-      <p>{%trans "Explore local places" %}</p>
+      <h1 class="hidden-xs">{% trans "Discover authentic experiences" %}</h1>
+      <p class="hidden-xs">{%trans "Explore local places" %}</p>
 
             <div class="container">
                 <div class="row">
@@ -94,8 +94,7 @@
                                         </div>
                                         <div class="price-box">
                                             {% trans "From" %} {{ experience.experience.dollarsign }}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span>
-                                            {% blocktrans with currency=experience.experience.currency %} {{ currency }}
-                                                /person {% endblocktrans %}
+                                            {% blocktrans with currency=experience.experience.currency %} {{ currency }}/person {% endblocktrans %}
                                         </div>
                                     </a>
                                 </div>

@@ -23,7 +23,7 @@
         <div id="criteria_div">
             <div id="mandatory_criteria_div">
                 <div id="date_destination_div" style="float:left;width:390px;">
-                    <!--<button id="add_day_button" type="button" style="float:left;width:75px;">Add</button>-->
+                    <button id="add_day_button" type="button" style="float:left;width:75px;">Add</button>
                     <div id="add_day_1_div">
                         <div class="data-icon"> 
                             <p class="date-exp">Dates</p>
@@ -49,7 +49,7 @@
                         </div>
                         <script>
                             $(function() {
-                                $("#id_start_datetime_picker_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
+                                $("#id_start_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
                             });
                         </script>
                         <div class="input-group date" id="id_end_datetime_picker_day_1" style="float:left;width:150px;">
@@ -60,7 +60,7 @@
                         </div>
                         <script>
                             $(function() {
-                                $("#id_end_datetime_picker_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
+                                $("#id_end_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
                             });
                         </script>
                     </div>
@@ -293,7 +293,7 @@
                     "</div>"+
                     "<script>"+
                         "$(function() {"+
-                            "$(\"#id_start_datetime_picker_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
+                            "$(\"#id_start_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
                         "});"+
                     "<\/script>"+
                     "<div class=\"input-group date\" id=\"id_end_datetime_picker_day_" + id + "\" style=\"float:left;width:150px;\">"+
@@ -304,7 +304,7 @@
                     "</div>"+
                     "<script>"+
                         "$(function() {"+
-                            "$(\"#id_end_datetime_picker_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
+                            "$(\"#id_end_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
                         "});"+
                     "<\/script>"+
                 "</div>";

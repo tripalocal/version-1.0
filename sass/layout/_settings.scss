@@ -16,6 +16,11 @@
   border-top: solid 1px $light-grey;
   height: 45px;
   border-bottom: solid 1px $light-grey;
+  .container {
+    @include media('<phone') {
+      padding: 0;
+    }
+  }
 }
 
 .tab_item {
@@ -29,10 +34,16 @@
   }
 }
 
+.form-width-lg {
+  width: 280px;
+  margin-right:20px;
+  @include media('<phone') {
+    width: 100%;
+  }
+}
+
 #active-tab {
-  color: rgb(130,202,202);
-  padding-left: 0;
-  padding-right: 6px;
+  color: $primary-color;
 }
 
 // My Profile form
@@ -49,8 +60,8 @@
     float: none;
   }
   @include media('<tablet') {
-    width: 80%;
-    margin: auto;
+    width: 90%;
+    margin: 15px auto;
   }
   p {
     margin-bottom: 10px;

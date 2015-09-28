@@ -26,160 +26,92 @@
     			<p>{% trans "My Profile" %}</p>
     		</div>
 
-            <form id="my_profile_form" method="post" action="" enctype="multipart/form-data">
-                {% csrf_token %}
-			    <div class="rightInterface">
-		            <p id="right_box">{% trans "Basic" %}</p>
-                    <hr>
-                    <table>
-                        <tr>
-                            <td>
-          	                    <div class="profile-lg void-profile" style="background:url({{MEDIA_URL}}{{image_url|urlencode}}); background-size: cover; background-repeat: no-repeat; background-position:center;">
-                                </div>
-                            </td>
-                            <td>
-          	                    <div class="text_grey text-position">{% blocktrans %}Clear frontal face photos are an important way for hosts and<br>
-                                                                    guests to learn about each other. It's not much fun to host a <br>
-                                                                    landscape! Please upload a photo that clearly shows your face.<br>
-                                                                    Please make sure your image is under 1MB.{% endblocktrans %}
-                                </div>
-                                {%if form.files.image%}
-                                <input class="form-control" id="uploadImage_1" placeholder="{{form.files.image.name}}" class="uploadImage" disabled="disabled" />
-                                {%else%}
-                                <input class="form-control" id="uploadImage_1" placeholder="{% trans "No file chosen" %}" class="uploadImage" disabled="disabled" />
-                                {%endif%}
-                                <div class="fileUpload btn btn-primary">
-                                    <img alt="" src="{% static 'app/img/camera.gif' %}"><span>{% trans "Choose File" %}</span>
-                                    {{form.image}}
-                                </div>
-                                <!--<a class="btn btn-primary btn-sm button-position" role="button">Choose File</a>
-                                <p class="no-file">No File Selected</p>-->
-                            </td>
-                        </tr>
-                        {% if LANGUAGE != "zh-CN" %}
-                        <tr>
-                            <td>
-                                <div>
-                                    <p>{% trans "First Name" %}</p>
-                                    <div class="form-group">
-                                        {{form.first_name}}
-        	                        </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div>
-                                    <p>{% trans "Last Name" %}
-                                        <img src="{{ MEDIA_URL }}icon/lock.jpg">
-                                    </p>
-                                    <div class="form-group">
-                                        {{form.last_name}}
-        	                        </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="text_grey blank-text">{% blocktrans %}This is only shared once you have a confirmed booking with <br>
-                                                                    another Tripalocal user. We only display your initial in public.{% endblocktrans %}
-                                </div>
-                            </td>
-                            <td>
-                                <div class="text_grey hinttext-position">{% blocktrans %}This is only shared once you have a confirmed booking with <br>
-                                                                    another Tripalocal user. We only display your initial in public.{% endblocktrans %}
-                                </div>
-                            </td>
-                        </tr>
-                        {%else%}
-                        <tr>
-                            <td>
-                                <div>
-                                    <p>{% trans "Last Name" %}
-                                        <img src="{{ MEDIA_URL }}icon/lock.jpg">
-                                    </p>
-                                    <div class="form-group">
-                                        {{form.last_name}}
-        	                        </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div>
-                                    <p>{% trans "First Name" %}</p>
-                                    <div class="form-group">
-                                        {{form.first_name}}
-        	                        </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="text_grey hinttext-position">{% blocktrans %}This is only shared once you have a confirmed booking with <br>
-                                                                    another Tripalocal user. We only display your initial in public.{% endblocktrans %}
-                                </div>
-                            </td>
-                            <td>
-                                <div class="text_grey blank-text">{% blocktrans %}This is only shared once you have a confirmed booking with <br>
-                                                                    another Tripalocal user. We only display your initial in public.{% endblocktrans %}
-                                </div>
-                            </td>
-                        </tr>
-                        {%endif%}
-                        <tr>
-                            <td>
-                                <div>
-                                    <p>{% trans "Email Address" %}
-                                        <img src="{{ MEDIA_URL }}icon/lock.jpg">
-                                    </p>
-                                </div>
-                                <div class="form-group">
-                                    {{form.email}}
-        	                    </div>
-                                <div class="text_grey hinttext-position">{% trans "Your email address will not be disclosed." %}</div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div>
-                                    <p>{% trans "Local Mobile Number" %}
-                                        <img src="{{ MEDIA_URL }}icon/lock.jpg">
-                                    </p>
-                                </div>
-                                <div class="form-group">
-          		                    {{form.phone_number}}
-        	                    </div>
-                                <div class="text_grey hinttext-position">{% trans "This information will be available to people who have booked your<br> experience." %}
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                    <table>
-                        <tr>
-                            <td>
-        	                    <p>{% trans "Bio" %}</p>
-                                {{form.bio}}
-                            </td>
-                            <td>
-                                <div class="bio-text-position">
-                                    <div class="text_grey bio-text-position1">
-        	                        {% blocktrans %} Tripalocal is all about like minded people doing things together.<br>
-                                    Your profile will help people understand your style and personal-<br>
-                                    ity.{% endblocktrans %}
-                                    </div>
-                                    <div class="text_grey bio-text-position2">
-                                    {% blocktrans %}It's like having friends all over the world to show you around, or<br>
-                                    vice versa. What type of people would you like to meet up with? {% endblocktrans %}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                    <p></p>
-                    <input id="id_submit" type="submit" class="btn btn-primary btn-sm" value="{% trans "Save" %}" />
-                </div>
-            </form>
-        </div>
-    </div>
 
+			    <div class="rightInterface">
+						<h2 id="right_box">{% trans "Basic" %}</h2>
+						<hr>
+						<form class="form-horizontal" id="my_profile_form" method="post" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+								    <div class="form-group">
+											<div class="col-sm-6">
+												<div class="profile-lg void-profile" style="background:url({{MEDIA_URL}}{{image_url|urlencode}}); background-size: cover; background-repeat: no-repeat; background-position:center;"></div>
+											</div>
+											<div class="col-sm-6">
+												<p class="text_grey">{% blocktrans %}Clear frontal face photos are an important way for hosts and
+																														guests to learn about each other. It's not much fun to host a
+																														landscape! Please upload a photo that clearly shows your face.
+																														Please make sure your image is under 1MB.{% endblocktrans %}
+												</p>
+												{%if form.files.image%}
+												<input class="form-control" id="uploadImage_1" placeholder="{{form.files.image.name}}" class="uploadImage" disabled="disabled" />
+												{%else%}
+												<input class="form-control" id="uploadImage_1" placeholder="{% trans "No file chosen" %}" class="uploadImage" disabled="disabled" />
+												{%endif%}
+												<div class="fileUpload btn btn-primary">
+														<img alt="" src="{% static 'app/img/camera.gif' %}"><span>{% trans "Choose File" %}</span>
+														{{form.image}}
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-sm-6">
+												<p>{% trans "First Name" %}
+													<img src="{{ MEDIA_URL }}icon/lock.jpg">
+												</p>
+												{{form.first_name}}
+												<p class="text_grey">{% blocktrans %}This is only shared once you have a confirmed booking with
+																														another Tripalocal user. We only display your initial in public.{% endblocktrans %}
+												</p>
+											</div>
+											<div class="col-sm-6">
+												<p>{% trans "Last Name" %}
+														<img src="{{ MEDIA_URL }}icon/lock.jpg">
+												</p>
+												{{form.last_name}}
+												<p class="text_grey">{% blocktrans %}This is only shared once you have a confirmed booking with
+																														another Tripalocal user. We only display your initial in public.{% endblocktrans %}
+												</p>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-sm-6">
+												<p>{% trans "Email Address" %}
+														<img src="{{ MEDIA_URL }}icon/lock.jpg">
+												</p>
+												{{form.email}}
+												<p class="text_grey">{% trans "Your email address will not be disclosed." %}
+												</p>
+											</div>
+											<div class="col-sm-6">
+												<p>{% trans "Local Mobile Number" %}</p>
+												{{form.phone_number}}
+												<p class="text_grey">{% trans "This information will be available to people who have booked your<br> experience." %}
+												</p>
+											</div>
+										</div>
+
+										<div class="form-group">
+											<div class="col-sm-6">
+												<p>{% trans "Bio" %}</p>
+												{{form.bio}}
+											</div>
+											<div class="col-sm-6" style="padding-top: 30px;">
+												<p class="text_grey">
+												{% blocktrans %} Tripalocal is all about like minded people doing things together.
+												Your profile will help people understand your style and personality.{% endblocktrans %}
+												</p>
+												<p class="text_grey">
+												{% blocktrans %}It's like having friends all over the world to show you around, or
+												vice versa. What type of people would you like to meet up with? {% endblocktrans %}
+												</p>
+											</div>
+										</div>
+                  	<input id="id_submit" type="submit" class="btn btn-primary btn-sm" value="{% trans "Save" %}" />
+									</form>
+								</div>
+
+						</div>
+</div>
 {% endblock %}
 
 {% block scripts %}

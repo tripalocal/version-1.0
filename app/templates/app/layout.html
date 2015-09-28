@@ -127,9 +127,9 @@
           </button>
           <a class="navbar-brand" href="https://www.tripalocal.com{{GEO_POSTFIX}}">
             {% if LANGUAGE == "zh-CN" %}
-            <img alt="Tripalocal" src="{{ MEDIA_URL }}img/top_logo-cn.svg" width="115" height="39">
+            <img alt="Tripalocal" src="{% static 'img/top_logo-cn.svg' %}" width="115" height="39">
             {% else %}
-            <img alt="Tripalocal" src="{{ MEDIA_URL }}img/top_logo-en.svg" width="115" height="39">
+            <img alt="Tripalocal" src="{% static 'img/top_logo-en.svg' %}" width="115" height="39">
             {% endif %}
           </a>
         </div>
@@ -180,7 +180,7 @@
         <div class="collapse navbar-collapse" id="main-menu-collapse">
           <ul class="nav navbar-nav main-menu">
             <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
-            <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Experiences' %}</a></li>
+            <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
             <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
             <li class="visible-xs"><a href="{{ GEO_POSTFIX }}myprofile">{% trans 'My Profile' %}</a></li>
             <li class="visible-xs"><a href="https://www.tripalocal.com{% if LANGUAGE == 'zh-CN' %}{{ request.path|slice:'3:' }}{% else %}/cn{{ request.path }}{% endif %}" style="border: 0;">{% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a></li>

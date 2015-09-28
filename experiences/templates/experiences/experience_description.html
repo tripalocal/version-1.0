@@ -5,7 +5,7 @@
                 {% if experience.type and experience.type == "RECOMMENDED" %}
                 <div class="recommended-label">{% trans "Recommended" %}</div>
                 {% endif %}
-                {% if experience.type and experience.type != "Multi-hosts" %}
+                {% if experience.type and experience.type == "PRIVATE" %}
                 {% if LANGUAGE != "zh-CN" %}
                 <h2 style="font-weight:bold">{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endfor %}
                 {% else %}

@@ -46,8 +46,6 @@ h1 {
     @include media('<tablet') {
       display: inline-block;
       float: right;
-      margin-top: 0;
-      margin-bottom: 0;
     }
     @include media('<phone') {
       float: none;
