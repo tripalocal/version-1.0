@@ -12,24 +12,6 @@
     {% endif %}
     <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/homepage.css' %}" rel="stylesheet">
-
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
-
-	<script>
-		$(function() {
-			$("#slideshow > div:gt(0)").hide();
-			setInterval(function() {
-			  $('#slideshow > div:first')
-			    .fadeOut(1000)
-			    .next()
-			    .fadeIn(1000)
-			    .end()
-			    .appendTo('#slideshow');
-			},  5000);
-		});
-	</script>
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -206,8 +188,8 @@
             <a style="cursor:pointer" id="enter_fullscreen"><img src="{% static 'img/homepage/play_btn.svg' %}" width="75"></a>
         </div>
     </div>
-    <div id="video-fullscreen" class="video-fullscreen">
-        <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="{% static 'img/homepage/closeIcon-01.svg' %}" width="30"></a>
+    <div id="video-fullscreen" class="video-fullscreen" style="display:none;">
+        <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="{{ MEDIA_URL }}homepage/closeIcon-01.svg" width="30"></a>
         <div class="video-wrap">
             <video controls preload="metadata">
                 <source src="http://bponlinewoc2264.ngcdn.telstra.com/pd_chief/chief_preview/Tripalocal%20Delivery_1.mp4" type="video/mp4">
@@ -222,13 +204,13 @@
             <h1>{% trans "Our Community"%}</h1>
             <div class="row">
                 <div class="col-sm-6">
-                  <div class="box" style="background-image:url({% static 'img/homepage/travelling-01.jpg' %})">
-                    <a class=" btn btn-danger">{% trans "Travelling" %}</a>
+                  <div class="box" style="background-image:url({{ MEDIA_URL }}homepage/travelling-01.jpg)">
+                    <a href="https://www.tripalocal.com/blog/" class="btn btn-danger">{% trans "Travelling" %}</a>
                   </div>
                 </div>
                 <div class="col-sm-6">
-                  <div class="box" style="background-image:url({% static 'img/homepage/hosting-01.jpg' %})">
-                    <a class=" btn btn-primary">{% trans "Hosting" %}</a>
+                  <div class="box" style="background-image:url({{ MEDIA_URL }}homepage/hosting-01.jpg)">
+                    <a href="https://www.tripalocal.com/blog/" class="btn btn-primary">{% trans "Hosting" %}</a>
                   </div>
                 </div>
             </div>
@@ -237,12 +219,28 @@
 {% endblock %}
 
 {% block scripts %}
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
     {%if LANGUAGE == "zh-CN"%}
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
     {%endif%}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/index.js' %}"></script>
+    <script>
+    	$(function() {
+    		$("#slideshow > div:gt(0)").hide();
+    		setInterval(function() {
+    		  $('#slideshow > div:first')
+    		    .fadeOut(1000)
+    		    .next()
+    		    .fadeIn(1000)
+    		    .end()
+    		    .appendTo('#slideshow');
+    		},  5000);
+    	});
+    </script>
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
     <script charset="utf-8" type="text/javascript">
     $("#video-fullscreen").hide();
         $(document).ready(function () {

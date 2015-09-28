@@ -8,12 +8,6 @@
     {% load staticfiles %}
     {% load i18n %}
 
-    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-
     <link rel="icon" href="{% static 'app/img/favicon.ico'%}" />
     <link href='https://fonts.googleapis.com/css?family=Exo' rel='stylesheet' type='text/css'>
     <link href="{% static 'app/content/main.css' %}" rel="stylesheet">
@@ -22,7 +16,6 @@
     {%else%}
     <link href="{% static 'app/content/tripalocal_en.css' %}" rel="stylesheet">
     {%endif%}
-{#    <link href="{% static 'app/content/tripalocal_xs.css' %}" rel="stylesheet">#}
 
     {% if form %}
         {{ form.media }}
@@ -241,6 +234,10 @@
 
     <div class="bottom-qr" style="background-image: url({% static 'img/wechat_qr.jpg' %})">
     </div>
+
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     {% block scripts %}{% endblock %}
 <script language="javascript" type="text/javascript">
