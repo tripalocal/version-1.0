@@ -109,6 +109,7 @@ STATICFILES_DIRS = (
     path.join(PROJECT_ROOT, 'app/static/'),
     path.join(PROJECT_ROOT, 'experiences/static/'),
     path.join(PROJECT_ROOT, 'custom_admin/static/'),
+    path.join(PROJECT_ROOT, 'global_static/'),
 )
 
 # List of finder classes that know how to find static files in
