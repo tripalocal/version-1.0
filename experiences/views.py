@@ -30,6 +30,7 @@ from unionpay import client, signer
 from unionpay.util.helper import load_config, make_order_id
 from django.views.decorators.csrf import csrf_exempt
 import itertools
+from django.db.models import Q
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -132,9 +133,10 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
             for i in range(len(city)):
                 city[i] = dict(Location_reverse).get(city[i]).lower()
 
-        experiences = Experience.objects.filter(status='Listed', city__iregex=r'(' + '|'.join(city) + ')') #like __iin
+        experiences = AbstractExperience.objects.filter(Q(experience__status = 'Listed') | Q(newproduct__status = 'Listed'))\
+                                                .filter(Q(experience__city__iregex=r'(' + '|'.join(city) + ')') | Q(newproduct__city__iregex=r'(' + '|'.join(city) + ')'))
     else:
-        experiences = Experience.objects.filter(status='Listed')
+        experiences = AbstractExperience.objects.filter(Q(experience__status = 'Listed') | Q(newproduct__status = 'Listed'))
 
     for experience in experiences:
         if guest_number is not None and (experience.guest_number_max < int(guest_number) or experience.guest_number_min > int(guest_number)):
@@ -199,6 +201,13 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         if photos is not None and len(photos) > 0:
             photo_url = photos[0].directory+photos[0].name
 
+        #get the number of booking times
+        bks = Booking.objects.filter(experience_id = experience.id)
+        if bks is not None:
+            bks = len(bks)
+        else:
+            bks = 0
+
         experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]),
                             'meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]), 'rate': rate,
                             'duration':int(experience.duration) if float(experience.duration).is_integer() else experience.duration,
@@ -209,7 +218,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                             'price':experience_fee_calculator(exp_price, experience.commission),
                             'currency':str(dict(Currency)[experience.currency.upper()]),
                             'dollarsign':DollarSign[experience.currency.upper()],'dates':{},
-                            'photo_url':photo_url, 'type':experience.type}
+                            'photo_url':photo_url, 'type':experience.type, 'popularity':bks}
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []
@@ -2649,32 +2658,32 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
                 if mobile:
                     exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
                                 'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
-                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'type':experience['type']}
+                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'type':experience['type'],'popularity':experience['popularity']}
                 else:
                     exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
                                 'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
-                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'type':experience['type'],'timeslots':experience['dates'][dt_string]}
+                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'type':experience['type'],'popularity':experience['popularity'],'timeslots':experience['dates'][dt_string]}
 
                 while counter < len(day_dict['experiences']):#find the correct rank
-                    if experience['rate'] > day_dict['experiences'][counter]['rate']:
+                    if experience['popularity'] > day_dict['experiences'][counter]['popularity']:
                         day_dict['experiences'].insert(counter, exp_dict)
                         insert = True
                         break
-                    elif experience['rate'] == day_dict['experiences'][counter]['rate']:
+                    elif experience['popularity'] == day_dict['experiences'][counter]['popularity']:
                         if instant_booking:
-                            #same rate, instant booking
+                            #same popularity, instant booking
                             index1 = counter
-                            while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate'] and day_dict['experiences'][counter]['instant_booking']:
+                            while counter < len(day_dict['experiences']) and experience['popularity'] == day_dict['experiences'][counter]['popularity'] and day_dict['experiences'][counter]['instant_booking']:
                                 counter += 1
                             index2 = counter
 
                         else:
-                            #same rate, instant booking
-                            while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate'] and day_dict['experiences'][counter]['instant_booking']:
+                            #same popularity, instant booking
+                            while counter < len(day_dict['experiences']) and experience['popularity'] == day_dict['experiences'][counter]['popularity'] and day_dict['experiences'][counter]['instant_booking']:
                                 counter += 1
                             index1 = counter
-                            #same rate, non instant booking
-                            while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate']:
+                            #same popularity, non instant booking
+                            while counter < len(day_dict['experiences']) and experience['popularity'] == day_dict['experiences'][counter]['popularity']:
                                 counter += 1
                             index2 = counter
 
