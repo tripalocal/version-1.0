@@ -946,7 +946,7 @@ msgstr "本土客"
 
 #: templates/experiences/multi_day_trip.html:22
 msgid "Authentic local experiences"
-msgstr "最原汁原味的旅行"
+msgstr "一场原汁原味的旅行"
 
 #: templates/experiences/multi_day_trip.html:23
 msgid "Check our most popular trips"
