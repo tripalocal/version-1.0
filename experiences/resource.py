@@ -1060,13 +1060,13 @@ def service_message(request, format=None):
                 sms_content = ""
                 for msg in messages:
                     sms_content += msg['msg_content']
-                    sms_content += ". "
+                    sms_content += ".\n"
 
                 if len(sms_content) > 140:
                     sms_content = sms_content[:140]
                 sms_header = _('%s' % MESSAGE_NOTIFY).format(sender_name=sender_name)
 
-                send_sms(receiver_phone_num, sms_header + sms_content)
+                send_sms(receiver_phone_num, sms_header + '\n' + sms_content)
 
             return Response(msg_ids, status=status.HTTP_200_OK)
 
