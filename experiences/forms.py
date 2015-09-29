@@ -30,6 +30,15 @@ Location = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Br
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
+#
+Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
+                    (_('Brisbane'), 'Brisbane'), (_('Cairns'), 'Cairns'),
+                    (_('Gold Coast'), 'Goldcoast'), (_('Hobart'), 'Hobart'),
+                    (_('Adelaide'), 'Adelaide'), (_('Darwin'), 'Darwin'),
+                    (_('Alice Springs'), 'Alicesprings'),
+                    (_('Christchurch'), 'Christchurch'), (_('Queenstown'), 'Queenstown'),
+                    (_('Auckland'), 'Auckland'), (_('Wellington'), 'Wellington'),)
+
 Locations = [('Australia', [('Melbourne', _('Melbourne'), _('Victoria')), ('Sydney', _('Sydney'), _('New South Wales')),
                            ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
                            ('Goldcoast', _('Gold Coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),

@@ -39,6 +39,16 @@ LANG_CN = settings.LANGUAGES[1][0]
 LANG_EN = settings.LANGUAGES[0][0]
 GEO_POSTFIX = settings.GEO_POSTFIX
 
+def isEnglish(s):
+    try:
+        s.decode('ascii') if isinstance(s, bytes) else s.encode('ascii')
+    except UnicodeDecodeError:
+        return False
+    except UnicodeEncodeError:
+        return False
+    else:
+        return True
+
 def experience_fee_calculator(price, commission_rate):
     if type(price)==int or type(price) == float:
         COMMISSION_PERCENT = round(commission_rate/(1-commission_rate),3)
@@ -117,6 +127,10 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
 
         if len(city) > 1 and (end_datetime-start_datetime).days+1 != len(city):
             raise TypeError("Wrong format: city, incorrect length")
+
+        if not isEnglish(city[0]):
+            for i in range(len(city)):
+                city[i] = dict(Location_reverse).get(city[i]).lower()
 
         experiences = Experience.objects.filter(status='Listed', city__iregex=r'(' + '|'.join(city) + ')') #like __iin
     else:
@@ -2607,6 +2621,10 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
     dt = start_datetime
 
     city = city.lower().split(",")
+    if not isEnglish(city[0]):
+        for i in range(len(city)):
+            city[i] = dict(Location_reverse).get(city[i]).lower()
+
     day_counter = 0
 
     #available_options: per experience --> itinerary: per day
