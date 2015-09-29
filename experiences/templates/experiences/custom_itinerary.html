@@ -1,9 +1,9 @@
 {% extends "app/layout.html" %}
+{% load staticfiles %}
 {% load mathfilters %}
 {% load i18n %}
 
 {% block head %}
-    {% load staticfiles %}
     <title>{% trans "Custom Itinerary" %}</title>
     <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" type="text/css" media="all" rel="stylesheet" />
     <link href="{% static 'experiences/content/custom_itinerary.css' %}" rel="stylesheet"/>
@@ -14,8 +14,8 @@
     <form id="itinerary_form" action="" method="post">
         {% csrf_token %}
 
-        <!--<div class="itinerary-back-button"> 
-            <button type="button" class="itinerary-return-button"></button> 
+        <!--<div class="itinerary-back-button">
+            <button type="button" class="itinerary-return-button"></button>
         </div>-->
 
         <div id="criteria_div">
@@ -125,8 +125,8 @@
                         </div>
                     </div>
                     <div id="items_selected_div" style="margin-left:150px">
-                        <div style="float:left;margin-top:13px;"> 
-                            <div class="interests-icon"> 
+                        <div style="float:left;margin-top:13px;">
+                            <div class="interests-icon">
                             </div>
                         </div>
                         <div class="items-selected-box" style="padding-left:15px">
@@ -135,11 +135,11 @@
                         </div>
                     </div>
                     <div id="per_person_div" style="margin-left:300px">
-                        <div  style="float:left;margin-top:13px;"> 
-                            <div class="people"> 
-                            </div>  
-                        </div> 
-                        <div class="items-selected-box" style="padding-left:10px"> 
+                        <div  style="float:left;margin-top:13px;">
+                            <div class="people">
+                            </div>
+                        </div>
+                        <div class="items-selected-box" style="padding-left:10px">
 	                        <span class="normal-font-1">{% trans "Per Person" %}</span><br>
 	                        <span id="id_price_per_person" name="id_price_per_person" class="items-font">$0</span>
 	                    </div>
@@ -163,7 +163,7 @@
 
         <div id="select-all-bar">
             <div id="select-all-checkbox" style="display:none;">
-         		<input id="select-all" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">Select all</label> 
+         		<input id="select-all" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">Select all</label>
          	</div>
          	<p id="fix-interface-itinerary" style="margin-left:550px">
          		<span style="width:60px;">{% trans "Price PP" %}</span>
