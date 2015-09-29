@@ -351,7 +351,10 @@
         if(city.length>0)
         {
             distinct_city = 1;
-            $("#destination_city_1").text(city[0]);
+            if(city[0])
+            {
+                $("#destination_city_1").text(city[0]);
+            }
             $("#id_start_datetime_day_1").val($("#id_start_datetime").val());
             start = new Date(Date.parse($("#id_start_datetime").val(),"YYYY-MM-DD"));
         }
