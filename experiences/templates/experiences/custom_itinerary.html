@@ -1,12 +1,10 @@
 {% extends "app/layout.html" %}
-{% load staticfiles %}
 {% load mathfilters %}
 {% load i18n %}
 
 {% block head %}
     {% load staticfiles %}
-    <title>{% trans 'Custom Itinerary' %}</title>
-    <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
+    <title>{% trans "Custom Itinerary" %}</title>
     <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" type="text/css" media="all" rel="stylesheet" />
     <link href="{% static 'experiences/content/custom_itinerary.css' %}" rel="stylesheet"/>
 {% endblock %}
@@ -16,43 +14,45 @@
     <form id="itinerary_form" action="" method="post">
         {% csrf_token %}
 
-        <!--<div class="itinerary-back-button">
-            <button type="button" class="itinerary-return-button"></button>
+        <!--<div class="itinerary-back-button"> 
+            <button type="button" class="itinerary-return-button"></button> 
         </div>-->
 
         <div id="criteria_div">
             <div id="mandatory_criteria_div">
-                <div id="date_destination_div" style="float:left;width:390px; padding-top:10px;">
-                    <button id="add_day_button" type="button" class="btn btn-default">{% trans 'Add' %}</button>
-                    <div class="container-fluid" id="add_day_1_div" style="padding-bottom:10px;">
-                      <div class="row" style="margin-bottom: 5px;">
-                        <h3 class="field-header">{% trans 'Location' %}</h3>
-                        <select id="destination_city_1" class="destination_city">
-                            <option value="Melbourne">Melbourne, VIC</option>
-                            <option value="Sydney">Sydney, NSW</option>
-                            <option value="Brisbane">Brisbane, QLD</option>
-                            <option value="Cairns">Cairns, QLD</option>
-                            <option value="Goldcoast">Goldcoast, QLD</option>
-                            <option value="Adelaide">Adelaide, SA</option>
-                            <option value="Hobart">Hobart, TAS</option>
-                            <option value="Darwin">Darwin, NT</option>
-                            <option value="Alicesprings">Alice Springs, NT</option>
-                            <option value="Christchurch">Christchurch, Canterbury</option>
-                            <option value="Queenstown">Queenstown, Otago</option>
-                            <option value="Auckland">Auckland, Auckland</option>
-                            <option value="Wellington">Wellington, Wellington</option>
-                        </select>
-                      </div>
-                      <div class="row">
-                        <h3 class="field-header" style="margin-right: 38px;">{% trans 'Dates' %}</h3>
-                        <div class="input-group start-date" id="id_start_datetime_picker_day_1">
-                            <input class="form-control" id="id_start_datetime_day_1" name="start_datetime" type="text" value="">
+                <div id="date_destination_div" style="float:left;width:390px;">
+                    <button id="add_day_button" type="button" style="float:left;width:75px;">{% trans "Add" %}</button>
+                    <div id="add_day_1_div">
+                        <div class="data-icon"> 
+                            <p class="date-exp">{% trans "Dates" %}</p>
+                        </div>
+                        <div class="ui selection dropdown">
+                            <i class="dropdown icon"></i>
+                            <div id="destination_city_1" class="text">{% trans "City" %}</div>
+                            <div class="menu">
+                                {% for k, v in locations %}
+                                <div class="header">{{ k }}</div>
+                                    {% for id, name, state in v %}
+                                    <div class="item" data-value="{{ id }}" data-text="{{ name }}">{{ name }}
+                                        <span class="light-color">{{ state }}</span>
+                                    </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
                         </div>
 
-                        <div class="input-group end-date" id="id_end_datetime_picker_day_1">
-                            <input class="form-control" id="id_end_datetime_day_1" name="end_datetime" type="text" value="">
+                        <div class="input-group date" id="id_start_datetime_picker_day_1" style="float:left;width:150px;">
+                            <input class="form-control" id="id_start_datetime_day_1" name="start_datetime" type="text" value="">
+                            <span class="input-group-addon">
+                                <span class="glyphicon-calendar glyphicon"></span>
+                            </span>
                         </div>
-                      </div>
+                        <div class="input-group date" id="id_end_datetime_picker_day_1" style="float:left;width:150px;">
+                            <input class="form-control" id="id_end_datetime_day_1" name="end_datetime" type="text" value="">
+                            <span class="input-group-addon">
+                                <span class="glyphicon-calendar glyphicon"></span>
+                            </span>
+                        </div>
                     </div>
                     {{form.start_datetime}}
                     {{form.end_datetime}}
@@ -69,22 +69,13 @@
                 <div id="language_div" style="float:left;">
                     <div class="language-icon">
                         <p class="language-exp">{% trans "Language" %}</p>
-                    </div>
+                    </div> 
                 </div>
-                <div class="language-choice-checkbox">
-                    {{form.language}}
-                    <div class="checkbox">
-                      <label>
-                        <input id="language_English" type="checkbox" value="English" name="checkbox-eng">
-                        English
-                      </label>
-                    </div>
-                    <div class="checkbox">
-                      <label>
-                        <input id="language_Mandarin" type="checkbox" value="Chinese" name="checkbox-cn">
-                        中文
-                      </label>
-                    </div>
+                <div class="language-choice-checkbox"> 
+                    {{form.language}} 
+                    <input id="language_English" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label id="language_English_label" for="checkbox-eng" class="css-label lite-x-cyan">English</label>
+                    <br> 
+                    <input id="language_Mandarin" type="checkbox" value="Chinese" class="css-checkbox" name="checkbox-cn"><label id="language_Mandarin_label" for="checkbox-cn" class="css-label lite-x-cyan">中文</label> 
                 </div>
                 <div class="vertical-bar"></div>
                 <div id="more-filters-button">
@@ -94,23 +85,18 @@
                 <div id="itinerary-search-button">
                 </div>
             </div>
-            <div id="optional_criteria_div" style="display:none; width:100%; margin-top:15px; min-height: 150px;" class="advanced-search">
+            <div id="optional_criteria_div" style="display:none;">
                 <div id="optional_criteria_container">
-                  <div class="container">
-                          <div class="icon-header">
-                              <div class="icon-image" style="background-image: url({% static 'experiences/img/tag.svg' %})"></div>
-                              <div class="icon-text">{%trans "Interests"%}</div>
-                          </div>
-                          <div class="interests">
-                          <div class="form-box" id="tags_div">
-                              {{form.tags}}
-                              {{form.all_tags}}
-                          </div>
-                        </div>
-                  </div>
+                    <div class="interests-icon" style="float:left;margin-top: 20px;margin-right: 25px;">
+                        <p class="interests-exp">{% trans "Interests" %}</p>
+                    </div>
+
+                    <div id="tags_div">
+                        {{form.tags}}
+                        {{form.all_tags}}
+                    </div>
                 </div>
             </div>
-
 <!--
             <div id="share-link-button">
                 <button>Share Link</button>
@@ -139,8 +125,8 @@
                         </div>
                     </div>
                     <div id="items_selected_div" style="margin-left:150px">
-                        <div style="float:left;margin-top:13px;">
-                            <div class="interests-icon">
+                        <div style="float:left;margin-top:13px;"> 
+                            <div class="interests-icon"> 
                             </div>
                         </div>
                         <div class="items-selected-box" style="padding-left:15px">
@@ -149,11 +135,11 @@
                         </div>
                     </div>
                     <div id="per_person_div" style="margin-left:300px">
-                        <div  style="float:left;margin-top:13px;">
-                            <div class="people">
-                            </div>
-                        </div>
-                        <div class="items-selected-box" style="padding-left:10px">
+                        <div  style="float:left;margin-top:13px;"> 
+                            <div class="people"> 
+                            </div>  
+                        </div> 
+                        <div class="items-selected-box" style="padding-left:10px"> 
 	                        <span class="normal-font-1">{% trans "Per Person" %}</span><br>
 	                        <span id="id_price_per_person" name="id_price_per_person" class="items-font">$0</span>
 	                    </div>
@@ -177,7 +163,7 @@
 
         <div id="select-all-bar">
             <div id="select-all-checkbox" style="display:none;">
-         		<input id="select-all" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">Select all</label>
+         		<input id="select-all" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">Select all</label> 
          	</div>
          	<p id="fix-interface-itinerary" style="margin-left:550px">
          		<span style="width:60px;">{% trans "Price PP" %}</span>
@@ -250,9 +236,14 @@
 {% endblock %}
 
 {% block scripts %}
-<script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
-<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+    {%if LANGUAGE == "zh-CN"%}
+    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+    {%endif%}
 
 <script charset="utf-8" type="text/javascript">
     function hideexperience(i, j)
@@ -277,47 +268,47 @@
 
     function addNewDay(id)
     {
-        new_div="<div id=\"add_day_" + id + "_div\" class=\"container-fluid\" style=\"padding-bottom:10px;\">"+
-                    "<button id=\"delete_day_button_" + id + "\" type=\"button\" class=\"btn btn-default;\">Delete</button>"+
-                    "<div class=\"row\" style=\"margin-bottom:5px;\">"+
-                    "<h3 class=\"field-header\">Location</h3>"+
-                    "<select id=\"destination_city_" + id + "\">"+
-                        "<option value=\"Melbourne\">Melbourne, VIC</option>"+
-                        "<option value=\"Sydney\">Sydney, NSW</option>"+
-                        "<option value=\"Brisbane\">Brisbane, QLD</option>"+
-                        "<option value=\"Cairns\">Cairns, QLD</option>"+
-                        "<option value=\"Goldcoast\">Goldcoast, QLD</option>"+
-                        "<option value=\"Adelaide\">Adelaide, SA</option>"+
-                        "<option value=\"Hobart\">Hobart, TAS</option>"+
-                        "<option value=\"Darwin\">Darwin, NT</option>"+
-                        "<option value=\"Alicesprings\">Alice Springs, NT</option>"+
-                        "<option value=\"Christchurch\">Christchurch, Canterbury</option>"+
-                        "<option value=\"Queenstown\">Queenstown, Otago</option>"+
-                        "<option value=\"Auckland\">Auckland, Auckland</option>"+
-                        "<option value=\"Wellington\">Wellington, Wellington</option>"+
-                    "</select>"+
-                    "</div>"+
-                    "<div class=\"row\">"+
-                    "<h3 class=\"field-header\" style=\"margin-right: 38px;\">Dates</h3>"+
-                    "<div class=\"input-group start-date\" id=\"id_start_datetime_picker_day_" + id + "\">"+
+        new_div="<div id=\"add_day_" + id + "_div\">"+
+                    "<button id=\"delete_day_button_" + id + "\" type=\"button\" style=\"float:left;width:75px;\">Delete</button>"+
+                    "<div class=\"ui selection dropdown\">"+
+                        "<i class=\"dropdown icon\"></i>" +
+                        "<div id=\"destination_city_" + id + "\" class=\"text\">{% trans "City" %}</div>" +
+                        "<div class=\"menu\">" + 
+                            {% for k, v in locations %}
+                            "<div class=\"header\">{{ k }}</div>" +
+                                {% for id, name, state in v %}
+                                "<div class=\"item\" data-value=\"{{ id }}\" data-text=\"{{ name }}\">{{ name }}" +
+                                    "<span class=\"light-color\">{{ state }}</span>" +
+                                "</div>" +
+                                {% endfor %}
+                            {% endfor %}
+                        "</div>" +
+                    "</div>" + 
+                    "<div class=\"input-group date\" id=\"id_start_datetime_picker_day_" + id + "\" style=\"float:left;width:150px;\">"+
                         "<input class=\"form-control\" id=\"id_start_datetime_day_" + id + "\" name=\"start_datetime\" type=\"text\" value=\"\">"+
+                        "<span class=\"input-group-addon\">"+
+                            "<span class=\"glyphicon-calendar glyphicon\"></span>"+
+                        "</span>"+
                     "</div>"+
                     "<script>"+
                         "$(function() {"+
                             "$(\"#id_start_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
                         "});"+
                     "<\/script>"+
-                    "<div class=\"input-group end-date\" id=\"id_end_datetime_picker_day_" + id + "\">"+
+                    "<div class=\"input-group date\" id=\"id_end_datetime_picker_day_" + id + "\" style=\"float:left;width:150px;\">"+
                         "<input class=\"form-control\" id=\"id_end_datetime_day_" + id + "\" name=\"end_datetime\" type=\"text\" value=\"\">"+
+                        "<span class=\"input-group-addon\">"+
+                            "<span class=\"glyphicon-calendar glyphicon\"></span>"+
+                        "</span>"+
                     "</div>"+
                     "<script>"+
                         "$(function() {"+
                             "$(\"#id_end_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
                         "});"+
                     "<\/script>"+
-                    "</div>"+
                 "</div>";
         $(new_div).insertAfter("#add_day_" + (id-1) + "_div");
+        $('.ui.dropdown').dropdown();
     }
 
     function updatePrice()
@@ -345,13 +336,22 @@
     }
 
     $(document).ready(function(){
-        $("#id_end_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
-        $("#id_start_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
+
+        $('.ui.dropdown').dropdown();
+
+        $(function() {
+            $("#id_start_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "{{LANGUAGE}}"});
+        });
+
+        $(function() {
+            $("#id_end_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "{{LANGUAGE}}"});
+        });
 
         city = $("#id_city").val().split(",");
         if(city.length>0)
         {
             distinct_city = 1;
+            $("#destination_city_1").text(city[0]);
             $("#id_start_datetime_day_1").val($("#id_start_datetime").val());
             start = new Date(Date.parse($("#id_start_datetime").val(),"YYYY-MM-DD"));
         }
@@ -365,7 +365,7 @@
                 $("#delete_day_button_"+(distinct_city)).click(function(e){
                     $(this).parent().remove();
                 });
-                $("#destination_city_"+distinct_city).val(city[i]);
+                $("#destination_city_"+distinct_city).text(city[i]);
 
                 $("#id_end_datetime_day_"+(distinct_city-1)).val((new Date(start.getTime() + (i-1)*24*60*60*1000)).toISOString().substring(0, 10));
 
@@ -614,7 +614,7 @@
         $("#id_city").val("");
         for(i=1;$("#destination_city_"+i).length>0;i++)
         {
-            city = $("#destination_city_"+i+" option:selected").val();
+            city = $("#destination_city_"+i).text();
             start = new Date(Date.parse($("#id_start_datetime_day_"+i).val(),"YYYY-MM-DD"));
             end = new Date(Date.parse($("#id_end_datetime_day_"+i).val(),"YYYY-MM-DD"));
 

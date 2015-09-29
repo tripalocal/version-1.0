@@ -2684,6 +2684,7 @@ def custom_itinerary(request):
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
 
     context = RequestContext(request)
+    context['locations'] = Locations
     context['LANGUAGE'] = settings.LANGUAGE_CODE
     form = CustomItineraryForm()
 
