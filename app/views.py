@@ -249,7 +249,7 @@ def mylisting(request):
     exps = Experience.objects.raw('select abstractexperience_ptr_id from experiences_experience where abstractexperience_ptr_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime', [request.user.id])
 
     for experience in exps:
-        experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+        experience.title = get_experience_title(experience.experience, settings.LANGUAGES[0][0])
         experiences.append(experience)
 
     context['experiences'] = experiences

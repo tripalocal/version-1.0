@@ -592,79 +592,85 @@ class Payment(models.Model):
         return True, re
 
 def get_experience_title(experience, language):
-    if experience.experiencetitle_set is not None and len(experience.experiencetitle_set.all()) > 0:
-        t = experience.experiencetitle_set.filter(language=language)
-        if len(t)>0:
-            return t[0].title
+    if type(experience) is Experience:
+        if experience.experiencetitle_set is not None and len(experience.experiencetitle_set.all()) > 0:
+            t = experience.experiencetitle_set.filter(language=language)
+            if len(t)>0:
+                return t[0].title
+            else:
+                return experience.experiencetitle_set.all()[0].title
         else:
-            return experience.experiencetitle_set.all()[0].title
-    else:
-        return None
+            return ''
+    else: 
+        return ''
 
 def get_experience_activity(experience, language):
-    if experience.experienceactivity_set is not None and len(experience.experienceactivity_set.all()) > 0:
+    if hasattr(experience, 'experienceactivity_set') and experience.experienceactivity_set is not None and len(experience.experienceactivity_set.all()) > 0:
         t = experience.experienceactivity_set.filter(language=language)
         if len(t)>0:
             return t[0].activity
         else:
             return experience.experienceactivity_set.all()[0].activity
     else:
-        return None
+        return ''
 
 def get_experience_description(experience, language):
-    if experience.experiencedescription_set is not None and len(experience.experiencedescription_set.all()) > 0:
-        t = experience.experiencedescription_set.filter(language=language)
-        if len(t)>0:
-            return t[0].description
+    if type(experience) is Experience:
+        if experience.experiencedescription_set is not None and len(experience.experiencedescription_set.all()) > 0:
+            t = experience.experiencedescription_set.filter(language=language)
+            if len(t)>0:
+                return t[0].description
+            else:
+                return experience.experiencedescription_set.all()[0].description
         else:
-            return experience.experiencedescription_set.all()[0].description
+            return ''
     else:
-        return None
+        return ''
 
 def get_experience_interaction(experience, language):
-    if experience.experienceinteraction_set is not None and len(experience.experienceinteraction_set.all()) > 0:
+    if hasattr(experience, 'experienceinteraction_set') and experience.experienceinteraction_set is not None and len(experience.experienceinteraction_set.all()) > 0:
         t = experience.experienceinteraction_set.filter(language=language)
         if len(t)>0:
             return t[0].interaction
         else:
             return experience.experienceinteraction_set.all()[0].interaction
     else:
-        return None
+        return ''
 
 def get_experience_dress(experience, language):
-    if experience.experiencedress_set is not None and len(experience.experiencedress_set.all()) > 0:
+    if hasattr(experience, 'experiencedress_set') and experience.experiencedress_set is not None and len(experience.experiencedress_set.all()) > 0:
         t = experience.experiencedress_set.filter(language=language)
         if len(t)>0:
             return t[0].dress
         else:
             return experience.experiencedress_set.all()[0].dress
     else:
-        return None
+        return ''
 
 def get_experience_meetup_spot(experience, language):
-    if experience.experiencemeetupspot_set is not None and len(experience.experiencemeetupspot_set.all()) > 0:
+    if hasattr(experience, 'experiencemeetupspot_set') and experience.experiencemeetupspot_set is not None and len(experience.experiencemeetupspot_set.all()) > 0:
         t = experience.experiencemeetupspot_set.filter(language=language)
         if len(t)>0:
             return t[0].meetup_spot
         else:
             return experience.experiencemeetupspot_set.all()[0].meetup_spot
     else:
-        return None
+        return ''
 
 def get_experience_dropoff_spot(experience, language):
-    if experience.experiencedropoffspot_set is not None and len(experience.experiencedropoffspot_set.all()) > 0:
+    if hasattr(experience, 'experiencedropoffspot_set') and experience.experiencedropoffspot_set is not None and len(experience.experiencedropoffspot_set.all()) > 0:
         t = experience.experiencedropoffspot_set.filter(language=language)
         if len(t)>0:
             return t[0].dropoff_spot
         else:
             return experience.experiencedropoffspot_set.all()[0].dropoff_spot
     else:
-        return None
+        return ''
 
 def get_experience_tags(experience, language):
     tags = []
 
-    if experience.tags is not None and len(experience.tags.all()) > 0:
+    if hasattr(experience, 'tags') and experience.tags is not None and len(experience.tags.all()) > 0:
         t = experience.tags.filter(language=language)
         for i in range(len(t)):
             tags.append(t[i].tag)
