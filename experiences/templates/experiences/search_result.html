@@ -46,7 +46,7 @@
                 </div>
 
                 <div style="vertical-align: middle; padding-top: 10px;">
-                  <h3 class="field-header" style="margin-right: 45px;"> {% trans 'Date' %} </h3>
+                  <h3 class="field-header"> {% trans 'Date' %} </h3>
                   <div class="start-date">
                       {{form.start_date}}
                   </div>
@@ -61,27 +61,24 @@
                 <div style="vertical-align: middle;">
                   <div class="checkbox-primary">
                     <div class="checkbox-inline">
-                      {{ form.is_kids_friendly }}
                       <label for="{{ form.is_kids_friendly.id_for_label }}" class="only-tag-label">
-                          <input type="checkbox">
+                          {{ form.is_kids_friendly }}
                           {%trans "Kids friendly only"%}
                       </label>
                     </div>
                   </div>
                   <div class="checkbox-primary">
                     <div class="checkbox-inline">
-                      {{ form.is_host_with_cars }}
                       <label for="{{ form.is_host_with_cars.id_for_label }}" class="only-tag-label">
-                          <input type="checkbox">
+                          {{ form.is_host_with_cars }}
                           {%trans "Drivers only"%}
                       </label>
                     </div>
                   </div>
                   <div class="checkbox-primary">
                     <div class="checkbox-inline">
-                      {{ form.is_private_tours }}
                       <label for="{{ form.is_private_tours.id_for_label }}" class="only-tag-label">
-                          <input type="checkbox">
+                          {{ form.is_private_tours }}
                           {%trans "Private tours only"%}
                       </label>
                     </div>
@@ -359,6 +356,26 @@
         $("#search_form")[0].action = "{{GEO_POSTFIX}}s/" + $("#id_city").val() + "/";
         $("#itinerary-search").click();
     });
+
+    $("#language_English").change(function() {
+      $("#itinerary-search").click();
+    })
+
+    $("#language_Mandarin").change(function() {
+      $("#itinerary-search").click();
+    })
+
+    $("#id_is_kids_friendly").change(function() {
+      $("#itinerary-search").click();
+    })
+
+    $("#id_is_host_with_cars").change(function() {
+      $("#itinerary-search").click();
+    })
+
+    $("#id_is_private_tours").change(function() {
+      $("#itinerary-search").click();
+    })
 
     $("#itinerary-search").click(function(e){
         $("#id_tags").val("");

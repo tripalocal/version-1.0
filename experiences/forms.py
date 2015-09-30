@@ -680,7 +680,7 @@ class BookingConfirmationForm(forms.Form):
                     if valid['valid'] and valid['new_price']==0.0:
                         send_booking_email_verification(booking, experience, user, instant_booking(experience,dt,tm))
                         sms_notification(booking, experience, user, self.cleaned_data['phone_number'])
-                        
+
                 else:
                     booking = Booking(user = user, experience= experience, guest_number = guest_number,
                                         datetime = bk_dt,
@@ -1208,9 +1208,9 @@ class SearchForm(forms.Form):
     guest_number = forms.ChoiceField(choices=Guest_Number, widget=forms.Select(attrs={'class':'ui dropdown smaller-box'}), required=False)
     city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'class':'ui dropdown'}), required=True)
     language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")
-    is_kids_friendly = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
-    is_host_with_cars = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
-    is_private_tours = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class':'css-checkbox'}))
+    is_kids_friendly = forms.BooleanField(required=False, widget=forms.CheckboxInput())
+    is_host_with_cars = forms.BooleanField(required=False, widget=forms.CheckboxInput())
+    is_private_tours = forms.BooleanField(required=False, widget=forms.CheckboxInput())
     tags = forms.CharField(widget=forms.Textarea, required=False, initial=Tags)
     all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
 
