@@ -931,11 +931,11 @@ class ItineraryBookingForm(forms.Form):
 
             experience = AbstractExperience.objects.get(id=ids[i])
             if type(experience) == Experience:
-                experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+                experience.title = experience.get_title(settings.LANGUAGES[0][0])
                 experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
                 experience.dropoff_spot = get_experience_dropoff_spot(experience, settings.LANGUAGES[0][0])
             else:
-                experience.title = experience.get_product_title(settings.LANGUAGES[0][0])
+                experience.title = experience.get_title(settings.LANGUAGES[0][0])
 
             if not free:
                 subtotal_price = 0.0
@@ -1180,9 +1180,9 @@ def send_booking_email_verification(booking, experience, user, is_instant_bookin
 
 def sms_notification(booking, experience, user, phone_number):
     if type(experience) == Experience:
-        exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+        exp_title = experience.get_title(settings.LANGUAGE_CODE)
     else:
-        exp_title = experience.get_product_title(settings.LANGUAGE_CODE)
+        exp_title = experience.get_title(settings.LANGUAGE_CODE)
     customer_phone_num = phone_number
     exp_datetime_local = booking.datetime.astimezone(tzlocal())
     exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))

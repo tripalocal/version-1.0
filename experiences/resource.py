@@ -142,7 +142,7 @@ def saveBookingRequest(booking_request):
         raise Exception("Illegal input")
 
     experience = Experience.objects.get(id=experience_id)
-    experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+    experience.title = experience.get_title(settings.LANGUAGES[0][0])
     experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
     #create a new account if the user does not exist
@@ -456,8 +456,8 @@ def service_wishlist(request):
                     photo_url = photos[0].directory+photos[0].name
 
                 experiences.append({'id':experience.id,
-                                    'title':get_experience_title(experience, settings.LANGUAGES[0][0]),
-                                    'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                                    'title':experience.get_title(settings.LANGUAGES[0][0]),
+                                    'description':experience.get_description(settings.LANGUAGES[0][0]),
                                     'price':experience_fee_calculator(exp_price, experience.commission),
                                     'language':experience.language,
                                     'duration':experience.duration,
@@ -598,16 +598,17 @@ def service_search(request, format=None):
         end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['end_datetime'].strip(), "%Y-%m-%d"))
         city = criteria['city']
         guest_number = criteria['guest_number']
-        keywords = criteria['keywords']
+        keywords = criteria.get('keywords', None)
         language = "Mandarin,English"
+        type = criteria.get('type', 'experiences')
 
         if keywords is not None and len(keywords) == 0:
             keywords = None
 
         if int(guest_number) == 0:
-            itinerary = get_itinerary(start_datetime, end_datetime, None, city, language, keywords, mobile=True)
+            itinerary = get_itinerary(type, start_datetime, end_datetime, None, city, language, keywords, mobile=True)
         else:
-            itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords, mobile=True)
+            itinerary = get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords, mobile=True)
 
         return Response(itinerary, status=status.HTTP_200_OK)
     except Exception as err:
@@ -645,7 +646,7 @@ def service_mytrip(request, format=None):
             
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
                   'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
-                  'experience_title':get_experience_title(booking.experience,settings.LANGUAGES[0][0]),
+                  'experience_title':booking.experience.get_title(settings.LANGUAGES[0][0]),
                   'experience_photo':photo_url,
                   'meetup_spot':get_experience_meetup_spot(booking.experience,settings.LANGUAGES[0][0]),
                   'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.',
@@ -830,10 +831,10 @@ def service_experience(request, format=None):
         for photo in photos:
             experience_images.append(photo.directory+photo.name)
 
-        return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
+        return Response({'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
-                         'experience_description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                         'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
                          'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
                          'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
                          'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
@@ -917,10 +918,10 @@ def service_experiencedetail(request, format=None):
         for photo in photos:
             experience_images.append(photo.directory+photo.name)
 
-        return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
+        return Response({'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
-                         'experience_description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                         'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
                          'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
                          'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
                          'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),

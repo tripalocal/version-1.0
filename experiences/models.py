@@ -73,7 +73,7 @@ class Product(models.Model):
                                                                     "particularly instant order during holiday")
 
     def __str__(self):
-        t = self.get_product_title(settings.LANGUAGES[0][0])
+        t = self.get_title(settings.LANGUAGES[0][0])
         return str(self.id) + '--' + t
 
     def get_product_title(self, lang):
@@ -85,6 +85,7 @@ class Product(models.Model):
                 return self.producti18n_set.all()[0].title
         else:
             return ''
+
 
 class ProductI18n(models.Model):
     EN = 'en'
@@ -162,7 +163,7 @@ class Experience(AbstractExperience):
     commission = models.FloatField(default=0.3)
 
     def __str__(self):
-        t = get_experience_title(self, settings.LANGUAGES[0][0])
+        t = self.get_title(settings.LANGUAGES[0][0])
         if t is None:
             t = ''
         s = self.status if self.status != None else ''
@@ -174,8 +175,8 @@ class Experience(AbstractExperience):
         language = 'en'
         if 'language' in kwargs:
             language = kwargs['language']
-        self.title = get_experience_title(self, language)
-        self.description = get_experience_description(self, language)
+        self.title = self.get_title(language)
+        self.description = self.get_description(language)
         self.activity = get_experience_activity(self, language)
         self.dress = get_experience_dress(self, language)
         self.interaction = get_experience_interaction(self, language)
@@ -217,6 +218,27 @@ class Experience(AbstractExperience):
 
     class Meta:
         ordering = ['id']
+
+
+    def get_title(self, language):
+        if self.experiencetitle_set is not None and len(self.experiencetitle_set.all()) > 0:
+            t = self.experiencetitle_set.filter(language=language)
+            if len(t)>0:
+                return t[0].title
+            else:
+                return self.experiencetitle_set.all()[0].title
+        else:
+            return ''
+
+    def get_description(self, language):
+        if self.experiencedescription_set is not None and len(self.experiencedescription_set.all()) > 0:
+            t = self.experiencedescription_set.filter(language=language)
+            if len(t)>0:
+                return t[0].description
+            else:
+                return self.experiencedescription_set.all()[0].description
+        else:
+            return ''
 
 class ExperienceI18n(models.Model):
     title = models.CharField(max_length=100, null=True)
@@ -274,10 +296,10 @@ class NewProduct(AbstractExperience):
     tags = models.ManyToManyField(ExperienceTag, related_name='newproduct_tags')
 
     def __str__(self):
-        t = self.get_product_title(settings.LANGUAGES[0][0])
+        t = self.get_title(settings.LANGUAGES[0][0])
         return str(self.id) + '--' + t
 
-    def get_product_title(self, lang):
+    def get_title(self, lang):
         if self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
             t = self.newproducti18n_set.filter(language=lang)
             if len(t)>0:
@@ -287,7 +309,7 @@ class NewProduct(AbstractExperience):
         else:
             return ''
 
-    def get_product_description(self, language):
+    def get_description(self, language):
         if self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
             t = self.newproducti18n_set.filter(language=language)
             if len(t)>0:
@@ -422,7 +444,7 @@ class Review(models.Model):
     operator_comment = models.TextField()
 
     def __str__(self):
-        return self.user.email + "--" + get_experience_title(self.experience,settings.LANGUAGES[0][0])
+        return self.user.email + "--" + self.experience.get_title(settings.LANGUAGES[0][0])
 
 class Coupon(models.Model):
     promo_code = models.CharField(max_length=10)
@@ -449,7 +471,7 @@ class Booking(models.Model):
     booking_extra_information = models.TextField()
 
     def __str__(self):
-        return self.user.email + "--" + get_experience_title(self.experience,settings.LANGUAGES[0][0])
+        return self.user.email + "--" + self.experience.get_title(settings.LANGUAGES[0][0])
 
     def upload_review(self, rate=None, review=None):
         experience_id = self.experience_id
@@ -591,18 +613,6 @@ class Payment(models.Model):
             return False, e
         return True, re
 
-def get_experience_title(experience, language):
-    if type(experience) is Experience:
-        if experience.experiencetitle_set is not None and len(experience.experiencetitle_set.all()) > 0:
-            t = experience.experiencetitle_set.filter(language=language)
-            if len(t)>0:
-                return t[0].title
-            else:
-                return experience.experiencetitle_set.all()[0].title
-        else:
-            return ''
-    else: 
-        return ''
 
 def get_experience_activity(experience, language):
     if hasattr(experience, 'experienceactivity_set') and experience.experienceactivity_set is not None and len(experience.experienceactivity_set.all()) > 0:
@@ -614,18 +624,6 @@ def get_experience_activity(experience, language):
     else:
         return ''
 
-def get_experience_description(experience, language):
-    if type(experience) is Experience:
-        if experience.experiencedescription_set is not None and len(experience.experiencedescription_set.all()) > 0:
-            t = experience.experiencedescription_set.filter(language=language)
-            if len(t)>0:
-                return t[0].description
-            else:
-                return experience.experiencedescription_set.all()[0].description
-        else:
-            return ''
-    else:
-        return ''
 
 def get_experience_interaction(experience, language):
     if hasattr(experience, 'experienceinteraction_set') and experience.experienceinteraction_set is not None and len(experience.experienceinteraction_set.all()) > 0:

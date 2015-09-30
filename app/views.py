@@ -26,7 +26,7 @@ from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, getBGImageURL, getProfileImage
 from allauth.account.signals import email_confirmed, password_changed
-from experiences.models import Booking, Experience, Payment, get_experience_title, get_experience_meetup_spot, \
+from experiences.models import Booking, Experience, Payment, get_experience_meetup_spot, \
     WechatProduct, WechatBooking
 from experiences.forms import Currency, DollarSign, email_account_generator
 from django.utils.translation import ugettext_lazy as _
@@ -249,7 +249,7 @@ def mylisting(request):
     exps = Experience.objects.raw('select abstractexperience_ptr_id from experiences_experience where abstractexperience_ptr_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime', [request.user.id])
 
     for experience in exps:
-        experience.title = get_experience_title(experience.experience, settings.LANGUAGES[0][0])
+        experience.title = experience.experience.get_title(settings.LANGUAGES[0][0])
         experiences.append(experience)
 
     context['experiences'] = experiences
@@ -272,7 +272,7 @@ def getreservation(user):
         phone_number = payment.phone_number if payment.phone_number != None and len(payment.phone_number) else guest.registereduser.phone_number
         reservation = {"booking_datetime":booking.datetime.astimezone(local_timezone), "booking_status":booking.status,
                        "booking_guest_number":booking.guest_number,"booking_id":booking.id,
-                       "experience_id":experience.id,"experience_title":get_experience_title(experience, settings.LANGUAGES[0][0]),
+                       "experience_id":experience.id,"experience_title":experience.get_title(settings.LANGUAGES[0][0]),
                        "payment_city":payment.city, "payment_country":payment.country,
                        "guest_first_name":guest.first_name, "guest_last_name":guest.last_name, "guest_phone_number":phone_number}
 
@@ -309,7 +309,7 @@ def mytrip(request):
         bookings = Booking.objects.filter(user=user_id)
 
         for booking in bookings:
-            booking.experience.title = get_experience_title(booking.experience, settings.LANGUAGES[0][0])
+            booking.experience.title = booking.experience.get_title(settings.LANGUAGES[0][0])
             booking.experience.meetup_spot = get_experience_meetup_spot(booking.experience, settings.LANGUAGES[0][0])
             user_bookings.append(booking)
 
