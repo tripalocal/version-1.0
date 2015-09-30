@@ -2785,7 +2785,7 @@ def custom_itinerary(request):
                     booking_form.data['guest_number'] = item['guest_number']
 
                     experience = AbstractExperience.objects.get(id=str(item['id']))
-                    price = float(experience_fee_calculator(experience.price, experience.commission))
+                    price = experience_fee_calculator(float(experience.price), experience.commission)
                     total_price += price*int(item['guest_number'])
                     guest_number = int(item['guest_number'])
 
