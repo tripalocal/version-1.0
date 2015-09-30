@@ -18,7 +18,7 @@
             <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
                 <div class="listing-img" style="background-image:url({{ MEDIA_URL }}{{ BGImageURL }});">
                     <div class="price-box">
-                        {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
+                        {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:experience.commission|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
                     </div>
                 </div>
             </a>

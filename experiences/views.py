@@ -661,7 +661,8 @@ class ExperienceDetailView(DetailView):
                            'total_price': experience_fee_calculator(subtotal_price, experience.commission),
                            'user_email':request.user.email,
                            'GEO_POSTFIX':settings.GEO_POSTFIX,
-                           'LANGUAGE':settings.LANGUAGE_CODE
+                           'LANGUAGE':settings.LANGUAGE_CODE,
+                           'commission':COMMISSION_PERCENT + 1,
                            })
 
     def get_context_data(self, **kwargs):
@@ -794,6 +795,10 @@ class ExperienceDetailView(DetailView):
             setExperienceDisplayPrice(related_experiences[i])
             if float(related_experiences[i].duration).is_integer():
                 related_experiences[i].duration = int(related_experiences[i].duration)
+            if related_experiences[i].commission > 0.0:
+                related_experiences[i].commission = related_experiences[i].commission/(1-related_experiences[i].commission)+1
+            else:
+                related_experiences[i].commission = settings.COMMISSION_PERCENT+1
 
         related_experiences_added_to_wishlist = []
 
@@ -837,6 +842,11 @@ class ExperienceDetailView(DetailView):
                 experience.pickup_detail = t.pickup_detail
                 experience.refund_policy = t.refund_policy
                 experience.whatsincluded = t.whatsincluded
+
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
 
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE
@@ -2391,6 +2401,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         i = 0
         while i < len(experienceList):
             experience = experienceList[i]
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+
             if type == 'product':
                 setProductDisplayPrice(experience)
 

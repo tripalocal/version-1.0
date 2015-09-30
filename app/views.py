@@ -117,6 +117,7 @@ def home(request):
     for i in range(len(featuredExperienceList)):
         featuredExperienceList[i].dollarsign = DollarSign[featuredExperienceList[i].currency.upper()]
         featuredExperienceList[i].currency = str(dict(Currency)[featuredExperienceList[i].currency.upper()])
+        featuredExperienceList[i].commission = 1 + round(featuredExperienceList[i].commission/(1-featuredExperienceList[i].commission), 3)
         featuredExperience.append({"experience":featuredExperienceList[i],"background":BGImages[i],"hostImage":profileImages[i]})
 
     random_city_ids = random.sample(range(len(ALL_CITIES)), 5)
