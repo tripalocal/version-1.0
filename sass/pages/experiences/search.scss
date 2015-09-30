@@ -91,6 +91,7 @@
 .top-field {
   @include media('<desktop') {
     margin-bottom: 15px;
+    padding-right: 0;
   }
 }
 
@@ -153,6 +154,7 @@
     }
     @include media('<tablet') {
       text-align: center;
+      padding: 0;
     }
   }
 }
