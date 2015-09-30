@@ -274,7 +274,7 @@ class NewProduct(AbstractExperience):
     end_datetime = models.DateTimeField(null=True)
     provider = models.ForeignKey(Provider)
     city = models.CharField(max_length=50)
-    language = models.CharField(max_length=50, default="english")
+    language = models.CharField(max_length=50, default="english;")
     currency = models.CharField(max_length=10, default="aud")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=UNLISTED)
     price_type = models.CharField(max_length=6, choices=PRICE_CHOICES, default=NORMAL,
