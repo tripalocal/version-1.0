@@ -2774,32 +2774,67 @@ def custom_itinerary(request):
                 row = -1
                 last_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2000/01/01", "%Y/%m/%d"))
                 i=-1
+                week_day = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+                total_price = 0.0
+                guest_number = 1
 
                 for item in itinerary:
-                    i += 1
                     booking_form.data['experience_id'] += str(item['id']) + ";"
                     booking_form.data['date'] += str(item['date']) + ";"
                     booking_form.data['time'] += str(item['time']) + ";"
                     booking_form.data['guest_number'] = item['guest_number']
 
+                    experience = AbstractExperience.objects.get(id=str(item['id']))
+                    price = float(experience_fee_calculator(experience.price, experience.commission))
+                    total_price += price*int(item['guest_number'])
+                    guest_number = int(item['guest_number'])
+
                     #save to excel sheet
+                    cell_format = workbook.add_format({'text_wrap': True})
                     current_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(str(item['date']), "%Y/%m/%d"))
                     if current_date > last_date:
                         #a new day
-                        if row >= 0:
-                            worksheet.write(row, col, schedule)
                         row += 1
+                        i += 1
+                        #date
                         col = 0
                         worksheet.write(row, col, str(item['date']))
+                        #day of week
                         col += 1
-                        worksheet.write(row, col, city[row]) #_('Arrive in {cityname}').format(cityname=city[row]))
+                        worksheet.write(row, col, week_day[current_date.weekday()])
+                        #number of people
                         col += 1
-                        schedule = item['title']
+                        worksheet.write(row, col, item['guest_number'])
+                        #accommdation
+                        col += 1
+                        worksheet.write(row, col, '')
+                        #city
+                        col += 1
+                        worksheet.write(row, col, city[i])
+                        #title, url
+                        col += 1
+                        worksheet.write(row, col, item['title'] + "\n" + "https://"+settings.ALLOWED_HOSTS[0]+"/experience/"+item['id'], cell_format)
+                        #price pp
+                        col += 1
+                        worksheet.write(row, col, price)
                         last_date = current_date
                     else:
-                        schedule += ", " + item['title']
+                        row += 1
+                        col = 5
+                        worksheet.write(row, col, item['title'] + "\n" + "https://"+settings.ALLOWED_HOSTS[0]+"/experience/"+item['id'], cell_format)
+                        #price pp
+                        col += 1
+                        worksheet.write(row, col, price)
 
-                worksheet.write(row, col, schedule)
+                row += 1
+                col = 0
+                worksheet.write(row, col, "Total price:")
+                col += 1
+                worksheet.write(row, col, total_price)
+                col += 1
+                worksheet.write(row, col, "Price per person:")
+                col += 1
+                worksheet.write(row, col, total_price/guest_number)
                 workbook.close()
                 return HttpResponseRedirect("https://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
 
