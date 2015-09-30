@@ -633,7 +633,7 @@ msgstr "艾利斯斯普林斯"
 
 #: views.py:52
 msgid "Christchurch"
-msgstr "克赖斯特彻奇(基督城)"
+msgstr "基督城"
 
 #: views.py:52
 msgid "Queenstown"
@@ -674,11 +674,11 @@ msgstr "不支持该文件类型"
 #~ "上传清晰的正面照能让其他用户更好的了解您。<br>我们并不推荐使用风景照作为头"
 #~ "像。<br>请上传一张您的清晰正面照。<br>照片应小于1MB。"
 
-#~ msgid "Australia"
-#~ msgstr "澳大利亚"
+msgid "Australia"
+msgstr "澳大利亚"
 
-#~ msgid "New Zealand"
-#~ msgstr "新西兰"
+msgid "New Zealand"
+msgstr "新西兰"
 
 #~ msgid "Tripalocal for Android"
 #~ msgstr "本土客安卓手机应用"

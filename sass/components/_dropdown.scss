@@ -27,7 +27,8 @@
 
 .ui.dropdown .menu .item {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 500;
+  color: $dark-grey;
 }
 
 .ui.dropdown .menu > .item:hover {

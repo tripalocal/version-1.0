@@ -28,6 +28,12 @@ msgstr "非私人团"
 msgid "Recommended"
 msgstr "推荐体验"
 
+msgid "Australia"
+msgstr "澳大利亚"
+
+msgid "New Zealand"
+msgstr "新西兰"
+
 #: forms.py:27 forms.py:74
 msgid "Melbourne, VIC"
 msgstr "墨尔本, 维多利亚州"
@@ -86,7 +92,7 @@ msgstr "北领地其他地区"
 
 #: forms.py:31 forms.py:78
 msgid "Christchurch, NZ"
-msgstr "克赖斯特彻奇(基督城), 新西兰"
+msgstr "基督城, 新西兰"
 
 #: forms.py:31 forms.py:78
 msgid "Queenstown, NZ"
@@ -138,7 +144,7 @@ msgstr "艾利斯斯普林斯"
 
 #: forms.py:39 forms.py:48
 msgid "Christchurch"
-msgstr "克赖斯特彻奇(基督城)"
+msgstr "基督城"
 
 #: forms.py:39 forms.py:49
 msgid "Queenstown"
