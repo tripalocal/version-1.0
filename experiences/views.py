@@ -208,6 +208,11 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         else:
             bks = 0
 
+        if type(experience) is Experience:
+            tp = experience.type
+        else:
+            tp ="NEWPRODUCT"
+
         experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]),
                             'meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]), 'rate': rate,
                             'duration':int(experience.duration) if float(experience.duration).is_integer() else experience.duration,
@@ -218,7 +223,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                             'price':experience_fee_calculator(exp_price, experience.commission),
                             'currency':str(dict(Currency)[experience.currency.upper()]),
                             'dollarsign':DollarSign[experience.currency.upper()],'dates':{},
-                            'photo_url':photo_url, 'type':experience.type, 'popularity':bks}
+                            'photo_url':photo_url, 'type':tp , 'popularity':bks}
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []
@@ -332,7 +337,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                         i += experience.guest_number_max #changed from bking.guest_number to experience.guest_number_max
 
                 if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
-                    if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
+                    if (hasattr(experience, 'repeat_cycle') and experience.repeat_cycle != "") or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                         instant_booking = False
                         #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
                         #instantbooking_i: skip the periods already checked
