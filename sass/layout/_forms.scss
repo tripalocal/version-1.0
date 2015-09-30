@@ -33,6 +33,10 @@ label {
   display: none;
 }
 
+.form-control:focus {
+  border-color: $primary-color;
+}
+
 // Tags
 .tag-box {
   float: left;
