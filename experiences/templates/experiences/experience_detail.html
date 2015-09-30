@@ -51,9 +51,9 @@
                     <br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
                     <div class="row" style="width:200px;margin-top:10px">
                     {% if LANGUAGE != "zh-CN" %}
-                        <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%}<br><p>
+                        <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%}<br><p>
                     {%else%}
-                        <label>{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:1.429|floatformat:"0" }}</span><label>{{experience.currency}}</label><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%}<br><p>
+                        <label>{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label>{{experience.currency}}</label><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%}<br><p>
                     {%endif%}
                     </div>
                     <form id="experience_booking_form" method="post" action="">
@@ -278,7 +278,7 @@
                 <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}">
                     <div class="listing-img" style="background-image:url({% for photo in related_experience.photo_set.all %}{% if forloop.first %} {{ MEDIA_URL }}{{photo.directory}}{{photo.name}} {%endif%}{%endfor%});">
                         <div class="price-box">
-                        {% trans "From" %} {{related_experience.dollarsign}}<span>{{ related_experience.price|mul:1.429|floatformat:"0" }}</span> {{related_experience.currency}} {% trans "/person" %}
+                        {% trans "From" %} {{related_experience.dollarsign}}<span>{{ related_experience.price|mul:related_experience.commission|floatformat:"0" }}</span> {{related_experience.currency}} {% trans "/person" %}
                         </div>
                     </div>
                 </a>
@@ -598,7 +598,7 @@ $(function(){
         if(price.length == max_number - min_number + 2) // not 1
         {
             guest_number = parseInt($("#id_guest_number").val());
-            price = Math.round(parseFloat(price[guest_number-min_number])*1.429);
+            price = Math.round(parseFloat(price[guest_number-min_number])*{{experience.commission}});
             $("#experience_price").text(price);
         }
 

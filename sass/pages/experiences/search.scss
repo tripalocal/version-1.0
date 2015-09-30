@@ -14,7 +14,6 @@
 
 
 // Search form
-
 .basic-search {
   color: $dark-grey;
   display: block;
@@ -23,13 +22,18 @@
   border-top: 1px solid $light-grey;
   border-bottom: 1px solid $light-grey;
   .container {
-    padding: 0;
+    width: 960px;
+    padding-left: 0;
     @include media('<desktop') {
       width: 430px;
+      padding: 0;
     }
     @include media('<phone') {
       width: 300px;
     }
+  }
+  .field-header {
+    min-width: 60px;
   }
 }
 
@@ -87,6 +91,7 @@
 .top-field {
   @include media('<desktop') {
     margin-bottom: 15px;
+    padding-right: 0;
   }
 }
 
@@ -103,6 +108,7 @@
 }
 
 .bottom-field {
+  padding: 0;
   @include media('<desktop') {
     display: none;
   }
@@ -142,11 +148,20 @@
 .search-result {
   padding-bottom: 50px;
   .container {
+    @include media('>=desktop') {
+      width: 960px;
+      padding: 0;
+    }
     @include media('<tablet') {
       text-align: center;
       padding: 0;
     }
   }
+}
+
+.expCount {
+  color: $dark-grey;
+  margin-right: 20px;
 }
 
 .exp-box {

@@ -345,7 +345,7 @@
                             (<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)
                         </p>
                         <hr style="margin:10px 0">
-                        <p>{% trans "Rate:" %} {{experience.dollarsign}}{{experience_price|floatformat|mul:1.429|floatformat:"0"}}{% trans " per person for " %}{{experience.duration}}{% trans " hours" %}</p>
+                        <p>{% trans "Rate:" %} {{experience.dollarsign}}{{experience_price|floatformat|mul:commission|floatformat:"0"}}{% trans " per person for " %}{{experience.duration}}{% trans " hours" %}</p>
                         <hr style="margin-bottom:10px;">
                         {% trans "Subtotal:" %} {{experience.dollarsign}}<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
                         <br>
@@ -400,7 +400,7 @@ $(function(){
         }
 */
         var handler = StripeCheckout.configure({
-                            key: 'pk_test_W9jgaSX9w9vrewiQIl5gE5l4',
+                            key: 'pk_live_62VE04d61Te70oh7IB7dqfjm',
                             image: '/images/tripalocal_Logo.png',
                             locale: '{{LANGUAGE}}',
                             token: function(token) {

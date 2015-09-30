@@ -6,7 +6,7 @@ from django.views.generic.list import ListView
 from django.views.generic import DetailView
 from experiences.forms import *
 from datetime import *
-import pytz, os, json, math, PIL
+import pytz, os, json, math, PIL, xlsxwriter
 from django.template import RequestContext, loader
 from Tripalocal_V1 import settings
 from decimal import Decimal
@@ -668,7 +668,8 @@ class ExperienceDetailView(DetailView):
                            'total_price': experience_fee_calculator(subtotal_price, experience.commission),
                            'user_email':request.user.email,
                            'GEO_POSTFIX':settings.GEO_POSTFIX,
-                           'LANGUAGE':settings.LANGUAGE_CODE
+                           'LANGUAGE':settings.LANGUAGE_CODE,
+                           'commission':COMMISSION_PERCENT + 1,
                            })
 
     def get_context_data(self, **kwargs):
@@ -801,6 +802,10 @@ class ExperienceDetailView(DetailView):
             setExperienceDisplayPrice(related_experiences[i])
             if float(related_experiences[i].duration).is_integer():
                 related_experiences[i].duration = int(related_experiences[i].duration)
+            if related_experiences[i].commission > 0.0:
+                related_experiences[i].commission = related_experiences[i].commission/(1-related_experiences[i].commission)+1
+            else:
+                related_experiences[i].commission = settings.COMMISSION_PERCENT+1
 
         related_experiences_added_to_wishlist = []
 
@@ -844,6 +849,11 @@ class ExperienceDetailView(DetailView):
                 experience.pickup_detail = t.pickup_detail
                 experience.refund_policy = t.refund_policy
                 experience.whatsincluded = t.whatsincluded
+
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
 
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE
@@ -2398,6 +2408,8 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         i = 0
         while i < len(experienceList):
             experience = experienceList[i]
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+
             if type == 'product':
                 setProductDisplayPrice(experience)
 
@@ -2727,6 +2739,7 @@ def custom_itinerary(request):
             if form.is_valid():
                 start_datetime = form.cleaned_data['start_datetime']
                 end_datetime = form.cleaned_data['end_datetime']
+                end_datetime = end_datetime.replace(hour=22)
                 guest_number = form.cleaned_data['guest_number']
                 city = form.cleaned_data['city']
                 language = form.cleaned_data['language']
@@ -2754,14 +2767,44 @@ def custom_itinerary(request):
                 booking_form.data['time'] = ""
                 booking_form.data['status'] = "Requested"
 
+                workbook = xlsxwriter.Workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'itineraries'), 'Itinerary.xlsx'))
+                worksheet = workbook.add_worksheet()
+                city = form.cleaned_data['city']
+                city = city.split(',')
+                row = -1
+                last_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2000/01/01", "%Y/%m/%d"))
+                i=-1
+
                 for item in itinerary:
+                    i += 1
                     booking_form.data['experience_id'] += str(item['id']) + ";"
                     booking_form.data['date'] += str(item['date']) + ";"
                     booking_form.data['time'] += str(item['time']) + ";"
                     booking_form.data['guest_number'] = item['guest_number']
 
-                return render(request, 'experiences/itinerary_booking_confirmation.html',
-                          {'form': booking_form,'itinerary':itinerary})
+                    #save to excel sheet
+                    current_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(str(item['date']), "%Y/%m/%d"))
+                    if current_date > last_date:
+                        #a new day
+                        if row >= 0:
+                            worksheet.write(row, col, schedule)
+                        row += 1
+                        col = 0
+                        worksheet.write(row, col, str(item['date']))
+                        col += 1
+                        worksheet.write(row, col, city[row]) #_('Arrive in {cityname}').format(cityname=city[row]))
+                        col += 1
+                        schedule = item['title']
+                        last_date = current_date
+                    else:
+                        schedule += ", " + item['title']
+
+                worksheet.write(row, col, schedule)
+                workbook.close()
+                return HttpResponseRedirect("https://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
+
+                #return render(request, 'experiences/itinerary_booking_confirmation.html',
+                #          {'form': booking_form,'itinerary':itinerary})
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
