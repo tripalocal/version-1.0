@@ -2658,7 +2658,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
     day_counter = 0
 
     #available_options: per experience --> itinerary: per day
-    if dt <= end_datetime:
+    while dt <= end_datetime:
         dt_string = dt.strftime("%Y/%m/%d")
         day_dict = {'date':dt_string, 'city':city[day_counter], 'experiences':[]}
 
