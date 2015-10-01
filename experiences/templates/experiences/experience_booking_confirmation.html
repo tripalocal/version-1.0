@@ -7,6 +7,7 @@
     <title>{% trans "Booking Confirmation" %}</title>
     <link rel="stylesheet" href="{% static 'experiences/content/checkout.css' %}">
     <script src="https://checkout.stripe.com/checkout.js"></script>
+    <script type="text/javascript" src="{% static 'experiences/scripts/qrcode.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -310,6 +311,10 @@
                         </div>
                     </div>
                     <input type="submit" id="submit_booking" name="Stripe" value="{% trans "Credit card/Alipay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>
+                    <input type="submit" id="wachat_booking" value="{% trans "Pay by WeChat" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>
+                    <div style="display: none" id="dialog" title="Dialog Title">
+                        <div id="qrcode"></div>
+                    </div>
                     <!--<input type="submit" id="submit_booking_unionpay" name="UnionPay" value="{% trans "Union Pay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>-->
                 </form>
             </div>
@@ -356,6 +361,21 @@
 <script charset="utf-8" type="text/javascript">
 
 $(function(){
+    var qrcode = new QRCode("qrcode", {
+            text: 'example.com',
+            width: 128,
+            height: 128,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+    function displayQRCode(code_url) {
+        $("#dialog").show();
+        qrcode.clear();
+        qrcode.makeCode(code_url);
+    }
+
     $(document).ready(function(){
         mixpanel.track("checkout");
 
@@ -465,9 +485,20 @@ $(function(){
         });
 
         // Close Checkout on page navigation
-            $(window).on('popstate', function() {
+        $(window).on('popstate', function () {
             handler.close();
         });
+
+        $('#wachat_booking').click(function (e) {
+            e.preventDefault();
+            $.post('/wechat_qr_payment/', {
+                'code': '123'
+            }).done(function (result) {
+                displayQRCode(result['code_url']);
+            }).fail(function (error) {
+                alert('出错了，请联系我们');
+            });
+        })
     })
 })
 </script>
