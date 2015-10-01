@@ -8,7 +8,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('experiences', '0008_auto_20150917_1559'),
+        ('experiences', '0007_auto_20150917_1524'),
     ]
 
     operations = [

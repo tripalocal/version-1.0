@@ -229,8 +229,8 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
         if exp_type == 'experience':
             experience_avail['meetup_spot'] = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
-            experience_avail['host_image'] = host.registereduser.image_url,
-            experience_avail['host'] = host.first_name + ' ' + host.last_name,
+            experience_avail['host_image'] = host.registereduser.image_url
+            experience_avail['host'] = host.first_name + ' ' + host.last_name
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []

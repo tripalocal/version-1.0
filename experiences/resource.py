@@ -600,7 +600,7 @@ def service_search(request, format=None):
         guest_number = criteria['guest_number']
         keywords = criteria.get('keywords', None)
         language = "Mandarin,English"
-        type = criteria.get('type', 'experiences')
+        type = criteria.get('type', 'experience')
 
         if keywords is not None and len(keywords) == 0:
             keywords = None
