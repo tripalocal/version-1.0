@@ -987,6 +987,7 @@ def experience_booking_confirmation(request):
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': total_price,
+                                                                           'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
 
@@ -1022,6 +1023,7 @@ def experience_booking_confirmation(request):
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': total_price,
+                                                                           'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
         elif 'UnionPay' in request.POST:
@@ -1065,6 +1067,7 @@ def experience_booking_confirmation(request):
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': total_price,
+                                                                           'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
         else:
