@@ -1,4 +1,4 @@
-import traceback
+﻿import traceback
 
 from django.http import Http404
 from django.db import models
@@ -8,6 +8,8 @@ from datetime import datetime
 from django.utils import timezone
 from allauth.socialaccount.models import SocialAccount
 from Tripalocal_V1 import settings
+from polymorphic import PolymorphicModel
+
 
 class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
@@ -21,7 +23,6 @@ class WechatProduct(models.Model):
     def __str__(self):
         return self.title
 
-
 class WechatBooking(models.Model):
     product = models.ForeignKey(WechatProduct)
     datetime = models.DateTimeField(default=timezone.now, blank=True)
@@ -33,7 +34,6 @@ class WechatBooking(models.Model):
     def __str__(self):
         return self.trade_no
 
-
 class Provider(models.Model):
     user = models.OneToOneField(User, null=True)
     company = models.CharField(max_length=100)
@@ -44,88 +44,10 @@ class Provider(models.Model):
     def __str__(self):
         return self.company
 
+class AbstractExperience(PolymorphicModel):
+    pass
 
-class Product(models.Model):
-    NORMAL = 'NORMAL'
-    AGE_PRICE = 'AGE'
-    DYNAMIC = 'DYNAMIC'
-
-    PRICE_CHOICES = (
-        (NORMAL, 'Normal price per person'),
-        (AGE_PRICE, 'Price for different age group'),
-        (DYNAMIC, 'Dynamic price'),
-    )
-
-    provider = models.ForeignKey(Provider)
-    price_type = models.CharField(max_length=6, choices=PRICE_CHOICES, default=NORMAL,
-                                  help_text="Only one of the price type will take effact.")
-    normal_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    dynamic_price = models.CharField(max_length=100, blank=True)
-    adult_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    adult_age = models.IntegerField(blank=True, null=True, help_text="Above what age should pay adult price.")
-
-    duration_in_min = models.IntegerField(blank=True, null=True, help_text="How long will it be in minutes?")
-    min_group_size = models.IntegerField(blank=True, null=True)
-    book_in_advance = models.IntegerField(blank=True, null=True)
-    instant_booking = models.TextField(blank=True)
-    free_translation = models.BooleanField(default=False)
-    order_on_holiday = models.BooleanField(default=False, help_text="If supplier take order during weekend and holiday "
-                                                                    "particularly instant order during holiday")
-
-    def __str__(self):
-        t = self.get_product_title(settings.LANGUAGES[0][0])
-        return str(self.id) + '--' + t
-
-    def get_product_title(self, lang):
-        if self.producti18n_set is not None and len(self.producti18n_set.all()) > 0:
-            t = self.producti18n_set.filter(language=lang)
-            if len(t)>0:
-                return t[0].title
-            else:
-                return self.producti18n_set.all()[0].title
-        else:
-            return ''
-
-
-class ProductI18n(models.Model):
-    EN = 'en'
-    ZH = 'zh'
-
-    LANG_CHOICES = (
-        (EN, 'English'),
-        (ZH, '中文'),
-    )
-
-    language = models.CharField(max_length=3, choices=LANG_CHOICES, default=EN)
-    product = models.ForeignKey(Product)
-    title = models.CharField(max_length=100)
-    location = models.TextField(blank=True)
-    background_info = models.TextField(blank=True)
-    description = models.TextField(blank=True)
-    service = models.TextField(blank=True)
-    highlights = models.TextField(blank=True)
-    schedule = models.TextField(blank=True)
-    ticket_use_instruction = models.TextField(blank=True)
-    refund_policy = models.TextField(blank=True)
-    notice = models.TextField(blank=True)
-    tips = models.TextField(blank=True)
-    whats_included = models.TextField(blank=True,
-                                      help_text="What's included in the price (pickup/meal/drink/certificate/photo)")
-    pickup_detail = models.TextField(blank=True)
-    combination_options = models.TextField(blank=True,
-                                           help_text="Combination option (for example the client can tick to choose "
-                                                     "whether to add translator or driver into the tour, and we can "
-                                                     "set standard price for different durations of such service "
-                                                     "provided)")
-    insurance = models.TextField(blank=True)
-    disclaimer = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.title
-
-
-class Experience(models.Model):
+class Experience(AbstractExperience):
     type = models.CharField(max_length=50)
     language = models.CharField(max_length=50)
 
@@ -162,7 +84,7 @@ class Experience(models.Model):
     commission = models.FloatField(default=0.3)
 
     def __str__(self):
-        t = get_experience_title(self, settings.LANGUAGES[0][0])
+        t = self.get_title(settings.LANGUAGES[0][0])
         if t is None:
             t = ''
         s = self.status if self.status != None else ''
@@ -174,8 +96,8 @@ class Experience(models.Model):
         language = 'en'
         if 'language' in kwargs:
             language = kwargs['language']
-        self.title = get_experience_title(self, language)
-        self.description = get_experience_description(self, language)
+        self.title = self.get_title(language)
+        self.description = self.get_description(language)
         self.activity = get_experience_activity(self, language)
         self.dress = get_experience_dress(self, language)
         self.interaction = get_experience_interaction(self, language)
@@ -218,6 +140,36 @@ class Experience(models.Model):
     class Meta:
         ordering = ['id']
 
+    def get_title(self, language):
+        if self.experiencetitle_set is not None and len(self.experiencetitle_set.all()) > 0:
+            t = self.experiencetitle_set.filter(language=language)
+            if len(t)>0:
+                return t[0].title
+            else:
+                return self.experiencetitle_set.all()[0].title
+        else:
+            return ''
+
+    def get_description(self, language):
+        if self.experiencedescription_set is not None and len(self.experiencedescription_set.all()) > 0:
+            t = self.experiencedescription_set.filter(language=language)
+            if len(t)>0:
+                return t[0].description
+            else:
+                return self.experiencedescription_set.all()[0].description
+        else:
+            return ''
+
+    def get_tags(self, language):
+        tags = []
+
+        if self.tags is not None and len(self.tags.all()) > 0:
+            t = self.tags.filter(language=language)
+            for i in range(len(t)):
+                tags.append(t[i].tag)
+
+        return tags
+
 class ExperienceI18n(models.Model):
     title = models.CharField(max_length=100, null=True)
     description = models.TextField(null=True)
@@ -228,6 +180,120 @@ class ExperienceI18n(models.Model):
     meetup_spot = models.TextField(null=True)
     dropoff_spot = models.TextField(null=True)
     experience = models.ForeignKey(Experience)
+
+class NewProduct(AbstractExperience):
+    NORMAL = 'NORMAL'
+    AGE_PRICE = 'AGE'
+    DYNAMIC = 'DYNAMIC'
+
+    PRICE_CHOICES = (
+        (NORMAL, 'Normal price per person'),
+        (AGE_PRICE, 'Price for different age group'),
+        (DYNAMIC, 'Dynamic price'),
+    )
+
+    LISTED = 'Listed'
+    UNLISTED = 'Unlisted'
+
+    STATUS_CHOICES = (
+        (LISTED, 'Listed'),
+        (UNLISTED, 'Unlisted'),
+    )
+
+    start_datetime = models.DateTimeField(null=True)
+    end_datetime = models.DateTimeField(null=True)
+    provider = models.ForeignKey(Provider)
+    city = models.CharField(max_length=50)
+    language = models.CharField(max_length=50, default="english;")
+    currency = models.CharField(max_length=10, default="aud")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=UNLISTED)
+    price_type = models.CharField(max_length=6, choices=PRICE_CHOICES, default=NORMAL,
+                                  help_text="Only one of the price type will take effact.")
+    price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    commission = models.FloatField(default=0.3)
+    dynamic_price = models.CharField(max_length=100, blank=True)
+    adult_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    adult_age = models.IntegerField(blank=True, null=True, help_text="Above what age should pay adult price.")
+    duration = models.FloatField(blank=True, null=True, help_text="How long will it be in hours?")
+    guest_number_min = models.IntegerField(blank=True, null=True)
+    guest_number_max = models.IntegerField(blank=True, null=True)
+    book_in_advance = models.IntegerField(blank=True, null=True)
+    instant_booking = models.TextField(blank=True)
+    free_translation = models.BooleanField(default=False)
+    order_on_holiday = models.BooleanField(default=False, help_text="If supplier take order during weekend and holiday "
+                                                                    "particularly instant order during holiday")
+    tags = models.ManyToManyField(ExperienceTag, related_name='newproduct_tags')
+
+    def __str__(self):
+        t = self.get_title(settings.LANGUAGES[0][0])
+        return str(self.id) + '--' + t
+
+    def get_title(self, lang):
+        if self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
+            t = self.newproducti18n_set.filter(language=lang)
+            if len(t)>0:
+                return t[0].title
+            else:
+                return self.newproducti18n_set.all()[0].title
+        else:
+            return ''
+
+    def get_description(self, language):
+        if self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
+            t = self.newproducti18n_set.filter(language=language)
+            if len(t)>0:
+                return t[0].description
+            else:
+                return self.newproducti18n_set.all()[0].description
+        else:
+            return None
+
+    def get_tags(self, language):
+        tags = []
+
+        if self.tags is not None and len(self.tags.all()) > 0:
+            t = self.tags.filter(language=language)
+            for i in range(len(t)):
+                tags.append(t[i].tag)
+
+        return tags
+
+class NewProductI18n(models.Model):
+    EN = 'en'
+    ZH = 'zh'
+
+    LANG_CHOICES = (
+        (EN, 'English'),
+        (ZH, '中文'),
+    )
+
+    language = models.CharField(max_length=3, choices=LANG_CHOICES, default=EN)
+    product = models.ForeignKey(NewProduct)
+    title = models.CharField(max_length=100)
+    location = models.TextField(blank=True)
+    background_info = models.TextField(blank=True)
+    description = models.TextField(blank=True)
+    service = models.TextField(blank=True)
+    highlights = models.TextField(blank=True)
+    schedule = models.TextField(blank=True)
+    ticket_use_instruction = models.TextField(blank=True)
+    refund_policy = models.TextField(blank=True)
+    notice = models.TextField(blank=True)
+    tips = models.TextField(blank=True)
+    whatsincluded = models.TextField(blank=True,
+                                      help_text="What's included in the price (pickup/meal/drink/certificate/photo)")
+    pickup_detail = models.TextField(blank=True)
+    combination_options = models.TextField(blank=True,
+                                           help_text="Combination option (for example the client can tick to choose "
+                                                     "whether to add translator or driver into the tour, and we can "
+                                                     "set standard price for different durations of such service "
+                                                     "provided)")
+    insurance = models.TextField(blank=True)
+    disclaimer = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.title
 
 class ExperienceTitle(models.Model):
     title = models.CharField(max_length=100)
@@ -272,7 +338,7 @@ class InstantBookingTimePeriod(models.Model):
     repeat_cycle = models.CharField(max_length=50)
     repeat_frequency = models.IntegerField()
     repeat_extra_information = models.CharField(max_length=50)
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
 
 class BlockOutTimePeriod(models.Model):
     start_datetime = models.DateTimeField()
@@ -282,7 +348,7 @@ class BlockOutTimePeriod(models.Model):
     repeat_cycle = models.CharField(max_length=50)
     repeat_frequency = models.IntegerField()
     repeat_extra_information = models.CharField(max_length=50)
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
 
 class WhatsIncluded(models.Model):
     item = models.CharField(max_length=50)
@@ -298,11 +364,11 @@ class Photo(models.Model):
     name = models.CharField(max_length=50)
     directory = models.CharField(max_length=50)
     image = models.ImageField(upload_to=upload_path)
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
 
 class Review(models.Model):
     user = models.ForeignKey(User)
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
     comment = models.TextField()
     rate = models.IntegerField()
     datetime = models.DateTimeField()
@@ -310,7 +376,7 @@ class Review(models.Model):
     operator_comment = models.TextField()
 
     def __str__(self):
-        return self.user.email + "--" + get_experience_title(self.experience,settings.LANGUAGES[0][0])
+        return self.user.email + "--" + self.experience.get_title(settings.LANGUAGES[0][0])
 
 class Coupon(models.Model):
     promo_code = models.CharField(max_length=10)
@@ -328,7 +394,7 @@ class Booking(models.Model):
     coupon = models.ForeignKey(Coupon)
     coupon_extra_information = models.TextField()
     guest_number = models.IntegerField()
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
     datetime = models.DateTimeField()
     status = models.CharField(max_length=50)
     submitted_datetime = models.DateTimeField()
@@ -337,7 +403,7 @@ class Booking(models.Model):
     booking_extra_information = models.TextField()
 
     def __str__(self):
-        return self.user.email + "--" + get_experience_title(self.experience,settings.LANGUAGES[0][0])
+        return self.user.email + "--" + self.experience.get_title(settings.LANGUAGES[0][0])
 
     def upload_review(self, rate=None, review=None):
         experience_id = self.experience_id
@@ -479,85 +545,55 @@ class Payment(models.Model):
             return False, e
         return True, re
 
-def get_experience_title(experience, language):
-    if experience.experiencetitle_set is not None and len(experience.experiencetitle_set.all()) > 0:
-        t = experience.experiencetitle_set.filter(language=language)
-        if len(t)>0:
-            return t[0].title
-        else:
-            return experience.experiencetitle_set.all()[0].title
-    else:
-        return None
-
 def get_experience_activity(experience, language):
-    if experience.experienceactivity_set is not None and len(experience.experienceactivity_set.all()) > 0:
+    if hasattr(experience, 'experienceactivity_set') and experience.experienceactivity_set is not None and len(experience.experienceactivity_set.all()) > 0:
         t = experience.experienceactivity_set.filter(language=language)
         if len(t)>0:
             return t[0].activity
         else:
             return experience.experienceactivity_set.all()[0].activity
     else:
-        return None
-
-def get_experience_description(experience, language):
-    if experience.experiencedescription_set is not None and len(experience.experiencedescription_set.all()) > 0:
-        t = experience.experiencedescription_set.filter(language=language)
-        if len(t)>0:
-            return t[0].description
-        else:
-            return experience.experiencedescription_set.all()[0].description
-    else:
-        return None
+        return ''
 
 def get_experience_interaction(experience, language):
-    if experience.experienceinteraction_set is not None and len(experience.experienceinteraction_set.all()) > 0:
+    if hasattr(experience, 'experienceinteraction_set') and experience.experienceinteraction_set is not None and len(experience.experienceinteraction_set.all()) > 0:
         t = experience.experienceinteraction_set.filter(language=language)
         if len(t)>0:
             return t[0].interaction
         else:
             return experience.experienceinteraction_set.all()[0].interaction
     else:
-        return None
+        return ''
 
 def get_experience_dress(experience, language):
-    if experience.experiencedress_set is not None and len(experience.experiencedress_set.all()) > 0:
+    if hasattr(experience, 'experiencedress_set') and experience.experiencedress_set is not None and len(experience.experiencedress_set.all()) > 0:
         t = experience.experiencedress_set.filter(language=language)
         if len(t)>0:
             return t[0].dress
         else:
             return experience.experiencedress_set.all()[0].dress
     else:
-        return None
+        return ''
 
 def get_experience_meetup_spot(experience, language):
-    if experience.experiencemeetupspot_set is not None and len(experience.experiencemeetupspot_set.all()) > 0:
+    if hasattr(experience, 'experiencemeetupspot_set') and experience.experiencemeetupspot_set is not None and len(experience.experiencemeetupspot_set.all()) > 0:
         t = experience.experiencemeetupspot_set.filter(language=language)
         if len(t)>0:
             return t[0].meetup_spot
         else:
             return experience.experiencemeetupspot_set.all()[0].meetup_spot
     else:
-        return None
+        return ''
 
 def get_experience_dropoff_spot(experience, language):
-    if experience.experiencedropoffspot_set is not None and len(experience.experiencedropoffspot_set.all()) > 0:
+    if hasattr(experience, 'experiencedropoffspot_set') and experience.experiencedropoffspot_set is not None and len(experience.experiencedropoffspot_set.all()) > 0:
         t = experience.experiencedropoffspot_set.filter(language=language)
         if len(t)>0:
             return t[0].dropoff_spot
         else:
             return experience.experiencedropoffspot_set.all()[0].dropoff_spot
     else:
-        return None
-
-def get_experience_tags(experience, language):
-    tags = []
-
-    if experience.tags is not None and len(experience.tags.all()) > 0:
-        t = experience.tags.filter(language=language)
-        for i in range(len(t)):
-            tags.append(t[i].tag)
-
-    return tags
+        return ''
 
 def get_experience_whatsincluded(experience, language):
     return WhatsIncluded.objects.filter(experience = experience, language = language)
@@ -768,3 +804,4 @@ def set_exp_dropoff_spot_all_langs(exp, meetup_spot, lang, other_lang):
     set_exp_dropoff_spot(exp, meetup_spot, lang)
     if not has_dropoff_spot_in_other_lang(exp, other_lang):
         set_exp_dropoff_spot(exp, meetup_spot, other_lang)
+

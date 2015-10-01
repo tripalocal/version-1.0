@@ -9,73 +9,85 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="{% static 'experiences/content/multi_day_trip.css' %}" rel="stylesheet">
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 	<title>{% trans "Tripalocal | Most popular trips" %}</title>
 {%endblock%}
 
 {% block content %}
 
 <div class="jumbotron top">
-  <h1>{% trans "Tripalocal" %}</h1>
+  {% if LANGUAGE == "zh-CN" %}
+  <img alt="{% trans 'Tripalocal' %}" src="{% static 'img/top_logo-cn.svg' %}" width="160">
+  {% else %}
+  <img alt="{% trans 'Tripalocal' %}" src="{% static 'img/top_logo-en.svg' %}" width="230">
+  {% endif %}
   <h1>{% trans "Authentic local experiences" %}</h1>
   <p>{% trans "Check our most popular trips" %}</p>
 </div>
 
 <div class="container">
   <div class="row">
-    <div class="col-sm-4">
+    <div class="col-md-4">
       <div class="exp-box">
-        <div class="listing-img" style="background-image:url({% static 'experiences/img/travelling-01.jpg'%})">
+        <div class="listing-img" style="background-image:url({% static 'img/homepage/travelling-01.jpg' %})">
         </div>
         <h1>{% trans "3 Day Trip" %}</h1>
-        <p>{% trans "Melbourne or Sydney" %}</p>
+        <p>{% trans "Melbourne" %}</p>
         <div class="price-box-sm">
-          <p>{% trans "Include accommodation for one night" %}</p>
+          <p>{% trans "Include 1 night accommodation" %}</p>
           <p style="margin-bottom:0;">AU $688</p>
-          <p><a href="{{GEO_POSTFIX}}experience/651/">{% trans "Melbourne" %}</a> / <a href="{{GEO_POSTFIX}}experience/661/">{% trans "Sydney" %}</a></p>
+          <p><a href="{{GEO_POSTFIX}}experience/651/">{% trans "View Details" %}</a></p>
         </div>
         <div class="price-box-sm">
-          <p>{% trans "Include all accommodation" %}</p>
+          <p>{% trans "Include 2 night accommodation" %}</p>
           <p style="margin-bottom:0;">AU $1088</p>
-          <p><a href="{{GEO_POSTFIX}}experience/701/">{% trans "Melbourne" %}</a> / <a href="{{GEO_POSTFIX}}experience/711/">{% trans "Sydney" %}</a></p>
+          <p><a href="{{GEO_POSTFIX}}experience/701/">{% trans "View Details" %}</a></p>
+        </div>
+        <p style="padding-top: 20px;">{% trans "Sydney" %}</p>
+        <div class="price-box-sm">
+          <p>{% trans "Include 1 night accommodation" %}</p>
+          <p style="margin-bottom:0;">AU $688</p>
+          <p><a href="{{GEO_POSTFIX}}experience/661/">{% trans "View Details" %}</a></p>
+        </div>
+        <div class="price-box-sm">
+          <p>{% trans "Include 2 night accommodation" %}</p>
+          <p style="margin-bottom:0;">AU $1088</p>
+          <p><a href="{{GEO_POSTFIX}}experience/711/">{% trans "View Details" %}</a></p>
         </div>
       </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-md-4">
       <div class="exp-box">
         <div class="listing-img" style="background-image:url({{ MEDIA_URL }}city/Sydney.jpg)">
         </div>
         <h1>{% trans "7 Day Trip" %}</h1>
         <p>{% trans "Melbourne + Sydney" %}</p>
         <div class="price-box-sm">
-          <p>{% trans "Include accommodation for one night" %}</p>
+          <p>{% trans "Include 1 night accommodation" %}</p>
           <p style="margin-bottom:0;">AU $1822</p>
-          <p><a href="{{GEO_POSTFIX}}experience/681/">{% trans "Check details" %}</a></p>
+          <p><a href="{{GEO_POSTFIX}}experience/681/">{% trans "View details" %}</a></p>
         </div>
         <div class="price-box-sm">
-          <p>{% trans "Include all accommodation" %}</p>
+          <p>{% trans "Includes all accommodation" %}</p>
           <p style="margin-bottom:0">AU $2822</p>
-          <p><a href="{{GEO_POSTFIX}}experience/731/">{% trans "Check details" %}</a></p>
+          <p><a href="{{GEO_POSTFIX}}experience/731/">{% trans "View details" %}</a></p>
         </div>
       </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-md-4">
       <div class="exp-box">
         <div class="listing-img" style="background-image:url({{ MEDIA_URL }}city/Brisbane.jpg)">
         </div>
         <h1>{% trans "10 Day Trip" %}</h1>
         <p>{% trans "Melbourne + Sydney + Gold Coast" %}</p>
         <div class="price-box-sm">
-          <p>{% trans "Include accommodation for one night" %}</p>
+          <p>{% trans "Include 1 night accommodation" %}</p>
           <p style="margin-bottom:0;">AU $2632</p>
-          <p><a href="{{GEO_POSTFIX}}experience/691/">{% trans "Check details" %}</a></p>
+          <p><a href="{{GEO_POSTFIX}}experience/691/">{% trans "View details" %}</a></p>
         </div>
         <div class="price-box-sm">
-          <p>{% trans "Include all accommodation" %}</p>
+          <p>{% trans "Includes all accommodation" %}</p>
           <p style="margin-bottom:0;">AU $3993</p>
-          <p><a href="{{GEO_POSTFIX}}experience/771/">{% trans "Check details" %}</a></p>
+          <p><a href="{{GEO_POSTFIX}}experience/771/">{% trans "View details" %}</a></p>
         </div>
       </div>
     </div>
@@ -90,6 +102,9 @@
 {%endblock%}
 
 {% block scripts %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+<script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 <script language="javascript" type="text/javascript">
     $(document).ready(function () {
         $('#show_popup').click(function(e) {

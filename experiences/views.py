@@ -6,7 +6,7 @@ from django.views.generic.list import ListView
 from django.views.generic import DetailView
 from experiences.forms import *
 from datetime import *
-import pytz, os, json, math, PIL
+import pytz, os, json, math, PIL, xlsxwriter
 from django.template import RequestContext, loader
 from Tripalocal_V1 import settings
 from decimal import Decimal
@@ -29,6 +29,8 @@ from experiences.telstra_sms_api import send_sms
 from unionpay import client, signer
 from unionpay.util.helper import load_config, make_order_id
 from django.views.decorators.csrf import csrf_exempt
+import itertools
+from django.db.models import Q
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -37,6 +39,16 @@ MaxIDImage=5
 LANG_CN = settings.LANGUAGES[1][0]
 LANG_EN = settings.LANGUAGES[0][0]
 GEO_POSTFIX = settings.GEO_POSTFIX
+
+def isEnglish(s):
+    try:
+        s.decode('ascii') if isinstance(s, bytes) else s.encode('ascii')
+    except UnicodeDecodeError:
+        return False
+    except UnicodeEncodeError:
+        return False
+    else:
+        return True
 
 def experience_fee_calculator(price, commission_rate):
     if type(price)==int or type(price) == float:
@@ -105,11 +117,25 @@ def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, cur
     else:
         raise Exception("func next_time_slot, illegal repeat_cycle")
 
-def get_available_experiences(start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None):
+def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None):
     #city/keywords is a string like A,B,C,
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     available_options = []
     end_datetime = end_datetime.replace(hour=22)
+
+    exp_type = exp_type.lower()
+    if exp_type == 'all':
+        experiences = AbstractExperience.objects.all()
+        experiences = [e for e in experiences if e.status == 'Listed']
+    elif exp_type == 'newproduct':
+        experiences = AbstractExperience.objects.instance_of(NewProduct)
+        experiences = [e for e in experiences if e.status == 'Listed']
+    else:
+        experiences = AbstractExperience.objects.instance_of(Experience)
+        if exp_type == 'itinerary':
+            experiences = [e for e in experiences if e.status == 'Listed' and e.type == 'ITINERARY']
+        else:
+            experiences = [e for e in experiences if e.status == 'Listed' and e.type != 'ITINERARY']
 
     if city is not None:
         city = str(city).lower().split(",")
@@ -117,9 +143,12 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         if len(city) > 1 and (end_datetime-start_datetime).days+1 != len(city):
             raise TypeError("Wrong format: city, incorrect length")
 
-        experiences = Experience.objects.filter(status='Listed', city__iregex=r'(' + '|'.join(city) + ')') #like __iin
-    else:
-        experiences = Experience.objects.filter(status='Listed')
+        if not isEnglish(city[0]):
+            for i in range(len(city)):
+                city[i] = dict(Location_reverse).get(city[i]).lower()
+
+        experiences = [e for e in experiences if e.city.lower() in city]
+
 
     for experience in experiences:
         if guest_number is not None and (experience.guest_number_max < int(guest_number) or experience.guest_number_min > int(guest_number)):
@@ -134,7 +163,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                 guest_number = experience.guest_number_max
 
         if keywords is not None:
-            experience_tags = get_experience_tags(experience, settings.LANGUAGES[0][0])
+            experience_tags = experience.get_tags(settings.LANGUAGES[0][0])
             tags = keywords.strip().split(",")
             match = False
             for tag in tags:
@@ -174,7 +203,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         if len(experience.instantbookingtimeperiod_set.all()) > 0 or len(experience.blockouttimeperiod_set.all()) > 0:
             calendar_updated = True
 
-        host = experience.hosts.all()[0]
+        host = get_host(experience)
         exp_price = float(experience.price)
         if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
@@ -183,16 +212,32 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
         photos = experience.photo_set.all()
         if photos is not None and len(photos) > 0:
             photo_url = photos[0].directory+photos[0].name
-        experience_avail = {'id':experience.id, 'title': get_experience_title(experience, settings.LANGUAGES[0][0]),
-                            'meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]), 'rate': rate,
-                            'duration':experience.duration, 'city':experience.city,
-                            'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
-                            'language':experience.language, 'host':host.first_name + ' ' + host.last_name,
-                            'host_image':host.registereduser.image_url, 'calendar_updated':calendar_updated,
+
+        #get the number of booking times
+        bks = Booking.objects.filter(experience_id = experience.id)
+        if bks is not None:
+            bks = len(bks)
+        else:
+            bks = 0
+
+        if type(experience) is Experience:
+            tp = experience.type
+        else:
+            tp ="NEWPRODUCT"
+
+        experience_avail = {'id':experience.id, 'title': experience.get_title(settings.LANGUAGES[0][0]), 'rate': rate,
+                            'duration':int(experience.duration) if float(experience.duration).is_integer() else experience.duration,
+                            'city':experience.city, 'description':experience.get_description(settings.LANGUAGES[0][0]),
+                            'language':experience.language, 'calendar_updated':calendar_updated,
                             'price':experience_fee_calculator(exp_price, experience.commission),
                             'currency':str(dict(Currency)[experience.currency.upper()]),
                             'dollarsign':DollarSign[experience.currency.upper()],'dates':{},
-                            'photo_url':photo_url, 'type':experience.type}
+                            'photo_url':photo_url, 'type':tp , 'popularity':bks, 'tags':experience.get_tags(settings.LANGUAGES[0][0])}
+
+        if exp_type == 'experience':
+            experience_avail['meetup_spot'] = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
+            experience_avail['host_image'] = host.registereduser.image_url
+            experience_avail['host'] = host.first_name + ' ' + host.last_name
 
         blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []
@@ -306,7 +351,7 @@ def get_available_experiences(start_datetime, end_datetime, guest_number=None, c
                         i += experience.guest_number_max #changed from bking.guest_number to experience.guest_number_max
 
                 if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
-                    if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
+                    if (hasattr(experience, 'repeat_cycle') and experience.repeat_cycle != "") or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                         instant_booking = False
                         #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
                         #instantbooking_i: skip the periods already checked
@@ -346,7 +391,7 @@ def experience_availability(request):
             local_timezone = pytz.timezone(settings.TIME_ZONE)
             available_options = []
 
-            available_options = get_available_experiences(start_datetime, end_datetime)
+            available_options = get_available_experiences('experience', start_datetime, end_datetime)
 
             #add title
             dict = {'id':'Id', 'title':'Title', 'host':'Host', 'dates':{}}
@@ -522,7 +567,7 @@ def getAvailableOptions(experience, available_options, available_date):
                     i += experience.guest_number_max
 
             if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
-                if experience.repeat_cycle != "" or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
+                if (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                     instant_booking = False
                     #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
                     #instantbooking_i: skip the periods already checked
@@ -569,7 +614,7 @@ def getAvailableOptions(experience, available_options, available_date):
     return available_date
 
 class ExperienceDetailView(DetailView):
-    model = Experience
+    model = AbstractExperience
     template_name = 'experiences/experience_detail.html'
     #context_object_name = 'experience'
 
@@ -585,10 +630,13 @@ class ExperienceDetailView(DetailView):
             form.data['user_id'] = request.user.id
             form.data['first_name'] = request.user.first_name
             form.data['last_name'] = request.user.last_name
-            experience = Experience.objects.get(id=form.data['experience_id'])
+            experience = AbstractExperience.objects.get(id=form.data['experience_id'])
             experience.dollarsign = DollarSign[experience.currency.upper()]
             #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
-            experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+            if type(experience) == Experience:
+                experience.title = experience.get_title(settings.LANGUAGES[0][0])
+            else:
+                experience.title = experience.get_title(settings.LANGUAGES[0][0])
             experience_price = experience.price
 
             if float(experience.duration).is_integer():
@@ -627,12 +675,16 @@ class ExperienceDetailView(DetailView):
                            'total_price': experience_fee_calculator(subtotal_price, experience.commission),
                            'user_email':request.user.email,
                            'GEO_POSTFIX':settings.GEO_POSTFIX,
-                           'LANGUAGE':settings.LANGUAGE_CODE
+                           'LANGUAGE':settings.LANGUAGE_CODE,
+                           'commission':COMMISSION_PERCENT + 1,
                            })
 
     def get_context_data(self, **kwargs):
         context = super(ExperienceDetailView, self).get_context_data(**kwargs)
-        experience = context['experience']
+        experience = context['experience'] if 'experience' in context else context['newproduct']
+        if 'experience' not in context:
+            context['experience'] = experience
+            experience.type="PRODUCT"
         sdt = experience.start_datetime
         last_sdt = pytz.timezone('UTC').localize(datetime.min)
         local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -652,7 +704,7 @@ class ExperienceDetailView(DetailView):
         context['cover_photo'] = cover_photo
 
         if experience.end_datetime < datetime.utcnow().replace(tzinfo=pytz.UTC):
-            if self.request.user.id != experience.hosts.all()[0].id:
+            if self.request.user.id != get_host(experience).id:
                 # other user, experience already expired
                 context['expired'] = True
                 return context
@@ -662,7 +714,9 @@ class ExperienceDetailView(DetailView):
                 return context
 
         if not experience.status.lower() == "listed":
-            if self.request.user.id != experience.hosts.all()[0].id and not self.request.user.is_superuser:
+            owner_id = get_host(experience).id
+
+            if self.request.user.id != owner_id and not self.request.user.is_superuser:
                 # other user, experience not published
                 context['listed'] = False
                 return context
@@ -695,12 +749,13 @@ class ExperienceDetailView(DetailView):
         if self.request.user.is_authenticated():
             context["user_email"] = self.request.user.email
 
-        context["host_bio"] = get_user_bio(experience.hosts.all()[0].registereduser, settings.LANGUAGES[0][0])
-        host_image = experience.hosts.all()[0].registereduser.image_url
-        if host_image == None or len(host_image) == 0:
-            context['host_image'] = 'profile_default.jpg'
-        else:
-            context['host_image'] = host_image
+        if type(experience) is Experience:
+            context["host_bio"] = get_user_bio(get_host(experience).registereduser, settings.LANGUAGES[0][0])
+            host_image = get_host(experience).registereduser.image_url
+            if host_image == None or len(host_image) == 0:
+                context['host_image'] = 'profile_default.jpg'
+            else:
+                context['host_image'] = host_image
 
         context['in_wishlist'] = False
         wishlist = self.request.user.registereduser.wishlist.all() if self.request.user.is_authenticated() else None
@@ -739,14 +794,25 @@ class ExperienceDetailView(DetailView):
                 if len(related_experiences)>=3:
                     break
 
+        if len(related_experiences)<3:
+            queryset = Experience.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").order_by('?')[:3]
+            for exp in queryset:
+                related_experiences.append(exp)
+                if len(related_experiences)>=3:
+                    break
+
         for i in range(0,len(related_experiences)):
             related_experiences[i].dollarsign = DollarSign[related_experiences[i].currency.upper()]
             related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
-            related_experiences[i].title = get_experience_title(related_experiences[i], settings.LANGUAGES[0][0])
-            related_experiences[i].description = get_experience_description(related_experiences[i], settings.LANGUAGES[0][0])
+            related_experiences[i].title = related_experiences[i].get_title(settings.LANGUAGES[0][0])
+            related_experiences[i].description = related_experiences[i].get_description(settings.LANGUAGES[0][0])
             setExperienceDisplayPrice(related_experiences[i])
             if float(related_experiences[i].duration).is_integer():
                 related_experiences[i].duration = int(related_experiences[i].duration)
+            if related_experiences[i].commission > 0.0:
+                related_experiences[i].commission = related_experiences[i].commission/(1-related_experiences[i].commission)+1
+            else:
+                related_experiences[i].commission = settings.COMMISSION_PERCENT+1
 
         related_experiences_added_to_wishlist = []
 
@@ -767,12 +833,34 @@ class ExperienceDetailView(DetailView):
 
         experience.dollarsign = DollarSign[experience.currency.upper()]
         experience.currency = str(dict(Currency)[experience.currency.upper()])
-        experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
-        experience.description = get_experience_description(experience, settings.LANGUAGES[0][0])
-        experience.activity = get_experience_activity(experience, settings.LANGUAGES[0][0])
-        experience.interaction = get_experience_interaction(experience, settings.LANGUAGES[0][0])
-        experience.dress = get_experience_dress(experience, settings.LANGUAGES[0][0])
-        experience.whatsincluded = get_experience_whatsincluded(experience, settings.LANGUAGES[0][0])
+        
+        if type(experience) is Experience:
+            experience.title = experience.get_title(settings.LANGUAGES[0][0])
+            experience.description = experience.get_description(settings.LANGUAGES[0][0])
+            experience.activity = get_experience_activity(experience, settings.LANGUAGES[0][0])
+            experience.interaction = get_experience_interaction(experience, settings.LANGUAGES[0][0])
+            experience.dress = get_experience_dress(experience, settings.LANGUAGES[0][0])
+            experience.whatsincluded = get_experience_whatsincluded(experience, settings.LANGUAGES[0][0])
+        else:
+            if experience.newproducti18n_set is not None and len(experience.newproducti18n_set.all()) > 0:
+                t = experience.newproducti18n_set.filter(language=settings.LANGUAGES[0][0])
+                if len(t)>0:
+                    t = t[0]
+                else:
+                    t = experience.newproducti18n_set.all()[0]
+
+                experience.title = t.title
+                experience.description = t.description
+                experience.highlights = t.highlights
+                experience.tips = t.tips
+                experience.pickup_detail = t.pickup_detail
+                experience.refund_policy = t.refund_policy
+                experience.whatsincluded = t.whatsincluded
+
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
 
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE
@@ -798,17 +886,21 @@ def experience_booking_successful(request, experience=None, guest_number=None, b
         is_instant_booking = True if data['is_instant_booking'] == "True" else False
 
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
+    mp.track(request.user.email, 'Sent request to '+ get_host(experience).first_name)
 
     if not settings.DEVELOPMENT:
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(request.user.email, 'Sent request to '+ experience.hosts.all()[0].first_name)
+        mp.track(request.user.email, 'Sent request to '+ get_host(experience).first_name)
 
     template = 'experiences/experience_booking_successful_requested.html'
     if is_instant_booking:
         template = 'experiences/experience_booking_successful_confirmed.html'
 
-    experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+    if type(experience) == Experience:
+        experience.title = experience.get_title(settings.LANGUAGES[0][0])
+    else:
+        experience.title = experience.get_title(settings.LANGUAGES[0][0])
+
     return render(request,template,{'experience': experience,
                                     'price_paid':price_paid,
                                     'guest_number':guest_number,
@@ -829,11 +921,14 @@ def experience_booking_confirmation(request):
     # A HTTP POST?
     if request.method == 'POST':
         form = BookingConfirmationForm(request.POST)
-        experience = Experience.objects.get(id=form.data['experience_id'])
+        experience = AbstractExperience.objects.get(id=form.data['experience_id'])
         experience.dollarsign = DollarSign[experience.currency.upper()]
         #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
-        experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
-        experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
+        if type(experience) == Experience:
+            experience.title = experience.get_title(settings.LANGUAGES[0][0])
+            experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
+        else:
+            experience.title = experience.get_title(settings.LANGUAGES[0][0])
 
         guest_number = int(form.data['guest_number'])
         subtotal_price = 0.0
@@ -892,6 +987,7 @@ def experience_booking_confirmation(request):
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': total_price,
+                                                                           'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
 
@@ -927,6 +1023,7 @@ def experience_booking_confirmation(request):
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': total_price,
+                                                                           'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
         elif 'UnionPay' in request.POST:
@@ -970,6 +1067,7 @@ def experience_booking_confirmation(request):
                                                                            'experience_price':experience_price,
                                                                            'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                                                                            'total_price': total_price,
+                                                                           'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
         else:
@@ -1024,6 +1122,41 @@ def saveProfileImage(user, profile, image_file):
             os.mkdir(dirname_other)
 
         subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
+
+def saveExperienceImage(experience, photo, extension, index):
+    filename = 'experience' + str(experience.id) + '_' + str(index) + extension
+    dir_name = 'experiences/' + str(experience.id) + '/'
+
+    photos = Photo.objects.filter(name=filename)
+    if len(photos) != 0:
+        ph = photos[0]
+        photos[0].image.delete()
+    else:
+        ph = Photo(name=filename, directory=dir_name, experience=experience)
+
+    ph.image = photo
+    ph.save()
+
+    #create the corresponding thumbnail (force .jpg)
+    basewidth = 400
+    thumb_file_name = 'thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg'
+
+    if storage.exists(thumb_file_name):
+        storage.delete(thumb_file_name)
+    try:
+        f = storage.open(dir_name + filename, 'rb')
+        img = Image.open(f)
+        f_thumb = storage.open(thumb_file_name, "wb")
+        wpercent = (basewidth / float(img.size[0]))
+        hsize = int((float(img.size[1]) * float(wpercent)))
+        img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
+        img_out = BytesIO()
+        img.save(img_out, format='JPEG')
+        f_thumb.write(img_out.getvalue())
+        f_thumb.close()
+    except:
+        #TODO
+        pass
 
 def updateExperience(experience, id, start_datetime, end_datetime, repeat_cycle, repeat_frequency, guest_number_min,
                    guest_number_max, price, currency, duration, city, status, language, dynamic_price,
@@ -1134,8 +1267,8 @@ def create_experience(request, id=None):
             experience = get_object_or_404(Experience, pk=id)
             if experience.currency is None:
                 experience.currency = 'aud'
-            host = experience.hosts.all()[0]
-            registerUser = experience.hosts.all()[0].registereduser
+            host = get_host(experience)
+            registerUser = host.registereduser
             list = experience.whatsincluded_set.filter(item="Food", language=settings.LANGUAGES[0][0])
             if len(list) > 0:
                 if list[0].included:
@@ -1177,9 +1310,9 @@ def create_experience(request, id=None):
             else:
                 COMMISSION_PERCENT = settings.COMMISSION_PERCENT
             data = {"id":experience.id,
-                "host":experience.hosts.all()[0].email,
-                "host_first_name":experience.hosts.all()[0].first_name,
-                "host_last_name":experience.hosts.all()[0].last_name,
+                "host":get_host(experience).email,
+                "host_first_name":get_host(experience).first_name,
+                "host_last_name":get_host(experience).last_name,
                 "host_bio": get_user_bio(registerUser, settings.LANGUAGES[0][0]),
                 "host_image":registerUser.image,
                 "host_image_url":registerUser.image_url,
@@ -1189,8 +1322,8 @@ def create_experience(request, id=None):
                 #"repeat_cycle":experience.repeat_cycle,
                 #"repeat_frequency":experience.repeat_frequency,
                 "phone_number":registerUser.phone_number,
-                "title":get_experience_title(experience, settings.LANGUAGES[0][0]),
-                "summary":get_experience_description(experience, settings.LANGUAGES[0][0]),
+                "title":experience.get_title(settings.LANGUAGES[0][0]),
+                "summary":experience.get_description(settings.LANGUAGES[0][0]),
                 "guest_number_min":experience.guest_number_min,
                 "guest_number_max":experience.guest_number_max,
                 "price":round(experience.price,2),
@@ -1336,38 +1469,7 @@ def create_experience(request, id=None):
                     name, extension = os.path.splitext(request.FILES['experience_photo_'+str(index)].name)
                     extension = extension.lower()
                     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
-                        filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-                        destination = open(dirname + filename, 'wb+')
-                        for chunk in request.FILES['experience_photo_'+str(index)].chunks():
-                            destination.write(chunk)
-                        destination.close()
-
-                        #copy to the other website -- folder+file
-                        if settings.LANGUAGES[0][0] == "en":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/experiences/' + str(experience.id) + '/'
-                        elif settings.LANGUAGES[0][0] == "zh":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/experiences/' + str(experience.id) + '/'
-
-                        if not os.path.isdir(dirname_other):
-                            os.mkdir(dirname_other)
-                        subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
-
-                        #create the corresponding thumbnail (force .jpg)
-                        basewidth = 400
-                        img = Image.open(dirname + filename)
-                        wpercent = (basewidth/float(img.size[0]))
-                        hsize = int((float(img.size[1])*float(wpercent)))
-                        img1 = img.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-                        img1.save(settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg')
-
-                        #copy to the other website -- folder+file
-                        if settings.LANGUAGES[0][0] == "en":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/thumbnails/experiences/'
-                        elif settings.LANGUAGES[0][0] == "zh":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/thumbnails/experiences/'
-                        if not os.path.isdir(dirname_other):
-                            os.mkdir(dirname_other)
-                        subprocess.Popen(['cp',settings.MEDIA_ROOT + '/thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg', dirname_other + 'experience' + str(experience.id) + '_' + str(index) + '.jpg'])
+                        saveExperienceImage(experience, content, extension, index)
 
                         name = 'experience' + str(experience.id) + '_' + str(index)
                         if not len(experience.photo_set.filter(name__startswith=name))>0:
@@ -1524,9 +1626,9 @@ def update_booking(id, accepted, user):
             return result
 
         experience = Experience.objects.get(id=booking.experience_id)
-        experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+        experience.title = experience.get_title(settings.LANGUAGES[0][0])
         experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
-        if not experience.hosts.all()[0].id == user.id:
+        if not get_host(experience).id == user.id:
             booking_success = False
             result={'booking_success':booking_success, 'error':'only the host can accept/reject the booking'}
             return result
@@ -1542,7 +1644,7 @@ def update_booking(id, accepted, user):
                 booking.coupon.end_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC)
                 booking.coupon.save()
 
-            exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+            exp_title = experience.get_title(settings.LANGUAGE_CODE)
             customer_phone_num = booking.payment.phone_number
             exp_datetime_local = booking.datetime.astimezone(tzlocal())
             exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
@@ -1679,7 +1781,7 @@ def update_booking(id, accepted, user):
                 booking.save()
 
                 #send SMS
-                exp_title = get_experience_title(experience, settings.LANGUAGE_CODE)
+                exp_title = experience.get_title(settings.LANGUAGE_CODE)
                 customer_phone_num = booking.payment.phone_number
                 exp_datetime_local = booking.datetime.astimezone(tzlocal())
                 exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
@@ -1802,11 +1904,11 @@ def getBGImageURL(experienceKey):
     return BGImageURL
 
 def tagsOnly(tag, exp):
-    experience_tags = get_experience_tags(exp, settings.LANGUAGES[0][0])
+    experience_tags = exp.get_tags(settings.LANGUAGES[0][0])
     return tag in experience_tags
 
 def getProfileImage(experience):
-    profileImage = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+    profileImage = RegisteredUser.objects.get(user_id=get_host(experience).id).image_url
     if profileImage:
         return profileImage
     else:
@@ -1819,6 +1921,14 @@ def setExperienceDisplayPrice(experience):
             experience.price = dp[len(dp)-2]#the string ends with ",", so the last one is ''
         elif experience.guest_number_min <= 4:
             experience.price = dp[4-experience.guest_number_min]
+
+def setProductDisplayPrice(experience):
+    #if experience.price_type == NewProduct.NORMAL:
+    #    experience.price = experience.price
+    #elif experience.price_type == NewProduct.AGE_PRICE:
+    #    experience.price = experience.children_price
+    #else:
+    setExperienceDisplayPrice(experience)
 
 def new_experience(request):
     context = RequestContext(request)
@@ -1909,12 +2019,12 @@ def manage_listing_price(request, experience, context):
 def manage_listing_overview(request, experience, context):
     if request.method == 'GET':
         data = {}
-        data['title'] = get_experience_title(experience, LANG_EN)
-        data['summary'] = get_experience_description(experience, LANG_EN)
+        data['title'] = experience.get_title(LANG_EN)
+        data['summary'] = experience.get_description(LANG_EN)
         data['language'] = experience.language
 
-        data['title_other'] = get_experience_title(experience, LANG_CN)
-        data['summary_other'] = get_experience_description(experience, LANG_CN)
+        data['title_other'] = experience.get_title(LANG_CN)
+        data['summary_other'] = experience.get_description(LANG_CN)
 
         form = ExperienceOverviewForm(initial=data)
 
@@ -2148,7 +2258,7 @@ def check_upload_filled(experience):
     else:
         result+='0'
     #check overview.
-    if get_experience_title(experience, LANG_EN) and get_experience_description(experience, LANG_EN):
+    if experience.get_title(LANG_EN) and experience.get_description(LANG_EN):
         result+='1'
     else:
         result+='0'
@@ -2176,7 +2286,7 @@ def check_upload_filled(experience):
 def manage_listing(request, exp_id, step, ):
     experience = get_object_or_404(Experience, pk=exp_id)
     if not request.user.is_superuser:
-        if not request.user in experience.hosts.all():
+        if request.user.id != get_host(experience).id:
             raise Http404("Sorry, but you can only edit your own experience.")
 
     experience_title_cn = get_object_or_404(ExperienceTitle, experience_id=exp_id, language='zh')
@@ -2215,7 +2325,7 @@ def manage_listing_continue(request, exp_id):
 
     price_fields = [exp.duration, exp.guest_number_min, exp.guest_number_max, exp.type]
     lang = settings.LANGUAGES[0][0]
-    overview_fields = [get_experience_title(exp, lang), get_experience_description(exp, lang), exp.language]
+    overview_fields = [exp.get_title(lang), exp.get_description(lang), exp.language]
     detail_fields = [get_experience_activity(exp, lang), get_experience_interaction(exp, lang),
                      get_experience_dress(exp, lang)]
     location_fields = [exp.city, get_experience_meetup_spot(exp, lang)]
@@ -2246,7 +2356,7 @@ def manage_listing_continue(request, exp_id):
     return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
-               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False):
+               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False,  type='s'):
 
     form = SearchForm()
     form.data = form.data.copy()
@@ -2288,37 +2398,35 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             break
 
     if request.is_ajax():
+        if type == 'product':
+            experienceList = NewProduct.objects.filter(city__iexact=city, status__iexact="listed")
+        else:
+            experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(
+                type__iexact="itinerary")
+
         # Add all experiences that belong to the specified city to a new list
         # alongside a list with all the number of reviews
-        experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(type__iexact="multi-hosts")
+        # experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(type__iexact="itinerary")
 
-        if is_kids_friendly:
-            experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
-        if is_host_with_cars:
-            experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
-        if is_private_tours:
-            experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
+            if is_kids_friendly:
+                experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
+            if is_host_with_cars:
+                experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
+            if is_private_tours:
+                experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
 
         i = 0
         while i < len(experienceList):
             experience = experienceList[i]
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
 
-            setExperienceDisplayPrice(experience)
+            if type == 'product':
+                setProductDisplayPrice(experience)
 
-            if start_date is not None and experience.end_datetime < start_date :
-                i += 1
-                continue
-
-            if end_date is not None and experience.start_datetime > end_date:
-                i += 1
-                continue
-
-            if guest_number is not None and len(guest_number) > 0 and experience.guest_number_max < int(guest_number):
-                i += 1
-                continue
-
-                experience_tags = get_experience_tags(experience, settings.LANGUAGES[0][0])
-                if keywords is not None and len(keywords) > 0 and experience_tags is not None and len(experience_tags) > 0:
+            else:
+                setExperienceDisplayPrice(experience)
+                experience_tags = experience.get_tags(settings.LANGUAGES[0][0])
+                if keywords is not None and len(keywords) > 0 and len(experience_tags) > 0:
                     tags = keywords.strip().split(",")
                     match = False
                     for tag in tags:
@@ -2328,6 +2436,20 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                     if not match:
                         i += 1
                         continue
+
+            if start_date is not None and experience.end_datetime < start_date :
+                i += 1
+                continue
+
+            if end_date is not None and experience.start_datetime > end_date:
+                i += 1
+                continue
+
+            if guest_number is not None and len(guest_number) > 0 and \
+                    experience.guest_number_max  and experience.guest_number_max < int(guest_number):
+                i += 1
+                continue
+
 
             if language is not None and len(language) > 0 and experience.language is not None and len(experience.language) > 0:
                 experience_language = experience.language.split(";")
@@ -2342,16 +2464,18 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                     i += 1
                     continue
 
-                if not experience.currency:
-                    experience.currency = 'aud'
-                experience.dollarsign = DollarSign[experience.currency.upper()]
-                experience.currency = str(dict(Currency)[experience.currency.upper()])
+            if not experience.currency:
+                experience.currency = 'aud'
+            experience.dollarsign = DollarSign[experience.currency.upper()]
+            experience.currency = str(dict(Currency)[experience.currency.upper()])
 
-                rate = 0.0
-                counter = 0
+            rate = 0.0
+            counter = 0
 
-                photoset = experience.photo_set.all()
-                image_url = experience.hosts.all()[0].registereduser.image_url
+            photoset = experience.photo_set.all()
+            if type != 'product':
+                image_url = get_host(experience).registereduser.image_url
+
                 if photoset!= None and len(photoset) > 0 and image_url != None and len(image_url) > 0:
                     for review in experience.review_set.all():
                         rate += review.rate
@@ -2410,38 +2534,45 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                                     rateList.insert(counter, rate)
                                 break
 
-                cityExperienceList.insert(counter, experience)
-                cityExperienceReviewList.insert(counter, getNReviews(experience.id))
-                # Fetch BGImageURL
-                BGImageURL = getBGImageURL(experience.id)
-                if (BGImageURL):
-                    BGImageURLList.insert(counter, BGImageURL)
-                else:
-                    BGImageURLList.insert(counter, "default_experience_background.jpg")
+            cityExperienceList.insert(counter, experience)
+            cityExperienceReviewList.insert(counter, getNReviews(experience.id))
+            # Fetch BGImageURL
+            BGImageURL = getBGImageURL(experience.id)
+            if (BGImageURL):
+                BGImageURLList.insert(counter, BGImageURL)
+            else:
+                BGImageURLList.insert(counter, "default_experience_background.jpg")
+
+            if type != 'product':
                 # Fetch profileImageURL
-                profileImageURL = RegisteredUser.objects.get(user_id=experience.hosts.all()[0].id).image_url
+                profileImageURL = RegisteredUser.objects.get(user_id=get_host(experience).id).image_url
                 if (profileImageURL):
                     profileImageURLList.insert(counter, profileImageURL)
                 else:
                     profileImageURLList.insert(counter, "profile_default.jpg")
-                # Format title & Description
-                experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
-                t = get_experience_title(experience, settings.LANGUAGES[0][0])
-                if (t != None and len(t) > 40):
-                    formattedTitleList.insert(counter, t[:37] + "...")
-                else:
-                    formattedTitleList.insert(counter, t)
-                if float(experience.duration).is_integer():
-                    experience.duration = int(experience.duration)
-                i += 1
+
+            # Format title & Description
+            experience.description = experience.get_description(settings.LANGUAGES[0][0])
+            t = experience.get_title(settings.LANGUAGES[0][0])
+
+
+            if float(experience.duration).is_integer():
+                experience.duration = int(experience.duration)
+
+            if (t != None and len(t) > 40):
+                formattedTitleList.insert(counter, t[:37] + "...")
+            else:
+                formattedTitleList.insert(counter, t)
+
+            i += 1
 
         if not settings.DEVELOPMENT:
             mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
             if request.user.is_authenticated():
-                mp.track(request.user.email,"Viewed " + city.title() + " search page");
+                mp.track(request.user.email,"Viewed " + city.title() + " search page")
             #else:
-            #    mp.track("","Viewed " + city.title() + " search page");
+            #    mp.track("","Viewed " + city.title() + " search page")
 
         template = 'experiences/experience_results.html'
     else:
@@ -2451,12 +2582,13 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                             'city' : city,
                             'city_display_name':city_display_name if city_display_name is not None else city.title(),
                             'length':len(cityExperienceList),
-                            'cityExperienceList' : zip(cityExperienceList, cityExperienceReviewList, formattedTitleList, BGImageURLList, profileImageURLList),
+                            'cityExperienceList' : itertools.zip_longest(cityExperienceList, formattedTitleList, BGImageURLList, profileImageURLList),
                             'cityList':cityList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
                             'locations' : Locations,
                             'LANGUAGE':settings.LANGUAGE_CODE,
                             'GEO_POSTFIX': GEO_POSTFIX,
+                            'type': type,
         })
     return render_to_response(template, {'form': form}, context)
 
@@ -2522,14 +2654,42 @@ def review_experience (request, id=None):
     else:
         return HttpResponseRedirect(GEO_POSTFIX)
 
-def get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False):
+def get_experience_score(criteria_dict, experience_tags):
+    '''
+    @criteria_dict: a dict {}
+    @experience_tag: a list []
+    '''
 
-    available_options = get_available_experiences(start_datetime, end_datetime, guest_number, city, language, keywords)
+    score = 0
+    for tag in experience_tags:
+        score += criteria_dict.get(tag, 0)
+    return score
+
+def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False,sort=1):
+    '''
+    @sort, 1:most popular, 2:outdoor, 3:urban
+    '''
+
+    available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords)
     itinerary = []
     dt = start_datetime
 
     city = city.lower().split(",")
+    if not isEnglish(city[0]):
+        for i in range(len(city)):
+            city[i] = dict(Location_reverse).get(city[i]).lower()
+
     day_counter = 0
+
+    if sort == 2:
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/outdoor.yaml').replace('\\', '/'))
+    elif sort == 3:
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/urban.yaml').replace('\\', '/'))
+    else:
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/popularity.yaml').replace('\\', '/'))
+
+    for experience in available_options:
+        experience['popularity'] = get_experience_score(config, experience['tags'])*0.9 + experience['popularity']*0.1
 
     #available_options: per experience --> itinerary: per day
     while dt <= end_datetime:
@@ -2550,35 +2710,31 @@ def get_itinerary(start_datetime, end_datetime, guest_number, city, language, ke
                 counter = 0
                 insert = False
 
+                exp_dict = experience
+                exp_dict['instant_booking'] = instant_booking
                 if mobile:
-                    exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
-                                'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
-                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'type':experience['type']}
-                else:
-                    exp_dict = {'instant_booking':instant_booking, 'id':experience['id'], 'title': experience['title'], 'meetup_spot':experience['meetup_spot'], 'duration':experience['duration'], 'description':experience['description'],
-                                'language':experience['language'], 'rate':experience['rate'], 'host':experience['host'], 'host_image':experience['host_image'], 'price':experience['price'], 'currency':experience['currency'],
-                                'dollarsign':experience['dollarsign'],'photo_url':experience['photo_url'],'type':experience['type'],'timeslots':experience['dates'][dt_string]}
+                    exp_dict['dates'] = {}
 
                 while counter < len(day_dict['experiences']):#find the correct rank
-                    if experience['rate'] > day_dict['experiences'][counter]['rate']:
+                    if experience['popularity'] > day_dict['experiences'][counter]['popularity']:
                         day_dict['experiences'].insert(counter, exp_dict)
                         insert = True
                         break
-                    elif experience['rate'] == day_dict['experiences'][counter]['rate']:
+                    elif experience['popularity'] == day_dict['experiences'][counter]['popularity']:
                         if instant_booking:
-                            #same rate, instant booking
+                            #same popularity, instant booking
                             index1 = counter
-                            while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate'] and day_dict['experiences'][counter]['instant_booking']:
+                            while counter < len(day_dict['experiences']) and experience['popularity'] == day_dict['experiences'][counter]['popularity'] and day_dict['experiences'][counter]['instant_booking']:
                                 counter += 1
                             index2 = counter
 
                         else:
-                            #same rate, instant booking
-                            while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate'] and day_dict['experiences'][counter]['instant_booking']:
+                            #same popularity, instant booking
+                            while counter < len(day_dict['experiences']) and experience['popularity'] == day_dict['experiences'][counter]['popularity'] and day_dict['experiences'][counter]['instant_booking']:
                                 counter += 1
                             index1 = counter
-                            #same rate, non instant booking
-                            while counter < len(day_dict['experiences']) and experience['rate'] == day_dict['experiences'][counter]['rate']:
+                            #same popularity, non instant booking
+                            while counter < len(day_dict['experiences']) and experience['popularity'] == day_dict['experiences'][counter]['popularity']:
                                 counter += 1
                             index2 = counter
 
@@ -2606,6 +2762,8 @@ def custom_itinerary(request):
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
 
     context = RequestContext(request)
+    context['locations'] = Locations
+    context['LANGUAGE'] = settings.LANGUAGE_CODE
     form = CustomItineraryForm()
 
     if request.method == 'POST':
@@ -2615,6 +2773,7 @@ def custom_itinerary(request):
             if form.is_valid():
                 start_datetime = form.cleaned_data['start_datetime']
                 end_datetime = form.cleaned_data['end_datetime']
+                end_datetime = end_datetime.replace(hour=22)
                 guest_number = form.cleaned_data['guest_number']
                 city = form.cleaned_data['city']
                 language = form.cleaned_data['language']
@@ -2625,7 +2784,7 @@ def custom_itinerary(request):
                 elif not isinstance(tags,str):
                     raise TypeError("Wrong format: keywords. String or list expected.")
 
-                itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, tags)
+                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags)
 
                 return render_to_response('experiences/custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
             else:
@@ -2642,14 +2801,79 @@ def custom_itinerary(request):
                 booking_form.data['time'] = ""
                 booking_form.data['status'] = "Requested"
 
+                workbook = xlsxwriter.Workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'itineraries'), 'Itinerary.xlsx'))
+                worksheet = workbook.add_worksheet()
+                city = form.cleaned_data['city']
+                city = city.split(',')
+                row = -1
+                last_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2000/01/01", "%Y/%m/%d"))
+                i=-1
+                week_day = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+                total_price = 0.0
+                guest_number = 1
+
                 for item in itinerary:
                     booking_form.data['experience_id'] += str(item['id']) + ";"
                     booking_form.data['date'] += str(item['date']) + ";"
                     booking_form.data['time'] += str(item['time']) + ";"
                     booking_form.data['guest_number'] = item['guest_number']
 
-                return render(request, 'experiences/itinerary_booking_confirmation.html',
-                          {'form': booking_form,'itinerary':itinerary})
+                    experience = AbstractExperience.objects.get(id=str(item['id']))
+                    price = experience_fee_calculator(float(experience.price), experience.commission)
+                    total_price += price*int(item['guest_number'])
+                    guest_number = int(item['guest_number'])
+
+                    #save to excel sheet
+                    cell_format = workbook.add_format({'text_wrap': True})
+                    current_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(str(item['date']), "%Y/%m/%d"))
+                    if current_date > last_date:
+                        #a new day
+                        row += 1
+                        i += 1
+                        #date
+                        col = 0
+                        worksheet.write(row, col, str(item['date']))
+                        #day of week
+                        col += 1
+                        worksheet.write(row, col, week_day[current_date.weekday()])
+                        #number of people
+                        col += 1
+                        worksheet.write(row, col, item['guest_number'])
+                        #accommdation
+                        col += 1
+                        worksheet.write(row, col, '')
+                        #city
+                        col += 1
+                        worksheet.write(row, col, city[i])
+                        #title, url
+                        col += 1
+                        worksheet.write(row, col, item['title'] + "\n" + "https://"+settings.ALLOWED_HOSTS[0]+"/experience/"+item['id'], cell_format)
+                        #price pp
+                        col += 1
+                        worksheet.write(row, col, price)
+                        last_date = current_date
+                    else:
+                        row += 1
+                        col = 5
+                        worksheet.write(row, col, item['title'] + "\n" + "https://"+settings.ALLOWED_HOSTS[0]+"/experience/"+item['id'], cell_format)
+                        #price pp
+                        col += 1
+                        worksheet.write(row, col, price)
+
+                row += 1
+                col = 0
+                worksheet.write(row, col, "Total price:")
+                col += 1
+                worksheet.write(row, col, total_price)
+                col += 1
+                worksheet.write(row, col, "Price per person:")
+                col += 1
+                worksheet.write(row, col, total_price/guest_number)
+                workbook.close()
+                return HttpResponseRedirect("https://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
+
+                #return render(request, 'experiences/itinerary_booking_confirmation.html',
+                #          {'form': booking_form,'itinerary':itinerary})
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
@@ -2765,7 +2989,7 @@ def itinerary_booking_successful(request):
     return render(request,'experiences/itinerary_booking_successful.html',{})
 
 def multi_day_trip(request):
-    experienceList = Experience.objects.filter(status='Listed', type='Multi-hosts')
+    experienceList = Experience.objects.filter(status='Listed', type='ITINERARY')
     i=0
     while i < len(experienceList):
         experience = experienceList[i]
@@ -2780,8 +3004,8 @@ def multi_day_trip(request):
         experience.currency = str(dict(Currency)[experience.currency.upper()])
 
         # Format title & Description
-        experience.description = get_experience_description(experience,settings.LANGUAGES[0][0])
-        t = get_experience_title(experience, settings.LANGUAGES[0][0])
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
         if (t != None and len(t) > 30):
             experience.title = t[:27] + "..."
         else:

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-03 13:24+1000\n"
+"POT-Creation-Date: 2015-09-25 15:52+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,8 +29,7 @@ msgstr "密码"
 msgid "first_name"
 msgstr "名字"
 
-#: forms.py:167 templates/app/myprofile.html:63
-#: templates/app/myprofile.html.py:106
+#: forms.py:167 templates/app/myprofile.html:58
 msgid "First Name"
 msgstr "名字"
 
@@ -38,8 +37,7 @@ msgstr "名字"
 msgid "last_name"
 msgstr "姓氏"
 
-#: forms.py:173 templates/app/myprofile.html:71
-#: templates/app/myprofile.html.py:96
+#: forms.py:173 templates/app/myprofile.html:67
 msgid "Last Name"
 msgstr "姓氏"
 
@@ -58,12 +56,12 @@ msgid "Contact Tripalocal"
 msgstr "联系本土客"
 
 #: templates/app/aboutus.html:16 templates/app/contactus.html:15
-#: templates/app/layout.html:171
+#: templates/app/layout.html:215
 msgid "Terms of Service"
 msgstr "服务条款"
 
 #: templates/app/aboutus.html:17 templates/app/contactus.html:16
-#: templates/app/layout.html:172
+#: templates/app/layout.html:216
 msgid "Privacy Policy"
 msgstr "隐私政策"
 
@@ -130,7 +128,7 @@ msgstr "为安全起见，请尽快登录修改你的密码"
 
 #: templates/app/email_auto_registration.html:97
 msgid "Login and change password"
-msgstr ""
+msgstr "登录并修改密码"
 
 #: templates/app/email_registration_successful.html:75
 msgid "Your account is ready!"
@@ -151,79 +149,69 @@ msgstr ""
 msgid "Tripalocal | Experience it like a local"
 msgstr "本土客，个性出境游，本地导游，旅游攻略，私人导游，旅行，分享，发现"
 
-#: templates/app/index.html:53
+#: templates/app/index.html:50
 msgid "City"
 msgstr "城市"
 
-#: templates/app/index.html:64
+#: templates/app/index.html:61
 msgid "Search"
 msgstr "搜索"
 
-#: templates/app/index.html:73 templates/app/index.html.py:75
+#: templates/app/index.html:70 templates/app/index.html.py:72
 msgid " to get notified when we launch in more countries."
 msgstr "第一时间了解新增城市请"
 
-#: templates/app/index.html:73 templates/app/index.html.py:75
-#: templates/app/layout.html:141 templates/app/loginpartial.html:60
+#: templates/app/index.html:70 templates/app/index.html.py:72
+#: templates/app/layout.html:176 templates/app/loginpartial.html:60
 msgid "Sign up"
 msgstr "注册"
 
-#: templates/app/index.html:83
+#: templates/app/index.html:80
 msgid "Discover authentic experiences"
 msgstr "探索本土化的生活轨迹"
 
-#: templates/app/index.html:84
+#: templates/app/index.html:81
 msgid "Explore local places"
 msgstr "发现当地的吃喝玩乐"
 
-#: templates/app/index.html:100 templates/app/index.html.py:150
-#: templates/app/index.html:180
+#: templates/app/index.html:96 templates/app/index.html.py:146
+#: templates/app/index.html:177
 msgid "From"
 msgstr ""
 
-#: templates/app/index.html:101
-#, python-format
-msgid ""
-" %(currency)s\n"
-"                                                /person "
-msgstr ""
-
-#: templates/app/index.html:124
-msgid "Request a trip"
-msgstr "订制行程"
-
-#: templates/app/index.html:150 templates/app/index.html.py:180
+#: templates/app/index.html:97 templates/app/index.html.py:146
+#: templates/app/index.html:177
 #, python-format
 msgid " %(currency)s/person "
 msgstr " %(currency)s/人 起"
 
-#: templates/app/index.html:206
+#: templates/app/index.html:119
+msgid "Request a trip"
+msgstr "订制行程"
+
+#: templates/app/index.html:203
 msgid "Travel with Tripalocal"
 msgstr "本土客带您去旅行"
 
-#: templates/app/index.html:207
+#: templates/app/index.html:204
 msgid "See how it works"
 msgstr "了解更多"
 
-#: templates/app/index.html:218
+#: templates/app/index.html:215
 msgid "Your browser does not support the video tag."
 msgstr "您的浏览器不支持video标签"
 
-#: templates/app/index.html:225
+#: templates/app/index.html:222
 msgid "Our Community"
 msgstr "我们的社区"
 
-#: templates/app/index.html:229
+#: templates/app/index.html:226
 msgid "Travelling"
-msgstr "旅行"
+msgstr "旅行心得"
 
-#: templates/app/index.html:229 templates/app/index.html.py:234
-msgid "(Coming soon)"
-msgstr "(敬请期待)"
-
-#: templates/app/index.html:234
+#: templates/app/index.html:231
 msgid "Hosting"
-msgstr "领路"
+msgstr "旅游达人"
 
 #: templates/app/index.html:262
 msgid " From "
@@ -245,104 +233,144 @@ msgstr "暂不需要"
 msgid "YES"
 msgstr "需要"
 
-#: templates/app/layout.html:73 templates/app/layout.html.py:98
-msgid "close"
-msgstr "关闭"
-
-#: templates/app/layout.html:76
-msgid "Tell us about your trip"
-msgstr "请告诉我们您的需求"
-
-#: templates/app/layout.html:78
-msgid "and we will get back to you within 48 hours"
-msgstr "我们会在48小时内给您答复"
-
-#: templates/app/layout.html:79
+#: templates/app/layout.html:74 templates/app/layout.html.py:90
 msgid "or check out some of our "
 msgstr "或者浏览"
 
-#: templates/app/layout.html:85
+#: templates/app/layout.html:80 templates/app/layout.html.py:96
 msgid "most popular trips"
 msgstr "最热门路线"
 
-#: templates/app/layout.html:90
+#: templates/app/layout.html:84 templates/app/layout.html.py:109
+msgid "close"
+msgstr "关闭"
+
+#: templates/app/layout.html:87
+msgid "Tell us about your trip"
+msgstr "请告诉我们您的需求"
+
+#: templates/app/layout.html:89
+msgid "and we will get back to you within 48 hours"
+msgstr "我们会在48小时内给您答复"
+
+#: templates/app/layout.html:101
 msgid "Please tell us more details"
 msgstr "请告诉我们您的行程计划"
 
-#: templates/app/layout.html:93
+#: templates/app/layout.html:104
 msgid "Email address"
 msgstr "电子邮箱"
 
-#: templates/app/layout.html:96
+#: templates/app/layout.html:107
 msgid "Send"
 msgstr "发送"
 
-#: templates/app/layout.html:128 templates/app/loginpartial.html:19
-#: templates/app/loginpartial.html.py:52
-msgid "Log out"
-msgstr "退出"
-
-#: templates/app/layout.html:143 templates/app/loginpartial.html:61
-msgid "Log in"
-msgstr "登录"
-
-#: templates/app/layout.html:168
-msgid "Company"
-msgstr "公司"
-
-#: templates/app/layout.html:169
-msgid "About Us"
-msgstr "关于我们"
-
-#: templates/app/layout.html:170
-msgid "Contact Us"
-msgstr "联系我们"
-
-#: templates/app/layout.html:178
-msgid "Travel"
-msgstr "旅行"
-
-#: templates/app/layout.html:179
-msgid "Refund Policy"
-msgstr "退款政策"
-
-#: templates/app/layout.html:185
-msgid "Social"
-msgstr "社交"
-
-#: templates/app/layout.html:186
-msgid "Facebook"
-msgstr ""
-
-#: templates/app/layout.html:187
-msgid "Twitter"
-msgstr ""
-
-#: templates/app/layout.html:214
-msgid "Sent!"
-msgstr "发送成功"
-
-#: templates/app/layout.html:219
-msgid "Error sending, please"
-msgstr "发送失败，请重试"
-
-#: templates/app/layout.html:219 templates/app/layout.html.py:301
-msgid "try again"
-msgstr "请重试"
-
-#: templates/app/layout.html:301
-msgid "Invalid email, please"
-msgstr "无效电子邮箱"
-
-#: templates/app/loginpartial.html:38 templates/app/mylisting.html:6
-#: templates/app/mylisting.html.py:15 templates/app/myprofile.html:15
-#: templates/app/myreservation.html:15 templates/app/mytrip.html:15
+#: templates/app/layout.html:159 templates/app/loginpartial.html:38
+#: templates/app/mylisting.html:6 templates/app/mylisting.html.py:15
+#: templates/app/myprofile.html:15 templates/app/myreservation.html:15
+#: templates/app/mytrip.html:15
 msgid "My Listing"
 msgstr "我的体验"
 
-#: templates/app/loginpartial.html:39 templates/app/myreservation.html:6
+#: templates/app/layout.html:160 templates/app/loginpartial.html:39
+#: templates/app/myreservation.html:6
 msgid "My Reservations"
 msgstr "体验预约记录"
+
+#: templates/app/layout.html:162
+msgid "My Trips"
+msgstr "我的预订"
+
+#: templates/app/layout.html:164 templates/app/loginpartial.html:50
+msgid "Edit Profile"
+msgstr "编辑个人信息"
+
+#: templates/app/layout.html:165 templates/app/loginpartial.html:51
+msgid "Account Settings"
+msgstr "账户设置"
+
+#: templates/app/layout.html:166
+msgid "Logout"
+msgstr "退出"
+
+#: templates/app/layout.html:173
+msgid "Login"
+msgstr "登录"
+
+#: templates/app/layout.html:182
+msgid "Travel with Locals"
+msgstr "旅游达人"
+
+#: templates/app/layout.html:183
+msgid "Local Experiences"
+msgstr "特色体验"
+
+#: templates/app/layout.html:184
+msgid "Itineraries"
+msgstr "精品路线"
+
+#: templates/app/layout.html:185 templates/app/mylisting.html:17
+#: templates/app/myprofile.html:6 templates/app/myprofile.html.py:17
+#: templates/app/myprofile.html:26 templates/app/myreservation.html:17
+#: templates/app/mytrip.html:17
+msgid "My Profile"
+msgstr "个人信息"
+
+#: templates/app/layout.html:212
+msgid "Company"
+msgstr "公司"
+
+#: templates/app/layout.html:213
+msgid "About Us"
+msgstr "关于我们"
+
+#: templates/app/layout.html:214
+msgid "Contact Us"
+msgstr "联系我们"
+
+#: templates/app/layout.html:222
+msgid "Travel"
+msgstr "旅行"
+
+#: templates/app/layout.html:223
+msgid "Refund Policy"
+msgstr "退款政策"
+
+#: templates/app/layout.html:229
+msgid "Social"
+msgstr "社交"
+
+#: templates/app/layout.html:230
+msgid "Facebook"
+msgstr ""
+
+#: templates/app/layout.html:231
+msgid "Twitter"
+msgstr ""
+
+#: templates/app/layout.html:259
+msgid "Sent!"
+msgstr "发送成功"
+
+#: templates/app/layout.html:264
+msgid "Error sending, please"
+msgstr "发送失败，请重试"
+
+#: templates/app/layout.html:264 templates/app/layout.html.py:353
+msgid "try again"
+msgstr "请重试"
+
+#: templates/app/layout.html:345
+msgid "Please fill in all fields."
+msgstr "请填写全部必填项"
+
+#: templates/app/layout.html:353
+msgid "Invalid email, please"
+msgstr "无效电子邮箱"
+
+#: templates/app/loginpartial.html:19 templates/app/loginpartial.html.py:52
+msgid "Log out"
+msgstr "退出"
 
 #: templates/app/loginpartial.html:45 templates/app/mylisting.html:16
 #: templates/app/myprofile.html:16 templates/app/myreservation.html:16
@@ -351,13 +379,9 @@ msgstr "体验预约记录"
 msgid "My Trip"
 msgstr "我的预订"
 
-#: templates/app/loginpartial.html:50
-msgid "Edit Profile"
-msgstr "编辑个人信息"
-
-#: templates/app/loginpartial.html:51
-msgid "Account Settings"
-msgstr "账户设置"
+#: templates/app/loginpartial.html:61
+msgid "Log in"
+msgstr "登录"
 
 #: templates/app/mycalendar.html:42
 msgid "Your calendar has been successfully updated"
@@ -366,12 +390,6 @@ msgstr ""
 #: templates/app/mycalendar.html:44
 msgid "Invalid input"
 msgstr ""
-
-#: templates/app/mylisting.html:17 templates/app/myprofile.html:6
-#: templates/app/myprofile.html.py:17 templates/app/myprofile.html:26
-#: templates/app/myreservation.html:17 templates/app/mytrip.html:17
-msgid "My Profile"
-msgstr "个人信息"
 
 #: templates/app/mylisting.html:18 templates/app/myprofile.html:18
 #: templates/app/myreservation.html:18 templates/app/mytrip.html:18
@@ -387,15 +405,15 @@ msgstr "我的体验"
 msgid "My Reservation"
 msgstr "体验预约记录"
 
-#: templates/app/mylisting.html:36
+#: templates/app/mylisting.html:35
 msgid "All listings"
 msgstr "我的体验"
 
-#: templates/app/mylisting.html:45
+#: templates/app/mylisting.html:44
 msgid "Not Published"
 msgstr "未发布"
 
-#: templates/app/mylisting.html:47
+#: templates/app/mylisting.html:46
 msgid "Published"
 msgstr "已发布"
 
@@ -407,58 +425,57 @@ msgstr "继续编辑"
 msgid "Update listing"
 msgstr "更新信息"
 
-#: templates/app/mylisting.html:58
+#: templates/app/mylisting.html:59
 msgid "You have not hosted any experience."
 msgstr "您还没有任何体验。"
 
-#: templates/app/myprofile.html:32
+#: templates/app/myprofile.html:31
 msgid "Basic"
 msgstr "基本信息"
 
-#: templates/app/myprofile.html:41
+#: templates/app/myprofile.html:40
 msgid ""
-"Clear frontal face photos are an important way for hosts and<br>\n"
-"                                                                    guests "
-"to learn about each other. It's not much fun to host a <br>\n"
-"                                                                    landscape! "
-"Please upload a photo that clearly shows your face.<br>\n"
-"                                                                    Please "
-"make sure your image is under 1MB."
+"Clear frontal face photos are an important way for hosts and\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tguests to learn "
+"about each other. It's not much fun to host a\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tlandscape! "
+"Please upload a photo that clearly shows your face.\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPlease make sure "
+"your image is under 1MB."
 msgstr ""
 "上传清晰的正面照能让其他用户更好的了解您。<br>我们并不推荐使用风景照作为头"
 "像。<br>请上传一张您的清晰正面照。<br>照片应小于1MB。"
 
-#: templates/app/myprofile.html:49
+#: templates/app/myprofile.html:48
 msgid "No file chosen"
 msgstr "未选择文件"
 
-#: templates/app/myprofile.html:52
+#: templates/app/myprofile.html:51
 msgid "Choose File"
 msgstr "选择文件"
 
-#: templates/app/myprofile.html:82 templates/app/myprofile.html.py:87
-#: templates/app/myprofile.html:115 templates/app/myprofile.html.py:120
+#: templates/app/myprofile.html:62 templates/app/myprofile.html.py:71
 msgid ""
-"This is only shared once you have a confirmed booking with <br>\n"
-"                                                                    another "
+"This is only shared once you have a confirmed booking with\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tanother "
 "Tripalocal user. We only display your initial in public."
 msgstr ""
 "其他本土客用户只有在体验订单确认后才会知道您全名。<br>在公共页面上我们只显示"
 "您姓氏的缩写。"
 
-#: templates/app/myprofile.html:129
+#: templates/app/myprofile.html:78
 msgid "Email Address"
 msgstr "电子邮箱"
 
-#: templates/app/myprofile.html:136
+#: templates/app/myprofile.html:82
 msgid "Your email address will not be disclosed."
 msgstr "我们不会公布您的电子邮箱。"
 
-#: templates/app/myprofile.html:143
+#: templates/app/myprofile.html:86
 msgid "Local Mobile Number"
 msgstr "当地手机号码"
 
-#: templates/app/myprofile.html:150
+#: templates/app/myprofile.html:88
 msgid ""
 "This information will be available to people who have booked your<br> "
 "experience."
@@ -466,30 +483,29 @@ msgstr ""
 "其他本土客用户只有在体验订单确认后才会知道您全名。<br> 在公共页面上我们只显示"
 "您姓氏的缩写。"
 
-#: templates/app/myprofile.html:158
+#: templates/app/myprofile.html:95
 msgid "Bio"
 msgstr "自我简介"
 
-#: templates/app/myprofile.html:164
+#: templates/app/myprofile.html:100
 msgid ""
-" Tripalocal is all about like minded people doing things together.<br>\n"
-"                                    Your profile will help people understand "
-"your style and personal-<br>\n"
-"                                    ity."
+" Tripalocal is all about like minded people doing things together.\n"
+"\t\t\t\t\t\t\t\t\t\t\t\tYour profile will help people understand your style "
+"and personality."
 msgstr ""
 "本土客的宗旨是让志同道合的人一起做一些有意义的事情。<br>您的资料能够帮助用户"
 "了解您的风格和个性。"
 
-#: templates/app/myprofile.html:169
+#: templates/app/myprofile.html:104
 msgid ""
-"It's like having friends all over the world to show you around, or<br>\n"
-"                                    vice versa. What type of people would "
-"you like to meet up with? "
+"It's like having friends all over the world to show you around, or\n"
+"\t\t\t\t\t\t\t\t\t\t\t\tvice versa. What type of people would you like to "
+"meet up with? "
 msgstr ""
 "就好像是有着世界各地的朋友能够带您参观不同的地方，<br>反之就好像是您为来自世"
 "界各地的朋友介绍某个地方。你会想遇到什么样的人呢？"
 
-#: templates/app/myprofile.html:177
+#: templates/app/myprofile.html:109
 msgid "Save"
 msgstr "保存"
 
@@ -579,62 +595,90 @@ msgstr "您用 %(user_email)注册的账户已经激活。"
 msgid "Show me around"
 msgstr "去主页逛逛"
 
-#: views.py:147
+#: views.py:48
 msgid "Melbourne"
 msgstr "墨尔本"
 
-#: views.py:147
+#: views.py:48
 msgid "Sydney"
 msgstr "悉尼"
 
-#: views.py:147
-msgid "Gold Coast"
-msgstr "黄金海岸"
-
-#: views.py:147
-msgid "Cairns"
-msgstr "凯恩斯"
-
-#: views.py:147
-msgid "Adelaide"
-msgstr "阿德莱德"
-
+#: views.py:48
 msgid "Brisbane"
 msgstr "布里斯班"
 
+#: views.py:49
+msgid "Cairns"
+msgstr "凯恩斯"
+
+#: views.py:50
+msgid "Gold Coast"
+msgstr "黄金海岸"
+
+#: views.py:50
 msgid "Hobart"
 msgstr "霍巴特"
 
+#: views.py:50
+msgid "Adelaide"
+msgstr "阿德莱德"
+
+#: views.py:51
 msgid "Darwin"
 msgstr "达尔文"
 
-msgid "Auckland"
-msgstr "奥克兰"
-
-msgid "Wellington"
-msgstr "惠灵顿"
-
-msgid "Queenstown"
-msgstr "皇后镇"
-
-msgid "Christchurch"
-msgstr "克赖斯特彻奇(基督城)"
-
+#: views.py:51
 msgid "Alice Springs"
 msgstr "艾利斯斯普林斯"
 
+#: views.py:52
+msgid "Christchurch"
+msgstr "基督城"
 
-#: views.py:247
+#: views.py:52
+msgid "Queenstown"
+msgstr "皇后镇"
+
+#: views.py:53
+msgid "Auckland"
+msgstr "奥克兰"
+
+#: views.py:53
+msgid "Wellington"
+msgstr "惠灵顿"
+
+#: views.py:224
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 您的帐户已经成功激活"
 
-#: views.py:726
+#: views.py:703
 msgid "Image size exceeds the limit"
 msgstr "文件大小超过上限"
 
-#: views.py:728
+#: views.py:705
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
+
+#~ msgid "(Coming soon)"
+#~ msgstr "(敬请期待)"
+
+#~ msgid ""
+#~ "Clear frontal face photos are an important way for hosts and<br>\n"
+#~ "                                                                    guests "
+#~ "to learn about each other. It's not much fun to host a <br>\n"
+#~ "                                                                    landscape! "
+#~ "Please upload a photo that clearly shows your face.<br>\n"
+#~ "                                                                    Please "
+#~ "make sure your image is under 1MB."
+#~ msgstr ""
+#~ "上传清晰的正面照能让其他用户更好的了解您。<br>我们并不推荐使用风景照作为头"
+#~ "像。<br>请上传一张您的清晰正面照。<br>照片应小于1MB。"
+
+msgid "Australia"
+msgstr "澳大利亚"
+
+msgid "New Zealand"
+msgstr "新西兰"
 
 #~ msgid "Tripalocal for Android"
 #~ msgstr "本土客安卓手机应用"
@@ -686,6 +730,3 @@ msgstr "不支持该文件类型"
 
 #~ msgid "Greater Queensland"
 #~ msgstr "昆士兰州其他地区"
-
-#~ msgid "AUD/person"
-#~ msgstr "澳元/人"

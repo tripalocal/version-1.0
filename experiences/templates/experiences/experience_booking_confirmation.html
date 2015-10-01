@@ -329,9 +329,11 @@
 				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}
                     {% endif %}
                 {% endfor %})">
+                {% if experience.hosts %}
                     <div class="profile-md checkout-profile">
                         <img src="{{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %}" height="240">
                     </div>
+                {% endif %}
                 </div>
                 <div class="checkoutBox checkoutInfo">
                     <h3 style="font-weight:bold;">{{ experience.title }}</h3>
@@ -343,7 +345,7 @@
                             (<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)
                         </p>
                         <hr style="margin:10px 0">
-                        <p>{% trans "Rate:" %} {{experience.dollarsign}}{{experience_price|floatformat|mul:1.429|floatformat:"0"}}{% trans " per person for " %}{{experience.duration}}{% trans " hours" %}</p>
+                        <p>{% trans "Rate:" %} {{experience.dollarsign}}{{experience_price|floatformat|mul:commission|floatformat:"0"}}{% trans " per person for " %}{{experience.duration}}{% trans " hours" %}</p>
                         <hr style="margin-bottom:10px;">
                         {% trans "Subtotal:" %} {{experience.dollarsign}}<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
                         <br>
@@ -399,7 +401,7 @@ $(function(){
 */
         var handler = StripeCheckout.configure({
                             key: 'pk_live_62VE04d61Te70oh7IB7dqfjm',
-                            image: '/images/tripalocal_Logo.png',
+                            image: '{{ MEDIA_URL }}img/tripalocal_logo_stripe.jpg',
                             locale: '{{LANGUAGE}}',
                             token: function(token) {
                                 // Use the token to create the charge with a server-side script.
@@ -442,7 +444,7 @@ $(function(){
                     {
                         // Open Checkout with further options
                         handler.open({
-                            name: 'Tripalocal',
+                            name: 'Tripalocal 本土客',
                             description: '',
                             amount: {{ total_price|mul:100 }},
                             currency: '{{experience.currency}}',

@@ -10,26 +10,8 @@
     <meta name="keywords" content="私人导游，本土导游，境外旅游，澳洲旅行，个性化旅行线路"/>
     <meta name="description" content="本土客，一个提供个性化向导的旅行平台，拥有全球私人导游，搜罗海外本土特色旅行线路！本土客专注游客目的地、旅行线路，p2p出境游，分享游客旅行经验。全球游客发布目的地旅行线路，支持预订目的地线路，本土客当地人带你体验目的地旅行魅力，看最美丽的风景，吃最地道的美食，玩最刺激的活动，做最接地气的文化交流，让你体验一段真正属于自己风格的自由行。"/>
     {% endif %}
-    <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/homepage.css' %}" rel="stylesheet">
-
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
-
-	<script>
-		$(function() {
-			$("#slideshow > div:gt(0)").hide();
-			setInterval(function() {
-			  $('#slideshow > div:first')
-			    .fadeOut(1000)
-			    .next()
-			    .fadeIn(1000)
-			    .end()
-			    .appendTo('#slideshow');
-			},  5000);
-		});
-	</script>
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -77,8 +59,8 @@
 
     <div class="tease-box">
 
-      <h1>{% trans "Discover authentic experiences" %}</h1>
-      <p>{%trans "Explore local places" %}</p>
+      <h1 class="hidden-xs">{% trans "Discover authentic experiences" %}</h1>
+      <p class="hidden-xs">{%trans "Explore local places" %}</p>
 
             <div class="container">
                 <div class="row">
@@ -89,14 +71,12 @@
                                      style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
                                     <a class="box-link"
                                        href="{{ GEO_POSTFIX }}experience/{{ experience.experience.id }}">
-                                        <div class="profile-featured">
-                                            <img src="{{ MEDIA_URL }}{{ experience.hostImage }}"
-                                                 height="240">
+                                        <div class="profile-frame-sm">
+                                            <div class="profile-sm" style="background-image:url({{ MEDIA_URL }}{{ experience.hostImage }});"></div>
                                         </div>
                                         <div class="price-box">
-                                            {% trans "From" %} {{ experience.experience.dollarsign }}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span>
-                                            {% blocktrans with currency=experience.experience.currency %} {{ currency }}
-                                                /person {% endblocktrans %}
+                                            {% trans "From" %} {{ experience.experience.dollarsign }}<span>{{ experience.experience.price|mul:experience.experience.commission|floatformat:"0" }}</span>
+                                            {% blocktrans with currency=experience.experience.currency %} {{ currency }}/person {% endblocktrans %}
                                         </div>
                                     </a>
                                 </div>
@@ -140,11 +120,12 @@
                     <div class="col-sm-4">
                       <div class="price-offer" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
                           <a class="box-link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
-                              <div class="profile-featured">
-                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" height="240">
-                              </div>
+                            <div class="profile-frame-sm">
+                                <div class="profile-sm" style="background-image:url({{ MEDIA_URL }}{{ experience.hostImage }});"></div>
+                            </div>
+
                               <div class="price-box">
-                                  {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
+                                  {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:experience.experience.commission|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
                               </div>
                           </a>
                       </div>
@@ -170,11 +151,12 @@
                     <div class="col-sm-4">
                       <div class="price-offer" style="background-image:url({{ MEDIA_URL }}{{ experience.background }});">
                           <a class="box-link" href="{{GEO_POSTFIX}}experience/{{ experience.experience.id }}">
-                              <div class="profile-featured">
-                                  <img src="{{ MEDIA_URL }}{{ experience.hostImage }}" height="240">
-                              </div>
+                            <div class="profile-frame-sm">
+                                <div class="profile-sm" style="background-image:url({{ MEDIA_URL }}{{ experience.hostImage }});"></div>
+                            </div>
+
                               <div class="price-box">
-                                  {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
+                                  {% trans "From" %} {{experience.experience.dollarsign}}<span>{{ experience.experience.price|mul:experience.experience.commission|floatformat:"0" }}</span> {% blocktrans with currency=experience.experience.currency %} {{currency}}/person {% endblocktrans %}
                               </div>
                           </a>
                       </div>
@@ -198,16 +180,17 @@
             </div>
     </div>
 
-    <div id="video-sec" class="video-box" style="background-image:url({{ MEDIA_URL }}homepage/video_poster-01.jpg)">
+    <div id="video-sec" class="video-box" style="background-image:url({% static 'img/homepage/video_poster-01.jpg' %})">
         <div class="video-overlay">
             <h1 style="font-size:32px;font-family:'EXO', Helvertica, sans-serif;">{% trans "Travel with Tripalocal" %}</h1>
             <p style="font-size:16px;">{% trans "See how it works" %}</p>
             <br><br>
-            <a style="cursor:pointer" id="enter_fullscreen"><img src="{{ MEDIA_URL }}homepage/play_btn.svg" width="75"></a>
+            <a style="cursor:pointer" id="enter_fullscreen"><img src="{% static 'img/homepage/play_btn.svg' %}" width="75"></a>
         </div>
     </div>
-    <div id="video-fullscreen" class="video-fullscreen">
-        <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img src="{{ MEDIA_URL }}homepage/closeIcon-01.svg" width="30"></a>
+    <div id="video-fullscreen" class="video-fullscreen" style="display:none;">
+        <a id="exit_video" style="position:absolute; top:40px; right:40px; cursor:pointer"><img
+                src="{% static 'img/homepage/closeIcon-01.svg' %}" width="30"></a>
         <div class="video-wrap">
             <video controls preload="metadata">
                 <source src="http://bponlinewoc2264.ngcdn.telstra.com/pd_chief/chief_preview/Tripalocal%20Delivery_1.mp4" type="video/mp4">
@@ -222,13 +205,13 @@
             <h1>{% trans "Our Community"%}</h1>
             <div class="row">
                 <div class="col-sm-6">
-                  <div class="box" style="background-image:url({{ MEDIA_URL }}homepage/travelling-01.jpg)">
-                    <a class=" btn btn-danger">{% trans "Travelling" %}<br><small>{% trans "(Coming soon)"%}</small></a>
+                  <div class="box" style="background-image:url({% static 'img/homepage/travelling-01.jpg' %})">
+                    <a href="https://www.tripalocal.com/blog/" class="btn btn-danger">{% trans "Travelling" %}</a>
                   </div>
                 </div>
                 <div class="col-sm-6">
-                  <div class="box" style="background-image:url({{ MEDIA_URL }}homepage/hosting-01.jpg)">
-                    <a class=" btn btn-primary">{% trans "Hosting" %}<br><small>{% trans "(Coming soon)"%}</small></a>
+                  <div class="box" style="background-image:url({% static 'img/homepage/hosting-01.jpg' %})">
+                    <a href="https://www.tripalocal.com/blog/" class="btn btn-primary">{% trans "Hosting" %}</a>
                   </div>
                 </div>
             </div>
@@ -237,12 +220,28 @@
 {% endblock %}
 
 {% block scripts %}
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
     {%if LANGUAGE == "zh-CN"%}
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
     {%endif%}
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/index.js' %}"></script>
+    <script>
+    	$(function() {
+    		$("#slideshow > div:gt(0)").hide();
+    		setInterval(function() {
+    		  $('#slideshow > div:first')
+    		    .fadeOut(1000)
+    		    .next()
+    		    .fadeIn(1000)
+    		    .end()
+    		    .appendTo('#slideshow');
+    		},  5000);
+    	});
+    </script>
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
     <script charset="utf-8" type="text/javascript">
     $("#video-fullscreen").hide();
         $(document).ready(function () {

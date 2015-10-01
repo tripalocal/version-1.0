@@ -5,7 +5,7 @@
     <label id="experience-count" class="expCount">{{ length }} {% trans "Experiences" %} &#8226; {{ city_display_name }}</label>
 
     <div id="experience-results" class="experience-results">
-        {% for experience, review, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
+        {% for experience, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
         {% if forloop.counter == 5 %}
         <div class="exp-box custom-itinerary-searchpage" >
           <form action="mailto:enquiries@tripalocal.com">
@@ -18,20 +18,27 @@
             <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
                 <div class="listing-img" style="background-image:url({{ MEDIA_URL }}{{ BGImageURL }});">
                     <div class="price-box">
-                        {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:1.429|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
+                        {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:experience.commission|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
                     </div>
                 </div>
             </a>
             <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ formattedTitle }} </h3></a>
 
-            <div class="profile-sm"
-                style="background:url({{ MEDIA_URL }}{{ profileImageURL|urlencode }}) no-repeat; background-size:cover; background-position:center;"></div>
+            {% if profileImageURL %}
+                <div class="profile-frame-sm">
+                    <div class="profile-sm"
+                         style="background:url(
+                                 {{ MEDIA_URL }}{{ profileImageURL|urlencode }}) no-repeat; background-size:cover;
+                                 background-position:center;"></div>
+                </div>
+            {% endif %}
+
 
             <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ experience.description }}</p>
 
             <div class="listing-footer">
-                <a href="http://tripalocal.com/stage1css/search_result.html#" style="display:none">{{ review }} reviews</a>
                 {%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
+                &#8226; <span style="font-weight:500;">{% if experience.type == 'PRIVATE' %}{% trans 'Private' %}{% endif %}</span>
             </div>
         </div>
         {% endfor %}

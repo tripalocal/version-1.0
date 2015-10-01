@@ -25,13 +25,8 @@
 .rigthInterface img{float: left; margin-top: 10px;}
 #booking-detail{float: left;}
 @media (max-width: 768px){
-.menu .menu-language{display: none;}
-.menu #id_profile_div{display: none;}
-.tab_area{display: none;}
-.leftsubMenu{display: none;}
 .rightInterface{padding: 0px; width: auto; float: none; margin-left:20px; margin-right: 20px; }
 .rightInterface p{padding-top: 10px; padding-left: 20px;}
-.tab_area{display: none;}
 .rightInterface hr{margin-top: 0px; margin-bottom: 0px;}
 .rightInterface img{margin-left: 15px; margin-top: 20px; float: left;}
 #booking-detail{width: 160px; margin-top: 10px;}
@@ -39,13 +34,8 @@
 #date{margin-left: 15px;}
 }
 @media (max-width: 992px){
-.menu .menu-language{display: none;}
-.menu #id_profile_div{display: none;}
-.tab_area{display: none;}
-.leftsubMenu{display: none;}
 .rightInterface{padding: 0px; width: auto; float: none; margin-left:20px; margin-right: 20px; }
 .rightInterface p{padding-top: 10px; padding-left: 20px;}
-.tab_area{display: none;}
 .rightInterface hr{margin-top: 0px; margin-bottom: 0px;}
 .rightInterface img{margin-left: 15px; margin-top: 20px; float: left;}
 #booking-detail{width: 320px; margin-top: 10px;}

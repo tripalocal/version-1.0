@@ -3,11 +3,13 @@ from django.conf.urls import patterns
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon, WechatProduct, WechatBooking, \
-    Product, ProductI18n, Provider
-from experiences.views import create_experience
+    NewProduct, NewProductI18n, Provider
+from experiences.views import create_experience, saveExperienceImage
 from app.models import RegisteredUser
 from allauth.socialaccount.models import SocialAccount
 from post_office.models import Email
+from Tripalocal_V1 import settings
+import os
 
 class ExperienceAdmin(admin.ModelAdmin):
     def get_urls(self):
@@ -32,24 +34,18 @@ class UserAdmin(UserAdmin):
 
 
 class ProductI18nInline(admin.StackedInline):
-    model = ProductI18n
-    extra = 0
+    model = NewProductI18n
+    verbose_name = "Product detail"
+    extra = 1
+
+
+class ProductPhotoInline(admin.TabularInline):
+    model = Photo
+    extra = 3
 
 
 class ProductAdmin(admin.ModelAdmin):
-    fieldsets = (
-        ('Product summary', {
-            'fields': (
-                'provider', 'duration_in_min', 'min_group_size', 'book_in_advance', 'instant_booking',
-                'free_translation',
-                'order_on_holiday')
-        }),
-        ('Pricing rule', {
-            'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
-        }),
-    )
-
-    inlines = [ProductI18nInline]
+    inlines = [ProductPhotoInline, ProductI18nInline]
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
@@ -57,17 +53,61 @@ class ProductAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(provider=request.user.provider)
 
-    def get_form(self, request, obj=None, **kwargs):
-        self.exclude = []
-        if not request.user.is_superuser:
-            self.exclude.append('provider')
-        return super(ProductAdmin, self).get_form(request, obj, **kwargs)
+    # def get_form(self, request, obj=None, **kwargs):
+        # fieldsets = (
+        #     ('Admin', {'fields': ('provider', 'status',)}),
+        #     ('Product summary', {
+        #         'fields': (
+        #             'city', 'duration', 'min_group_size', 'max_group_size', 'book_in_advance', 'instant_booking',
+        #             'free_translation',
+        #             'order_on_holiday')
+        #     }),
+        #     ('Pricing rule', {
+        #         'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
+        #     }),
+        # )
+        #
+        # fieldsets2 = (
+        #     ('Product summary', {
+        #         'fields': (
+        #             'city', 'duration', 'min_group_size', 'max_group_size', 'book_in_advance', 'instant_booking',
+        #             'free_translation',
+        #             'order_on_holiday')
+        #     }),
+        #     ('Pricing rule', {
+        #         'fields': ('price_type', 'normal_price', 'dynamic_price', 'adult_price', 'children_price', 'adult_age')
+        #     }),
+        # )
+        # if not request.user.is_superuser:
+        #     self.fieldsets = fieldsets2
+        # else:
+        #     self.fieldsets = fieldsets
+        # return super(ProductAdmin, self).get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:
             obj.provider = request.user.provider
         super(ProductAdmin, self).save_model(request, obj, form, change)
 
+    def save_formset(self, request, form, formset, change):
+        if request.FILES and len(request.FILES) > 0 and formset.prefix == 'photo_set':
+            instances = formset.save(commit=False)
+            for obj in formset.deleted_objects:
+                obj.delete()
+            i = 0
+
+            for instance in instances:
+                id = instance.experience.id
+                i = len(Photo.objects.filter(experience_id=id))
+                photo = request.FILES['photo_set-' + str(i) + '-image']
+                name, extension = os.path.splitext(photo.name)
+
+                saveExperienceImage(instance.experience, photo, extension, i+1)
+
+                i += 1
+            formset.save_m2m()
+        else:
+            super(ProductAdmin, self).save_formset(request, form, formset, change)
 
 class ProviderAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
@@ -83,6 +123,7 @@ class ProviderAdmin(admin.ModelAdmin):
         return super(ProviderAdmin, self).get_form(request, obj, **kwargs)
 
 
+
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
@@ -96,7 +137,7 @@ admin.site.register(Booking)
 admin.site.register(Coupon)
 admin.site.register(WechatProduct)
 admin.site.register(WechatBooking, WechatBookingAdmin)
-admin.site.register(Product, ProductAdmin)
+admin.site.register(NewProduct, ProductAdmin)
 admin.site.register(Provider, ProviderAdmin)
 #admin.site.register(Email)
 #admin.site.register(SocialAccount)

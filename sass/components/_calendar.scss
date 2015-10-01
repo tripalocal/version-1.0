@@ -1,0 +1,8 @@
+/*
+  calendar styles
+*/
+
+.bootstrap-datetimepicker-widget td.active,
+.bootstrap-datetimepicker-widget td.active:hover {
+  background-color: $primary-color !important;
+}

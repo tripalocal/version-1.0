@@ -4,92 +4,88 @@
 {% load i18n %}
 
 {%block head %}
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!--<link href="{% static 'experiences/content/tripalocal_search.css' %}" rel="stylesheet">
-    <link href="{% static 'experiences/content/tripalocal_search_async.css' %}" rel="stylesheet">-->
+    <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
     <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
-    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
-    {%if LANGUAGE == "zh-CN"%}
-    <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
-    {%endif%}
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
     <title>{%trans "Discover" %} {{ city_display_name }}</title>
 {%endblock%}
 
 {% block content %}
-    <form id="search_form" action="{{GEO_POSTFIX}}s/melbourne/" method="post">
+    <form id="search_form" action="{{GEO_POSTFIX}}{{ request.path }}" method="post">
         {% csrf_token %}
         <div class="basic-search">
           <div class="container">
             <div class="row">
 
-              <div class="dates col-xs-4">
-                <div class="icon-header">
-                  <div class="icon-image" style="background-image: url({% static 'experiences/img/calendar.svg'%})"></div>
-                  <div class="icon-text">{% trans 'Dates' %}</div>
-                </div>
-                <div class="form-box">
+              <div class="col-md-6 top-field">
+                <div style="vertical-align: middle;">
+                  <h3 class="field-header"> {% trans 'Location' %}</h3>
                   <div class="ui selection dropdown">
                       <input id="id_city" type="hidden" name="city" value="city">
                       <i class="dropdown icon"></i>
                       <div id="city_name" class="text">{%trans "City" %}</div>
                       <div id="city-menu" class="menu"></div>
                   </div>
-                  <div class="input-group start-date">
-                      {{form.start_date}}
-                  </div>
-                  <div class="input-group end-date">
-                      {{form.end_date}}
-                  </div>
-                </div>
-              </div>
-
-              <div class="people col-xs-3">
-                <div class="icon-header">
-                  <div class="icon-image" style="background-image: url({% static 'experiences/img/group.svg' %})"></div>
-                  <div class="icon-text">{% trans 'People' %}</div>
-                </div>
-                <div class="form-box">
-                  {{form.guest_number}}
-                </div>
-              </div>
-
-              <div class="language col-xs-3">
-                <div class="icon-header">
-                  <div class="icon-image" style="background-image: url({% static 'experiences/img/discuss.svg'%})"></div>
-                  <div class="icon-text">{% trans 'Language' %}</div>
-                </div>
-                <div class="form-box">
                   {{form.language}}
-                  <div class="checkbox">
+                  <div class="checkbox-inline">
                     <label>
                       <input id="language_English" type="checkbox" value="English" name="checkbox-eng">
                       English
                     </label>
                   </div>
-                  <div class="checkbox">
+                  <div class="checkbox-inline">
                     <label>
                       <input id="language_Mandarin" type="checkbox" value="Chinese" name="checkbox-cn">
                       中文
                     </label>
                   </div>
                 </div>
+
+                <div style="vertical-align: middle; padding-top: 10px;">
+                  <h3 class="field-header"> {% trans 'Date' %} </h3>
+                  <div class="start-date">
+                      {{form.start_date}}
+                  </div>
+                  <div class="end-date">
+                      {{form.end_date}}
+                  </div>
+                  {{form.guest_number}}
+                </div>
               </div>
 
-              <div class="col-xs-2">
-                <input class="btn btn-default" id="itinerary-search" type="submit" value="{% trans "Update" %}" name="{% trans "Search" %}">
+              <div class ="col-md-6 bottom-field">
+                <div style="vertical-align: middle;">
+                  <div class="checkbox-primary">
+                    <div class="checkbox-inline">
+                      <label for="{{ form.is_kids_friendly.id_for_label }}" class="only-tag-label">
+                          {{ form.is_kids_friendly }}
+                          {%trans "Kids friendly only"%}
+                      </label>
+                    </div>
+                  </div>
+                  <div class="checkbox-primary">
+                    <div class="checkbox-inline">
+                      <label for="{{ form.is_host_with_cars.id_for_label }}" class="only-tag-label">
+                          {{ form.is_host_with_cars }}
+                          {%trans "Drivers only"%}
+                      </label>
+                    </div>
+                  </div>
+                  <div class="checkbox-primary">
+                    <div class="checkbox-inline">
+                      <label for="{{ form.is_private_tours.id_for_label }}" class="only-tag-label">
+                          {{ form.is_private_tours }}
+                          {%trans "Private tours only"%}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div style="padding-top:15px; vertical-align:middle">
+                  <h3 class="field-header">{% trans "Interests: food &amp; wine, education, history &amp; culture, architecture" %}<span class="three-dots">...</span> <a class="more-filters-btn" style="cursor:pointer;">{% trans 'edit' %}</a></h3>
+                </div>
               </div>
-
             </div>
           </div>
+          <input id="itinerary-search" type="hidden" value="{% trans 'Update' %}" name="{% trans 'Search' %}">
         </div>
 
         <div class="advanced-search" id="optional_criteria_div" style="display:none;">
@@ -104,52 +100,22 @@
                             {{form.tags}}
                             {{form.all_tags}}
                         </div>
-                        <div class="form-box" id="only_tags">
-                          <div class="checkbox">
-                            {{ form.is_kids_friendly }}
-                            <label for="{{ form.is_kids_friendly.id_for_label }}" class="only-tag-label">
-                                <input type="checkbox">
-                                {%trans "Kids friendly only"%}
-                            </label>
-                          </div>
-                          <div class="checkbox">
-                            {{ form.is_host_with_cars }}
-                            <label for="{{ form.is_host_with_cars.id_for_label }}" class="only-tag-label">
-                                <input type="checkbox">
-                                {%trans "Hosts with cars only"%}
-                            </label>
-                          </div>
-                          <div class="checkbox">
-                            {{ form.is_private_tours }}
-                            <label for="{{ form.is_private_tours.id_for_label }}" class="only-tag-label">
-                                <input type="checkbox">
-                                {%trans "Private tours only"%}
-                            </label>
-                          </div>
-                        </div>
+
                     </div>
             </div>
         </div>
 
-        <div class="mobile-search">
-            <h1 style="float:left;margin:15px 20px -10px 20px">{%trans "Melbourne, VIC"%}</h1>
-            <img src="{{ MEDIA_URL }}search.svg" width="25" style="float:right;margin:15px 20px -10px 20px">
-        </div>
     </form>
 
     <div class="search-result">
       <div class="container">
-        <div class="loading"><img src="{% static 'experiences/img/loading.gif' %}" width="64px" height="64px" class="ajax-loader"/></div>
-
-        <div class="container-fluid">
           <div id="more-filters-div" class="more-filters">
-              <button class="btn btn-default" id="more_filters" type="button" value="More Filters" style="width:100px;float:left;margin-right:10px;">{%trans "More Filters" %}</button>
+              <button class="btn btn-default more-filters-btn" id="more_filters" type="button" value="More Filters" style="width:100px;float:left;margin-right:10px;">{%trans "More Filters" %}</button>
               <button class="btn btn-primary" id="apply_filters" type="button" value="Apply Filters" style="width:100px;display:none;float:left;">{% trans "Apply Filters" %}</button>
               <div id="ajax-experience-count" class="experience-count"></div>
           </div>
+          <div class="loading"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
           <div id="ajax-experience-result"></div>
-
-        </div>
       </div>
     </div>
     <!-- /.container -->
@@ -157,6 +123,16 @@
 {% endblock %}
 
 {% block scripts %}
+  <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+  {%if LANGUAGE == "zh-CN"%}
+  <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+  {%endif%}
+  <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+  <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+  <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+
+
 <script charset="utf-8" type="text/javascript">
 	$(document).ajaxStart(function() {
 		$(".loading").show();
@@ -178,6 +154,14 @@
         }
 
         return temp.substr(temp.lastIndexOf("/") + 1);
+    }
+
+    function cityToHref(href, city) {
+        if (href.substr(-1) === '/') {
+            temp = href.substr(0, href.length - 1);
+        }
+
+        return temp.substr(0, temp.lastIndexOf("/") + 1) + city + '/';
     }
 
     function loadExperienceList(href) {
@@ -343,10 +327,10 @@
             $("#itinerary-search").click()
         });
 
-
         $('#itinerary-search').on('click', function (event) {
             event.preventDefault();
-            var href = '{{GEO_POSTFIX}}s/' + $("#id_city").val() + '/';
+{#            var href = cityToHref(location.href, $("#id_city").val());#}
+            var href = '{{GEO_POSTFIX}}{{ type }}/' + $("#id_city").val() + '/';
             history.pushState({}, 'City', href);
             loadExperienceList(href);
         });
@@ -367,6 +351,26 @@
         $("#search_form")[0].action = "{{GEO_POSTFIX}}s/" + $("#id_city").val() + "/";
         $("#itinerary-search").click();
     });
+
+    $("#language_English").change(function() {
+      $("#itinerary-search").click();
+    })
+
+    $("#language_Mandarin").change(function() {
+      $("#itinerary-search").click();
+    })
+
+    $("#id_is_kids_friendly").change(function() {
+      $("#itinerary-search").click();
+    })
+
+    $("#id_is_host_with_cars").change(function() {
+      $("#itinerary-search").click();
+    })
+
+    $("#id_is_private_tours").change(function() {
+      $("#itinerary-search").click();
+    })
 
     $("#itinerary-search").click(function(e){
         $("#id_tags").val("");
@@ -397,7 +401,8 @@
 
     });
 
-    $("#more_filters").click(function(e){
+    $(".more-filters-btn").click(function(e){
+        $(".three-dots").hide()
         tags_div = $("#optional_criteria_div");
         if(tags_div.css("display")=="none")
         {
@@ -410,6 +415,7 @@
             tags_div.hide();
             $("#more_filters").text('{%trans "More Filters"%}');
             $("#apply_filters").hide();
+            $(".three-dots").show()
         }
     });
 

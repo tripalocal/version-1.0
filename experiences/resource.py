@@ -12,7 +12,7 @@ from app.models import *
 from post_office import mail
 from Tripalocal_V1 import settings
 from tripalocal_messages.models import Aliases, Users
-from experiences.forms import email_account_generator, ExperienceForm, ItineraryBookingForm, check_coupon, Currency, DollarSign
+from experiences.forms import *
 from django.db import connections
 from django.template import loader, RequestContext, Context
 from django.template.loader import get_template
@@ -142,7 +142,7 @@ def saveBookingRequest(booking_request):
         raise Exception("Illegal input")
 
     experience = Experience.objects.get(id=experience_id)
-    experience.title = get_experience_title(experience, settings.LANGUAGES[0][0])
+    experience.title = experience.get_title(settings.LANGUAGES[0][0])
     experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
     #create a new account if the user does not exist
@@ -213,7 +213,7 @@ def saveBookingRequest(booking_request):
     if user not in experience.guests.all():
         experience.guests.add(user)
 
-    host = experience.hosts.all()[0]
+    host = get_host(experience)
     #send an email to the traveller
     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
@@ -456,13 +456,13 @@ def service_wishlist(request):
                     photo_url = photos[0].directory+photos[0].name
 
                 experiences.append({'id':experience.id,
-                                    'title':get_experience_title(experience, settings.LANGUAGES[0][0]),
-                                    'description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                                    'title':experience.get_title(settings.LANGUAGES[0][0]),
+                                    'description':experience.get_description(settings.LANGUAGES[0][0]),
                                     'price':experience_fee_calculator(exp_price, experience.commission),
                                     'language':experience.language,
                                     'duration':experience.duration,
                                     'photo_url':photo_url,
-                                    'host_image':experience.hosts.all()[0].registereduser.image_url})
+                                    'host_image':get_host(experience).registereduser.image_url})
 
             return Response(experiences,status=status.HTTP_200_OK)
 
@@ -598,16 +598,17 @@ def service_search(request, format=None):
         end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(criteria['end_datetime'].strip(), "%Y-%m-%d"))
         city = criteria['city']
         guest_number = criteria['guest_number']
-        keywords = criteria['keywords']
+        keywords = criteria.get('keywords', None)
         language = "Mandarin,English"
+        type = criteria.get('type', 'experience')
 
         if keywords is not None and len(keywords) == 0:
             keywords = None
 
         if int(guest_number) == 0:
-            itinerary = get_itinerary(start_datetime, end_datetime, None, city, language, keywords, mobile=True)
+            itinerary = get_itinerary(type, start_datetime, end_datetime, None, city, language, keywords, mobile=True)
         else:
-            itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, keywords, mobile=True)
+            itinerary = get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords, mobile=True)
 
         return Response(itinerary, status=status.HTTP_200_OK)
     except Exception as err:
@@ -635,7 +636,7 @@ def service_mytrip(request, format=None):
         bks = []
         for booking in bookings:
             payment = booking.payment if booking.payment_id != None else Payment()
-            host = booking.experience.hosts.all()[0]
+            host = get_host(booking.experience)
             phone_number = host.registereduser.phone_number
 
             photo_url = ''
@@ -645,7 +646,7 @@ def service_mytrip(request, format=None):
             
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
                   'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
-                  'experience_title':get_experience_title(booking.experience,settings.LANGUAGES[0][0]),
+                  'experience_title':booking.experience.get_title(settings.LANGUAGES[0][0]),
                   'experience_photo':photo_url,
                   'meetup_spot':get_experience_meetup_spot(booking.experience,settings.LANGUAGES[0][0]),
                   'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.',
@@ -800,7 +801,7 @@ def service_experience(request, format=None):
         included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
         included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
 
-        host = experience.hosts.all()[0]
+        host = get_host(experience)
         host_image = host.registereduser.image_url
         host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
 
@@ -830,10 +831,10 @@ def service_experience(request, format=None):
         for photo in photos:
             experience_images.append(photo.directory+photo.name)
 
-        return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
+        return Response({'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
-                         'experience_description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                         'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
                          'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
                          'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
                          'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
@@ -887,7 +888,7 @@ def service_experiencedetail(request, format=None):
         included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
         included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
 
-        host = experience.hosts.all()[0]
+        host = get_host(experience)
         host_image = host.registereduser.image_url
         host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
 
@@ -917,10 +918,10 @@ def service_experiencedetail(request, format=None):
         for photo in photos:
             experience_images.append(photo.directory+photo.name)
 
-        return Response({'experience_title':get_experience_title(experience, settings.LANGUAGES[0][0]),
+        return Response({'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
                          'experience_language':experience.language,
                          'experience_duration':experience.duration,
-                         'experience_description':get_experience_description(experience, settings.LANGUAGES[0][0]),
+                         'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
                          'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
                          'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
                          'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
@@ -1060,13 +1061,13 @@ def service_message(request, format=None):
                 sms_content = ""
                 for msg in messages:
                     sms_content += msg['msg_content']
-                    sms_content += ". "
+                    sms_content += ".\n"
 
                 if len(sms_content) > 140:
                     sms_content = sms_content[:140]
                 sms_header = _('%s' % MESSAGE_NOTIFY).format(sender_name=sender_name)
 
-                send_sms(receiver_phone_num, sms_header + sms_content)
+                send_sms(receiver_phone_num, sms_header + '\n' + sms_content)
 
             return Response(msg_ids, status=status.HTTP_200_OK)
 
@@ -1140,7 +1141,7 @@ def service_email(request, format=None):
         exp_urls = []
 
         for exp in exps:
-            host = exp.hosts.all()[0]
+            host = get_host(exp)
             if host not in hosts:
                 hosts.append(host)
                 exp_urls.append([])

@@ -16,6 +16,11 @@
   border-top: solid 1px $light-grey;
   height: 45px;
   border-bottom: solid 1px $light-grey;
+  .container {
+    @include media('<phone') {
+      padding: 0;
+    }
+  }
 }
 
 .tab_item {
@@ -29,10 +34,16 @@
   }
 }
 
+.form-width-lg {
+  width: 280px;
+  margin-right:20px;
+  @include media('<phone') {
+    width: 100%;
+  }
+}
+
 #active-tab {
-  color: rgb(130,202,202);
-  padding-left: 0;
-  padding-right: 6px;
+  color: $primary-color;
 }
 
 // My Profile form
@@ -44,6 +55,14 @@
   @include border-radius(5px);
   padding: 20px;
   margin-bottom: 20px;
+  @include media('<desktop') {
+    display: block;
+    float: none;
+  }
+  @include media('<tablet') {
+    width: 90%;
+    margin: 15px auto;
+  }
   p {
     margin-bottom: 10px;
   }
@@ -56,6 +75,15 @@
   border: $light-grey 1px solid;
   @include border-radius(5px);
   padding: 15px;
+  @include media('<desktop') {
+    display: block;
+    float: none;
+    margin-bottom: 20px;
+  }
+  @include media('<tablet') {
+    width: 30%;
+    margin: 0 auto 20px auto;
+  }
   a {
     color: $dark-grey;
     &:hover {

@@ -22,24 +22,23 @@
 
 	<div class="row row-area">
     	<div class="content-area container">
-    		<div class="leftsubMenu">
-                <p>
+    		<ul class="leftsubMenu">
+                <li>
                     <a href="#" id="active-tab">{% trans "Managing Listing" %}</a>
-                </p>
-                <p>
+                </li>
+                <li>
                     <a href="{{GEO_POSTFIX}}myreservation">{% trans "My Reservation" %}</a>
-                </p>
-            </div>
+                </li>
+            </ul>
 
 			<div class="rightInterface">
-		        <div class="right-content-box-header">
-                    <p>{% trans "All listings" %}</p>
-                </div>
+                <h2>{% trans "All listings" %}</h2>
                 <hr>
+								<div class="container-fluid">
 		        {% for experience in experiences %}
-                <div class="listedItem edit-draft">
-                    <div><img class="thumbnail" src="{{ MEDIA_URL }}thumbnails/experiences/experience{{experience.id}}_1.jpg"></div>
-                    <div class="listing-status">
+                <div class="row listedItem edit-draft">
+                    <img class="col-md-4 thumbnail" src="{{ MEDIA_URL }}thumbnails/experiences/experience{{experience.id}}_1.jpg">
+                    <div class="col-md-4 listing-status">
                         <p>{{experience.title}}</p>
                         {% if experience.status|title != "Listed" %}
                         <p id="not-pub">{% trans "Not Published" %}</p>
@@ -47,16 +46,19 @@
                         <p id="published">{% trans "Published" %}</p>
                         {% endif %}
                     </div>
+										<div class="col-md-4">
                     {% if experience.status|title != "Listed" %}
                     <a class="btn btn-primary btn-sm" role="button" id="edit-draft" href="{{GEO_POSTFIX}}manage-listing-continue/{{ experience.id }}">{% trans "Edit draft" %}</a>
                     {% elif experience.status|title == "Listed" %}
                     <a class="btn btn-primary btn-sm" role="button" id="update-listing" href="{{GEO_POSTFIX}}manage-listing-continue/{{ experience.id }}">{% trans "Update listing" %}</a>
                     {% endif %}
-
+									</div>
                 </div>
+
                 {% empty %}
                 <p style="width:400px;">{% trans "You have not hosted any experience." %}</p>
 		    	{% endfor %}
+					</div>
     		</div>
     	</div>
     </div>
