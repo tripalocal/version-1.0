@@ -356,8 +356,8 @@
     $(document).ready(function(){
 
         $('.ui.dropdown').dropdown();
-        $("#id_start_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "{{LANGUAGE}}"});
-        $("#id_end_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "{{LANGUAGE}}"});
+        $("#id_start_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "locale": "{{LANGUAGE}}"});
+        $("#id_end_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "locale": "{{LANGUAGE}}"});
 
         city = $("#id_city").val().split(",");
         if(city.length>0)
