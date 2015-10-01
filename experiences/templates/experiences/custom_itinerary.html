@@ -21,7 +21,7 @@
 
         <div id="criteria_div">
             <div id="mandatory_criteria_div">
-                <div id="date_destination_div" style="float:left;width:390px; padding-top:10px;">
+                <div id="date_destination_div" style="float:left;width:300px; padding-top:10px;">
                     <button id="add_day_button" type="button" class="btn btn-default">{% trans 'Add' %}</button>
                     <div class="container-fluid" id="add_day_1_div" style="padding-bottom:10px;">
                       <div class="row" style="margin-bottom: 5px;">
@@ -85,6 +85,12 @@
                     </div>
                 </div>
                 <div class="vertical-bar"></div>
+                <div id="sort_by_div" style="float:left;width:150px;">
+                    <div class="">
+                        <p class="">{% trans "Sort by" %}</p>
+                    </div>
+                    {{form.sort}}
+                </div>
                 <div id="more-filters-button">
                     <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters">{% trans "More Filters" %}</button>
                     <input class="btn-block btn btn-default" id="itinerary-search" type="submit" value="{% trans "Search" %}" name="Search">
@@ -350,14 +356,17 @@
     $(document).ready(function(){
 
         $('.ui.dropdown').dropdown();
-        $("#id_end_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
-        $("#id_start_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
-
+        $("#id_start_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "{{LANGUAGE}}"});
+        $("#id_end_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "{{LANGUAGE}}"});
 
         city = $("#id_city").val().split(",");
         if(city.length>0)
         {
             distinct_city = 1;
+            if(city[0])
+            {
+                $("#destination_city_1").text(city[0]);
+            }
             $("#id_start_datetime_day_1").val($("#id_start_datetime").val());
             start = new Date(Date.parse($("#id_start_datetime").val(),"YYYY-MM-DD"));
         }

@@ -39,6 +39,10 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
                     (_('Christchurch'), 'Christchurch'), (_('Queenstown'), 'Queenstown'),
                     (_('Auckland'), 'Auckland'), (_('Wellington'), 'Wellington'),)
 
+#                    (_('Greater South Australia'), 'GRSA'),(_('Greater Victoria'), 'GRVIC'),
+#                    (_('Greater New South Wales'), 'GRNSW'),(_('Greater Queensland'), 'GRQLD'),
+#                    (_('Greater Northern Territory'), 'GRNT'),
+
 Locations = [('Australia', [('Melbourne', _('Melbourne'), _('Victoria')), ('Sydney', _('Sydney'), _('New South Wales')),
                            ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
                            ('Goldcoast', _('Gold Coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
@@ -782,6 +786,7 @@ class ExperienceAvailabilityForm(forms.Form):
     start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
 
+SortBy=((1,'Popularity'),(2,'Outdoor'),(3,'Urban'),)
 class CustomItineraryForm(forms.Form):
     start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
@@ -791,6 +796,7 @@ class CustomItineraryForm(forms.Form):
     tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     itinerary_string = forms.CharField(widget=forms.Textarea, required=False)
+    sort = forms.ChoiceField(choices=SortBy, required=True)
 
     def __init__(self, *args, **kwargs):
         super(CustomItineraryForm, self).__init__(*args, **kwargs)

@@ -2665,7 +2665,7 @@ def get_experience_score(criteria_dict, experience_tags):
         score += criteria_dict.get(tag, 0)
     return score
 
-def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False,sort=1):
+def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1):
     '''
     @sort, 1:most popular, 2:outdoor, 3:urban
     '''
@@ -2778,13 +2778,14 @@ def custom_itinerary(request):
                 city = form.cleaned_data['city']
                 language = form.cleaned_data['language']
                 tags = form.cleaned_data['tags']
+                sort = int(form.cleaned_data['sort'])
 
                 if isinstance(tags, list):
                     tags = ','.join(tags)
                 elif not isinstance(tags,str):
                     raise TypeError("Wrong format: keywords. String or list expected.")
 
-                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags)
+                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort)
 
                 return render_to_response('experiences/custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
             else:
