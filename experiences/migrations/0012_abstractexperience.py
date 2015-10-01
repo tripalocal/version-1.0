@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('contenttypes', '0001_initial'),
-        ('experiences', '0011_productphoto'),
+        ('experiences', '0009_auto_20150917_1642'),
     ]
 
     operations = [

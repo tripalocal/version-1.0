@@ -15,7 +15,11 @@
 {% block content %}
 
 <div class="jumbotron top">
-  <h1>{% trans "Tripalocal" %}</h1>
+  {% if LANGUAGE == "zh-CN" %}
+  <img alt="{% trans 'Tripalocal' %}" src="{% static 'img/top_logo-cn.svg' %}" width="160">
+  {% else %}
+  <img alt="{% trans 'Tripalocal' %}" src="{% static 'img/top_logo-en.svg' %}" width="230">
+  {% endif %}
   <h1>{% trans "Authentic local experiences" %}</h1>
   <p>{% trans "Check our most popular trips" %}</p>
 </div>
@@ -98,8 +102,8 @@
 {%endblock%}
 
 {% block scripts %}
-<script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-<script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 <script language="javascript" type="text/javascript">
     $(document).ready(function () {
