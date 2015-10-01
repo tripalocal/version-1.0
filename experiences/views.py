@@ -123,12 +123,16 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
     available_options = []
     end_datetime = end_datetime.replace(hour=22)
 
-    if exp_type == 'new_product':
+    exp_type = exp_type.lower()
+    if exp_type == 'newproduct':
         experiences = AbstractExperience.objects.instance_of(NewProduct)
+        experiences = [e for e in experiences if e.status == 'Listed']
     else:
         experiences = AbstractExperience.objects.instance_of(Experience)
-
-    experiences = [e for e in experiences if e.status == 'Listed']
+        if exp_type == 'itinerary':
+            experiences = [e for e in experiences if e.status == 'Listed' and e.type == 'ITINERARY']
+        else:
+            experiences = [e for e in experiences if e.status == 'Listed' and e.type != 'ITINERARY']
 
     if city is not None:
         city = str(city).lower().split(",")
@@ -2392,11 +2396,11 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             experienceList = NewProduct.objects.filter(city__iexact=city, status__iexact="listed")
         else:
             experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(
-                type__iexact="multi-hosts")
+                type__iexact="itinerary")
 
         # Add all experiences that belong to the specified city to a new list
         # alongside a list with all the number of reviews
-        # experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(type__iexact="multi-hosts")
+        # experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(type__iexact="itinerary")
 
             if is_kids_friendly:
                 experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
@@ -2955,7 +2959,7 @@ def itinerary_booking_successful(request):
     return render(request,'experiences/itinerary_booking_successful.html',{})
 
 def multi_day_trip(request):
-    experienceList = Experience.objects.filter(status='Listed', type='Multi-hosts')
+    experienceList = Experience.objects.filter(status='Listed', type='ITINERARY')
     i=0
     while i < len(experienceList):
         experience = experienceList[i]
