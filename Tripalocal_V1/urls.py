@@ -125,4 +125,6 @@ urlpatterns = patterns('',
     url(r'^wechat/payment_notify/$', 'app.views.wechat_payment_notify', name='wechat_payment_notify'),
     url(r'^wechat/generate_order/$', 'app.views.generate_order', name='wechat_generate_order'),
     url(r'^wechat_payment_success/$', TemplateView.as_view(template_name="app/wechat_payment_success.html")),
+    url(r'^wechat_qr_payment/$', 'app.views.wechat_qr_payment', name='wechat_qr_payment'),
+    url(r'^wechat/qr_payment_notify/$', 'app.views.wechat_qr_payment_notify', name='wechat_qr_payment_notify'),
 )

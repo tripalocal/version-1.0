@@ -63,7 +63,7 @@ class UnifiedOrderPay(WeiXinPay):
     def __init__(self, appid, mch_id, api_key):
         super(UnifiedOrderPay, self).__init__(appid, mch_id, api_key)
         self.url = "https://api.mch.weixin.qq.com/pay/unifiedorder"
-        self.trade_type = "NAIVE"
+        self.trade_type = "NATIVE"
 
     def post(self, body, out_trade_no, total_fee, spbill_create_ip, notify_url, **kwargs):
         tmp_kwargs = {
