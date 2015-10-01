@@ -124,7 +124,10 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
     end_datetime = end_datetime.replace(hour=22)
 
     exp_type = exp_type.lower()
-    if exp_type == 'newproduct':
+    if exp_type == 'all':
+        experiences = AbstractExperience.objects.all()
+        experiences = [e for e in experiences if e.status == 'Listed']
+    elif exp_type == 'newproduct':
         experiences = AbstractExperience.objects.instance_of(NewProduct)
         experiences = [e for e in experiences if e.status == 'Listed']
     else:
@@ -160,7 +163,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                 guest_number = experience.guest_number_max
 
         if keywords is not None:
-            experience_tags = get_experience_tags(experience, settings.LANGUAGES[0][0])
+            experience_tags = experience.get_tags(settings.LANGUAGES[0][0])
             tags = keywords.strip().split(",")
             match = False
             for tag in tags:
@@ -229,7 +232,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                             'price':experience_fee_calculator(exp_price, experience.commission),
                             'currency':str(dict(Currency)[experience.currency.upper()]),
                             'dollarsign':DollarSign[experience.currency.upper()],'dates':{},
-                            'photo_url':photo_url, 'type':tp , 'popularity':bks}
+                            'photo_url':photo_url, 'type':tp , 'popularity':bks, 'tags':experience.get_tags(settings.LANGUAGES[0][0])}
 
         if exp_type == 'experience':
             experience_avail['meetup_spot'] = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
@@ -388,7 +391,7 @@ def experience_availability(request):
             local_timezone = pytz.timezone(settings.TIME_ZONE)
             available_options = []
 
-            available_options = get_available_experiences(start_datetime, end_datetime)
+            available_options = get_available_experiences('experience', start_datetime, end_datetime)
 
             #add title
             dict = {'id':'Id', 'title':'Title', 'host':'Host', 'dates':{}}
@@ -1898,7 +1901,7 @@ def getBGImageURL(experienceKey):
     return BGImageURL
 
 def tagsOnly(tag, exp):
-    experience_tags = get_experience_tags(exp, settings.LANGUAGES[0][0])
+    experience_tags = exp.get_tags(settings.LANGUAGES[0][0])
     return tag in experience_tags
 
 def getProfileImage(experience):
@@ -2419,7 +2422,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
             else:
                 setExperienceDisplayPrice(experience)
-                experience_tags = get_experience_tags(experience, settings.LANGUAGES[0][0])
+                experience_tags = experience.get_tags(settings.LANGUAGES[0][0])
                 if keywords is not None and len(keywords) > 0 and len(experience_tags) > 0:
                     tags = keywords.strip().split(",")
                     match = False
@@ -2648,7 +2651,21 @@ def review_experience (request, id=None):
     else:
         return HttpResponseRedirect(GEO_POSTFIX)
 
-def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False):
+def get_experience_score(criteria_dict, experience_tags):
+    '''
+    @criteria_dict: a dict {}
+    @experience_tag: a list []
+    '''
+
+    score = 0
+    for tag in experience_tags:
+        score += criteria_dict.get(tag, 0)
+    return score
+
+def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False,sort=1):
+    '''
+    @sort, 1:most popular, 2:outdoor, 3:urban
+    '''
 
     available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords)
     itinerary = []
@@ -2660,6 +2677,16 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
             city[i] = dict(Location_reverse).get(city[i]).lower()
 
     day_counter = 0
+
+    if sort == 2:
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/outdoor.yaml').replace('\\', '/'))
+    elif sort == 3:
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/urban.yaml').replace('\\', '/'))
+    else:
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/popularity.yaml').replace('\\', '/'))
+
+    for experience in available_options:
+        experience['popularity'] = get_experience_score(config, experience['tags'])*0.9 + experience['popularity']*0.1
 
     #available_options: per experience --> itinerary: per day
     while dt <= end_datetime:
@@ -2754,7 +2781,7 @@ def custom_itinerary(request):
                 elif not isinstance(tags,str):
                     raise TypeError("Wrong format: keywords. String or list expected.")
 
-                itinerary = get_itinerary(start_datetime, end_datetime, guest_number, city, language, tags)
+                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags)
 
                 return render_to_response('experiences/custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
             else:

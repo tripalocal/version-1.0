@@ -44,7 +44,6 @@ class Provider(models.Model):
     def __str__(self):
         return self.company
 
-
 class AbstractExperience(PolymorphicModel):
     pass
 
@@ -141,7 +140,6 @@ class Experience(AbstractExperience):
     class Meta:
         ordering = ['id']
 
-
     def get_title(self, language):
         if self.experiencetitle_set is not None and len(self.experiencetitle_set.all()) > 0:
             t = self.experiencetitle_set.filter(language=language)
@@ -161,6 +159,16 @@ class Experience(AbstractExperience):
                 return self.experiencedescription_set.all()[0].description
         else:
             return ''
+
+    def get_tags(self, language):
+        tags = []
+
+        if self.tags is not None and len(self.tags.all()) > 0:
+            t = self.tags.filter(language=language)
+            for i in range(len(t)):
+                tags.append(t[i].tag)
+
+        return tags
 
 class ExperienceI18n(models.Model):
     title = models.CharField(max_length=100, null=True)
@@ -240,6 +248,16 @@ class NewProduct(AbstractExperience):
                 return self.newproducti18n_set.all()[0].description
         else:
             return None
+
+    def get_tags(self, language):
+        tags = []
+
+        if self.tags is not None and len(self.tags.all()) > 0:
+            t = self.tags.filter(language=language)
+            for i in range(len(t)):
+                tags.append(t[i].tag)
+
+        return tags
 
 class NewProductI18n(models.Model):
     EN = 'en'
@@ -347,7 +365,6 @@ class Photo(models.Model):
     directory = models.CharField(max_length=50)
     image = models.ImageField(upload_to=upload_path)
     experience = models.ForeignKey(AbstractExperience)
-
 
 class Review(models.Model):
     user = models.ForeignKey(User)
@@ -528,7 +545,6 @@ class Payment(models.Model):
             return False, e
         return True, re
 
-
 def get_experience_activity(experience, language):
     if hasattr(experience, 'experienceactivity_set') and experience.experienceactivity_set is not None and len(experience.experienceactivity_set.all()) > 0:
         t = experience.experienceactivity_set.filter(language=language)
@@ -538,7 +554,6 @@ def get_experience_activity(experience, language):
             return experience.experienceactivity_set.all()[0].activity
     else:
         return ''
-
 
 def get_experience_interaction(experience, language):
     if hasattr(experience, 'experienceinteraction_set') and experience.experienceinteraction_set is not None and len(experience.experienceinteraction_set.all()) > 0:
@@ -579,16 +594,6 @@ def get_experience_dropoff_spot(experience, language):
             return experience.experiencedropoffspot_set.all()[0].dropoff_spot
     else:
         return ''
-
-def get_experience_tags(experience, language):
-    tags = []
-
-    if hasattr(experience, 'tags') and experience.tags is not None and len(experience.tags.all()) > 0:
-        t = experience.tags.filter(language=language)
-        for i in range(len(t)):
-            tags.append(t[i].tag)
-
-    return tags
 
 def get_experience_whatsincluded(experience, language):
     return WhatsIncluded.objects.filter(experience = experience, language = language)
