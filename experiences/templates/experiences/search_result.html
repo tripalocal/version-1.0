@@ -4,13 +4,8 @@
 {% load i18n %}
 
 {%block head %}
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
     <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
-    <link href="{% static 'app/content/bootstrap-datetimepicker.css' %}" rel="stylesheet">
     <title>{%trans "Discover" %} {{ city_display_name }}</title>
 {%endblock%}
 
