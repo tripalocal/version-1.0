@@ -153,7 +153,6 @@ h1 {
 
     .search-from, .search-to {
       display: none;
-      overflow: hidden;
       padding: 3px;
       @include media('>tablet') {
         display: block;
