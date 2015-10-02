@@ -1021,7 +1021,7 @@ msgstr "订制行程"
 #: templates/experiences/experience_results.html:21
 #, python-format
 msgid " %(currency)s/person "
-msgstr "%(currency)s/人 起"
+msgstr "%(currency)s/人起"
 
 #: templates/experiences/experience_results.html:41
 msgid "Public"
