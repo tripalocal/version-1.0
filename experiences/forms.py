@@ -786,7 +786,7 @@ class ExperienceAvailabilityForm(forms.Form):
     start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
 
-SortBy=((1,'Popularity'),(2,'Outdoor'),(3,'Urban'),)
+SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
 class CustomItineraryForm(forms.Form):
     start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
@@ -1090,8 +1090,8 @@ def get_host(experience):
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
     host = get_host(experience)
     if not is_instant_booking:
-        # send an email to the host
         if not settings.DEVELOPMENT:
+            # send an email to the host
             mail.send(subject=_('[Tripalocal] ') + user.first_name + _(' has requested your experience'), message='',
                         sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                         recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], #fail_silently=False,
@@ -1104,6 +1104,7 @@ def send_booking_email_verification(booking, experience, user, is_instant_bookin
                                                                 'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
                                                                 'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no',
                                                                 'LANGUAGE':settings.LANGUAGE_CODE}))
+
             # send an email to the traveler
             mail.send(subject=_('[Tripalocal] Your booking request is sent to the host'),  message='',
                         sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
