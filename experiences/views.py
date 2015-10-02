@@ -2712,8 +2712,10 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
 
                 exp_dict = experience
                 exp_dict['instant_booking'] = instant_booking
-                if mobile:
-                    exp_dict['dates'] = {}
+                if not mobile:
+                    exp_dict['timeslots'] = experience['dates'][dt_string]
+
+                experience['dates'][dt_string] = {}
 
                 while counter < len(day_dict['experiences']):#find the correct rank
                     if experience['popularity'] > day_dict['experiences'][counter]['popularity']:
