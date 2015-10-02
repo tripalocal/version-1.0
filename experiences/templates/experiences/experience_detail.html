@@ -4,7 +4,7 @@
 
 {% block head %}
     {% load staticfiles %}
-    {% if experience.type == 'PRIVATE' %}
+    {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
     {% if LANGUAGE != "zh-CN" %}
     <title>{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</title>
     {%else%}
@@ -36,12 +36,12 @@
 	    <div class="row">
             <div class="stickem">
                 <div class="booking-box">
-                    {% if experience.type == 'PRIVATE' %}
+                    {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
                     <div class="profile-lg">
                         <div style="background:url({{ MEDIA_URL }}{{ host_image|urlencode }}); no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
                     </div>
                     {% endif %}
-                    {% if experience.type == 'PRIVATE' %}
+                    {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
                     {% if LANGUAGE != "zh-CN" %}
                     {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
                     {%else%}
@@ -160,7 +160,7 @@
         </div>
     </div>
 
-    {% if experience.type == "PRIVATE" %}
+    {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
     <div class="container-fluid">
         <div class="experience-host bio-box">
             <h2>{% trans "About the host," %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</h2>

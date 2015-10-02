@@ -287,9 +287,9 @@
     function addNewDay(id)
     {
         new_div="<div id=\"add_day_" + id + "_div\" class=\"container-fluid\" style=\"padding-bottom:10px;\">"+
-                    "<button id=\"delete_day_button_" + id + "\" type=\"button\" class=\"btn btn-default;\" style=\"margin-left: -15px;\">Delete</button>"+
+                    "<button id=\"delete_day_button_" + id + "\" type=\"button\" class=\"btn btn-default;\" style=\"margin-left: -15px;\">{% trans 'Delete' %}</button>"+
                     "<div class=\"row\" style=\"margin-bottom:5px;\">"+
-                    "<h3 class=\"field-header\">Location</h3>"+
+                    "<h3 class=\"field-header\">{% trans 'Location' %}</h3>"+
                     "<div class=\"ui selection dropdown\">"+
                         "<i class=\"dropdown icon\"></i>" +
                         "<div id=\"destination_city_" + id + "\" class=\"text\">{% trans "City" %}</div>" +
@@ -306,13 +306,13 @@
                     "</div>" +
                     "</div>"+
                     "<div class=\"row\">"+
-                    "<h3 class=\"field-header\" style=\"margin-right: 38px;\">Dates</h3>"+
+                    "<h3 class=\"field-header\" style=\"margin-right: 38px;\">{% trans "Dates" %}</h3>"+
                     "<div class=\"input-group start-date\" id=\"id_start_datetime_picker_day_" + id + "\">"+
                         "<input class=\"form-control\" id=\"id_start_datetime_day_" + id + "\" name=\"start_datetime\" type=\"text\" value=\"\">"+
                     "</div>"+
                     "<script>"+
                         "$(function() {"+
-                            "$(\"#id_start_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
+                            "$(\"#id_start_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"locale\": \"{{LANGUAGE}}\"});"+
                         "});"+
                     "<\/script>"+
                     "<div class=\"input-group end-date\" id=\"id_end_datetime_picker_day_" + id + "\">"+
@@ -320,7 +320,7 @@
                     "</div>"+
                     "<script>"+
                         "$(function() {"+
-                            "$(\"#id_end_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
+                            "$(\"#id_end_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"locale\": \"{{LANGUAGE}}\"});"+
                         "});"+
                     "<\/script>"+
                     "</div>"+
