@@ -308,14 +308,6 @@
                             <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
                             <p>{% trans "Please accept terms and conditions" %}</p>
                         </div>
-
-                        <div>
-                            <img src="/images/icon/give-back.svg" width="25" style="float:left">
-                            <p style="margin:20px 10px 0 35px">{% trans "It’s ok to change your mind" %}<br>
-                                {% trans "If you cancel at least 7 calendar days in advance, there is no cancellation fee." %}<br>
-                                {% trans "If you cancel between 3 and 6 calendar days in advance, you will be charged a 50 percent cancellation fee." %}<br>
-                                {% trans "If you cancel within 2 calendar days in advance, you will be charged a 100 percent cancellation fee." %}</p>
-                        </div>
                     </div>
                     <input type="submit" id="submit_booking" name="Stripe" value="{% trans "Credit card/Alipay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>
                     <!--<input type="submit" id="submit_booking_unionpay" name="UnionPay" value="{% trans "Union Pay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>-->

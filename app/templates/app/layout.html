@@ -127,7 +127,7 @@
           </a>
         </div>
 
-          <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right" style="min-width: 75px;"
+          <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right"
           href="https://www.tripalocal.com{% if LANGUAGE == "zh-CN" %}{{ request.path|slice:"3:" }}{% else %}/cn{{ request.path }}{% endif %}">
           {% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}
           </a>
