@@ -30,27 +30,27 @@ msgstr "推荐体验"
 
 #: forms.py:27 forms.py:78
 msgid "Melbourne, VIC"
-msgstr "墨尔本, 维多利亚州"
+msgstr "墨尔本, 维多利亚"
 
 #: forms.py:27 forms.py:78
 msgid "Sydney, NSW"
-msgstr "悉尼, 新南威尔士州"
+msgstr "悉尼, 新南威尔士"
 
 #: forms.py:27 forms.py:78
 msgid "Brisbane, QLD"
-msgstr "布里斯班, 昆士兰州"
+msgstr "布里斯班, 昆士兰"
 
 #: forms.py:27 forms.py:78
 msgid "Cairns, QLD"
-msgstr "凯恩斯, 昆士兰州"
+msgstr "凯恩斯, 昆士兰"
 
 #: forms.py:28 forms.py:79
 msgid "Gold coast, QLD"
-msgstr "黄金海岸, 昆士兰州"
+msgstr "黄金海岸, 昆士兰"
 
 #: forms.py:28 forms.py:79
 msgid "Hobart, TAS"
-msgstr "霍巴特, 塔斯马尼亚州"
+msgstr "霍巴特, 塔斯马尼亚"
 
 #: forms.py:28 forms.py:79
 msgid "Adelaide, SA"
@@ -158,19 +158,19 @@ msgstr "澳大利亚"
 
 #: forms.py:46
 msgid "Victoria"
-msgstr "维多利亚州"
+msgstr "维多利亚"
 
 #: forms.py:46
 msgid "New South Wales"
-msgstr "新南威尔士州"
+msgstr "新南威尔士"
 
 #: forms.py:47 forms.py:48
 msgid "Queensland"
-msgstr "昆士兰州"
+msgstr "昆士兰"
 
 #: forms.py:48
 msgid "Tasmania"
-msgstr "塔斯马尼亚州"
+msgstr "塔斯马尼亚"
 
 #: forms.py:49
 msgid "South Australia"
