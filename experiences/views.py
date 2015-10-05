@@ -2672,7 +2672,7 @@ def get_experience_score(criteria_dict, experience_tags):
         score += criteria_dict.get(tag, 0)
     return score
 
-def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1):
+def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1, age_limit=1):
     '''
     @sort, 1:most popular, 2:outdoor, 3:urban
     '''
@@ -2689,11 +2689,19 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
     day_counter = 0
 
     if sort == 2:
-        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/outdoor.yaml').replace('\\', '/'))
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/outdoor.yaml').replace('\\', '/'))
     elif sort == 3:
-        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/urban.yaml').replace('\\', '/'))
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/urban.yaml').replace('\\', '/'))
     else:
-        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/popularity.yaml').replace('\\', '/'))
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/popularity.yaml').replace('\\', '/'))
+
+    if age_limit == 2:
+        config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_elderly.yaml').replace('\\', '/')))
+    elif age_limit == 3:
+        config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_children.yaml').replace('\\', '/')))
+    elif age_limit == 4:
+        config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_elderly.yaml').replace('\\', '/')))
+        config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_children.yaml').replace('\\', '/')))
 
     for experience in available_options:
         experience['popularity'] = get_experience_score(config, experience['tags'])*0.9 + experience['popularity']*0.1
@@ -2788,13 +2796,14 @@ def custom_itinerary(request):
                 language = form.cleaned_data['language']
                 tags = form.cleaned_data['tags']
                 sort = int(form.cleaned_data['sort'])
+                age_limit = int(form.cleaned_data['age_limit'])
 
                 if isinstance(tags, list):
                     tags = ','.join(tags)
                 elif not isinstance(tags,str):
                     raise TypeError("Wrong format: keywords. String or list expected.")
 
-                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort)
+                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort, age_limit)
 
                 return render_to_response('experiences/custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
             else:
