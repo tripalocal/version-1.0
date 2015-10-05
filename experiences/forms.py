@@ -1088,6 +1088,9 @@ def get_host(experience):
         return experience.provider.user
 
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
+    if type(experience) != Experience: #issue 209
+        return
+
     host = get_host(experience)
     if not is_instant_booking:
         if not settings.DEVELOPMENT:
@@ -1190,6 +1193,8 @@ def sms_notification(booking, experience, user, phone_number):
         exp_title = experience.get_title(settings.LANGUAGE_CODE)
     else:
         exp_title = experience.get_title(settings.LANGUAGE_CODE)
+        return #issue 209
+
     customer_phone_num = phone_number
     exp_datetime_local = booking.datetime.astimezone(tzlocal())
     exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
