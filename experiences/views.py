@@ -2397,11 +2397,18 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             city = cityList[i][0]
             break
 
+    #for issue 208
+    city_search = [city]
+    for state, cities in Location_relation.items():
+        if city in cities:
+            city_search = [state, city]
+            break
+
     if request.is_ajax():
         if type == 'product':
-            experienceList = NewProduct.objects.filter(city__iexact=city, status__iexact="listed")
+            experienceList = NewProduct.objects.filter(city__in=city_search, status__iexact="listed")
         else:
-            experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(
+            experienceList = Experience.objects.filter(city__in=city_search, status__iexact="listed").exclude(
                 type__iexact="itinerary")
 
         # Add all experiences that belong to the specified city to a new list
