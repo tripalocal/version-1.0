@@ -1397,7 +1397,7 @@ def create_experience(request, id=None):
                 user = User.objects.get(email=form.data['host'])
             except User.DoesNotExist:
                 form.add_error("host","host email does not exist")
-            return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
+                return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
 
             if not id:
                 #create a new experience
@@ -1411,16 +1411,16 @@ def create_experience(request, id=None):
                 lan2 = None
 
             experience = updateExperience(experience=experience,
-                                        id=form.data['id'],
+                                        id=int(form.data['id']),
                                         start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2015-01-01 00:00", "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),#form.data['start_datetime']
                                         end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2025-01-01 00:00", "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),#form.data['end_datetime']
                                         repeat_cycle = "Hourly",
                                         repeat_frequency = 1,
-                                        guest_number_min = form.data['guest_number_min'],
-                                        guest_number_max = form.data['guest_number_max'],
-                                        price = form.data['price'],
+                                        guest_number_min = int(form.data['guest_number_min']),
+                                        guest_number_max = int(form.data['guest_number_max']),
+                                        price = float(form.data['price']),
                                         currency = form.data['currency'].lower(),
-                                        duration = form.data['duration'],
+                                        duration = float(form.data['duration']),
                                         city = form.data['suburb'],
                                         status = form.data['status'],
                                         language = form.data['language'],
@@ -1587,7 +1587,7 @@ def create_experience(request, id=None):
                                               experience = experience, language=settings.LANGUAGES[0][0])
                     transport.save()
 
-            return HttpResponseRedirect(GEO_POSTFIX + 'admin/experiences/experience/'+experience.id)
+            return HttpResponseRedirect(GEO_POSTFIX + 'admin/experiences/experience/'+str(experience.id))
 
     return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
 

@@ -743,7 +743,7 @@ class CreateExperienceForm(forms.Form):
     dress_code = forms.CharField(widget=forms.Textarea)
     suburb = forms.ChoiceField(choices=Suburbs)
     meetup_spot = forms.CharField(widget=forms.Textarea)
-    dropoff_spot = forms.CharField(widget=forms.Textarea)
+    dropoff_spot = forms.CharField(widget=forms.Textarea, required = False)
     status = forms.ChoiceField(choices=Status)
     experience_photo_1 = forms.ImageField(required = False)
     experience_photo_2 = forms.ImageField(required = False)
