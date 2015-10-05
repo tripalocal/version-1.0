@@ -42,7 +42,8 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
 #                    (_('Greater New South Wales'), 'GRNSW'),(_('Greater Queensland'), 'GRQLD'),
 #                    (_('Greater Northern Territory'), 'GRNT'),
 
-Location_relation = {'GRQLD':['Brisbane','Cairns','Goldcoast'], 'GRNT':['Darwin','Alicesprings']} #for issue 208
+Location_relation = {'GRQLD':['Brisbane','Cairns','Goldcoast'], 'GRNT':['Darwin','Alicesprings'],
+                     'GRVIC':['Melbourne'], 'GRSA':['Adelaide'], 'GRNSW':['Sydney']} #for issue 208
 
 Locations = [(_('Australia'), [('Melbourne', _('Melbourne'), _('Victoria')), ('Sydney', _('Sydney'), _('New South Wales')),
                            ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
