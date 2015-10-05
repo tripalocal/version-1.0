@@ -800,29 +800,15 @@ def wechat_payment_notify(request):
         return HttpResponse('')
 
 
-@csrf_exempt
-def wechat_qr_payment(request):
-    unified_pay = UnifiedOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
-    out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
-    notify_url = request.build_absolute_uri(reverse('wechat_qr_payment_notify'))
-    pay_info = unified_pay.post("sfasfas", out_trade_no, str(123), "127.0.0.1", notify_url)
-    if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
-        code_url = pay_info['code_url']
-        return HttpResponse(json.dumps({'code_url':code_url}), content_type='application/json')
+# @csrf_exempt
+# def wechat_qr_payment(request):
+#     unified_pay = UnifiedOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
+#     out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
+#     notify_url = request.build_absolute_uri(reverse('wechat_qr_payment_notify'))
+#     pay_info = unified_pay.post("sfasfas", out_trade_no, str(123), "127.0.0.1", notify_url)
+#     if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
+#         code_url = pay_info['code_url']
+#         return HttpResponse(json.dumps({'code_url':code_url}), content_type='application/json')
+#
+#     return HttpResponse(json.dumps(pay_info), content_type='application/json')
 
-    return HttpResponse(json.dumps(pay_info), content_type='application/json')
-
-
-@csrf_exempt
-def wechat_qr_payment_notify(request):
-    if (request.body):
-        notify_info = xmltodict.parse(request.body.decode("utf-8"))['xml']
-        if (notify_info.get('return_code', None)) == 'SUCCESS' and 'out_trade_no' in notify_info:
-            out_trade_no = notify_info['out_trade_no']
-            attach = notify_info['attach']
-            print('out_trade_no', out_trade_no)
-            print('attach', attach)
-            xml = dict_to_xml({'return_code': 'SUCCESS', 'return_msg': 'OK'})
-            return HttpResponse(xml)
-    else:
-        return HttpResponse('')
