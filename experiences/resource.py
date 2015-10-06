@@ -16,7 +16,7 @@ from experiences.forms import *
 from django.db import connections
 from django.template import loader, RequestContext, Context
 from django.template.loader import get_template
-from app.forms import BookingRequestXLSForm, ExperienceTagsXLSForm
+from app.forms import UploadXLSForm, ExperienceTagsXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator
@@ -280,7 +280,7 @@ def saveBookingRequestsFromXLS(request):
 
     context = RequestContext(request)
     if request.method == 'POST':
-        form = BookingRequestXLSForm(request.POST, request.FILES)
+        form = UploadXLSForm(request.POST, request.FILES)
         if form.is_valid():
             try:
                 file = request.FILES['file']
@@ -337,7 +337,134 @@ def saveBookingRequestsFromXLS(request):
                 if booking_request:
                     saveBookingRequest(booking_request)
     else:
-        form = BookingRequestXLSForm()
+        form = UploadXLSForm()
+
+    return render_to_response('app/booking_request_xls.html', {'form': form}, context)
+
+def updateNewProduct(experience):
+    id = experience['Tripalocal listing ID']
+    title = experience['Title']
+    background = experience['Background info']
+    description = experience['Description']
+    service = experience['Service']
+    highlights = experience['Highlights']
+    schedule = experience['Schedule']
+    whatsincluded = experience['What\'s included']
+    language = experience['Language']
+    disclaimer = experience['Disclaimer']
+    guest_number_min = int(float(experience['Guest number min']))
+    refund_policy = experience['Refund policy']
+    ticket_use_instruction = experience['Ticket use instruction']
+    notice = experience['Notice']
+    pick_up = experience['Pick up detail']
+    insurance = experience['Insurance']
+
+    if id and len(id):
+        #update an existing experience
+        id = int(id)
+        exp = AbstractExperience.objects.get(id = id)
+    else:
+        #create a new product
+        exp = NewProduct()
+
+    exp.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+    exp.end_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
+    exp.provider = Provider.objects.get(id=1)
+    exp.language = language.lower() + ";"
+    exp.guest_number_min = guest_number_min
+    exp.save()
+
+    exp_i18n = NewProductI18n()
+
+    if hasattr(exp, 'newproducti18n_set') and len(exp.newproducti18n_set.all()) > 0:
+        exp_i18n_prev = exp.newproducti18n_set.filter(language = settings.LANGUAGES[0][0])
+        if len(exp_i18n_prev)>0:
+            exp_i18n = exp_i18n_prev[0]
+    
+    exp_i18n.title = title
+    exp_i18n.background = background
+    exp_i18n.description = description
+    exp_i18n.service = service
+    exp_i18n.highlights = highlights
+    exp_i18n.schedule = schedule
+    exp_i18n.whatsincluded = whatsincluded
+    exp_i18n.disclaimer = disclaimer
+    exp_i18n.title = title
+    exp_i18n.refund_policy = refund_policy
+    exp_i18n.ticket_use_instruction = ticket_use_instruction
+    exp_i18n.notice = notice
+    exp_i18n.pick_up = pick_up
+    exp_i18n.insurance = insurance
+    exp_i18n.language = settings.LANGUAGES[0][0]
+
+    exp_i18n.product_id = exp.id
+    exp_i18n.save()
+
+def updateNewProductFromXLS(request):
+    if not (request.user.is_authenticated() and request.user.is_superuser):
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "update_newproduct_xls")
+
+    context = RequestContext(request)
+    if request.method == 'POST':
+        form = UploadXLSForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                file = request.FILES['file']
+                name, extension = os.path.splitext(file.name)
+                extension = extension.lower();
+                if extension in ('.xls', '.xlsx'):
+                    destination = open(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name), 'wb+')
+                    for chunk in file.chunks():             
+                        destination.write(chunk)
+                    destination.close()
+
+                workbook = xlrd.open_workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name))
+            except OSError:
+                #TODO
+                raise
+
+            worksheet = workbook.sheet_by_name('Sheet 1')
+
+            num_rows = worksheet.nrows - 1
+            num_cells = worksheet.ncols - 1
+            curr_row = 0
+            col_names= []
+            legal_names= ['Tripalocal listing ID', 'Title', 'Background info', 'Description',
+                          'Service', 'Highlights', 'Schedule', 'What\'s included', 'Language',
+                          'Disclaimer', 'Guest number min', 'Refund policy', 'Ticket use instruction',
+                          'Notice', 'Pick up detail', 'Insurance']
+
+            curr_cell = -1
+            while curr_cell < num_cells:
+                curr_cell += 1
+                # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                cell_type = worksheet.cell_type(curr_row, curr_cell)
+                cell_value = worksheet.cell_value(curr_row, curr_cell)
+                if cell_type == 1 and cell_value in legal_names:
+                    col_names.append(cell_value)
+                else:
+                    raise Exception("Type error: column name, " + str(curr_cell))
+
+            while curr_row < num_rows:
+                curr_row += 1
+                row = worksheet.row(curr_row)
+
+                curr_cell = -1
+                experience={}
+                while curr_cell < num_cells:
+                    curr_cell += 1
+                    # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                    cell_type = worksheet.cell_type(curr_row, curr_cell)
+
+                    if cell_type <= 2:
+                        experience[col_names[curr_cell]] = str(worksheet.cell_value(curr_row, curr_cell))
+                    else:
+                        raise Exception("Type error: row " + str(curr_row) + ", col " + str(curr_cell))
+
+                if experience:
+                    updateNewProduct(experience)
+    else:
+        form = UploadXLSForm()
 
     return render_to_response('app/booking_request_xls.html', {'form': form}, context)
 
