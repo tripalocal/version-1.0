@@ -1099,8 +1099,8 @@ def service_message(request, format=None):
             msg_ids = []
 
             for msg in messages:
-                message = Message(sender_id=request.user.id, receiver_id=msg['receiver_id'], content=msg['msg_content'],
-                                    status="received", datetime_sent=datetime.strptime(msg['msg_date'], '%Y/%m/%d/%H/%M/%S/%f'))
+                message = Message(sender_id=request.user.id, receiver_id=msg['receiver_id'], content=msg['msg_content'], status="received",
+                                  datetime_sent=pytz.timezone("UTC").localize(datetime.strptime(msg['msg_date'], '%Y/%m/%d/%H/%M/%S/%f')))
                 message.save()
                 msg_ids.append({"local_id":msg['local_id'],"global_id":message.id})
 
