@@ -574,10 +574,10 @@ class BookingConfirmationForm(forms.Form):
     status = forms.CharField(initial="Requested")
     promo_code = forms.CharField(required=False)
 
-    card_number = CreditCardField(required=False, label="Card Number")
-    expiration = CCExpField(required=False, label="Expiration")
-    cvv = forms.IntegerField(required=False, label="CVV Number",
-        max_value=9999, widget=forms.TextInput(attrs={'size': '4'}))
+    #card_number = CreditCardField(required=False, label="Card Number")
+    #expiration = CCExpField(required=False, label="Expiration")
+    #cvv = forms.IntegerField(required=False, label="CVV Number",
+    #    max_value=9999, widget=forms.TextInput(attrs={'size': '4'}))
 
     first_name = forms.CharField(max_length=50)
     last_name = forms.CharField(max_length=50)
