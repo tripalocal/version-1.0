@@ -14,8 +14,8 @@
 </div>
 {% endblock %}
 {% block scripts %}
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script charset="utf-8" type="text/javascript">
-$(function(){
     $(document).ready(function(){
         $("#id_total").text(((parseFloat($("#id_sub_total").text())*0.0)*1.000+0.0).toFixed(2));
         $("#id_service_fee").text(((parseFloat($("#id_sub_total").text())*0.0)*0.000+0.0).toFixed(2));
@@ -27,6 +27,5 @@ $(function(){
         $("#id_expiration_1").val((new Date()).getFullYear());
         $("#id_cvv").val(123);
     })
-})
 </script>
 {% endblock %}
