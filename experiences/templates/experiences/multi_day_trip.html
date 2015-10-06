@@ -97,7 +97,9 @@
 <div class="jumbotron bottom">
   <h1>{% trans "Prefer a personally tailored trip?" %}</h1>
   <p>{% trans "Please contact our lovely custom service"%}</p>
-  <button id="show_popup" class="btn btn-primary">{% trans "Help me plan my trip" %}</button>
+  <form action="mailto:enquiries@tripalocal.com">
+  <button class="btn btn-primary">{% trans "Help me plan my trip" %}</button>
+  </form>
 </div>
 {%endblock%}
 
@@ -105,11 +107,4 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
-<script language="javascript" type="text/javascript">
-    $(document).ready(function () {
-        $('#show_popup').click(function(e) {
-            $('#help-popup').modal('show');
-        });
-    })
-</script>
 {% endblock %}
