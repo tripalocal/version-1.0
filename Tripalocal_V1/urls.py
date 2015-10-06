@@ -125,6 +125,7 @@ urlpatterns = patterns('',
     url(r'^wechat/payment_notify/$', 'app.views.wechat_payment_notify', name='wechat_payment_notify'),
     url(r'^wechat/generate_order/$', 'app.views.generate_order', name='wechat_generate_order'),
     # url(r'^wechat_qr_payment/$', 'app.views.wechat_qr_payment', name='wechat_qr_payment'),
-    url(r'^wechat_qr_payment/(?P<code_url>.*)/$', 'experiences.views.wechat_qr_payment', name='wechat_qr_payment'),
+    url(r'^wechat_qr_payment/$', 'experiences.views.wechat_qr_payment', name='wechat_qr_payment'),
     url(r'^wechat/qr_payment_notify/$', 'experiences.views.wechat_qr_payment_notify', name='wechat_qr_payment_notify'),
+    url(r'^wechat_qr_payment_query/(?P<out_trade_no>.*)/$', 'experiences.views.wechat_qr_payment_query', name='wechat_qr_payment_query'),
 )

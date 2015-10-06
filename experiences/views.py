@@ -1,11 +1,10 @@
 from io import BytesIO
-from urllib.parse import unquote_plus
-from app.wechat_payment.api import UnifiedOrderPay
+from urllib.parse import urlencode
+from app.wechat_payment.api import UnifiedOrderPay, OrderQuery
 from app.wechat_payment.utils import dict_to_xml
 from django.core.files.storage import default_storage as storage
 from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
-from django.utils.http import urlquote_plus
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
 from experiences.forms import *
@@ -1103,7 +1102,9 @@ def experience_booking_confirmation(request):
                         #               + '&price_paid=' + str(total_price) + '&is_instant_booking=' \
                         #               + str(instant_booking(experience, bk_date, bk_time))
                         # return render_to_response('experiences/wechat_qr_payment.html', {'code_url': code_url}, context)
-                        return redirect('wechat_qr_payment', code_url=urlquote_plus(code_url))
+
+                        return redirect(url_with_querystring(reverse('wechat_qr_payment'), code_url=code_url,
+                                                             out_trade_no=out_trade_no))
                     else:
                         return HttpResponse('<html><body>WeChat Payment Error.</body></html>')
                 else:
@@ -1139,6 +1140,11 @@ def experience_booking_confirmation(request):
         # If the request was not a POST
         #form = BookingConfirmationForm()
         return HttpResponseRedirect(GEO_POSTFIX)
+
+
+def url_with_querystring(path, **kwargs):
+    return path + '?' + urlencode(kwargs)
+
 
 def saveProfileImage(user, profile, image_file):
     content_type = image_file.content_type.split('/')[0]
@@ -3154,8 +3160,32 @@ def unionpay_refund_callback(request):
             logger.debug(err)
 
 
-def wechat_qr_payment(request, code_url):
-    return render_to_response('experiences/wechat_qr_payment.html', {'code_url': unquote_plus(code_url)}, RequestContext(request))
+def wechat_qr_payment(request):
+    code_url = request.GET.get('code_url')
+    out_trade_no = request.GET.get('out_trade_no')
+    return render_to_response('experiences/wechat_qr_payment.html',
+                              {'code_url': code_url,
+                               'out_trade_no': out_trade_no},
+                              RequestContext(request))
+
+
+def wechat_qr_payment_query(request, out_trade_no):
+    order_query = OrderQuery(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
+    pay_info = order_query.post(out_trade_no)
+    if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
+        trade_state = pay_info['trade_state']
+        if trade_state == 'SUCCESS':
+            return HttpResponse(json.dumps({'order_paid': True}))
+        else:
+            return HttpResponse(json.dumps({'order_paid': False}))
+
+    else:
+        return HttpResponse(json.dumps({'order_paid': False}))
+    # return render_to_response('experiences/wechat_qr_payment.html',
+    #                           {'code_url': code_url,
+    #                            'out_trade_no': out_trade_no},
+    #                           RequestContext(request))
+    pass
 
 
 @csrf_exempt
