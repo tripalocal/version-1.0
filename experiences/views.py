@@ -1397,7 +1397,7 @@ def create_experience(request, id=None):
                 user = User.objects.get(email=form.data['host'])
             except User.DoesNotExist:
                 form.add_error("host","host email does not exist")
-            return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
+                return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
 
             if not id:
                 #create a new experience
@@ -1411,16 +1411,16 @@ def create_experience(request, id=None):
                 lan2 = None
 
             experience = updateExperience(experience=experience,
-                                        id=form.data['id'],
+                                        id=int(form.data['id']),
                                         start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2015-01-01 00:00", "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),#form.data['start_datetime']
                                         end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2025-01-01 00:00", "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),#form.data['end_datetime']
                                         repeat_cycle = "Hourly",
                                         repeat_frequency = 1,
-                                        guest_number_min = form.data['guest_number_min'],
-                                        guest_number_max = form.data['guest_number_max'],
-                                        price = form.data['price'],
+                                        guest_number_min = int(form.data['guest_number_min']),
+                                        guest_number_max = int(form.data['guest_number_max']),
+                                        price = float(form.data['price']),
                                         currency = form.data['currency'].lower(),
-                                        duration = form.data['duration'],
+                                        duration = float(form.data['duration']),
                                         city = form.data['suburb'],
                                         status = form.data['status'],
                                         language = form.data['language'],
@@ -1587,7 +1587,7 @@ def create_experience(request, id=None):
                                               experience = experience, language=settings.LANGUAGES[0][0])
                     transport.save()
 
-            return HttpResponseRedirect(GEO_POSTFIX + 'admin/experiences/experience/'+experience.id)
+            return HttpResponseRedirect(GEO_POSTFIX + 'admin/experiences/experience/'+str(experience.id))
 
     return render_to_response('experiences/create_experience.html', {'form': form, 'display_error':display_error}, context)
 
@@ -2397,11 +2397,18 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             city = cityList[i][0]
             break
 
+    #for issue 208
+    city_search = [city]
+    for state, cities in Location_relation.items():
+        if city in cities:
+            city_search = [state, city]
+            break
+
     if request.is_ajax():
         if type == 'product':
-            experienceList = NewProduct.objects.filter(city__iexact=city, status__iexact="listed")
+            experienceList = NewProduct.objects.filter(city__in=city_search, status__iexact="listed")
         else:
-            experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(
+            experienceList = Experience.objects.filter(city__in=city_search, status__iexact="listed").exclude(
                 type__iexact="itinerary")
 
         # Add all experiences that belong to the specified city to a new list
@@ -2665,7 +2672,7 @@ def get_experience_score(criteria_dict, experience_tags):
         score += criteria_dict.get(tag, 0)
     return score
 
-def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1):
+def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1, age_limit=1):
     '''
     @sort, 1:most popular, 2:outdoor, 3:urban
     '''
@@ -2682,11 +2689,19 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
     day_counter = 0
 
     if sort == 2:
-        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/outdoor.yaml').replace('\\', '/'))
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/outdoor.yaml').replace('\\', '/'))
     elif sort == 3:
-        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/urban.yaml').replace('\\', '/'))
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/urban.yaml').replace('\\', '/'))
     else:
-        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/popularity.yaml').replace('\\', '/'))
+        config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/popularity.yaml').replace('\\', '/'))
+
+    if age_limit == 2:
+        config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_elderly.yaml').replace('\\', '/')))
+    elif age_limit == 3:
+        config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_children.yaml').replace('\\', '/')))
+    elif age_limit == 4:
+        config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_elderly.yaml').replace('\\', '/')))
+        config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_children.yaml').replace('\\', '/')))
 
     for experience in available_options:
         experience['popularity'] = get_experience_score(config, experience['tags'])*0.9 + experience['popularity']*0.1
@@ -2753,6 +2768,14 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
                 if not insert:
                     day_dict['experiences'].append(exp_dict)
 
+        #to avoid showing the same top N items everyday, swap items [0, N-1] with [day_counter*N, (day_counter+1)*N-1]
+        N=3
+        for i in range(day_counter*N, (day_counter+1)*N):
+            day_dict['experiences'].insert(i%N, day_dict['experiences'][i])
+            day_dict['experiences'].pop(i+1)
+            day_dict['experiences'].insert(i+1, day_dict['experiences'][i%N+1])
+            day_dict['experiences'].pop(i%N+1)
+
         itinerary.append(day_dict)
         dt += timedelta(days=1)
         day_counter += (1 if len(city) > 1 else 0)
@@ -2781,13 +2804,14 @@ def custom_itinerary(request):
                 language = form.cleaned_data['language']
                 tags = form.cleaned_data['tags']
                 sort = int(form.cleaned_data['sort'])
+                age_limit = int(form.cleaned_data['age_limit'])
 
                 if isinstance(tags, list):
                     tags = ','.join(tags)
                 elif not isinstance(tags,str):
                     raise TypeError("Wrong format: keywords. String or list expected.")
 
-                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort)
+                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort, age_limit)
 
                 return render_to_response('experiences/custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
             else:

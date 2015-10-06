@@ -91,6 +91,12 @@
                     </div>
                     {{form.sort}}
                 </div>
+                <div id="age_limit_div" style="float:left;width:150px;">
+                    <div class="">
+                        <p class="">{% trans "Age limit" %}</p>
+                    </div>
+                    {{form.age_limit}}
+                </div>
                 <div id="more-filters-button">
                     <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters">{% trans "More Filters" %}</button>
                     <input class="btn-block btn btn-default" id="itinerary-search" type="submit" value="{% trans "Search" %}" name="Search">
