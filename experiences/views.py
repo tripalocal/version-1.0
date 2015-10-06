@@ -1091,20 +1091,20 @@ def experience_booking_confirmation(request):
 
                 if total_price > 0.0:
                     #not free
+                    # todo: remove stub money amout
                     pay_info = unified_pay.post(experience.get_title(settings.LANGUAGES[0][0]), out_trade_no,
-                                                str(int(total_price)), "127.0.0.1", notify_url)
+                                                str(1), "127.0.0.1", notify_url)
                     if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
                         code_url = pay_info['code_url']
-                        # success_url = 'http://' + settings.ALLOWED_HOSTS[0] \
-                        #               + '/experience_booking_successful/?experience_id=' + str(experience.id) \
-                        #               + '&guest_number=' + form.data['guest_number'] \
-                        #               + '&booking_datetime=' + form.data['date'].strip() + form.data['time'].strip() \
-                        #               + '&price_paid=' + str(total_price) + '&is_instant_booking=' \
-                        #               + str(instant_booking(experience, bk_date, bk_time))
-                        # return render_to_response('experiences/wechat_qr_payment.html', {'code_url': code_url}, context)
+                        success_url = 'http://' + settings.ALLOWED_HOSTS[0] \
+                                      + '/experience_booking_successful/?experience_id=' + str(experience.id) \
+                                      + '&guest_number=' + form.data['guest_number'] \
+                                      + '&booking_datetime=' + form.data['date'].strip() + form.data['time'].strip() \
+                                      + '&price_paid=' + str(total_price) + '&is_instant_booking=' \
+                                      + str(instant_booking(experience, bk_date, bk_time))
 
                         return redirect(url_with_querystring(reverse('wechat_qr_payment'), code_url=code_url,
-                                                             out_trade_no=out_trade_no))
+                                                             out_trade_no=out_trade_no, success_url=success_url))
                     else:
                         return HttpResponse('<html><body>WeChat Payment Error.</body></html>')
                 else:
@@ -3163,9 +3163,11 @@ def unionpay_refund_callback(request):
 def wechat_qr_payment(request):
     code_url = request.GET.get('code_url')
     out_trade_no = request.GET.get('out_trade_no')
+    success_url = request.GET.get('success_url')
     return render_to_response('experiences/wechat_qr_payment.html',
                               {'code_url': code_url,
-                               'out_trade_no': out_trade_no},
+                               'out_trade_no': out_trade_no,
+                               'success_url': success_url},
                               RequestContext(request))
 
 

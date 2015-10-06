@@ -38,9 +38,11 @@
 
         // query order status every 10 seconds
         setInterval(function () {
-            $.get('/wechat_qr_payment_query/{{ out_trade_no }}/', function(data) {
+            $.get('/wechat_qr_payment_query/{{ out_trade_no }}/', function (data) {
                 if (data['order_paid'] == true) {
-                    alert('Should redirect to payment successful page.')
+                    {% autoescape off %}
+                        window.location.href = '{{ success_url }}';
+                    {% endautoescape %}
                 } else {
                     console.log(data['order_paid'])
                 }
