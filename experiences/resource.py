@@ -16,10 +16,10 @@ from experiences.forms import *
 from django.db import connections
 from django.template import loader, RequestContext, Context
 from django.template.loader import get_template
-from app.forms import BookingRequestXLSForm, ExperienceTagsXLSForm
+from app.forms import UploadXLSForm, ExperienceTagsXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator
+from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator, update_pageview_statistics
 from app.views import getreservation
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
@@ -280,7 +280,7 @@ def saveBookingRequestsFromXLS(request):
 
     context = RequestContext(request)
     if request.method == 'POST':
-        form = BookingRequestXLSForm(request.POST, request.FILES)
+        form = UploadXLSForm(request.POST, request.FILES)
         if form.is_valid():
             try:
                 file = request.FILES['file']
@@ -337,7 +337,134 @@ def saveBookingRequestsFromXLS(request):
                 if booking_request:
                     saveBookingRequest(booking_request)
     else:
-        form = BookingRequestXLSForm()
+        form = UploadXLSForm()
+
+    return render_to_response('app/booking_request_xls.html', {'form': form}, context)
+
+def updateNewProduct(experience):
+    id = experience['Tripalocal listing ID']
+    title = experience['Title']
+    background = experience['Background info']
+    description = experience['Description']
+    service = experience['Service']
+    highlights = experience['Highlights']
+    schedule = experience['Schedule']
+    whatsincluded = experience['What\'s included']
+    language = experience['Language']
+    disclaimer = experience['Disclaimer']
+    guest_number_min = int(float(experience['Guest number min']))
+    refund_policy = experience['Refund policy']
+    ticket_use_instruction = experience['Ticket use instruction']
+    notice = experience['Notice']
+    pick_up = experience['Pick up detail']
+    insurance = experience['Insurance']
+
+    if id and len(id):
+        #update an existing experience
+        id = int(id)
+        exp = AbstractExperience.objects.get(id = id)
+    else:
+        #create a new product
+        exp = NewProduct()
+
+    exp.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+    exp.end_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
+    exp.provider = Provider.objects.get(id=1)
+    exp.language = language.lower() + ";"
+    exp.guest_number_min = guest_number_min
+    exp.save()
+
+    exp_i18n = NewProductI18n()
+
+    if hasattr(exp, 'newproducti18n_set') and len(exp.newproducti18n_set.all()) > 0:
+        exp_i18n_prev = exp.newproducti18n_set.filter(language = settings.LANGUAGES[0][0])
+        if len(exp_i18n_prev)>0:
+            exp_i18n = exp_i18n_prev[0]
+    
+    exp_i18n.title = title
+    exp_i18n.background = background
+    exp_i18n.description = description
+    exp_i18n.service = service
+    exp_i18n.highlights = highlights
+    exp_i18n.schedule = schedule
+    exp_i18n.whatsincluded = whatsincluded
+    exp_i18n.disclaimer = disclaimer
+    exp_i18n.title = title
+    exp_i18n.refund_policy = refund_policy
+    exp_i18n.ticket_use_instruction = ticket_use_instruction
+    exp_i18n.notice = notice
+    exp_i18n.pick_up = pick_up
+    exp_i18n.insurance = insurance
+    exp_i18n.language = settings.LANGUAGES[0][0]
+
+    exp_i18n.product_id = exp.id
+    exp_i18n.save()
+
+def updateNewProductFromXLS(request):
+    if not (request.user.is_authenticated() and request.user.is_superuser):
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "update_newproduct_xls")
+
+    context = RequestContext(request)
+    if request.method == 'POST':
+        form = UploadXLSForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                file = request.FILES['file']
+                name, extension = os.path.splitext(file.name)
+                extension = extension.lower();
+                if extension in ('.xls', '.xlsx'):
+                    destination = open(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name), 'wb+')
+                    for chunk in file.chunks():             
+                        destination.write(chunk)
+                    destination.close()
+
+                workbook = xlrd.open_workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), file.name))
+            except OSError:
+                #TODO
+                raise
+
+            worksheet = workbook.sheet_by_name('Sheet 1')
+
+            num_rows = worksheet.nrows - 1
+            num_cells = worksheet.ncols - 1
+            curr_row = 0
+            col_names= []
+            legal_names= ['Tripalocal listing ID', 'Title', 'Background info', 'Description',
+                          'Service', 'Highlights', 'Schedule', 'What\'s included', 'Language',
+                          'Disclaimer', 'Guest number min', 'Refund policy', 'Ticket use instruction',
+                          'Notice', 'Pick up detail', 'Insurance']
+
+            curr_cell = -1
+            while curr_cell < num_cells:
+                curr_cell += 1
+                # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                cell_type = worksheet.cell_type(curr_row, curr_cell)
+                cell_value = worksheet.cell_value(curr_row, curr_cell)
+                if cell_type == 1 and cell_value in legal_names:
+                    col_names.append(cell_value)
+                else:
+                    raise Exception("Type error: column name, " + str(curr_cell))
+
+            while curr_row < num_rows:
+                curr_row += 1
+                row = worksheet.row(curr_row)
+
+                curr_cell = -1
+                experience={}
+                while curr_cell < num_cells:
+                    curr_cell += 1
+                    # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                    cell_type = worksheet.cell_type(curr_row, curr_cell)
+
+                    if cell_type <= 2:
+                        experience[col_names[curr_cell]] = str(worksheet.cell_value(curr_row, curr_cell))
+                    else:
+                        raise Exception("Type error: row " + str(curr_row) + ", col " + str(curr_cell))
+
+                if experience:
+                    updateNewProduct(experience)
+    else:
+        form = UploadXLSForm()
 
     return render_to_response('app/booking_request_xls.html', {'form': form}, context)
 
@@ -790,20 +917,21 @@ def service_experience(request, format=None):
     try:
         data = request.data
         exp_id = data['experience_id']
-        experience = Experience.objects.get(id=exp_id)
+        experience = AbstractExperience.objects.get(id=exp_id)
         available_options = []
         available_date = ()
 
         available_date = getAvailableOptions(experience, available_options, available_date)
 
-        WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
-        included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
-        included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
-        included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
+        if type(experience) == Experience:
+            WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
+            included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
+            included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
+            included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
 
-        host = get_host(experience)
-        host_image = host.registereduser.image_url
-        host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
+            host = get_host(experience)
+            host_image = host.registereduser.image_url
+            host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
 
         rate = 0.0
         counter = 0
@@ -811,9 +939,9 @@ def service_experience(request, format=None):
         for review in experience.review_set.all():
             reviewer = User.objects.get(id=review.user_id)
             d={'reviewer_firstname':reviewer.first_name,
-                  'reviewer_lastname':reviewer.last_name,
-                  'reviewer_image':reviewer.registereduser.image_url,
-                  'review_comment':review.comment,}
+                'reviewer_lastname':reviewer.last_name,
+                'reviewer_image':reviewer.registereduser.image_url,
+                'review_comment':review.comment,}
             experience_reviews.append(d)
             rate += review.rate
             counter += 1
@@ -831,42 +959,71 @@ def service_experience(request, format=None):
         for photo in photos:
             experience_images.append(photo.directory+photo.name)
 
-        return Response({'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
-                         'experience_language':experience.language,
-                         'experience_duration':experience.duration,
-                         'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
-                         'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
-                         'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
-                         'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
-                         'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
-                         'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
-                         'experience_currency': str(dict(Currency)[experience.currency.upper()]),
-                         'experience_dollarsign': DollarSign[experience.currency.upper()],
-                         'experience_dynamic_price':dynamic_price,
-                         'experience_guest_number_min':experience.guest_number_min,
-                         'experience_guest_number_max':experience.guest_number_max,
-                         'experience_images':experience_images,
+        result = {'experience_language':experience.language,
+                    'experience_duration':experience.duration,
+                    'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
+                    'experience_currency': str(dict(Currency)[experience.currency.upper()]),
+                    'experience_dollarsign': DollarSign[experience.currency.upper()],
+                    'experience_dynamic_price':dynamic_price,
+                    'experience_guest_number_min':experience.guest_number_min,
+                    'experience_guest_number_max':experience.guest_number_max,
+                    'experience_images':experience_images,
 
-                         'available_options':available_options,
-                         'available_date':available_date,
+                    'available_options':available_options,
+                    'available_date':available_date,
 
-                         'included_food':included_food.included,
-                         'included_food_detail':included_food.details,
-                         'included_ticket':included_ticket.included,
-                         'included_ticket_detail':included_ticket.details,
-                         'included_transport':included_transport.included,
-                         'included_transport_detail':included_transport.details,
+                    'experience_rate':math.ceil(rate),
+                    'experience_reviews':experience_reviews,
+                }
 
-                         'host_firstname': host.first_name,
-                         'host_lastname': host.last_name,
-                         'host_image':host_image,
-                         'host_bio':host_bio,
-                         'host_id':str(host.id),
+        if type(experience) == Experience:
+            result_experience = {'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
+                    'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
+                    'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
+                    'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
+                    'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
+                    'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
+                    
+                    'included_food':included_food.included,
+                    'included_food_detail':included_food.details,
+                    'included_ticket':included_ticket.included,
+                    'included_ticket_detail':included_ticket.details,
+                    'included_transport':included_transport.included,
+                    'included_transport_detail':included_transport.details,
 
-                         'experience_rate':math.ceil(rate),
-                         'experience_reviews':experience_reviews,
+                    'host_firstname': host.first_name,
+                    'host_lastname': host.last_name,
+                    'host_image':host_image,
+                    'host_bio':host_bio,
+                    'host_id':str(host.id),}
+            result.update(result_experience)
+        else:
+            result_newproduct = {'title':'',
+                                 'description':'',
+                                 'highlights':'',
+                                 'notice':'',
+                                 'tips':'',
+                                 'whatsincluded':'',
+                                 'pickup_detail':''
+                                 }
+            if experience.newproducti18n_set is not None and len(experience.newproducti18n_set.all()) > 0:
+                t = experience.newproducti18n_set.filter(language=settings.LANGUAGES[0][0])
+                if len(t)>0:
+                    t=t[0]
+                else:
+                    t = experience.newproducti18n_set.all()[0]
 
-                         }, status=status.HTTP_200_OK)
+                result_newproduct['title'] = t.title
+                result_newproduct['description'] = t.description
+                result_newproduct['highlights'] = t.highlights
+                result_newproduct['notice'] = t.notice
+                result_newproduct['tips'] = t.tips
+                result_newproduct['whatsincluded'] = t.whatsincluded
+                result_newproduct['pickup_detail'] = t.pickup_detail
+
+            result.update(result_newproduct)
+
+        return Response(result, status=status.HTTP_200_OK)
 
     except Exception as err:
         #TODO
@@ -881,16 +1038,17 @@ def service_experiencedetail(request, format=None):
             data = ast.literal_eval(data)
 
         exp_id = data['experience_id']
-        experience = Experience.objects.get(id=exp_id)
+        experience = AbstractExperience.objects.get(id=exp_id)
         
-        WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
-        included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
-        included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
-        included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
+        if type(experience) == Experience:
+            WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
+            included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
+            included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
+            included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
 
-        host = get_host(experience)
-        host_image = host.registereduser.image_url
-        host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
+            host = get_host(experience)
+            host_image = host.registereduser.image_url
+            host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
 
         rate = 0.0
         counter = 0
@@ -918,39 +1076,68 @@ def service_experiencedetail(request, format=None):
         for photo in photos:
             experience_images.append(photo.directory+photo.name)
 
-        return Response({'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
-                         'experience_language':experience.language,
-                         'experience_duration':experience.duration,
-                         'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
-                         'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
-                         'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
-                         'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
-                         'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
-                         'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
-                         'experience_currency': str(dict(Currency)[experience.currency.upper()]),
-                         'experience_dollarsign': DollarSign[experience.currency.upper()],
-                         'experience_dynamic_price':dynamic_price,
-                         'experience_guest_number_min':experience.guest_number_min,
-                         'experience_guest_number_max':experience.guest_number_max,
-                         'experience_images':experience_images,
+        result = {'experience_language':experience.language,
+                    'experience_duration':experience.duration,
+                    'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
+                    'experience_currency': str(dict(Currency)[experience.currency.upper()]),
+                    'experience_dollarsign': DollarSign[experience.currency.upper()],
+                    'experience_dynamic_price':dynamic_price,
+                    'experience_guest_number_min':experience.guest_number_min,
+                    'experience_guest_number_max':experience.guest_number_max,
+                    'experience_images':experience_images,
 
-                         'included_food':included_food.included,
-                         'included_food_detail':included_food.details,
-                         'included_ticket':included_ticket.included,
-                         'included_ticket_detail':included_ticket.details,
-                         'included_transport':included_transport.included,
-                         'included_transport_detail':included_transport.details,
+                    'experience_rate':math.ceil(rate),
+                    'experience_reviews':experience_reviews,
+                }
 
-                         'host_firstname': host.first_name,
-                         'host_lastname': host.last_name,
-                         'host_image':host_image,
-                         'host_bio':host_bio,
-                         'host_id':str(host.id),
+        if type(experience) == Experience:
+            result_experience = {'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
+                    'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
+                    'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
+                    'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
+                    'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
+                    'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
+                    
+                    'included_food':included_food.included,
+                    'included_food_detail':included_food.details,
+                    'included_ticket':included_ticket.included,
+                    'included_ticket_detail':included_ticket.details,
+                    'included_transport':included_transport.included,
+                    'included_transport_detail':included_transport.details,
 
-                         'experience_rate':math.ceil(rate),
-                         'experience_reviews':experience_reviews,
+                    'host_firstname': host.first_name,
+                    'host_lastname': host.last_name,
+                    'host_image':host_image,
+                    'host_bio':host_bio,
+                    'host_id':str(host.id),}
+            result.update(result_experience)
+        else:
+            result_newproduct = {'title':'',
+                                 'description':'',
+                                 'highlights':'',
+                                 'notice':'',
+                                 'tips':'',
+                                 'whatsincluded':'',
+                                 'pickup_detail':''
+                                 }
+            if experience.newproducti18n_set is not None and len(experience.newproducti18n_set.all()) > 0:
+                t = experience.newproducti18n_set.filter(language=settings.LANGUAGES[0][0])
+                if len(t)>0:
+                    t=t[0]
+                else:
+                    t = experience.newproducti18n_set.all()[0]
 
-                         }, status=status.HTTP_200_OK)
+                result_newproduct['title'] = t.title
+                result_newproduct['description'] = t.description
+                result_newproduct['highlights'] = t.highlights
+                result_newproduct['notice'] = t.notice
+                result_newproduct['tips'] = t.tips
+                result_newproduct['whatsincluded'] = t.whatsincluded
+                result_newproduct['pickup_detail'] = t.pickup_detail
+
+            result.update(result_newproduct)
+
+        return Response(result, status=status.HTTP_200_OK)
 
     except Exception as err:
         #TODO
@@ -1039,8 +1226,8 @@ def service_message(request, format=None):
             msg_ids = []
 
             for msg in messages:
-                message = Message(sender_id=request.user.id, receiver_id=msg['receiver_id'], content=msg['msg_content'],
-                                    status="received", datetime_sent=datetime.strptime(msg['msg_date'], '%Y/%m/%d/%H/%M/%S/%f'))
+                message = Message(sender_id=request.user.id, receiver_id=msg['receiver_id'], content=msg['msg_content'], status="received",
+                                  datetime_sent=pytz.timezone("UTC").localize(datetime.strptime(msg['msg_date'], '%Y/%m/%d/%H/%M/%S/%f')))
                 message.save()
                 msg_ids.append({"local_id":msg['local_id'],"global_id":message.id})
 
@@ -1162,3 +1349,15 @@ def service_email(request, format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
     return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
+def service_pageview(request):
+    try:
+        data = request.POST
+        update_pageview_statistics(data['user_id'], data['experience_id'], data['length'])
+        response={'success':True}
+    except Exception as err:
+        response={'success':False}
+    return HttpResponse(json.dumps(response),content_type="application/json")
+        

@@ -1,172 +1,18 @@
-{% block head %}
-    {% load i18n %}
-    {% load account %}
-    {% load url from future %}
-    {% load mathfilters %}
+{% extends "app/email_notification.html" %}
 
-    {% load staticfiles %}
-    <link href="{% static 'app/content/email.css' %}" rel="stylesheet">
-    {% if form %}
-        {{ form.media }}
-    {% endif %}
-    <title></title>
+{% block heading %}{% trans "Booking reminder" %}{% endblock %}
+{% block subheading %}
+{% blocktrans with user_first_name=user.first_name %}Tomorrow you will be meeting {{user_first_name}} at {% endblocktrans %}<br>
+                                <strong>{{experience.meetup_spot}}</strong><br>
+                                {% trans "on " %}<strong>{% if LANGUAGE != "zh-CN" %}{{ booking.datetime|date:'d/m/Y' }}{% else %}{{ booking.datetime|date:'Y-m-d' }}{%endif%} </strong>{% trans " at " %}<strong> {{ booking.datetime|date:'H:i' }}</strong><br>
+                                {% trans "to take them on your experience" %}<br>
+                                <a href="{{experience_url}}" target="_blank">{{experience.title}}</a>
 {% endblock %}
-
 {% block content %}
-        
-    <center>
-        <table align="center" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable">
-            <tr>
-                <td align="center" valign="top" id="bodyCell">
-                    <!-- BEGIN TEMPLATE // -->
-                    <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateContainer">
-                        <tr>
-                            <td align="center" valign="top">
-                                <!-- BEGIN PREHEADER // -->
-                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templatePreheader">
-                                    <tr>
-                                        <td valign="top" class="preheaderContainer" style="padding-top:9px;">
-                                            <tbody class="mcnTextBlockOuter">
-                                                <tr>
-                                                    <td valign="top" class="mcnTextBlockInner">
-                                                        <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-                                                                        {% if not webpage %}
-                                                                        <div style="text-align: center;"><span style="color: #000000;font-family: arial;font-size: 12px;line-height: normal;">:: {% trans "Reply above this line to send a message to " %}{{user.first_name}} ::</span></div>
-                                                                        {%endif%}
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>  
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <!-- // END PREHEADER -->
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="center" valign="top">
-                                <!-- BEGIN HEADER // -->
-                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateHeader">
-                                    <tr>
-                                        <td valign="top" class="headerContainer">
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnImageBlock">
-							                    <tbody class="mcnImageBlockOuter">
-								                    <tr>
-									                    <td valign="top" style="padding:9px" class="mcnImageBlockInner">
-										                    <table align="left" width="100%" border="0" cellpadding="0" cellspacing="0" class="mcnImageContentContainer">
-											                    <tbody>
-												                    <tr>
-													                    <td class="mcnImageContent" valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0;">
-														                    <img align="left" alt="" src="https://gallery.mailchimp.com/12d0686497f605217203bf2be/images/73468143-d086-470b-9c08-799cb653adc0.jpg" width="564" style="max-width:600px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage">
-													                    </td>
-												                    </tr>
-											                    </tbody>
-										                    </table>
-									                    </td>
-								                    </tr>
-							                    </tbody>
-                                            </table>
-						                </td>
-                                    </tr>
-                                </table>
-                                <!-- // END HEADER -->
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="center" valign="top">
-                                <!-- BEGIN BODY // -->
-                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateBody">
-                                    <tr>
-                                        <td valign="top" class="bodyContainer">
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock">
-							                    <tbody class="mcnTextBlockOuter">
-								                    <tr>
-									                    <td valign="top" class="mcnTextBlockInner">
-										                    <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
-											                    <tbody>
-												                    <tr>
-													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                        <h1 style="text-align: center;"><font size="5">{% trans "Booking reminder" %}</font></h1>
-														                    <p style="text-align: center;">{% blocktrans with user_first_name=user.first_name %}Tomorrow you will be meeting {{user_first_name}} at {% endblocktrans %}<br>
-                                                                                <strong>{{experience.meetup_spot}}</strong><br>
-                                                                                {% trans "on " %}<strong>{% if LANGUAGE != "zh-CN" %}{{ booking.datetime|date:'d/m/Y' }}{% else %}{{ booking.datetime|date:'Y-m-d' }}{%endif%} </strong>{% trans " at " %}<strong> {{ booking.datetime|date:'H:i' }}</strong><br>
-                                                                                {% trans "to take them on your experience" %}<br>
-                                                                                <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
-                                                                                <br>
-                                                                                {% for h in experience.hosts.all %}{% if forloop.first %}
-                                                                                {% blocktrans with user_first_name=user.first_name user_phone_number=user.registereduser.phone_number host_phone_number=h.registereduser.phone_number%}{{user_first_name}}'s local mobile&nbsp;number is <strong>{{user_phone_number}}</strong><br>
-                                                                                Please contact {{user_first_name}}&nbsp;on the day for any last minute changes.<br>
-                                                                                We have given {{user_first_name}} your number <strong> {{ host_phone_number }}</strong><br>
-                                                                                please send {{user_first_name}} a message if this number is incorrect.{% endblocktrans %}
-                                                                                {% endif %}{% endfor %}
-                                                                            </p>
-													                    </td>
-												                    </tr>
-											                    </tbody>
-										                    </table>
-									                    </td>
-								                    </tr>
-							                    </tbody>
-                                            </table>
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock">
-                                                <tbody class="mcnTextBlockOuter">
-                                                    <tr>
-                                                        <td valign="top" class="mcnTextBlockInner">              
-                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
-                                                                <tbody>
-						                                            <tr>
-							                                            <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-								                                        </td>
-						                                            </tr>
-					                                            </tbody>
-				                                            </table>              
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-						                </td>
-                                    </tr>
-                                </table>
-                                <!-- // END BODY -->
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="center" valign="top">
-                                <!-- BEGIN FOOTER // -->
-                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateFooter">
-                                    <tr>
-                                        <td valign="top" class="footerContainer" style="padding-bottom:9px;">
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock">
-							                    <tbody class="mcnTextBlockOuter">
-								                    <tr>
-									                    <td valign="top" class="mcnTextBlockInner">
-										                    <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
-											                    <tbody><tr>
-												                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                    <div style="text-align: right;"><a class="utilityLink" href=""></a></div>
-												                    </td>
-											                    </tr>
-										                    </tbody></table>
-									                    </td>
-								                    </tr>
-							                    </tbody>
-                                            </table>
-						                </td>
-                                    </tr>
-                                </table>
-                                <!-- // END FOOTER -->
-                            </td>
-                        </tr>
-                    </table>
-                    <!-- // END TEMPLATE -->
-                </td>
-            </tr>
-        </table>
-    </center>
+  {% for h in experience.hosts.all %}{% if forloop.first %}
+  {% blocktrans with user_first_name=user.first_name user_phone_number=user.registereduser.phone_number host_phone_number=h.registereduser.phone_number%}{{user_first_name}}'s local mobile&nbsp;number is <strong>{{user_phone_number}}</strong><br>
+  Please contact {{user_first_name}}&nbsp;on the day for any last minute changes.<br>
+  We have given {{user_first_name}} your number <strong> {{ host_phone_number }}</strong><br>
+  please send {{user_first_name}} a message if this number is incorrect.{% endblocktrans %}
+  {% endif %}{% endfor %}
 {% endblock %}

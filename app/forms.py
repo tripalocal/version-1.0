@@ -66,7 +66,7 @@ class UserProfileForm(forms.Form):
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['phone_number'].widget.attrs['class'] = 'form-control'
 
-class BookingRequestXLSForm(forms.Form):
+class UploadXLSForm(forms.Form):
     file = forms.FileField()
 
 class ExperienceTagsXLSForm(forms.Form):

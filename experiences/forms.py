@@ -574,10 +574,10 @@ class BookingConfirmationForm(forms.Form):
     status = forms.CharField(initial="Requested")
     promo_code = forms.CharField(required=False)
 
-    card_number = CreditCardField(required=False, label="Card Number")
-    expiration = CCExpField(required=False, label="Expiration")
-    cvv = forms.IntegerField(required=False, label="CVV Number",
-        max_value=9999, widget=forms.TextInput(attrs={'size': '4'}))
+    #card_number = CreditCardField(required=False, label="Card Number")
+    #expiration = CCExpField(required=False, label="Expiration")
+    #cvv = forms.IntegerField(required=False, label="CVV Number",
+    #    max_value=9999, widget=forms.TextInput(attrs={'size': '4'}))
 
     first_name = forms.CharField(max_length=50)
     last_name = forms.CharField(max_length=50)
@@ -673,7 +673,7 @@ class BookingConfirmationForm(forms.Form):
                 ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,guest_number,
                              coupon_extra_information = coupon_extra_information, coupon = coupon,
                              payment_phone_number = payment_phone_number, stripe_token = stripeToken)
-            elif 'UnionPay' in self.data:
+            elif 'UnionPay' in self.data or 'WeChat' in self.data:
                 booking_extra_information=self.cleaned_data['booking_extra_information']
                 if coupon:
                     st = "paid" if valid['valid'] and valid['new_price']==0.0 else 'requested'
