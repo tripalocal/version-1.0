@@ -865,7 +865,44 @@ class ExperienceDetailView(DetailView):
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE
         context['wishlist_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_wishlist/"
+        
+        #update page view statistics
+        if self.request.user.is_staff:
+            #ignore page views by staff
+            return context
+        elif self.request.user.is_authenticated:
+            user = self.request.user
+        else:
+            #annoymous visiters are treated as user 1
+            user = User.objects.get(id=1)
+
+        update_pageview_statistics(user.id, experience.id)
+        time_arrived = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        context['time_arrived'] = time_arrived
+        context['pageview_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_pageview/"
+
         return context
+
+def update_pageview_statistics(user_id, experience_id, length = None):
+    '''
+    @length None: times_viewed++; not None: update average_length
+    '''
+    try:
+        record = UserPageViewStatistics.objects.get(user_id=user_id, experience_id = experience_id)
+    except UserPageViewStatistics.DoesNotExist:
+        record = UserPageViewStatistics(user_id = user_id, experience_id = experience_id,
+                                        times_viewed = 0, average_length = 0.0)
+    if length:
+        try:
+            length = float(length)
+            record.average_length = float((record.average_length * (record.times_viewed-1) + length) / record.times_viewed)
+        except BaseException:
+            #TODO
+            pass
+    else:
+        record.times_viewed += 1
+
+    record.save()
 
 EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 

@@ -66,6 +66,12 @@ class UserPhoto(models.Model):
     user = models.ForeignKey(User)
     type = models.CharField(max_length=50)
 
+class UserPageViewStatistics(models.Model):
+    user = models.ForeignKey(User)
+    experience = models.ForeignKey(Experience)
+    times_viewed = models.IntegerField(default=0)
+    average_length = models.FloatField(default=0.0)
+
 def get_user_bio(registereduser, language):
     if registereduser.registereduserbio_set is not None and len(registereduser.registereduserbio_set.all()) > 0:
         b = registereduser.registereduserbio_set.filter(language=language)

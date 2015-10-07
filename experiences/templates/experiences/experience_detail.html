@@ -313,6 +313,7 @@
 {% block scripts %}
 <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 <script charset="utf-8" type="text/javascript">
 
 $(function(){
@@ -678,5 +679,33 @@ $(function(){
         $("#experience-hostinterests").height(bio_height+10);
         $("#bio_show_more").css("top",bio_height+20+"px");
     })
+
+    {% if not request.user.is_staff %}
+    $(window).bind('beforeunload', function(){
+        {% if request.user.is_authenticated %}
+        user_id = {{request.user.id}};
+        {% else %}
+        user_id = 1;
+        {% endif %}
+
+        time_arrived = Date.parseExact("{{time_arrived}}", "yyyy-MM-dd HH:mm:ss");
+        time_left = new Date();
+        length = (time_left - time_arrived)/1000;
+        
+        $.ajax({
+                type: 'POST',
+                url: "http://localhost:8000/service_pageview/", //"{{pageview_webservice}}",
+                dataType: 'json',
+                data: {
+                    "csrfmiddlewaretoken": "{{ csrf_token }}",
+                    "user_id": user_id,
+                    "experience_id": {{experience.id}},
+                    "length": length
+                },
+                success: function (data) {},
+                error: function (e) {}
+        })
+    })
+    {% endif %}
 </script>
 {% endblock %}

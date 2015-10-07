@@ -19,7 +19,7 @@ from django.template.loader import get_template
 from app.forms import UploadXLSForm, ExperienceTagsXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator
+from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator, update_pageview_statistics
 from app.views import getreservation
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
@@ -1349,3 +1349,15 @@ def service_email(request, format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST, data={"error":err})
     return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
+def service_pageview(request):
+    try:
+        data = request.POST
+        update_pageview_statistics(data['user_id'], data['experience_id'], data['length'])
+        response={'success':True}
+    except Exception as err:
+        response={'success':False}
+    return HttpResponse(json.dumps(response),content_type="application/json")
+        
