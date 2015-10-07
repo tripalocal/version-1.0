@@ -30,7 +30,6 @@ Location = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Br
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
-
 Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
                     (_('Brisbane'), 'Brisbane'), (_('Cairns'), 'Cairns'),
                     (_('Gold Coast'), 'Goldcoast'), (_('Hobart'), 'Hobart'),
@@ -39,13 +38,20 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
                     (_('Christchurch'), 'Christchurch'), (_('Queenstown'), 'Queenstown'),
                     (_('Auckland'), 'Auckland'), (_('Wellington'), 'Wellington'),)
 
-Locations = [('Australia', [('Melbourne', _('Melbourne'), _('Victoria')), ('Sydney', _('Sydney'), _('New South Wales')),
+#                    (_('Greater South Australia'), 'GRSA'),(_('Greater Victoria'), 'GRVIC'),
+#                    (_('Greater New South Wales'), 'GRNSW'),(_('Greater Queensland'), 'GRQLD'),
+#                    (_('Greater Northern Territory'), 'GRNT'),
+
+Location_relation = {'GRQLD':['Brisbane','Cairns','Goldcoast'], 'GRNT':['Darwin','Alicesprings'],
+                     'GRVIC':['Melbourne'], 'GRSA':['Adelaide'], 'GRNSW':['Sydney']} #for issue 208
+
+Locations = [(_('Australia'), [('Melbourne', _('Melbourne'), _('Victoria')), ('Sydney', _('Sydney'), _('New South Wales')),
                            ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
                            ('Goldcoast', _('Gold Coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
                            ('Adelaide', _('Adelaide'), _('South Australia')),
                            ('Darwin', _('Darwin'), _('Northern Territory')),
                            ('Alicesprings', _('Alice Springs'), _('Northern Territory'))]),
-             ('New Zealand', [('Christchurch', _('Christchurch'), _('Canterbury')),
+             (_('New Zealand'), [('Christchurch', _('Christchurch'), _('Canterbury')),
                              ('Queenstown', _('Queenstown'), _('Otago')),
                              ('Auckland', _('Auckland'), _('Auckland')),
                              ('Wellington', _('Wellington'), _('Wellington'))])]
@@ -105,7 +111,7 @@ if settings.LANGUAGE_CODE.lower()=="zh-cn":
 ('Palestinian Territories', 'Palestinian Territories'),('Panama', 'Panama'),('Papua New Guinea', 'Papua New Guinea'),('Paraguay', 'Paraguay'),('Peru', 'Peru'),('Philippines', 'Philippines'),('Poland', 'Poland'),('Portugal', 'Portugal'),('Qatar', 'Qatar'),('Romania', 'Romania'),('Russia', 'Russia'),('Rwanda', 'Rwanda'),('Saint Kitts and Nevis', 'Saint Kitts and Nevis'),('Saint Lucia', 'Saint Lucia'),('Saint Vincent and the Grenadines', 'Saint Vincent and the Grenadines'),('Samoa ', 'Samoa '),('San Marino', 'San Marino'),('Sao Tome and Principe', 'Sao Tome and Principe'),('Saudi Arabia', 'Saudi Arabia'),('Senegal', 'Senegal'),('Serbia', 'Serbia'),('Seychelles', 'Seychelles'),('Sierra Leone', 'Sierra Leone'),('Singapore', 'Singapore'),
 ('Sint Maarten', 'Sint Maarten'),('Slovakia', 'Slovakia'),('Slovenia', 'Slovenia'),('Solomon Islands', 'Solomon Islands'),('Somalia', 'Somalia'),('South Africa', 'South Africa'),('South Korea', 'South Korea'),('South Sudan', 'South Sudan'),('Spain ', 'Spain '),('Sri Lanka', 'Sri Lanka'),('Sudan', 'Sudan'),('Suriname', 'Suriname'),('Swaziland ', 'Swaziland '),('Sweden', 'Sweden'),('Switzerland', 'Switzerland'),('Syria', 'Syria'),('Taiwan, China', 'Taiwan, China'),('Tajikistan', 'Tajikistan'),('Tanzania', 'Tanzania'),('Thailand ', 'Thailand '),('Timor-Leste', 'Timor-Leste'),('Togo', 'Togo'),('Tonga', 'Tonga'),('Trinidad and Tobago', 'Trinidad and Tobago'),('Tunisia', 'Tunisia'),('Turkey', 'Turkey'),('Turkmenistan', 'Turkmenistan'),
 ('Tuvalu', 'Tuvalu'),('Uganda', 'Uganda'),('Ukraine', 'Ukraine'),('United Arab Emirates', 'United Arab Emirates'),('United Kingdom', 'United Kingdom'),('Uruguay', 'Uruguay'),('Uzbekistan', 'Uzbekistan'),('Vanuatu', 'Vanuatu'),('Venezuela', 'Venezuela'),('Vietnam', 'Vietnam'),('Yemen', 'Yemen'),('Zambia', 'Zambia'),('Zimbabwe ', 'Zimbabwe '),)
-    Tags = "美食美酒, 名校游学, 历史人文, 经典建筑, 蜜月旅拍, 风光摄影, 移民考察, 亲子夏令营, 户外探险, 购物扫货, 运动休闲, 领路人自驾, 刺激享乐, 赛事庆典, 美容保健, 私人团"
+    Tags = "美食美酒, 名校游学, 历史人文, 经典建筑, 蜜月旅拍, 风光摄影, 移民考察, 户外探险, 购物扫货, 运动休闲, 刺激享乐, 赛事庆典, 美容保健"
 
 #from http://stackoverflow.com/questions/16773579/customize-radio-buttons-in-django
 class HorizRadioRenderer(forms.RadioSelect.renderer):
@@ -568,10 +574,10 @@ class BookingConfirmationForm(forms.Form):
     status = forms.CharField(initial="Requested")
     promo_code = forms.CharField(required=False)
 
-    card_number = CreditCardField(required=False, label="Card Number")
-    expiration = CCExpField(required=False, label="Expiration")
-    cvv = forms.IntegerField(required=False, label="CVV Number",
-        max_value=9999, widget=forms.TextInput(attrs={'size': '4'}))
+    #card_number = CreditCardField(required=False, label="Card Number")
+    #expiration = CCExpField(required=False, label="Expiration")
+    #cvv = forms.IntegerField(required=False, label="CVV Number",
+    #    max_value=9999, widget=forms.TextInput(attrs={'size': '4'}))
 
     first_name = forms.CharField(max_length=50)
     last_name = forms.CharField(max_length=50)
@@ -667,7 +673,7 @@ class BookingConfirmationForm(forms.Form):
                 ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,guest_number,
                              coupon_extra_information = coupon_extra_information, coupon = coupon,
                              payment_phone_number = payment_phone_number, stripe_token = stripeToken)
-            elif 'UnionPay' in self.data:
+            elif 'UnionPay' in self.data or 'WeChat' in self.data:
                 booking_extra_information=self.cleaned_data['booking_extra_information']
                 if coupon:
                     st = "paid" if valid['valid'] and valid['new_price']==0.0 else 'requested'
@@ -737,7 +743,7 @@ class CreateExperienceForm(forms.Form):
     dress_code = forms.CharField(widget=forms.Textarea)
     suburb = forms.ChoiceField(choices=Suburbs)
     meetup_spot = forms.CharField(widget=forms.Textarea)
-    dropoff_spot = forms.CharField(widget=forms.Textarea)
+    dropoff_spot = forms.CharField(widget=forms.Textarea, required = False)
     status = forms.ChoiceField(choices=Status)
     experience_photo_1 = forms.ImageField(required = False)
     experience_photo_2 = forms.ImageField(required = False)
@@ -782,6 +788,8 @@ class ExperienceAvailabilityForm(forms.Form):
     start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
 
+SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
+AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children')),(4,_('Famili with elderly&children')))
 class CustomItineraryForm(forms.Form):
     start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
     end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
@@ -791,6 +799,8 @@ class CustomItineraryForm(forms.Form):
     tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     itinerary_string = forms.CharField(widget=forms.Textarea, required=False)
+    sort = forms.ChoiceField(choices=SortBy, required=True)
+    age_limit = forms.ChoiceField(choices=AgeLimit, required=True)
 
     def __init__(self, *args, **kwargs):
         super(CustomItineraryForm, self).__init__(*args, **kwargs)
@@ -1082,10 +1092,13 @@ def get_host(experience):
         return experience.provider.user
 
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
+    if type(experience) != Experience: #issue 209
+        return
+
     host = get_host(experience)
     if not is_instant_booking:
-        # send an email to the host
         if not settings.DEVELOPMENT:
+            # send an email to the host
             mail.send(subject=_('[Tripalocal] ') + user.first_name + _(' has requested your experience'), message='',
                         sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=user.email)[0].mail + '>',
                         recipients = [Aliases.objects.filter(destination__contains=host.email)[0].mail], #fail_silently=False,
@@ -1098,6 +1111,7 @@ def send_booking_email_verification(booking, experience, user, is_instant_bookin
                                                                 'accept_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=yes',
                                                                 'reject_url': settings.DOMAIN_NAME + '/booking/' + str(booking.id) + '?accept=no',
                                                                 'LANGUAGE':settings.LANGUAGE_CODE}))
+
             # send an email to the traveler
             mail.send(subject=_('[Tripalocal] Your booking request is sent to the host'),  message='',
                         sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
@@ -1183,6 +1197,8 @@ def sms_notification(booking, experience, user, phone_number):
         exp_title = experience.get_title(settings.LANGUAGE_CODE)
     else:
         exp_title = experience.get_title(settings.LANGUAGE_CODE)
+        return #issue 209
+
     customer_phone_num = phone_number
     exp_datetime_local = booking.datetime.astimezone(tzlocal())
     exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))

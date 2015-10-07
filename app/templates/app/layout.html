@@ -45,66 +45,24 @@
 
 <body>
     <!-- Popup Modal -->
-    <div class="modal fade" id="help-popup" tabindex="-1" role="dialog" aria-labelledby="help-popup">
+    <div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="popup">
         <div class="modal-dialog" role="document">
-            <div class="modal-content help" style="background-image:url('{% static 'app/img/nightlight_web.jpg' %}')">
-                <div id="popup-page-1">
-                    <h1>{% trans "Do you need help planning your trip to Australia and New Zealand?" %}</h1>
-
-                    <div class="modal-body">
-                        <div class="container-fluid">
-                            <div class="row">
-                                <div class="col-xs-6" style="float:left;">
-                                  <button class="btn btn-secondary" id="help-no">{% trans "NO" %}</button>
-                                </div>
-                                <div class="col-xs-6" style="float:left;">
-                                  <button class="btn btn-primary" id="help-yes">{% trans "YES" %}</button>
-                                </div>
-                            </div>
-                            <div class="row">
-                              <br>
-                              <p>
-                              {% trans "or check out some of our " %}
-                              {%if LANGUAGE == "zh-CN"%}
-                              <a id="multidaytrip-link" href="https://www.tripalocal.com/cn/multidaytrip/">
-                              {%else%}
-                              <a id="multidaytrip-link" href="https://www.tripalocal.com/multidaytrip/">
-                              {%endif%}
-                              {% trans "most popular trips" %}</a></p>
-                            </div>
-                        </div>
-                    </div>
-                    <a class="close-popup">{% trans "close" %}</a>
+            <div class="modal-content popup">
+              <div class="profile-logo-frame"><div class="profile-logo" style="background-image:url({% static 'img/profileimage.jpg' %})"></div></div>
+              <a class="close-popup">{% trans 'close' %}</a>
+              <div class="popup-content">
+                <h2 id="popup-name">{% trans 'Edwin' %}</h2>
+                <h3 id="popup-subname">{% trans 'Travel Expert' %}</h3>
+                <div class="conversation-box">
+                  <h2 id="popup-conversation">"It's perfect weather to relax in nature from now until March, why not go camping?"</h2>
                 </div>
-                <div id="popup-page-2" hidden="true">
-                    <h1>{% trans "Tell us about your trip" %}</h1>
-
-                    <p>{% trans "and we will get back to you within 48 hours" %}<br>
-                    {% trans "or check out some of our " %}
-                    {%if LANGUAGE == "zh-CN"%}
-                    <a id="multidaytrip-link" href="https://www.tripalocal.com/cn/multidaytrip/">
-                    {%else%}
-                    <a id="multidaytrip-link" href="https://www.tripalocal.com/multidaytrip/">
-                    {%endif%}
-                    {% trans "most popular trips" %}</a></p>
-                    <form id="custom-trip-form" class="popup-form" action="/email_custom_trip" method="POST">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <textarea class="form-control" id="popup-form-details" rows="4"
-                                      placeholder="{% trans 'Please tell us more details' %}"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" class="form-control" id="popup-form-email" placeholder="{% trans 'Email address' %}">
-                        </div>
-                        <div id="results"></div>
-                        <button id="popup-send" class="btn btn-primary popup-form-submit" type="submit" value="send">{% trans 'Send' %}</button>
-                    </form>
-                    <a class="close-popup">{% trans "close" %}</a>
-                </div>
+                <div class="product-image" id="popup-product-image" style="background-image:url(https://tripalocal-static.s3.amazonaws.com/images/experiences/1051/experience1051_3.jpg)"></div>
+                <h3 id="popup-product-title">2 day camping at Mornington Peninsula Island</h3>
+                <a id="popup-product-link" href="{{ GEO_POSTFIX }}experience/1051/" class="btn btn-full-width">{% trans 'Check it out' %}</a>
+              </div>
             </div>
         </div>
     </div>
-
     <!-- End Modal -->
 
 
@@ -127,7 +85,7 @@
           </a>
         </div>
 
-          <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right" style="min-width: 75px;"
+          <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right"
           href="https://www.tripalocal.com{% if LANGUAGE == "zh-CN" %}{{ request.path|slice:"3:" }}{% else %}/cn{{ request.path }}{% endif %}">
           {% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}
           </a>
@@ -240,6 +198,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     {% block scripts %}{% endblock %}
+<script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 <script language="javascript" type="text/javascript">
     function create_post(email, message) {
         $.ajax({
@@ -276,9 +235,47 @@
         return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     }
 
+
     $(document).ready(function () {
       $("a[href*='" + location.pathname + "']").addClass("current");
-        var popupTimmer;
+
+      // START POPUP THINGS
+
+        var conversations = [
+          "\"{% trans 'Do you want to experience fine dining with the best view in the Southern Hemisphere? Try Skylines Stratosphere Bar & Restaurant in Queenstown, New Zealand.' %}\"",
+          "\"{% trans 'Its perfect weather to relax in nature from now until March, why not go camping?' %}\"",
+          "\"{% trans 'An unforgettable thrill awaits you! Feel the power and excitement of the iconic Harley Davidson.' %}\""
+        ];
+        var productImages = [
+          "url(https://tripalocal-static.s3.amazonaws.com/images/experiences/1061/experience1061_1.jpg)",
+          "url(https://tripalocal-static.s3.amazonaws.com/images/experiences/1051/experience1051_3.jpg)",
+          "url(https://tripalocal-static.s3.amazonaws.com/images/experiences/862/experience862_1.jpg)"
+        ];
+        var productTitles = [
+          "{% trans 'Skylines Stratosfare Restaurant & Bar' %}",
+          "{% trans '2 day camping at Mornington Peninsula Island' %}",
+          "{% trans 'Harley Davidson motorcycle' %}"
+        ];
+        var productLinks = [
+          "{{ GEO_POSTFIX }}experience/1061/",
+          "{{ GEO_POSTFIX }}experience/1051/",
+          "{{ GEO_POSTFIX }}experience/862/"
+        ];
+
+        var product = Math.floor(Math.random() * productLinks.length);
+        $("#popup-conversation").html(conversations[product]);
+        $("#popup-product-image").css("background-image", productImages[product]);
+        $("#popup-product-title").html(productTitles[product]);
+        $("#popup-product-link").attr("href", productLinks[product]);
+
+        $("#popup-product-image").click( function() {
+          window.location.href = productLinks[product];
+        });
+        $("#popup-product-title").click( function() {
+          window.location.href = productLinks[product];
+        });
+
+        var popupTimer;
 
         if ($(window).width() > 520) {
             var nClose = parseInt($.cookie("closePopup"), 10);
@@ -286,82 +283,31 @@
             if (!nClose || nClose < 3) {
                 if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
                     $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
-                  popupTimmer = setTimeout(function () {
-                      $('#help-popup').modal('show');
-                      mixpanel.track("saw popup01");
+                  popupTimer = setTimeout(function () {
+                      $('#popup').modal('show');
+                      mixpanel.track("saw popup");
                   }, 15000); // milliseconds
                 }
 
             }
 
-            $('#help-popup').on('hidden.bs.modal', function () {
-                mixpanel.track("closed popup01");
+            $('#popup').on('hidden.bs.modal', function () {
+                mixpanel.track("closed popup");
             });
 
             $('.close-popup').click(function () {
-                clearTimeout(popupTimmer);
+                clearTimeout(popupTimer);
                 if (nClose) {
                     $.cookie("closePopup", nClose + 1, {path: '/'});
                 } else {
                     $.cookie("closePopup", 1, {path: '/'});
                 }
 
-                $('#help-popup').modal('hide');
-                mixpanel.track("closed popup01");
+                $('#popup').modal('hide');
+                mixpanel.track("closed popup");
             });
-
-            $('#help-no').click(function () {
-                clearTimeout(popupTimmer);
-                if (nClose) {
-                    $.cookie("closePopup", nClose + 1, {path: '/'});
-                } else {
-                    $.cookie("closePopup", 1, {path: '/'});
-                }
-
-                $('#help-popup').modal('hide');
-                mixpanel.track("selected No from popup01");
-            });
-
-            $('#help-yes').click(function () {
-                $('#popup-page-1').hide();
-                $('#popup-page-2').show();
-                mixpanel.track("selected Yes from popup01");
-            });
-
-            $('#multidaytrip-link').click(function() {
-              mixpanel.track("checked out designed multi-day from pop up box");
-            });
-
-
-            $('#custom-trip-form').on('submit', function (event) {
-                event.preventDefault();
-
-                $('#results').empty();
-                email = $('#popup-form-email').val();
-                message = $('#popup-form-details').val();
-
-                if (!message || !email) {
-                    $('#results').html("<p class='popup-result'>{% trans 'Please fill in all fields.' %}</p>");
-                } else {
-                    var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-                    if (regex.test(email)) {
-                        $('#popup-send').hide();
-                        create_post(email, message);
-                    } else {
-                        $('#popup-send').hide();
-                        $('#results').html("<br><p class='popup-result'>{% trans 'Invalid email, please' %} <span class='try-again'>{% trans 'try again' %}</span></p>");
-                        $('.try-again').click( function() {
-                          $('#results').html("<br>");
-                          $('#popup-form-email').val('');
-                          $('#popup-send').show();
-                        });
-                    }
-                }
-            });
-
-
-
         }
+      // END POPUP THINGS
 
         var des_url = window.location.pathname;
         if (des_url.indexOf("/cn") > -1) {

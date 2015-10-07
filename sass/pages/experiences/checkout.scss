@@ -9,81 +9,91 @@
   '../../utils/functions',
   '../../utils/placeholders';
 
+
+.container {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.form-section {
+  padding-left: 15px;
+  padding-right: 15px;
+  border-bottom: 1px solid $light-grey;
+}
+
 .checkoutBox {
   width: 550px;
+  float: left;
+  margin-right: 80px;
   background-color: white;
   border: $light-grey 1px solid;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -khtml-border-radius: 5px;
   border-radius: 5px;
-  padding: 15px;
+  h3, p, .form-control {
+    color: $dark-grey;
+    font-weight: normal;
+  }
+
   @include media('<tablet') {
-    padding: 10px;
     width: 90%;
     float: none;
-    margin-left: 5%;
-    td {
-      display: inline-block;
-      margin-right: 15px
-    }
-  }
-  .row {
-    border-top: $light-grey 1px solid;
-    padding: 15px 0;
-  }
-
-  p {
-    margin-bottom: 0;
-  }
-
-  .row {
-    padding-left: 20px;
-    color: $slate-grey;
-  }
-
-  td {
-    display: inline-block;
+    margin: auto;
   }
 }
 
-#id_promo_code,
-#id_card_number,
-#id_country {
-  width: 222px;
-}
-#id_phone_number,
-#id_roaming_number {
-  width: 145px;
-}
-#id_expire_on > span > select {
-  width: 100px;
-  margin-right: 10px;
-}
-#id_cvv {
-  width: 100px;
-}
-#traveller_detail #id_first_name,
-#traveller_detail #id_last_name {
-  width: 222px;
-  height: 34px;
-}
 .checkoutInfo {
+  background: white;
+  border: $light-grey 1px solid;
+  border-radius: 5px;
   width: 300px;
   margin-top: 20px;
   padding: 15px;
+  float: right;
+  @include media('<tablet') {
+    float: none;
+    width: 100%;
+  }
 }
+
+.checkout-profile {
+  width: 90px;
+  height: 90px;
+  border: 1px solid $light-grey;
+  border-radius: 100px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.profile-frame {
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 100px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+}
+
+
 .warning-sign {
   border: 1px #ff5e5e solid;
   background-color: #ffc7c7;
   border-radius: 3px;
-  color: #ff5e5e;
   height: 30px;
   margin-top: 8px;
-  min-width: 222px;
-  margin-right: 20px;
+  margin-bottom: 8px;
 }
 .warning-sign p {
+  color: #ff5e5e;
   display: inline-block;
   position: relative;
   top: 4px;
@@ -91,32 +101,37 @@
   padding-right: 20px;
 }
 
-
-.navbar-form {
-  padding: 0;
+.help-message {
+  display: inline-block;
+  font-size: 12px;
+  color: $dark-grey;
+  max-width: 400px;
+  margin-left: 15px;
+  margin-top: 15px;
 }
 
-.experience {
-  padding: 30px 0;
-}
-
-.checkout-profile {
-  margin: auto;
-  position: relative;
-  margin-top: -20px;
-}
-.checkoutBox {
-  float: left;
-}
-.checkoutDetails {
-  float: right;
+.exp-box {
   @include media('<tablet') {
-    margin-top: 50px;
-    float: none;
+    p, h3 {
+      margin-left: 0;
+    }
   }
 }
-.form-control {
-  @include media('<tablet') {
-    width: 95%;
-  }
+
+.btn-lg {
+  width: 180px;
+  margin: 15px 30px 15px 15px;
+  border-radius: 3px;
+  font-size: 14px
+}
+
+#id_promo_code {
+  display: inline-block;
+  width: auto;
+  margin-right: 15px;
+}
+
+#id_country {
+  height: 35px;
+  width: 170px;
 }

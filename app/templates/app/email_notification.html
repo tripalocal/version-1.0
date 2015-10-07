@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+{% load i18n %}
+{% load account %}
+{% load url from future %}
+{% load mathfilters %}
+{% if form %}
+    {{ form.media }}
+{% endif %}
+<title>{% block title %}Notification - Tripalocal{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css?family=Source+Serif+Pro" rel="stylesheet" type="text/css">
+<style type="text/css">
+
+  /* reset */
+  #outlook a {padding:0;} /* Force Outlook to provide a "view in browser" menu link. */
+  .ExternalClass {width:100%;} /* Force Hotmail to display emails at full width */
+  .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {line-height: 100%;} /* Forces Hotmail to display normal line spacing.  More on that: http://www.emailonacid.com/forum/viewthread/43/ */
+  p {margin: 0; padding: 0; font-size: 0px; line-height: 0px;} /* squash Exact Target injected paragraphs */
+  table td {border-collapse: collapse;} /* Outlook 07, 10 padding issue fix */
+  table {border-collapse: collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; } /* remove spacing around Outlook 07, 10 tables */
+
+  /* bring inline */
+  img {display: block; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;}
+  a img {border: none;}
+  a {text-decoration: none; color: #33cccc;} /* text link */
+  a.phone {text-decoration: none; color: #000001 !important; pointer-events: auto; cursor: default;} /* phone link, use as wrapper on phone numbers */
+  span {font-size: 13px; line-height: 17px; font-family: monospace; color: #000001;}
+
+</style>
+<!--[if gte mso 9]>
+  <style>
+  /* Target Outlook 2007 and 2010 */
+  </style>
+<![endif]-->
+</head>
+<body style="width:100%; margin:0; padding:0; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+
+<!-- body wrapper -->
+<table cellpadding="0" cellspacing="0" border="0" style="margin:0; padding:0; width:100%; line-height: 100% !important;">
+  <tr>
+    <td valign="top">
+      <!-- edge wrapper -->
+      <table cellpadding="0" cellspacing="0" border="0" align="center" width="680" height="800" style="background: #f7f7f7;">
+        <tr>
+          <td valign="top">
+            <table cellpadding="0" cellspacing="0" border="0" align="center" width="170" height="100">
+              <tr>
+                <td valign="top" style="vertical-align: middle;">
+                  <img src="{% if LANGUAGE != 'zh-CN' %}{% static 'img/logo_2015_en.png' %}{% else %}{% static 'img/logo_2015_cn.png' %}{% endif %}" alt="Tripalocal" width="170" height="100" style="width: 170px; height: 100px;"/>
+                </td>
+              </tr>
+            </table>
+            <!-- content wrapper -->
+            <table cellpadding="0" cellspacing="0" border="0" align="center" width="600" height="390" style="background: #ffffff;">
+              <tr>
+                <td valign="top" style="vertical-align: top; border: 1px solid #dfdfdf;">
+<!-- ///////////////////////////////////////////////////// -->
+
+<table cellpadding="0" cellspacing="0" border="0" align="center" height="100">
+  <tr>
+    <td valign="top" style="vertical-align: middle; text-align: center;">
+      <br><br>
+      <span style="font-family: 'Source Serif Pro', serif; font-size: 18pt; color: #333333;">{% block heading %}{% endblock %}</span>
+      <br><br>
+      <span style="font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12pt; color: #333333; word-wrap: break-word;">{% block subheading %}{% endblock %}</span>
+    </td>
+  </tr>
+</table>
+<table cellpadding="0" cellspacing="0" border="0" align="center" height="150">
+  <tr>
+    <td valign="top" style="vertical-align: top;">
+      <img src="{% static 'img/profileimage.jpg' %}" alt="Traveller Profile" width="136" height="136" style="width: 136px; height: 136px; border-radius: 100px;"/>
+    </td>
+  </tr>
+</table>
+<table cellpadding="0" cellspacing="0" border="0" align="center" height="75" width="415">
+  <tr>
+    <td valign="top" style="vertical-align: top; text-align: center;">
+      <span style="font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12pt; color: #333333; word-wrap: break-word;">{% block content %}{% endblock %}</span>
+    </td>
+  </tr>
+</table>
+<table cellpadding="0" cellspacing="0" border="0" align="center" height="75">
+  <tr>
+    <td valign="top" style="vertical-align: top; text-align: center;">
+      <a href="https://www.tripalocal.com/html/tripalocalapp.html" style="height: 38px; width: 254px; background-color: #33cccc; border: 1px solid #33cccc; border-radius: 20px; color: #ffffff; display: inline-block; font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12pt; line-height: 38px; text-align:center; text-decoration:none; width: 254px; -webkit-text-size-adjust:none; mso-hide:all;">{% block button %}{% endblock %}</a>
+    </td>
+  </tr>
+</table>
+<!-- //////////// -->
+                </td>
+              </tr>
+            </table>
+            <!-- / content wrapper -->
+            <table cellpadding="0" cellspacing="0" border="0" align="center" width="500" height="280">
+              <tr>
+                <td valign="top" style="vertical-align: top; padding-top: 80px; width: 150px;">
+                  <img src="{% if LANGUAGE != 'zh-CN' %}{% static 'img/app-store-badge_en.png' %}{% else %}{% static 'img/app-store-badge_cn.png' %}" alt="App Store" width="132" height="40" style="width: 132px; height: 40px"/>
+                </td>
+                <td valign="top" style="vertical-align: top; padding-top: 32px; width: 180px; padding-left: 20px; padding-right: 30px; position: relative;">
+                  <img src="{% static 'img/mobileApps.png' %}" alt="Mobiles" width="180" height="203" style="width: 180px; height: 203px;"/>
+                  <img src="{% if LANGUAGE != 'zh-CN' %}{% static 'img/app_banner_en.svg' %}{% else %}{% static 'img/app_banner_cn.svg' %}" alt="Get the App!" width="320" height="66" style="width: 320px; height: 66px; position: absolute; top: 150px; left: -55px"/>
+                </td>
+                <td valign="top" style="vertical-align: top; padding-top: 80px; width: 150px;">
+                  <img src="{% if LANGUAGE != 'zh-CN' %}{% static 'img/play-store-badge_en.png' %}{% else %}{% static 'img/play-store-badge_cn.png' %}" alt="Play Store" width="132" height="40" style="width: 132px; height: 40px"/>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <!-- / edge wrapper -->
+    </td>
+  </tr>
+</table>
+<!-- / page wrapper -->
+</body>
+</html>

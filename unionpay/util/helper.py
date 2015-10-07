@@ -50,7 +50,7 @@ def make_submit_form(data, front_trans_url):
 def load_config(filepath):
     import yaml
     try:
-        yaml_map = yaml.load(open(filepath, 'r'))
+        yaml_map = yaml.load(open(filepath, 'r', encoding="utf8"))
     except Exception as e:
         exit("[Config] yaml format error: {}".format(e))
     return ObjectDict(yaml_map)

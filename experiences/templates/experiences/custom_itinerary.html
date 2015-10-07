@@ -21,7 +21,7 @@
 
         <div id="criteria_div">
             <div id="mandatory_criteria_div">
-                <div id="date_destination_div" style="float:left;width:390px; padding-top:10px;">
+                <div id="date_destination_div" style="float:left;width:300px; padding-top:10px;">
                     <button id="add_day_button" type="button" class="btn btn-default">{% trans 'Add' %}</button>
                     <div class="container-fluid" id="add_day_1_div" style="padding-bottom:10px;">
                       <div class="row" style="margin-bottom: 5px;">
@@ -85,6 +85,18 @@
                     </div>
                 </div>
                 <div class="vertical-bar"></div>
+                <div id="sort_by_div" style="float:left;width:150px;">
+                    <div class="">
+                        <p class="">{% trans "Sort by" %}</p>
+                    </div>
+                    {{form.sort}}
+                </div>
+                <div id="age_limit_div" style="float:left;width:150px;">
+                    <div class="">
+                        <p class="">{% trans "Age limit" %}</p>
+                    </div>
+                    {{form.age_limit}}
+                </div>
                 <div id="more-filters-button">
                     <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters">{% trans "More Filters" %}</button>
                     <input class="btn-block btn btn-default" id="itinerary-search" type="submit" value="{% trans "Search" %}" name="Search">
@@ -281,9 +293,9 @@
     function addNewDay(id)
     {
         new_div="<div id=\"add_day_" + id + "_div\" class=\"container-fluid\" style=\"padding-bottom:10px;\">"+
-                    "<button id=\"delete_day_button_" + id + "\" type=\"button\" class=\"btn btn-default;\" style=\"margin-left: -15px;\">Delete</button>"+
+                    "<button id=\"delete_day_button_" + id + "\" type=\"button\" class=\"btn btn-default;\" style=\"margin-left: -15px;\">{% trans 'Delete' %}</button>"+
                     "<div class=\"row\" style=\"margin-bottom:5px;\">"+
-                    "<h3 class=\"field-header\">Location</h3>"+
+                    "<h3 class=\"field-header\">{% trans 'Location' %}</h3>"+
                     "<div class=\"ui selection dropdown\">"+
                         "<i class=\"dropdown icon\"></i>" +
                         "<div id=\"destination_city_" + id + "\" class=\"text\">{% trans "City" %}</div>" +
@@ -300,13 +312,13 @@
                     "</div>" +
                     "</div>"+
                     "<div class=\"row\">"+
-                    "<h3 class=\"field-header\" style=\"margin-right: 38px;\">Dates</h3>"+
+                    "<h3 class=\"field-header\" style=\"margin-right: 38px;\">{% trans "Dates" %}</h3>"+
                     "<div class=\"input-group start-date\" id=\"id_start_datetime_picker_day_" + id + "\">"+
                         "<input class=\"form-control\" id=\"id_start_datetime_day_" + id + "\" name=\"start_datetime\" type=\"text\" value=\"\">"+
                     "</div>"+
                     "<script>"+
                         "$(function() {"+
-                            "$(\"#id_start_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
+                            "$(\"#id_start_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"locale\": \"{{LANGUAGE}}\"});"+
                         "});"+
                     "<\/script>"+
                     "<div class=\"input-group end-date\" id=\"id_end_datetime_picker_day_" + id + "\">"+
@@ -314,7 +326,7 @@
                     "</div>"+
                     "<script>"+
                         "$(function() {"+
-                            "$(\"#id_end_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"language\": \"en-au\"});"+
+                            "$(\"#id_end_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"locale\": \"{{LANGUAGE}}\"});"+
                         "});"+
                     "<\/script>"+
                     "</div>"+
@@ -350,14 +362,17 @@
     $(document).ready(function(){
 
         $('.ui.dropdown').dropdown();
-        $("#id_end_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
-        $("#id_start_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "language": "en-au"});
-
+        $("#id_start_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "locale": "{{LANGUAGE}}"});
+        $("#id_end_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "locale": "{{LANGUAGE}}"});
 
         city = $("#id_city").val().split(",");
         if(city.length>0)
         {
             distinct_city = 1;
+            if(city[0])
+            {
+                $("#destination_city_1").text(city[0]);
+            }
             $("#id_start_datetime_day_1").val($("#id_start_datetime").val());
             start = new Date(Date.parse($("#id_start_datetime").val(),"YYYY-MM-DD"));
         }

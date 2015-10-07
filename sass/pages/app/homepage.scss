@@ -82,13 +82,10 @@ h1 {
   }
 
   .btn-secondary {
-    background-color: $primary-color;
+    background-color: transparent;
     color: white;
-    border-color: $primary-color;
-    &:hover {
-      background-color: darken($primary-color, 20%);
-      border-color: darken($primary-color, 20%);
-    }
+    border-color: transparent;
+    
   }
 }
 

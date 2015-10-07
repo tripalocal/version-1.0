@@ -3,7 +3,7 @@ Definition of views.
 """
 from time import gmtime
 from time import strftime
-from app.wechat_payment.api import JsAPIOrderPay
+from app.wechat_payment.api import JsAPIOrderPay, UnifiedOrderPay
 from app.wechat_payment.utils import dict_to_xml
 from django.core.urlresolvers import reverse
 
@@ -798,3 +798,17 @@ def wechat_payment_notify(request):
         return HttpResponse('')
     else:
         return HttpResponse('')
+
+
+# @csrf_exempt
+# def wechat_qr_payment(request):
+#     unified_pay = UnifiedOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
+#     out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
+#     notify_url = request.build_absolute_uri(reverse('wechat_qr_payment_notify'))
+#     pay_info = unified_pay.post("sfasfas", out_trade_no, str(123), "127.0.0.1", notify_url)
+#     if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
+#         code_url = pay_info['code_url']
+#         return HttpResponse(json.dumps({'code_url':code_url}), content_type='application/json')
+#
+#     return HttpResponse(json.dumps(pay_info), content_type='application/json')
+
