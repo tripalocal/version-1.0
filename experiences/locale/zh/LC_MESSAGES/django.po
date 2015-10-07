@@ -804,7 +804,17 @@ msgstr "信用卡 / 支付宝"
 msgid "Union Pay"
 msgstr "银联支付"
 
-#: templates/experiences/experience_booking_confirmation.html:149
+
+msgid "Pay by WeChat"
+msgstr "微信扫码支付"
+
+msgid "QR Code Payment"
+msgstr "扫码支付"
+
+msgid "Please scan the QR code below."
+msgstr "请扫描下面的二维码。"
+
+#: templates/experiences/experience_booking_confirmation.html:343
 msgid "Reservation for"
 msgstr "预订人数："
 
