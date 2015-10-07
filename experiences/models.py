@@ -463,6 +463,10 @@ class Payment(models.Model):
         stripe.api_key = settings.STRIPE_SECRET_KEY
  
         self.stripe = stripe
+
+    def __str__(self):
+        return self.charge_id
+
  
     # store the stripe charge id for this sale
     charge_id = models.CharField(max_length=32)
