@@ -3,7 +3,7 @@ from django.conf.urls import patterns
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon, WechatProduct, WechatBooking, \
-    NewProduct, NewProductI18n, Provider
+    NewProduct, NewProductI18n, Provider, Payment
 from experiences.views import create_experience, saveExperienceImage
 from app.models import RegisteredUser
 from allauth.socialaccount.models import SocialAccount
@@ -128,6 +128,7 @@ class ProviderAdmin(admin.ModelAdmin):
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
+admin.site.register(Payment)
 admin.site.register(Experience, ExperienceAdmin)
 admin.site.register(Photo)
 admin.site.register(WhatsIncluded)

@@ -124,6 +124,7 @@
                 </div>
                 <input type="submit" id="submit_booking" name="Stripe" value="{% trans "Credit card / Alipay" %}" class="btn btn-primary btn-lg"/>
                 <!--<input type="submit" id="submit_booking_unionpay" name="UnionPay" value="{% trans "Union Pay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>-->
+{#              <input type="submit" id="wechat_booking" name="WeChat" value="{% trans "Pay by WeChat" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>#}
               </form>
             </div>
 
@@ -170,6 +171,55 @@
 <script charset="utf-8" type="text/javascript">
 
 $(function(){
+    function checkPaymentForm(handler, e) {
+        if ($("#isAgreementSelected").is(':checked'))
+            {
+                if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
+                {
+                    phone1=$("#id_phone_number").val();
+                    phone2=$("#id_roaming_number").val();
+                    if(phone1)
+                    {
+                        if(phone2)
+                        {
+                            //$("#id_phone_number").val(phone1+','+phone2);
+                        }
+                    }
+                    else if(phone2)
+                    {
+                        $("#id_phone_number").val(phone2);
+                    }
+                    else
+                    {
+                        //must leave at least one number
+                        $("#id_phone_number").css("border-color","red");
+                        $("#id_roaming_number").css("border-color","red");
+                        $("#phone_warning").show();
+                        e.preventDefault();
+                        return;
+                    }
+                    if({{total_price}}>0.00)
+                    {
+                        handler(e);
+                    }
+                    else
+                    {
+                        //$("#category_form").submit();
+                    }
+                }
+                else
+                {
+                    e.preventDefault();
+                    $("#id_coupon_term_condition").attr("style","width:480px; display:inline-block; margin-bottom:10px;");
+                }
+            }
+            else
+            {
+                e.preventDefault();
+                $("#id_term_condition").attr("style","display:inline-block;");
+            }
+    }
+
     $(document).ready(function(){
         mixpanel.track("checkout");
 
@@ -220,64 +270,27 @@ $(function(){
                             }
                         });
 
-        $("#submit_booking").bind("click", function(e) {
-            if ($("#isAgreementSelected").is(':checked'))
-            {
-                if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
-                {
-                    phone1=$("#id_phone_number").val();
-                    phone2=$("#id_roaming_number").val();
-                    if(phone1)
-                    {
-                        if(phone2)
-                        {
-                            //$("#id_phone_number").val(phone1+','+phone2);
-                        }
-                    }
-                    else if(phone2)
-                    {
-                        $("#id_phone_number").val(phone2);
-                    }
-                    else
-                    {
-                        //must leave at least one number
-                        $("#id_phone_number").css("border-color","red");
-                        $("#id_roaming_number").css("border-color","red");
-                        $("#phone_warning").show();
-                        e.preventDefault();
-                        return;
-                    }
-                    if({{total_price}}>0.00)
-                    {
-                        // Open Checkout with further options
-                        handler.open({
-                            name: 'Tripalocal 本土客',
-                            description: '',
-                            amount: {{ total_price|mul:100 }},
-                            currency: '{{experience.currency}}',
-                            locale: '{{LANGUAGE}}',
-                            alipay: true
-                        });
-                        e.preventDefault();
-                    }
-                    else
-                    {
-                        //$("#category_form").submit();
-                    }
-                }
-                else
-                {
-                    e.preventDefault();
-                    $("#id_coupon_term_condition").attr("style","width:480px; display:inline-block; margin-bottom:10px;");
-                }
-            }
-            else
-            {
-                e.preventDefault();
-                $("#id_term_condition").attr("style","display:inline-block;");
-            }
 
+        $("#submit_booking").bind("click", function (e) {
+            checkPaymentForm(function () {
+                handler.open({
+                    name: 'Tripalocal 本土客',
+                    description: '',
+                    amount: {{ total_price|mul:100 }},
+                    currency: '{{experience.currency}}',
+                    locale: '{{LANGUAGE}}',
+                    alipay: true
+                });
+                e.preventDefault();
+            }, e);
         });
+
+        $("#wechat_booking").bind("click", function (e) {
+            checkPaymentForm(function () {
+
+            }, e)
+        });
+
 
         // Close Checkout on page navigation
             $(window).on('popstate', function() {

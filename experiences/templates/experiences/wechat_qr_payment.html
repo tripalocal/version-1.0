@@ -1,0 +1,54 @@
+{% load staticfiles %}
+{% load i18n %}
+
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="{% static 'app/content/main.css' %}" rel="stylesheet">
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="{% static 'experiences/scripts/qrcode.min.js' %}"></script>
+
+    <title>{% trans "QR Code Payment" %}</title>
+</head>
+
+<body>
+
+<div style="margin: 0 auto; text-align: center;">
+
+    <h2>{% trans "Please Scan" %}</h2>
+
+    <div id="qrcode" style="width:128px; margin: 0 auto; text-align: center;"></div>
+</div>
+
+</body>
+
+<script charset="utf-8" type="text/javascript">
+    $(document).ready(function () {
+        var qrcode = new QRCode("qrcode", {
+            text: '{{ code_url }}',
+            width: 128,
+            height: 128,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // query order status every 10 seconds
+        setInterval(function () {
+            $.get('/wechat_qr_payment_query/{{ out_trade_no }}/', function (data) {
+                if (data['order_paid'] == true) {
+                    {% autoescape off %}
+                        window.location.href = '{{ success_url }}';
+                    {% endautoescape %}
+                } else {
+                    console.log(data['order_paid'])
+                }
+            }, "json");
+        }, 10000);
+    });
+
+</script>
+</html>

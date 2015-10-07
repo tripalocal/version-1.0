@@ -1,4 +1,7 @@
 from io import BytesIO
+from urllib.parse import urlencode
+from app.wechat_payment.api import UnifiedOrderPay, OrderQuery
+from app.wechat_payment.utils import dict_to_xml
 from django.core.files.storage import default_storage as storage
 from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
@@ -30,6 +33,7 @@ from unionpay import client, signer
 from unionpay.util.helper import load_config, make_order_id
 from django.views.decorators.csrf import csrf_exempt
 import itertools
+import xmltodict
 from django.db.models import Q
 
 MaxPhotoNumber=10
@@ -1107,6 +1111,64 @@ def experience_booking_confirmation(request):
                                                                            'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                                                                            'LANGUAGE':settings.LANGUAGE_CODE}, context)
+
+        elif 'WeChat' in request.POST:
+            display_error = True
+            unified_pay = UnifiedOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
+            from app.views import create_wx_trade_no
+            out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
+            notify_url = request.build_absolute_uri(reverse('wechat_qr_payment_notify'))
+            form.data = form.data.copy()
+            form.data['booking_extra_information'] = out_trade_no
+
+            if form.is_valid():
+                bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
+                bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
+                total_price = form.cleaned_data['price_paid'] if form.cleaned_data['price_paid'] != -1.0 else total_price
+
+                if total_price > 0.0:
+                    #not free
+                    # todo: remove stub money amout
+                    pay_info = unified_pay.post(experience.get_title(settings.LANGUAGES[0][0]), out_trade_no,
+                                                str(1), "127.0.0.1", notify_url)
+                    if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
+                        code_url = pay_info['code_url']
+                        success_url = 'http://' + settings.ALLOWED_HOSTS[0] \
+                                      + '/experience_booking_successful/?experience_id=' + str(experience.id) \
+                                      + '&guest_number=' + form.data['guest_number'] \
+                                      + '&booking_datetime=' + form.data['date'].strip() + form.data['time'].strip() \
+                                      + '&price_paid=' + str(total_price) + '&is_instant_booking=' \
+                                      + str(instant_booking(experience, bk_date, bk_time))
+
+                        return redirect(url_with_querystring(reverse('wechat_qr_payment'), code_url=code_url,
+                                                             out_trade_no=out_trade_no, success_url=success_url))
+                    else:
+                        return HttpResponse('<html><body>WeChat Payment Error.</body></html>')
+                else:
+                    #free
+                    return experience_booking_successful(request,
+                                                         experience,
+                                                         int(form.data['guest_number']),
+                                                         datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
+                                                         form.cleaned_data['price_paid'],
+                                                         instant_booking(experience,bk_date,bk_time))
+
+            else:
+                return render_to_response('experiences/experience_booking_confirmation.html', {'form': form,
+                                                                           'user_email':request.user.email,
+                                                                           'display_error':display_error,
+                                                                           'experience': experience,
+                                                                           'guest_number':form.data['guest_number'],
+                                                                           'date':form.data['date'],
+                                                                           'time':form.data['time'],
+                                                                           'subtotal_price':subtotal_price,
+                                                                           'experience_price':experience_price,
+                                                                           'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
+                                                                           'total_price': total_price,
+                                                                           'commission':1 + COMMISSION_PERCENT,
+                                                                           'GEO_POSTFIX':settings.GEO_POSTFIX,
+                                                                           'LANGUAGE':settings.LANGUAGE_CODE}, context)
+
         else:
             #TODO
             #submit name missing in IE
@@ -1115,6 +1177,11 @@ def experience_booking_confirmation(request):
         # If the request was not a POST
         #form = BookingConfirmationForm()
         return HttpResponseRedirect(GEO_POSTFIX)
+
+
+def url_with_querystring(path, **kwargs):
+    return path + '?' + urlencode(kwargs)
+
 
 def saveProfileImage(user, profile, image_file):
     content_type = image_file.content_type.split('/')[0]
@@ -3152,3 +3219,63 @@ def unionpay_refund_callback(request):
                 pass
         except Exception as err:
             logger.debug(err)
+
+
+def wechat_qr_payment(request):
+    code_url = request.GET.get('code_url')
+    out_trade_no = request.GET.get('out_trade_no')
+    success_url = request.GET.get('success_url')
+    return render_to_response('experiences/wechat_qr_payment.html',
+                              {'code_url': code_url,
+                               'out_trade_no': out_trade_no,
+                               'success_url': success_url},
+                              RequestContext(request))
+
+
+def wechat_qr_payment_query(request, out_trade_no):
+    order_query = OrderQuery(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
+    pay_info = order_query.post(out_trade_no)
+    if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
+        trade_state = pay_info['trade_state']
+        if trade_state == 'SUCCESS':
+            return HttpResponse(json.dumps({'order_paid': True}))
+        else:
+            return HttpResponse(json.dumps({'order_paid': False}))
+
+    else:
+        return HttpResponse(json.dumps({'order_paid': False}))
+    # return render_to_response('experiences/wechat_qr_payment.html',
+    #                           {'code_url': code_url,
+    #                            'out_trade_no': out_trade_no},
+    #                           RequestContext(request))
+    pass
+
+
+@csrf_exempt
+def wechat_qr_payment_notify(request):
+    if (request.body):
+        notify_info = xmltodict.parse(request.body.decode("utf-8"))['xml']
+        if (notify_info.get('return_code', None)) == 'SUCCESS':
+            out_trade_no = notify_info['out_trade_no']
+            transaction_id = notify_info['transaction_id']
+
+            bks = Booking.objects.filter(booking_extra_information=out_trade_no, status="requested")
+            if len(bks) > 0:
+                bk = bks[0]
+                bk.status = "paid"
+                bk.save()
+
+                payment = bk.payment
+                payment.charge_id = transaction_id
+                payment.save()
+
+                experience = Experience.objects.get(id=bk.experience_id)
+                user = User.objects.get(id=bk.user_id)
+                bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+                send_booking_email_verification(bk, experience, user,
+                                                instant_booking(experience, bk.datetime.date(), bk.datetime.time()))
+                sms_notification(bk, experience, user, payment.phone_number)
+            xml = dict_to_xml({'return_code': 'SUCCESS', 'return_msg': 'OK'})
+            return HttpResponse(xml)
+    else:
+        return HttpResponse('')
