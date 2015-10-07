@@ -257,7 +257,7 @@ $(function(){
 */
         var handler = StripeCheckout.configure({
                             key: 'pk_live_62VE04d61Te70oh7IB7dqfjm',
-                            image: '/global_static/img/tripalocal_logo_stripe.jpg',
+                            image: '{% static 'img/tripalocal_logo_stripe.jpg'%}',
                             locale: '{{LANGUAGE}}',
                             token: function(token) {
                                 // Use the token to create the charge with a server-side script.
