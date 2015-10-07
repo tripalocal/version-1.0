@@ -874,7 +874,7 @@ class ExperienceDetailView(DetailView):
         if self.request.user.is_staff:
             #ignore page views by staff
             return context
-        elif self.request.user.is_authenticated:
+        elif self.request.user.is_authenticated():
             user = self.request.user
         else:
             #annoymous visiters are treated as user 1
