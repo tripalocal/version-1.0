@@ -44,6 +44,31 @@ LANG_CN = settings.LANGUAGES[1][0]
 LANG_EN = settings.LANGUAGES[0][0]
 GEO_POSTFIX = settings.GEO_POSTFIX
 
+def set_initial_currency(request):
+    if 'custom_currency' not in request.session:
+        if settings.LANGUAGES[0][0] == "zh":
+            request.session["custom_currency"] = "CNY"
+        else:
+            #TODO
+            request.session["custom_currency"] = "AUD"
+
+def convert_experience_price(request, experience):
+    if 'custom_currency' in request.session\
+        and experience.currency.lower() != request.session['custom_currency'].lower():
+        experience.price = convert_currency(experience.price, experience.currency, request.session['custom_currency'])
+
+        if experience.dynamic_price and type(experience.dynamic_price) == str:
+                price = experience.dynamic_price.split(',')
+                if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
+                #these is comma in the end, so the length is max-min+2
+                    new_dynamic_price=""
+                    for i in range(len(price)-1):
+                        price[i] = convert_currency(float(price[i]), experience.currency, request.session['custom_currency'])
+                        new_dynamic_price += str(price[i]) + ","
+                    experience.dynamic_price = new_dynamic_price
+
+        experience.currency = request.session['custom_currency']
+
 def isEnglish(s):
     try:
         s.decode('ascii') if isinstance(s, bytes) else s.encode('ascii')
@@ -635,6 +660,7 @@ class ExperienceDetailView(DetailView):
             form.data['first_name'] = request.user.first_name
             form.data['last_name'] = request.user.last_name
             experience = AbstractExperience.objects.get(id=form.data['experience_id'])
+            convert_experience_price(request, experience)
             experience.dollarsign = DollarSign[experience.currency.upper()]
             #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
             if type(experience) == Experience:
@@ -684,6 +710,7 @@ class ExperienceDetailView(DetailView):
                            })
 
     def get_context_data(self, **kwargs):
+        set_initial_currency(self.request)
         context = super(ExperienceDetailView, self).get_context_data(**kwargs)
         experience = context['experience'] if 'experience' in context else context['newproduct']
         if 'experience' not in context:
@@ -806,6 +833,7 @@ class ExperienceDetailView(DetailView):
                     break
 
         for i in range(0,len(related_experiences)):
+            convert_experience_price(self.request, related_experiences[i])
             related_experiences[i].dollarsign = DollarSign[related_experiences[i].currency.upper()]
             related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
             related_experiences[i].title = related_experiences[i].get_title(settings.LANGUAGES[0][0])
@@ -835,6 +863,7 @@ class ExperienceDetailView(DetailView):
 
         context['related_experiences'] = zip(related_experiences, related_experiences_added_to_wishlist)
 
+        convert_experience_price(self.request, experience)
         experience.dollarsign = DollarSign[experience.currency.upper()]
         experience.currency = str(dict(Currency)[experience.currency.upper()])
         
@@ -954,6 +983,7 @@ def experience_booking_successful(request, experience=None, guest_number=None, b
 def experience_booking_confirmation(request):
     # Get the context from the request.
     context = RequestContext(request)
+    set_initial_currency(request)
     display_error = False
 
     if not request.user.is_authenticated():
@@ -962,7 +992,10 @@ def experience_booking_confirmation(request):
     # A HTTP POST?
     if request.method == 'POST':
         form = BookingConfirmationForm(request.POST)
+        form.data = form.data.copy()
+        form.data['custom_currency'] = request.session['custom_currency']
         experience = AbstractExperience.objects.get(id=form.data['experience_id'])
+        convert_experience_price(request, experience)
         experience.dollarsign = DollarSign[experience.currency.upper()]
         #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
         if type(experience) == Experience:
@@ -1178,10 +1211,8 @@ def experience_booking_confirmation(request):
         #form = BookingConfirmationForm()
         return HttpResponseRedirect(GEO_POSTFIX)
 
-
 def url_with_querystring(path, **kwargs):
     return path + '?' + urlencode(kwargs)
-
 
 def saveProfileImage(user, profile, image_file):
     content_type = image_file.content_type.split('/')[0]
@@ -2461,7 +2492,7 @@ def manage_listing_continue(request, exp_id):
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
                is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False,  type='s'):
-
+    set_initial_currency(request)
     form = SearchForm()
     form.data = form.data.copy()
     form.data['city'] = city.title()
@@ -2529,6 +2560,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         i = 0
         while i < len(experienceList):
             experience = experienceList[i]
+            convert_experience_price(request, experience)
             experience.commission = round(experience.commission/(1-experience.commission),3)+1
 
             if type == 'product':

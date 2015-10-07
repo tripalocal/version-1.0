@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden, HttpResponseNotAllowed
 import json, pytz, xlrd, re, os, subprocess, math, logging, ast
 from django.contrib.auth.models import User
 from datetime import *
@@ -1353,9 +1353,25 @@ def service_email(request, format=None):
 @api_view(['POST'])
 @authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
 def service_pageview(request):
+    if not request.is_ajax():
+        return HttpResponseNotAllowed(['POST'])
+
     try:
         data = request.POST
         update_pageview_statistics(data['user_id'], data['experience_id'], data['length'])
+        response={'success':True}
+    except Exception as err:
+        response={'success':False}
+    return HttpResponse(json.dumps(response),content_type="application/json")
+
+@api_view(['POST'])
+def service_update_session(request):
+    if not request.is_ajax():
+        return HttpResponseNotAllowed(['POST'])
+
+    try:
+        data = request.POST
+        request.session[data['key']] = data['value']
         response={'success':True}
     except Exception as err:
         response={'success':False}

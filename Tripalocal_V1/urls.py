@@ -112,6 +112,7 @@ urlpatterns = patterns('',
     url(r'^service_publicprofile/$', 'experiences.resource.service_publicprofile'),
     url(r'^service_experiencedetail/$', 'experiences.resource.service_experiencedetail'),
     url(r'^service_pageview/$', 'experiences.resource.service_pageview'),
+    url(r'^service_update_session/$', 'experiences.resource.service_update_session'),
     url(r'^update_files/$', 'experiences.resource.update_files'),
 
     url(r'^custom_admin/$', superuser_required(ExperienceView.as_view()), name='custom_admin_index'),

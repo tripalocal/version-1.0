@@ -24,11 +24,11 @@ from django.contrib import messages
 import string, random, pytz, subprocess, geoip2.database, requests
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
-from experiences.views import SearchView, getBGImageURL, getProfileImage
+from experiences.views import SearchView, getBGImageURL, getProfileImage, set_initial_currency, convert_experience_price
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment, get_experience_meetup_spot, \
     WechatProduct, WechatBooking
-from experiences.forms import Currency, DollarSign, email_account_generator
+from experiences.forms import Currency, DollarSign, email_account_generator, convert_currency
 from django.utils.translation import ugettext_lazy as _
 from post_office import mail
 from django.contrib.auth.models import User
@@ -57,6 +57,8 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 
 def home(request):
     context = RequestContext(request)
+    set_initial_currency(request)
+
     if request.method == 'POST':
         form = HomepageSearchForm(request.POST)
         if form.is_valid():
@@ -115,6 +117,8 @@ def home(request):
 
     featuredExperience = []
     for i in range(len(featuredExperienceList)):
+        convert_experience_price(request, featuredExperienceList[i])
+
         featuredExperienceList[i].dollarsign = DollarSign[featuredExperienceList[i].currency.upper()]
         featuredExperienceList[i].currency = str(dict(Currency)[featuredExperienceList[i].currency.upper()])
         featuredExperienceList[i].commission = 1 + round(featuredExperienceList[i].commission/(1-featuredExperienceList[i].commission), 3)
