@@ -230,8 +230,6 @@ msgid "Edwin"
 msgstr "本土客"
 
 #: app/templates/app/layout.html:55
-#, fuzzy
-#| msgid "Travel"
 msgid "Travel Expert"
 msgstr "旅游专家"
 
