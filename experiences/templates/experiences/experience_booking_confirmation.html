@@ -171,7 +171,7 @@
 <script charset="utf-8" type="text/javascript">
 
 $(function(){
-    function checkPaymentForm(handler, e) {
+    function checkPaymentForm(preparePayment, e) {
         if ($("#isAgreementSelected").is(':checked'))
             {
                 if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked'))
@@ -200,7 +200,7 @@ $(function(){
                     }
                     if({{total_price}}>0.00)
                     {
-                        handler(e);
+                        preparePayment();
                     }
                     else
                     {
@@ -286,9 +286,7 @@ $(function(){
         });
 
         $("#wechat_booking").bind("click", function (e) {
-            checkPaymentForm(function () {
-
-            }, e)
+            checkPaymentForm(function () {}, e)
         });
 
 
