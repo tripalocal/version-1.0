@@ -504,7 +504,7 @@ class CCExpField(forms.MultiValueField):
             return date(year, month, day)
         return None
 
-def check_coupon(coupon, experience_id, guest_number):
+def check_coupon(coupon, experience_id, guest_number, target_currency=None):
 
     rules = json.loads(coupon.rules)
     guest_number = int(guest_number)
@@ -559,6 +559,9 @@ def check_coupon(coupon, experience_id, guest_number):
     else:
         #percentage, e.g., 30% discount --> percentage == -0.3
         price = round(subtotal_price*(1.00+COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+
+    if target_currency is not None and target_currency.lower() != experience.currency.lower():
+        price = convert_currency(price, experience.currency.upper(), target_currency.upper())
 
     result = {"valid":True, "new_price":price}
     return result

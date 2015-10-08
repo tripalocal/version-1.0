@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-08 16:13+1100\n"
+"POT-Creation-Date: 2015-10-08 16:20+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,9 +84,13 @@ msgstr ""
 "人，从而改变旅行的方式。"
 
 #: app/templates/app/aboutus.html:25
+#, fuzzy
+#| msgid ""
+#| "Our mission is to bring travel back to its roots: a discover of the "
+#| "people, culture and stories."
 msgid ""
-"Our mission is to bring travel back to its roots: a discover of the people, "
-"culture and stories."
+"Our mission is to bring travel back to its roots: a discovery of culture, "
+"people and their stories."
 msgstr "我们的宗旨是还原旅行的本质：挖掘当地人的故事和体验他们的文化。"
 
 #: app/templates/app/aboutus.html:26
@@ -378,7 +382,7 @@ msgstr "莫宁顿半岛环岛2天1夜野营之旅"
 msgid "Harley Davidson motorcycle"
 msgstr "哈雷戴维森摩托骑行游览墨尔本市区"
 
-#: app/templates/app/layout.html:378
+#: app/templates/app/layout.html:379
 msgid "Please try again later"
 msgstr ""
 

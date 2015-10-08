@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-08 16:13+1100\n"
+"POT-Creation-Date: 2015-10-08 16:20+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -216,85 +216,85 @@ msgstr "新西兰元"
 msgid "CNY"
 msgstr ""
 
-#: experiences/forms.py:793
+#: experiences/forms.py:796
 msgid "Popularity"
 msgstr "预定次数"
 
-#: experiences/forms.py:793
+#: experiences/forms.py:796
 msgid "Outdoor"
 msgstr "户外运动"
 
-#: experiences/forms.py:793
+#: experiences/forms.py:796
 msgid "Urban"
 msgstr "都市风情"
 
-#: experiences/forms.py:794
+#: experiences/forms.py:797
 msgid "None"
 msgstr "无"
 
-#: experiences/forms.py:794
+#: experiences/forms.py:797
 msgid "Famili with elderly"
 msgstr "有老人"
 
-#: experiences/forms.py:794
+#: experiences/forms.py:797
 msgid "Famili with children"
 msgstr "有小孩"
 
-#: experiences/forms.py:794
+#: experiences/forms.py:797
 msgid "Famili with elderly&children"
 msgstr "有老人和小孩"
 
-#: experiences/forms.py:829 experiences/forms.py:1220
-#: experiences/forms.py:1224 experiences/resource.py:1255
-#: experiences/views.py:1731 experiences/views.py:1739
-#: experiences/views.py:1743 experiences/views.py:1970
-#: experiences/views.py:1975 experiences/views.py:1984
-#: experiences/views.py:1989
+#: experiences/forms.py:832 experiences/forms.py:1223
+#: experiences/forms.py:1227 experiences/resource.py:1255
+#: experiences/views.py:1801 experiences/views.py:1809
+#: experiences/views.py:1813 experiences/views.py:2040
+#: experiences/views.py:2045 experiences/views.py:2054
+#: experiences/views.py:2059
 #, python-format
 msgid "%s"
 msgstr ""
 
-#: experiences/forms.py:1108
+#: experiences/forms.py:1111
 msgid "[Tripalocal] "
 msgstr "【本土客】 "
 
-#: experiences/forms.py:1108
+#: experiences/forms.py:1111
 msgid " has requested your experience"
 msgstr " 预约了您的体验"
 
-#: experiences/forms.py:1109 experiences/forms.py:1123
-#: experiences/forms.py:1143 experiences/forms.py:1155
-#: experiences/forms.py:1167 experiences/forms.py:1191
+#: experiences/forms.py:1112 experiences/forms.py:1126
+#: experiences/forms.py:1146 experiences/forms.py:1158
+#: experiences/forms.py:1170 experiences/forms.py:1194
 #: experiences/resource.py:219 experiences/resource.py:243
 #: experiences/resource.py:255 experiences/resource.py:267
-#: experiences/views.py:1791 experiences/views.py:1807
-#: experiences/views.py:1819 experiences/views.py:1846
-#: experiences/views.py:1927 experiences/views.py:1938
+#: experiences/views.py:1861 experiences/views.py:1877
+#: experiences/views.py:1889 experiences/views.py:1916
+#: experiences/views.py:1997 experiences/views.py:2008
 msgid "Tripalocal <"
 msgstr "本土客 <"
 
-#: experiences/forms.py:1122
+#: experiences/forms.py:1125
 msgid "[Tripalocal] Your booking request is sent to the host"
 msgstr "【本土客】 您的预约已经发送"
 
-#: experiences/forms.py:1142 experiences/forms.py:1190
+#: experiences/forms.py:1145 experiences/forms.py:1193
 #: experiences/resource.py:218 experiences/resource.py:242
-#: experiences/views.py:1790 experiences/views.py:1845
+#: experiences/views.py:1860 experiences/views.py:1915
 msgid "[Tripalocal] Booking confirmed"
 msgstr "【本土客】 预订确认"
 
-#: experiences/forms.py:1154 experiences/forms.py:1166
+#: experiences/forms.py:1157 experiences/forms.py:1169
 #: experiences/resource.py:254 experiences/resource.py:266
-#: experiences/views.py:1806 experiences/views.py:1818
+#: experiences/views.py:1876 experiences/views.py:1888
 msgid "[Tripalocal] Booking reminder"
 msgstr "【本土客】 预订提醒"
 
-#: experiences/forms.py:1178 experiences/resource.py:230
-#: experiences/views.py:1833
+#: experiences/forms.py:1181 experiences/resource.py:230
+#: experiences/views.py:1903
 msgid "[Tripalocal] How was your experience?"
 msgstr "【本土客】 您对我们的体验还满意吗？"
 
-#: experiences/forms.py:1210 experiences/views.py:1922
+#: experiences/forms.py:1213 experiences/views.py:1992
 msgid "%H:%M %d %b %Y"
 msgstr "%Y年%-m月%d日 %H:%M"
 
@@ -1321,41 +1321,41 @@ msgstr "扫码支付"
 msgid "Please scan the QR code below."
 msgstr "请扫描下面的二维码。"
 
-#: experiences/views.py:1221 experiences/views.py:1599
-#: experiences/views.py:1632 experiences/views.py:2311
+#: experiences/views.py:1291 experiences/views.py:1669
+#: experiences/views.py:1702 experiences/views.py:2381
 msgid "Image size exceeds the limit"
 msgstr "图片大小超过上限"
 
-#: experiences/views.py:1223 experiences/views.py:1601
-#: experiences/views.py:1634
+#: experiences/views.py:1293 experiences/views.py:1671
+#: experiences/views.py:1704
 msgid "File type is not supported"
 msgstr "不支持的文件类型"
 
-#: experiences/views.py:1540
+#: experiences/views.py:1610
 msgid "Experience with the same Id already exists"
 msgstr "该Id已分配给其他体验"
 
-#: experiences/views.py:1785
+#: experiences/views.py:1855
 msgid "%H:%M %-d %b %Y"
 msgstr "%Y年%-m月%-d日 %H:%M"
 
-#: experiences/views.py:1926
+#: experiences/views.py:1996
 msgid "[Tripalocal] Your experience is cancelled"
 msgstr "【本土客】 您预订的体验已经取消"
 
-#: experiences/views.py:1937
+#: experiences/views.py:2007
 msgid "[Tripalocal] Cancellation confirmed"
 msgstr "【本土客】 确认取消"
 
-#: experiences/views.py:2554
+#: experiences/views.py:2624
 msgid "Kids Friendly"
 msgstr "亲子夏令营"
 
-#: experiences/views.py:2556
+#: experiences/views.py:2626
 msgid "Host with Car"
 msgstr "领路人自驾"
 
-#: experiences/views.py:2558
+#: experiences/views.py:2628
 msgid "Private group"
 msgstr "私人团"
 
