@@ -3,8 +3,7 @@
 <div class="description-box">
   <h2 style="font-weight:bold">{{ experience.title }}
     <br>
-    <small style="font-size:14px">{%if experience.duration
-      < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24|floatformat: "0"}} {% trans "days" %}{%endif%} &#8226; {%if experience.language=="english;mandarin;" %}English / 中文{%else%}English{%endif%}
+    <small style="font-size:14px">{%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if experience.language == "english;mandarin;" %}English / 中文{%else%}English{%endif%}
       &#8226; {{ experience_city }}</small>
   </h2>
 
