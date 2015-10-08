@@ -146,7 +146,7 @@
                         </div>
                     </form>
                     {%endif%}
-                    
+
                     {% if experience.type == "PRODUCT" %}
                     <div style="border-bottom:1px solid #ccc;">
                       <p>{%if experience.duration < 24 %}{{experience.duration}} {% trans "hour" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "day" %}{%endif%} {% trans 'Public Tour' %}</p>
@@ -182,6 +182,19 @@
                         {% else %}
                             <input style="display:inline-block; width: 75px;" type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
                         {% endif %}
+
+                      <!--- PAGE VIEW STATISTICS HERE -->
+                        <!-- Display this if the experience is within the top 50% most viewed -->
+                        <div class="booking-tip" style="display:none;">
+                          <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
+                          <p>{% trans 'Hurry, more than 50% of this tour has been booked within the next 6 months' %}</p>
+                        </div>
+                        <!-- Display this if the experience is within the top 80% most viewed -->
+                        <div class="booking-tip" style="display:none;">
+                          <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
+                          <p>{% trans 'Hurry, more than 80% of this tour has been booked within the next 6 months' %}</p>
+                        </div>
+                      <!--- -->
 
                         <div class="save-to-wishlist">
                         {% if not in_wishlist %}
