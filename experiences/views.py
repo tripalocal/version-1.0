@@ -158,7 +158,7 @@ def sort_experiences(experiences, customer=None, preference=None):
     if customer is not None:
         records = UserPageViewStatistics.objects.filter(user=customer)
         if records and len(records)>0:
-            #records and experiences shoudld be shorted by id
+            #records and experiences shoudld be sorted by id
             j_last = 0
             for i in range(len(experiences)):
                 for j in range(j_last, len(records)):
@@ -218,6 +218,14 @@ def sort_experiences(experiences, customer=None, preference=None):
 
         sorted += 1
 
+    return experiences
+
+def experience_similarity(experience1, experience2):
+    #TODO
+    return 1
+
+def resort_experiences(experiences, experiences_not_interested, experience_interested):
+    #TODO
     return experiences
 
 def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None):
