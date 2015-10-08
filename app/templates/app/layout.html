@@ -264,7 +264,7 @@
           "url(https://tripalocal-static.s3.amazonaws.com/images/experiences/862/experience862_1.jpg)"
         ];
         var productTitles = [
-          "{% trans 'Skylines Stratosfare Restaurant & Bar' %}",
+          "{% trans 'Skylines Stratosphere Restaurant & Bar' %}",
           "{% trans '2 day camping at Mornington Peninsula Island' %}",
           "{% trans 'Harley Davidson motorcycle' %}"
         ];
@@ -293,8 +293,9 @@
             var nClose = parseInt($.cookie("closePopup"), 10);
 
             if (!nClose || nClose < 3) {
-                if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
-                    $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
+                if ($(location).attr('pathname').match('^/(cn/)?$') ||
+                    $(location).attr('pathname').match('^/(cn/)?s/') ||
+                    $(location).attr('pathname').match('^/(cn/)?experience/(?!(1061/$|1051/$|862/$))')) {
                   popupTimer = setTimeout(function () {
                       $('#popup').modal('show');
                       mixpanel.track("saw popup");

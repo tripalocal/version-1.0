@@ -138,7 +138,7 @@
                 {% endfor %}); position: relative;">
                 {% if experience.hosts %}
                     <div class="profile-frame">
-                        <div class="checkout-profile" style="background:url({{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %})"></div>
+                        <div class="checkout-profile" style="background-image:url({{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %})"></div>
                     </div>
                 {% endif %}
                 </div>
