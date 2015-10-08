@@ -20,47 +20,39 @@
                 <div class="container-fluid" style="text-align:left;">
 					<div class="row" style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;">
 						<div class="col-sm-3">
-							<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Overview" %}</h3>
+							<h3>{% trans "Overview" %}</h3>
 						</div>
 						<div class="col-sm-9">
-                            <p>
-								{{ experience.description|linebreaks }}<br>
+								{{ experience.description|linebreaks }}
 								{{ experience.interaction|linebreaks }}
-                            </p>
 						</div>
 					</div>
 
 					<div class="row" style="border-bottom:1px solid #CCCCCC;">
 						<div class="col-sm-3">
-							<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "Activities" %}</h3>
+							<h3>{% trans "Activities" %}</h3>
 						</div>
-						<div class="col-sm-9 col-xs-12" id="div_experience_activity">
-                            <p>
+						<div class="col-sm-9" id="div_experience_activity">
 								{{ experience.activity|linebreaks }}
-                            </p>
 						</div>
 					</div>
 
 					<div class="row" style="border-bottom:1px solid #CCCCCC;">
 						<div class="col-sm-3">
-							<h3 style="color:grey; margin-top:0;line-height:1.5;">{% trans "What to wear" %}</h3>
+							<h3>{% trans "What to wear" %}</h3>
 						</div>
 						<div class="col-sm-9">
-                            <p>
 							{{ experience.dress|linebreaks }}
-                            </p>
 						</div>
 					</div>
 
 					{% for w in experience.whatsincluded %}
 					<div class="row">
-						<div class="col-sm-3 col-xs-12" style="margin-bottom:0;">
-							<h3 style="color:grey;margin-top:0;line-height:1.5;">{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%elif w.item.lower == "transport"%}交通{%elif w.item.lower == "accommodation"%}住宿{%elif w.item.lower == "private guide"%}旅游达人{%endif%}{%endif%}:</h3>
+						<div class="col-sm-3" style="margin-bottom:0;">
+							<h3>{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%elif w.item.lower == "transport"%}交通{%elif w.item.lower == "accommodation"%}住宿{%elif w.item.lower == "private guide"%}旅游达人{%endif%}{%endif%}:</h3>
 						</div>
 						<div class="col-sm-9" style="margin-bottom:0;">
-							<p>
-                                {{w.details}}
-                            </p>
+              {{w.details}}
 						</div>
 					</div>
 					{% endfor %}
@@ -109,3 +101,4 @@
                     </a>
                 </div>
             </div>
+          </div>
