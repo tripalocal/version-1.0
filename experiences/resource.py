@@ -1365,6 +1365,7 @@ def service_pageview(request):
     return HttpResponse(json.dumps(response),content_type="application/json")
 
 @api_view(['POST'])
+@csrf_exempt
 def service_update_session(request):
     if not request.is_ajax():
         return HttpResponseNotAllowed(['POST'])

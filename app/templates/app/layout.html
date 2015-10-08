@@ -359,6 +359,7 @@
                     url: "/service_update_session/",
                     dataType: 'json',
                     data: {
+                        "csrfmiddlewaretoken": "{{ csrf_token }}",
                         "key": "custom_currency",
                         "value": $("#id_currency_select").val()
                     },
