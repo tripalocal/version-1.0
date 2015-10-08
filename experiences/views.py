@@ -151,10 +151,33 @@ def sort_experiences(experiences, customer=None, preference=None):
     @customer: sort the experiences based on the auto-collected data of the customer
     @preference: sort the experiences based on the specified preference (a dict read from configuration files)
     '''
+    pageview_max = 0
+    match_max = 0
+    bookings_max = 0
+
     if customer is not None:
-        #TODO
-        pass
+        records = UserPageViewStatistics.objects.filter(user=customer)
+        if records and len(records)>0:
+            #records and experiences shoudld be shorted by id
+            j_last = 0
+            for i in range(len(experiences)):
+                for j in range(j_last, len(records)):
+                    if experiences[i].id == records[j].experience.id:
+                        experiences[i].pageview = records[j].times_viewed * records[j].average_length
+                        if experiences[i].pageview > pageview_max:
+                            pageview_max = experiences[i].pageview
+                        j_last = j+1
+                        break
+                    elif experiences[i].id > records[j].experience.id:
+                        #should not occur, becuase records[j].experience is definitely in experiences
+                        j_last = j+1
+                        continue
+                    else:
+                        break
+
     if preference is not None:
+        #TODO: in the case where neither customer nor preference is None,
+        #the experiences list only needs to be read once instead of twice
         for experience in experiences:
             #get the number of booking times
             bks = Booking.objects.filter(experience_id = experience.id)
@@ -162,8 +185,38 @@ def sort_experiences(experiences, customer=None, preference=None):
                 bks = len(bks)
             else:
                 bks = 0
-            experience.popularity = get_experience_score(preference, experience.get_tags(settings.LANGUAGES[0][0]))*0.9 + bks*0.1
-        #TODO
+            experience.bookings = bks
+            experience.match = get_experience_score(preference, experience.get_tags(settings.LANGUAGES[0][0]))
+            if bks > bookings_max:
+                bookings_max = bks
+            if experience.match > match_max:
+                match_max = experience.match
+
+    sorted = 0
+    for experience in experiences:
+        experience.popularity = 0.0
+        #normalize
+        #popularoity = a*pageview+b*match+c*bookings
+        #sort by pupolarity
+        if pageview_max > 0 and hasattr(experience, 'pageview'):
+            experience.pageview = float(experience.pageview/pageview_max)
+            experience.popularity += 4 * experience.pageview
+        if match_max > 0 and hasattr(experience, 'match'):
+            experience.match = float(experience.match/match_max)
+            experience.popularity += 5 * experience.match
+        if bookings_max > 0 and hasattr(experience, 'bookings'):
+            experience.bookings = float(experience.bookings/bookings_max)
+            experience.popularity += 1 * experience.bookings
+
+        i=0
+        for i in range(sorted+1):
+            if experience.popularity > experiences[i].popularity:
+                break
+        if i != sorted:
+            experiences.insert(i, experience)
+            experiences.pop(sorted+1)
+
+        sorted += 1
 
     return experiences
 
