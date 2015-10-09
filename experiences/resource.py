@@ -914,118 +914,134 @@ def service_couponverification(request, format=None):
 
     return Response(result, status=status.HTTP_200_OK)
 
+def get_experience_detail(exp_id, get_available_date=True):
+    experience = AbstractExperience.objects.get(id=exp_id)
+    available_options = []
+    available_date = ()
+
+    if get_available_date:
+        available_date = getAvailableOptions(experience, available_options, available_date)
+
+    if type(experience) == Experience:
+        WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
+        included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
+        included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
+        included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
+
+        host = get_host(experience)
+        host_image = host.registereduser.image_url
+        host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
+
+    rate = 0.0
+    counter = 0
+    experience_reviews = []
+    for review in experience.review_set.all():
+        reviewer = User.objects.get(id=review.user_id)
+        d={'reviewer_firstname':reviewer.first_name,
+            'reviewer_lastname':reviewer.last_name,
+            'reviewer_image':reviewer.registereduser.image_url,
+            'review_comment':review.comment,}
+        experience_reviews.append(d)
+        rate += review.rate
+        counter += 1
+        
+    if counter > 0:        
+        rate /= counter
+        
+    dynamic_price = []
+    if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
+        dynamic_price = experience.dynamic_price.split(",")
+        dynamic_price = [experience_fee_calculator(float(x), experience.commission) for x in dynamic_price if x]
+
+    experience_images = []
+    photos = experience.photo_set.all()
+    for photo in photos:
+        experience_images.append(photo.directory+photo.name)
+
+    result = {'experience_language':experience.language,
+                'experience_duration':experience.duration,
+                'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
+                'experience_currency': str(dict(Currency)[experience.currency.upper()]),
+                'experience_dollarsign': DollarSign[experience.currency.upper()],
+                'experience_dynamic_price':dynamic_price,
+                'experience_guest_number_min':experience.guest_number_min,
+                'experience_guest_number_max':experience.guest_number_max,
+                'experience_images':experience_images,
+                'experience_city':experience.city,
+
+                'experience_rate':math.ceil(rate),
+                'experience_reviews':experience_reviews,
+            }
+
+    if get_available_date:
+        avail_date = {'available_options':available_options,
+            'available_date':available_date,}
+        result.update(avail_date)
+
+    if type(experience) == Experience:
+        result_experience = {'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
+                'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
+                'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
+                'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
+                'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
+                'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
+                    
+                'included_food':included_food.included,
+                'included_food_detail':included_food.details,
+                'included_ticket':included_ticket.included,
+                'included_ticket_detail':included_ticket.details,
+                'included_transport':included_transport.included,
+                'included_transport_detail':included_transport.details,
+
+                'host_firstname': host.first_name,
+                'host_lastname': host.last_name,
+                'host_image':host_image,
+                'host_bio':host_bio,
+                'host_id':str(host.id),}
+        result.update(result_experience)
+    else:
+        result_newproduct = {'title':'',
+                                'description':'',
+                                'highlights':'',
+                                'notice':'',
+                                'tips':'',
+                                'whatsincluded':'',
+                                'pickup_detail':'',
+                                'service':'',
+                                'schedule':'',
+                                'disclaimer':'',
+                                'refund_policy':'',
+                                'insurance':'',
+                                }
+        if experience.newproducti18n_set is not None and len(experience.newproducti18n_set.all()) > 0:
+            t = experience.newproducti18n_set.filter(language=settings.LANGUAGES[0][0])
+            if len(t)>0:
+                t=t[0]
+            else:
+                t = experience.newproducti18n_set.all()[0]
+
+            result_newproduct['title'] = t.title
+            result_newproduct['description'] = t.description
+            result_newproduct['highlights'] = t.highlights
+            result_newproduct['notice'] = t.notice
+            result_newproduct['tips'] = t.tips
+            result_newproduct['whatsincluded'] = t.whatsincluded
+            result_newproduct['service'] = t.service
+            result_newproduct['schedule'] = experience.instant_booking
+            result_newproduct['disclaimer'] = t.disclaimer
+            result_newproduct['refund_policy'] = t.refund_policy
+            result_newproduct['insurance'] = t.insurance
+
+        result.update(result_newproduct)
+    return result
+
 #TODO: change to GET
 @api_view(['POST'])
 @csrf_exempt
 def service_experience(request, format=None):
     try:
         data = request.data
-        exp_id = data['experience_id']
-        experience = AbstractExperience.objects.get(id=exp_id)
-        available_options = []
-        available_date = ()
-
-        available_date = getAvailableOptions(experience, available_options, available_date)
-
-        if type(experience) == Experience:
-            WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
-            included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
-            included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
-            included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
-
-            host = get_host(experience)
-            host_image = host.registereduser.image_url
-            host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
-
-        rate = 0.0
-        counter = 0
-        experience_reviews = []
-        for review in experience.review_set.all():
-            reviewer = User.objects.get(id=review.user_id)
-            d={'reviewer_firstname':reviewer.first_name,
-                'reviewer_lastname':reviewer.last_name,
-                'reviewer_image':reviewer.registereduser.image_url,
-                'review_comment':review.comment,}
-            experience_reviews.append(d)
-            rate += review.rate
-            counter += 1
-        
-        if counter > 0:        
-            rate /= counter
-        
-        dynamic_price = []
-        if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
-            dynamic_price = experience.dynamic_price.split(",")
-            dynamic_price = [experience_fee_calculator(float(x), experience.commission) for x in dynamic_price if x]
-
-        experience_images = []
-        photos = experience.photo_set.all()
-        for photo in photos:
-            experience_images.append(photo.directory+photo.name)
-
-        result = {'experience_language':experience.language,
-                    'experience_duration':experience.duration,
-                    'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
-                    'experience_currency': str(dict(Currency)[experience.currency.upper()]),
-                    'experience_dollarsign': DollarSign[experience.currency.upper()],
-                    'experience_dynamic_price':dynamic_price,
-                    'experience_guest_number_min':experience.guest_number_min,
-                    'experience_guest_number_max':experience.guest_number_max,
-                    'experience_images':experience_images,
-
-                    'available_options':available_options,
-                    'available_date':available_date,
-
-                    'experience_rate':math.ceil(rate),
-                    'experience_reviews':experience_reviews,
-                }
-
-        if type(experience) == Experience:
-            result_experience = {'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
-                    'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
-                    'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
-                    'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
-                    'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
-                    'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
-                    
-                    'included_food':included_food.included,
-                    'included_food_detail':included_food.details,
-                    'included_ticket':included_ticket.included,
-                    'included_ticket_detail':included_ticket.details,
-                    'included_transport':included_transport.included,
-                    'included_transport_detail':included_transport.details,
-
-                    'host_firstname': host.first_name,
-                    'host_lastname': host.last_name,
-                    'host_image':host_image,
-                    'host_bio':host_bio,
-                    'host_id':str(host.id),}
-            result.update(result_experience)
-        else:
-            result_newproduct = {'title':'',
-                                 'description':'',
-                                 'highlights':'',
-                                 'notice':'',
-                                 'tips':'',
-                                 'whatsincluded':'',
-                                 'pickup_detail':''
-                                 }
-            if experience.newproducti18n_set is not None and len(experience.newproducti18n_set.all()) > 0:
-                t = experience.newproducti18n_set.filter(language=settings.LANGUAGES[0][0])
-                if len(t)>0:
-                    t=t[0]
-                else:
-                    t = experience.newproducti18n_set.all()[0]
-
-                result_newproduct['title'] = t.title
-                result_newproduct['description'] = t.description
-                result_newproduct['highlights'] = t.highlights
-                result_newproduct['notice'] = t.notice
-                result_newproduct['tips'] = t.tips
-                result_newproduct['whatsincluded'] = t.whatsincluded
-                result_newproduct['pickup_detail'] = t.pickup_detail
-
-            result.update(result_newproduct)
+        result = get_experience_detail(data['experience_id'])
 
         return Response(result, status=status.HTTP_200_OK)
 
@@ -1041,105 +1057,7 @@ def service_experiencedetail(request, format=None):
         if type(data) is str:
             data = ast.literal_eval(data)
 
-        exp_id = data['experience_id']
-        experience = AbstractExperience.objects.get(id=exp_id)
-        
-        if type(experience) == Experience:
-            WhatsIncludedList = WhatsIncluded.objects.filter(experience=experience)
-            included_food = WhatsIncludedList.filter(item='Food', language=settings.LANGUAGES[0][0])[0]
-            included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
-            included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
-
-            host = get_host(experience)
-            host_image = host.registereduser.image_url
-            host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
-
-        rate = 0.0
-        counter = 0
-        experience_reviews = []
-        for review in experience.review_set.all():
-            reviewer = User.objects.get(id=review.user_id)
-            d={'reviewer_firstname':reviewer.first_name,
-                  'reviewer_lastname':reviewer.last_name,
-                  'reviewer_image':reviewer.registereduser.image_url,
-                  'review_comment':review.comment,}
-            experience_reviews.append(d)
-            rate += review.rate
-            counter += 1
-        
-        if counter > 0:        
-            rate /= counter
-        
-        dynamic_price = []
-        if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
-            dynamic_price = experience.dynamic_price.split(",")
-            dynamic_price = [experience_fee_calculator(float(x), experience.commission) for x in dynamic_price if x]
-
-        experience_images = []
-        photos = experience.photo_set.all()
-        for photo in photos:
-            experience_images.append(photo.directory+photo.name)
-
-        result = {'experience_language':experience.language,
-                    'experience_duration':experience.duration,
-                    'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
-                    'experience_currency': str(dict(Currency)[experience.currency.upper()]),
-                    'experience_dollarsign': DollarSign[experience.currency.upper()],
-                    'experience_dynamic_price':dynamic_price,
-                    'experience_guest_number_min':experience.guest_number_min,
-                    'experience_guest_number_max':experience.guest_number_max,
-                    'experience_images':experience_images,
-
-                    'experience_rate':math.ceil(rate),
-                    'experience_reviews':experience_reviews,
-                }
-
-        if type(experience) == Experience:
-            result_experience = {'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
-                    'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
-                    'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
-                    'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
-                    'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
-                    'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
-                    
-                    'included_food':included_food.included,
-                    'included_food_detail':included_food.details,
-                    'included_ticket':included_ticket.included,
-                    'included_ticket_detail':included_ticket.details,
-                    'included_transport':included_transport.included,
-                    'included_transport_detail':included_transport.details,
-
-                    'host_firstname': host.first_name,
-                    'host_lastname': host.last_name,
-                    'host_image':host_image,
-                    'host_bio':host_bio,
-                    'host_id':str(host.id),}
-            result.update(result_experience)
-        else:
-            result_newproduct = {'title':'',
-                                 'description':'',
-                                 'highlights':'',
-                                 'notice':'',
-                                 'tips':'',
-                                 'whatsincluded':'',
-                                 'pickup_detail':''
-                                 }
-            if experience.newproducti18n_set is not None and len(experience.newproducti18n_set.all()) > 0:
-                t = experience.newproducti18n_set.filter(language=settings.LANGUAGES[0][0])
-                if len(t)>0:
-                    t=t[0]
-                else:
-                    t = experience.newproducti18n_set.all()[0]
-
-                result_newproduct['title'] = t.title
-                result_newproduct['description'] = t.description
-                result_newproduct['highlights'] = t.highlights
-                result_newproduct['notice'] = t.notice
-                result_newproduct['tips'] = t.tips
-                result_newproduct['whatsincluded'] = t.whatsincluded
-                result_newproduct['pickup_detail'] = t.pickup_detail
-
-            result.update(result_newproduct)
+        result = get_experience_detail(data['experience_id'], False)
 
         return Response(result, status=status.HTTP_200_OK)
 
