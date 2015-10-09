@@ -353,6 +353,8 @@ def updateNewProduct(experience):
     language = experience['Language']
     disclaimer = experience['Disclaimer']
     guest_number_min = int(float(experience['Guest number min']))
+    guest_number_max = int(float(experience['Guest number max']))
+    price = float(experience['Price'])
     refund_policy = experience['Refund policy']
     ticket_use_instruction = experience['Ticket use instruction']
     notice = experience['Notice']
@@ -372,6 +374,8 @@ def updateNewProduct(experience):
     exp.provider = Provider.objects.get(id=1)
     exp.language = language.lower() + ";"
     exp.guest_number_min = guest_number_min
+    exp.guest_number_max = guest_number_max
+    exp.price = price
     exp.save()
 
     exp_i18n = NewProductI18n()
@@ -382,7 +386,7 @@ def updateNewProduct(experience):
             exp_i18n = exp_i18n_prev[0]
     
     exp_i18n.title = title
-    exp_i18n.background = background
+    exp_i18n.background_info = background
     exp_i18n.description = description
     exp_i18n.service = service
     exp_i18n.highlights = highlights
@@ -393,7 +397,7 @@ def updateNewProduct(experience):
     exp_i18n.refund_policy = refund_policy
     exp_i18n.ticket_use_instruction = ticket_use_instruction
     exp_i18n.notice = notice
-    exp_i18n.pick_up = pick_up
+    exp_i18n.pickup_detail = pick_up
     exp_i18n.insurance = insurance
     exp_i18n.language = settings.LANGUAGES[0][0]
 
@@ -431,7 +435,7 @@ def updateNewProductFromXLS(request):
             col_names= []
             legal_names= ['Tripalocal listing ID', 'Title', 'Background info', 'Description',
                           'Service', 'Highlights', 'Schedule', 'What\'s included', 'Language',
-                          'Disclaimer', 'Guest number min', 'Refund policy', 'Ticket use instruction',
+                          'Disclaimer', 'Guest number min', 'Guest number max', 'Price', 'Refund policy', 'Ticket use instruction',
                           'Notice', 'Pick up detail', 'Insurance']
 
             curr_cell = -1
