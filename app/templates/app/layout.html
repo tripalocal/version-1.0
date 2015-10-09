@@ -293,12 +293,19 @@
             var nClose = parseInt($.cookie("closePopup"), 10);
 
             if (!nClose || nClose < 3) {
-                if ($(location).attr('pathname').match('^/(cn/)?$') ||
+                if ($(location).attr('pathname').match('^/$') ||
+                    $(location).attr('pathname').match('^/cn/$') ||
                     $(location).attr('pathname').match('^/(cn/)?s/') ||
                     $(location).attr('pathname').match('^/(cn/)?experience/(?!(1061/$|1051/$|862/$))')) {
                   popupTimer = setTimeout(function () {
                       $('#popup').modal('show');
-                      mixpanel.track("saw popup");
+                      if (product == 0) {
+                        mixpanel.track("saw popup skyline");
+                      } else if (product == 1) {
+                        mixpanel.track("saw popup camping");
+                      } else {
+                        mixpanel.track("saw popup motorcycle");
+                      }
                   }, 15000); // milliseconds
                 }
 

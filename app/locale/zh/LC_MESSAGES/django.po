@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 11:48+1100\n"
+"POT-Creation-Date: 2015-10-09 17:20+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -231,7 +231,7 @@ msgstr "关闭"
 
 #: app/templates/app/layout.html:54
 msgid "Edwin"
-msgstr "本土客"
+msgstr "本土君"
 
 #: app/templates/app/layout.html:55
 msgid "Travel Expert"
@@ -384,7 +384,7 @@ msgstr "莫宁顿半岛环岛2天1夜野营之旅"
 msgid "Harley Davidson motorcycle"
 msgstr "哈雷戴维森摩托骑行游览墨尔本市区"
 
-#: app/templates/app/layout.html:380
+#: app/templates/app/layout.html:381
 msgid "Please try again later"
 msgstr ""
 
