@@ -1037,7 +1037,11 @@ def get_experience_detail(experience, get_available_date=True):
     result_related = {"related_experiences":[]}
     related_experiences = get_related_experiences(experience, None)
     for exp in related_experiences:
-        result_related['related_experiences'].append({'id':exp.id,
+        image=""
+        ph = exp.photo_set.all()
+        if ph and len(ph) > 0:
+            image = ph[0].directory+ph[0].name
+        result_related['related_experiences'].append({'image':image,
                                                         'title':exp.get_title(settings.LANGUAGE_CODE[0][0]),
                                                         'price':float(exp.price)*exp.commission, #commission is updated in get_related_experiences 
                                                         'currency': str(dict(Currency).get(exp.currency.upper(),exp.currency.upper())),

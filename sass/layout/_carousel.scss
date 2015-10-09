@@ -8,6 +8,10 @@
   width: 560px;
   height: 365px;
   background-color: $light-grey;
+  @include media('<desktop') {
+    width: 100%;
+    height: auto;
+  }
 }
 
 .carousel-indicators {
