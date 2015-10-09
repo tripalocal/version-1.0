@@ -1,8 +1,6 @@
 ﻿from datetime import *
 from calendar import monthrange
-import string
-import json
-import random
+import string, json, random, pytz, os
 from dateutil.tz import tzlocal
 
 from django import forms
@@ -14,13 +12,13 @@ from experiences.constant import *
 from experiences.models import *
 from Tripalocal_V1 import settings
 from experiences.telstra_sms_api import send_sms
-import pytz
 from django.template import loader
 from tripalocal_messages.models import Aliases
 from django.utils.translation import ugettext as _
 from django.db import connections
 from app.models import RegisteredUser
 from post_office import mail
+from unionpay.util.helper import load_config
 
 Type = (('PRIVATE', _('Private')),('NONPRIVATE', _('NonPrivate')),('RECOMMENDED', _('Recommended')),)
 
@@ -83,8 +81,8 @@ Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Bri
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
-Currency = (('AUD',_('AUD')),('NZD',_('NZD')),) #('CNY',_('CNY')),
-DollarSign = {'AUD':'$','NZD':'$'} #'CNY':'￥',
+Currency = (('AUD',_('AUD')),('NZD',_('NZD')),('CNY',_('CNY')),)
+DollarSign = {'AUD':'$','NZD':'$','CNY':'￥'}
 CurrencyCode = {'AUD':'036','NZD':'554'}
 
 Status = (('Submitted', 'Pending Review'), ('Listed','Listed'), ('Unlisted','Unlisted'))
@@ -506,7 +504,7 @@ class CCExpField(forms.MultiValueField):
             return date(year, month, day)
         return None
 
-def check_coupon(coupon, experience_id, guest_number):
+def check_coupon(coupon, experience_id, guest_number, target_currency=None):
 
     rules = json.loads(coupon.rules)
     guest_number = int(guest_number)
@@ -562,6 +560,9 @@ def check_coupon(coupon, experience_id, guest_number):
         #percentage, e.g., 30% discount --> percentage == -0.3
         price = round(subtotal_price*(1.00+COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
 
+    if target_currency is not None and target_currency.lower() != experience.currency.lower():
+        price = convert_currency(price, experience.currency.upper(), target_currency.upper())
+
     result = {"valid":True, "new_price":price}
     return result
 
@@ -592,6 +593,7 @@ class BookingConfirmationForm(forms.Form):
     coupon_extra_information = forms.CharField(max_length=500, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
     price_paid = forms.DecimalField(max_digits=6, decimal_places=2, required=False)
+    custom_currency = forms.CharField(max_length=3, required=True)
 
     def __init__(self, *args, **kwargs):
         super(BookingConfirmationForm, self).__init__(*args, **kwargs)
@@ -601,6 +603,7 @@ class BookingConfirmationForm(forms.Form):
         self.fields['date'].widget.attrs['readonly'] = True
         self.fields['time'].widget.attrs['readonly'] = True
         self.fields['status'].widget.attrs['readonly'] = True
+        self.fields['custom_currency'].widget.attrs['readonly'] = True
         self.fields['experience_id'].widget = forms.HiddenInput()
         self.fields['user_id'].widget = forms.HiddenInput()
         self.fields['date'].widget = forms.HiddenInput()
@@ -608,6 +611,7 @@ class BookingConfirmationForm(forms.Form):
         self.fields['guest_number'].widget = forms.HiddenInput()
         self.fields['status'].widget = forms.HiddenInput()
         self.fields['coupon_extra_information'].widget = forms.HiddenInput()
+        self.fields['custom_currency'].widget = forms.HiddenInput()
 
     def clean(self):
         """
@@ -660,6 +664,7 @@ class BookingConfirmationForm(forms.Form):
             payment_country = self.cleaned_data['country']
             payment_postcode = self.cleaned_data['postcode']
             payment_phone_number = self.cleaned_data['phone_number']
+            currency = self.cleaned_data['custom_currency']
 
             ids = []
             dates = []
@@ -672,7 +677,7 @@ class BookingConfirmationForm(forms.Form):
                 booking_extra_information="Need Chinese Translation" if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information'] else ""
                 ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,guest_number,
                              coupon_extra_information = coupon_extra_information, coupon = coupon,
-                             payment_phone_number = payment_phone_number, stripe_token = stripeToken)
+                             payment_phone_number = payment_phone_number, stripe_token = stripeToken, currency = currency)
             elif 'UnionPay' in self.data or 'WeChat' in self.data:
                 booking_extra_information=self.cleaned_data['booking_extra_information']
                 if coupon:
@@ -922,7 +927,8 @@ class ItineraryBookingForm(forms.Form):
                 card_number=None,exp_month=None,exp_year=None,cvv=None,
                 booking_extra_information=None,coupon_extra_information=None,coupon=None,
                 payment_street1=None,payment_street2=None,payment_city=None,
-                payment_state=None,payment_country=None,payment_postcode=None,payment_phone_number=None,stripe_token=None):
+                payment_state=None,payment_country=None,payment_postcode=None,
+                payment_phone_number=None,stripe_token=None,currency=None):
 
         for i in range(len(ids)):
             extra_fee = 0.00
@@ -975,6 +981,9 @@ class ItineraryBookingForm(forms.Form):
 
                 if price > 0:
                     payment = Payment()
+                    if currency is not None and currency.lower() != experience.currency.lower():
+                        price = convert_currency(price, experience.currency, currency)
+                        experience.currency = currency
                     #change price into cent
                     success, instance = payment.charge(int(price*100), experience.currency, card_number, exp_month, exp_year, cvv, stripe_token)
                 else:
@@ -1238,3 +1247,8 @@ class SearchForm(forms.Form):
         self.fields['all_tags'].widget = forms.HiddenInput()
         self.fields['language'].widget.attrs['readonly'] = True
         self.fields['language'].widget = forms.HiddenInput()
+
+def convert_currency(price, current_currency, target_currency):
+    file_name = 'experiences/currency_conversion_rate/' + current_currency.upper() + '.yaml'
+    conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
+    return float(price)*float(conversion.get(target_currency.upper(), 1.00))

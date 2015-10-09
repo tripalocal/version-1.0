@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-07 16:03+1100\n"
+"POT-Creation-Date: 2015-10-09 11:48+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,12 +56,12 @@ msgid "Contact Tripalocal"
 msgstr "联系本土客"
 
 #: app/templates/app/aboutus.html:16 app/templates/app/contactus.html:15
-#: app/templates/app/layout.html:166
+#: app/templates/app/layout.html:178
 msgid "Terms of Service"
 msgstr "服务条款"
 
 #: app/templates/app/aboutus.html:17 app/templates/app/contactus.html:16
-#: app/templates/app/layout.html:167
+#: app/templates/app/layout.html:179
 msgid "Privacy Policy"
 msgstr "隐私政策"
 
@@ -84,9 +84,13 @@ msgstr ""
 "人，从而改变旅行的方式。"
 
 #: app/templates/app/aboutus.html:25
+#, fuzzy
+#| msgid ""
+#| "Our mission is to bring travel back to its roots: a discover of the "
+#| "people, culture and stories."
 msgid ""
-"Our mission is to bring travel back to its roots: a discover of the people, "
-"culture and stories."
+"Our mission is to bring travel back to its roots: a discovery of culture, "
+"people and their stories."
 msgstr "我们的宗旨是还原旅行的本质：挖掘当地人的故事和体验他们的文化。"
 
 #: app/templates/app/aboutus.html:26
@@ -288,80 +292,101 @@ msgstr "精品路线"
 msgid "My Profile"
 msgstr "个人信息"
 
-#: app/templates/app/layout.html:163
+#: app/templates/app/layout.html:165
+msgid "CNY"
+msgstr ""
+
+#: app/templates/app/layout.html:166
+msgid "AUD"
+msgstr ""
+
+#: app/templates/app/layout.html:167
+msgid "NZD"
+msgstr ""
+
+#: app/templates/app/layout.html:175
 msgid "Company"
 msgstr "公司"
 
-#: app/templates/app/layout.html:164
+#: app/templates/app/layout.html:176
 msgid "About Us"
 msgstr "关于我们"
 
-#: app/templates/app/layout.html:165
+#: app/templates/app/layout.html:177
 msgid "Contact Us"
 msgstr "联系我们"
 
-#: app/templates/app/layout.html:173
+#: app/templates/app/layout.html:185
 msgid "Travel"
 msgstr "旅行"
 
-#: app/templates/app/layout.html:174
+#: app/templates/app/layout.html:186
 msgid "Refund Policy"
 msgstr "退款政策"
 
-#: app/templates/app/layout.html:180
+#: app/templates/app/layout.html:192
 msgid "Social"
 msgstr "社交"
 
-#: app/templates/app/layout.html:181
+#: app/templates/app/layout.html:193
 msgid "Facebook"
 msgstr ""
 
-#: app/templates/app/layout.html:182
+#: app/templates/app/layout.html:194
 msgid "Twitter"
 msgstr ""
 
-#: app/templates/app/layout.html:217
+#: app/templates/app/layout.html:229
 msgid "Sent!"
 msgstr "发送成功"
 
-#: app/templates/app/layout.html:222
+#: app/templates/app/layout.html:234
 msgid "Error sending, please"
 msgstr "发送失败，请重试"
 
-#: app/templates/app/layout.html:222
+#: app/templates/app/layout.html:234
 msgid "try again"
 msgstr "请重试"
 
-#: app/templates/app/layout.html:245
+#: app/templates/app/layout.html:257
 msgid ""
 "Do you want to experience fine dining with the best view in the Southern "
 "Hemisphere? Try Skylines Stratosphere Bar & Restaurant in Queenstown, New "
 "Zealand."
-msgstr "想看看南半球最佳景致餐厅是怎么样的吗？就一定不能错过新西兰在天际缆车顶端天际缆车餐厅"
+msgstr ""
+"想看看南半球最佳景致餐厅是怎么样的吗？就一定不能错过新西兰在天际缆车顶端天际"
+"缆车餐厅"
 
-#: app/templates/app/layout.html:246
+#: app/templates/app/layout.html:258
 msgid ""
 "Its perfect weather to relax in nature from now until March, why not go "
 "camping?"
-msgstr "从现在起到明年三月，澳洲的天气是最适合在大自然放松的。为什么不去野营呢？"
+msgstr ""
+"从现在起到明年三月，澳洲的天气是最适合在大自然放松的。为什么不去野营呢？"
 
-#: app/templates/app/layout.html:247
+#: app/templates/app/layout.html:259
 msgid ""
 "An unforgettable thrill awaits you! Feel the power and excitement of the "
 "iconic Harley Davidson."
 msgstr "坐上哈雷戴维森摩托车骑行，在墨尔本公路享受不一样的速度与激情。"
 
-#: app/templates/app/layout.html:255
-msgid "Skylines Stratosfare Restaurant & Bar"
+#: app/templates/app/layout.html:267
+#, fuzzy
+#| msgid "Skylines Stratosfare Restaurant & Bar"
+msgid "Skylines Stratosphere Restaurant & Bar"
 msgstr "天际缆车餐厅"
 
-#: app/templates/app/layout.html:256
+#: app/templates/app/layout.html:268
 msgid "2 day camping at Mornington Peninsula Island"
 msgstr "莫宁顿半岛环岛2天1夜野营之旅"
 
-#: app/templates/app/layout.html:257
+#: app/templates/app/layout.html:269
 msgid "Harley Davidson motorcycle"
 msgstr "哈雷戴维森摩托骑行游览墨尔本市区"
+
+#: app/templates/app/layout.html:380
+msgid "Please try again later"
+msgstr ""
 
 #: app/templates/app/loginpartial.html:19
 #: app/templates/app/loginpartial.html:52
@@ -649,15 +674,15 @@ msgstr "奥克兰"
 msgid "Wellington"
 msgstr "惠灵顿"
 
-#: app/views.py:225
+#: app/views.py:229
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 您的帐户已经成功激活"
 
-#: app/views.py:704
+#: app/views.py:708
 msgid "Image size exceeds the limit"
 msgstr "文件大小超过上限"
 
-#: app/views.py:706
+#: app/views.py:710
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
 

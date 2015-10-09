@@ -54,7 +54,17 @@
     margin-bottom: 15px;
     margin-top: 15px;
   }
+
+  h3 {
+    color: $dark-grey;
+    margin-top: 0;
+  }
+
+  p {
+    color: $slate-grey;
+  }
 }
+
 
 .bio-box {
   float: none;

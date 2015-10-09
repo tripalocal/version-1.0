@@ -40,14 +40,12 @@
                     <div class="profile-lg">
                         <div style="background:url({{ MEDIA_URL }}{{ host_image|urlencode }}); no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
                     </div>
-                    {% endif %}
-                    {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
                     {% if LANGUAGE != "zh-CN" %}
                     {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
                     {%else%}
                     {% trans "with" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "Reservation" %}
                     {%endif%}
-                    {%endif%}
+
                     <br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
                     <div class="row" style="width:200px;margin-top:10px">
                     {% if LANGUAGE != "zh-CN" %}
@@ -56,6 +54,7 @@
                         <label>{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label>{{experience.currency}}</label><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%}<br><p>
                     {%endif%}
                     </div>
+
                     <form id="experience_booking_form" method="post" action="">
                         {% csrf_token %}
 
@@ -96,7 +95,7 @@
                                 <td id="instant_booking_time_{{forloop.counter0}}" class="time-list">
                                     <div class="timebtn">
                                         <div>
-                                            <span>{{op.time_string}}</span><img src="/images/instant.png">
+                                            <span>{{op.time_string}}</span><img src="{% static 'icon/instant.png' %}">
                                         </div>
                                     </div>
                                 </td>
@@ -136,18 +135,86 @@
                             <div id="save_to_wishlist_icon" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';" class="save_to_wishlist_not_added"></div>
                             {%endif%}
                             <div id="save_to_wishlist_description" class="description">
-                                <h3 id="wishlist_head">{% trans "Save to Wishlist" %}</h3>
-                                <p id="wishlist_p">Save now, plan later</p>
+                                <h3 id="wishlist_head" style="margin-top:10px; font-weight:normal;">{% trans "Save to Wishlist" %}</h3>
                             </div>
                         {% else %}
                             <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_added"></div>
                             <div id="save_to_wishlist_description" class="description">
-                                <h3 id="wishlist_head">{% trans "Saved to Wishlist" %}</h3>
-                                <p id="wishlist_p"></p>
+                                <h3 id="wishlist_head" style="margin-top:10px; font-weight:normal;">{% trans "Saved to Wishlist" %}</h3>
                             </div>
                         {% endif %}
                         </div>
                     </form>
+                    {%endif%}
+
+                    {% if experience.type == "PRODUCT" %}
+                    <div style="border-bottom:1px solid #ccc;">
+                      <p>{%if experience.duration < 24 %}{{experience.duration}} {% trans "hour" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "day" %}{%endif%} {% trans 'Public Tour' %}</p>
+                    </div>
+                    <div style="padding-top:10px; padding-bottom:10px; border-bottom:1px solid #ccc;">
+                      {% if LANGUAGE != "zh-CN" %}
+                          <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
+                      {%else%}
+                          <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label>{{experience.currency}}</label><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
+                      {%endif%}
+                    </div>
+                    <form style="text-align: left; padding-top: 20px;" id="experience_booking_form" method="post" action="">
+                        {% csrf_token %}
+
+                        {% for field in form.hidden_fields %}
+                            {{ field }}
+                        {% endfor %}
+                        <div class="form-group" style="display:inline-block; text-align:left; margin-right: 10px;">
+                          <p>{% trans 'Date' %}</p>
+                          {{form.date}}
+                        </div>
+                        <div class="form-group" style="display:inline-block; text-align:left; margin-right: 10px;">
+                          <p>{% trans 'Guests' %}</p>
+                          <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none;"/>
+                          <input type="text" id="guest_number_max" name="{{experience.guest_number_max}}" disabled="disabled" style="display:none;"/>
+                          {% for op in available_options %}
+                              <p id="seat_left_{{forloop.counter0}}" style="display:none;"> {{op.available_seat}} </p>
+                          {% endfor %}
+                          {{form.guest_number}}
+                        </div>
+                        {% if user.is_authenticated %}
+                            <input style="display:inline-block; width: 75px;" id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" />
+                        {% else %}
+                            <input style="display:inline-block; width: 75px;" type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
+                        {% endif %}
+
+                      <!--- PAGE VIEW STATISTICS HERE -->
+                        <!-- Display this if the experience is within the top 50% most viewed -->
+                        <div class="booking-tip" style="display:none;">
+                          <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
+                          <p>{% trans 'Hurry, more than 50% of this tour has been booked within the next 6 months' %}</p>
+                        </div>
+                        <!-- Display this if the experience is within the top 80% most viewed -->
+                        <div class="booking-tip" style="display:none;">
+                          <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
+                          <p>{% trans 'Hurry, more than 80% of this tour has been booked within the next 6 months' %}</p>
+                        </div>
+                      <!--- -->
+
+                        <div class="save-to-wishlist">
+                        {% if not in_wishlist %}
+                            {% if user.is_authenticated %}
+                            <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_not_added"></div>
+                            {% else %}
+                            <div id="save_to_wishlist_icon" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';" class="save_to_wishlist_not_added"></div>
+                            {%endif%}
+                            <div id="save_to_wishlist_description" class="description">
+                                <h3 id="wishlist_head" style="margin-top:10px; font-weight:normal;">{% trans "Save to Wishlist" %}</h3>
+                            </div>
+                        {% else %}
+                            <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_added"></div>
+                            <div id="save_to_wishlist_description" class="description">
+                                <h3 id="wishlist_head" style="margin-top:10px; font-weight:normal;">{% trans "Saved to Wishlist" %}</h3>
+                            </div>
+                        {% endif %}
+                        </div>
+                    </form>
+                    {% endif %}
                 </div>
             </div>
 
@@ -459,14 +526,14 @@ $(function(){
                                 {
                                     if(result.added)
                                     {
-                                        alert('{%trans "The experience has been added to your wishlist" %}');
+                                        //alert('{%trans "The experience has been added to your wishlist" %}');
                                         $('#save_to_wishlist_related_'+i).removeClass("save_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).addClass("saved_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).attr("val","True");
                                     }
                                     if(result.removed)
                                     {
-                                        alert('{%trans "The experience has been removed from your wishlist" %}');
+                                        //alert('{%trans "The experience has been removed from your wishlist" %}');
                                         $('#save_to_wishlist_related_'+i).removeClass("saved_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).addClass("save_to_wishlist_related");
                                         $('#save_to_wishlist_related_'+i).attr("val","False");
@@ -691,10 +758,10 @@ $(function(){
         time_arrived = Date.parseExact("{{time_arrived}}", "yyyy-MM-dd HH:mm:ss");
         time_left = new Date();
         length = (time_left - time_arrived)/1000;
-        
+
         $.ajax({
                 type: 'POST',
-                url: "http://localhost:8000/service_pageview/", //"{{pageview_webservice}}",
+                url: "/service_pageview/",
                 dataType: 'json',
                 data: {
                     "csrfmiddlewaretoken": "{{ csrf_token }}",
