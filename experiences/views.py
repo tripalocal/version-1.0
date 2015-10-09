@@ -53,7 +53,7 @@ def set_initial_currency(request):
             request.session["custom_currency"] = "AUD"
 
 def convert_experience_price(request, experience):
-    if 'custom_currency' in request.session\
+    if hasattr(request, 'session') and 'custom_currency' in request.session\
         and experience.currency.lower() != request.session['custom_currency'].lower():
         experience.price = convert_currency(experience.price, experience.currency, request.session['custom_currency'])
 
@@ -719,6 +719,59 @@ def getAvailableOptions(experience, available_options, available_date):
             #TODO
     return available_date
 
+def get_related_experiences(experience, request):
+    related_experiences = []
+    cursor = connections['default'].cursor()
+    cursor.execute("select experience_id from experiences_experience_guests where experience_id != %s and user_id in" +
+                    "(select user_id from experiences_experience_guests where experience_id=%s)",
+                            [experience.id, experience.id])
+    ids = cursor.fetchall()
+    if ids and len(ids)>0:
+        for id in ids:
+            related_experiences.append(id[0])
+        related_experiences = list(Experience.objects.filter(id__in=related_experiences).filter(city__iexact=experience.city))
+    if len(related_experiences)<3:
+        cursor = connections['default'].cursor()
+        cursor.execute("select experience_id from (select distinct experience_id, count(experiencetag_id)" +
+                        "from experiences_experience_tags where experience_id!=%s and experiencetag_id in" +
+                        "(SELECT experiencetag_id FROM experiences_experience_tags where experience_id=%s)" +
+                        "group by experience_id order by count(experiencetag_id) desc) as t1", #LIMIT %s
+                            [experience.id, experience.id])
+        ids = cursor.fetchall()
+        r_ids = []
+        for i in range(len(ids)):
+            r_ids.append(ids[i][0])
+
+        queryset = Experience.objects.filter(id__in=r_ids).filter(city__iexact=experience.city).filter(status__iexact="listed")
+        for exp in queryset:
+            if not any(x.id == exp.id for x in related_experiences):
+                related_experiences.append(exp)
+            if len(related_experiences)>=3:
+                break
+
+    if len(related_experiences)<3:
+        queryset = Experience.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").order_by('?')[:3]
+        for exp in queryset:
+            related_experiences.append(exp)
+            if len(related_experiences)>=3:
+                break
+
+    for i in range(0,len(related_experiences)):
+        convert_experience_price(request, related_experiences[i])
+        related_experiences[i].dollarsign = DollarSign[related_experiences[i].currency.upper()]
+        related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
+        related_experiences[i].title = related_experiences[i].get_title(settings.LANGUAGES[0][0])
+        related_experiences[i].description = related_experiences[i].get_description(settings.LANGUAGES[0][0])
+        setExperienceDisplayPrice(related_experiences[i])
+        if float(related_experiences[i].duration).is_integer():
+            related_experiences[i].duration = int(related_experiences[i].duration)
+        if related_experiences[i].commission > 0.0:
+            related_experiences[i].commission = related_experiences[i].commission/(1-related_experiences[i].commission)+1
+        else:
+            related_experiences[i].commission = settings.COMMISSION_PERCENT+1
+
+    return related_experiences
+
 class ExperienceDetailView(DetailView):
     model = AbstractExperience
     template_name = 'experiences/experience_detail.html'
@@ -873,58 +926,11 @@ class ExperienceDetailView(DetailView):
                     context['in_wishlist'] = True
                     break
 
-        related_experiences = []
-        cursor = connections['default'].cursor()
-        cursor.execute("select experience_id from experiences_experience_guests where experience_id != %s and user_id in" +
-                       "(select user_id from experiences_experience_guests where experience_id=%s)",
-                             [experience.id, experience.id])
-        ids = cursor.fetchall()
-        if ids and len(ids)>0:
-            for id in ids:
-                related_experiences.append(id[0])
-            related_experiences = list(Experience.objects.filter(id__in=related_experiences).filter(city__iexact=experience.city))
-        if len(related_experiences)<3:
-            cursor = connections['default'].cursor()
-            cursor.execute("select experience_id from (select distinct experience_id, count(experiencetag_id)" +
-                           "from experiences_experience_tags where experience_id!=%s and experiencetag_id in" +
-                           "(SELECT experiencetag_id FROM experiences_experience_tags where experience_id=%s)" +
-                           "group by experience_id order by count(experiencetag_id) desc) as t1", #LIMIT %s
-                             [experience.id, experience.id])
-            ids = cursor.fetchall()
-            r_ids = []
-            for i in range(len(ids)):
-                r_ids.append(ids[i][0])
-
-            queryset = Experience.objects.filter(id__in=r_ids).filter(city__iexact=experience.city).filter(status__iexact="listed")
-            for exp in queryset:
-                if not any(x.id == exp.id for x in related_experiences):
-                    related_experiences.append(exp)
-                if len(related_experiences)>=3:
-                    break
-
-        if len(related_experiences)<3:
-            queryset = Experience.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").order_by('?')[:3]
-            for exp in queryset:
-                related_experiences.append(exp)
-                if len(related_experiences)>=3:
-                    break
-
-        for i in range(0,len(related_experiences)):
-            convert_experience_price(self.request, related_experiences[i])
-            related_experiences[i].dollarsign = DollarSign[related_experiences[i].currency.upper()]
-            related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
-            related_experiences[i].title = related_experiences[i].get_title(settings.LANGUAGES[0][0])
-            related_experiences[i].description = related_experiences[i].get_description(settings.LANGUAGES[0][0])
-            setExperienceDisplayPrice(related_experiences[i])
-            if float(related_experiences[i].duration).is_integer():
-                related_experiences[i].duration = int(related_experiences[i].duration)
-            if related_experiences[i].commission > 0.0:
-                related_experiences[i].commission = related_experiences[i].commission/(1-related_experiences[i].commission)+1
-            else:
-                related_experiences[i].commission = settings.COMMISSION_PERCENT+1
+        related_experiences = get_related_experiences(experience, self.request)
 
         related_experiences_added_to_wishlist = []
 
+        cursor = connections['default'].cursor()
         if self.request.user.is_authenticated():
             for r in related_experiences:
                 cursor.execute("select id from app_registereduser_wishlist where experience_id = %s and registereduser_id=%s",

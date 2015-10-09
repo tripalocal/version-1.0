@@ -19,7 +19,7 @@ from django.template.loader import get_template
 from app.forms import UploadXLSForm, ExperienceTagsXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator, update_pageview_statistics
+from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator, update_pageview_statistics, get_related_experiences
 from app.views import getreservation
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
@@ -914,8 +914,7 @@ def service_couponverification(request, format=None):
 
     return Response(result, status=status.HTTP_200_OK)
 
-def get_experience_detail(exp_id, get_available_date=True):
-    experience = AbstractExperience.objects.get(id=exp_id)
+def get_experience_detail(experience, get_available_date=True):
     available_options = []
     available_date = ()
 
@@ -961,8 +960,8 @@ def get_experience_detail(exp_id, get_available_date=True):
     result = {'experience_language':experience.language,
                 'experience_duration':experience.duration,
                 'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
-                'experience_currency': str(dict(Currency)[experience.currency.upper()]),
-                'experience_dollarsign': DollarSign[experience.currency.upper()],
+                'experience_currency': str(dict(Currency).get(experience.currency.upper(),experience.currency.upper())),
+                'experience_dollarsign': DollarSign.get(experience.currency.upper(),'$'),
                 'experience_dynamic_price':dynamic_price,
                 'experience_guest_number_min':experience.guest_number_min,
                 'experience_guest_number_max':experience.guest_number_max,
@@ -1033,6 +1032,19 @@ def get_experience_detail(exp_id, get_available_date=True):
             result_newproduct['insurance'] = t.insurance
 
         result.update(result_newproduct)
+
+    #get related experiences
+    result_related = {"related_experiences":[]}
+    related_experiences = get_related_experiences(experience, None)
+    for exp in related_experiences:
+        result_related['related_experiences'].append({'id':exp.id,
+                                                        'title':exp.get_title(settings.LANGUAGE_CODE[0][0]),
+                                                        'price':float(exp.price)*exp.commission, #commission is updated in get_related_experiences 
+                                                        'currency': str(dict(Currency).get(exp.currency.upper(),exp.currency.upper())),
+                                                        'dollarsign': DollarSign.get(exp.currency.upper(),'$'),
+                                                        'duration':exp.duration,
+                                                        'language':exp.language})
+    result.update(result_related)
     return result
 
 #TODO: change to GET
@@ -1041,7 +1053,8 @@ def get_experience_detail(exp_id, get_available_date=True):
 def service_experience(request, format=None):
     try:
         data = request.data
-        result = get_experience_detail(data['experience_id'])
+        experience = AbstractExperience.objects.get(id=data['experience_id'])
+        result = get_experience_detail(experience)
 
         return Response(result, status=status.HTTP_200_OK)
 
@@ -1057,7 +1070,8 @@ def service_experiencedetail(request, format=None):
         if type(data) is str:
             data = ast.literal_eval(data)
 
-        result = get_experience_detail(data['experience_id'], False)
+        experience = AbstractExperience.objects.get(id=data['experience_id'])
+        result = get_experience_detail(experience, False)
 
         return Response(result, status=status.HTTP_200_OK)
 
