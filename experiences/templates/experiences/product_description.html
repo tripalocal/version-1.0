@@ -19,18 +19,21 @@
       </div>
     </div>
 
+    {% if experience.highlights %}
     <div class="row" style="border-bottom:1px solid #CCCCCC;">
       <div class="col-sm-3">
         <h3>{% trans "Highlights" %}</h3>
       </div>
-      <div class="col-sm-9 col-xs-12" id="div_experience_highlights">
+      <div class="col-sm-9" id="div_experience_highlights">
         <p>
           {{ experience.highlights|linebreaks }}
         </p>
       </div>
     </div>
+    {% endif %}
 
-    <div class="row" style="border-bottom:1px solid #CCCCCC;height: 10px;">
+    {% if experience.service %}
+    <div class="row" style="border-bottom:1px solid #CCCCCC;">
       <div class="col-sm-3">
         <h3>{% trans "Description" %}</h3>
       </div>
@@ -38,8 +41,10 @@
         <p>{{ experience.service|linebreaks }}</p>
       </div>
     </div>
+    {% endif %}
 
-    <div class="row" style="border-bottom:1px solid #CCCCCC;height: 10px;">
+    {% if experience.schedule %}
+    <div class="row" style="border-bottom:1px solid #CCCCCC;">
       <div class="col-sm-3">
         <h3>{% trans "Schedule" %}</h3>
       </div>
@@ -47,8 +52,9 @@
         <p>{{ experience.schedule|linebreaks }}</p>
       </div>
     </div>
+    {% endif %}
 
-
+    {% if experience.tips || experience.notice %}
     <div class="row" style="border-bottom:1px solid #CCCCCC;">
       <div class="col-sm-3">
         <h3>{% trans "Tips" %}</h3>
@@ -62,7 +68,9 @@
         </p>
       </div>
     </div>
+    {% endif %}
 
+    {% if experience.whatsincluded %}
     <div class="row" style="border-bottom:1px solid #CCCCCC;">
       <div class="col-sm-3">
         <h3>{% trans "What's included" %}</h3>
@@ -73,7 +81,9 @@
         </p>
       </div>
     </div>
+    {% endif %}
 
+    {% if experience.pickup_detail %}
     <div class="row" style="border-bottom:1px solid #CCCCCC;">
       <div class="col-sm-3">
         <h3>{% trans "Pickup detail" %}</h3>
@@ -84,21 +94,47 @@
         </p>
       </div>
     </div>
+    {% endif %}
 
+    {% if experience.disclaimer %}
     <div class="row" style="border-bottom:1px solid #CCCCCC;">
       <div class="col-sm-3">
-        <h3>{% trans "Refund policy" %}</h3>
+        <h3 style="font-size: 10px;">{% trans "Disclaimer" %}</h3>
       </div>
       <div class="col-sm-9">
-        <p>
+        <p style="font-size: 10px;">
+          {{ experience.disclaimer|linebreaks }}
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if experience.refund_policy %}
+    <div class="row" style="border-bottom:1px solid #CCCCCC;">
+      <div class="col-sm-3">
+        <h3 style="font-size: 10px;">{% trans "Refund policy" %}</h3>
+      </div>
+      <div class="col-sm-9">
+        <p style="font-size: 10px;">
           {{ experience.refund_policy|linebreaks }}
         </p>
       </div>
     </div>
+    {% endif %}
 
-
-
+    {% if experience.insurance %}
+    <div class="row" style="border-bottom:1px solid #CCCCCC;">
+      <div class="col-sm-3">
+        <h3 style="font-size: 10px;">{% trans "Insurance" %}</h3>
+      </div>
+      <div class="col-sm-9">
+        <p style="font-size: 10px;">
+          {{ experience.insurance|linebreaks }}
+        </p>
+      </div>
+    </div>
   </div>
+  {% endif %}
 
   <div id="myCarousel" class="carousel slide" data-ride="carousel">
     <!-- Indicators -->
