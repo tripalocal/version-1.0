@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from experiences.models import Experience
+from experiences.models import Experience, AbstractExperience
 
 class RegisteredUser(models.Model):
     def upload_path(self, name):
@@ -68,7 +68,7 @@ class UserPhoto(models.Model):
 
 class UserPageViewStatistics(models.Model):
     user = models.ForeignKey(User)
-    experience = models.ForeignKey(Experience)
+    experience = models.ForeignKey(AbstractExperience)
     times_viewed = models.IntegerField(default=0)
     average_length = models.FloatField(default=0.0)
 
