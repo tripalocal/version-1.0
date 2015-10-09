@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-08 16:20+1100\n"
+"POT-Creation-Date: 2015-10-09 11:48+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -371,7 +371,9 @@ msgid ""
 msgstr "坐上哈雷戴维森摩托车骑行，在墨尔本公路享受不一样的速度与激情。"
 
 #: app/templates/app/layout.html:267
-msgid "Skylines Stratosfare Restaurant & Bar"
+#, fuzzy
+#| msgid "Skylines Stratosfare Restaurant & Bar"
+msgid "Skylines Stratosphere Restaurant & Bar"
 msgstr "天际缆车餐厅"
 
 #: app/templates/app/layout.html:268
@@ -382,7 +384,7 @@ msgstr "莫宁顿半岛环岛2天1夜野营之旅"
 msgid "Harley Davidson motorcycle"
 msgstr "哈雷戴维森摩托骑行游览墨尔本市区"
 
-#: app/templates/app/layout.html:379
+#: app/templates/app/layout.html:380
 msgid "Please try again later"
 msgstr ""
 
