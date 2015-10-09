@@ -1,13 +1,13 @@
 {% load mathfilters %} {% load i18n %}
 
 <div class="description-box">
-  <h2 style="font-weight:bold">{{ experience.title }}
-    <br>
-    <small style="font-size:14px">{%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if experience.language == "english;mandarin;" %}English / 中文{%else%}English{%endif%}
-      &#8226; {{ experience_city }}</small>
-  </h2>
-
   <div class="container-fluid" style="text-align:left;">
+    <h2 style="font-weight:bold">{{ experience.title }}
+      <br>
+      <small style="font-size:14px">{%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if experience.language == "english;mandarin;" %}English / 中文{%else%}English{%endif%}
+        &#8226; {{ experience_city }}</small>
+    </h2>
+
     <div class="row" style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;">
       <div class="col-sm-3">
         <h3>{% trans "Overview" %}</h3>
@@ -133,8 +133,9 @@
         </p>
       </div>
     </div>
+    {% endif %}
   </div>
-  {% endif %}
+
 
   <div id="myCarousel" class="carousel slide" data-ride="carousel">
     <!-- Indicators -->

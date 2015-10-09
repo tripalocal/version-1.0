@@ -33,7 +33,6 @@
 	</div>
 
     <div class="container stickem-container">
-	    <div class="row">
             <div class="stickem">
                 <div class="booking-box">
                     {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
@@ -223,8 +222,6 @@
             {% else %}
                 {% include "experiences/experience_description.html" %}
             {%endif%}
-
-        </div>
     </div>
 
     {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
@@ -300,15 +297,16 @@
                 {% endif %}
                     {%if review.user.registereduser.image_url != None and review.user.registereduser.image_url != ''%}
                     <div class="profile-frame-sm" style="float:left;">
-                        <div class="profile-sm" style="background-image:src({{ MEDIA_URL }}{{review.user.registereduser.image_url}})">
+                        <div class="profile-sm" style="background-image:url({{ MEDIA_URL }}{{review.user.registereduser.image_url|urlencode}})">
                         </div>
                     </div>
                     {%else%}
                     <div class="profile-frame-sm" style="float:left;">
-                        <div class="profile-sm" style="background-image:src({{ MEDIA_URL }}img/profile_default.jpg)">
+                        <div class="profile-sm" style="background-image:url({{ MEDIA_URL }}img/profile_default.jpg)">
                         </div>
                     </div>
                     {%endif%}
+                    <div class="reviewName"><p>{{review.user.first_name }}</p></div>
                     <div class="reviewText">{{review.comment}}
                         <div class="reviewDate">
                         {% if LANGUAGE != "zh-CN" %}

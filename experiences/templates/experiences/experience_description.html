@@ -1,7 +1,9 @@
 {% load mathfilters %}
 {% load i18n %}
 
-            <div class="description-box">
+        <div class="description-box">
+            <div class="container-fluid" style="text-align:left;">
+              <div class="row">
                 {% if experience.type and experience.type == "RECOMMENDED" %}
                 <div class="recommended-label">{% trans "Recommended" %}</div>
                 {% endif %}
@@ -16,8 +18,8 @@
                 {% endif %}
                 <br><small style="font-size:14px">{%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%} &#8226; {{ experience_city }}</small>
                 </h2>
+              </div>
 
-                <div class="container-fluid" style="text-align:left;">
 					<div class="row" style="border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC;">
 						<div class="col-sm-3">
 							<h3>{% trans "Overview" %}</h3>
@@ -57,7 +59,7 @@
 					</div>
 					{% endfor %}
 
-					<div class="row" style="border-bottom:1px solid #CCCCCC;height: 10px;">
+					<div class="row" style="border-bottom:1px solid #CCCCCC;height: 10px;margin-bottom:20px;">
 						<div class="col-sm-3">
 						</div>
 						<div class="col-sm-9">
