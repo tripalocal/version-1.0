@@ -149,15 +149,16 @@
 
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
-      {% for photo in experience.photo_set.all %} {% if forloop.counter == 1 %}
+      {% for photo in experience.photo_set.all %}
+      {% if forloop.counter == 1 %}
       <div class="item active">
-        {%else%}
-        <div class="item">
-          {% endif %}
-          <img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}" alt="Chania">
-        </div>
-        {% endfor %}
+      {%else%}
+      <div class="item">
+      {% endif %}
+        <img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}" alt="Chania">
       </div>
+        {% endfor %}
+    </div>
 
       <!-- Left and right controls -->
       <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev" style="background:none">
@@ -168,6 +169,6 @@
         <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
         <span class="sr-only">Next</span>
       </a>
-    </div>
+
   </div>
 </div>

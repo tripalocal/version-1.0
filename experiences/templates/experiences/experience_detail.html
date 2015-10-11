@@ -380,6 +380,29 @@
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 <script charset="utf-8" type="text/javascript">
+function resizeImg() {
+    var thisImg= $('.item');
+    var refH = thisImg.height();
+    var refW = thisImg.width();
+    var refRatio = refW/refH;
+
+    var imgH = thisImg.children("img").height();
+    var imgW = thisImg.children("img").width();
+
+    if ( (imgW/imgH) > refRatio ) {
+        thisImg.addClass("portrait");
+        thisImg.removeClass("landscape");
+    } else {
+        thisImg.addClass("landscape");
+        thisImg.removeClass("portrait");
+    }
+}
+
+$(document).ready(resizeImg())
+
+$(window).resize(function(){
+    resizeImg();
+});
 
 $(function(){
     $(document).ready(function(){
