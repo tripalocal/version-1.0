@@ -22,9 +22,11 @@ from unionpay.util.helper import load_config
 
 Type = (('PRIVATE', _('Private')),('NONPRIVATE', _('NonPrivate')),('RECOMMENDED', _('Recommended')),)
 
-Location = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),
-            ('Goldcoast',_('Gold coast, QLD')),('Hobart',_('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
-            ('GRVIC', _('Greater Victoria')),('GRNSW', _('Greater New South Wales')),('GRQLD', _('Greater Queensland')),
+Location = (('Melbourne', _('Melbourne, VIC')),('GRVIC', _('Greater Victoria')),
+            ('Sydney', _('Sydney, NSW')),('GRNSW', _('Greater New South Wales')),
+            ('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),('Goldcoast',_('Gold coast, QLD')),('GRQLD', _('Greater Queensland')),
+            ('Hobart',_('Hobart, TAS')),('GRTAS', _('Greater Tasmania')),
+            ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
@@ -41,7 +43,7 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
 #                    (_('Greater Northern Territory'), 'GRNT'),
 
 Location_relation = {'GRQLD':['Brisbane','Cairns','Goldcoast'], 'GRNT':['Darwin','Alicesprings'],
-                     'GRVIC':['Melbourne'], 'GRSA':['Adelaide'], 'GRNSW':['Sydney']} #for issue 208
+                     'GRVIC':['Melbourne'], 'GRSA':['Adelaide'], 'GRNSW':['Sydney'], 'GRTAS':['Hobart']} #for issue 208
 
 Locations = [(_('Australia'), [('Melbourne', _('Melbourne'), _('Victoria')), ('Sydney', _('Sydney'), _('New South Wales')),
                            ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
