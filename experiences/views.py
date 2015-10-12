@@ -722,10 +722,10 @@ def getAvailableOptions(experience, available_options, available_date):
 def get_related_experiences(experience, request):
     related_experiences = []
     cursor = connections['default'].cursor()
-    cursor.execute("select experience_id from experiences_experience_guests where experience_id != %s and user_id in" +
+    cursor.execute("select distinct experience_id from experiences_experience_guests where experience_id != %s and user_id in" +
                     "(select user_id from experiences_experience_guests where experience_id=%s)",
                             [experience.id, experience.id])
-    ids = cursor.fetchall()
+    ids = cursor._rows
     if ids and len(ids)>0:
         for id in ids:
             related_experiences.append(id[0])
@@ -737,7 +737,7 @@ def get_related_experiences(experience, request):
                         "(SELECT experiencetag_id FROM experiences_experience_tags where experience_id=%s)" +
                         "group by experience_id order by count(experiencetag_id) desc) as t1", #LIMIT %s
                             [experience.id, experience.id])
-        ids = cursor.fetchall()
+        ids = cursor._rows
         r_ids = []
         for i in range(len(ids)):
             r_ids.append(ids[i][0])
@@ -935,7 +935,7 @@ class ExperienceDetailView(DetailView):
             for r in related_experiences:
                 cursor.execute("select id from app_registereduser_wishlist where experience_id = %s and registereduser_id=%s",
                              [r.id,self.request.user.registereduser.id])
-                wl = cursor.fetchone()
+                wl = cursor._rows
                 if wl and len(wl)>0:
                     related_experiences_added_to_wishlist.append(True)
                 else:
@@ -996,6 +996,44 @@ class ExperienceDetailView(DetailView):
         time_arrived = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         context['time_arrived'] = time_arrived
         context['pageview_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_pageview/"
+
+        #check whether the experience is among the top 50%, 80% most viewed in the past 30 days
+        if type(experience) is Experience:
+            table_name = "experiences_experience"
+            if experience.type == "ITINERARY":
+                target_type = "'ITINERARY'"
+            else:
+                target_type = "'PRIVATE', 'NONPRIVATE'"
+
+            cursor.execute("SELECT experience_id, count(experience_id) FROM app_userpageviewrecord" + \
+                                " where time_arrived >= NOW() - INTERVAL 30 DAY and (select type from " + table_name + \
+                                " where abstractexperience_ptr_id=experience_id) in (" + \
+                                target_type + ") group by experience_id order by count(experience_id) desc;")
+        else:
+            table_name = "experiences_newproduct"
+            cursor.execute("SELECT experience_id, count(experience_id) FROM app_userpageviewrecord" + \
+                                " where time_arrived >= NOW() - INTERVAL 30 DAY and experience_id in " + \
+                                " (select abstractexperience_ptr_id from " + table_name + ")" + \
+                                " group by experience_id order by count(experience_id) desc;")
+
+        j=0
+        top_20 = False
+        top_50 = False
+        for i in range(int(cursor.rowcount*0.2)+1):
+            j=i
+            if cursor._rows[i][0] == experience.id:
+                top_20 = True
+                top_50 = True
+                break
+
+        if not top_50:
+            for i in range(j+1, int(cursor.rowcount*0.5)+1):
+                if cursor._rows[i][0] == experience.id:
+                    top_50 = True
+                    break
+
+        context['top_20'] = top_20
+        context['top_50'] = top_50
 
         return context
 
