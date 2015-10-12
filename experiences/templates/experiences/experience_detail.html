@@ -411,6 +411,12 @@ $(function(){
             $(document.body).stickem();
         }
 
+        {% if experience.type == "PRODUCT" %}
+        if (screen.width < 767) {
+          $(".booking-box").css("margin-top", "-30px");
+        }
+        {% endif %}
+
         if($("#div_experience_activity").text().length>0)
         {
            $("#div_experience_activity")[0].innerHTML = $("#div_experience_activity")[0].innerHTML.replace(/&lt;strong&gt;/g,"<strong>").replace(/&lt;\/strong&gt;/g,"</strong>");
