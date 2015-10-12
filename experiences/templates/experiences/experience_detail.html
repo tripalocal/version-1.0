@@ -182,18 +182,22 @@
                             <input style="display:inline-block; width: 75px;" type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
                         {% endif %}
 
-                      <!--- PAGE VIEW STATISTICS HERE -->
+                        <!--- PAGE VIEW STATISTICS HERE -->
+                        {% if not top_20 and top_50 %}
                         <!-- Display this if the experience is within the top 50% most viewed -->
-                        <div class="booking-tip" style="display:none;">
+                        <div class="booking-tip" style="">
                           <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
                           <p>{% trans 'Hurry, more than 50% of this tour has been booked within the next 6 months' %}</p>
                         </div>
+                        {% endif %}
+                        {% if top_20 %}
                         <!-- Display this if the experience is within the top 80% most viewed -->
-                        <div class="booking-tip" style="display:none;">
+                        <div class="booking-tip" style="">
                           <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
                           <p>{% trans 'Hurry, more than 80% of this tour has been booked within the next 6 months' %}</p>
                         </div>
-                      <!--- -->
+                        {% endif %}
+                        <!--- -->
 
                         <div class="save-to-wishlist">
                         {% if not in_wishlist %}

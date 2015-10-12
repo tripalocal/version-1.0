@@ -531,7 +531,7 @@ def service_wishlist(request):
                     #user.registereduser.wishlist.add(experience)
                     cursor = connections['default'].cursor()
                     cursor.execute("select id from app_registereduser_wishlist where experience_id=%s and registereduser_id=%s", [experience.id, user.registereduser.id])
-                    wl = cursor.fetchone()
+                    wl = cursor._rows
                     if wl is not None and len(wl)>0:
                         response={'success':False, 'error':'already added'}
                         return HttpResponse(json.dumps(response),content_type="application/json")
@@ -566,7 +566,7 @@ def service_wishlist(request):
             user = request.user
             cursor = connections['default'].cursor()
             wl = cursor.execute("select experience_id from app_registereduser_wishlist where registereduser_id=%s", [user.registereduser.id])
-            wl = cursor.fetchall()
+            wl = cursor._rows
             experiences = []
             for id in wl:
                 experience = Experience.objects.get(id=id[0])
