@@ -130,11 +130,31 @@
 
         <div class="collapse navbar-collapse" id="main-menu-collapse">
           <ul class="nav navbar-nav main-menu">
+            {% if user.is_authenticated %}
+            <li class="visible-xs"><div class="profile-navbar" id="id_profile_div"
+                       style="display:inline-block; background:url({% if user.socialaccount_set.all %}
+                           http://graph.facebook.com/{{ user.socialaccount_set.all.0.uid }}/picture?width=40&height=40
+                       {% elif user.registereduser.image_url and user.registereduser.image_url.strip %}
+                           {{ MEDIA_URL }}{{ user.registereduser.image_url }}
+                       {% else %}
+                           {{ MEDIA_URL }}img/profile_default.jpg
+                       {% endif %});
+                      background-size: cover; background-repeat: no-repeat; background-position:center;"><a style="display:inline-block; width:34px; height:34px; border-radius:100px; margin:0; padding:0;"
+                          href="{{ GEO_POSTFIX }}myprofile"></a>
+                  </div> <p style="display:inline; vertical-align:middle; margin-left:10px;">{{ user.first_name }}</p>
+            </li>
+            {% endif %}
+            <li class="visible-xs"><a href="{{ GEO_POSTFIX }}">{% trans 'Homepage' %}</a></li>
             <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
             <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
             <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
-            <li class="visible-xs"><a href="{{ GEO_POSTFIX }}myprofile">{% trans 'My Profile' %}</a></li>
             <li class="visible-xs"><a href="https://www.tripalocal.com{% if LANGUAGE == 'zh-CN' %}{{ request.path|slice:'3:' }}{% else %}/cn{{ request.path }}{% endif %}" style="border: 0;">{% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a></li>
+            {% if user.is_authenticated %}
+            <li class="visible-xs"><a href="{{ GEO_POSTFIX }}accounts/logout/">{% trans "Logout" %}</a></li>
+            {% else %}
+            <li class="visible-xs"><a href="{{ GEO_POSTFIX }}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></li>
+            <li class="visible-xs"><a href="{{ GEO_POSTFIX }}accounts/login/?next={{ request.path }}">{% trans "Login" %}</a></li>
+            {% endif %}
           </ul>
         </div>
 
