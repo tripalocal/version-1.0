@@ -1001,17 +1001,22 @@ class ExperienceDetailView(DetailView):
 
 def update_pageview_statistics(user_id, experience_id, length = None):
     '''
-    @length None: times_viewed++; not None: update average_length
+    @length None: arrive, times_viewed++; not None: leave, update average_length
     '''
     try:
         record = UserPageViewStatistics.objects.get(user_id=user_id, experience_id = experience_id)
+        detail = UserPageViewRecord.objects.get(user_id=user_id, experience_id=experience_id, time_left__isnull=True)
     except UserPageViewStatistics.DoesNotExist:
         record = UserPageViewStatistics(user_id = user_id, experience_id = experience_id,
                                         times_viewed = 0, average_length = 0.0)
+    except UserPageViewRecord.DoesNotExist:
+        detail = UserPageViewRecord(user_id=user_id, experience_id=experience_id,
+                                    time_arrived=datetime.utcnow())
     if length:
         try:
             length = float(length)
             record.average_length = float((record.average_length * (record.times_viewed-1) + length) / record.times_viewed)
+            detail.time_left = datetime.utcnow()
         except BaseException:
             #TODO
             pass
@@ -1019,6 +1024,7 @@ def update_pageview_statistics(user_id, experience_id, length = None):
         record.times_viewed += 1
 
     record.save()
+    detail.save()
 
 EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 

@@ -5,6 +5,16 @@
 */
 
 .carousel {
+  margin-top: 20px;
+  width: 560px;
+  height: 365px;
+  @include media('<desktop') {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.carousel-inner {
   width: 560px;
   height: 365px;
   background-color: $light-grey;
@@ -12,6 +22,22 @@
     width: 100%;
     height: auto;
   }
+}
+
+.item {
+  height: 100%;
+  width: 100%;
+  text-align: center; /* optional */
+}
+.item img {
+  vertical-align: top;
+}
+.portrait img {
+  width: 100%;
+}
+
+.landscape img {
+  height: 100%;
 }
 
 .carousel-indicators {
