@@ -167,6 +167,10 @@
                           <p>{% trans 'Date' %}</p>
                           {{form.date}}
                         </div>
+                        <div class="form-group" style="display:none; text-align:left; margin-right: 10px;">
+                          <p>{% trans 'Time' %}</p>
+                          {{form.time}}
+                        </div>
                         <div class="form-group" style="display:inline-block; text-align:left; margin-right: 10px;">
                           <p>{% trans 'Guests' %}</p>
                           <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none;"/>
