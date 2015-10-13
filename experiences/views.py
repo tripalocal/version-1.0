@@ -564,8 +564,12 @@ def getAvailableOptions(experience, available_options, available_date):
         #    sdt += timedelta(weeks=experience.repeat_frequency)
         #else :
             #TODO
-    #set the start time to 6 hours later
-    sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+23)
+    #set the start time according to book_in_advance or 23 hours later
+    if hasattr(experience, 'book_in_advance') and experience.book_in_advance is not None and experience.book_in_advance>0:
+        sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(hour=22, minute=0, second=0, microsecond=0) + relativedelta(days=experience.book_in_advance-1)
+    else:
+        sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+23)
+
 
     blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
     blockout_start = []
@@ -1049,12 +1053,12 @@ def update_pageview_statistics(user_id, experience_id, length = None):
                                         times_viewed = 0, average_length = 0.0)
     except UserPageViewRecord.DoesNotExist:
         detail = UserPageViewRecord(user_id=user_id, experience_id=experience_id,
-                                    time_arrived=datetime.utcnow())
+                                    time_arrived=pytz.timezone("UTC").localize(datetime.utcnow()))
     if length:
         try:
             length = float(length)
             record.average_length = float((record.average_length * (record.times_viewed-1) + length) / record.times_viewed)
-            detail.time_left = datetime.utcnow()
+            detail.time_left = pytz.timezone("UTC").localize(datetime.utcnow())
         except BaseException:
             #TODO
             pass
