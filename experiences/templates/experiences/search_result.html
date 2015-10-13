@@ -134,7 +134,9 @@
 
 
 <script charset="utf-8" type="text/javascript">
-	$(document).ajaxStart(function() {
+  $("#navbar").removeClass("navbar-static-top");
+  $("#navbar").addClass("navbar-fixed-top");
+  $(document).ajaxStart(function() {
 		$(".loading").show();
 	});
 	$(document).ajaxStop(function() {
