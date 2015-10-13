@@ -1047,10 +1047,11 @@ def update_pageview_statistics(user_id, experience_id, length = None):
     '''
     try:
         record = UserPageViewStatistics.objects.get(user_id=user_id, experience_id = experience_id)
-        detail = UserPageViewRecord.objects.get(user_id=user_id, experience_id=experience_id, time_left__isnull=True)
     except UserPageViewStatistics.DoesNotExist:
         record = UserPageViewStatistics(user_id = user_id, experience_id = experience_id,
                                         times_viewed = 0, average_length = 0.0)
+    try:
+        detail = UserPageViewRecord.objects.get(user_id=user_id, experience_id=experience_id, time_left__isnull=True)
     except UserPageViewRecord.DoesNotExist:
         detail = UserPageViewRecord(user_id=user_id, experience_id=experience_id,
                                     time_arrived=pytz.timezone("UTC").localize(datetime.utcnow()))
