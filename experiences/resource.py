@@ -525,7 +525,7 @@ def service_wishlist(request):
             added = data['added']
 
             user = User.objects.get(id=user_id)
-            experience = Experience.objects.get(id=experience_id)
+            experience = AbstractExperience.objects.get(id=experience_id)
             if added == "False":
                 try:
                     #user.registereduser.wishlist.add(experience)
@@ -569,7 +569,7 @@ def service_wishlist(request):
             wl = cursor._rows
             experiences = []
             for id in wl:
-                experience = Experience.objects.get(id=id[0])
+                experience = AbstractExperience.objects.get(id=id[0])
                 #price
                 if experience.guest_number_min <= 4 and experience.guest_number_max>=4:
                     guest_number = 4
