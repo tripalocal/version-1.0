@@ -154,7 +154,7 @@
                       {% if LANGUAGE != "zh-CN" %}
                           <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
                       {%else%}
-                          <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label>{{experience.currency}}</label><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
+                          <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label style="vertical-align:top; margin-left:5px;">{{experience.currency}}</label><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
                       {%endif%}
                     </div>
                     <form style="text-align: left; padding-top: 20px;" id="experience_booking_form" method="post" action="">
@@ -181,9 +181,9 @@
                           {{form.guest_number}}
                         </div>
                         {% if user.is_authenticated %}
-                            <input style="display:inline-block; width: 75px;" id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" />
+                            <input style="display:inline-block; width: 60px;" id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" />
                         {% else %}
-                            <input style="display:inline-block; width: 75px;" type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
+                            <input style="display:inline-block; width: 60px;" type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
                         {% endif %}
 
                         <!--- PAGE VIEW STATISTICS HERE -->
