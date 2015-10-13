@@ -572,7 +572,7 @@ class BookingConfirmationForm(forms.Form):
     user_id = forms.CharField()
     experience_id = forms.CharField()
     date = forms.DateField()
-    time = forms.TimeField()
+    time = forms.TimeField(initial=time(9,00,00))
     guest_number = forms.IntegerField(label="People")
     status = forms.CharField(initial="Requested")
     promo_code = forms.CharField(required=False)
