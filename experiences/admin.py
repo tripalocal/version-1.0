@@ -3,7 +3,7 @@ from django.conf.urls import patterns
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from experiences.models import Experience, Photo, WhatsIncluded, Review, Booking, Coupon, WechatProduct, WechatBooking, \
-    NewProduct, NewProductI18n, Provider, Payment
+    NewProduct, NewProductI18n, Provider, Payment, Coordinate
 from experiences.views import create_experience, saveExperienceImage
 from app.models import RegisteredUser
 from allauth.socialaccount.models import SocialAccount
@@ -43,9 +43,12 @@ class ProductPhotoInline(admin.TabularInline):
     model = Photo
     extra = 3
 
+class ExperienceCoordinateInline(admin.TabularInline):
+    model = Coordinate
+    extra = 5
 
 class ProductAdmin(admin.ModelAdmin):
-    inlines = [ProductPhotoInline, ProductI18nInline]
+    inlines = [ProductPhotoInline, ProductI18nInline, ExperienceCoordinateInline]
 
     def get_queryset(self, request):
         qs = super(ProductAdmin, self).get_queryset(request)
