@@ -9,7 +9,7 @@
   padding-top: 50px;
 
   @include media('<tablet') {
-    padding: 0;
+    padding-top: 20px;
   }
 
   h5 {

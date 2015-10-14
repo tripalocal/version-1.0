@@ -70,7 +70,7 @@
     <div id="navbar" class="navbar navbar-static-top">
       <div class="container-fluid">
         <div class="navbar-header navbar-default">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-collapse" aria-expanded="false">
+          <button id="mobile-menu-button" type="button" class="navbar-toggle collapsed" data-toggle="offcanvas" data-target="#main-menu-offcanvas" aria-expanded="false">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -128,39 +128,45 @@
           </a>
           {% endif %}
 
-        <div class="collapse navbar-collapse" id="main-menu-collapse">
-          <ul class="nav navbar-nav main-menu">
-            {% if user.is_authenticated %}
-            <li class="visible-xs"><div class="profile-navbar" id="id_profile_div"
-                       style="display:inline-block; background:url({% if user.socialaccount_set.all %}
-                           http://graph.facebook.com/{{ user.socialaccount_set.all.0.uid }}/picture?width=40&height=40
-                       {% elif user.registereduser.image_url and user.registereduser.image_url.strip %}
-                           {{ MEDIA_URL }}{{ user.registereduser.image_url }}
-                       {% else %}
-                           {{ MEDIA_URL }}img/profile_default.jpg
-                       {% endif %});
-                      background-size: cover; background-repeat: no-repeat; background-position:center;"><a style="display:inline-block; width:34px; height:34px; border-radius:100px; margin:0; padding:0;"
-                          href="{{ GEO_POSTFIX }}myprofile"></a>
-                  </div> <p style="display:inline; vertical-align:middle; margin-left:10px;">{{ user.first_name }}</p>
-            </li>
-            {% endif %}
-            <li class="visible-xs"><a href="{{ GEO_POSTFIX }}">{% trans 'Homepage' %}</a></li>
-            <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
-            <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
-            <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
-            <li class="visible-xs"><a href="https://www.tripalocal.com{% if LANGUAGE == 'zh-CN' %}{{ request.path|slice:'3:' }}{% else %}/cn{{ request.path }}{% endif %}" style="border: 0;">{% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a></li>
-            {% if user.is_authenticated %}
-            <li class="visible-xs"><a href="{{ GEO_POSTFIX }}accounts/logout/">{% trans "Logout" %}</a></li>
-            {% else %}
-            <li class="visible-xs"><a href="{{ GEO_POSTFIX }}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></li>
-            <li class="visible-xs"><a href="{{ GEO_POSTFIX }}accounts/login/?next={{ request.path }}">{% trans "Login" %}</a></li>
-            {% endif %}
-          </ul>
-        </div>
+        <ul class="nav navbar-nav main-menu">
+          <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
+          <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
+          <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
+        </ul>
 
       </div>
     </div>
 
+    <div class="navmenu navmenu-default navmenu-fixed-left offcanvas" id="main-menu-offcanvas">
+      <ul class="nav navmenu-nav">
+        {% if user.is_authenticated %}
+        <li><a href="{{ GEO_POSTFIX }}myprofile"><div class="profile-navbar" id="id_profile_div"
+                   style="display:inline-block; background:url({% if user.socialaccount_set.all %}
+                       http://graph.facebook.com/{{ user.socialaccount_set.all.0.uid }}/picture?width=40&height=40
+                   {% elif user.registereduser.image_url and user.registereduser.image_url.strip %}
+                       {{ MEDIA_URL }}{{ user.registereduser.image_url }}
+                   {% else %}
+                       {{ MEDIA_URL }}img/profile_default.jpg
+                   {% endif %});
+                  background-size: cover; background-repeat: no-repeat; background-position:center;">
+              </div><p style="display:inline; margin-left:10px; position:relative; bottom:10px;">{{ user.first_name }}</p></a>
+        </li>
+        {% endif %}
+        <li><a href="{{ GEO_POSTFIX }}">{% trans 'Homepage' %}</a></li>
+        <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
+        <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
+        <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
+        <li><a href="https://www.tripalocal.com{% if LANGUAGE == 'zh-CN' %}{{ request.path|slice:'3:' }}{% else %}/cn{{ request.path }}{% endif %}" style="border: 0;">{% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a></li>
+        {% if user.is_authenticated %}
+        <li><a href="{{ GEO_POSTFIX }}accounts/logout/">{% trans "Logout" %}</a></li>
+        {% else %}
+        <li><a href="{{ GEO_POSTFIX }}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></li>
+        <li><a href="{{ GEO_POSTFIX }}accounts/login/?next={{ request.path }}">{% trans "Login" %}</a></li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <div class="dimmer"></div>
 
     {% block content %}{% endblock %}
 
@@ -220,12 +226,15 @@
         </div>
     </div>
 
-    <div class="bottom-qr" style="background-image: url({% static 'img/wechat_qr.jpg' %})">
+    <div class="side-banner" id="wechat-qr">
+      <p>{% trans 'Scan for wechat' %}</p>
+      <div class="qr-code" style="background-image:url({% static 'img/wechat_qr.jpg' %})"></div>
     </div>
 
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js"></script>
 
     {% block scripts %}{% endblock %}
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
@@ -267,10 +276,15 @@
 
 
     $(document).ready(function () {
+      // Highlight current menu link
       $("a[href*='" + location.pathname + "']").addClass("current");
 
-      // START POPUP THINGS
+      // Slide in wechat-qr
+      setTimeout(function() {
+        $("#wechat-qr").animate({'margin-right': 0}, 500, 'linear');
+      }, 2000);
 
+      // Popup logic
         var conversations = [
           "\"{% trans 'Do you want to experience fine dining with the best view in the Southern Hemisphere? Try Skylines Stratosphere Bar & Restaurant in Queenstown, New Zealand.' %}\"",
           "\"{% trans 'Its perfect weather to relax in nature from now until March, why not go camping?' %}\"",
@@ -424,6 +438,14 @@
             mixpanel.track("utm"+utmId);
         }
     });
+
+    $("#mobile-menu-button").click(function() {
+      $(".dimmer").fadeIn(250);
+    });
+    $(".dimmer").click(function() {
+      $(".dimmer").fadeOut(250);
+    })
+
 
     </script>
 </body>
