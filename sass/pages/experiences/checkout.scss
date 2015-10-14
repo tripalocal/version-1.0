@@ -34,7 +34,7 @@
   }
 
   @include media('<tablet') {
-    width: 90%;
+    width: 100%;
     float: none;
     margin: auto;
   }
@@ -108,6 +108,9 @@
   max-width: 400px;
   margin-left: 15px;
   margin-top: 15px;
+  @include media('<tablet') {
+    max-width: 85%;
+  }
 }
 
 .exp-box {
@@ -129,6 +132,9 @@
   display: inline-block;
   width: auto;
   margin-right: 15px;
+  @include media('<phone') {
+    margin-right: 5px;
+  }
 }
 
 #id_country {

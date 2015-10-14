@@ -350,6 +350,7 @@
     <div class="also" style="border-top: 1px solid #CCCCCC; background-color:#FFF;">
     	<div class="container">
             <h2 style="font-weight:bold">{% trans "People also booked" %}</h2>
+
             {% for related_experience, added_to_wishlist in related_experiences %}
             {% if forloop.counter0 < 3 %}
             <div class="exp-box">
@@ -372,8 +373,7 @@
                                         {% endif %}
                                     {% endwith %})">
                     </div>
-				</div>
-
+				        </div>
                 <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
                 <div class="listing-footer">
                     <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}></div>
