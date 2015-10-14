@@ -165,7 +165,7 @@
         {% endif %}
       </ul>
     </div>
-    
+
     <div class="dimmer"></div>
 
     {% block content %}{% endblock %}
@@ -226,7 +226,9 @@
         </div>
     </div>
 
-    <div class="bottom-qr" style="background-image: url({% static 'img/wechat_qr.jpg' %})">
+    <div class="side-banner" id="wechat-qr">
+      <p>{% trans 'Scan for wechat' %}</p>
+      <div class="qr-code" style="background-image:url({% static 'img/wechat_qr.jpg' %})"></div>
     </div>
 
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -274,10 +276,15 @@
 
 
     $(document).ready(function () {
+      // Highlight current menu link
       $("a[href*='" + location.pathname + "']").addClass("current");
 
-      // START POPUP THINGS
+      // Slide in wechat-qr
+      setTimeout(function() {
+        $("#wechat-qr").animate({'margin-right': 0}, 500, 'linear');
+      }, 2000);
 
+      // Popup logic
         var conversations = [
           "\"{% trans 'Do you want to experience fine dining with the best view in the Southern Hemisphere? Try Skylines Stratosphere Bar & Restaurant in Queenstown, New Zealand.' %}\"",
           "\"{% trans 'Its perfect weather to relax in nature from now until March, why not go camping?' %}\"",
