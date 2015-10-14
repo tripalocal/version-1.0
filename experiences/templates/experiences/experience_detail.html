@@ -375,7 +375,7 @@
                     </div>
                 </a>
                 <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
-
+                {% if related_experience.profileImageURL %}
                 <div class="profile-frame-sm">
                     <div class="profile-sm"
                             style="background-image:url({% with related_experience.hosts.all|first as host %}
@@ -387,7 +387,7 @@
                                     {% endwith %})">
                     </div>
 				        </div>
-                
+                {% endif %}
                 <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ related_experience.description }}</p>
                 <div class="listing-footer">
                     <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}></div>
