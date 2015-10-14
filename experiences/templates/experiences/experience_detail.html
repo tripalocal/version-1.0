@@ -375,7 +375,7 @@
                     </div>
                 </a>
                 <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
-                {% if related_experience.profileImageURL %}
+                {% if related_experience.type == 'PRIVATE' or related_experience.type == 'PUBLIC' %}
                 <div class="profile-frame-sm">
                     <div class="profile-sm"
                             style="background-image:url({% with related_experience.hosts.all|first as host %}
