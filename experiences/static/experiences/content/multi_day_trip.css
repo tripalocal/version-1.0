@@ -68,16 +68,6 @@ h1 {
   }
 }
 
-.price-box-sm {
-  width: 120px;
-  border: 1px solid #ccc;
-  text-align: center;
-  display: inline-block;
-  padding: 5px 10px 5px 10px;
-  margin: 0 10px 0 10px;
-  border-radius: 3px;
-}
-
 .price-box-sm p {
   font-weight: normal;
 }

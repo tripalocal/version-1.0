@@ -326,8 +326,15 @@
       padding: 0;
     }
   }
-
+  
+  .price-box-sm {
+    margin-top: 15px;
+    p {
+      font-size: 14px;
+    }
+  }
 }
+
 .experience-results {
   width: 960px;
   margin: 0 auto;

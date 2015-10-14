@@ -352,8 +352,20 @@
             <h2 style="font-weight:bold">{% trans "People also booked" %}</h2>
 
             {% for related_experience, added_to_wishlist in related_experiences %}
-            {% if forloop.counter0 < 3 %}
+            {% if forloop.counter0 < 2 %}
             <div class="exp-box">
+              {% if related_experience.type == 'PRIVATE' or related_experience.type == 'PUBLIC' %}
+                <div class="exp-type">
+                  <img src="{% static 'experiences/img/local-55.svg' %}" width="35" height="35">
+                  <h3>{% trans 'Travel with Locals' %}</h3>
+                </div>
+              {% endif %}
+              {% if related_experience.type == 'PRODUCT' %}
+                <div class="exp-type">
+                  <img src="{% static 'experiences/img/hot-56.svg' %}" width="35" height="35">
+                  <h3>{% trans 'Local Experiences' %}</h3>
+                </div>
+              {% endif %}
                 <label id="related_experience_id_{{forloop.counter0}}" style="display:none;">{{related_experience.id}}</label>
                 <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}">
                     <div class="listing-img" style="background-image:url({% for photo in related_experience.photo_set.all %}{% if forloop.first %} {{ MEDIA_URL }}{{photo.directory}}{{photo.name}} {%endif%}{%endfor%});">
@@ -363,6 +375,7 @@
                     </div>
                 </a>
                 <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
+
                 <div class="profile-frame-sm">
                     <div class="profile-sm"
                             style="background-image:url({% with related_experience.hosts.all|first as host %}
@@ -374,7 +387,8 @@
                                     {% endwith %})">
                     </div>
 				        </div>
-                <p style="overflow-y:hidden; height:100px">{{ related_experience.description }}</p>
+                
+                <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ related_experience.description }}</p>
                 <div class="listing-footer">
                     <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}></div>
                     <div>{%if related_experience.duration < 24 %}{{related_experience.duration}} {% trans "hrs" %}{%else%}{{related_experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
@@ -382,6 +396,30 @@
             </div>
             {% endif %}
             {% endfor %}
+
+            <div class="exp-box">
+              <div class="exp-type">
+                <img src="{% static 'experiences/img/itinerary-57.svg' %}" width="35" height="35">
+                <h3>{% trans 'Itineraries' %}</h3>
+              </div>
+              <div class="listing-img" style="background-image:linear-gradient(rgba(0, 0, 0, 0.3),rgba(0, 0, 0, 0.3)),url({{ MEDIA_URL }}city/Sydney.jpg)">
+                <div class="listing-img-text">
+                  <h1>{% trans "7 Day Trip" %}</h1>
+                  <h2>{% trans "Melbourne + Sydney" %}</h2>
+                </div>
+              </div>
+              <div class="price-box-sm">
+                <p>{% trans "Include 1 night accommodation" %}</p>
+                <p style="margin-bottom:0;">AU $1822</p>
+                <p><a href="{{GEO_POSTFIX}}experience/681/">{% trans "View details" %}</a></p>
+              </div>
+              <div class="price-box-sm">
+                <p>{% trans "Includes all accommodation" %}</p>
+                <p style="margin-bottom:0">AU $2822</p>
+                <p><a href="{{GEO_POSTFIX}}experience/731/">{% trans "View details" %}</a></p>
+              </div>
+            </div>
+
         </div>
     </div>
 {%else%}
