@@ -340,7 +340,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                             'photo_url':photo_url, 'type':tp , 'popularity':experience.popularity,
                             'tags':experience.get_tags(settings.LANGUAGES[0][0])}
 
-        if exp_type == 'experience':
+        if type(experience) == Experience:
             experience_avail['meetup_spot'] = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
             experience_avail['host_image'] = host.registereduser.image_url
             experience_avail['host'] = host.first_name + ' ' + host.last_name
