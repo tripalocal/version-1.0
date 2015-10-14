@@ -1030,6 +1030,7 @@ def get_experience_detail(experience, get_available_date=True):
             result_newproduct['disclaimer'] = t.disclaimer
             result_newproduct['refund_policy'] = t.refund_policy
             result_newproduct['insurance'] = t.insurance
+            result_newproduct['pickup_detail'] = t.pickup_detail
 
         result.update(result_newproduct)
 

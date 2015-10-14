@@ -8,6 +8,10 @@
   padding-bottom: 20px;
   padding-top: 50px;
 
+  @include media('<tablet') {
+    padding: 0;
+  }
+
   h5 {
     color: white;
     margin-top: 0;

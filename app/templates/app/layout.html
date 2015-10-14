@@ -166,7 +166,8 @@
 
     <div id="footer_div" class="footer">
         <div class="container">
-            <div class="col-sm-6">
+          <div class="row">
+            <div class="col-sm-4">
                 <ul class="footer-head">
                     <li>
                         <select id="id_language_select" class="form-control">
@@ -178,16 +179,12 @@
                 </ul>
             </div>
 
-            <div class="col-sm-2 col-sm-6">
-                <ul class="">
-                    <li>
-                        <select id="id_currency_select" class="form-control">
-                            <option id="id_currency_cny" value="CNY">{% trans 'CNY' %}</option>
-                            <option id="id_currency_aud" value="AUD">{% trans 'AUD' %}</option>
-                            <option id="id_currency_nzd" value="NZD">{% trans 'NZD' %}</option>
-                        </select>
-                    </li>
-                </ul>
+            <div class="col-sm-2" style="text-align:center;">
+                <select id="id_currency_select" class="form-control" style="margin-bottom:20px; height:50px; max-width:80px; display:inline-block;">
+                    <option id="id_currency_cny" value="CNY">{% trans 'CNY' %}</option>
+                    <option id="id_currency_aud" value="AUD">{% trans 'AUD' %}</option>
+                    <option id="id_currency_nzd" value="NZD">{% trans 'NZD' %}</option>
+                </select>
             </div>
 
             <div class="col-sm-2 col-xs-6">
@@ -215,6 +212,7 @@
                 </ul>
             </div>
         </div>
+      </div>
 
         <div class="footer-line">
             <p id="copyright"> &#169; Tripalocal Pty. Ltd. ABN 45 600 546 549</p>

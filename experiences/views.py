@@ -725,7 +725,12 @@ def getAvailableOptions(experience, available_options, available_date):
 
 def get_related_experiences(experience, request):
     related_experiences = []
+    related_newproducts = []
+    counter_experience = 0
+    counter_newproduct = 0
+    N=1
     cursor = connections['default'].cursor()
+    #other experiences booked by those that booked this experience
     cursor.execute("select distinct experience_id from experiences_experience_guests where experience_id != %s and user_id in" +
                     "(select user_id from experiences_experience_guests where experience_id=%s)",
                             [experience.id, experience.id])
@@ -733,8 +738,12 @@ def get_related_experiences(experience, request):
     if ids and len(ids)>0:
         for id in ids:
             related_experiences.append(id[0])
+            related_newproducts.append(id[0])
         related_experiences = list(Experience.objects.filter(id__in=related_experiences).filter(city__iexact=experience.city))
-    if len(related_experiences)<3:
+        related_newproducts = list(NewProduct.objects.filter(id__in=related_newproducts).filter(city__iexact=experience.city))
+
+    #other similar experiences based on tags
+    if len(related_experiences)<N or len(related_newproducts)<N:
         cursor = connections['default'].cursor()
         cursor.execute("select experience_id from (select distinct experience_id, count(experiencetag_id)" +
                         "from experiences_experience_tags where experience_id!=%s and experiencetag_id in" +
@@ -746,19 +755,37 @@ def get_related_experiences(experience, request):
         for i in range(len(ids)):
             r_ids.append(ids[i][0])
 
-        queryset = Experience.objects.filter(id__in=r_ids).filter(city__iexact=experience.city).filter(status__iexact="listed")
-        for exp in queryset:
-            if not any(x.id == exp.id for x in related_experiences):
-                related_experiences.append(exp)
-            if len(related_experiences)>=3:
-                break
+        if len(related_experiences)<N:
+            queryset = Experience.objects.filter(id__in=r_ids).filter(city__iexact=experience.city).filter(status__iexact="listed")
+            for exp in queryset:
+                if not any(x.id == exp.id for x in related_experiences):
+                    related_experiences.append(exp)
+                if len(related_experiences)>=N:
+                    break
 
-    if len(related_experiences)<3:
-        queryset = Experience.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").order_by('?')[:3]
+        if len(related_newproducts)<N:
+            queryset = NewProduct.objects.filter(id__in=r_ids).filter(city__iexact=experience.city).filter(status__iexact="listed")
+            for exp in queryset:
+                if not any(x.id == exp.id for x in related_newproducts):
+                    related_newproducts.append(exp)
+                if len(related_newproducts)>=N:
+                    break
+
+    #random experiences
+    if len(related_experiences)<N:
+        queryset = Experience.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").exclude(id=experience.id).order_by('?')[:N]
         for exp in queryset:
             related_experiences.append(exp)
-            if len(related_experiences)>=3:
+            if len(related_experiences)>=N:
                 break
+    if len(related_newproducts)<N:
+        queryset = NewProduct.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").exclude(id=experience.id).order_by('?')[:N]
+        for exp in queryset:
+            related_newproducts.append(exp)
+            if len(related_newproducts)>=N:
+                break
+
+    related_experiences += related_newproducts
 
     for i in range(0,len(related_experiences)):
         convert_experience_price(request, related_experiences[i])
