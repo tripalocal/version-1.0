@@ -726,8 +726,6 @@ def getAvailableOptions(experience, available_options, available_date):
 def get_related_experiences(experience, request):
     related_experiences = []
     related_newproducts = []
-    counter_experience = 0
-    counter_newproduct = 0
     N=1
     cursor = connections['default'].cursor()
     #other experiences booked by those that booked this experience
@@ -737,8 +735,10 @@ def get_related_experiences(experience, request):
     ids = cursor._rows
     if ids and len(ids)>0:
         for id in ids:
-            related_experiences.append(id[0])
-            related_newproducts.append(id[0])
+            if len(related_experiences) < N:
+                related_experiences.append(id[0])
+            if len(related_newproducts) < N:
+                related_newproducts.append(id[0])
         related_experiences = list(Experience.objects.filter(id__in=related_experiences).filter(city__iexact=experience.city))
         related_newproducts = list(NewProduct.objects.filter(id__in=related_newproducts).filter(city__iexact=experience.city))
 
