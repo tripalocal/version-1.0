@@ -552,8 +552,9 @@ class Payment(models.Model):
 class Coordinate(models.Model):
     longitude = models.FloatField()
     latitude = models.FloatField()
-    type = models.TextField()
-    order = models.IntegerField()
+    name = models.TextField(null=True)
+    type = models.TextField(null=True)
+    order = models.IntegerField(null=True)
     experience = models.ForeignKey(AbstractExperience)
 
 def get_experience_activity(experience, language):
