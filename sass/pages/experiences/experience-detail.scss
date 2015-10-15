@@ -309,6 +309,16 @@
   color: black;
 }
 
+// Map
+.map {
+  width: 560px;
+  height: 365px;
+  margin: 30px auto;
+  @include media('<tablet') {
+    width: 100%;
+  }
+}
+
 // People also booked
 .also {
   border-top: 1px solid $light-grey;
@@ -326,7 +336,7 @@
       padding: 0;
     }
   }
-  
+
   .price-box-sm {
     margin-top: 15px;
     p {
