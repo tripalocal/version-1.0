@@ -38,11 +38,11 @@
     <ul class="subMenu">
     <li  id="activated"><a href="/custom_admin/booking">Current Bookings</a></li>
     <li>Archived</li>
-   
+
     </ul>
     <div class="clear"></div>
 
-<form id = "custom_admin_panel_table_form" action="/custom_admin/send_confirmation_email/" method="post"> 
+<form id = "custom_admin_panel_table_form" action="/custom_admin/send_confirmation_email/" method="post">
   {% csrf_token %}
 <table border="0" cellspacing="0" cellpadding="0">
     <tr>
@@ -65,7 +65,7 @@
     <th scope="col"> Status</th>
 
   </tr>
- 
+
     {% for booking in booking_list %}
     {% if not booking.status = 'requested' and not booking.status = 'accepted' and not booking.status = 'rejected' and not booking.status = 'no_show' and not booking.status = 'deleted' and not booking.status = 'paid'%}
       <tr id="booking-table-row-{{booking.id}}">
@@ -87,7 +87,7 @@
     </tr>
     {% endif %}
     {% endfor %}
-  
+
   </table>
 
         {% if is_paginated %}

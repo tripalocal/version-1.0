@@ -38,7 +38,7 @@
   	<ul class="subMenu">
     <li>Current Bookings</li>
     <li id="activated"><a href="/custom_admin/booking-archive/">Archived</a></li>
-   
+
     </ul>
     <div class="clear"></div>
 
@@ -65,7 +65,7 @@
     <th scope="col"  width="120">Actions</th>
 
   </tr>
- 
+
     {% for booking in booking_list %}
     {% if booking.status == 'requested' or booking.status == 'accepted' or booking.status == 'rejected' or booking.status == 'no_show' or booking.status == 'paid' %}
       <tr id="booking-table-row-{{booking.id}}">
@@ -97,7 +97,7 @@
             {% ifequal action 'Reopen booking' %}
               <a href="#/" id="booking-reopen-booking-link-{{booking.id}}">{{action}}</a>
             {% endifequal %}
-            
+
             {% ifequal action 'Cancel booking' %}
                <a href="#/" id="booking-cancel-booking-link-{{booking.id}}">{{action}}</a>
             {% endifequal %}
@@ -111,7 +111,7 @@
     </tr>
     {% endif %}
     {% endfor %}
-  
+
   </table>
     {% if is_paginated %}
         <div class="pagination">
