@@ -15,6 +15,7 @@
     {% endif %}
     <!--<link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">-->
     <link href="{% static 'experiences/content/experience-detail.css' %}" rel="stylesheet">
+    <script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
 {% endblock %}
 
 {% block content %}
@@ -69,6 +70,7 @@
                         {% endif %}
                         {% endfor %}
                     </table>
+                    <input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
 
                     {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' or experience.type == 'ITINERARY'%}
                     {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
@@ -82,7 +84,7 @@
                     {%endif%}
                     {%endif%}
 
-                    <br><input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
+                    <br>
                     <div class="row" style="width:200px;margin-top:10px">
                     {% if LANGUAGE != "zh-CN" %}
                         <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%}<br><p>
@@ -237,6 +239,8 @@
                 {% include "experiences/experience_description.html" %}
             {%endif%}
     </div>
+
+    <div id="experience_map" style="width: 500px; height: 400px;"></div>
 
     {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
     <div class="container-fluid">
@@ -671,6 +675,39 @@ $(function(){
             {
                 break;
             }
+        }
+
+        var locations = [];
+
+        {% for coordinate in coordinates %}
+            locations.push(['{{coordinate.0}}',{{coordinate.1}},{{coordinate.2}}]);
+        {% endfor %}
+
+        var map = new google.maps.Map(document.getElementById('experience_map'), {
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
+        var infowindow = new google.maps.InfoWindow();
+
+        var marker, i;
+	    var bounds = new google.maps.LatLngBounds();
+
+        for (i = 0; i < locations.length; i++) {  
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                map: map
+            });
+
+            bounds.extend(marker.getPosition());
+
+            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                return function() {
+                    infowindow.setContent(locations[i][0]);
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
+
+            map.fitBounds(bounds);
         }
     })
 })
