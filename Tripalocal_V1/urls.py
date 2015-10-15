@@ -18,7 +18,7 @@ from django.contrib import admin
 from rest_framework.authtoken import views
 
 from app.decorators import superuser_required
-from custom_admin.views.main import BookingView, BookingArchiveView, ExperienceView, PaymentView
+from custom_admin.views.main import BookingView, BookingArchiveView, ExperienceView, PaymentView, NewProductView
 from django.conf.urls import *
 from django.views.i18n import javascript_catalog
 
@@ -115,12 +115,13 @@ urlpatterns = patterns('',
     url(r'^service_update_session/$', 'experiences.resource.service_update_session'),
     url(r'^update_files/$', 'experiences.resource.update_files'),
 
-    url(r'^custom_admin/$', superuser_required(ExperienceView.as_view()), name='custom_admin_index'),
+    url(r'^custom_admin/$', superuser_required(NewProductView.as_view()), name='custom_admin_index'),
     url(r'^custom_admin/booking$', superuser_required(BookingView.as_view()), name='admin_booking'),
     #url(r'^custom_admin/change_time/(?P<booking_id>\d+)$', BookingView.as_view()),
     url(r'^custom_admin/booking-archive/$', superuser_required(BookingArchiveView.as_view()), name='admin_booking_archive'),
     url(r'^custom_admin/payment/$', superuser_required(PaymentView.as_view()), name='admin_payment'),
     url(r'^custom_admin/experience/$', superuser_required(ExperienceView.as_view()), name='admin_experience'),
+    url(r'^custom_admin/newproduct/$', superuser_required(NewProductView.as_view()), name='admin_newproduct'),
     url(r'^multidaytrip/$','experiences.views.multi_day_trip'),
     url(r'^unionpay_payment_callback/$','experiences.views.unionpay_payment_callback'),
     url(r'^unionpay_refund_callback/$','experiences.views.unionpay_refund_callback'),

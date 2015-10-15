@@ -6,11 +6,12 @@ from django.utils.decorators import method_decorator
 from app.decorators import ajax_form_validate
 from app.base import AjaxDisptcherProcessorMixin
 from app.utils import MailSupportMixin
-from experiences.models import Booking, Experience
+from experiences.models import Booking, Experience, NewProduct
 from custom_admin.views.base import BookingInfoMixin
 from custom_admin.forms import BookingForm, ExperienceUploadForm, CreateExperienceForm
 from custom_admin.views.base import StatusGenerator
 from custom_admin.mail import MailService
+from Tripalocal_V1 import settings
 
 class AdminCommonOperation(object):
 
@@ -39,6 +40,29 @@ class ExperienceView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
     def post(self, request, **kwargs):
         return self._process_request_with_general_return(request, model_class=Experience, **kwargs)
+
+    def _manipulate_post_status(self, request, experience, **kwargs):
+        experience.change_status(kwargs['form'].cleaned_data['status'])
+
+    def _manipulate_post_commission(self, request, experience, **kwargs):
+        experience.update_commission(kwargs['form'].cleaned_data['commission'])
+        return {'commission': kwargs['form'].cleaned_data['commission']}
+
+class NewProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
+    model = NewProduct
+    template_name = 'custom_admin/newproduct.html'
+    context_object_name = 'newproduct_list'
+    paginate_by = 200
+
+    def get_context_data(self, **kwargs):
+        context = super(NewProductView, self).get_context_data(**kwargs)
+        for exp in context['newproduct_list']:
+            exp.title = exp.get_title(settings.LANGUAGES[0][0])
+        return context
+
+    @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
+    def post(self, request, **kwargs):
+        return self._process_request_with_general_return(request, model_class=NewProduct, **kwargs)
 
     def _manipulate_post_status(self, request, experience, **kwargs):
         experience.change_status(kwargs['form'].cleaned_data['status'])
