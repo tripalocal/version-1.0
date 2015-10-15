@@ -340,7 +340,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                             'photo_url':photo_url, 'type':tp , 'popularity':experience.popularity,
                             'tags':experience.get_tags(settings.LANGUAGES[0][0])}
 
-        if exp_type == 'experience':
+        if type(experience) == Experience:
             experience_avail['meetup_spot'] = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
             experience_avail['host_image'] = host.registereduser.image_url
             experience_avail['host'] = host.first_name + ' ' + host.last_name
@@ -1013,21 +1013,6 @@ class ExperienceDetailView(DetailView):
         context['LANGUAGE'] = settings.LANGUAGE_CODE
         context['wishlist_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_wishlist/"
         
-        #update page view statistics
-        if self.request.user.is_staff:
-            #ignore page views by staff
-            return context
-        elif self.request.user.is_authenticated():
-            user = self.request.user
-        else:
-            #annoymous visiters are treated as user 1
-            user = User.objects.get(id=1)
-
-        update_pageview_statistics(user.id, experience.id)
-        time_arrived = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        context['time_arrived'] = time_arrived
-        context['pageview_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_pageview/"
-
         #check whether the experience is among the top 50%, 80% most viewed in the past 30 days
         if type(experience) is Experience:
             table_name = "experiences_experience"
@@ -1066,6 +1051,31 @@ class ExperienceDetailView(DetailView):
         context['top_20'] = top_20
         context['top_50'] = top_50
 
+        #get coordinates
+        coordinates = []
+        if experience.coordinate_set is not None:
+            for co in experience.coordinate_set.all():
+                if co.order is not None and co.order >= 1:
+                    coordinates.insert(co.order-1, [co.name if co.name is not None else '', co.longitude, co.latitude])
+                else:
+                    coordinates.append([co.name if co.name is not None else '', co.longitude, co.latitude])
+
+        context['coordinates'] = coordinates
+
+        #update page view statistics
+        if self.request.user.is_staff:
+            #ignore page views by staff
+            return context
+        elif self.request.user.is_authenticated():
+            user = self.request.user
+        else:
+            #annoymous visiters are treated as user 1
+            user = User.objects.get(id=1)
+
+        update_pageview_statistics(user.id, experience.id)
+        time_arrived = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        context['time_arrived'] = time_arrived
+        context['pageview_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_pageview/"
         return context
 
 def update_pageview_statistics(user_id, experience_id, length = None):

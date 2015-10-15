@@ -58,9 +58,22 @@
     background-size: cover;
     width: 100%;
     margin: 0;
+    text-align: center;
     @include media('>tablet') {
       width: auto;
     }
+
+    h1, h2 {
+      color: white;
+      font-weight: normal;
+      margin-top: 0;
+    }
+  }
+
+  .listing-img-text {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .listing-footer {
@@ -73,4 +86,37 @@
       margin-right: 30px;
     }
   }
+}
+
+.exp-type {
+  padding-bottom: 10px;
+
+  @include media('<tablet') {
+    margin-left: 20px;
+  }
+
+  img {
+    display: inline-block;
+  }
+  h3 {
+    display: inline-block;
+    color: $dark-grey;
+    font-size: 14px;
+    font-weight: normal;
+    margin-left: 10px;
+  }
+}
+
+.price-box-sm {
+  width: 120px;
+  border: 1px solid #ccc;
+  text-align: center;
+  display: inline-block;
+  padding: 5px 10px 5px 10px;
+  margin: 0 10px 0 10px;
+  border-radius: 3px;
+}
+
+.price-box-sm p {
+  font-weight: normal;
 }

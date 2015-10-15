@@ -549,6 +549,14 @@ class Payment(models.Model):
             return False, e
         return True, re
 
+class Coordinate(models.Model):
+    longitude = models.FloatField()
+    latitude = models.FloatField()
+    name = models.CharField(max_length=100, null=True, blank=True)
+    type = models.CharField(max_length=100, null=True, blank=True)
+    order = models.IntegerField(null=True, blank=True)
+    experience = models.ForeignKey(AbstractExperience)
+
 def get_experience_activity(experience, language):
     if hasattr(experience, 'experienceactivity_set') and experience.experienceactivity_set is not None and len(experience.experienceactivity_set.all()) > 0:
         t = experience.experienceactivity_set.filter(language=language)
