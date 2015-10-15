@@ -119,7 +119,6 @@ class Experience(AbstractExperience):
         self._new_experience_i18n_info('zh')
         self._new_experience_i18n_info('en')
 
-
     def _new_experience_i18n_info(self, language, **kwargs):
         ExperienceTitle.objects.create(experience=self, language=language)
         ExperienceDescription.objects.create(experience=self, language=language)
@@ -258,6 +257,14 @@ class NewProduct(AbstractExperience):
                 tags.append(t[i].tag)
 
         return tags
+
+    def change_status(self, new_status=None):
+        self.status = new_status
+        self.save()
+
+    def update_commission(self, commission):
+        self.commission = commission
+        self.save()
 
 class NewProductI18n(models.Model):
     EN = 'en'
