@@ -67,8 +67,6 @@ msgid "Hobart, TAS"
 msgstr "霍巴特, 塔斯马尼亚"
 
 #: experiences/forms.py:28 experiences/forms.py:82
-#, fuzzy
-#| msgid "Tasmania"
 msgid "Greater Tasmania"
 msgstr "塔斯马尼亚"
 
@@ -963,26 +961,18 @@ msgid "Saved to Wishlist"
 msgstr "已保存至兴趣列表"
 
 #: experiences/templates/experiences/experience_detail.html:156
-#, fuzzy
-#| msgid "hours"
 msgid "hour"
 msgstr "小时"
 
 #: experiences/templates/experiences/experience_detail.html:156
-#, fuzzy
-#| msgid "days"
 msgid "day"
 msgstr "天"
 
 #: experiences/templates/experiences/experience_detail.html:156
-#, fuzzy
-#| msgid "Public"
 msgid "Public Tour"
 msgstr "非私人团"
 
 #: experiences/templates/experiences/experience_detail.html:181
-#, fuzzy
-#| msgid " Guests"
 msgid "Guests"
 msgstr "人"
 
