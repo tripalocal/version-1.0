@@ -350,9 +350,6 @@
         </div>
     </div>
 
-
-
-
     <div class="also" style="border-top: 1px solid #CCCCCC; background-color:#FFF;">
     	<div class="container">
             <h2 style="font-weight:bold">{% trans "People also booked" %}</h2>
@@ -686,31 +683,39 @@ $(function(){
             locations.push(['{{coordinate.0}}',{{coordinate.1}},{{coordinate.2}}]);
         {% endfor %}
 
-        var map = new google.maps.Map(document.getElementById('experience_map'), {
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        });
-
-        var infowindow = new google.maps.InfoWindow();
-
-        var marker, i;
-	    var bounds = new google.maps.LatLngBounds();
-
-        for (i = 0; i < locations.length; i++) {
-            marker = new google.maps.Marker({
-                position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-                map: map
+        if(locations.length > 0)
+        {
+            var map = new google.maps.Map(document.getElementById('experience_map'), {
+                mapTypeId: google.maps.MapTypeId.ROADMAP
             });
 
-            bounds.extend(marker.getPosition());
+            var infowindow = new google.maps.InfoWindow();
 
-            google.maps.event.addListener(marker, 'click', (function(marker, i) {
-                return function() {
-                    infowindow.setContent(locations[i][0]);
-                    infowindow.open(map, marker);
-                }
-            })(marker, i));
+            var marker, i;
+	        var bounds = new google.maps.LatLngBounds();
 
-            map.fitBounds(bounds);
+            for (i = 0; i < locations.length; i++) 
+            {
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                    map: map
+                });
+
+                bounds.extend(marker.getPosition());
+
+                google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                    return function() {
+                        infowindow.setContent(locations[i][0]);
+                        infowindow.open(map, marker);
+                    }
+                })(marker, i));
+
+                map.fitBounds(bounds);
+            }
+        }
+        else
+        {
+            $("#experience_map").hide();   
         }
     })
 })
