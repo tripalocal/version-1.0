@@ -44,6 +44,31 @@ LANG_CN = settings.LANGUAGES[1][0]
 LANG_EN = settings.LANGUAGES[0][0]
 GEO_POSTFIX = settings.GEO_POSTFIX
 
+def set_initial_currency(request):
+    if 'custom_currency' not in request.session:
+        if settings.LANGUAGES[0][0] == "zh":
+            request.session["custom_currency"] = "CNY"
+        else:
+            #TODO
+            request.session["custom_currency"] = "AUD"
+
+def convert_experience_price(request, experience):
+    if hasattr(request, 'session') and 'custom_currency' in request.session\
+        and experience.currency.lower() != request.session['custom_currency'].lower():
+        experience.price = convert_currency(experience.price, experience.currency, request.session['custom_currency'])
+
+        if experience.dynamic_price and type(experience.dynamic_price) == str:
+                price = experience.dynamic_price.split(',')
+                if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
+                #these is comma in the end, so the length is max-min+2
+                    new_dynamic_price=""
+                    for i in range(len(price)-1):
+                        price[i] = convert_currency(float(price[i]), experience.currency, request.session['custom_currency'])
+                        new_dynamic_price += str(price[i]) + ","
+                    experience.dynamic_price = new_dynamic_price
+
+        experience.currency = request.session['custom_currency']
+
 def isEnglish(s):
     try:
         s.decode('ascii') if isinstance(s, bytes) else s.encode('ascii')
@@ -121,7 +146,89 @@ def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, cur
     else:
         raise Exception("func next_time_slot, illegal repeat_cycle")
 
-def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None):
+def sort_experiences(experiences, customer=None, preference=None):
+    '''
+    @customer: sort the experiences based on the auto-collected data of the customer
+    @preference: sort the experiences based on the specified preference (a dict read from configuration files)
+    '''
+    pageview_max = 0
+    match_max = 0
+    bookings_max = 0
+
+    if customer is not None:
+        records = UserPageViewStatistics.objects.filter(user=customer)
+        if records and len(records)>0:
+            #records and experiences shoudld be sorted by id
+            j_last = 0
+            for i in range(len(experiences)):
+                for j in range(j_last, len(records)):
+                    if experiences[i].id == records[j].experience.id:
+                        experiences[i].pageview = records[j].times_viewed * records[j].average_length
+                        if experiences[i].pageview > pageview_max:
+                            pageview_max = experiences[i].pageview
+                        j_last = j+1
+                        break
+                    elif experiences[i].id > records[j].experience.id:
+                        #should not occur, becuase records[j].experience is definitely in experiences
+                        j_last = j+1
+                        continue
+                    else:
+                        break
+
+    if preference is not None:
+        #TODO: in the case where neither customer nor preference is None,
+        #the experiences list only needs to be read once instead of twice
+        for experience in experiences:
+            #get the number of booking times
+            bks = Booking.objects.filter(experience_id = experience.id)
+            if bks is not None:
+                bks = len(bks)
+            else:
+                bks = 0
+            experience.bookings = bks
+            experience.match = get_experience_score(preference, experience.get_tags(settings.LANGUAGES[0][0]))
+            if bks > bookings_max:
+                bookings_max = bks
+            if experience.match > match_max:
+                match_max = experience.match
+
+    sorted = 0
+    for experience in experiences:
+        experience.popularity = 0.0
+        #normalize
+        #popularoity = a*pageview+b*match+c*bookings
+        #sort by pupolarity
+        if pageview_max > 0 and hasattr(experience, 'pageview'):
+            experience.pageview = float(experience.pageview/pageview_max)
+            experience.popularity += 4 * experience.pageview
+        if match_max > 0 and hasattr(experience, 'match'):
+            experience.match = float(experience.match/match_max)
+            experience.popularity += 5 * experience.match
+        if bookings_max > 0 and hasattr(experience, 'bookings'):
+            experience.bookings = float(experience.bookings/bookings_max)
+            experience.popularity += 1 * experience.bookings
+
+        i=0
+        for i in range(sorted+1):
+            if experience.popularity > experiences[i].popularity:
+                break
+        if i != sorted:
+            experiences.insert(i, experience)
+            experiences.pop(sorted+1)
+
+        sorted += 1
+
+    return experiences
+
+def experience_similarity(experience1, experience2):
+    #TODO
+    return 1
+
+def resort_experiences(experiences, experiences_not_interested, experience_interested):
+    #TODO
+    return experiences
+
+def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None):
     #city/keywords is a string like A,B,C,
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     available_options = []
@@ -153,6 +260,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
         experiences = [e for e in experiences if e.city.lower() in city]
 
+    experiences = sort_experiences(experiences, customer, preference)
 
     for experience in experiences:
         if guest_number is not None and (experience.guest_number_max < int(guest_number) or experience.guest_number_min > int(guest_number)):
@@ -217,13 +325,6 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         if photos is not None and len(photos) > 0:
             photo_url = photos[0].directory+photos[0].name
 
-        #get the number of booking times
-        bks = Booking.objects.filter(experience_id = experience.id)
-        if bks is not None:
-            bks = len(bks)
-        else:
-            bks = 0
-
         if type(experience) is Experience:
             tp = experience.type
         else:
@@ -236,9 +337,10 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                             'price':experience_fee_calculator(exp_price, experience.commission),
                             'currency':str(dict(Currency)[experience.currency.upper()]),
                             'dollarsign':DollarSign[experience.currency.upper()],'dates':{},
-                            'photo_url':photo_url, 'type':tp , 'popularity':bks, 'tags':experience.get_tags(settings.LANGUAGES[0][0])}
+                            'photo_url':photo_url, 'type':tp , 'popularity':experience.popularity,
+                            'tags':experience.get_tags(settings.LANGUAGES[0][0])}
 
-        if exp_type == 'experience':
+        if type(experience) == Experience:
             experience_avail['meetup_spot'] = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
             experience_avail['host_image'] = host.registereduser.image_url
             experience_avail['host'] = host.first_name + ' ' + host.last_name
@@ -462,8 +564,12 @@ def getAvailableOptions(experience, available_options, available_date):
         #    sdt += timedelta(weeks=experience.repeat_frequency)
         #else :
             #TODO
-    #set the start time to 6 hours later
-    sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+23)
+    #set the start time according to book_in_advance or 23 hours later
+    if hasattr(experience, 'book_in_advance') and experience.book_in_advance is not None and experience.book_in_advance>0:
+        sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(hour=22, minute=0, second=0, microsecond=0) + relativedelta(days=experience.book_in_advance-1)
+    else:
+        sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+23)
+
 
     blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
     blockout_start = []
@@ -617,6 +723,86 @@ def getAvailableOptions(experience, available_options, available_date):
             #TODO
     return available_date
 
+def get_related_experiences(experience, request):
+    related_experiences = []
+    related_newproducts = []
+    N=1
+    cursor = connections['default'].cursor()
+    #other experiences booked by those that booked this experience
+    cursor.execute("select distinct experience_id from experiences_experience_guests where experience_id != %s and user_id in" +
+                    "(select user_id from experiences_experience_guests where experience_id=%s)",
+                            [experience.id, experience.id])
+    ids = cursor._rows
+    if ids and len(ids)>0:
+        for id in ids:
+            if len(related_experiences) < N:
+                related_experiences.append(id[0])
+            if len(related_newproducts) < N:
+                related_newproducts.append(id[0])
+        related_experiences = list(Experience.objects.filter(id__in=related_experiences).filter(city__iexact=experience.city))
+        related_newproducts = list(NewProduct.objects.filter(id__in=related_newproducts).filter(city__iexact=experience.city))
+
+    #other similar experiences based on tags
+    if len(related_experiences)<N or len(related_newproducts)<N:
+        cursor = connections['default'].cursor()
+        cursor.execute("select experience_id from (select distinct experience_id, count(experiencetag_id)" +
+                        "from experiences_experience_tags where experience_id!=%s and experiencetag_id in" +
+                        "(SELECT experiencetag_id FROM experiences_experience_tags where experience_id=%s)" +
+                        "group by experience_id order by count(experiencetag_id) desc) as t1", #LIMIT %s
+                            [experience.id, experience.id])
+        ids = cursor._rows
+        r_ids = []
+        for i in range(len(ids)):
+            r_ids.append(ids[i][0])
+
+        if len(related_experiences)<N:
+            queryset = Experience.objects.filter(id__in=r_ids).filter(city__iexact=experience.city).filter(status__iexact="listed")
+            for exp in queryset:
+                if not any(x.id == exp.id for x in related_experiences):
+                    related_experiences.append(exp)
+                if len(related_experiences)>=N:
+                    break
+
+        if len(related_newproducts)<N:
+            queryset = NewProduct.objects.filter(id__in=r_ids).filter(city__iexact=experience.city).filter(status__iexact="listed")
+            for exp in queryset:
+                if not any(x.id == exp.id for x in related_newproducts):
+                    related_newproducts.append(exp)
+                if len(related_newproducts)>=N:
+                    break
+
+    #random experiences
+    if len(related_experiences)<N:
+        queryset = Experience.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").exclude(id=experience.id).order_by('?')[:N]
+        for exp in queryset:
+            related_experiences.append(exp)
+            if len(related_experiences)>=N:
+                break
+    if len(related_newproducts)<N:
+        queryset = NewProduct.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").exclude(id=experience.id).order_by('?')[:N]
+        for exp in queryset:
+            related_newproducts.append(exp)
+            if len(related_newproducts)>=N:
+                break
+
+    related_experiences += related_newproducts
+
+    for i in range(0,len(related_experiences)):
+        convert_experience_price(request, related_experiences[i])
+        related_experiences[i].dollarsign = DollarSign[related_experiences[i].currency.upper()]
+        related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
+        related_experiences[i].title = related_experiences[i].get_title(settings.LANGUAGES[0][0])
+        related_experiences[i].description = related_experiences[i].get_description(settings.LANGUAGES[0][0])
+        setExperienceDisplayPrice(related_experiences[i])
+        if float(related_experiences[i].duration).is_integer():
+            related_experiences[i].duration = int(related_experiences[i].duration)
+        if related_experiences[i].commission > 0.0:
+            related_experiences[i].commission = related_experiences[i].commission/(1-related_experiences[i].commission)+1
+        else:
+            related_experiences[i].commission = settings.COMMISSION_PERCENT+1
+
+    return related_experiences
+
 class ExperienceDetailView(DetailView):
     model = AbstractExperience
     template_name = 'experiences/experience_detail.html'
@@ -635,6 +821,7 @@ class ExperienceDetailView(DetailView):
             form.data['first_name'] = request.user.first_name
             form.data['last_name'] = request.user.last_name
             experience = AbstractExperience.objects.get(id=form.data['experience_id'])
+            convert_experience_price(request, experience)
             experience.dollarsign = DollarSign[experience.currency.upper()]
             #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
             if type(experience) == Experience:
@@ -684,6 +871,7 @@ class ExperienceDetailView(DetailView):
                            })
 
     def get_context_data(self, **kwargs):
+        set_initial_currency(self.request)
         context = super(ExperienceDetailView, self).get_context_data(**kwargs)
         experience = context['experience'] if 'experience' in context else context['newproduct']
         if 'experience' not in context:
@@ -769,62 +957,16 @@ class ExperienceDetailView(DetailView):
                     context['in_wishlist'] = True
                     break
 
-        related_experiences = []
-        cursor = connections['default'].cursor()
-        cursor.execute("select experience_id from experiences_experience_guests where experience_id != %s and user_id in" +
-                       "(select user_id from experiences_experience_guests where experience_id=%s)",
-                             [experience.id, experience.id])
-        ids = cursor.fetchall()
-        if ids and len(ids)>0:
-            for id in ids:
-                related_experiences.append(id[0])
-            related_experiences = list(Experience.objects.filter(id__in=related_experiences).filter(city__iexact=experience.city))
-        if len(related_experiences)<3:
-            cursor = connections['default'].cursor()
-            cursor.execute("select experience_id from (select distinct experience_id, count(experiencetag_id)" +
-                           "from experiences_experience_tags where experience_id!=%s and experiencetag_id in" +
-                           "(SELECT experiencetag_id FROM experiences_experience_tags where experience_id=%s)" +
-                           "group by experience_id order by count(experiencetag_id) desc) as t1", #LIMIT %s
-                             [experience.id, experience.id])
-            ids = cursor.fetchall()
-            r_ids = []
-            for i in range(len(ids)):
-                r_ids.append(ids[i][0])
-
-            queryset = Experience.objects.filter(id__in=r_ids).filter(city__iexact=experience.city).filter(status__iexact="listed")
-            for exp in queryset:
-                if not any(x.id == exp.id for x in related_experiences):
-                    related_experiences.append(exp)
-                if len(related_experiences)>=3:
-                    break
-
-        if len(related_experiences)<3:
-            queryset = Experience.objects.filter(city__iexact=experience.city).filter(status__iexact="listed").order_by('?')[:3]
-            for exp in queryset:
-                related_experiences.append(exp)
-                if len(related_experiences)>=3:
-                    break
-
-        for i in range(0,len(related_experiences)):
-            related_experiences[i].dollarsign = DollarSign[related_experiences[i].currency.upper()]
-            related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
-            related_experiences[i].title = related_experiences[i].get_title(settings.LANGUAGES[0][0])
-            related_experiences[i].description = related_experiences[i].get_description(settings.LANGUAGES[0][0])
-            setExperienceDisplayPrice(related_experiences[i])
-            if float(related_experiences[i].duration).is_integer():
-                related_experiences[i].duration = int(related_experiences[i].duration)
-            if related_experiences[i].commission > 0.0:
-                related_experiences[i].commission = related_experiences[i].commission/(1-related_experiences[i].commission)+1
-            else:
-                related_experiences[i].commission = settings.COMMISSION_PERCENT+1
+        related_experiences = get_related_experiences(experience, self.request)
 
         related_experiences_added_to_wishlist = []
 
+        cursor = connections['default'].cursor()
         if self.request.user.is_authenticated():
             for r in related_experiences:
                 cursor.execute("select id from app_registereduser_wishlist where experience_id = %s and registereduser_id=%s",
                              [r.id,self.request.user.registereduser.id])
-                wl = cursor.fetchone()
+                wl = cursor._rows
                 if wl and len(wl)>0:
                     related_experiences_added_to_wishlist.append(True)
                 else:
@@ -835,6 +977,7 @@ class ExperienceDetailView(DetailView):
 
         context['related_experiences'] = zip(related_experiences, related_experiences_added_to_wishlist)
 
+        convert_experience_price(self.request, experience)
         experience.dollarsign = DollarSign[experience.currency.upper()]
         experience.currency = str(dict(Currency)[experience.currency.upper()])
         
@@ -870,6 +1013,55 @@ class ExperienceDetailView(DetailView):
         context['LANGUAGE'] = settings.LANGUAGE_CODE
         context['wishlist_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_wishlist/"
         
+        #check whether the experience is among the top 50%, 80% most viewed in the past 30 days
+        if type(experience) is Experience:
+            table_name = "experiences_experience"
+            if experience.type == "ITINERARY":
+                target_type = "'ITINERARY'"
+            else:
+                target_type = "'PRIVATE', 'NONPRIVATE'"
+
+            cursor.execute("SELECT experience_id, count(experience_id) FROM app_userpageviewrecord" + \
+                                " where time_arrived >= NOW() - INTERVAL 30 DAY and (select type from " + table_name + \
+                                " where abstractexperience_ptr_id=experience_id) in (" + \
+                                target_type + ") group by experience_id order by count(experience_id) desc;")
+        else:
+            table_name = "experiences_newproduct"
+            cursor.execute("SELECT experience_id, count(experience_id) FROM app_userpageviewrecord" + \
+                                " where time_arrived >= NOW() - INTERVAL 30 DAY and experience_id in " + \
+                                " (select abstractexperience_ptr_id from " + table_name + ")" + \
+                                " group by experience_id order by count(experience_id) desc;")
+
+        j=0
+        top_20 = False
+        top_50 = False
+        for i in range(int(cursor.rowcount*0.2)+1):
+            j=i
+            if cursor._rows[i][0] == experience.id:
+                top_20 = True
+                top_50 = True
+                break
+
+        if not top_50:
+            for i in range(j+1, int(cursor.rowcount*0.5)+1):
+                if cursor._rows[i][0] == experience.id:
+                    top_50 = True
+                    break
+
+        context['top_20'] = top_20
+        context['top_50'] = top_50
+
+        #get coordinates
+        coordinates = []
+        if experience.coordinate_set is not None:
+            for co in experience.coordinate_set.all():
+                if co.order is not None and co.order >= 1:
+                    coordinates.insert(co.order-1, [co.name if co.name is not None else '', co.longitude, co.latitude])
+                else:
+                    coordinates.append([co.name if co.name is not None else '', co.longitude, co.latitude])
+
+        context['coordinates'] = coordinates
+
         #update page view statistics
         if self.request.user.is_staff:
             #ignore page views by staff
@@ -884,22 +1076,27 @@ class ExperienceDetailView(DetailView):
         time_arrived = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         context['time_arrived'] = time_arrived
         context['pageview_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_pageview/"
-
         return context
 
 def update_pageview_statistics(user_id, experience_id, length = None):
     '''
-    @length None: times_viewed++; not None: update average_length
+    @length None: arrive, times_viewed++; not None: leave, update average_length
     '''
     try:
         record = UserPageViewStatistics.objects.get(user_id=user_id, experience_id = experience_id)
     except UserPageViewStatistics.DoesNotExist:
         record = UserPageViewStatistics(user_id = user_id, experience_id = experience_id,
                                         times_viewed = 0, average_length = 0.0)
+    try:
+        detail = UserPageViewRecord.objects.get(user_id=user_id, experience_id=experience_id, time_left__isnull=True)
+    except UserPageViewRecord.DoesNotExist:
+        detail = UserPageViewRecord(user_id=user_id, experience_id=experience_id,
+                                    time_arrived=pytz.timezone("UTC").localize(datetime.utcnow()))
     if length:
         try:
             length = float(length)
             record.average_length = float((record.average_length * (record.times_viewed-1) + length) / record.times_viewed)
+            detail.time_left = pytz.timezone("UTC").localize(datetime.utcnow())
         except BaseException:
             #TODO
             pass
@@ -907,6 +1104,7 @@ def update_pageview_statistics(user_id, experience_id, length = None):
         record.times_viewed += 1
 
     record.save()
+    detail.save()
 
 EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 
@@ -954,6 +1152,7 @@ def experience_booking_successful(request, experience=None, guest_number=None, b
 def experience_booking_confirmation(request):
     # Get the context from the request.
     context = RequestContext(request)
+    set_initial_currency(request)
     display_error = False
 
     if not request.user.is_authenticated():
@@ -962,7 +1161,10 @@ def experience_booking_confirmation(request):
     # A HTTP POST?
     if request.method == 'POST':
         form = BookingConfirmationForm(request.POST)
+        form.data = form.data.copy()
+        form.data['custom_currency'] = request.session['custom_currency']
         experience = AbstractExperience.objects.get(id=form.data['experience_id'])
+        convert_experience_price(request, experience)
         experience.dollarsign = DollarSign[experience.currency.upper()]
         #experience.currency = str(dict(Currency)[experience.currency.upper()])#comment out on purpose --> stripe
         if type(experience) == Experience:
@@ -1129,8 +1331,9 @@ def experience_booking_confirmation(request):
                 if total_price > 0.0:
                     #not free
                     # todo: remove stub money amout
+                    price = int(convert_currency(0.01, experience.currency, "CNY") * 100)
                     pay_info = unified_pay.post(experience.get_title(settings.LANGUAGES[0][0]), out_trade_no,
-                                                str(1), "127.0.0.1", notify_url)
+                                                str(price), "127.0.0.1", notify_url)
                     if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
                         code_url = pay_info['code_url']
                         success_url = 'http://' + settings.ALLOWED_HOSTS[0] \
@@ -1178,10 +1381,8 @@ def experience_booking_confirmation(request):
         #form = BookingConfirmationForm()
         return HttpResponseRedirect(GEO_POSTFIX)
 
-
 def url_with_querystring(path, **kwargs):
     return path + '?' + urlencode(kwargs)
-
 
 def saveProfileImage(user, profile, image_file):
     content_type = image_file.content_type.split('/')[0]
@@ -2461,7 +2662,7 @@ def manage_listing_continue(request, exp_id):
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
                is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False,  type='s'):
-
+    set_initial_currency(request)
     form = SearchForm()
     form.data = form.data.copy()
     form.data['city'] = city.title()
@@ -2529,6 +2730,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         i = 0
         while i < len(experienceList):
             experience = experienceList[i]
+            convert_experience_price(request, experience)
             experience.commission = round(experience.commission/(1-experience.commission),3)+1
 
             if type == 'product':
@@ -2776,21 +2978,10 @@ def get_experience_score(criteria_dict, experience_tags):
         score += criteria_dict.get(tag, 0)
     return score
 
-def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1, age_limit=1):
+def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1, age_limit=1, customer=None):
     '''
     @sort, 1:most popular, 2:outdoor, 3:urban
     '''
-
-    available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords)
-    itinerary = []
-    dt = start_datetime
-
-    city = city.lower().split(",")
-    if not isEnglish(city[0]):
-        for i in range(len(city)):
-            city[i] = dict(Location_reverse).get(city[i]).lower()
-
-    day_counter = 0
 
     if sort == 2:
         config = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/outdoor.yaml').replace('\\', '/'))
@@ -2807,8 +2998,16 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
         config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_elderly.yaml').replace('\\', '/')))
         config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_children.yaml').replace('\\', '/')))
 
-    for experience in available_options:
-        experience['popularity'] = get_experience_score(config, experience['tags'])*0.9 + experience['popularity']*0.1
+    available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords, customer=customer, preference=config)
+    itinerary = []
+    dt = start_datetime
+
+    city = city.lower().split(",")
+    if not isEnglish(city[0]):
+        for i in range(len(city)):
+            city[i] = dict(Location_reverse).get(city[i]).lower()
+
+    day_counter = 0
 
     #available_options: per experience --> itinerary: per day
     while dt <= end_datetime:
@@ -2915,7 +3114,8 @@ def custom_itinerary(request):
                 elif not isinstance(tags,str):
                     raise TypeError("Wrong format: keywords. String or list expected.")
 
-                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort, age_limit)
+                customer = request.user if request.user.is_authenticated() else None
+                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort, age_limit, customer)
 
                 return render_to_response('experiences/custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
             else:

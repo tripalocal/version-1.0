@@ -53,16 +53,34 @@
   }
 }
 
-.bottom-qr {
+.side-banner {
+  margin-right: -80px;
   position: fixed;
-  bottom: 40px;
-  right: 10px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  width: 64px;
-  height: 64px;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 120px;
+  background-color: $primary-color;
+  text-align: center;
+  border-radius: 3px 0 0 3px;
+  z-index: 1050;
+
   @include media('<tablet') {
     display: none;
   }
+
+  p {
+    color: white;
+    margin: 5px 0;
+  }
+}
+
+.qr-code {
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
 }

@@ -12,7 +12,9 @@
   '../../utils/functions',
   '../../utils/placeholders';
 
-
+body {
+    padding-top: 50px;
+}
 // Search form
 .basic-search {
   color: $dark-grey;

@@ -11,7 +11,8 @@
   color: $dark-grey;
   height: 51px;
   text-align: center;
-border-bottom: 1px solid $light-grey;
+  border-bottom: 1px solid $light-grey;
+
   a {
     color: $dark-grey;
   }
@@ -32,6 +33,9 @@ border-bottom: 1px solid $light-grey;
     display: inline-block;
     float: none;
     vertical-align: top;
+    @include media('<tablet') {
+      display: none;
+    }
     a {
       padding: 15px 0 0 0;
       margin: 0 20px 12px 20px;
@@ -42,6 +46,8 @@ border-bottom: 1px solid $light-grey;
       border-color: $primary-color;
     }
   }
+
+
 
   .navbar-brand {
     display: block;
@@ -76,14 +82,18 @@ border-bottom: 1px solid $light-grey;
   }
 }
 
-.navbar-default, .navbar-collapse {
+.navmenu {
+  text-align: left;
   background-color: white;
+  color: $dark-grey;
+  padding-left: 15px;
+  padding-top: 20px;
+  width: 250px;
+  z-index: 2050;
 }
 
-.navbar-collapse {
-  @include media('<tablet') {
-    border-bottom: 1px solid $light-grey;
-  }
+.navbar-default, .navbar-collapse {
+  background-color: white;
 }
 
 @media (min-width: 768px) {

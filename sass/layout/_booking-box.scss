@@ -73,14 +73,33 @@
   }
 }
 
+.booking-tip {
+  width: 100%;
+  height: 50px;
+  position: relative;
+  display: block;
+  img {
+    position: absolute;
+    left: 0;
+  }
+  p {
+    position: absolute;
+    left: 50px;
+    top: 10px;
+    line-height: 1.2;
+    font-size: 12px;
+    text-align: left;
+  }
+}
+
 .save-to-wishlist {
   border: 1px solid $light-grey;
   color: $dark-grey;
-  margin-top: 30px;
   height: 50px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
+  margin-top: 15px;
   border-radius: 3px;
   padding: 5px 55px;
 

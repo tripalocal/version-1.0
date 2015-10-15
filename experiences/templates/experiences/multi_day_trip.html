@@ -107,4 +107,8 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+<script type="text/javascript">
+  $("#navbar").removeClass("navbar-static-top");
+  $("#navbar").addClass("navbar-fixed-top");
+</script>
 {% endblock %}

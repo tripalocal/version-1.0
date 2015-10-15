@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-07 16:03+1100\n"
+"POT-Creation-Date: 2015-10-14 15:08+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,6 +67,10 @@ msgstr ""
 
 #: custom_admin/forms.py:10
 msgid "Greater Queensland"
+msgstr ""
+
+#: custom_admin/forms.py:10
+msgid "Greater Tasmania"
 msgstr ""
 
 #: custom_admin/forms.py:11
@@ -584,9 +588,10 @@ msgstr ""
 
 #: venv/lib/python3.4/site-packages/argparse.py:2275
 #: venv/lib/python3.4/site-packages/gunicorn/argparse_compat.py:2259
-#, python-format
+#, fuzzy, python-format
+#| msgid "Invalid last name"
 msgid "invalid %s value: %r"
-msgstr ""
+msgstr "无效姓氏"
 
 #: venv/lib/python3.4/site-packages/argparse.py:2285
 #: venv/lib/python3.4/site-packages/gunicorn/argparse_compat.py:2269
@@ -629,8 +634,10 @@ msgid "Enter a valid URL."
 msgstr ""
 
 #: venv/lib/python3.4/site-packages/django/core/validators.py:115
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/django/core/validators.py:120
 #: venv/lib/python3.4/site-packages/rest_framework/fields.py:586
@@ -647,18 +654,24 @@ msgstr ""
 
 #: venv/lib/python3.4/site-packages/django/core/validators.py:188
 #: venv/lib/python3.4/site-packages/django/core/validators.py:207
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "Enter a valid IPv4 address."
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/django/core/validators.py:193
 #: venv/lib/python3.4/site-packages/django/core/validators.py:208
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "Enter a valid IPv6 address."
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/django/core/validators.py:203
 #: venv/lib/python3.4/site-packages/django/core/validators.py:206
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/django/core/validators.py:229
 #: venv/lib/python3.4/site-packages/django/db/models/fields/__init__.py:1075
@@ -819,8 +832,10 @@ msgid "'%(value)s' value must be a decimal number."
 msgstr ""
 
 #: venv/lib/python3.4/site-packages/django/db/models/fields/__init__.py:1304
+#, fuzzy
+#| msgid "Remember me"
 msgid "Decimal number"
-msgstr ""
+msgstr "记住密码"
 
 #: venv/lib/python3.4/site-packages/django/db/models/fields/__init__.py:1475
 msgid "File path"
@@ -942,13 +957,17 @@ msgid "This field is required."
 msgstr ""
 
 #: venv/lib/python3.4/site-packages/django/forms/fields.py:236
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "Enter a whole number."
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/django/forms/fields.py:279
 #: venv/lib/python3.4/site-packages/django/forms/fields.py:316
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "Enter a number."
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/django/forms/fields.py:318
 #, python-format
@@ -1036,12 +1055,16 @@ msgstr ""
 #: venv/lib/python3.4/site-packages/django/forms/fields.py:872
 #: venv/lib/python3.4/site-packages/django/forms/fields.py:987
 #: venv/lib/python3.4/site-packages/django/forms/models.py:1195
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "Enter a list of values."
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/django/forms/fields.py:988
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "Enter a complete value."
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #. Translators: This is the default suffix added to form field labels
 #: venv/lib/python3.4/site-packages/django/forms/forms.py:122
@@ -1312,8 +1335,10 @@ msgid "October"
 msgstr ""
 
 #: venv/lib/python3.4/site-packages/django/utils/dates.py:19
+#, fuzzy
+#| msgid "Remember me"
 msgid "November"
-msgstr ""
+msgstr "记住密码"
 
 #: venv/lib/python3.4/site-packages/django/utils/dates.py:20
 #, fuzzy
@@ -1482,9 +1507,11 @@ msgid "October"
 msgstr ""
 
 #: venv/lib/python3.4/site-packages/django/utils/dates.py:55
+#, fuzzy
+#| msgid "Remember me"
 msgctxt "alt. month"
 msgid "November"
-msgstr ""
+msgstr "记住密码"
 
 #: venv/lib/python3.4/site-packages/django/utils/dates.py:56
 #, fuzzy
@@ -1494,8 +1521,10 @@ msgid "December"
 msgstr "记住密码"
 
 #: venv/lib/python3.4/site-packages/django/utils/ipv6.py:10
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/django/utils/text.py:76
 #, python-format
@@ -2070,8 +2099,10 @@ msgid "first step"
 msgstr "名字"
 
 #: venv/lib/python3.4/site-packages/formwizard/templates/formwizard/wizard_form.html:15
+#, fuzzy
+#| msgid "First Name"
 msgid "prev step"
-msgstr ""
+msgstr "名字"
 
 #: venv/lib/python3.4/site-packages/formwizard/templates/formwizard/wizard_form.html:17
 msgid "submit"
@@ -2080,8 +2111,10 @@ msgstr ""
 #: venv/lib/python3.4/site-packages/jsonfield/fields.py:31
 #: venv/lib/python3.4/site-packages/jsonfield/fields.py:43
 #: venv/lib/python3.4/site-packages/jsonfield/fields.py:80
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "Enter valid JSON"
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/kombu/transport/django/models.py:21
 msgid "queues"
@@ -2213,8 +2246,10 @@ msgid "Year"
 msgstr ""
 
 #: venv/lib/python3.4/site-packages/payments/fields.py:120
+#, fuzzy
+#| msgid "Please enter a valid email"
 msgid "Enter a valid security number."
-msgstr ""
+msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/payments/stripe/widgets.py:20
 msgid "Total payment"
