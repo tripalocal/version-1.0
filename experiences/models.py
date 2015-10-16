@@ -396,6 +396,12 @@ class Coupon(models.Model):
     def __str__(self):
         return self.promo_code
 
+class CustomItinerary(models.Model):
+    user = models.ForeignKey(User)
+    title = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
+
 class Booking(models.Model):
     user = models.ForeignKey(User)
     coupon = models.ForeignKey(Coupon)
@@ -408,6 +414,7 @@ class Booking(models.Model):
     payment = models.ForeignKey("Payment", related_name="payment")
     refund_id = models.CharField(max_length=50)
     booking_extra_information = models.TextField()
+    custom_itinerary = models.ForeignKey(CustomItinerary, null=True, blank=True)
 
     def __str__(self):
         return self.user.email + "--" + self.experience.get_title(settings.LANGUAGES[0][0])
