@@ -12,28 +12,156 @@
 
 {% block content %}
 <form id="itinerary_form" action="" method="post">
+  <!-- Top search bar -->
   <div class="basic-search">
     <div class="container">
       <div class="row">
         <div class="form-inline">
           <h3 class="form-header">{% trans "Title" %}</h3>
-          <input type="text" class="form-control" id="itinerary-title">
+          <input type="text" class="form-control" id="itinerary-title" style="width:220px;">
+        </div>
+        <div class="form-inline">
+          <h3 class="form-header">{% trans "Date" %}</h3>
+          <input type="text" class="form-control" id="itinerary-start-date" style="width:100px; margin-right:10px;">
+          <input type="text" class="form-control" id="itinerary-end-date" style="width:100px;">
+        </div>
+        <div class="form-inline right-group" style="margin-right:0;">
+          <h3 class="form-header">{% trans "Group size" %}</h3>
+          <button class="btn btn-grey">Adult x 5</button>
+          <button class="btn btn-default">+ Add Kids</button>
         </div>
       </div>
       <div class="row">
         <div class="form-inline">
           <h3 class="form-header">{% trans "Location" %}</h3>
-          <input type="text" class="form-control" id="itinerary-title">
+          <button class="btn btn-grey">Melbourne (3)</button>
+          <button class="btn btn-grey">Sydney (2)</button>
+          <button class="btn btn-default">+ Add (4 left)</button>
+        </div>
+        <div class="form-inline right-group">
+          <h3 class="form-header"> </h3>
+          <button class="btn btn-default">Preview</button>
+          <button class="btn btn-default">Export PDF</button>
+          <button class="btn btn-primary">Email</button>
         </div>
       </div>
     </div>
   </div>
 
   <div class="container">
-    <div class="itinerary-search">
-    </div>
-
-    <div class="itinerary-plan">
+    <div class="row">
+      <div class="col-sm-6">
+        <!-- Left section -->
+        <div class="section">
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Experiences</a></li>
+            <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Transport</a></li>
+            <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Food</a></li>
+            <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Price</a></li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="home">
+              <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                <input type="text" class="form-control">
+              </div>
+              <div class="exp-box-sm">
+                <div class="exp-img"></div>
+                <div class="exp-info">
+                  <h3>Such experience title</h3>
+                  <p>Very description wow</p>
+                  <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                </div>
+                <div class="exp-price">
+                  <p>$AUD</p>
+                  <h2>3239</h2>
+                  <p>{% trans "per person" %}</p>
+                </div>
+              </div>
+              <div class="exp-box-sm">
+                <div class="exp-img"></div>
+                <div class="exp-info">
+                  <h3>Another one</h3>
+                  <p>Very description wow</p>
+                  <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
+                </div>
+                <div class="exp-price">
+                  <p>$AUD</p>
+                  <h2>339</h2>
+                  <p>{% trans "per person" %}</p>
+                </div>
+              </div>
+              <div class="exp-box-sm">
+                <div class="exp-img"></div>
+                <div class="exp-info">
+                  <h3>Yet another</h3>
+                  <p>Very description wow cool blah blah blah</p>
+                  <p>2 hrs &middot; English &middot; <strong>Public</strong></p>
+                </div>
+                <div class="exp-price">
+                  <p>$AUD</p>
+                  <h2>9000</h2>
+                  <p>{% trans "per person" %}</p>
+                </div>
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="profile">...</div>
+            <div role="tabpanel" class="tab-pane fade" id="messages">...</div>
+            <div role="tabpanel" class="tab-pane fade" id="settings">...</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <!-- Right section -->
+        <div class="section">
+          <h1 class="section-heading">Itinerary</h1>
+          <h2 class="price-line">$AUD 3456 per person (Total of $AUD 23456)</h2>
+          <div class="section-box">
+            <p>Melbourne 3 Days</p>
+          </div>
+          <div class="section-box">
+            <p>Day 1</p>
+            <div class="exp-box-sm">
+              <div class="exp-img"></div>
+              <div class="exp-info">
+                <h3>Such experience title</h3>
+                <p>Very description wow</p>
+                <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+              </div>
+              <div class="exp-price">
+                <p>$AUD</p>
+                <h2>3239</h2>
+                <p>{% trans "per person" %}</p>
+              </div>
+            </div>
+          </div>
+          <div class="section-box">
+            <p>Day 2</p>
+            <div class="exp-box-sm">
+              <div class="exp-img"></div>
+              <div class="exp-info">
+                <h3>Another one</h3>
+                <p>Very description wow</p>
+                <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
+              </div>
+              <div class="exp-price">
+                <p>$AUD</p>
+                <h2>339</h2>
+                <p>{% trans "per person" %}</p>
+              </div>
+            </div>
+          </div>
+          <div class="section-box">
+            <p>Day 3</p>
+          </div>
+          <div class="section-box-add">
+            <span class="add-sign">+</span>
+            <p>Sydney 2 Days</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </form>

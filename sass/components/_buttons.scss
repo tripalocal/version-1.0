@@ -24,6 +24,15 @@
   }
 }
 
+.btn-grey {
+  background-color: $pale-grey;
+  color: $dark-grey;
+  border-color: $light-grey;
+  &:hover {
+    background-color: darken($pale-grey, 10%);
+  }
+}
+
 .btn-clear {
   background-color: transparent;
   border-color: $medium-grey;
