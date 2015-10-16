@@ -615,8 +615,6 @@ msgid "Thank you for your confirmation"
 msgstr "感谢您的确认激活"
 
 #: app/templates/app/registration_successful.html:78
-#, fuzzy, python-format
-#| msgid " Your account associate with %(account_email)s is now activated. "
 msgid " Your account associate with %(account_email)s is now activated. "
 msgstr "您用 %(user_email)注册的账户已经激活。"
 
