@@ -1040,7 +1040,7 @@ msgstr "/人"
 
 #: experiences/templates/experiences/experience_detail.html:405
 msgid "Itineraries"
-msgstr ""
+msgstr "精品路线"
 
 #: experiences/templates/experiences/experience_detail.html:409
 #: experiences/templates/experiences/multi_day_trip.html:80
