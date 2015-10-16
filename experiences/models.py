@@ -396,18 +396,28 @@ class Coupon(models.Model):
     def __str__(self):
         return self.promo_code
 
+class CustomItinerary(models.Model):
+    user = models.ForeignKey(User)
+    title = models.CharField(max_length=100)
+    status = models.CharField(max_length=10, default="draft")
+    description = models.TextField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
+
 class Booking(models.Model):
     user = models.ForeignKey(User)
-    coupon = models.ForeignKey(Coupon)
+    coupon = models.ForeignKey(Coupon, null=True, blank=True)
     coupon_extra_information = models.TextField()
     guest_number = models.IntegerField()
+    adult_number = models.IntegerField(null=True, blank=True)
+    children_number = models.IntegerField(null=True, blank=True)
     experience = models.ForeignKey(AbstractExperience)
     datetime = models.DateTimeField()
     status = models.CharField(max_length=50)
     submitted_datetime = models.DateTimeField()
-    payment = models.ForeignKey("Payment", related_name="payment")
-    refund_id = models.CharField(max_length=50)
-    booking_extra_information = models.TextField()
+    payment = models.ForeignKey("Payment", related_name="payment", null=True, blank=True)
+    refund_id = models.CharField(max_length=50, null=True, blank=True)
+    booking_extra_information = models.TextField(null=True, blank=True)
+    custom_itinerary = models.ForeignKey(CustomItinerary, null=True, blank=True)
 
     def __str__(self):
         return self.user.email + "--" + self.experience.get_title(settings.LANGUAGES[0][0])

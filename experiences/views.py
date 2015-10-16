@@ -3143,6 +3143,10 @@ def custom_itinerary(request):
                 total_price = 0.0
                 guest_number = 1
 
+                ci = CustomItinerary()
+                ci.user = request.user
+                ci.title = str(request.user.id) + "_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                ci.save()
                 for item in itinerary:
                     booking_form.data['experience_id'] += str(item['id']) + ";"
                     booking_form.data['date'] += str(item['date']) + ";"
@@ -3153,6 +3157,16 @@ def custom_itinerary(request):
                     price = experience_fee_calculator(float(experience.price), experience.commission)
                     total_price += price*int(item['guest_number'])
                     guest_number = int(item['guest_number'])
+
+                    #save the custom itinerary as draft
+                    local_timezone = pytz.timezone(settings.TIME_ZONE)
+                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y/%m/%d"))
+                    bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
+
+                    booking = Booking(user = request.user, experience= experience, guest_number = guest_number,
+                                    datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
+                                    submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
+                    booking.save()
 
                     #save to excel sheet
                     cell_format = workbook.add_format({'text_wrap': True})
