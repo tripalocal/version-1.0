@@ -1043,12 +1043,13 @@ def get_experience_detail(experience, get_available_date=True):
         if ph and len(ph) > 0:
             image = ph[0].directory+ph[0].name
         result_related['related_experiences'].append({'image':image,
-                                                        'title':exp.get_title(settings.LANGUAGE_CODE[0][0]),
-                                                        'price':float(exp.price)*exp.commission, #commission is updated in get_related_experiences 
-                                                        'currency': str(dict(Currency).get(exp.currency.upper(),exp.currency.upper())),
-                                                        'dollarsign': DollarSign.get(exp.currency.upper(),'$'),
-                                                        'duration':exp.duration,
-                                                        'language':exp.language})
+                                                      'id':exp.id,
+                                                      'title':exp.get_title(settings.LANGUAGE_CODE[0][0]),
+                                                      'price':float(exp.price)*exp.commission, #commission is updated in get_related_experiences 
+                                                      'currency': str(dict(Currency).get(exp.currency.upper(),exp.currency.upper())),
+                                                      'dollarsign': DollarSign.get(exp.currency.upper(),'$'),
+                                                      'duration':exp.duration,
+                                                      'language':exp.language})
     result.update(result_related)
     return result
 
