@@ -228,6 +228,23 @@ def resort_experiences(experiences, experiences_not_interested, experience_inter
     #TODO
     return experiences
 
+def search_experience(condition, language="zh", type="experience"):
+    cursor = connections['default'].cursor()
+    result = []
+    cmds = ["select product_id from experiences_newproducti18n where language='%%s%' and " + \
+           "title like %s or description like '%%s%';",
+           "(select experience_id from experiences_experiencetitle where language=%s and title like '%%s%') union" + \
+           "(select experience_id from experiences_experiencedescription where language=%s and description like '%%s%');"]
+
+    for cmd in cmds:
+        cursor.execute(cmd, [language, condition, condition])
+        ids = cursor._rows
+        for id in ids:
+            result.append(id[0])
+
+    result = AbstractExperience.objects.filter(id__in=result)
+    return result
+
 def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None):
     #city/keywords is a string like A,B,C,
     local_timezone = pytz.timezone(settings.TIME_ZONE)
