@@ -1356,8 +1356,8 @@ msgid "Experience with the same Id already exists"
 msgstr "该Id已分配给其他体验"
 
 #: experiences/views.py:1955
-msgid "%H:%M %-d %b %Y"
-msgstr "%Y年%-m月%-d日 %H:%M"
+msgid "%H:%M %d %b %Y"
+msgstr "%Y{0}%m{1}%d{2} %H:%M"
 
 #: experiences/views.py:2096
 msgid "[Tripalocal] Your experience is cancelled"
