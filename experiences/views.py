@@ -1969,7 +1969,7 @@ def update_booking(id, accepted, user):
             exp_title = experience.get_title(settings.LANGUAGE_CODE)
             customer_phone_num = booking.payment.phone_number
             exp_datetime_local = booking.datetime.astimezone(tzlocal())
-            exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %-d %b %Y"))
+            exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y")).format(*'年月日')
 
             send_booking_confirmed_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
 

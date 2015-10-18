@@ -1212,7 +1212,7 @@ def sms_notification(booking, experience, user, phone_number):
 
     customer_phone_num = phone_number
     exp_datetime_local = booking.datetime.astimezone(tzlocal())
-    exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
+    exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y")).format(*'年月日')
     host = get_host(experience)
     send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
     schedule_request_reminder_sms(booking.id, host.id, user.first_name, booking.datetime + timedelta(days=1))
