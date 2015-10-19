@@ -886,6 +886,61 @@ def service_booking(request, format=None):
         result = {"success":"false"}
         return Response(result, status=status.HTTP_400_BAD_REQUEST)
 
+#{"bookings":[{"id":"1061","datetime":"2015/06/17 12:00","guest_number_adult":2,"guest_number_children":2,"coupon":"abcdefgh"},{"id":"20","datetime":"2015/06/17 17:00","guest_number_adult":3,"guest_number_children":0,"coupon":"abcdefgh"}]}
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_booking_request(request, format=None):
+    try:
+        data = request.data
+        user = request.user
+
+        if type(data) is str:
+            data = ast.literal_eval(data)
+
+        bookings = data['bookings']
+        local_timezone = pytz.timezone(settings.TIME_ZONE)
+
+        for item in bookings:
+            experience = AbstractExperience.objects.get(id=str(item['id']))
+            host = get_host(experience)
+            bk_datetime = local_timezone.localize(datetime.strptime(item['datetime'].strip(), "%Y/%m/%d %H:%M")).astimezone(pytz.timezone("UTC"))
+            guest_number_adult = int(item['guest_number_adult'])
+            guest_number_children = int(item['guest_number_children'])
+            coupon = None
+            if 'coupon' in item and len(item['coupon']) > 0:
+                coupon = Coupon.objects.filter(promo_code__iexact = item['coupon'],
+                                           end_datetime__gt = bk_datetime,
+                                           start_datetime__lt = bk_datetime)
+                if len(coupon)>0:
+                    coupon = coupon[0]
+                    valid = check_coupon(coupon, experience.id, guest_number_adult + guest_number_children)
+                    if not valid['valid']:
+                        coupon = None
+                else:
+                    coupon = None
+
+            booking = Booking(user = user, experience= experience, guest_number = guest_number_adult + guest_number_children,
+							  datetime = bk_datetime,submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="requested",
+							  coupon=coupon)
+            
+            booking.save()
+            send_booking_email_verification(booking, experience, user, False)
+
+        result = {"success":"true"}
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        logger = logging.getLogger("Tripalocal_V1")
+        reason = ""
+        if hasattr(err, 'detail'):
+            reason = err.detail
+        else:
+            reason = err
+        logger.error(reason)
+        result = {"success":"false","error":reason}
+        return Response(result, status=status.HTTP_400_BAD_REQUEST)
+
 #{"coupon":"aasfsaf","id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2}
 @api_view(['POST'])
 @authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication)) #
