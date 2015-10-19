@@ -1,4 +1,4 @@
-from io import BytesIO
+﻿from io import BytesIO
 from urllib.parse import urlencode
 from app.wechat_payment.api import UnifiedOrderPay, OrderQuery
 from app.wechat_payment.utils import dict_to_xml

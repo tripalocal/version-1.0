@@ -49,12 +49,14 @@ Locations = [(_('Australia'), [('Melbourne', _('Melbourne'), _('Victoria')), ('S
                            ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
                            ('Goldcoast', _('Gold Coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
                            ('Adelaide', _('Adelaide'), _('South Australia')),
-                           ('Darwin', _('Darwin'), _('Northern Territory')),
-                           ('Alicesprings', _('Alice Springs'), _('Northern Territory'))]),
-             (_('New Zealand'), [('Christchurch', _('Christchurch'), _('Canterbury')),
+                           #('Darwin', _('Darwin'), _('Northern Territory')),
+                           #('Alicesprings', _('Alice Springs'), _('Northern Territory'))
+                           ]),
+             (_('New Zealand'), [#('Christchurch', _('Christchurch'), _('Canterbury')),
                              ('Queenstown', _('Queenstown'), _('Otago')),
-                             ('Auckland', _('Auckland'), _('Auckland')),
-                             ('Wellington', _('Wellington'), _('Wellington'))])]
+                             #('Auckland', _('Auckland'), _('Auckland')),
+                             #('Wellington', _('Wellington'), _('Wellington'))
+                             ])]
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),)#('english;translation','English+Chinese translation'),
 
@@ -537,7 +539,7 @@ def check_coupon(coupon, experience_id, guest_number, target_currency=None):
 
     #not free:
     subtotal_price = 0.0
-    experience = Experience.objects.get(id = experience_id)
+    experience = AbstractExperience.objects.get(id = experience_id)
     if experience.dynamic_price and type(experience.dynamic_price) == str:
         price = experience.dynamic_price.split(',')
         if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
