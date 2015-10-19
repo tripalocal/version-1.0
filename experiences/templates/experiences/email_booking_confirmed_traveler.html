@@ -1,7 +1,7 @@
+{% extends "app/email_notification.html" %}
 {% load staticfiles %}
 {% load mathfilters %}
 {% load i18n %}
-{% extends "app/email_notification.html" %}
 
 {% block heading %}{% trans "Booking confirmed" %}{% endblock %}
 {% block subheading %}{% trans "Please meet "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " at the meeting point"%}{% endblock %}

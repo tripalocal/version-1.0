@@ -1,7 +1,7 @@
+{% extends "app/email_notification.html" %}
 {% load staticfiles %}
 {% load mathfilters %}
 {% load i18n %}
-{% extends "app/email_notification.html" %}
 
 {% block heading %}{% trans "How was your experience with "%}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.first_name|title }}{% endif %}{% endfor %}{% trans "? "%}{% endblock %}
 {% block subheading %}

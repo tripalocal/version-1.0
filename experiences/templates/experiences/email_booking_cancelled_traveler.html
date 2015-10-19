@@ -1,7 +1,7 @@
+{% extends "app/email_notification.html" %}
 {% load staticfiles %}
 {% load mathfilters %}
 {% load i18n %}
-{% extends "app/email_notification.html" %}
 
 {% block heading %}{% trans "Cancellation confirmed" %}{% endblock %}
 {% block subheading %}{% trans "Your experience with " %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " is now cancelled" %}{% endblock %}

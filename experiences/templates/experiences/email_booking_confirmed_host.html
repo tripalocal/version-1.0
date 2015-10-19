@@ -1,7 +1,7 @@
+{% extends "app/email_notification.html" %}
 {% load staticfiles %}
 {% load mathfilters %}
 {% load i18n %}
-{% extends "app/email_notification.html" %}
 
 {% block heading %}{% trans "Booking confirmed" %}{% endblock %}
 {% block subheading %}{% trans "Please meet " %}{{user.first_name}}{%if booking.guest_number > 1 %}{% trans " and " %}{{booking.guest_number|sub:1}} {%if booking.guest_number > 2 %}{% trans "others" %}{%else%}{% trans "other" %}{%endif%}{%endif%}{% trans "at the meeting point"%}{% endblock %}
