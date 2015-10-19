@@ -132,7 +132,7 @@
                             </tr>
                         </table>
 
-                        <div class="save-to-wishlist">
+                        <div class="save-to-wishlist" style="display:none;">
                         {% if not in_wishlist %}
                             {% if user.is_authenticated %}
                             <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_not_added"></div>
@@ -210,7 +210,7 @@
                         {% endif %}
                         <!--- -->
 
-                        <div class="save-to-wishlist">
+                        <div class="save-to-wishlist" style="display: none;">
                         {% if not in_wishlist %}
                             {% if user.is_authenticated %}
                             <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_not_added"></div>
@@ -433,6 +433,8 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 <script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
 <script charset="utf-8" type="text/javascript">
+$("#navbar").removeClass("navbar-static-top");
+$("#navbar").addClass("navbar-fixed-top");
 function resizeImg() {
     var thisImg= $('.item');
     var refH = thisImg.height();
