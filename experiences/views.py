@@ -265,7 +265,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         else:
             experiences = [e for e in experiences if e.status == 'Listed' and e.type != 'ITINERARY']
 
-    if city is not None:
+    if city is not None and exp_type != 'itinerary':
         city = str(city).lower().split(",")
 
         if len(city) > 1 and (end_datetime-start_datetime).days+1 != len(city):
@@ -473,7 +473,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                     if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
                         i += experience.guest_number_max #changed from bking.guest_number to experience.guest_number_max
 
-                if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
+                if i == 0 or (hasattr(experience, 'type') and experience.type == "NONPRIVATE" and i < experience.guest_number_max):
                     if (hasattr(experience, 'repeat_cycle') and experience.repeat_cycle != "") or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                         instant_booking = False
                         #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
@@ -693,7 +693,7 @@ def getAvailableOptions(experience, available_options, available_date):
                 if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
                     i += experience.guest_number_max
 
-            if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
+            if i == 0 or (hasattr(experience, 'type') and experience.type == "NONPRIVATE" and i < experience.guest_number_max):
                 if (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                     instant_booking = False
                     #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
@@ -3032,7 +3032,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
         day_dict = {'date':dt_string, 'city':city[day_counter], 'experiences':[]}
 
         for experience in available_options:
-            if experience['city'].lower() != city[day_counter]:
+            if experience['type'] != 'ITINERARY' and experience['city'].lower() != city[day_counter]:
                 continue
 
             if dt_string in experience['dates'] and len(experience['dates'][dt_string]) > 0:
