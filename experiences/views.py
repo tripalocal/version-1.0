@@ -2909,7 +2909,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         template = 'experiences/search_result.html'
 
     context = RequestContext(request, {
-                            'city' : _(city),
+                            'city' : city,
                             'city_display_name':city_display_name if city_display_name is not None else city.title(),
                             'length':len(cityExperienceList),
                             'cityExperienceList' : itertools.zip_longest(cityExperienceList, formattedTitleList, BGImageURLList, profileImageURLList),
