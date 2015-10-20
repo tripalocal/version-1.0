@@ -152,7 +152,7 @@
                     </form>
                     {%endif%}
 
-                    {% if experience.type == "PRODUCT" %}
+                    {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
                     <div style="border-bottom:1px solid #ccc;">
                       <p>{%if experience.duration < 24 %}{{experience.duration}} {% trans "hour" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "day" %}{%endif%} {% trans 'Public Tour' %}</p>
                     </div>
@@ -232,7 +232,7 @@
                 </div>
             </div>
 
-            {% if experience.type == "PRODUCT" %}
+            {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
                 {% include "experiences/product_description.html" %}
             {% else %}
                 {% include "experiences/experience_description.html" %}
@@ -357,7 +357,7 @@
             {% for related_experience, added_to_wishlist in related_experiences %}
             {% if forloop.counter0 < 2 %}
             <div class="exp-box">
-              {% if related_experience.type == 'PRIVATE' or related_experience.type == 'PUBLIC' %}
+              {% if related_experience.type == 'PRIVATE' or related_experience.type == 'NONPRIVATE' %}
                 <div class="exp-type">
                   <img src="{% static 'experiences/img/local-55.svg' %}" width="35" height="35">
                   <h3>{% trans 'Travel with Locals' %}</h3>
@@ -377,7 +377,7 @@
                     </div>
                 </a>
                 <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
-                {% if related_experience.type == 'PRIVATE' or related_experience.type == 'PUBLIC' %}
+                {% if related_experience.type == 'PRIVATE' or related_experience.type == 'NONPRIVATE' %}
                 <div class="profile-frame-sm">
                     <div class="profile-sm"
                             style="background-image:url({% with related_experience.hosts.all|first as host %}
@@ -466,7 +466,7 @@ $(function(){
             $(document.body).stickem();
         }
 
-        {% if experience.type == "PRODUCT" %}
+        {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
         if (screen.width < 767) {
           $(".booking-box").attr("style", "margin-top:-60px;");
         }
