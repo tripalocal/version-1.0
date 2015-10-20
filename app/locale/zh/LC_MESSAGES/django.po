@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 13:19+1100\n"
+"POT-Creation-Date: 2015-10-20 11:23+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -615,6 +615,8 @@ msgid "Thank you for your confirmation"
 msgstr "感谢您的确认激活"
 
 #: app/templates/app/registration_successful.html:78
+#, fuzzy, python-format
+#| msgid " Your account associate with %(account_email)s is now activated. "
 msgid " Your account associate with %(account_email)s is now activated. "
 msgstr "您用 %(user_email)注册的账户已经激活。"
 

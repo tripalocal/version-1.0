@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 13:20+1100\n"
+"POT-Creation-Date: 2015-10-20 11:23+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,79 +30,79 @@ msgstr "拼团"
 msgid "Recommended"
 msgstr "推荐体验"
 
-#: experiences/forms.py:25 experiences/forms.py:80
+#: experiences/forms.py:25 experiences/forms.py:82
 msgid "Melbourne, VIC"
 msgstr "墨尔本, 维多利亚"
 
-#: experiences/forms.py:25 experiences/forms.py:82
+#: experiences/forms.py:25 experiences/forms.py:84
 msgid "Greater Victoria"
 msgstr "维多利亚州其他地区"
 
-#: experiences/forms.py:26 experiences/forms.py:80
+#: experiences/forms.py:26 experiences/forms.py:82
 msgid "Sydney, NSW"
 msgstr "悉尼, 新南威尔士"
 
-#: experiences/forms.py:26 experiences/forms.py:82
+#: experiences/forms.py:26 experiences/forms.py:84
 msgid "Greater New South Wales"
 msgstr "新南威尔士州其他地区"
 
-#: experiences/forms.py:27 experiences/forms.py:80
+#: experiences/forms.py:27 experiences/forms.py:82
 msgid "Brisbane, QLD"
 msgstr "布里斯班, 昆士兰"
 
-#: experiences/forms.py:27 experiences/forms.py:80
+#: experiences/forms.py:27 experiences/forms.py:82
 msgid "Cairns, QLD"
 msgstr "凯恩斯, 昆士兰"
 
-#: experiences/forms.py:27 experiences/forms.py:81
+#: experiences/forms.py:27 experiences/forms.py:83
 msgid "Gold coast, QLD"
 msgstr "黄金海岸, 昆士兰"
 
-#: experiences/forms.py:27 experiences/forms.py:82
+#: experiences/forms.py:27 experiences/forms.py:84
 msgid "Greater Queensland"
 msgstr "昆士兰州其他地区"
 
-#: experiences/forms.py:28 experiences/forms.py:81
+#: experiences/forms.py:28 experiences/forms.py:83
 msgid "Hobart, TAS"
 msgstr "霍巴特, 塔斯马尼亚"
 
-#: experiences/forms.py:28 experiences/forms.py:82
+#: experiences/forms.py:28 experiences/forms.py:84
 msgid "Greater Tasmania"
 msgstr "塔斯马尼亚"
 
-#: experiences/forms.py:29 experiences/forms.py:81
+#: experiences/forms.py:29 experiences/forms.py:83
 msgid "Adelaide, SA"
 msgstr "阿德莱德, 南澳"
 
-#: experiences/forms.py:29 experiences/forms.py:81
+#: experiences/forms.py:29 experiences/forms.py:83
 msgid "Greater South Australia"
 msgstr "南澳其他地区"
 
-#: experiences/forms.py:30 experiences/forms.py:83
+#: experiences/forms.py:30 experiences/forms.py:85
 msgid "Darwin, NT"
 msgstr "达尔文, 北领地"
 
-#: experiences/forms.py:30 experiences/forms.py:83
+#: experiences/forms.py:30 experiences/forms.py:85
 msgid "Alice Springs, NT"
 msgstr "艾利斯斯普林斯, 北领地"
 
-#: experiences/forms.py:30 experiences/forms.py:83
+#: experiences/forms.py:30 experiences/forms.py:85
 msgid "Greater Northern Territory"
 msgstr "北领地其他地区"
 
-#: experiences/forms.py:31 experiences/forms.py:84
+#: experiences/forms.py:31 experiences/forms.py:86
 msgid "Christchurch, NZ"
 msgstr "基督城, 新西兰"
 
-#: experiences/forms.py:31 experiences/forms.py:84
+#: experiences/forms.py:31 experiences/forms.py:86
 msgid "Queenstown, NZ"
 msgstr "皇后镇, 新西兰"
 
-#: experiences/forms.py:31 experiences/forms.py:84
+#: experiences/forms.py:31 experiences/forms.py:86
 msgid "Auckland, NZ"
 msgstr "奥克兰, 新西兰"
 
-#: experiences/forms.py:31 experiences/forms.py:84
+#: experiences/forms.py:31 experiences/forms.py:86
 msgid "Wellington, NZ"
 msgstr "惠灵顿, 新西兰"
 
@@ -136,27 +136,27 @@ msgstr "霍巴特"
 msgid "Adelaide"
 msgstr "阿德莱德"
 
-#: experiences/forms.py:36 experiences/forms.py:52
+#: experiences/forms.py:36
 msgid "Darwin"
 msgstr "达尔文"
 
-#: experiences/forms.py:37 experiences/forms.py:53
+#: experiences/forms.py:37
 msgid "Alice Springs"
 msgstr "艾利斯斯普林斯"
 
-#: experiences/forms.py:38 experiences/forms.py:54
+#: experiences/forms.py:38
 msgid "Christchurch"
 msgstr "基督城"
 
-#: experiences/forms.py:38 experiences/forms.py:55
+#: experiences/forms.py:38 experiences/forms.py:56
 msgid "Queenstown"
 msgstr "皇后镇"
 
-#: experiences/forms.py:39 experiences/forms.py:56
+#: experiences/forms.py:39
 msgid "Auckland"
 msgstr "奥克兰"
 
-#: experiences/forms.py:39 experiences/forms.py:57
+#: experiences/forms.py:39
 msgid "Wellington"
 msgstr "惠灵顿"
 
@@ -184,121 +184,114 @@ msgstr "塔斯马尼亚"
 msgid "South Australia"
 msgstr "南澳"
 
-#: experiences/forms.py:52 experiences/forms.py:53
-msgid "Northern Territory"
-msgstr "北领地"
-
-#: experiences/forms.py:54
+#: experiences/forms.py:55
 msgid "New Zealand"
 msgstr "新西兰"
 
-#: experiences/forms.py:54
-msgid "Canterbury"
-msgstr "坎特伯雷"
-
-#: experiences/forms.py:55
+#: experiences/forms.py:56
 msgid "Otago"
 msgstr "奥塔哥"
 
-#: experiences/forms.py:66
+#: experiences/forms.py:68
 msgid " Guest"
 msgstr "人"
 
-#: experiences/forms.py:66 experiences/forms.py:67
+#: experiences/forms.py:68 experiences/forms.py:69
 msgid " Guests"
 msgstr "人"
 
-#: experiences/forms.py:86
+#: experiences/forms.py:88
 msgid "AUD"
 msgstr "澳元"
 
-#: experiences/forms.py:86
+#: experiences/forms.py:88
 msgid "NZD"
 msgstr "新西兰元"
 
-#: experiences/forms.py:86
+#: experiences/forms.py:88
 msgid "CNY"
 msgstr "人民币"
 
-#: experiences/forms.py:798
+#: experiences/forms.py:800
 msgid "Popularity"
 msgstr "预定次数"
 
-#: experiences/forms.py:798
+#: experiences/forms.py:800
 msgid "Outdoor"
 msgstr "户外运动"
 
-#: experiences/forms.py:798
+#: experiences/forms.py:800
 msgid "Urban"
 msgstr "都市风情"
 
-#: experiences/forms.py:799
+#: experiences/forms.py:801
 msgid "None"
 msgstr "无"
 
-#: experiences/forms.py:799
+#: experiences/forms.py:801
 msgid "Famili with elderly"
 msgstr "有老人"
 
-#: experiences/forms.py:799
+#: experiences/forms.py:801
 msgid "Famili with children"
 msgstr "有小孩"
 
-#: experiences/forms.py:799
+#: experiences/forms.py:801
 msgid "Famili with elderly&children"
 msgstr "有老人和小孩"
 
-#: experiences/forms.py:834 experiences/forms.py:1225
-#: experiences/forms.py:1229 experiences/resource.py:1196
-#: experiences/views.py:1901 experiences/views.py:1909
-#: experiences/views.py:1913 experiences/views.py:2140
-#: experiences/views.py:2145 experiences/views.py:2154
-#: experiences/views.py:2159
+#: experiences/forms.py:836 experiences/forms.py:1227
+#: experiences/forms.py:1231 experiences/resource.py:1252
+#: experiences/views.py:1918 experiences/views.py:1926
+#: experiences/views.py:1930 experiences/views.py:2157
+#: experiences/views.py:2162 experiences/views.py:2171
+#: experiences/views.py:2176
 #, python-format
 msgid "%s"
 msgstr ""
 
-#: experiences/forms.py:1113
+#: experiences/forms.py:1115
 msgid "[Tripalocal] "
 msgstr "【本土客】 "
 
-#: experiences/forms.py:1113
+#: experiences/forms.py:1115
 msgid " has requested your experience"
 msgstr " 预约了您的体验"
 
-#: experiences/forms.py:1114 experiences/forms.py:1128
-#: experiences/forms.py:1148 experiences/forms.py:1160
-#: experiences/forms.py:1172 experiences/forms.py:1196
+#: experiences/forms.py:1116 experiences/forms.py:1130
+#: experiences/forms.py:1150 experiences/forms.py:1162
+#: experiences/forms.py:1174 experiences/forms.py:1198
 #: experiences/resource.py:219 experiences/resource.py:243
 #: experiences/resource.py:255 experiences/resource.py:267
-#: experiences/views.py:1961 experiences/views.py:1977
-#: experiences/views.py:1989 experiences/views.py:2016
-#: experiences/views.py:2097 experiences/views.py:2108
+#: experiences/views.py:1978 experiences/views.py:1994
+#: experiences/views.py:2006 experiences/views.py:2033
+#: experiences/views.py:2114 experiences/views.py:2125
 msgid "Tripalocal <"
 msgstr "本土客 <"
 
-#: experiences/forms.py:1127
+#: experiences/forms.py:1129
 msgid "[Tripalocal] Your booking request is sent to the host"
 msgstr "【本土客】 您的预约已经发送"
 
-#: experiences/forms.py:1147 experiences/forms.py:1195
+#: experiences/forms.py:1149 experiences/forms.py:1197
 #: experiences/resource.py:218 experiences/resource.py:242
-#: experiences/views.py:1960 experiences/views.py:2015
+#: experiences/views.py:1977 experiences/views.py:2032
 msgid "[Tripalocal] Booking confirmed"
 msgstr "【本土客】 预订确认"
 
-#: experiences/forms.py:1159 experiences/forms.py:1171
+#: experiences/forms.py:1161 experiences/forms.py:1173
 #: experiences/resource.py:254 experiences/resource.py:266
-#: experiences/views.py:1976 experiences/views.py:1988
+#: experiences/views.py:1993 experiences/views.py:2005
 msgid "[Tripalocal] Booking reminder"
 msgstr "【本土客】 预订提醒"
 
-#: experiences/forms.py:1183 experiences/resource.py:230
-#: experiences/views.py:2003
+#: experiences/forms.py:1185 experiences/resource.py:230
+#: experiences/views.py:2020
 msgid "[Tripalocal] How was your experience?"
 msgstr "【本土客】 您对我们的体验还满意吗？"
 
-#: experiences/forms.py:1215 experiences/views.py:2092
+#: experiences/forms.py:1217 experiences/views.py:1972
+#: experiences/views.py:2109
 msgid "%H:%M %d %b %Y"
 msgstr "%Y{0}%m{1}%d{2}%H:%M"
 
@@ -437,35 +430,35 @@ msgstr "确定"
 msgid "Delete"
 msgstr "删除"
 
-#: experiences/templates/experiences/email_booking_cancelled_host.html:3
-#: experiences/templates/experiences/email_booking_cancelled_traveler.html:3
+#: experiences/templates/experiences/email_booking_cancelled_host.html:6
+#: experiences/templates/experiences/email_booking_cancelled_traveler.html:6
 msgid "Cancellation confirmed"
 msgstr "【本土客】 确认取消"
 
-#: experiences/templates/experiences/email_booking_cancelled_host.html:4
+#: experiences/templates/experiences/email_booking_cancelled_host.html:7
 #, python-format
 msgid "Your following booking with %(first_name)s is now cancelled: "
 msgstr "您预订与%(first_name)s的体验之旅已经被取消"
 
-#: experiences/templates/experiences/email_booking_cancelled_host.html:12
+#: experiences/templates/experiences/email_booking_cancelled_host.html:15
 msgid "To avoid future cancellations, please update your calendar regularly."
 msgstr "为了避免取消预约，请定期更新您的行程安排。"
 
-#: experiences/templates/experiences/email_booking_cancelled_traveler.html:4
+#: experiences/templates/experiences/email_booking_cancelled_traveler.html:7
 msgid "Your experience with "
 msgstr "您预订与"
 
-#: experiences/templates/experiences/email_booking_cancelled_traveler.html:4
+#: experiences/templates/experiences/email_booking_cancelled_traveler.html:7
 msgid " is now cancelled"
 msgstr "的体验之旅已经被取消"
 
-#: experiences/templates/experiences/email_booking_cancelled_traveler.html:7
-#: experiences/templates/experiences/email_booking_confirmed_host.html:7
+#: experiences/templates/experiences/email_booking_cancelled_traveler.html:10
+#: experiences/templates/experiences/email_booking_confirmed_host.html:10
 msgid "Your refund is now on the way back to your original payment method."
 msgstr "退款已经在处理过程中，不久就会返回到您之前用于支付的账户。"
 
-#: experiences/templates/experiences/email_booking_cancelled_traveler.html:8
-#: experiences/templates/experiences/email_booking_confirmed_host.html:8
+#: experiences/templates/experiences/email_booking_cancelled_traveler.html:11
+#: experiences/templates/experiences/email_booking_confirmed_host.html:11
 msgid ""
 "The refund usually takes 2-3 business days but may take up to 10 business "
 "days depending on the bank."
@@ -473,64 +466,64 @@ msgstr ""
 "退款通常会在2~3个工作日后返回到您的账户，但由于银行等原因， 该期限可能会达到"
 "10个工作日。"
 
-#: experiences/templates/experiences/email_booking_confirmed_host.html:3
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:3
+#: experiences/templates/experiences/email_booking_confirmed_host.html:6
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:6
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:112
 msgid "Booking confirmed"
 msgstr "预订确认"
 
-#: experiences/templates/experiences/email_booking_confirmed_host.html:4
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:4
-#: experiences/templates/experiences/email_reminder_traveler.html:5
+#: experiences/templates/experiences/email_booking_confirmed_host.html:7
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:7
+#: experiences/templates/experiences/email_reminder_traveler.html:8
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:113
 msgid "Please meet "
 msgstr "请与"
 
-#: experiences/templates/experiences/email_booking_confirmed_host.html:4
-#: experiences/templates/experiences/email_booking_requested_host.html:6
+#: experiences/templates/experiences/email_booking_confirmed_host.html:7
+#: experiences/templates/experiences/email_booking_requested_host.html:9
 msgid " and "
 msgstr "等"
 
-#: experiences/templates/experiences/email_booking_confirmed_host.html:4
-#: experiences/templates/experiences/email_booking_requested_host.html:6
+#: experiences/templates/experiences/email_booking_confirmed_host.html:7
+#: experiences/templates/experiences/email_booking_requested_host.html:9
 msgid "others"
 msgstr "人"
 
-#: experiences/templates/experiences/email_booking_confirmed_host.html:4
-#: experiences/templates/experiences/email_booking_requested_host.html:6
+#: experiences/templates/experiences/email_booking_confirmed_host.html:7
+#: experiences/templates/experiences/email_booking_requested_host.html:9
 msgid "other"
 msgstr "人"
 
-#: experiences/templates/experiences/email_booking_confirmed_host.html:4
+#: experiences/templates/experiences/email_booking_confirmed_host.html:7
 msgid "at the meeting point"
 msgstr "在以下地点会合"
 
-#: experiences/templates/experiences/email_booking_confirmed_host.html:11
-#: experiences/templates/experiences/email_booking_requested_traveler.html:7
-#: experiences/templates/experiences/email_reminder_host.html:7
+#: experiences/templates/experiences/email_booking_confirmed_host.html:14
+#: experiences/templates/experiences/email_booking_requested_traveler.html:10
+#: experiences/templates/experiences/email_reminder_host.html:10
 #: experiences/templates/experiences/experience_booking_successful_requested.html:115
 msgid "on "
 msgstr "时间："
 
-#: experiences/templates/experiences/email_booking_confirmed_host.html:11
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:7
-#: experiences/templates/experiences/email_booking_requested_host.html:6
-#: experiences/templates/experiences/email_booking_requested_traveler.html:7
-#: experiences/templates/experiences/email_reminder_host.html:7
-#: experiences/templates/experiences/email_reminder_traveler.html:7
+#: experiences/templates/experiences/email_booking_confirmed_host.html:14
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:10
+#: experiences/templates/experiences/email_booking_requested_host.html:9
+#: experiences/templates/experiences/email_booking_requested_traveler.html:10
+#: experiences/templates/experiences/email_reminder_host.html:10
+#: experiences/templates/experiences/email_reminder_traveler.html:10
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:115
 #: experiences/templates/experiences/experience_booking_successful_requested.html:115
 #: experiences/templates/experiences/review_experience.html:103
 msgid " at "
 msgstr ", "
 
-#: experiences/templates/experiences/email_booking_confirmed_host.html:12
-#: experiences/templates/experiences/email_reminder_host.html:8
+#: experiences/templates/experiences/email_booking_confirmed_host.html:15
+#: experiences/templates/experiences/email_reminder_host.html:11
 msgid "to take them on your experience"
 msgstr "带他们体验"
 
-#: experiences/templates/experiences/email_booking_confirmed_host.html:16
-#: experiences/templates/experiences/email_reminder_host.html:13
+#: experiences/templates/experiences/email_booking_confirmed_host.html:19
+#: experiences/templates/experiences/email_reminder_host.html:16
 #, python-format
 msgid ""
 "%(user_first_name)s's local mobile&nbsp;number is <strong>"
@@ -551,77 +544,77 @@ msgstr ""
 "                                                                                如"
 "果此号码不正确，请与%(user_first_name)s联系并确认信息"
 
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:4
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:7
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:113
 msgid " at the meeting point"
 msgstr "在以下地点会合"
 
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:7
-#: experiences/templates/experiences/email_reminder_traveler.html:7
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:10
+#: experiences/templates/experiences/email_reminder_traveler.html:10
 #: experiences/templates/experiences/experience_booking_confirmation.html:151
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:115
 msgid "on"
 msgstr "时间："
 
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:8
-#: experiences/templates/experiences/email_reminder_traveler.html:8
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:11
+#: experiences/templates/experiences/email_reminder_traveler.html:11
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:116
 msgid "to experience"
 msgstr "体验"
 
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:11
-#: experiences/templates/experiences/email_reminder_traveler.html:12
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:14
+#: experiences/templates/experiences/email_reminder_traveler.html:15
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:119
 msgid "'s local mobile number is "
 msgstr "的当地手机号"
 
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:12
-#: experiences/templates/experiences/email_reminder_traveler.html:13
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:15
+#: experiences/templates/experiences/email_reminder_traveler.html:16
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:120
 msgid "Please contact "
 msgstr "如果当天有任何行程变更，请及时与"
 
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:12
-#: experiences/templates/experiences/email_reminder_traveler.html:13
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:15
+#: experiences/templates/experiences/email_reminder_traveler.html:16
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:120
 msgid " on the day for any last minute changes."
 msgstr "联系"
 
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:13
-#: experiences/templates/experiences/email_reminder_traveler.html:14
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:16
+#: experiences/templates/experiences/email_reminder_traveler.html:17
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:121
 msgid "We have given your number to "
 msgstr "我们把您的手机号提供给了"
 
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:14
-#: experiences/templates/experiences/email_reminder_traveler.html:15
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:17
+#: experiences/templates/experiences/email_reminder_traveler.html:18
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:122
 msgid "please send "
 msgstr "如果此号码不正确，请与"
 
-#: experiences/templates/experiences/email_booking_confirmed_traveler.html:14
-#: experiences/templates/experiences/email_reminder_traveler.html:15
+#: experiences/templates/experiences/email_booking_confirmed_traveler.html:17
+#: experiences/templates/experiences/email_reminder_traveler.html:18
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:122
 msgid " a message if this number is incorrect."
 msgstr "联系并确认信息"
 
-#: experiences/templates/experiences/email_booking_requested_host.html:3
+#: experiences/templates/experiences/email_booking_requested_host.html:6
 msgid " has requested for your experience"
 msgstr " 预约了您的体验"
 
-#: experiences/templates/experiences/email_booking_requested_host.html:6
+#: experiences/templates/experiences/email_booking_requested_host.html:9
 msgid "Are you free on "
 msgstr "您在"
 
-#: experiences/templates/experiences/email_booking_requested_host.html:6
+#: experiences/templates/experiences/email_booking_requested_host.html:9
 msgid " to take "
 msgstr "是否有空带"
 
-#: experiences/templates/experiences/email_booking_requested_host.html:6
+#: experiences/templates/experiences/email_booking_requested_host.html:9
 msgid " on your experience"
 msgstr "进行您的体验之旅"
 
-#: experiences/templates/experiences/email_booking_requested_host.html:8
+#: experiences/templates/experiences/email_booking_requested_host.html:11
 #, python-format
 msgid ""
 "If you are not available on the proposed date, please reply to this email to "
@@ -633,54 +626,54 @@ msgstr ""
 "未找到合适时间,您可以点下方按钮取消这次体验,%(user_first_name)s将得到全额退"
 "款。"
 
-#: experiences/templates/experiences/email_booking_requested_traveler.html:3
+#: experiences/templates/experiences/email_booking_requested_traveler.html:6
 #: experiences/templates/experiences/experience_booking_successful_requested.html:112
 msgid "Your booking request has been sent to "
 msgstr "【本土客】 您的预约已经发送给"
 
-#: experiences/templates/experiences/email_booking_requested_traveler.html:5
+#: experiences/templates/experiences/email_booking_requested_traveler.html:8
 #: experiences/templates/experiences/experience_booking_successful_requested.html:113
 msgid "You "
 msgstr "您"
 
-#: experiences/templates/experiences/email_booking_requested_traveler.html:5
+#: experiences/templates/experiences/email_booking_requested_traveler.html:8
 #: experiences/templates/experiences/experience_booking_successful_requested.html:113
 msgid "and "
 msgstr "和"
 
-#: experiences/templates/experiences/email_booking_requested_traveler.html:5
+#: experiences/templates/experiences/email_booking_requested_traveler.html:8
 #: experiences/templates/experiences/experience_booking_successful_requested.html:113
 msgid " of your "
 msgstr "个"
 
-#: experiences/templates/experiences/email_booking_requested_traveler.html:5
+#: experiences/templates/experiences/email_booking_requested_traveler.html:8
 #: experiences/templates/experiences/experience_booking_successful_requested.html:113
 msgid "friends"
 msgstr "朋友"
 
-#: experiences/templates/experiences/email_booking_requested_traveler.html:5
+#: experiences/templates/experiences/email_booking_requested_traveler.html:8
 #: experiences/templates/experiences/experience_booking_successful_requested.html:113
 msgid "friend"
 msgstr "朋友"
 
-#: experiences/templates/experiences/email_booking_requested_traveler.html:5
+#: experiences/templates/experiences/email_booking_requested_traveler.html:8
 #: experiences/templates/experiences/experience_booking_successful_requested.html:113
 msgid " have requested to experience "
 msgstr "预约了以下体验"
 
-#: experiences/templates/experiences/email_booking_requested_traveler.html:10
+#: experiences/templates/experiences/email_booking_requested_traveler.html:13
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:140
 #: experiences/templates/experiences/experience_booking_successful_requested.html:133
 msgid " should get back to you within 24 hours."
 msgstr "将会在未来的24小时内与您联系。"
 
-#: experiences/templates/experiences/email_booking_requested_traveler.html:11
+#: experiences/templates/experiences/email_booking_requested_traveler.html:14
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:141
 #: experiences/templates/experiences/experience_booking_successful_requested.html:134
 msgid "If you don't hear from "
 msgstr "如果24小时内您未收到任何来自"
 
-#: experiences/templates/experiences/email_booking_requested_traveler.html:11
+#: experiences/templates/experiences/email_booking_requested_traveler.html:14
 #: experiences/templates/experiences/experience_booking_successful_confirmed.html:141
 #: experiences/templates/experiences/experience_booking_successful_requested.html:134
 msgid " within next 24 hours, your payment will be refunded."
@@ -696,37 +689,37 @@ msgid ""
 "refunded."
 msgstr "您的预约已被取消，您将收到全额退款。"
 
-#: experiences/templates/experiences/email_reminder_host.html:3
-#: experiences/templates/experiences/email_reminder_traveler.html:3
+#: experiences/templates/experiences/email_reminder_host.html:6
+#: experiences/templates/experiences/email_reminder_traveler.html:6
 msgid "Booking reminder"
 msgstr "【本土客】 预订提醒"
 
-#: experiences/templates/experiences/email_reminder_host.html:5
+#: experiences/templates/experiences/email_reminder_host.html:8
 #, python-format
 msgid "Tomorrow you will be meeting %(user_first_name)s at "
 msgstr "明天请与%(user_first_name)s"
 
-#: experiences/templates/experiences/email_reminder_traveler.html:5
+#: experiences/templates/experiences/email_reminder_traveler.html:8
 msgid " tomorrow at"
 msgstr "明天在以下地点会合"
 
-#: experiences/templates/experiences/email_review_traveler.html:3
+#: experiences/templates/experiences/email_review_traveler.html:6
 msgid "How was your experience with "
 msgstr "您对"
 
-#: experiences/templates/experiences/email_review_traveler.html:3
+#: experiences/templates/experiences/email_review_traveler.html:6
 msgid "? "
 msgstr "的体验之旅有什么感想?"
 
-#: experiences/templates/experiences/email_review_traveler.html:5
+#: experiences/templates/experiences/email_review_traveler.html:8
 msgid "You have completed the following experience on "
 msgstr "您在"
 
-#: experiences/templates/experiences/email_review_traveler.html:5
+#: experiences/templates/experiences/email_review_traveler.html:8
 msgid ", how did it go?"
 msgstr "进行了以下的体验, 感觉如何?"
 
-#: experiences/templates/experiences/email_review_traveler.html:10
+#: experiences/templates/experiences/email_review_traveler.html:13
 msgid "Leave a review for your host so they can get more bookings :)"
 msgstr "请留下您对领路人的评价，以便他们能更好地完善服务。"
 
@@ -883,11 +876,11 @@ msgstr "天"
 msgid "Overview"
 msgstr "详细介绍"
 
-#: experiences/templates/experiences/experience_description.html:35
+#: experiences/templates/experiences/experience_description.html:36
 msgid "Activities"
 msgstr "具体行程"
 
-#: experiences/templates/experiences/experience_description.html:44
+#: experiences/templates/experiences/experience_description.html:47
 msgid "What to wear"
 msgstr "推荐穿着"
 
@@ -950,13 +943,13 @@ msgstr "预订"
 
 #: experiences/templates/experiences/experience_detail.html:143
 #: experiences/templates/experiences/experience_detail.html:221
-#: experiences/templates/experiences/experience_detail.html:834
+#: experiences/templates/experiences/experience_detail.html:836
 msgid "Save to Wishlist"
 msgstr "保存至兴趣列表"
 
 #: experiences/templates/experiences/experience_detail.html:148
 #: experiences/templates/experiences/experience_detail.html:226
-#: experiences/templates/experiences/experience_detail.html:825
+#: experiences/templates/experiences/experience_detail.html:827
 msgid "Saved to Wishlist"
 msgstr "已保存至兴趣列表"
 
@@ -1079,30 +1072,30 @@ msgstr "包括全部住宿"
 msgid "The experience has expired, or has not been approved."
 msgstr "该体验已结束，或仍在审核中。"
 
-#: experiences/templates/experiences/experience_detail.html:609
-#: experiences/templates/experiences/experience_detail.html:821
+#: experiences/templates/experiences/experience_detail.html:611
+#: experiences/templates/experiences/experience_detail.html:823
 msgid "The experience has been added to your wishlist"
 msgstr "该体验已成功加入您的兴趣列表"
 
-#: experiences/templates/experiences/experience_detail.html:616
-#: experiences/templates/experiences/experience_detail.html:830
+#: experiences/templates/experiences/experience_detail.html:618
+#: experiences/templates/experiences/experience_detail.html:832
 msgid "The experience has been removed from your wishlist"
 msgstr "该体验已成功从您的兴趣列表中移除"
 
-#: experiences/templates/experiences/experience_detail.html:628
-#: experiences/templates/experiences/experience_detail.html:844
+#: experiences/templates/experiences/experience_detail.html:630
+#: experiences/templates/experiences/experience_detail.html:846
 msgid "Please try again later"
 msgstr "请稍后再试"
 
-#: experiences/templates/experiences/experience_detail.html:835
+#: experiences/templates/experiences/experience_detail.html:837
 msgid "Save now, plan later"
 msgstr ""
 
-#: experiences/templates/experiences/experience_detail.html:855
+#: experiences/templates/experiences/experience_detail.html:857
 msgid "- Less"
 msgstr "收起"
 
-#: experiences/templates/experiences/experience_detail.html:863
+#: experiences/templates/experiences/experience_detail.html:865
 msgid "+ More"
 msgstr "展开"
 
@@ -1341,39 +1334,45 @@ msgstr "扫码支付"
 msgid "Please scan the QR code below."
 msgstr "请扫描下面的二维码。"
 
-#: experiences/views.py:1391 experiences/views.py:1769
-#: experiences/views.py:1802 experiences/views.py:2481
+#: experiences/views.py:1408 experiences/views.py:1786
+#: experiences/views.py:1819 experiences/views.py:2498
 msgid "Image size exceeds the limit"
 msgstr "图片大小超过上限"
 
-#: experiences/views.py:1393 experiences/views.py:1771
-#: experiences/views.py:1804
+#: experiences/views.py:1410 experiences/views.py:1788
+#: experiences/views.py:1821
 msgid "File type is not supported"
 msgstr "不支持的文件类型"
 
-#: experiences/views.py:1710
+#: experiences/views.py:1727
 msgid "Experience with the same Id already exists"
 msgstr "该Id已分配给其他体验"
 
-#: experiences/views.py:2096
+#: experiences/views.py:2113
 msgid "[Tripalocal] Your experience is cancelled"
 msgstr "【本土客】 您预订的体验已经取消"
 
-#: experiences/views.py:2107
+#: experiences/views.py:2124
 msgid "[Tripalocal] Cancellation confirmed"
 msgstr "【本土客】 确认取消"
 
-#: experiences/views.py:2724
+#: experiences/views.py:2741
 msgid "Kids Friendly"
 msgstr "亲子夏令营"
 
-#: experiences/views.py:2726
+#: experiences/views.py:2743
 msgid "Host with Car"
 msgstr "领路人自驾"
 
-#: experiences/views.py:2728
+#: experiences/views.py:2745
 msgid "Private group"
 msgstr "私人团"
+
+#~ msgid "Northern Territory"
+#~ msgstr "北领地"
+
+#~ msgid "Canterbury"
+#~ msgstr "坎特伯雷"
 
 #~ msgid "Reply above this line to send a message to "
 #~ msgstr "在此线以上回复给"
