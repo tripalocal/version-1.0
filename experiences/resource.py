@@ -126,6 +126,83 @@ def updateExperienceTagsFromXLS(request):
 
     return render_to_response('app/experience_tags_xls.html', {'form': form}, context)
 
+def get_user(first_name, last_name, email, phone):
+    '''
+    if the user does not exist, create a new one, otherwise return the user
+    '''
+    if email is None and phone is None:
+        return None
+
+    if email is None:
+        profile = RegisteredUser.objects.filter(phone_number = phone)
+        if profile and len(profile):
+            profile = profile[0]
+            return profile.user
+        else:
+            return None
+    else:
+        try:
+            user = User.objects.get(email=email)
+            return user
+        except User.DoesNotExist:
+            count = len(User.objects.filter(first_name__iexact=first_name)) + len(User.objects.filter(username__iexact=first_name))
+            if count > 0 :
+                user = User(first_name = first_name, last_name = last_name, email = email,
+                            username = first_name+str(count+1),
+                            date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                            last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
+            else:
+                user = User(first_name = first_name, last_name = last_name, email = email,
+                            username = first_name,
+                            date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                            last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
+            user.save()
+            password = User.objects.make_random_password()
+            user.set_password(password)
+            user.save()
+            profile = RegisteredUser(user = user, phone_number = phone)
+            profile.save()
+
+            cursor = connections['default'].cursor()
+            cursor.execute("Insert into account_emailaddress (user_id,email,verified,`primary`) values (%s, %s, %s, %s)", 
+                           [user.id, email, 1, 1])
+
+            username = user.username
+
+            new_email = Users(id = email_account_generator() + ".user@tripalocal.com",
+                                name = username,
+                                maildir = username + "/")
+            new_email.save()
+
+            new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
+            new_alias.save()
+
+            if not settings.DEVELOPMENT:
+                if len(settings.ADMINS) == 0:
+                    with open('/etc/postfix/canonical', 'a') as f:
+                        f.write(user.email + " " + new_email.id + "\n")
+                        f.close()
+
+                    subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+
+                    with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+                        f.write(new_email.id + "\n")
+                        f.close()
+                else:
+                    try:
+                        response = requests.post('https://www.tripalocal.com/update_files/',
+                                                 data={'user_email': user.email,'tripalocal_email':new_email.id},
+                                                 auth=(settings.ADMINS[0][1], settings.ADMIN_PASSWORD[0]),
+                                                 timeout=3)
+                    except requests.exceptions.RequestException as err:
+                        #TODO
+                        pass
+
+            #send a welcome email
+            mail.send(subject=_('[Tripalocal] Successfully registered'), message='', sender=settings.DEFAULT_FROM_EMAIL,
+                          recipients = [email], priority='now', html_message=loader.render_to_string('app/email_auto_registration.html',
+                                                                                                     {'email':user.email, 'password':password, 'url':'https://www.tripalocal.com' + GEO_POSTFIX + 'accounts/login?next=' + GEO_POSTFIX + 'accounts/password/change/'}))
+
 def saveBookingRequest(booking_request):
     first_name = booking_request['first_name']
     last_name = booking_request['last_name']
@@ -146,55 +223,7 @@ def saveBookingRequest(booking_request):
     experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
     #create a new account if the user does not exist
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        count = len(User.objects.filter(first_name__iexact=first_name))
-        if count > 0 :
-            user = User(first_name = first_name, last_name = last_name, email = email,
-                        username = first_name+str(count+1),
-                        date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
-                        last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
-        else:
-            user = User(first_name = first_name, last_name = last_name, email = email,
-                        username = first_name,
-                        date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
-                        last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
-        user.save()
-        password = User.objects.make_random_password()
-        user.set_password(password)
-        user.save()
-        profile = RegisteredUser(user = user, phone_number = phone)
-        profile.save()
-
-        cursor = connections['default'].cursor()
-        cursor.execute("Insert into account_emailaddress (user_id,email,verified,`primary`) values (%s, %s, %s, %s)", 
-                       [user.id, email, 1, 1])
-
-        username = user.username
-
-        new_email = Users(id = email_account_generator() + ".user@tripalocal.com",
-                            name = username,
-                            maildir = username + "/")
-        new_email.save()
-
-        new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
-        new_alias.save()
-
-        with open('/etc/postfix/canonical', 'a') as f:
-            f.write(user.email + " " + new_email.id + "\n")
-            f.close()
-
-        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
-    
-        with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
-            f.write(new_email.id + "\n")
-            f.close()
-                    
-        #send a welcome email
-        mail.send(subject=_('[Tripalocal] Successfully registered'), message='', sender=settings.DEFAULT_FROM_EMAIL,
-                      recipients = [email], priority='now', html_message=loader.render_to_string('app/email_auto_registration.html',
-                                                                                                 {'email':user.email, 'password':password, 'url':'https://www.tripalocal.com' + GEO_POSTFIX + 'accounts/login?next=' + GEO_POSTFIX + 'accounts/password/change/'}))
+    user = get_user(first_name, last_name, email, phone)
 
     #record the booking request
     local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -886,23 +915,28 @@ def service_booking(request, format=None):
         result = {"success":"false"}
         return Response(result, status=status.HTTP_400_BAD_REQUEST)
 
-#{"bookings":[{"id":"1061","datetime":"2015/06/17 12:00","guest_number_adult":2,"guest_number_children":2,"coupon":"abcdefgh"},{"id":"20","datetime":"2015/06/17 17:00","guest_number_adult":3,"guest_number_children":0,"coupon":"abcdefgh"}]}
+#{"partner":"test","bookings":[{"first_name":"1","last_name":"1","email":"test@test.com","phone":"1324134","experience_id":"1061","datetime":"2015/12/17 12:00","guest_number_adult":2,"guest_number_children":2,"coupon":"abcdefgh"},{"email":"test@test.com","experience_id":"1061","datetime":"2015/12/28 17:00","guest_number_adult":3,"guest_number_children":0,"coupon":"abcdefgh"}]}
 @api_view(['POST'])
 @authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
 def service_booking_request(request, format=None):
     try:
         data = request.data
-        user = request.user
 
         if type(data) is str:
             data = ast.literal_eval(data)
 
         bookings = data['bookings']
+        partner = data['partner']
         local_timezone = pytz.timezone(settings.TIME_ZONE)
 
         for item in bookings:
-            experience = AbstractExperience.objects.get(id=str(item['id']))
+            first_name = item['first_name'] if 'first_name' in item else None
+            last_name = item['last_name'] if 'last_name' in item else None
+            email = item['email'] if 'email' in item else None
+            phone = item['phone'] if 'phone' in item else None
+            user = get_user(first_name, last_name, email, phone)
+            experience = AbstractExperience.objects.get(id=str(item['experience_id']))
             host = get_host(experience)
             bk_datetime = local_timezone.localize(datetime.strptime(item['datetime'].strip(), "%Y/%m/%d %H:%M")).astimezone(pytz.timezone("UTC"))
             guest_number_adult = int(item['guest_number_adult'])
@@ -910,8 +944,8 @@ def service_booking_request(request, format=None):
             coupon = None
             if 'coupon' in item and len(item['coupon']) > 0:
                 coupon = Coupon.objects.filter(promo_code__iexact = item['coupon'],
-                                           end_datetime__gt = bk_datetime,
-                                           start_datetime__lt = bk_datetime)
+                                               end_datetime__gt = bk_datetime,
+                                               start_datetime__lt = bk_datetime)
                 if len(coupon)>0:
                     coupon = coupon[0]
                     valid = check_coupon(coupon, experience.id, guest_number_adult + guest_number_children)
@@ -920,9 +954,10 @@ def service_booking_request(request, format=None):
                 else:
                     coupon = None
 
-            booking = Booking(user = user, experience= experience, guest_number = guest_number_adult + guest_number_children,
-							  datetime = bk_datetime,submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="requested",
-							  coupon=coupon)
+            booking = Booking(user = user, experience = experience, guest_number = guest_number_adult + guest_number_children,
+                              adult_number = guest_number_adult, children_number = guest_number_children,
+							  datetime = bk_datetime, submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC),
+							  status=partner, coupon=coupon)
             
             booking.save()
             send_booking_email_verification(booking, experience, user, False)

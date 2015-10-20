@@ -265,7 +265,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         else:
             experiences = [e for e in experiences if e.status == 'Listed' and e.type != 'ITINERARY']
 
-    if city is not None:
+    if city is not None and exp_type != 'itinerary':
         city = str(city).lower().split(",")
 
         if len(city) > 1 and (end_datetime-start_datetime).days+1 != len(city):
@@ -473,7 +473,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                     if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
                         i += experience.guest_number_max #changed from bking.guest_number to experience.guest_number_max
 
-                if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
+                if i == 0 or (hasattr(experience, 'type') and experience.type == "NONPRIVATE" and i < experience.guest_number_max):
                     if (hasattr(experience, 'repeat_cycle') and experience.repeat_cycle != "") or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                         instant_booking = False
                         #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
@@ -693,7 +693,7 @@ def getAvailableOptions(experience, available_options, available_date):
                 if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
                     i += experience.guest_number_max
 
-            if i == 0 or (experience.type == "NONPRIVATE" and i < experience.guest_number_max):
+            if i == 0 or (hasattr(experience, 'type') and experience.type == "NONPRIVATE" and i < experience.guest_number_max):
                 if (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                     instant_booking = False
                     #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
@@ -997,7 +997,7 @@ class ExperienceDetailView(DetailView):
         convert_experience_price(self.request, experience)
         experience.dollarsign = DollarSign[experience.currency.upper()]
         experience.currency = str(dict(Currency)[experience.currency.upper()])
-        
+
         if type(experience) is Experience:
             experience.title = experience.get_title(settings.LANGUAGES[0][0])
             experience.description = experience.get_description(settings.LANGUAGES[0][0])
@@ -1029,7 +1029,7 @@ class ExperienceDetailView(DetailView):
         context['GEO_POSTFIX'] = settings.GEO_POSTFIX
         context['LANGUAGE'] = settings.LANGUAGE_CODE
         context['wishlist_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_wishlist/"
-        
+
         #check whether the experience is among the top 50%, 80% most viewed in the past 30 days
         if type(experience) is Experience:
             table_name = "experiences_experience"
@@ -2108,7 +2108,7 @@ def update_booking(id, accepted, user):
                 exp_datetime_local = booking.datetime.astimezone(tzlocal())
                 exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
                 send_booking_cancelled_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
-                
+
                 #send an email to the traveller
                 mail.send(subject=_('[Tripalocal] Your experience is cancelled'), message='',
                           sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
@@ -2909,7 +2909,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         template = 'experiences/search_result.html'
 
     context = RequestContext(request, {
-                            'city' : city,
+                            'city' : _(city),
                             'city_display_name':city_display_name if city_display_name is not None else city.title(),
                             'length':len(cityExperienceList),
                             'cityExperienceList' : itertools.zip_longest(cityExperienceList, formattedTitleList, BGImageURLList, profileImageURLList),
@@ -3032,7 +3032,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
         day_dict = {'date':dt_string, 'city':city[day_counter], 'experiences':[]}
 
         for experience in available_options:
-            if experience['city'].lower() != city[day_counter]:
+            if experience['type'] != 'ITINERARY' and experience['city'].lower() != city[day_counter]:
                 continue
 
             if dt_string in experience['dates'] and len(experience['dates'][dt_string]) > 0:
@@ -3412,7 +3412,7 @@ def unionpay_payment_callback(request):
                     experience = Experience.objects.get(id=bk.experience_id)
                     user = User.objects.get(id=bk.user_id)
                     bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
-                    send_booking_email_verification(bk, experience, user, 
+                    send_booking_email_verification(bk, experience, user,
                                                     instant_booking(experience, bk.datetime.date(), bk.datetime.time()))
                     sms_notification(bk, experience, user, payment.phone_number)
                 logger.debug("payment success:"+str(ret['orderId']))

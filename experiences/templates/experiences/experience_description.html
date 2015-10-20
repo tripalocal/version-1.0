@@ -30,6 +30,7 @@
 						</div>
 					</div>
 
+          {% if experience.activity %}
 					<div class="row" style="border-bottom:1px solid #CCCCCC;">
 						<div class="col-sm-3">
 							<h3>{% trans "Activities" %}</h3>
@@ -38,7 +39,9 @@
 								{{ experience.activity|linebreaks }}
 						</div>
 					</div>
+          {% endif %}
 
+          {% if experience.dress %}
 					<div class="row" style="border-bottom:1px solid #CCCCCC;">
 						<div class="col-sm-3">
 							<h3>{% trans "What to wear" %}</h3>
@@ -47,6 +50,7 @@
 							{{ experience.dress|linebreaks }}
 						</div>
 					</div>
+          {% endif %}
 
 					{% for w in experience.whatsincluded %}
 					<div class="row">
@@ -102,5 +106,4 @@
                         <span class="sr-only">Next</span>
                     </a>
                 </div>
-            </div>
           </div>

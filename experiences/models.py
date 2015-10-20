@@ -199,6 +199,7 @@ class NewProduct(AbstractExperience):
         (UNLISTED, 'Unlisted'),
     )
 
+    type = models.CharField(max_length=50, default="PUBLIC")
     start_datetime = models.DateTimeField(null=True)
     end_datetime = models.DateTimeField(null=True)
     provider = models.ForeignKey(Provider)
