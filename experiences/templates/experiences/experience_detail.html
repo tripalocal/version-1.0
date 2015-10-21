@@ -154,14 +154,10 @@
 
                     {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
                     <div style="border-bottom:1px solid #ccc;">
-                      <p>{%if experience.duration < 24 %}{{experience.duration}} {% trans "hour" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "day" %}{%endif%} {% trans 'Public Tour' %}</p>
+                        <p>{%if experience.duration < 24 %}{{experience.duration}}{% trans " hour" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}}{% trans " day" %}{%endif%}{% trans ' Public Tour' %}</p>
                     </div>
                     <div style="padding-top:10px; padding-bottom:10px; border-bottom:1px solid #ccc;">
-                      {% if LANGUAGE != "zh-CN" %}
-                          <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
-                      {%else%}
-                          <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label style="vertical-align:top; margin-left:5px;">{{experience.currency}}</label><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
-                      {%endif%}
+                        <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
                     </div>
                     <form style="text-align: left; padding-top: 20px;" id="experience_booking_form" method="post" action="">
                         {% csrf_token %}
