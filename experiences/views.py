@@ -43,6 +43,7 @@ MaxIDImage=5
 LANG_CN = settings.LANGUAGES[1][0]
 LANG_EN = settings.LANGUAGES[0][0]
 GEO_POSTFIX = settings.GEO_POSTFIX
+TYPE_PUBLIC = ['NONPRIVATE','PublicProduct']
 
 def set_initial_currency(request):
     if 'custom_currency' not in request.session:
@@ -342,11 +343,6 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         if photos is not None and len(photos) > 0:
             photo_url = photos[0].directory+photos[0].name
 
-        if type(experience) is Experience:
-            tp = experience.type
-        else:
-            tp ="NEWPRODUCT"
-
         experience_avail = {'id':experience.id, 'title': experience.get_title(settings.LANGUAGES[0][0]), 'rate': rate,
                             'duration':int(experience.duration) if float(experience.duration).is_integer() else experience.duration,
                             'city':experience.city, 'description':experience.get_description(settings.LANGUAGES[0][0]),
@@ -354,7 +350,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                             'price':experience_fee_calculator(exp_price, experience.commission),
                             'currency':str(dict(Currency)[experience.currency.upper()]),
                             'dollarsign':DollarSign[experience.currency.upper()],'dates':{},
-                            'photo_url':photo_url, 'type':tp , 'popularity':experience.popularity,
+                            'photo_url':photo_url, 'type':experience.type , 'popularity':experience.popularity,
                             'tags':experience.get_tags(settings.LANGUAGES[0][0])}
 
         if type(experience) == Experience:
@@ -473,7 +469,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                     if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
                         i += experience.guest_number_max #changed from bking.guest_number to experience.guest_number_max
 
-                if i == 0 or (hasattr(experience, 'type') and experience.type == "NONPRIVATE" and i < experience.guest_number_max):
+                if i == 0 or (hasattr(experience, 'type') and (experience.type in TYPE_PUBLIC) and i < experience.guest_number_max):
                     if (hasattr(experience, 'repeat_cycle') and experience.repeat_cycle != "") or (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                         instant_booking = False
                         #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
@@ -693,7 +689,7 @@ def getAvailableOptions(experience, available_options, available_date):
                 if bking.datetime < sdt and bking.datetime + timedelta(hours=experience.duration) >= sdt and bking.status.lower() != "rejected":
                     i += experience.guest_number_max
 
-            if i == 0 or (hasattr(experience, 'type') and experience.type == "NONPRIVATE" and i < experience.guest_number_max):
+            if i == 0 or (hasattr(experience, 'type') and experience.type in TYPE_PUBLIC and i < experience.guest_number_max):
                 if (sdt_local.time().hour > 7 and sdt_local.time().hour <22):
                     instant_booking = False
                     #instantbooking_start, instantbooking_end are sorted, sdt keeps increasing
@@ -893,7 +889,7 @@ class ExperienceDetailView(DetailView):
         experience = context['experience'] if 'experience' in context else context['newproduct']
         if 'experience' not in context:
             context['experience'] = experience
-            experience.type="PRODUCT"
+
         sdt = experience.start_datetime
         last_sdt = pytz.timezone('UTC').localize(datetime.min)
         local_timezone = pytz.timezone(settings.TIME_ZONE)
