@@ -145,6 +145,9 @@ def get_user(first_name, last_name, email, phone):
             user = User.objects.get(email=email)
             return user
         except User.DoesNotExist:
+            if first_name is None or last_name is None or phone is None:
+                return None
+
             count = len(User.objects.filter(first_name__iexact=first_name)) + len(User.objects.filter(username__iexact=first_name))
             if count > 0 :
                 user = User(first_name = first_name, last_name = last_name, email = email,
@@ -202,6 +205,8 @@ def get_user(first_name, last_name, email, phone):
             mail.send(subject=_('[Tripalocal] Successfully registered'), message='', sender=settings.DEFAULT_FROM_EMAIL,
                           recipients = [email], priority='now', html_message=loader.render_to_string('app/email_auto_registration.html',
                                                                                                      {'email':user.email, 'password':password, 'url':'https://www.tripalocal.com' + GEO_POSTFIX + 'accounts/login?next=' + GEO_POSTFIX + 'accounts/password/change/'}))
+
+            return user
 
 def saveBookingRequest(booking_request):
     first_name = booking_request['first_name']
@@ -915,7 +920,11 @@ def service_booking(request, format=None):
         result = {"success":"false"}
         return Response(result, status=status.HTTP_400_BAD_REQUEST)
 
-#{"partner":"test","bookings":[{"first_name":"1","last_name":"1","email":"test@test.com","phone":"1324134","experience_id":"1061","datetime":"2015/12/17 12:00","guest_number_adult":2,"guest_number_children":2,"coupon":"abcdefgh"},{"email":"test@test.com","experience_id":"1061","datetime":"2015/12/28 17:00","guest_number_adult":3,"guest_number_children":0,"coupon":"abcdefgh"}]}
+#{"partner":"test","bookings":[
+#{"first_name":"first","last_name":"last","email":"test@test.com","phone":"123456789","experience_id":"2","datetime":"2015/12/17 12:00","guest_number_adult":2,"guest_number_children":2,"coupon":"abcdefgh"},
+#{"email":"test@test.com","experience_id":"1","datetime":"2015/12/28 17:00","guest_number_adult":3,"guest_number_children":0,"coupon":""},
+#{"phone":"123456789","experience_id":"20","datetime":"2015/12/28 17:00","guest_number_adult":3,"guest_number_children":0,"coupon":""},
+#]}
 @api_view(['POST'])
 @authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
@@ -936,6 +945,8 @@ def service_booking_request(request, format=None):
             email = item['email'] if 'email' in item else None
             phone = item['phone'] if 'phone' in item else None
             user = get_user(first_name, last_name, email, phone)
+            if user is None:
+                raise Exception("Incomplete/Incorrect user information")
             experience = AbstractExperience.objects.get(id=str(item['experience_id']))
             host = get_host(experience)
             bk_datetime = local_timezone.localize(datetime.strptime(item['datetime'].strip(), "%Y/%m/%d %H:%M")).astimezone(pytz.timezone("UTC"))
