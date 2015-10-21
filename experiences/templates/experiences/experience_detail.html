@@ -424,6 +424,13 @@
               </div>
         </div>
     </div>
+    {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
+    <style>
+    .stickit {
+      padding-top: 80px;
+    }
+    </style>
+    {% endif %}
 {%else%}
     <p>{% trans "The experience has expired, or has not been approved." %}</p>
 {%endif%}
