@@ -150,6 +150,24 @@
 </script>
 
 <script charset="utf-8" type="text/javascript">
+    function getCityName(city)
+    {
+        cities = $('.item');
+        if(cities && cities.length)
+        {
+            for(i=0;i<cities.length;i++)
+            {
+                if (typeof(cities[i].dataset) !== 'undefined' &&
+                    typeof(cities[i].dataset.text) !== 'undefined' &&
+                    cities[i].dataset.value.toLowerCase() == city.toLowerCase())
+                {
+                    return cities[i].dataset.text;
+                }
+            } 
+        }
+        return city;
+    }
+
     function hrefToCityName(href) {
         if (href.substr(-1) === '/') {
             temp = href.substr(0, href.length - 1);
@@ -217,7 +235,7 @@
             {% endfor %}
         {% endfor %}
 
-        $("#city_name").text("{{city}}");
+        $("#city_name").text(getCityName("{{city}}"));
         $('.ui.dropdown').dropdown();
 
         $("#id_guest_number").addClass("guestNumber");
@@ -341,7 +359,7 @@
             if (e.originalEvent.state !== null) {
                 var city = hrefToCityName(location.href);
                 $("#id_city").val(city);
-                $("#city_name").text(city);
+                $("#city_name").text(getCityName(city));
                 loadExperienceList(location.href);
             }
         });
