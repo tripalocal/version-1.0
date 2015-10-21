@@ -35,6 +35,7 @@ class ExperienceView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
         context = super(ExperienceView, self).get_context_data(**kwargs)
         for exp in context['experience_list']:
             exp.get_experience_i18n_info()
+            exp.title = exp.get_title(settings.LANGUAGES[0][0])
         return context
 
     @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
