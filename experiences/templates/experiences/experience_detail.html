@@ -393,7 +393,9 @@
                 <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ related_experience.description }}</p>
                 <div class="listing-footer">
                     <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}></div>
-                    <div>{%if related_experience.duration < 24 %}{{related_experience.duration}} {% trans "hrs" %}{%else%}{{related_experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
+                    <div>{%if related_experience.duration < 24 %}{{related_experience.duration}} {% trans "hrs" %}{%else%}{{related_experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}
+                        &#8226; <span style="font-weight:500;">{% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}{% trans 'Private' %}{% endif %}</span>
+                    </div>
                 </div>
             </div>
             {% endif %}
