@@ -4,10 +4,8 @@
 {% load i18n %}
 
 {% block heading %}{{user_first_name}}{% trans " has requested for your experience"%}{% endblock %}
-{% block subheading %}{% endblock %}
+{% block subheading %}<a href="{{experience_url}}" target="_blank">{{experience.title}}</a> {% if LANGUAGE != "zh-CN" %}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{%endif%} {{ booking.datetime|date:'H:i' }}{% trans "on" %}{% endblock %}
 {% block content %}
-{% trans "Are you free on "%}<strong>{% if LANGUAGE != "zh-CN" %}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{%endif%}</strong>{% trans " at " %}<strong>{{ booking.datetime|date:'H:i' }}</strong>{% trans " to take " %}{{user_first_name}}{%if booking.guest_number > 1%}{% trans " and " %}{{booking.guest_number|sub:1}} {%if booking.guest_number > 2%}{% trans "others" %}{%else%}{% trans "other" %}{%endif%}{%endif%}{% trans " on your experience" %}<br>
-                                <a href="{{experience_url}}" target="_blank">{{experience.title}}</a>?<br>
-                                {% blocktrans with user_first_name=user_first_name %}If you are not available on the proposed date, please reply to this email to {{user_first_name}} with a new date and time. If a new time cannot be arranged, you can cancel this reservation below and {{user_first_name}} will be refunded.{% endblocktrans %}
-
+{% trans "Are you free on "%}{% if LANGUAGE != "zh-CN" %}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{%endif%} {{ booking.datetime|date:'H:i' }}{% trans " for " %}{{user_first_name}}{%if booking.guest_number > 1%}{% trans " and " %}{{booking.guest_number|sub:1}} {%if booking.guest_number > 2%}{% trans "others" %}{%else%}{% trans "other" %}{%endif%}{%endif%}?<br>
+{% blocktrans with user_first_name=user_first_name %}Please respond within 48 hours or {{user_first_name}} will be refunded.{% endblocktrans %}
 {% endblock %}

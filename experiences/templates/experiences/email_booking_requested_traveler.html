@@ -3,13 +3,13 @@
 {% load mathfilters %}
 {% load i18n %}
 
-{% block heading %}{% trans "Your booking request has been sent to "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% endblock %}
+{% block heading %}{% trans "You have requested "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans "'s experience" %}{% endblock %}
 {% block subheading %}
-{% trans "You "%}{%if guest_number > 1 %}{% trans "and "%}{{guest_number|sub:1}}{% trans " of your "%}{%if guest_number > 2%}{% trans "friends"%}{%else%}{% trans "friend"%}{%endif%}{%endif%}{% trans " have requested to experience "%}<br>
-                                <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
-                                {% trans "on "%}<strong>{% if LANGUAGE != "zh-CN"%}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{%endif%}</strong>{% trans " at "%}<strong>{{ booking.datetime|date:'H:i' }}</strong>
+<a href="{{experience_url}}" target="_blank">{{experience.title}}</a>{% trans " on "%}{% if LANGUAGE != "zh-CN"%}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{%endif%} {{ booking.datetime|date:'H:i' }}
 {% endblock %}
+
+{% block profile %}{{ MEDIA_URL }}{{ host_image|urlencode }}{% endblock %}
+
 {% block content %}
-{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " should get back to you within 24 hours."%}<br>
-                {% trans "If you don't hear from "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " within next 24 hours, your payment will be refunded."%}
+{% trans "Please feel free to send a message to" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} {% trans "if you have any questions." %}
 {% endblock %}
