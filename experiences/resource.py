@@ -1068,6 +1068,7 @@ def get_experience_detail(experience, get_available_date=True):
                 'experience_guest_number_max':experience.guest_number_max,
                 'experience_images':experience_images,
                 'experience_city':experience.city,
+                'experience_type':experience.type,
 
                 'experience_rate':math.ceil(rate),
                 'experience_reviews':experience_reviews,
