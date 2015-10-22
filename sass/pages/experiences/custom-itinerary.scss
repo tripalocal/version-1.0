@@ -52,6 +52,19 @@ body {
   }
 }
 
+.popover {
+  color: $dark-grey;
+  width: 250px;
+  button {
+    min-width: 100px;
+    margin-top: 15px;
+  }
+  .btn-danger {
+    width: 100%;
+    color: $pink;
+  }
+}
+
 // Main sections
 .section {
   min-height: 600px;

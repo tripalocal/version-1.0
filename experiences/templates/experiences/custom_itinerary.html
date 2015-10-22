@@ -27,16 +27,68 @@
         </div>
         <div class="form-inline right-group" style="margin-right:0;">
           <h3 class="form-header">{% trans "Group size" %}</h3>
-          <button class="btn btn-grey">Adult x 5</button>
-          <button class="btn btn-default">+ Add Kids</button>
+          <button id="add-adults" type="button" class="btn btn-grey"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
+            <div class='form-goup'>
+              <select class='form-control'><option>1 Adult</option></select>
+            </div>
+              <button class='btn btn-primary'>Add</button>
+              <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-adults&quot;).popover(&quot;hide&quot;);'>Cancel</button>
+            ">Adult x 5
+          </button>
+          <button id="add-kids" type="button" class="btn btn-default"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
+            <div class='form-goup'>
+              <select class='form-control'><option>1 Kid</option></select>
+            </div>
+              <button class='btn btn-primary'>Add</button>
+              <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-kids&quot;).popover(&quot;hide&quot;);'>Cancel</button>
+            ">+ Add Kids
+          </button>
         </div>
       </div>
       <div class="row">
         <div class="form-inline">
           <h3 class="form-header">{% trans "Location" %}</h3>
-          <button class="btn btn-grey">Melbourne (3)</button>
-          <button class="btn btn-grey">Sydney (2)</button>
-          <button class="btn btn-default">+ Add (4 left)</button>
+          <button id="" type="button" class="btn btn-grey" data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
+            <div class='form-group'>
+              <p>Location</p>
+              <select class='form-control'><option>Melbourne</option></select>
+            </div>
+            <div class='form-goup'>
+              <p>Duration</p>
+              <select class='form-control'><option>1 Day</option></select>
+            </div>
+              <button class='btn btn-primary'>Add</button>
+              <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#&quot;).popover(&quot;hide&quot;);'>Cancel</button>
+              <button class='btn btn-danger'>Delete Location</button>
+            ">Melbourne <span class="badge">3</span>
+          </button>
+          <button id="" type="button" class="btn btn-grey" data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
+            <div class='form-group'>
+              <p>Location</p>
+              <select class='form-control'><option>Melbourne</option></select>
+            </div>
+            <div class='form-goup'>
+              <p>Duration</p>
+              <select class='form-control'><option>1 Day</option></select>
+            </div>
+              <button class='btn btn-primary'>Add</button>
+              <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#&quot;).popover(&quot;hide&quot;);'>Cancel</button>
+              <button class='btn btn-danger'>Delete Location</button>
+            ">Sydney <span class="badge">2</span>
+          </button>
+          <button id="add-city" type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
+            <div class='form-group'>
+              <p>Location</p>
+              <select class='form-control'><option>Melbourne</option></select>
+            </div>
+            <div class='form-goup'>
+              <p>Duration</p>
+              <select class='form-control'><option>1 Day</option></select>
+            </div>
+              <button class='btn btn-primary'>Add</button>
+              <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-city&quot;).popover(&quot;hide&quot;);'>Cancel</button>
+            "> + Add <span class="badge">4 left</span>
+          </button>
         </div>
         <div class="form-inline right-group">
           <h3 class="form-header"> </h3>
@@ -183,4 +235,5 @@
     {%if LANGUAGE == "zh-CN"%}
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
     {%endif%}
+    <script type="text/javascript" src="{% static 'experiences/scripts/custom_itinerary.js' %}"></script>
 {% endblock %}
