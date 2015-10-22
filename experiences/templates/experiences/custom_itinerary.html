@@ -55,14 +55,17 @@
         <div class="section">
           <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Experiences</a></li>
-            <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Transport</a></li>
-            <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Food</a></li>
-            <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Price</a></li>
+            <li role="presentation" class="active"><a href="#experience" aria-controls="experience" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/hot-56.svg' %}"></a></li>
+            <li role="presentation"><a href="#flight" aria-controls="flight" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/flight.svg' %}"></a></li>
+            <li role="presentation"><a href="#transfer" aria-controls="transfer" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/transfer.svg' %}"></a></li>
+            <li role="presentation"><a href="#accommodation" aria-controls="accommodation" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/accommodation.svg' %}"></a></li>
+            <li role="presentation"><a href="#restaurant" aria-controls="restaurant" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/restaurant.svg' %}"></a></li>
+            <li role="presentation"><a href="#suggestion" aria-controls="suggestion" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/itinerary.svg' %}"></a></li>
+            <li role="presentation"><a href="#pricing" aria-controls="pricing" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/price.svg' %}"></a></li>
           </ul>
           <!-- Tab panes -->
           <div class="tab-content">
-            <div role="tabpanel" class="tab-pane fade in active" id="home">
+            <div role="tabpanel" class="tab-pane fade in active" id="experience">
               <div class="input-group">
                 <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
                 <input type="text" class="form-control">
@@ -107,9 +110,12 @@
                 </div>
               </div>
             </div>
-            <div role="tabpanel" class="tab-pane fade" id="profile">Stuff!</div>
-            <div role="tabpanel" class="tab-pane fade" id="messages">Things!</div>
-            <div role="tabpanel" class="tab-pane fade" id="settings">Etc!</div>
+            <div role="tabpanel" class="tab-pane fade" id="flight">Flights</div>
+            <div role="tabpanel" class="tab-pane fade" id="transfer">Transfers</div>
+            <div role="tabpanel" class="tab-pane fade" id="accommodation">Accommodation</div>
+            <div role="tabpanel" class="tab-pane fade" id="restaurant">Restaurants!</div>
+            <div role="tabpanel" class="tab-pane fade" id="suggestion">Suggestions!</div>
+            <div role="tabpanel" class="tab-pane fade" id="pricing">Pricing!</div>
           </div>
         </div>
       </div>
