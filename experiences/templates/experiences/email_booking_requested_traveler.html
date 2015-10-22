@@ -8,7 +8,7 @@
 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a>{% trans " on "%}{% if LANGUAGE != "zh-CN"%}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{%endif%} {{ booking.datetime|date:'H:i' }}
 {% endblock %}
 
-{% block profile %}{{ MEDIA_URL }}{{ host_image|urlencode }}{% endblock %}
+{% block profile %}{% with experience.hosts.all|first as host %}{% if host.registereduser.image_url %}{{ MEDIA_URL }}{{ host.registereduser.image_url }}{% else %}{{ MEDIA_URL }}img/profile_default.jpg{% endif %}{% endwith %}{% endblock %}
 
 {% block content %}
 {% trans "Please feel free to send a message to" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} {% trans "if you have any questions." %}

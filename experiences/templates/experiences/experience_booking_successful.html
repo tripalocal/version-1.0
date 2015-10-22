@@ -86,7 +86,7 @@
 <table cellpadding="0" cellspacing="0" border="0" align="center" height="150">
   <tr>
     <td valign="top" style="vertical-align: top;">
-      <img src="{{ MEDIA_URL }}{{ host_image|urlencode }}" alt="Traveller Profile" width="136" height="136" style="width: 136px; height: 136px; border-radius: 100px;"/>
+      <img src="{% with experience.hosts.all|first as host %}{% if host.registereduser.image_url %}{{ MEDIA_URL }}{{ host.registereduser.image_url }}{% else %}{{ MEDIA_URL }}img/profile_default.jpg{% endif %}{% endwith %}" alt="Traveller Profile" width="136" height="136" style="width: 136px; height: 136px; border-radius: 100px;"/>
     </td>
   </tr>
 </table>
