@@ -7,11 +7,29 @@
     {% load mathfilters %}
 
     {% load staticfiles %}
-    <link href="{% static 'app/content/email.css' %}" rel="stylesheet">
     {% if form %}
         {{ form.media }}
     {% endif %}
     <title>Successful Booking</title>
+
+    <style type="text/css">
+
+      /* reset */
+      #outlook a {padding:0;} /* Force Outlook to provide a "view in browser" menu link. */
+      .ExternalClass {width:100%;} /* Force Hotmail to display emails at full width */
+      .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {line-height: 100%;} /* Forces Hotmail to display normal line spacing.  More on that: http://www.emailonacid.com/forum/viewthread/43/ */
+      p {margin: 0; padding: 0; font-size: 0px; line-height: 0px;} /* squash Exact Target injected paragraphs */
+      table td {border-collapse: collapse;} /* Outlook 07, 10 padding issue fix */
+      table {border-collapse: collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; } /* remove spacing around Outlook 07, 10 tables */
+
+      /* bring inline */
+      img {display: block; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;}
+      a img {border: none;}
+      a {text-decoration: none; color: #33cccc;} /* text link */
+      a.phone {text-decoration: none; color: #000001 !important; pointer-events: auto; cursor: default;} /* phone link, use as wrapper on phone numbers */
+      span {font-size: 13px; line-height: 17px; font-family: monospace; color: #000001;}
+
+    </style>
 
 <!-- Facebook Conversion Code for experience requested -->
  <script>(function() {
@@ -34,151 +52,85 @@
 
 {% block content %}
 
-    <center>
-        <table align="center" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable">
-            <tr>
-                <td align="center" valign="top" id="bodyCell">
-                    <!-- BEGIN TEMPLATE // -->
-                    <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateContainer">
-                        <tr>
-                            <td align="center" valign="top">
-                                <!-- BEGIN PREHEADER // -->
-                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templatePreheader">
-                                    <tr>
-                                        <td valign="top" class="preheaderContainer" style="padding-top:9px;">
-                                            <tbody class="mcnTextBlockOuter">
-                                                <tr>
-                                                    <td valign="top" class="mcnTextBlockInner">
-                                                        <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
-                                                            <tbody>
-                                                                <tr>
-                                                                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <!-- // END PREHEADER -->
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="center" valign="top">
-                                <!-- BEGIN HEADER // -->
-                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateHeader">
-                                    <tr>
-                                        <td valign="top" class="headerContainer">
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnImageBlock">
-							                    <tbody class="mcnImageBlockOuter">
-								                    <tr>
-									                    <td valign="top" style="padding:9px" class="mcnImageBlockInner">
-										                    <table align="left" width="100%" border="0" cellpadding="0" cellspacing="0" class="mcnImageContentContainer">
-											                    <tbody>
-												                    <tr>
-													                    <td class="mcnImageContent" valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0;">
-														                    <img align="left" alt="" src="https://gallery.mailchimp.com/12d0686497f605217203bf2be/images/73468143-d086-470b-9c08-799cb653adc0.jpg" width="564" style="max-width:600px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage">
-													                    </td>
-												                    </tr>
-											                    </tbody>
-										                    </table>
-									                    </td>
-								                    </tr>
-							                    </tbody>
-                                            </table>
-						                </td>
-                                    </tr>
-                                </table>
-                                <!-- // END HEADER -->
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="center" valign="top">
-                                <!-- BEGIN BODY // -->
-                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateBody">
-                                    <tr>
-                                        <td valign="top" class="bodyContainer">
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock">
-							                    <tbody class="mcnTextBlockOuter">
-								                    <tr>
-									                    <td valign="top" class="mcnTextBlockInner">
-										                    <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
-											                    <tbody>
-												                    <tr>
-													                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                        <h1 style="text-align: center;"><font size="5">Your booking request has been sent to {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}</font></h1>
-														                    <p style="text-align: center;">You {%if guest_number > 1 %} and {{guest_number|sub:1}} of your {%if guest_number > 2%}friends{%else%}friend{%endif%}{%endif%} have requested to experience <br>
-                                                                                <a href="{{experience_url}}" target="_blank"><span style="line-height:21px; text-align:center">{{experience.title}}</span></a><br>
-                                                                                on {{ booking_datetime|date:'d/m/Y' }} at {{ booking_datetime|date:'H:i' }} with {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}
-                                                                            </p>
-													                    </td>
-												                    </tr>
-											                    </tbody>
-										                    </table>
-									                    </td>
-								                    </tr>
-							                    </tbody>
-                                            </table>
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock">
-                                                <tbody class="mcnTextBlockOuter">
-                                                    <tr>
-                                                        <td valign="top" class="mcnTextBlockInner">
-                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
-                                                                <tbody>
-						                                            <tr>
-							                                            <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-								                                            <div style="text-align: center;">{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} should get back to you within 24 hours.<br>
-                                                                            If you don't hear from {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} within next 24 hours, your payment will be refunded.</div>
-							                                            </td>
-						                                            </tr>
-					                                            </tbody>
-				                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-						                </td>
-                                    </tr>
-                                </table>
-                                <!-- // END BODY -->
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="center" valign="top">
-                                <!-- BEGIN FOOTER // -->
-                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="templateFooter">
-                                    <tr>
-                                        <td valign="top" class="footerContainer" style="padding-bottom:9px;">
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock">
-							                    <tbody class="mcnTextBlockOuter">
-								                    <tr>
-									                    <td valign="top" class="mcnTextBlockInner">
-										                    <table align="left" border="0" cellpadding="0" cellspacing="0" width="600" class="mcnTextContentContainer">
-											                    <tbody><tr>
-												                    <td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-													                    <div style="text-align: right;"><a class="utilityLink" href=""></a></div>
-												                    </td>
-											                    </tr>
-										                    </tbody></table>
-									                    </td>
-								                    </tr>
-							                    </tbody>
-                                            </table>
-						                </td>
-                                    </tr>
-                                </table>
-                                <!-- // END FOOTER -->
-                            </td>
-                        </tr>
-                    </table>
-                    <!-- // END TEMPLATE -->
+<!-- body wrapper -->
+<table cellpadding="0" cellspacing="0" border="0" style="margin:0; padding:0; width:100%; line-height: 100% !important;">
+  <tr>
+    <td valign="top">
+      <!-- edge wrapper -->
+      <table cellpadding="0" cellspacing="0" border="0" align="center" width="680" height="800" style="background: #f7f7f7;">
+        <tr>
+          <td valign="top">
+            <table cellpadding="0" cellspacing="0" border="0" align="center" width="170" height="100">
+              <tr>
+                <td valign="top" style="vertical-align: middle;">
+                  <img src="{% if LANGUAGE != 'zh-CN' %}{% static 'img/logo_2015_en.png' %}{% else %}{% static 'img/logo_2015_cn.png' %}{% endif %}" alt="Tripalocal" width="170" height="100" style="width: 170px; height: 100px;"/>
                 </td>
-            </tr>
-        </table>
-    </center>
+              </tr>
+            </table>
+            <!-- content wrapper -->
+            <table cellpadding="0" cellspacing="0" border="0" align="center" width="600" height="390" style="background: #ffffff;">
+              <tr>
+                <td valign="top" style="vertical-align: top; border: 1px solid #dfdfdf;">
+<!-- ///////////////////////////////////////////////////// -->
+
+<table cellpadding="0" cellspacing="0" border="0" align="center" height="100">
+  <tr>
+    <td valign="top" style="vertical-align: middle; text-align: center;">
+      <br><br>
+      <span style="font-family: 'Helvetica', 'Arial', sans-serif; font-size: 18pt; color: #333333;">{% trans "You have requested "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans "'s experience" %}</span>
+      <br><br>
+      <span style="font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12pt; color: #333333; word-wrap: break-word;"><a href="{{experience_url}}" target="_blank">{{experience.title}}</a>{% trans " on "%}{% if LANGUAGE != "zh-CN"%}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{%endif%} {{ booking.datetime|date:'H:i' }}</span>
+    </td>
+  </tr>
+</table>
+<table cellpadding="0" cellspacing="0" border="0" align="center" height="150">
+  <tr>
+    <td valign="top" style="vertical-align: top;">
+      <img src="{% with experience.hosts.all|first as host %}{% if host.registereduser.image_url %}{{ MEDIA_URL }}{{ host.registereduser.image_url }}{% else %}{{ MEDIA_URL }}img/profile_default.jpg{% endif %}{% endwith %}" alt="Traveller Profile" width="136" height="136" style="width: 136px; height: 136px; border-radius: 100px;"/>
+    </td>
+  </tr>
+</table>
+<table cellpadding="0" cellspacing="0" border="0" align="center" height="75" width="415">
+  <tr>
+    <td valign="top" style="vertical-align: top; text-align: center;">
+      <span style="font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12pt; color: #333333; word-wrap: break-word;">{% trans "Please feel free to send a message to" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %} {% trans "if you have any questions." %}</span>
+    </td>
+  </tr>
+</table>
+<table cellpadding="0" cellspacing="0" border="0" align="center" height="75">
+  <tr>
+    <td valign="top" style="vertical-align: top; text-align: center;">
+      <a href="https://www.tripalocal.com/html/tripalocalapp.html" style="height: 38px; width: 254px; background-color: #33cccc; border: 1px solid #33cccc; border-radius: 20px; color: #ffffff; display: inline-block; font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12pt; line-height: 38px; text-align:center; text-decoration:none; width: 254px; -webkit-text-size-adjust:none; mso-hide:all;">{% block button %}{% trans 'Send message' %}{% endblock %}</a>
+    </td>
+  </tr>
+</table>
+<!-- //////////// -->
+                </td>
+              </tr>
+            </table>
+            <!-- / content wrapper -->
+            <table cellpadding="0" cellspacing="0" border="0" align="center" width="500" height="280">
+              <tr>
+                <td valign="top" style="vertical-align: top; padding-top: 80px; width: 150px;">
+                  <img src="{% if LANGUAGE != 'zh-CN' %}{% static 'img/app-store-badge_en.png' %}{% else %}{% static 'img/app-store-badge_zh.png' %}{% endif %}" alt="App Store" width="132" height="40" style="width: 132px; height: 40px"/>
+                </td>
+                <td valign="top" style="vertical-align: top; padding-top: 32px; width: 180px; padding-left: 20px; padding-right: 30px; position: relative;">
+                  <img src="{% static 'img/mobileApps.png' %}" alt="Mobiles" width="180" height="203" style="width: 180px; height: 203px;"/>
+                  <img src="{% if LANGUAGE != 'zh-CN' %}{% static 'img/app_banner_en.svg' %}{% else %}{% static 'img/app_banner_cn.svg' %}{% endif %}" alt="Get the App!" width="320" height="66" style="width: 320px; height: 66px; position: absolute; top: 150px; left: -55px"/>
+                </td>
+                <td valign="top" style="vertical-align: top; padding-top: 80px; width: 150px;">
+                  <img src="{% if LANGUAGE != 'zh-CN' %}{% static 'img/play-store-badge_en.png' %}{% else %}{% static 'img/play-store-badge_zh.png' %}{% endif %}" alt="Play Store" width="132" height="40" style="width: 132px; height: 40px"/>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <!-- / edge wrapper -->
+    </td>
+  </tr>
+</table>
+<!-- / page wrapper -->
 {% endblock %}
 
 {% block scripts %}
