@@ -1058,7 +1058,8 @@ def get_experience_detail(experience, get_available_date=True):
     for photo in photos:
         experience_images.append(photo.directory+photo.name)
 
-    result = {'experience_language':experience.language,
+    result = {'experience_id':experience.id,
+                'experience_language':experience.language,
                 'experience_duration':experience.duration,
                 'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
                 'experience_currency': str(dict(Currency).get(experience.currency.upper(),experience.currency.upper())),
