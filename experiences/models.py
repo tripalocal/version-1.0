@@ -45,6 +45,8 @@ class Provider(models.Model):
         return self.company
 
 class AbstractExperience(PolymorphicModel):
+    def get_title(self, language):
+        return ""
     pass
 
 class Experience(AbstractExperience):
