@@ -3086,11 +3086,12 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
 
         #to avoid showing the same top N items everyday, swap items [0, N-1] with [day_counter*N, (day_counter+1)*N-1]
         N=3
-        for i in range(day_counter*N, (day_counter+1)*N):
-            day_dict['experiences'].insert(i%N, day_dict['experiences'][i])
-            day_dict['experiences'].pop(i+1)
-            day_dict['experiences'].insert(i+1, day_dict['experiences'][i%N+1])
-            day_dict['experiences'].pop(i%N+1)
+        if len(day_dict['experiences']) >= 2*N:
+            for i in range(day_counter*N, (day_counter+1)*N):
+                day_dict['experiences'].insert(i%N, day_dict['experiences'][i])
+                day_dict['experiences'].pop(i+1)
+                day_dict['experiences'].insert(i+1, day_dict['experiences'][i%N+1])
+                day_dict['experiences'].pop(i%N+1)
 
         itinerary.append(day_dict)
         dt += timedelta(days=1)

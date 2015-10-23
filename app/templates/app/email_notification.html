@@ -12,7 +12,6 @@
     {{ form.media }}
 {% endif %}
 <title>{% block title %}Notification - Tripalocal{% endblock %}</title>
-<link href="https://fonts.googleapis.com/css?family=Source+Serif+Pro" rel="stylesheet" type="text/css">
 <style type="text/css">
 
   /* reset */
@@ -64,7 +63,7 @@
   <tr>
     <td valign="top" style="vertical-align: middle; text-align: center;">
       <br><br>
-      <span style="font-family: 'Source Serif Pro', serif; font-size: 18pt; color: #333333;">{% block heading %}{% endblock %}</span>
+      <span style="font-family: 'Helvetica', 'Arial', sans-serif; font-size: 18pt; color: #333333;">{% block heading %}{% endblock %}</span>
       <br><br>
       <span style="font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12pt; color: #333333; word-wrap: break-word;">{% block subheading %}{% endblock %}</span>
     </td>
@@ -87,7 +86,7 @@
 <table cellpadding="0" cellspacing="0" border="0" align="center" height="75">
   <tr>
     <td valign="top" style="vertical-align: top; text-align: center;">
-      <a href="https://www.tripalocal.com/html/tripalocalapp.html" style="height: 38px; width: 254px; background-color: #33cccc; border: 1px solid #33cccc; border-radius: 20px; color: #ffffff; display: inline-block; font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12pt; line-height: 38px; text-align:center; text-decoration:none; width: 254px; -webkit-text-size-adjust:none; mso-hide:all;">{% block button %}{% endblock %}</a>
+      <a href="https://www.tripalocal.com/html/tripalocalapp.html" style="height: 38px; width: 254px; background-color: #33cccc; border: 1px solid #33cccc; border-radius: 20px; color: #ffffff; display: inline-block; font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12pt; line-height: 38px; text-align:center; text-decoration:none; width: 254px; -webkit-text-size-adjust:none; mso-hide:all;">{% block button %}{% trans 'Send message' %}{% endblock %}</a>
     </td>
   </tr>
 </table>

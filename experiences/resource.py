@@ -786,8 +786,8 @@ def service_search(request, format=None):
 def service_mytrip(request, format=None):
     try:
         user = request.user
-        booking_status = "paid,accepted,rejected"
-        b = Booking.objects.filter(user=user, status__in=booking_status.split(","))
+        booking_status = ["paid","accepted","rejected","paid_archived","accepted_archived","rejected_archived"]
+        b = Booking.objects.filter(user=user, status__in=booking_status)
 
         bookings = []
         for booking in b:
