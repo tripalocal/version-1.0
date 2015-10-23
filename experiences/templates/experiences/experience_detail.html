@@ -876,7 +876,9 @@ $(function(){
     })
 
     {% if not request.user.is_staff %}
-    $(window).bind('beforeunload', function(){
+    var myEvent = window.attachEvent || window.addEventListener;
+    var chkevent = window.attachEvent ? 'onbeforeunload' : 'beforeunload'; 
+    myEvent(chkevent, function(e) {
         {% if request.user.is_authenticated %}
         user_id = {{request.user.id}};
         {% else %}
