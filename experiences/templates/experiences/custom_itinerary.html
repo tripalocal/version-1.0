@@ -12,6 +12,20 @@
 
 {% block content %}
 <form id="itinerary_form" action="" method="post">
+  {% csrf_token %}
+  <div style="display:none;">
+  <!-- TODO -->
+    {{form.start_datetime}}
+    {{form.end_datetime}}
+    {{form.city}}
+    {{form.guest_number}}
+    {{form.language}}
+    {{form.sort}}
+    {{form.age_limit}}
+    {{form.tags}}
+    {{form.all_tags}}
+    {{form.itinerary_string}}
+  </div>
   <!-- Top search bar -->
   <div class="basic-search">
     <div class="container">
@@ -95,6 +109,8 @@
           <button class="btn btn-default">Preview</button>
           <button class="btn btn-default">Export PDF</button>
           <button class="btn btn-primary">Email</button>
+          <!-- TODO -->
+          <input class="btn btn-default" id="itinerary_search" type="submit" value="{% trans "Search" %}" name="Search">
         </div>
       </div>
     </div>
@@ -122,91 +138,13 @@
                 <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
                 <input type="text" class="form-control">
               </div>
-              <div class="column">
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Such experience title</h3>
-                    <p>Very description wow</p>
-                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>3239</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Another one</h3>
-                    <p>Very description wow</p>
-                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>339</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Yet another</h3>
-                    <p>Very description wow cool blah blah blah</p>
-                    <p>2 hrs &middot; English &middot; <strong>Public</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>9000</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Yet another</h3>
-                    <p>Very description wow cool blah blah blah</p>
-                    <p>2 hrs &middot; English &middot; <strong>Public</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>9000</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Yet another</h3>
-                    <p>Very description wow cool blah blah blah</p>
-                    <p>2 hrs &middot; English &middot; <strong>Public</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>9000</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Yet another</h3>
-                    <p>Very description wow cool blah blah blah</p>
-                    <p>2 hrs &middot; English &middot; <strong>Public</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>9000</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
+              <div class="column" id="experience_column">
 
               </div>
             </div>
             <div role="tabpanel" class="tab-pane fade" id="flight">
               <button class="btn btn-default" style="float:right;">+ Add Flight</button>
-              <div class="column">
+              <div class="column" id="flight_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
@@ -237,7 +175,7 @@
             </div>
             <div role="tabpanel" class="tab-pane fade" id="transfer">
               <button class="btn btn-default" style="float:right">+ Add Transfer</button>
-              <div class="column">
+              <div class="column" id="transfer_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
@@ -268,7 +206,7 @@
             </div>
             <div role="tabpanel" class="tab-pane fade" id="accommodation">
               <button class="btn btn-default" style="float:right">+ Add Accommodation</button>
-              <div class="column">
+              <div class="column" id="accommodation_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
@@ -299,7 +237,7 @@
             </div>
             <div role="tabpanel" class="tab-pane fade" id="restaurant">
               <button class="btn btn-default" style="float:right">+ Add Restaurant</button>
-              <div class="column">
+              <div class="column" id="restaurant_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
@@ -330,7 +268,7 @@
             </div>
             <div role="tabpanel" class="tab-pane fade" id="suggestion">
               <button class="btn btn-default" style="float:right">+ Add Suggestion</button>
-              <div class="column">
+              <div class="column" id="suggestion_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
@@ -361,7 +299,7 @@
             </div>
             <div role="tabpanel" class="tab-pane fade" id="pricing">
               <button class="btn btn-default" style="float:right">+ Add Pricing</button>
-              <div class="column">
+              <div class="column" id="pricing_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
@@ -439,4 +377,61 @@
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
     {%endif%}
     <script type="text/javascript" src="{% static 'experiences/scripts/custom_itinerary.js' %}"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function()
+    {
+        //fill out the left panel
+        experience_column = $("#experience_column");
+        flight_column = $("#flight_column");
+        transfer_column = $("#transfer_column");
+        accommodation_column = $("#accommodation_column");
+        restaurant_column = $("#restaurant_column");
+
+        {%for day in itinerary%}
+        i = {{forloop.counter}};
+        new_day = "<div id='experience_day_" + i + "'></div>";
+        experience_column.append(new_day);
+            {% for experience in day.experiences %}
+            {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
+            new_experience = "<div class='exp-box-sm portlet'>" + 
+                                "<div class='exp-img portlet-header'>" +
+                                    "<img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}'/>" +
+                                "</div>" +
+                                "<div class='exp-info portlet-header'>" + 
+                                    "<h3>{{experience.title}}</h3>" +
+                                    "<p>{{experience.description|escapejs|slice:"0:20"}}</p>" +
+                                    "<p>{{experience.duration}} {% trans 'hr(s)' %} &middot; " +
+                                       "{%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;" +
+                                       "{% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>" +
+                                "</div>"+
+                                "<div class='exp-price portlet-header'>" +
+                                    "<p>{{experience.dollarsign}}{{experience.currency}}</p>" +
+                                    "<h2>{{experience.price}}</h2>" +
+                                    "<p>{% trans 'per person' %}</p>" +
+                                "</div>" +
+                            "</div>";
+            $("#experience_day_"+ i).append(new_experience);
+            {% elif experience.type == "Flight" %}
+            //TODO
+            {% elif experience.type == "Transfer" %}
+            //TODO
+            {% elif experience.type == "Accommodation" %}
+            //TODO
+            {% elif experience.type == "Restaurant" %}
+            //TODO
+            {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+        $("#button_email").click(function(e){
+            var itinerary = [];
+            dict={"id":"",
+                  "date":"","time":"",
+                  "guest_number":1};
+            itinerary.push(dict);
+            $("#id_itinerary_string").val(JSON.stringify(itinerary));
+        })
+    })
+    </script>
 {% endblock %}
