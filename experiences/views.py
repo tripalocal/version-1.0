@@ -1099,26 +1099,38 @@ def update_pageview_statistics(user_id, experience_id, length = None):
     '''
     @length None: arrive, times_viewed++; not None: leave, update average_length
     '''
+    if length and float(length) < 0:
+        length = 0
+
     try:
         record = UserPageViewStatistics.objects.get(user_id=user_id, experience_id = experience_id)
     except UserPageViewStatistics.DoesNotExist:
         record = UserPageViewStatistics(user_id = user_id, experience_id = experience_id,
                                         times_viewed = 0, average_length = 0.0)
-    try:
-        detail = UserPageViewRecord.objects.get(user_id=user_id, experience_id=experience_id, time_left__isnull=True)
-    except UserPageViewRecord.DoesNotExist:
-        detail = UserPageViewRecord(user_id=user_id, experience_id=experience_id,
-                                    time_arrived=pytz.timezone("UTC").localize(datetime.utcnow()))
+       
     if length:
+        #leave an experience page
         try:
             length = float(length)
+            if length > 300:
+                length = 300 if user_id != 1 else 0
             record.average_length = float((record.average_length * (record.times_viewed-1) + length) / record.times_viewed)
-            detail.time_left = pytz.timezone("UTC").localize(datetime.utcnow())
+
+            detail = UserPageViewRecord.objects.filter(user_id=user_id, experience_id=experience_id, time_left__isnull=True)
+            if len(detail)>1:
+                for i in range(1,len(detail)):
+                    detail[i].time_left = detail[i].time_arrived
+                    detail[i].save()
+
+            detail[0].time_left = pytz.timezone("UTC").localize(datetime.utcnow())
         except BaseException:
             #TODO
             pass
     else:
+        #arrive at an experience page
         record.times_viewed += 1
+        detail = UserPageViewRecord(user_id=user_id, experience_id=experience_id,
+                                    time_arrived=pytz.timezone("UTC").localize(datetime.utcnow()))
 
     record.save()
     detail.save()
