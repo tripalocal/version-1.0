@@ -816,6 +816,32 @@ def get_related_experiences(experience, request):
 
     return related_experiences
 
+def get_experience_popularity(experience):
+    cursor = connections['default'].cursor()
+    if type(experience) is Experience:
+        table_name = "experiences_experience"
+        if experience.type == "ITINERARY":
+            target_type = "'ITINERARY'"
+        else:
+            target_type = "'PRIVATE', 'NONPRIVATE'"
+
+        cursor.execute("SELECT experience_id, count(experience_id) FROM app_userpageviewrecord" + \
+                            " where time_arrived >= NOW() - INTERVAL 30 DAY and (select type from " + table_name + \
+                            " where abstractexperience_ptr_id=experience_id) in (" + \
+                            target_type + ") group by experience_id order by count(experience_id) desc;")
+    else:
+        table_name = "experiences_newproduct"
+        cursor.execute("SELECT experience_id, count(experience_id) FROM app_userpageviewrecord" + \
+                            " where time_arrived >= NOW() - INTERVAL 30 DAY and experience_id in " + \
+                            " (select abstractexperience_ptr_id from " + table_name + ")" + \
+                            " group by experience_id order by count(experience_id) desc;")
+
+    for i in range(int(cursor.rowcount)):
+        if cursor._rows[i][0] == experience.id:
+            break
+
+    return 100 - 100*i/int(cursor.rowcount) if int(cursor.rowcount)>0 else 0
+
 class ExperienceDetailView(DetailView):
     model = AbstractExperience
     template_name = 'experiences/experience_detail.html'
@@ -1027,39 +1053,17 @@ class ExperienceDetailView(DetailView):
         context['wishlist_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_wishlist/"
 
         #check whether the experience is among the top 50%, 80% most viewed in the past 30 days
-        if type(experience) is Experience:
-            table_name = "experiences_experience"
-            if experience.type == "ITINERARY":
-                target_type = "'ITINERARY'"
-            else:
-                target_type = "'PRIVATE', 'NONPRIVATE'"
+        p = get_experience_popularity(experience)
 
-            cursor.execute("SELECT experience_id, count(experience_id) FROM app_userpageviewrecord" + \
-                                " where time_arrived >= NOW() - INTERVAL 30 DAY and (select type from " + table_name + \
-                                " where abstractexperience_ptr_id=experience_id) in (" + \
-                                target_type + ") group by experience_id order by count(experience_id) desc;")
+        if p >= 80:
+            top_20 = True
+            top_50 = True
+        elif p >= 50:
+            top_20 = False
+            top_50 = True
         else:
-            table_name = "experiences_newproduct"
-            cursor.execute("SELECT experience_id, count(experience_id) FROM app_userpageviewrecord" + \
-                                " where time_arrived >= NOW() - INTERVAL 30 DAY and experience_id in " + \
-                                " (select abstractexperience_ptr_id from " + table_name + ")" + \
-                                " group by experience_id order by count(experience_id) desc;")
-
-        j=0
-        top_20 = False
-        top_50 = False
-        for i in range(int(cursor.rowcount*0.2)+1):
-            j=i
-            if cursor._rows[i][0] == experience.id:
-                top_20 = True
-                top_50 = True
-                break
-
-        if not top_50:
-            for i in range(j+1, int(cursor.rowcount*0.5)+1):
-                if cursor._rows[i][0] == experience.id:
-                    top_50 = True
-                    break
+            top_20 = False
+            top_50 = False
 
         context['top_20'] = top_20
         context['top_50'] = top_50

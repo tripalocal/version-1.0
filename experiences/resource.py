@@ -19,7 +19,7 @@ from django.template.loader import get_template
 from app.forms import UploadXLSForm, ExperienceTagsXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator, update_pageview_statistics, get_related_experiences
+from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator, update_pageview_statistics, get_related_experiences, get_experience_popularity
 from app.views import getreservation
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
@@ -1073,6 +1073,8 @@ def get_experience_detail(experience, get_available_date=True):
 
                 'experience_rate':math.ceil(rate),
                 'experience_reviews':experience_reviews,
+
+                'experience_popularity':get_experience_popularity(experience),
             }
 
     if get_available_date:
