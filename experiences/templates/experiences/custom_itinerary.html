@@ -122,43 +122,45 @@
                 <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
                 <input type="text" class="form-control">
               </div>
-              <div class="exp-box-sm">
-                <div class="exp-img"></div>
-                <div class="exp-info">
-                  <h3>Such experience title</h3>
-                  <p>Very description wow</p>
-                  <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+              <div class="column">
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-content">
+                    <h3>Such experience title</h3>
+                    <p>Very description wow</p>
+                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                  </div>
+                  <div class="exp-price">
+                    <p>$AUD</p>
+                    <h2>3239</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
                 </div>
-                <div class="exp-price">
-                  <p>$AUD</p>
-                  <h2>3239</h2>
-                  <p>{% trans "per person" %}</p>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-content">
+                    <h3>Another one</h3>
+                    <p>Very description wow</p>
+                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
+                  </div>
+                  <div class="exp-price">
+                    <p>$AUD</p>
+                    <h2>339</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
                 </div>
-              </div>
-              <div class="exp-box-sm">
-                <div class="exp-img"></div>
-                <div class="exp-info">
-                  <h3>Another one</h3>
-                  <p>Very description wow</p>
-                  <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
-                </div>
-                <div class="exp-price">
-                  <p>$AUD</p>
-                  <h2>339</h2>
-                  <p>{% trans "per person" %}</p>
-                </div>
-              </div>
-              <div class="exp-box-sm">
-                <div class="exp-img"></div>
-                <div class="exp-info">
-                  <h3>Yet another</h3>
-                  <p>Very description wow cool blah blah blah</p>
-                  <p>2 hrs &middot; English &middot; <strong>Public</strong></p>
-                </div>
-                <div class="exp-price">
-                  <p>$AUD</p>
-                  <h2>9000</h2>
-                  <p>{% trans "per person" %}</p>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-content">
+                    <h3>Yet another</h3>
+                    <p>Very description wow cool blah blah blah</p>
+                    <p>2 hrs &middot; English &middot; <strong>Public</strong></p>
+                  </div>
+                  <div class="exp-price">
+                    <p>$AUD</p>
+                    <h2>9000</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -181,38 +183,18 @@
           </div>
           <div class="section-box">
             <p>Day 1</p>
-            <div class="exp-box-sm">
-              <div class="exp-img"></div>
-              <div class="exp-info">
-                <h3>Such experience title</h3>
-                <p>Very description wow</p>
-                <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
-              </div>
-              <div class="exp-price">
-                <p>$AUD</p>
-                <h2>3239</h2>
-                <p>{% trans "per person" %}</p>
-              </div>
+            <div class="column">
             </div>
           </div>
           <div class="section-box">
             <p>Day 2</p>
-            <div class="exp-box-sm">
-              <div class="exp-img"></div>
-              <div class="exp-info">
-                <h3>Another one</h3>
-                <p>Very description wow</p>
-                <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
-              </div>
-              <div class="exp-price">
-                <p>$AUD</p>
-                <h2>339</h2>
-                <p>{% trans "per person" %}</p>
-              </div>
+            <div class="column">
             </div>
           </div>
           <div class="section-box">
             <p>Day 3</p>
+            <div class="column">
+            </div>
           </div>
           <div class="section-box-add">
             <span class="add-sign">+</span>
@@ -227,6 +209,7 @@
 {% endblock %}
 
 {% block scripts %}
+    <script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
     <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
     <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
