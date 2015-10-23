@@ -23,6 +23,17 @@
     right: 0;
     margin-top: -8px;
 }
+.portlet-header {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  &:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+  }
+}
 .portlet-content {
     padding: 0.4em;
 }
