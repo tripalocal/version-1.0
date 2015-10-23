@@ -45,7 +45,7 @@
   width: 100%;
   margin: 40px auto;
   @include media('>=desktop') {
-    width: 600px;
+    width: 560px;
     float: right;
   }
   .col-md-3, .col-md-9, .col-sm-3, .col-sm-9 {
@@ -57,6 +57,7 @@
   h3 {
     color: $dark-grey;
     margin-top: 0;
+    font-weight: normal;
   }
 
   p {
@@ -74,21 +75,21 @@
 .bio-box {
   float: none;
   width: 100%;
-  margin: auto;
   padding-left: 30px;
   @include media('>tablet') {
     width: 720px;
-    float: right;
+    margin: auto;
   }
   @include media('>desktop') {
-    float: none;
-    position: relative;
-    left: 15%;
+    width: 720px;
+    float: right;
+    margin-right: -15px;
   }
 }
 
 .review-box {
   @extend .bio-box;
+  padding-left: 0;
   .reviewText {
     margin-right: 60px;
     float: right;
@@ -184,7 +185,6 @@
   color: $primary-color;
   float: left;
   margin-left: 150px;
-  width: 100%;
   cursor: pointer;
 }
 

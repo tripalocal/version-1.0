@@ -1,4 +1,7 @@
 {% extends "app/email_notification.html" %}
+{% load staticfiles %}
+{% load mathfilters %}
+{% load i18n %}
 
 {% block heading %}{% trans "Cancellation confirmed" %}{% endblock %}
 {% block subheading %}{% blocktrans with first_name=user.first_name%}Your following booking with {{first_name}} is now cancelled: {% endblocktrans %}{% endblock %}

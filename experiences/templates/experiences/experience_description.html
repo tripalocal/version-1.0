@@ -30,6 +30,7 @@
 						</div>
 					</div>
 
+          {% if experience.activity %}
 					<div class="row" style="border-bottom:1px solid #CCCCCC;">
 						<div class="col-sm-3">
 							<h3>{% trans "Activities" %}</h3>
@@ -38,7 +39,9 @@
 								{{ experience.activity|linebreaks }}
 						</div>
 					</div>
+          {% endif %}
 
+          {% if experience.dress %}
 					<div class="row" style="border-bottom:1px solid #CCCCCC;">
 						<div class="col-sm-3">
 							<h3>{% trans "What to wear" %}</h3>
@@ -47,8 +50,10 @@
 							{{ experience.dress|linebreaks }}
 						</div>
 					</div>
+          {% endif %}
 
 					{% for w in experience.whatsincluded %}
+          {% if w.details %}
 					<div class="row">
 						<div class="col-sm-3" style="margin-bottom:0;">
 							<h3>{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%elif w.item.lower == "transport"%}交通{%elif w.item.lower == "accommodation"%}住宿{%elif w.item.lower == "private guide"%}旅游达人{%endif%}{%endif%}:</h3>
@@ -57,6 +62,7 @@
               {{w.details}}
 						</div>
 					</div>
+          {% endif %}
 					{% endfor %}
 
 					<div class="row" style="border-bottom:1px solid #CCCCCC;height: 10px;margin-bottom:20px;">
@@ -102,5 +108,4 @@
                         <span class="sr-only">Next</span>
                     </a>
                 </div>
-            </div>
           </div>

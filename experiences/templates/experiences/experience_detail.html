@@ -132,7 +132,7 @@
                             </tr>
                         </table>
 
-                        <div class="save-to-wishlist">
+                        <div class="save-to-wishlist" style="display:none;">
                         {% if not in_wishlist %}
                             {% if user.is_authenticated %}
                             <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_not_added"></div>
@@ -152,16 +152,13 @@
                     </form>
                     {%endif%}
 
-                    {% if experience.type == "PRODUCT" %}
+                    {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
                     <div style="border-bottom:1px solid #ccc;">
-                      <p>{%if experience.duration < 24 %}{{experience.duration}} {% trans "hour" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "day" %}{%endif%} {% trans 'Public Tour' %}</p>
+                        <p>{%if experience.duration < 24 %}{{experience.duration}}{% trans " hour" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}}{% trans " day" %}{%endif%}
+                           {% if experience.type == "PublicProduct"%}{% trans ' Public Tour' %}{% else %}{% trans ' Private Tour' %}{% endif %}</p>
                     </div>
                     <div style="padding-top:10px; padding-bottom:10px; border-bottom:1px solid #ccc;">
-                      {% if LANGUAGE != "zh-CN" %}
-                          <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
-                      {%else%}
-                          <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label style="vertical-align:top; margin-left:5px;">{{experience.currency}}</label><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
-                      {%endif%}
+                        <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
                     </div>
                     <form style="text-align: left; padding-top: 20px;" id="experience_booking_form" method="post" action="">
                         {% csrf_token %}
@@ -210,7 +207,7 @@
                         {% endif %}
                         <!--- -->
 
-                        <div class="save-to-wishlist">
+                        <div class="save-to-wishlist" style="display: none;">
                         {% if not in_wishlist %}
                             {% if user.is_authenticated %}
                             <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_not_added"></div>
@@ -232,7 +229,7 @@
                 </div>
             </div>
 
-            {% if experience.type == "PRODUCT" %}
+            {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
                 {% include "experiences/product_description.html" %}
             {% else %}
                 {% include "experiences/experience_description.html" %}
@@ -357,7 +354,7 @@
             {% for related_experience, added_to_wishlist in related_experiences %}
             {% if forloop.counter0 < 2 %}
             <div class="exp-box">
-              {% if related_experience.type == 'PRIVATE' or related_experience.type == 'PUBLIC' %}
+              {% if related_experience.type == 'PRIVATE' or related_experience.type == 'NONPRIVATE' %}
                 <div class="exp-type">
                   <img src="{% static 'experiences/img/local-55.svg' %}" width="35" height="35">
                   <h3>{% trans 'Travel with Locals' %}</h3>
@@ -377,7 +374,7 @@
                     </div>
                 </a>
                 <a href="{{GEO_POSTFIX}}experience/{{related_experience.id}}"><h3>{{ related_experience.title }}</h3></a>
-                {% if related_experience.type == 'PRIVATE' or related_experience.type == 'PUBLIC' %}
+                {% if related_experience.type == 'PRIVATE' or related_experience.type == 'NONPRIVATE' %}
                 <div class="profile-frame-sm">
                     <div class="profile-sm"
                             style="background-image:url({% with related_experience.hosts.all|first as host %}
@@ -393,7 +390,9 @@
                 <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ related_experience.description }}</p>
                 <div class="listing-footer">
                     <div id="save_to_wishlist_related_{{forloop.counter0}}"{% if not user.is_authenticated %} onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"{%endif%}{%if added_to_wishlist%} val="True" class="saved_to_wishlist_related"{%else%}val="False" class="save_to_wishlist_related"{%endif%}></div>
-                    <div>{%if related_experience.duration < 24 %}{{related_experience.duration}} {% trans "hrs" %}{%else%}{{related_experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</div>
+                    <div>{%if related_experience.duration < 24 %}{{related_experience.duration}} {% trans "hrs" %}{%else%}{{related_experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%} &#8226; {%if related_experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}
+                        &#8226; <span style="font-weight:500;">{% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}{% trans 'Private' %}{% endif %}</span>
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -422,6 +421,13 @@
               </div>
         </div>
     </div>
+    {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
+    <style>
+    .stickit {
+      padding-top: 80px;
+    }
+    </style>
+    {% endif %}
 {%else%}
     <p>{% trans "The experience has expired, or has not been approved." %}</p>
 {%endif%}
@@ -433,6 +439,8 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 <script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
 <script charset="utf-8" type="text/javascript">
+$("#navbar").removeClass("navbar-static-top");
+$("#navbar").addClass("navbar-fixed-top");
 function resizeImg() {
     var thisImg= $('.item');
     var refH = thisImg.height();
@@ -464,7 +472,7 @@ $(function(){
             $(document.body).stickem();
         }
 
-        {% if experience.type == "PRODUCT" %}
+        {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
         if (screen.width < 767) {
           $(".booking-box").attr("style", "margin-top:-60px;");
         }
@@ -869,7 +877,9 @@ $(function(){
     })
 
     {% if not request.user.is_staff %}
-    $(window).bind('beforeunload', function(){
+    var myEvent = window.attachEvent || window.addEventListener;
+    var chkevent = window.attachEvent ? 'onbeforeunload' : 'beforeunload'; 
+    myEvent(chkevent, function(e) {
         {% if request.user.is_authenticated %}
         user_id = {{request.user.id}};
         {% else %}

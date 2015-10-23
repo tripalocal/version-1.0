@@ -28,6 +28,7 @@ Location = (('Melbourne', _('Melbourne, VIC')),('GRVIC', _('Greater Victoria')),
             ('Hobart',_('Hobart, TAS')),('GRTAS', _('Greater Tasmania')),
             ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
+            ('GRWA', _('Greater West Australia')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
@@ -49,12 +50,14 @@ Locations = [(_('Australia'), [('Melbourne', _('Melbourne'), _('Victoria')), ('S
                            ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
                            ('Goldcoast', _('Gold Coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
                            ('Adelaide', _('Adelaide'), _('South Australia')),
-                           ('Darwin', _('Darwin'), _('Northern Territory')),
-                           ('Alicesprings', _('Alice Springs'), _('Northern Territory'))]),
-             (_('New Zealand'), [('Christchurch', _('Christchurch'), _('Canterbury')),
+                           #('Darwin', _('Darwin'), _('Northern Territory')),
+                           #('Alicesprings', _('Alice Springs'), _('Northern Territory'))
+                           ]),
+             (_('New Zealand'), [#('Christchurch', _('Christchurch'), _('Canterbury')),
                              ('Queenstown', _('Queenstown'), _('Otago')),
-                             ('Auckland', _('Auckland'), _('Auckland')),
-                             ('Wellington', _('Wellington'), _('Wellington'))])]
+                             #('Auckland', _('Auckland'), _('Auckland')),
+                             #('Wellington', _('Wellington'), _('Wellington'))
+                             ])]
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),)#('english;translation','English+Chinese translation'),
 
@@ -80,7 +83,7 @@ Included = (('Yes', ''),('No', ''),)
 Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),
             ('Goldcoast',_('Gold coast, QLD')),('Hobart',_('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
             ('GRVIC', _('Greater Victoria')),('GRNSW', _('Greater New South Wales')),('GRQLD', _('Greater Queensland')),('GRTAS', _('Greater Tasmania')),
-            ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
+            ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),('GRWA', _('Greater West Australia')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Currency = (('AUD',_('AUD')),('NZD',_('NZD')),('CNY',_('CNY')),)
@@ -537,7 +540,7 @@ def check_coupon(coupon, experience_id, guest_number, target_currency=None):
 
     #not free:
     subtotal_price = 0.0
-    experience = Experience.objects.get(id = experience_id)
+    experience = AbstractExperience.objects.get(id = experience_id)
     if experience.dynamic_price and type(experience.dynamic_price) == str:
         price = experience.dynamic_price.split(',')
         if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
@@ -798,10 +801,10 @@ class ExperienceAvailabilityForm(forms.Form):
 SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
 AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children')),(4,_('Famili with elderly&children')))
 class CustomItineraryForm(forms.Form):
-    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
-    guest_number = forms.ChoiceField(choices=Guest_Number_Min, required=True)
-    city = forms.CharField(widget=forms.Textarea,  required=True)
+    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}), initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()))
+    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}), initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()))
+    guest_number = forms.ChoiceField(choices=Guest_Number_Min, required=True, initial=1)
+    city = forms.CharField(widget=forms.Textarea,  required=True, initial="Melbourne")
     language = forms.CharField(widget=forms.Textarea,  required=True, initial="English,Mandarin")
     tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
@@ -1212,7 +1215,7 @@ def sms_notification(booking, experience, user, phone_number):
 
     customer_phone_num = phone_number
     exp_datetime_local = booking.datetime.astimezone(tzlocal())
-    exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
+    exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y")).format(*'年月日')
     host = get_host(experience)
     send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
     schedule_request_reminder_sms(booking.id, host.id, user.first_name, booking.datetime + timedelta(days=1))

@@ -34,23 +34,23 @@
         <p>{% trans "Melbourne" %}</p>
         <div class="price-box-sm">
           <p>{% trans "Include 1 night accommodation" %}</p>
-          <p style="margin-bottom:0;">AU $688</p>
+          <p style="margin-bottom:0;">{% for e in experienceList %}{% if e.id == 651 %}{{e.currency}} {{e.dollarsign}}{{ e.price }}{% endif %}{% endfor %}</p>
           <p><a href="{{GEO_POSTFIX}}experience/651/">{% trans "View Details" %}</a></p>
         </div>
         <div class="price-box-sm">
           <p>{% trans "Include 2 night accommodation" %}</p>
-          <p style="margin-bottom:0;">AU $1088</p>
+          <p style="margin-bottom:0;">{% for e in experienceList %}{% if e.id == 701 %}{{e.currency}} {{e.dollarsign}}{{ e.price }}{% endif %}{% endfor %}</p>
           <p><a href="{{GEO_POSTFIX}}experience/701/">{% trans "View Details" %}</a></p>
         </div>
         <p style="padding-top: 20px;">{% trans "Sydney" %}</p>
         <div class="price-box-sm">
           <p>{% trans "Include 1 night accommodation" %}</p>
-          <p style="margin-bottom:0;">AU $688</p>
+          <p style="margin-bottom:0;">{% for e in experienceList %}{% if e.id == 661 %}{{e.currency}} {{e.dollarsign}}{{ e.price }}{% endif %}{% endfor %}</p>
           <p><a href="{{GEO_POSTFIX}}experience/661/">{% trans "View Details" %}</a></p>
         </div>
         <div class="price-box-sm">
           <p>{% trans "Include 2 night accommodation" %}</p>
-          <p style="margin-bottom:0;">AU $1088</p>
+          <p style="margin-bottom:0;">{% for e in experienceList %}{% if e.id == 711 %}{{e.currency}} {{e.dollarsign}}{{ e.price }}{% endif %}{% endfor %}</p>
           <p><a href="{{GEO_POSTFIX}}experience/711/">{% trans "View Details" %}</a></p>
         </div>
       </div>
@@ -63,12 +63,12 @@
         <p>{% trans "Melbourne + Sydney" %}</p>
         <div class="price-box-sm">
           <p>{% trans "Include 1 night accommodation" %}</p>
-          <p style="margin-bottom:0;">AU $1822</p>
+          <p style="margin-bottom:0;">{% for e in experienceList %}{% if e.id == 681 %}{{e.currency}} {{e.dollarsign}}{{ e.price }}{% endif %}{% endfor %}</p>
           <p><a href="{{GEO_POSTFIX}}experience/681/">{% trans "View details" %}</a></p>
         </div>
         <div class="price-box-sm">
           <p>{% trans "Includes all accommodation" %}</p>
-          <p style="margin-bottom:0">AU $2822</p>
+          <p style="margin-bottom:0">{% for e in experienceList %}{% if e.id == 731 %}{{e.currency}} {{e.dollarsign}}{{ e.price }}{% endif %}{% endfor %}</p>
           <p><a href="{{GEO_POSTFIX}}experience/731/">{% trans "View details" %}</a></p>
         </div>
       </div>
@@ -81,12 +81,12 @@
         <p>{% trans "Melbourne + Sydney + Gold Coast" %}</p>
         <div class="price-box-sm">
           <p>{% trans "Include 1 night accommodation" %}</p>
-          <p style="margin-bottom:0;">AU $2632</p>
+          <p style="margin-bottom:0;">{% for e in experienceList %}{% if e.id == 691 %}{{e.currency}} {{e.dollarsign}}{{ e.price }}{% endif %}{% endfor %}</p>
           <p><a href="{{GEO_POSTFIX}}experience/691/">{% trans "View details" %}</a></p>
         </div>
         <div class="price-box-sm">
           <p>{% trans "Includes all accommodation" %}</p>
-          <p style="margin-bottom:0;">AU $3993</p>
+          <p style="margin-bottom:0;">{% for e in experienceList %}{% if e.id == 771 %}{{e.currency}} {{e.dollarsign}}{{ e.price }}{% endif %}{% endfor %}</p>
           <p><a href="{{GEO_POSTFIX}}experience/771/">{% trans "View details" %}</a></p>
         </div>
       </div>
