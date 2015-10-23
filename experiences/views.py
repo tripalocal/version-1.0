@@ -1112,6 +1112,8 @@ def update_pageview_statistics(user_id, experience_id, length = None):
         #leave an experience page
         try:
             length = float(length)
+            if length > 300:
+                length = 300 if user_id != 1 else 0
             record.average_length = float((record.average_length * (record.times_viewed-1) + length) / record.times_viewed)
 
             detail = UserPageViewRecord.objects.filter(user_id=user_id, experience_id=experience_id, time_left__isnull=True)
