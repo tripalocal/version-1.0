@@ -60,7 +60,7 @@
                             </td>
                             <td class="people-list">
                                 {% if user.is_authenticated %}
-                                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" />
+                                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" disabled='disabled' />
                                 {% else %}
                                 <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
                                 {% endif %}
@@ -459,6 +459,15 @@ function resizeImg() {
     }
 }
 
+function is_form_valid()
+{
+    if($("#id_date").val() && $("#id_time").val() && $("#id_guest_number").val())
+    {
+        return true;
+    }
+    return false;
+}
+
 $(document).ready(resizeImg())
 
 $(window).resize(function(){
@@ -467,6 +476,7 @@ $(window).resize(function(){
 
 $(function(){
     $(document).ready(function(){
+
         mixpanel.track("viewed an experience");
         if(screen.width > 767){
             $(document.body).stickem();
@@ -547,7 +557,15 @@ $(function(){
             {% else %}
             //mixpanel.track("Clicked on \"Request\"_cn");
             {% endif %}
-            $("#experience_booking_form").submit();
+
+            if(is_form_valid())
+            {
+                $("#experience_booking_form").submit();
+            }
+            else
+            {
+                alert("{%trans 'Please select coordinate, time and guest number' %}");
+            }
         });
 
         for(i=0;i<3;i++)
@@ -568,7 +586,14 @@ $(function(){
                 mixpanel.track("Clicked on \"Book_cn\"");
                 {% endif %}
 
-                $("#experience_booking_form").submit();
+                if(is_form_valid())
+                {
+                    $("#experience_booking_form").submit();
+                }
+                else
+                {
+                    alert("{%trans 'Please select coordinate, time and guest number' %}");
+                }
             });
         }
 
@@ -723,6 +748,8 @@ $(function(){
         {
             $("#experience_map").hide();
         }
+
+        $("#id_submit_request").prop('disabled', false);
     })
 })
 
