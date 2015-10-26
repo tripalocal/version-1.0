@@ -3374,6 +3374,11 @@ def bring_the_kids(request):
 
         experience.image = getBGImageURL(experience.id)
 
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
         if not experience.currency:
             experience.currency = 'aud'
         convert_experience_price(request, experience)
@@ -3411,6 +3416,11 @@ def hopeless_romance(request):
         setExperienceDisplayPrice(experience)
 
         experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
 
         if not experience.currency:
             experience.currency = 'aud'
@@ -3450,6 +3460,11 @@ def local_culture(request):
         setExperienceDisplayPrice(experience)
 
         experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
 
         if not experience.currency:
             experience.currency = 'aud'
