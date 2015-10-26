@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-26 11:57+1100\n"
+"POT-Creation-Date: 2015-10-26 14:34+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -316,13 +316,13 @@ msgstr "退出"
 msgid "Login"
 msgstr "登录"
 
-#: app/templates/app/layout.html:197 app/templates/app/layout.html.py:221
-msgid "Travel with Locals"
-msgstr "旅游达人"
-
-#: app/templates/app/layout.html:198 app/templates/app/layout.html.py:222
+#: app/templates/app/layout.html:197 app/templates/app/layout.html.py:222
 msgid "Local Experiences"
 msgstr "特色体验"
+
+#: app/templates/app/layout.html:198 app/templates/app/layout.html.py:221
+msgid "Travel with Locals"
+msgstr "旅游达人"
 
 #: app/templates/app/layout.html:199 app/templates/app/layout.html.py:223
 msgid "Itineraries"
@@ -669,6 +669,8 @@ msgid "Thank you for your confirmation"
 msgstr "感谢您的确认激活"
 
 #: app/templates/app/registration_successful.html:78
+#, fuzzy, python-format
+#| msgid " Your account associate with %(account_email)s is now activated. "
 msgid " Your account associate with %(account_email)s is now activated. "
 msgstr "您用 %(user_email)注册的账户已经激活。"
 
