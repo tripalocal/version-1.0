@@ -714,7 +714,7 @@ class BookingConfirmationForm(forms.Form):
                     booking.save()
 
                 #add the user to the guest list
-                if user not in experience.guests.all():
+                if hasattr(experience,'guests') and user not in experience.guests.all():
                 #experience.guests.add(user)
                     cursor = connections['default'].cursor()
                     cursor.execute("Insert into experiences_experience_guests (experience_id,user_id) values (%s, %s)", [experience.id, user.id])

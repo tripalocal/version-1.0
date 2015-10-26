@@ -271,7 +271,7 @@ def getreservation(user):
     local_timezone = pytz.timezone(settings.TIME_ZONE)
 
     for booking in bookings:
-        experience = Experience.objects.get(id=booking.experience_id)
+        experience = AbstractExperience.objects.get(id=booking.experience_id)
         payment = Payment.objects.get(id=booking.payment_id) if booking.payment_id != None else Payment()
         guest = User.objects.get(id=booking.user_id)
         phone_number = payment.phone_number if payment.phone_number != None and len(payment.phone_number) else guest.registereduser.phone_number
