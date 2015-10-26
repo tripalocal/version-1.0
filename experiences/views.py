@@ -1107,7 +1107,7 @@ def update_pageview_statistics(user_id, experience_id, length = None):
     except UserPageViewStatistics.DoesNotExist:
         record = UserPageViewStatistics(user_id = user_id, experience_id = experience_id,
                                         times_viewed = 0, average_length = 0.0)
-       
+
     if length:
         #leave an experience page
         try:
@@ -3362,6 +3362,102 @@ def itinerary_booking_successful(request):
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
 
     return render(request,'experiences/itinerary_booking_successful.html',{})
+
+def bring_the_kids(request):
+    experienceList = Experience.objects.filter(id__in=[911,2041,464,69,408])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/bring_the_kids.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def hopeless_romance(request):
+    experienceList = Experience.objects.filter(id__in=[209,302,911,921,71,852,862,1021])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/hopeless_romance.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def local_culture(request):
+    experienceList = Experience.objects.filter(id__in=[981,1591,911,921,54,106,2,32,37])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/local_culture.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
 
 def multi_day_trip(request):
     experienceList = Experience.objects.filter(status='Listed', type='ITINERARY')

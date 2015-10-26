@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-22 10:15+1100\n"
+"POT-Creation-Date: 2015-10-26 11:57+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -130,6 +130,10 @@ msgstr "为安全起见，请尽快登录修改你的密码"
 msgid "Login and change password"
 msgstr "登录并修改密码"
 
+#: app/templates/app/email_notification.html:89
+msgid "Send message"
+msgstr "发信息"
+
 #: app/templates/app/email_registration_successful.html:75
 msgid "Your account is ready!"
 msgstr "您的帐号已激活"
@@ -175,50 +179,51 @@ msgstr "探索本土化的生活轨迹"
 msgid "Explore local places"
 msgstr "发现当地的吃喝玩乐"
 
-#: app/templates/app/index.html:78 app/templates/app/index.html.py:128
-#: app/templates/app/index.html:159
-msgid "From"
-msgstr ""
+#: app/templates/app/index.html:70
+msgid "Bring<br>the Kids"
+msgstr "亲子游"
 
-#: app/templates/app/index.html:79 app/templates/app/index.html.py:128
-#: app/templates/app/index.html:159
-#, python-format
-msgid " %(currency)s/person "
-msgstr " %(currency)s/人 起"
+#: app/templates/app/index.html:77
+msgid "Hopeless<br>Romance"
+msgstr "蜜月游"
 
-#: app/templates/app/index.html:101
+#: app/templates/app/index.html:84
+msgid "Local<br>Culture"
+msgstr "风土人情"
+
+#: app/templates/app/index.html:104
 msgid "Request a trip"
 msgstr "订制行程"
 
-#: app/templates/app/index.html:185
+#: app/templates/app/index.html:151
 msgid "Travel with Tripalocal"
 msgstr "本土客带您去旅行"
 
-#: app/templates/app/index.html:186
+#: app/templates/app/index.html:152
 msgid "See how it works"
 msgstr "了解更多"
 
-#: app/templates/app/index.html:198
+#: app/templates/app/index.html:164
 msgid "Your browser does not support the video tag."
 msgstr "您的浏览器不支持video标签"
 
-#: app/templates/app/index.html:205
+#: app/templates/app/index.html:171
 msgid "Our Community"
 msgstr "我们的社区"
 
-#: app/templates/app/index.html:209
+#: app/templates/app/index.html:175
 msgid "Travelling"
 msgstr "旅行心得"
 
-#: app/templates/app/index.html:214
+#: app/templates/app/index.html:180
 msgid "Hosting"
 msgstr "旅游达人"
 
-#: app/templates/app/index.html:261
+#: app/templates/app/index.html:227
 msgid " From "
 msgstr "到达日期"
 
-#: app/templates/app/index.html:262
+#: app/templates/app/index.html:228
 msgid " To "
 msgstr "离开日期"
 
@@ -734,6 +739,9 @@ msgstr "文件大小超过上限"
 #: app/views.py:710
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
+
+#~ msgid " %(currency)s/person "
+#~ msgstr " %(currency)s/人 起"
 
 #~ msgid "%(country)s"
 #~ msgstr "%(country)s"
