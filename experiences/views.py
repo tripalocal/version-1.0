@@ -1147,7 +1147,7 @@ def experience_booking_successful(request, experience=None, guest_number=None, b
 
     data = request.GET
     if experience is None and data is not None:
-        experience = Experience.objects.get(id=data['experience_id'])
+        experience = AbstractExperience.objects.get(id=data['experience_id'])
         guest_number = int(data['guest_number'])
         booking_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['booking_datetime'], "%Y-%m-%d%H:%M"))
         price_paid = float(data['price_paid'])
@@ -1959,7 +1959,7 @@ def update_booking(id, accepted, user):
             result={'booking_success':booking_success, 'error':'the booking has been cancelled/rejected'}
             return result
 
-        experience = Experience.objects.get(id=booking.experience_id)
+        experience = AbstractExperience.objects.get(id=booking.experience_id)
         experience.title = experience.get_title(settings.LANGUAGES[0][0])
         experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
         if not get_host(experience).id == user.id:
@@ -3364,7 +3364,7 @@ def itinerary_booking_successful(request):
     return render(request,'experiences/itinerary_booking_successful.html',{})
 
 def bring_the_kids(request):
-    experienceList = Experience.objects.filter(id__in=[911,2041,464,69,408])
+    experienceList = AbstractExperience.objects.filter(id__in=[911,2041,464,69,408])
     i=0
     while i < len(experienceList):
         experience = experienceList[i]
@@ -3396,7 +3396,7 @@ def bring_the_kids(request):
     return render_to_response(template, {}, context)
 
 def hopeless_romance(request):
-    experienceList = Experience.objects.filter(id__in=[209,302,911,921,71,852,862,1021])
+    experienceList = AbstractExperience.objects.filter(id__in=[209,302,911,921,71,852,862,1021])
     i=0
     while i < len(experienceList):
         experience = experienceList[i]
@@ -3428,7 +3428,7 @@ def hopeless_romance(request):
     return render_to_response(template, {}, context)
 
 def local_culture(request):
-    experienceList = Experience.objects.filter(id__in=[981,1591,911,921,54,106,2,32,37])
+    experienceList = AbstractExperience.objects.filter(id__in=[981,1591,911,921,54,106,2,32,37])
     i=0
     while i < len(experienceList):
         experience = experienceList[i]
@@ -3518,7 +3518,7 @@ def unionpay_payment_callback(request):
                     payment.street1 = ret['txnTime']
                     payment.save()
 
-                    experience = Experience.objects.get(id=bk.experience_id)
+                    experience = AbstractExperience.objects.get(id=bk.experience_id)
                     user = User.objects.get(id=bk.user_id)
                     bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
                     send_booking_email_verification(bk, experience, user,
@@ -3609,7 +3609,7 @@ def wechat_qr_payment_notify(request):
                 payment.charge_id = transaction_id
                 payment.save()
 
-                experience = Experience.objects.get(id=bk.experience_id)
+                experience = AbstractExperience.objects.get(id=bk.experience_id)
                 user = User.objects.get(id=bk.user_id)
                 bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
                 send_booking_email_verification(bk, experience, user,

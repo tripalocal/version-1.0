@@ -107,8 +107,8 @@ def updateExperienceTagsFromXLS(request):
                 id = row[curr_cell].value.split("--")[0]
                 id = int(id)
                 try:
-                    exp = Experience.objects.get(id=id)
-                except Experience.DoesNotExist:
+                    exp = AbstractExperience.objects.get(id=id)
+                except AbstractExperience.DoesNotExist:
                     continue
 
                 while curr_cell < num_cells:
@@ -223,7 +223,7 @@ def saveBookingRequest(booking_request):
     if not isLegalInput([first_name,last_name,email,city,country,phone,experience_id,guest_number,booking_datetime,booking_extra_information]):
         raise Exception("Illegal input")
 
-    experience = Experience.objects.get(id=experience_id)
+    experience = AbstractExperience.objects.get(id=experience_id)
     experience.title = experience.get_title(settings.LANGUAGES[0][0])
     experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
@@ -1370,7 +1370,7 @@ def service_email(request, format=None):
     try:
         data = request.data
         start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['start_date'].strip(), "%Y/%m/%d"))
-        exps = Experience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
+        exps = AbstractExperience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
         hosts = []
         exp_urls = []
 
