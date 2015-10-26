@@ -3364,6 +3364,7 @@ def itinerary_booking_successful(request):
     return render(request,'experiences/itinerary_booking_successful.html',{})
 
 def bring_the_kids(request):
+    set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[911,2041,464,69,408])
     i=0
     while i < len(experienceList):
@@ -3375,8 +3376,13 @@ def bring_the_kids(request):
 
         if not experience.currency:
             experience.currency = 'aud'
+        convert_experience_price(request, experience)
         experience.dollarsign = DollarSign[experience.currency.upper()]
         experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
 
         # Format title & Description
         experience.description = experience.get_description(settings.LANGUAGES[0][0])
@@ -3396,6 +3402,7 @@ def bring_the_kids(request):
     return render_to_response(template, {}, context)
 
 def hopeless_romance(request):
+    set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[209,302,911,921,71,852,862,1021])
     i=0
     while i < len(experienceList):
@@ -3407,8 +3414,14 @@ def hopeless_romance(request):
 
         if not experience.currency:
             experience.currency = 'aud'
+        convert_experience_price(request, experience)
         experience.dollarsign = DollarSign[experience.currency.upper()]
         experience.currency = str(dict(Currency)[experience.currency.upper()])
+
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
 
         # Format title & Description
         experience.description = experience.get_description(settings.LANGUAGES[0][0])
@@ -3428,6 +3441,7 @@ def hopeless_romance(request):
     return render_to_response(template, {}, context)
 
 def local_culture(request):
+    set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[981,1591,911,921,54,106,2,32,37])
     i=0
     while i < len(experienceList):
@@ -3439,8 +3453,13 @@ def local_culture(request):
 
         if not experience.currency:
             experience.currency = 'aud'
+        convert_experience_price(request, experience)
         experience.dollarsign = DollarSign[experience.currency.upper()]
         experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
 
         # Format title & Description
         experience.description = experience.get_description(settings.LANGUAGES[0][0])
