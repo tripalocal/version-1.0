@@ -40,7 +40,7 @@
 
           <div class="listing-footer">
               {%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
-              {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}&#8226; <span style="font-weight:500;">{% trans 'Private' %}</span>{% endif %} &#8226; {% trans 'Location' %}
+              {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}&#8226; <span style="font-weight:500;">{% trans 'Private' %}</span>{% endif %} &#8226; {{experience.city}}
           </div>
       </div>
       {% endfor %}
