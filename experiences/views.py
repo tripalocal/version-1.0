@@ -35,6 +35,7 @@ from django.views.decorators.csrf import csrf_exempt
 import itertools
 import xmltodict
 from django.db.models import Q
+from experiences.utils import isEnglish
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -69,16 +70,6 @@ def convert_experience_price(request, experience):
                     experience.dynamic_price = new_dynamic_price
 
         experience.currency = request.session['custom_currency']
-
-def isEnglish(s):
-    try:
-        s.decode('ascii') if isinstance(s, bytes) else s.encode('ascii')
-    except UnicodeDecodeError:
-        return False
-    except UnicodeEncodeError:
-        return False
-    else:
-        return True
 
 def experience_fee_calculator(price, commission_rate):
     if type(price)==int or type(price) == float:
