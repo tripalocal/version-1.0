@@ -49,55 +49,55 @@ $(function() {
   //Add item buttons (left panel)
   $("#add-flight-btn").click(function() {
     $("#flight_column").hide();
-    $("#add-flight").show();
+    $("#add-flight").fadeIn();
   });
   $("#add-flight-cancel").click(function() {
-    $("#flight_column").show();
+    $("#flight_column").fadeIn();
     $("#add-flight").hide();
   });
 
   $("#add-transfer-btn").click(function() {
     $("#transfer_column").hide();
-    $("#add-transfer").show();
+    $("#add-transfer").fadeIn();
   });
   $("#add-transfer-cancel").click(function() {
-    $("#transfer_column").show();
+    $("#transfer_column").fadeIn();
     $("#add-transfer").hide();
   });
 
   $("#add-accommodation-btn").click(function() {
     $("#accommodation_column").hide();
-    $("#add-accommodation").show();
+    $("#add-accommodation").fadeIn();
   });
   $("#add-accommodation-cancel").click(function() {
-    $("#accommodation_column").show();
+    $("#accommodation_column").fadeIn();
     $("#add-accommodation").hide();
   });
 
   $("#add-restaurant-btn").click(function() {
     $("#restaurant_column").hide();
-    $("#add-restaurant").show();
+    $("#add-restaurant").fadeIn();
   });
   $("#add-restaurant-cancel").click(function() {
-    $("#restaurant_column").show();
+    $("#restaurant_column").fadeIn();
     $("#add-restaurant").hide();
   });
 
   $("#add-suggestion-btn").click(function() {
     $("#suggestion_column").hide();
-    $("#add-suggestion").show();
+    $("#add-suggestion").fadeIn();
   });
   $("#add-suggestion-cancel").click(function() {
-    $("#suggestion_column").show();
+    $("#suggestion_column").fadeIn();
     $("#add-suggestion").hide();
   });
 
   $("#add-pricing-btn").click(function() {
     $("#pricing_column").hide();
-    $("#add-pricing").show();
+    $("#add-pricing").fadeIn();
   });
   $("#add-pricing-cancel").click(function() {
-    $("#pricing_column").show();
+    $("#pricing_column").fadeIn();
     $("#add-pricing").hide();
   });
 });
