@@ -500,27 +500,42 @@
         <div class="section">
           <h1 class="section-heading">Itinerary</h1>
           <h2 class="price-line">$AUD 3456 per person (Total of $AUD 23456)</h2>
-          <div class="section-box">
+          <div class="section-box-add" onclick="$('.collapse').collapse('hide'); $('#melbourne-collapse').collapse('show');">
+            <span class="add-sign">+</span>
             <p>Melbourne 3 Days</p>
           </div>
-          <div class="section-box">
-            <p>Day 1</p>
-            <div class="column">
+          <div class="collapse" id="melbourne-collapse">
+            <div class="section-box">
+              <p>Day 1</p>
+              <div class="column">
+              </div>
+            </div>
+            <div class="section-box">
+              <p>Day 2</p>
+              <div class="column">
+              </div>
+            </div>
+            <div class="section-box">
+              <p>Day 3</p>
+              <div class="column">
+              </div>
             </div>
           </div>
-          <div class="section-box">
-            <p>Day 2</p>
-            <div class="column">
-            </div>
-          </div>
-          <div class="section-box">
-            <p>Day 3</p>
-            <div class="column">
-            </div>
-          </div>
-          <div class="section-box-add">
+          <div class="section-box-add"  onclick="$('.collapse').collapse('hide'); $('#sydney-collapse').collapse('show');">
             <span class="add-sign">+</span>
             <p>Sydney 2 Days</p>
+          </div>
+          <div class="collapse" id="sydney-collapse">
+            <div class="section-box">
+              <p>Day 1</p>
+              <div class="column">
+              </div>
+            </div>
+            <div class="section-box">
+              <p>Day 2</p>
+              <div class="column">
+              </div>
+            </div>
           </div>
         </div>
       </div>
