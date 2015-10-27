@@ -143,7 +143,7 @@
               </div>
             </div>
             <div role="tabpanel" class="tab-pane fade" id="flight">
-              <button class="btn btn-default" style="float:right;">+ Add Flight</button>
+              <button type="button" class="btn btn-default" style="float:right;" id="add-flight-btn">+ Add Flight</button>
               <div class="column" id="flight_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
@@ -172,9 +172,37 @@
                   </div>
                 </div>
               </div>
+              <div class="new-item-form container-fluid" id="add-flight" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Departing Location" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:inline-block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%"><span style="display:inline;">$AUD/per trip</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 250px;"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row" style="text-align:center; margin-top:30px;">
+                  <button id="add-flight-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                </div>
+              </div>
             </div>
             <div role="tabpanel" class="tab-pane fade" id="transfer">
-              <button class="btn btn-default" style="float:right">+ Add Transfer</button>
+              <button type="button" id="add-transfer-btn" class="btn btn-default" style="float:right">+ Add Transfer</button>
               <div class="column" id="transfer_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
@@ -203,9 +231,37 @@
                   </div>
                 </div>
               </div>
+              <div class="new-item-form container-fluid" id="add-transfer" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Location" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:inline-block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%"><span style="display:inline;">$AUD/per trip</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 250px;"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row" style="text-align:center; margin-top:30px;">
+                  <button id="add-transfer-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                </div>
+              </div>
             </div>
             <div role="tabpanel" class="tab-pane fade" id="accommodation">
-              <button class="btn btn-default" style="float:right">+ Add Accommodation</button>
+              <button type="button" id="add-accommodation-btn" class="btn btn-default" style="float:right">+ Add Accommodation</button>
               <div class="column" id="accommodation_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
@@ -234,9 +290,37 @@
                   </div>
                 </div>
               </div>
+              <div class="new-item-form container-fluid" id="add-accommodation" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Location" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:inline-block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%"><span style="display:inline;">$AUD/per trip</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 250px;"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row" style="text-align:center; margin-top:30px;">
+                  <button id="add-accommodation-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                </div>
+              </div>
             </div>
             <div role="tabpanel" class="tab-pane fade" id="restaurant">
-              <button class="btn btn-default" style="float:right">+ Add Restaurant</button>
+              <button type="button" id="add-restaurant-btn" class="btn btn-default" style="float:right">+ Add Restaurant</button>
               <div class="column" id="restaurant_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
@@ -265,9 +349,37 @@
                   </div>
                 </div>
               </div>
+              <div class="new-item-form container-fluid" id="add-restaurant" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Location" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:inline-block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%"><span style="display:inline;">$AUD/per trip</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 250px;"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row" style="text-align:center; margin-top:30px;">
+                  <button id="add-restaurant-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                </div>
+              </div>
             </div>
             <div role="tabpanel" class="tab-pane fade" id="suggestion">
-              <button class="btn btn-default" style="float:right">+ Add Suggestion</button>
+              <button type="button" id="add-suggestion-btn" class="btn btn-default" style="float:right">+ Add Suggestion</button>
               <div class="column" id="suggestion_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
@@ -296,9 +408,37 @@
                   </div>
                 </div>
               </div>
+              <div class="new-item-form container-fluid" id="add-suggestion" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Location" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:inline-block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%"><span style="display:inline;">$AUD/per trip</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 250px;"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row" style="text-align:center; margin-top:30px;">
+                  <button id="add-suggestion-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                </div>
+              </div>
             </div>
             <div role="tabpanel" class="tab-pane fade" id="pricing">
-              <button class="btn btn-default" style="float:right">+ Add Pricing</button>
+              <button type="button" id="add-pricing-btn" class="btn btn-default" style="float:right">+ Add Pricing</button>
               <div class="column" id="pricing_column">
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
@@ -325,6 +465,30 @@
                     <h2>339</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
+                </div>
+              </div>
+              <div class="new-item-form container-fluid" id="add-pricing" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:inline-block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%"><span style="display:inline;">$AUD/per trip</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 250px;"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row" style="text-align:center; margin-top:30px;">
+                  <button id="add-pricing-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
                 </div>
               </div>
             </div>
@@ -394,11 +558,11 @@
         experience_column.append(new_day);
             {% for experience in day.experiences %}
             {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
-            new_experience = "<div class='exp-box-sm portlet'>" + 
+            new_experience = "<div class='exp-box-sm portlet'>" +
                                 "<div class='exp-img portlet-header'>" +
                                     "<img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}'/>" +
                                 "</div>" +
-                                "<div class='exp-info portlet-header'>" + 
+                                "<div class='exp-info portlet-header'>" +
                                     "<h3>{{experience.title}}</h3>" +
                                     "<p>{{experience.description|escapejs|slice:"0:20"}}</p>" +
                                     "<p>{{experience.duration}} {% trans 'hr(s)' %} &middot; " +
