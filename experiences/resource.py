@@ -32,7 +32,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from experiences.constant import  *
 from experiences.telstra_sms_api import send_sms
-
+from experiences.utils import isEnglish
 
 if settings.LANGUAGE_CODE.lower() != "zh-cn":
     from allauth.socialaccount.providers.facebook.views import fb_complete_login
@@ -76,30 +76,35 @@ def updateExperienceTagsFromXLS(request):
             all_tags = []
 
             curr_cell = -1
-            while curr_cell < num_cells:
-                curr_cell += 1
-                # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
-                cell_type = worksheet.cell_type(curr_row, curr_cell)
-                cell_value = worksheet.cell_value(curr_row, curr_cell)
-                if cell_type == 1 or cell_type == 0:
-                    all_tags.append(cell_value)
-                else:
-                    raise Exception("Type error: column name, " + str(curr_cell))
+            while curr_row < 2:
+                #the first two rows are tags
+                while curr_cell < num_cells:
+                    curr_cell += 1
+                    # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                    cell_type = worksheet.cell_type(curr_row, curr_cell)
+                    cell_value = worksheet.cell_value(curr_row, curr_cell)
+                    if cell_type == 1 or cell_type == 0:
+                        all_tags.append(cell_value)
+                    else:
+                        raise Exception("Type error: column name, " + str(curr_cell))
+                curr_row += 1
+                curr_cell = -1
 
             cursor = connections['default'].cursor()
             #delete all existing records
-            cursor.execute("delete from experiences_experience_tags where experiencetag_id in (select id from experiences_experiencetag where language=%s)",[settings.LANGUAGES[0][0]])
-            cursor.execute("delete from experiences_newproduct_tags where experiencetag_id in (select id from experiences_experiencetag where language=%s)",[settings.LANGUAGES[0][0]])
-            cursor.execute("delete from experiences_experiencetag where language=%s",[settings.LANGUAGES[0][0]])
+            cursor.execute("delete from experiences_experience_tags")
+            cursor.execute("delete from experiences_newproduct_tags")
+            cursor.execute("delete from experiences_experiencetag")
             #add new tags
             all_tags = [x for x in all_tags if x]
             for i in range(len(all_tags)):
-                tag = ExperienceTag(tag = all_tags[i], language = settings.LANGUAGES[0][0])
+                tag = ExperienceTag(tag = all_tags[i], language = "en" if isEnglish(all_tags[i]) else "zh")
                 tag.save()
                 all_tags.remove(all_tags[i])
                 all_tags.insert(i, tag)
 
-            curr_row = 0
+            curr_row = 1
+            #start from the third row
             while curr_row < num_rows:
                 curr_row += 1
                 row = worksheet.row(curr_row)
@@ -120,6 +125,7 @@ def updateExperienceTagsFromXLS(request):
                     if cell_type == 1 or cell_type == 0:
                         if worksheet.cell_value(curr_row, curr_cell).lower() == "y":
                             exp.tags.add(all_tags[curr_cell-1])
+                            exp.tags.add(all_tags[curr_cell-1+num_cells])
                     else:
                         raise Exception("Type error: row " + str(curr_row) + ", col " + str(curr_cell))
     else:
@@ -813,7 +819,7 @@ def service_mytrip(request, format=None):
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
                   'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
                   'experience_title':booking.experience.get_title(settings.LANGUAGES[0][0]),
-                  'experience_photo':photo_url,
+                  'experience_photo':photo_url, 'experience_type':booking.experience.type,
                   'meetup_spot':get_experience_meetup_spot(booking.experience,settings.LANGUAGES[0][0]),
                   'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.',
                   'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
