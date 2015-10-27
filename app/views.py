@@ -311,7 +311,8 @@ def mytrip(request):
 
         # Retrieve all bookings the user has made
         user_bookings = []
-        bookings = Booking.objects.filter(user=user_id)
+        booking_status = ["paid","accepted","rejected","paid_archived","accepted_archived","rejected_archived"]
+        bookings = Booking.objects.filter(user=user_id, status__in=booking_status)
 
         for booking in bookings:
             booking.experience.title = booking.experience.get_title(settings.LANGUAGES[0][0])

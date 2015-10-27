@@ -89,6 +89,7 @@ def updateExperienceTagsFromXLS(request):
             cursor = connections['default'].cursor()
             #delete all existing records
             cursor.execute("delete from experiences_experience_tags where experiencetag_id in (select id from experiences_experiencetag where language=%s)",[settings.LANGUAGES[0][0]])
+            cursor.execute("delete from experiences_newproduct_tags where experiencetag_id in (select id from experiences_experiencetag where language=%s)",[settings.LANGUAGES[0][0]])
             cursor.execute("delete from experiences_experiencetag where language=%s",[settings.LANGUAGES[0][0]])
             #add new tags
             all_tags = [x for x in all_tags if x]
@@ -104,7 +105,7 @@ def updateExperienceTagsFromXLS(request):
                 row = worksheet.row(curr_row)
 
                 curr_cell = 0
-                id = row[curr_cell].value.split("--")[0]
+                id = row[curr_cell].value
                 id = int(id)
                 try:
                     exp = AbstractExperience.objects.get(id=id)
