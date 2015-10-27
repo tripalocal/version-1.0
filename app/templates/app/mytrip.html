@@ -52,9 +52,9 @@
 				            		    </td>
 				            		    <td>
 				            			    <div>
-                                                {% if booking.status|lower == "accepted" %}
+                                                {% if booking.status|lower == "accepted" or booking.status|lower == "accepted_archived" %}
 					               			    <div class="confirm"><div style="margin-left:5px;">{% trans "Confirmed" %}</div></div>
-                                                {% elif booking.status|lower == "rejected" %}
+                                                {% elif booking.status|lower == "rejected" or booking.status|lower == "rejected_archived" %}
                                                 <div class="cancel"><div style="margin-left:5px;">{% trans "Cancelled" %}</div></div>
                                                 {% else %}
                                                 <div class="request"><div style="margin-left:5px;">{% trans "Requested" %}</div></div>
