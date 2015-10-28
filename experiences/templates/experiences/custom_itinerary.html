@@ -664,18 +664,27 @@
 
     function add_new_city()
     {
-        var i=0;
-        for(i=0;i<10;i++)
+        var i=-1;
+        //the last city was inserted before $("#add-city")
+        if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').startsWith("button_city_"))
         {
-            if($("#button_city_"+i).length == 0)
+            var id = $("#add-city").prev().attr('id').split("_");   
+            i = parseInt(id[id.length-1]);
+        }
+        var j=0,k=0;
+        for(k=0;k<i;k++)
+        {
+            if($("#button_city_"+k).length > 0)
             {
-                break;
+                j++;
+
+                if(j>=10)
+                {
+                    return;
+                }
             }
         }
-        if(i==10)
-        {
-            return;
-        }
+        i += 1;
         var city_name = $("#new_city option:selected").text();
         var duration = $("#new_duration").val();
         var new_city =
@@ -694,9 +703,9 @@
                             "<option value=2>2{% trans ' Day' %}</option>" +
                         "</select>" +
                     "</div>" +
-                    "<button class='btn btn-primary'>{% trans 'Update' %}</button>" +
+                    "<button id='update_city_" + i + "' class='btn btn-primary' onclick='update_city(" + i + ")'>{% trans 'Update' %}</button>" +
                     "<button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#button_city_" + i + "&quot;).popover(&quot;hide&quot;);'>{% trans 'Cancel' %}</button>" +
-                    "<button class='btn btn-danger'>{% trans 'Delete Location' %}</button>" +
+                    "<button id='delete_city_" + i + "' class='btn btn-danger' onclick='delete_city(" + i + ")'>{% trans 'Delete Location' %}</button>" +
                     "\" city='" + $("#new_city").val() + "' duration=" + duration + ">" + city_name + " <span class=\"badge\">" + duration + "</span>" +
                 "</button>";
         $(new_city).insertBefore($("#add-city"));
@@ -704,20 +713,40 @@
         $('[data-toggle="popover"]').popover();
     }
 
-    function update_city()
+    function update_city(i)
+    {
+        var city_name = $("#city_list_" + i + " option:selected").text();
+        var duration = $("#duration_list_" + i).val();
+        $("#button_city_" + i)[0].innerHTML = city_name + " <span class=\"badge\">" + duration + "</span>";
+        $("#button_city_" + i).popover("hide");
+    }
+
+    function delete_city(i)
+    {
+        $("#button_city_" + i).popover("hide");
+        $("#button_city_" + i).remove();
+    }
+
+    function set_city_before_submit()
     {
         var cities="";
-        for(i=0;i<10;i++)
+        //the last city was inserted before $("#add-city"), there must be at least one city
+        if(!($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').startsWith("button_city_")))
         {
-            if($("#button_city_"+i).length == 0)
+            //TODO
+        }
+        var id = $("#add-city").prev().attr('id').split("_");
+        var j = parseInt(id[id.length-1]);
+        for(var i=0;i<j;i++)
+        {
+            if($("#button_city_"+i).length > 0)
             {
-                break;
-            }
-            city = $("#button_city_"+i).attr("city");
-            duration = $("#button_city_"+i).attr("duration");
-            for(j=0;j<duration;j++)
-            {
-                cities += city + ",";
+                city = $("#button_city_"+i).attr("city");
+                duration = $("#button_city_"+i).attr("duration");
+                for(j=0;j<duration;j++)
+                {
+                    cities += city + ",";
+                }
             }
         }
         cities = cities.substring(0,cities.length-1);
