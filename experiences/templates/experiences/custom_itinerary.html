@@ -566,23 +566,23 @@
     $(document).ready(function()
     {
         //fill out the left panel
-        experience_column = $("#experience_column");
-        flight_column = $("#flight_column");
-        transfer_column = $("#transfer_column");
-        accommodation_column = $("#accommodation_column");
-        restaurant_column = $("#restaurant_column");
+        var experience_column = $("#experience_column");
+        var flight_column = $("#flight_column");
+        var transfer_column = $("#transfer_column");
+        var accommodation_column = $("#accommodation_column");
+        var restaurant_column = $("#restaurant_column");
 
         {%for day in itinerary%}
-        i = {{forloop.counter}};
+        var i = {{forloop.counter}};
         {% if forloop.first %}
-        new_day = "<div id='experience_day_" + i + "'></div>";
+        var new_day = "<div id='experience_day_" + i + "'></div>";
         {% else %}
-        new_day = "<div id='experience_day_" + i + "' style='display:none;'></div>";
+        var new_day = "<div id='experience_day_" + i + "' style='display:none;'></div>";
         {% endif %}
         experience_column.append(new_day);
             {% for experience in day.experiences %}
             {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
-            new_experience = "<div class='exp-box-sm portlet'>" +
+            var new_experience = "<div class='exp-box-sm portlet'>" +
                                 "<div class='exp-img portlet-header'>" +
                                     "<img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='width:inherit;'/>" +
                                 "</div>" +
@@ -614,9 +614,9 @@
 
         $("#button_email").click(function(e){
             var itinerary = [];
-            dict={"id":"",
-                  "date":"","time":"",
-                  "guest_number":1};
+            var dict={"id":"",
+                      "date":"","time":"",
+                      "guest_number":1};
             itinerary.push(dict);
             $("#id_itinerary_string").val(JSON.stringify(itinerary));
         })
@@ -624,7 +624,7 @@
 
     function add_new_city()
     {
-        i=0;
+        var i=0;
         for(i=0;i<10;i++)
         {
             if($("#button_city_"+i).length == 0)
@@ -636,31 +636,50 @@
         {
             return;
         }
-        city_name = $("#new_city option:selected" ).text();
-        duration = $("#new_duration").val();
-        new_city =
+        var city_name = $("#new_city option:selected").text();
+        var duration = $("#new_duration").val();
+        var new_city =
                 "<button id=\"button_city_" + i + "\" type=\"button\" class=\"btn btn-grey\" data-container=\"body\" data-toggle=\"popover\" data-placement=\"bottom\" data-html=\"true\" data-content=\"" +
                     "<div class='form-group'>" +
                         "<p>{% trans 'Location' %}</p>" +
-                        "<select class='form-control'>" +
+                        "<select id='city_list_" + i + "' class='form-control'>" +
                             "<option value='Melbourne'>{% trans 'Melbourne' %}</option>" +
                             "<option value='Sydney'>{% trans 'Sydney' %}</option>" +
                         "</select>" +
                     "</div>" +
                     "<div class='form-goup'>" +
                         "<p>{% trans 'Duration' %}</p>" +
-                        "<select class='form-control'>" +
+                        "<select id='duration_list_" + i +"' class='form-control'>" +
                             "<option value=1>1{% trans ' Day' %}</option>" +
                             "<option value=2>2{% trans ' Day' %}</option>" +
                         "</select>" +
                     "</div>" +
                     "<button class='btn btn-primary'>{% trans 'Update' %}</button>" +
-                    "<button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#&quot;).popover(&quot;hide&quot;);'>{% trans 'Cancel' %}</button>" +
+                    "<button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#button_city_" + i + "&quot;).popover(&quot;hide&quot;);'>{% trans 'Cancel' %}</button>" +
                     "<button class='btn btn-danger'>{% trans 'Delete Location' %}</button>" +
-                    "\">" + city_name + " <span class=\"badge\">" + duration + "</span>" +
+                    "\" city='" + $("#new_city").val() + "' duration=" + duration + ">" + city_name + " <span class=\"badge\">" + duration + "</span>" +
                 "</button>";
         $(new_city).insertBefore($("#add-city"));
     }
 
+    function update_city()
+    {
+        var cities="";
+        for(i=0;i<10;i++)
+        {
+            if($("#button_city_"+i).length == 0)
+            {
+                break;
+            }
+            city = $("#button_city_"+i).attr("city");
+            duration = $("#button_city_"+i).attr("duration");
+            for(j=0;j<duration;j++)
+            {
+                cities += city + ",";
+            }
+        }
+        cities = cities.substring(0,cities.length-1);
+        $("#id_city").val(cities);
+    }
     </script>
 {% endblock %}
