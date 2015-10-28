@@ -107,6 +107,7 @@ body {
     height: 90%;
     margin-top: 15px;
     overflow: scroll;
+    text-align: right;
   }
 }
 
@@ -118,13 +119,17 @@ body {
 }
 
 .new-item-form {
-  clear: both;
-  padding-top: 15px;
+  color: $dark-grey;
+  padding: 15px 0 0 0;
   .form-control {
     border: 1px solid $light-grey;
     border-radius: 3px;
     height: 30px;
   }
+  .btn {
+    margin-right: 0;
+  }
+
 }
 
 // Experience box
@@ -148,6 +153,7 @@ body {
 
 .exp-info {
   display: inline-block;
+  text-align: left;
   color: $slate-grey;
   vertical-align: top;
   margin-left: 10px;
