@@ -249,3 +249,23 @@ body {
   color: $dark-grey;
   font-size: 14px;
 }
+
+// Warning popups
+.modal-sm {
+  width: 230px;
+  color: $dark-grey;
+  .btn {
+    margin: 0;
+  }
+}
+
+.modal-body {
+  padding: 10px;
+  min-height: 160px;
+}
+
+.modal-footer {
+  text-align: center;
+  padding: 0 0 10px 0;
+  border: 0;
+}

@@ -546,7 +546,47 @@
 </form>
 
 <!-- Warning popups -->
+<div class="modal fade" id="warning-delete-location" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        Are you sure you want to delete this location? Everything you have planned for that location will be deleted.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Delete</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<div class="modal fade" id="warning-duration-location" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        Are you sure you want to reduce the duration of this location? Everything you have planned for the removed days will be deleted.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Go ahead</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="warning-duration-trip" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        Are you sure you want to reduce the duration of the entire trip? Any location that falls outside of the duration will be deleted.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Go ahead</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 
