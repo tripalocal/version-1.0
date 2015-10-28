@@ -1,8 +1,6 @@
-$(function() {
-  // Initialize popovers
-  $('[data-toggle="popover"]').popover();
 
-  // Draggable logic
+// Enable columns to snap in draggable components
+function init_drag() {
   $(".column").sortable({
     connectWith: ".column",
     handle: ".portlet-header",
@@ -17,23 +15,26 @@ $(function() {
       ui.item.removeData("move_handler");
     }
   });
+}
 
-  function tilt_direction(item) {
-    var left_pos = item.position().left,
-      move_handler = function(e) {
-        if (e.pageX >= left_pos) {
-          item.addClass("right");
-          item.removeClass("left");
-        } else {
-          item.addClass("left");
-          item.removeClass("right");
-        }
-        left_pos = e.pageX;
-      };
-    $("html").bind("mousemove", move_handler);
-    item.data("move_handler", move_handler);
-  }
+// Tilting of draggable components
+function tilt_direction(item) {
+  var left_pos = item.position().left,
+    move_handler = function(e) {
+      if (e.pageX >= left_pos) {
+        item.addClass("right");
+        item.removeClass("left");
+      } else {
+        item.addClass("left");
+        item.removeClass("right");
+      }
+      left_pos = e.pageX;
+    };
+  $("html").bind("mousemove", move_handler);
+  item.data("move_handler", move_handler);
+}
 
+$(document).ready(function() {
   $(".portlet")
     .addClass("ui-widget ui-widget-content ui-helper-clearfix ui-corner-all")
     .find(".portlet-header")
@@ -45,6 +46,9 @@ $(function() {
     icon.toggleClass("ui-icon-minusthick ui-icon-plusthick");
     icon.closest(".portlet").find(".portlet-content").toggle();
   });
+
+  // Initialize popovers
+  $('[data-toggle="popover"]').popover();
 
   //Add item buttons (left panel)
   $("#add-flight-btn").click(function() {

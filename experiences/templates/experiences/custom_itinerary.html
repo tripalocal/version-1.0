@@ -47,7 +47,7 @@
             </div>
               <button class='btn btn-primary'>Add</button>
               <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-adults&quot;).popover(&quot;hide&quot;);'>Cancel</button>
-            ">Adult x 5
+            ">Adults <span class="badge">5</span>
           </button>
           <button id="add-kids" type="button" class="btn btn-default"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
             <div class='form-goup'>
@@ -502,7 +502,7 @@
         <div id="right_section" class="section">
           <h1 class="section-heading">Itinerary</h1>
           <h2 class="price-line">$AUD 3456 per person (Total of $AUD 23456)</h2>
-          
+
         </div>
       </div>
     </div>
@@ -510,7 +510,7 @@
 </form>
 
 <!-- Warning popups -->
-<div class="modal fade" id="warning-delete-location" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="warning-delete-location" tabindex="-1" role="dialog" aria-labelledby="warning">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-body">
@@ -524,7 +524,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="warning-duration-location" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="warning-duration-location" tabindex="-1" role="dialog" aria-labelledby="warning">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-body">
@@ -538,7 +538,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="warning-duration-trip" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="warning-duration-trip" tabindex="-1" role="dialog" aria-labelledby="warning">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-body">
@@ -556,9 +556,6 @@
 
 {% block scripts %}
     <script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
     {%if LANGUAGE == "zh-CN"%}
@@ -623,7 +620,9 @@
                       "guest_number":1};
             itinerary.push(dict);
             $("#id_itinerary_string").val(JSON.stringify(itinerary));
-        })
+        });
+
+        init_drag();
     })
 
     function add_new_city()
@@ -632,7 +631,7 @@
         //the last city was inserted before $("#add-city")
         if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').startsWith("button_city_"))
         {
-            var id = $("#add-city").prev().attr('id').split("_");   
+            var id = $("#add-city").prev().attr('id').split("_");
             i = parseInt(id[id.length-1]);
         }
         var j=0,k=0;
@@ -719,6 +718,8 @@
         }
         new_item += "</div>";
         $("#right_section").append(new_item);
+        init_drag();
+
     }
 
     function update_city(i)
@@ -748,6 +749,7 @@
                 $("#city-collapse-" + i + "-" + j).remove();
             }
         }
+        init_drag();
     }
 
     function delete_city(i)
@@ -783,5 +785,6 @@
         cities = cities.substring(0,cities.length-1);
         $("#id_city").val(cities);
     }
+
     </script>
 {% endblock %}
