@@ -499,46 +499,10 @@
       </div>
       <div class="col-sm-6">
         <!-- Right section -->
-        <div class="section">
+        <div id="right_section" class="section">
           <h1 class="section-heading">Itinerary</h1>
           <h2 class="price-line">$AUD 3456 per person (Total of $AUD 23456)</h2>
-          <div class="section-box-add" onclick="$('.collapse').collapse('hide'); $('#melbourne-collapse').collapse('show');">
-            <span class="add-sign">+</span>
-            <p>Melbourne <span class="badge">3 Days</span></p>
-          </div>
-          <div class="collapse" id="melbourne-collapse">
-            <div class="section-box">
-              <p>Day 1</p>
-              <div class="column">
-              </div>
-            </div>
-            <div class="section-box">
-              <p>Day 2</p>
-              <div class="column">
-              </div>
-            </div>
-            <div class="section-box">
-              <p>Day 3</p>
-              <div class="column">
-              </div>
-            </div>
-          </div>
-          <div class="section-box-add"  onclick="$('.collapse').collapse('hide'); $('#sydney-collapse').collapse('show');">
-            <span class="add-sign">+</span>
-            <p>Sydney <span class="badge">2 Days</span></p>
-          </div>
-          <div class="collapse" id="sydney-collapse">
-            <div class="section-box">
-              <p>Day 1</p>
-              <div class="column">
-              </div>
-            </div>
-            <div class="section-box">
-              <p>Day 2</p>
-              <div class="column">
-              </div>
-            </div>
-          </div>
+          
         </div>
       </div>
     </div>
@@ -687,20 +651,45 @@
         i += 1;
         var city_name = $("#new_city option:selected").text();
         var duration = $("#new_duration").val();
+        var cities = ["Melbourne","Sydney","Brisbane","Goldcoast"];//TODO
+
+        //add a new button for the city
         var new_city =
                 "<button id=\"button_city_" + i + "\" type=\"button\" class=\"btn btn-grey\" data-container=\"body\" data-toggle=\"popover\" data-placement=\"bottom\" data-html=\"true\" data-content=\"" +
                     "<div class='form-group'>" +
                         "<p>{% trans 'Location' %}</p>" +
-                        "<select id='city_list_" + i + "' class='form-control'>" +
-                            "<option value='Melbourne'>{% trans 'Melbourne' %}</option>" +
-                            "<option value='Sydney'>{% trans 'Sydney' %}</option>" +
-                        "</select>" +
+                        "<select id='city_list_" + i + "' class='form-control'>";
+
+        for(var c=0;c<cities.length;c++)
+        {
+            if(cities[c] == $("#new_city").val())
+            {
+                new_city += "<option value='" + cities[c] + "' selected>" + cities[c] + "</option>";
+            }
+            else
+            {
+                new_city += "<option value='" + cities[c] + "'>" + cities[c] + "</option>";
+            }
+
+        }
+        new_city +=     "</select>" +
                     "</div>" +
                     "<div class='form-goup'>" +
                         "<p>{% trans 'Duration' %}</p>" +
-                        "<select id='duration_list_" + i +"' class='form-control'>" +
-                            "<option value=1>1{% trans ' Day' %}</option>" +
-                            "<option value=2>2{% trans ' Day' %}</option>" +
+                        "<select id='duration_list_" + i +"' class='form-control'>";
+
+        for(var d=1;d<=10;d++)
+        {
+            if(d == parseInt(duration))
+            {
+                new_city += "<option value=" + d + " selected>" + d + "{% trans ' Day' %}</option>";
+            }
+            else
+            {
+                new_city += "<option value=" + d + ">" + d + "{% trans ' Day' %}</option>";
+            }
+        }
+        new_city +=
                         "</select>" +
                     "</div>" +
                     "<button id='update_city_" + i + "' class='btn btn-primary' onclick='update_city(" + i + ")'>{% trans 'Update' %}</button>" +
@@ -711,20 +700,62 @@
         $(new_city).insertBefore($("#add-city"));
         // Initialise popovers
         $('[data-toggle="popover"]').popover();
+
+        //add a new item in the right section
+        var new_item =
+                    "<div id=\"city-title-" + i + "\" class=\"section-box-add\" onclick=\"$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');\">" +
+                        "<span class=\"add-sign\">+</span>" +
+                        "<p id=\"city-title-p-" + i + "\">" + city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span></p>" +
+                    "</div>" +
+                    "<div class=\"collapse\" id=\"city-collapse-" + i + "\">";
+        for(var j=1;j<=duration;j++)
+        {
+            new_item +=
+                        "<div id=\"city-collapse-" + i + "-" + j + "\" class=\"section-box\">" +
+                            "<p>{% trans 'Day' %} " + j + "</p>" +
+                            "<div class=\"column\">" +
+                            "</div>" +
+                        "</div>";
+        }
+        new_item += "</div>";
+        $("#right_section").append(new_item);
     }
 
     function update_city(i)
     {
         var city_name = $("#city_list_" + i + " option:selected").text();
-        var duration = $("#duration_list_" + i).val();
+        var duration = parseInt($("#duration_list_" + i).val());
         $("#button_city_" + i)[0].innerHTML = city_name + " <span class=\"badge\">" + duration + "</span>";
         $("#button_city_" + i).popover("hide");
+        //TODO: update $("#button_city_" + i).attr("data-content")
+
+        $("#city-title-p-" + i)[0].innerHTML = city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span>";
+        for(var j=1;j<=10;j++)
+        {
+            if(j<=duration && $("#city-collapse-" + i + "-" + j).length == 0)
+            {
+                //add a new day
+                var new_day =   "<div id=\"city-collapse-" + i + "-" + j + "\" class=\"section-box\">" +
+                                    "<p>{% trans 'Day' %} " + j + "</p>" +
+                                    "<div class=\"column\">" +
+                                    "</div>" +
+                                "</div>";
+                $("#city-collapse-" + i).append(new_day);
+            }
+            else if(j>duration && $("#city-collapse-" + i + "-" + j).length > 0)
+            {
+                //delete the day
+                $("#city-collapse-" + i + "-" + j).remove();
+            }
+        }
     }
 
     function delete_city(i)
     {
         $("#button_city_" + i).popover("hide");
         $("#button_city_" + i).remove();
+        $("#city-title-" + i).remove();
+        $("#city-collapse-" + i).remove();
     }
 
     function set_city_before_submit()
