@@ -74,8 +74,9 @@
             <div class='form-goup'>
                 <p>{% trans 'Duration' %}</p>
                 <select id='new_duration' class='form-control'>
-                    <option value=1>1{% trans ' Day' %}</option>
-                    <option value=2>2{% trans ' Day' %}</option>
+                    {% for i in "0123456789" %}
+                    <option value={{i|add:1}}>{{i|add:1}}{% trans ' Day' %}</option>
+                    {% endfor %}
                 </select>
             </div>
               <button class='btn btn-primary' onclick='add_new_city();$(&quot;#add-city&quot;).popover(&quot;hide&quot;);'>{% trans 'Add' %}</button>
@@ -564,6 +565,8 @@
     <script type="text/javascript" src="{% static 'experiences/scripts/custom_itinerary.js' %}"></script>
 
     <script type="text/javascript">
+    cities = ["Melbourne","Sydney","Brisbane","Goldcoast"];//TODO
+
     $(document).ready(function()
     {
         //fill out the left panel
@@ -625,34 +628,8 @@
         init_drag();
     })
 
-    function add_new_city()
+    function construct_data_content(i, cities, city, city_name, duration)
     {
-        var i=-1;
-        //the last city was inserted before $("#add-city")
-        if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').startsWith("button_city_"))
-        {
-            var id = $("#add-city").prev().attr('id').split("_");
-            i = parseInt(id[id.length-1]);
-        }
-        var j=0,k=0;
-        for(k=0;k<i;k++)
-        {
-            if($("#button_city_"+k).length > 0)
-            {
-                j++;
-
-                if(j>=10)
-                {
-                    return;
-                }
-            }
-        }
-        i += 1;
-        var city_name = $("#new_city option:selected").text();
-        var duration = $("#new_duration").val();
-        var cities = ["Melbourne","Sydney","Brisbane","Goldcoast"];//TODO
-
-        //add a new button for the city
         var new_city =
                 "<button id=\"button_city_" + i + "\" type=\"button\" class=\"btn btn-grey\" data-container=\"body\" data-toggle=\"popover\" data-placement=\"bottom\" data-html=\"true\" data-content=\"" +
                     "<div class='form-group'>" +
@@ -661,7 +638,7 @@
 
         for(var c=0;c<cities.length;c++)
         {
-            if(cities[c] == $("#new_city").val())
+            if(cities[c] == city)
             {
                 new_city += "<option value='" + cities[c] + "' selected>" + cities[c] + "</option>";
             }
@@ -696,6 +673,37 @@
                     "<button id='delete_city_" + i + "' class='btn btn-danger' onclick='delete_city(" + i + ")'>{% trans 'Delete Location' %}</button>" +
                     "\" city='" + $("#new_city").val() + "' duration=" + duration + ">" + city_name + " <span class=\"badge\">" + duration + "</span>" +
                 "</button>";
+        return new_city;
+    }
+
+    function add_new_city()
+    {
+        var i=-1;
+        //the last city was inserted before $("#add-city")
+        if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').startsWith("button_city_"))
+        {
+            var id = $("#add-city").prev().attr('id').split("_");
+            i = parseInt(id[id.length-1]);
+        }
+        var j=0,k=0;
+        for(k=0;k<i;k++)
+        {
+            if($("#button_city_"+k).length > 0)
+            {
+                j++;
+
+                if(j>=10)
+                {
+                    return;
+                }
+            }
+        }
+        i += 1;
+        var city_name = $("#new_city option:selected").text();
+        var duration = $("#new_duration").val();
+
+        //add a new button for the city
+        var new_city = construct_data_content(i, cities, $("#new_city").val(), city_name, duration);
         $(new_city).insertBefore($("#add-city"));
         // Initialise popovers
         $('[data-toggle="popover"]').popover();
@@ -728,7 +736,10 @@
         var duration = parseInt($("#duration_list_" + i).val());
         $("#button_city_" + i)[0].innerHTML = city_name + " <span class=\"badge\">" + duration + "</span>";
         $("#button_city_" + i).popover("hide");
-        //TODO: update $("#button_city_" + i).attr("data-content")
+        //update $("#button_city_" + i).attr("data-content")
+        $("#button_city_" + i).replaceWith(construct_data_content(i, cities, $("#city_list_" + i).val(), city_name, duration));
+        // Initialise popovers
+        $('[data-toggle="popover"]').popover();
 
         $("#city-title-p-" + i)[0].innerHTML = city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span>";
         for(var j=1;j<=10;j++)
