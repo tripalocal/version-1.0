@@ -7,733 +7,817 @@
     <title>{% trans 'Custom Itinerary' %}</title>
     <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
     <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" type="text/css" media="all" rel="stylesheet" />
-    <link href="{% static 'experiences/content/custom_itinerary.css' %}" rel="stylesheet"/>
+    <link href="{% static 'experiences/content/custom-itinerary.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
-<div>
-    <form id="itinerary_form" action="" method="post">
-        {% csrf_token %}
-
-        <!--<div class="itinerary-back-button">
-            <button type="button" class="itinerary-return-button"></button>
-        </div>-->
-
-        <div id="criteria_div">
-            <div id="mandatory_criteria_div">
-                <div id="date_destination_div" style="float:left;width:300px; padding-top:10px;">
-                    <button id="add_day_button" type="button" class="btn btn-default">{% trans 'Add' %}</button>
-                    <div class="container-fluid" id="add_day_1_div" style="padding-bottom:10px;">
-                      <div class="row" style="margin-bottom: 5px;">
-                        <h3 class="field-header">{% trans 'Location' %}</h3>
-                        <div class="ui selection dropdown">
-                            <i class="dropdown icon"></i>
-                            <div id="destination_city_1" class="text">{% trans "City" %}</div>
-                            <div class="menu">
-                                {% for k, v in locations %}
-                                <div class="header">{{ k }}</div>
-                                    {% for id, name, state in v %}
-                                    <div class="item" data-value="{{ id }}" data-text="{{ name }}">{{ name }}
-                                        <span class="light-color">{{ state }}</span>
-                                    </div>
-                                    {% endfor %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <h3 class="field-header" style="margin-right: 38px;">{% trans 'Dates' %}</h3>
-                        <div class="input-group start-date" id="id_start_datetime_picker_day_1">
-                            <input class="form-control" id="id_start_datetime_day_1" name="start_datetime" type="text" value="">
-                        </div>
-
-                        <div class="input-group end-date" id="id_end_datetime_picker_day_1">
-                            <input class="form-control" id="id_end_datetime_day_1" name="end_datetime" type="text" value="">
-                        </div>
-                      </div>
-                    </div>
-                    {{form.start_datetime}}
-                    {{form.end_datetime}}
-                    {{form.city}}
-                </div>
-                <div class="vertical-bar"></div>
-                <div id="guest_number_div" style="float:left;width:150px;">
-                    <div class="people">
-                        <p class="people-exp">{% trans "People" %}</p>
-                    </div>
-                    {{form.guest_number}}
-                </div>
-                <div class="vertical-bar" style="margin-left:70px;"></div>
-                <div id="language_div" style="float:left;">
-                    <div class="language-icon">
-                        <p class="language-exp">{% trans "Language" %}</p>
-                    </div>
-                </div>
-                <div class="language-choice-checkbox">
-                    {{form.language}}
-                    <div class="checkbox">
-                      <label>
-                        <input id="language_English" type="checkbox" value="English" name="checkbox-eng">
-                        English
-                      </label>
-                    </div>
-                    <div class="checkbox">
-                      <label>
-                        <input id="language_Mandarin" type="checkbox" value="Chinese" name="checkbox-cn">
-                        中文
-                      </label>
-                    </div>
-                </div>
-                <div class="vertical-bar"></div>
-                <div id="sort_by_div" style="float:left;width:150px;">
-                    <div class="">
-                        <p class="">{% trans "Sort by" %}</p>
-                    </div>
-                    {{form.sort}}
-                </div>
-                <div id="age_limit_div" style="float:left;width:150px;">
-                    <div class="">
-                        <p class="">{% trans "Age limit" %}</p>
-                    </div>
-                    {{form.age_limit}}
-                </div>
-                <div id="more-filters-button">
-                    <button class="btn-block btn btn-default" id="more_filters" type="button" value="More Filters">{% trans "More Filters" %}</button>
-                    <input class="btn-block btn btn-default" id="itinerary-search" type="submit" value="{% trans "Search" %}" name="Search">
-                </div>
-                <div id="itinerary-search-button">
-                </div>
+<form id="itinerary_form" action="" method="post">
+  {% csrf_token %}
+  <div style="display:none;">
+  <!-- TODO -->
+    {{form.start_datetime}}
+    {{form.end_datetime}}
+    {{form.city}}
+    {{form.guest_number}}
+    {{form.language}}
+    {{form.sort}}
+    {{form.age_limit}}
+    {{form.tags}}
+    {{form.all_tags}}
+    {{form.itinerary_string}}
+  </div>
+  <!-- Top search bar -->
+  <div class="basic-search">
+    <div class="container">
+      <div class="row">
+        <div class="form-inline">
+          <h3 class="form-header">{% trans "Title" %}</h3>
+          <input type="text" class="form-control" id="itinerary-title" style="width:220px;">
+        </div>
+        <div class="form-inline">
+          <h3 class="form-header">{% trans "Date" %}</h3>
+          <input type="text" class="form-control" id="itinerary-start-date" style="width:100px; margin-right:10px;">
+          <input type="text" class="form-control" id="itinerary-end-date" style="width:100px;">
+        </div>
+        <div class="form-inline right-group" style="margin-right:0;">
+          <h3 class="form-header">{% trans "Group size" %}</h3>
+          <button id="add-adults" type="button" class="btn btn-grey"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
+            <div class='form-goup'>
+              <select class='form-control'><option>1 Adult</option></select>
             </div>
-            <div id="optional_criteria_div" style="display:none; width:100%; margin-top:15px; min-height: 150px;" class="advanced-search">
-                <div id="optional_criteria_container">
-                  <div class="container">
-                          <div class="icon-header">
-                              <div class="icon-image" style="background-image: url({% static 'experiences/img/tag.svg' %})"></div>
-                              <div class="icon-text">{%trans "Interests"%}</div>
-                          </div>
-                          <div class="interests">
-                          <div class="form-box" id="tags_div">
-                              {{form.tags}}
-                              {{form.all_tags}}
-                          </div>
-                        </div>
+              <button class='btn btn-primary'>Add</button>
+              <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-adults&quot;).popover(&quot;hide&quot;);'>Cancel</button>
+            ">Adults <span class="badge">5</span>
+          </button>
+          <button id="add-kids" type="button" class="btn btn-default"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
+            <div class='form-goup'>
+              <select class='form-control'><option>1 Kid</option></select>
+            </div>
+              <button class='btn btn-primary'>Add</button>
+              <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-kids&quot;).popover(&quot;hide&quot;);'>Cancel</button>
+            ">+ Add Kids
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-inline">
+          <h3 class="form-header">{% trans "Location" %}</h3>
+
+          <button id="add-city" type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
+            <div class='form-group'>
+                <p>{% trans 'Location' %}</p>
+                <select id='new_city' class='form-control'>
+                    <option value='Melbourne'>{% trans 'Melbourne' %}</option>
+                    <option value='Sydney'>{% trans 'Sydney' %}</option>
+                </select>
+            </div>
+            <div class='form-goup'>
+                <p>{% trans 'Duration' %}</p>
+                <select id='new_duration' class='form-control'>
+                    {% for i in "0123456789" %}
+                    <option value={{i|add:1}}>{{i|add:1}}{% trans ' Day' %}</option>
+                    {% endfor %}
+                </select>
+            </div>
+              <button class='btn btn-primary' onclick='add_new_city();$(&quot;#add-city&quot;).popover(&quot;hide&quot;);'>{% trans 'Add' %}</button>
+              <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-city&quot;).popover(&quot;hide&quot;);'>{% trans 'Cancel' %}</button>
+            "> + {% trans 'Add' %} <span class="badge">4 left</span>
+          </button>
+        </div>
+        <div class="form-inline right-group">
+          <h3 class="form-header"> </h3>
+          <button class="btn btn-default">Preview</button>
+          <button class="btn btn-default">Export PDF</button>
+          <button class="btn btn-primary">Email</button>
+          <!-- TODO -->
+          <input class="btn btn-default" id="itinerary_search" type="submit" value="{% trans "Search" %}" name="Search" style="display:none;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <!-- Left section -->
+        <div class="section">
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#experience" aria-controls="experience" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/hot-56.svg' %}"></a></li>
+            <li role="presentation"><a href="#flight" aria-controls="flight" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/flight.svg' %}"></a></li>
+            <li role="presentation"><a href="#transfer" aria-controls="transfer" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/transfer.svg' %}"></a></li>
+            <li role="presentation"><a href="#accommodation" aria-controls="accommodation" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/accommodation.svg' %}"></a></li>
+            <li role="presentation"><a href="#restaurant" aria-controls="restaurant" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/restaurant.svg' %}"></a></li>
+            <li role="presentation"><a href="#suggestion" aria-controls="suggestion" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/itinerary.svg' %}"></a></li>
+            <li role="presentation"><a href="#pricing" aria-controls="pricing" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/price.svg' %}"></a></li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="experience">
+              <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                <input type="text" class="form-control">
+              </div>
+              <div id="experience_column" style='height:360px;'>
+
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="flight">
+              <div class="column" id="flight_column">
+                <button type="button" class="btn btn-default" id="add-flight-btn">+ Add Flight</button>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Such experience title</h3>
+                    <p>Very description wow</p>
+                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>3239</h2>
+                    <p>{% trans "per person" %}</p>
                   </div>
                 </div>
-            </div>
-
-<!--
-            <div id="share-link-button">
-                <button>Share Link</button>
-            </div>
-
-            <div id="save-itinerary-button">
-                <button>Save Itinerary</button>
-            </div>
--->
-            {{form.itinerary_string}}
-        </div>
-
-        {% if itinerary %}
-        <div id="checkout-bar">
-        <!-- change something here, make the the checkout bar stick on the top .@song -->
-            <div id="checkout-bar-container">
-                <p class="checkout-info">
-                    <div id="total-hours_div" style="margin-left:0px">
-                        <div style="float:left;margin-top:13px;">
-                            <div class="hour-icon">
-                            </div>
-                        </div>
-                        <div class="items-selected-box" style="padding-left:10px">
-                            <span class="normal-font-1">{% trans "Hours planned" %}</span>
-                            <span id="id_total_hours" class="items-font">0</span>
-                        </div>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Another one</h3>
+                    <p>Very description wow</p>
+                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>339</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="new-item-form container-fluid" id="add-flight" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                      <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"></div>
+                      <div style="display:none;">
+                        <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="..."></span>
+                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                      </div>
                     </div>
-                    <div id="items_selected_div" style="margin-left:150px">
-                        <div style="float:left;margin-top:13px;">
-                            <div class="interests-icon">
-                            </div>
-                        </div>
-                        <div class="items-selected-box" style="padding-left:15px">
-                            <span class="normal-font-1">{% trans "Items selected" %}</span>
-                            <span id="id_item_selected" name="id_item_selected" class="items-font">0</span>
-                        </div>
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
                     </div>
-                    <div id="per_person_div" style="margin-left:300px">
-                        <div  style="float:left;margin-top:13px;">
-                            <div class="people">
-                            </div>
-                        </div>
-                        <div class="items-selected-box" style="padding-left:10px">
-	                        <span class="normal-font-1">{% trans "Per Person" %}</span><br>
-	                        <span id="id_price_per_person" name="id_price_per_person" class="items-font">$0</span>
-	                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Departing Location" %}</label>
+                      <input class="form-control">
                     </div>
-                    <div id="total-amount_div" style="margin-left:150px">
-                        <div style="float:left;margin-top:13px;">
-                            <div class="money-icon">
-                            </div>
-                        </div>
-                        <div class="items-selected-box" style="padding-left:10px">
-                            <span class="normal-font-1">{% trans "Selected Total" %}</span>
-	                        <span id="id_total_price" class="items-font">$0</span>
-                        </div>
+                    <div class="form-group">
+                      <label style="display:block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
                     </div>
-                    <div id="btn_div" style="margin-left:775px">
-                        <input id="itinerary-preview" type="button" value="{% trans "Proceed to Checkout" %}" name="Preview" class="checkout-button">
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 350px;"></textarea>
                     </div>
-                </p>
+                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button id="add-flight-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  </div>
+                </div>
+              </div>
             </div>
-        </div>
-
-        <div id="select-all-bar">
-            <div id="select-all-checkbox" style="display:none;">
-         		<input id="select-all" type="checkbox" value="English" class="css-checkbox" name="checkbox-eng"><label for="checkbox-eng" name="checkbox2_lbl" class="css-label lite-cyan-check">Select all</label>
-         	</div>
-         	<p id="fix-interface-itinerary" style="margin-left:550px">
-         		<span style="width:60px;">{% trans "Price PP" %}</span>
-        		<span>{% trans "Group Size" %}</span>
-        		<span>{% trans "Subtotal"%}</span>
-         	</p>
-        </div>
-
-        <div id="itinerary_div" style="margin-left:-20px">
-            <table id="itinerary_table">
-                <tbody>
-                {%for day in itinerary%}
-                    <tr>
-                        <td style="display:inline-block; border:none;">{% trans "Day" %} {{forloop.counter}} {{day.date}}</td>
-                        {% for experience in day.experiences %}
-                        {% if forloop.counter <= 3 %}
-                        <td style="height:100px;display:inline-block;background-color:#EAEAEA;">
-                        {% else %}
-                        <td style="height:100px;display:none;">
-                        {% endif %}
-                            <div class="itinerary-list" style="padding-top:10px;margin-left:20px">
-                                <div style="width:180px;float:left;margin-left:10px;">
-                                    <p style="display:none;">{{experience.id}}</p>
-                                    <p style="display:none;">{{experience.duration}}</p>
-                                    <p style="display:none;">{{experience.host}}</p>
-                                    <p style="display:none;">{{experience.host_image}}</p>
-                                    <input type="checkbox" value="yes">
-                                    <a href="/experience/{{experience.id}}" target="_blank">
-                                        <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg" alt="{{experience.title}}" class="itinerary-experience-image"/>
-                                    </a>
-                                    <div class="profile-itinerary">
-                                        <img src="{{MEDIA_URL}}{{experience.host_image}}" class="itinerary-host-image"/>
-                                    </div>
-                                </div>
-                                <div style="margin-left: 100px;">
-                                    <a href="/experience/{{experience.id}}" target="_blank"><p style="width:150px;display:inline-block;font-size:12px;float:left;color:#333;">{{experience.title}}</p></a>
-                                    <select style="display:inline-block;margin-left:90px;">
-                                        <option value="None">{% trans "Please select time" %}</option>
-                                    {% for slot in experience.timeslots%}
-                                        <option value="{{slot.time_string}}" instant_booking="{{slot.instant_booking}}">{%if slot.instant_booking%}&#x26A1;{%else%}{%endif%} {{slot.time_string}}:00 - {{slot.time_string|add:experience.duration|mod:24}}:00</option>
-                                    {%endfor%}
-                                    </select>
-                                    <p style="display:inline-block;margin-left:-60px;width:52px;">{{experience.price}}</p>
-                                    <p style="display:inline-block;margin-left:40px;width:16px;"></p>
-                                    <p style="display:inline-block;margin-left:50px;width:52px;"></p>
-                                    <input type="button" value="Remove" class="btn-default btn btn-default" style="display:inline-block;margin-left:35px;height:40px;">
-                                </div>
-                                <div style="margin-top:10px;">
-                                    <p style="font-size:12px;">{{experience.duration}} {% trans "hr(s)" %} &#8226; {%if experience.language == "english;mandarin;"%}English / 中文{%else%}English{%endif%}</p>
-                                </div>
-                            </div>
-                        </td>
-                        {%endfor%}
-                    </tr>
-                {%endfor%}
-                </tbody>
-            </table>
-        </div>
-
-        <div id="preview_div" style="display:none;">
-            <div id="preview_content"></div>
-            <div>
-                <button type="button" id="preview_change" class="confirmation-button">{% trans "Change" %}</button>
-                <input type="submit" name="Confirm" value="{% trans "Confirm" %}" id="preview_confirm" class="confirmation-button"/>
+            <div role="tabpanel" class="tab-pane fade" id="transfer">
+              <div class="column" id="transfer_column">
+                <button type="button" id="add-transfer-btn" class="btn btn-default">+ Add Transfer</button>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Such experience title</h3>
+                    <p>Very description wow</p>
+                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>3239</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Another one</h3>
+                    <p>Very description wow</p>
+                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>339</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="new-item-form container-fluid" id="add-transfer" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                      <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"></div>
+                      <div style="display:none;">
+                        <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="..."></span>
+                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Departing Location" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per trip</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 350px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button id="add-transfer-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  </div>
+                </div>
+              </div>
             </div>
+            <div role="tabpanel" class="tab-pane fade" id="accommodation">
+              <div class="column" id="accommodation_column">
+                <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Such experience title</h3>
+                    <p>Very description wow</p>
+                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>3239</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Another one</h3>
+                    <p>Very description wow</p>
+                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>339</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="new-item-form container-fluid" id="add-accommodation" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                      <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"></div>
+                      <div style="display:none;">
+                        <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="..."></span>
+                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Location" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per night</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 350px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button id="add-accommodation-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="restaurant">
+              <div class="column" id="restaurant_column">
+                <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Such experience title</h3>
+                    <p>Very description wow</p>
+                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>3239</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Another one</h3>
+                    <p>Very description wow</p>
+                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>339</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="new-item-form container-fluid" id="add-restaurant" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                      <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"></div>
+                      <div style="display:none;">
+                        <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="..."></span>
+                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Location" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 350px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button id="add-restaurant-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="suggestion">
+              <div class="column" id="suggestion_column">
+                <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Such experience title</h3>
+                    <p>Very description wow</p>
+                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>3239</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Another one</h3>
+                    <p>Very description wow</p>
+                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>339</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="new-item-form container-fluid" id="add-suggestion" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                      <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"></div>
+                      <div style="display:none;">
+                        <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="..."></span>
+                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label>{% trans "Location" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 350px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button id="add-suggestion-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="pricing">
+              <div class="column" id="pricing_column">
+                <button type="button" id="add-pricing-btn" class="btn btn-default">+ Add Pricing</button>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Such experience title</h3>
+                    <p>Very description wow</p>
+                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>3239</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+                <div class="exp-box-sm portlet">
+                  <div class="exp-img portlet-header"></div>
+                  <div class="exp-info portlet-header">
+                    <h3>Another one</h3>
+                    <p>Very description wow</p>
+                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
+                  </div>
+                  <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>339</h2>
+                    <p>{% trans "per person" %}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="new-item-form container-fluid" id="add-pricing" style="display:none;">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Title" %}</label>
+                      <input class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label style="display:block;">{% trans "Price" %}</label>
+                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD</span>
+                    </div>
+                  </div>
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label>{% trans "Details" %}</label>
+                      <textarea class="form-control" style="height: 350px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button id="add-pricing-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        {%endif%}
-    </form>
+      </div>
+      <div class="col-sm-6">
+        <!-- Right section -->
+        <div id="right_section" class="section" style="height:70vh; overflow:scroll;">
+          <h1 class="section-heading">Itinerary</h1>
+          <h2 class="price-line">$AUD 3456 per person (Total of $AUD 23456)</h2>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- Warning popups -->
+<div class="modal fade" id="warning-delete-location" tabindex="-1" role="dialog" aria-labelledby="warning">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        Are you sure you want to delete this location? Everything you have planned for that location will be deleted.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="confirm-delete">Delete</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
 </div>
+
+<div class="modal fade" id="warning-duration-location" tabindex="-1" role="dialog" aria-labelledby="warning">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        Are you sure you want to reduce the duration of this location? Everything you have planned for the removed days will be deleted.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="confirm-duration-location">Go ahead</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="warning-duration-trip" tabindex="-1" role="dialog" aria-labelledby="warning">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        Are you sure you want to reduce the duration of the entire trip? Any location that falls outside of the duration will be deleted.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="confirm-duration-trip">Go ahead</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
-    <script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
     {%if LANGUAGE == "zh-CN"%}
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
     {%endif%}
+    <script type="text/javascript" src="{% static 'experiences/scripts/custom_itinerary.js' %}"></script>
 
-<script charset="utf-8" type="text/javascript">
-    function hideexperience(i, j)
-    {
-        $("#day_"+i+"_exp_"+j).hide();
-        $("#day_"+i+"_exp_"+j).attr("not-interested","yes");
-        //$($(experience.children()[0]).children()[0]).hide();
-        //$($($(experience.children()[0]).children()[1]).children()[1]).hide();
-        //$(experience.children()[1]).hide();
-        j++;
-        while($("#day_"+i+"_exp_"+j).length && ($("#day_"+i+"_exp_"+j+"_choice_no").is(':checked') || $("#day_"+i+"_exp_"+j).attr("style").split(" ").join("").indexOf("display:none")<0))
-        //skip exps that (1)with "no" checked or (2)already shown
-        {
-            j++;
-        }
-        if($("#day_"+i+"_exp_"+j).length)
-        {
-            //$("#day_"+i+"_exp_"+j).show();
-            $("#day_"+i+"_exp_"+j).css('display', 'inline-block');
-        }
-    }
+    <script type="text/javascript">
+    cities = ["Melbourne","Sydney","Brisbane","Goldcoast"];//TODO
 
-    function addNewDay(id)
+    $(document).ready(function()
     {
-        new_div="<div id=\"add_day_" + id + "_div\" class=\"container-fluid\" style=\"padding-bottom:10px;\">"+
-                    "<button id=\"delete_day_button_" + id + "\" type=\"button\" class=\"btn btn-default;\" style=\"margin-left: -15px;\">{% trans 'Delete' %}</button>"+
-                    "<div class=\"row\" style=\"margin-bottom:5px;\">"+
-                    "<h3 class=\"field-header\">{% trans 'Location' %}</h3>"+
-                    "<div class=\"ui selection dropdown\">"+
-                        "<i class=\"dropdown icon\"></i>" +
-                        "<div id=\"destination_city_" + id + "\" class=\"text\">{% trans "City" %}</div>" +
-                        "<div class=\"menu\">" +
-                            {% for k, v in locations %}
-                            "<div class=\"header\">{{ k }}</div>" +
-                                {% for id, name, state in v %}
-                                "<div class=\"item\" data-value=\"{{ id }}\" data-text=\"{{ name }}\">{{ name }}" +
-                                    "<span class=\"light-color\">{{ state }}</span>" +
+        //fill out the left panel
+        var experience_column = $("#experience_column");
+        var flight_column = $("#flight_column");
+        var transfer_column = $("#transfer_column");
+        var accommodation_column = $("#accommodation_column");
+        var restaurant_column = $("#restaurant_column");
+
+        {%for day in itinerary%}
+        var i = {{forloop.counter}};
+        {% if forloop.first %}
+        var new_day = "<div id='experience_day_" + i + "' class='column city_{{day.city|title}}' style='overflow-x:hidden;overflow-y:scroll;'></div>";
+        {% else %}
+        var new_day = "<div id='experience_day_" + i + "' class='column city_{{day.city|title}}' style='display:none;'></div>";
+        {% endif %}
+        experience_column.append(new_day);
+            {% for experience in day.experiences %}
+            {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
+            var new_experience = "<div class='exp-box-sm portlet'>" +
+                                "<div class='exp-img portlet-header'>" +
+                                    "<img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='width:inherit;'/>" +
                                 "</div>" +
-                                {% endfor %}
-                            {% endfor %}
-                        "</div>" +
-                    "</div>" +
-                    "</div>"+
-                    "<div class=\"row\">"+
-                    "<h3 class=\"field-header\" style=\"margin-right: 38px;\">{% trans "Dates" %}</h3>"+
-                    "<div class=\"input-group start-date\" id=\"id_start_datetime_picker_day_" + id + "\">"+
-                        "<input class=\"form-control\" id=\"id_start_datetime_day_" + id + "\" name=\"start_datetime\" type=\"text\" value=\"\">"+
-                    "</div>"+
-                    "<script>"+
-                        "$(function() {"+
-                            "$(\"#id_start_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"locale\": \"{{LANGUAGE}}\"});"+
-                        "});"+
-                    "<\/script>"+
-                    "<div class=\"input-group end-date\" id=\"id_end_datetime_picker_day_" + id + "\">"+
-                        "<input class=\"form-control\" id=\"id_end_datetime_day_" + id + "\" name=\"end_datetime\" type=\"text\" value=\"\">"+
-                    "</div>"+
-                    "<script>"+
-                        "$(function() {"+
-                            "$(\"#id_end_datetime_day_" + id + "\").datetimepicker({\"format\": \"YYYY-MM-DD\", \"locale\": \"{{LANGUAGE}}\"});"+
-                        "});"+
-                    "<\/script>"+
-                    "</div>"+
-                "</div>";
-        $(new_div).insertAfter("#add_day_" + (id-1) + "_div");
-        $('.ui.dropdown').dropdown();
-    }
+                                "<div class='exp-info portlet-header'>" +
+                                    "<h3>{{experience.title}}</h3>" +
+                                    "<p>{{experience.description|escapejs|slice:"0:16"}}</p>" +
+                                    "<p>{{experience.duration}} {% trans 'hr(s)' %} &middot; " +
+                                       "{%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;" +
+                                       "{% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>" +
+                                "</div>"+
+                                "<div class='exp-price portlet-header'>" +
+                                    "<p>{{experience.dollarsign}}{{experience.currency}}</p>" +
+                                    "<h2>{{experience.price}}</h2>" +
+                                    "<p>{% trans 'per person' %}</p>" +
+                                "</div>" +
+                            "</div>";
+            $("#experience_day_"+ i).append(new_experience);
+            {% elif experience.type == "Flight" %}
+            //TODO
+            {% elif experience.type == "Transfer" %}
+            //TODO
+            {% elif experience.type == "Accommodation" %}
+            //TODO
+            {% elif experience.type == "Restaurant" %}
+            //TODO
+            {% endif %}
+            {% endfor %}
+        {% endfor %}
 
-    function updatePrice()
+        $("#itinerary_search").click(function(e){
+            set_data_before_submit();
+        });
+
+        $("#button_email").click(function(e){
+            var itinerary = [];
+            var dict={"id":"",
+                      "date":"","time":"",
+                      "guest_number":1};
+            itinerary.push(dict);
+            $("#id_itinerary_string").val(JSON.stringify(itinerary));
+        });
+
+        init_drag();
+    })
+
+    function construct_data_content(i, cities, city, city_name, duration)
     {
-        var table = $("#itinerary_table")[0];
-        items = 0;
-        total_price = 0;
-        hours = 0;
-        guest_number = parseInt($("#id_guest_number option:selected").text());
-        for (var i = 0, row; row = table.rows[i]; i++) {
-            for (var j = 0, col; col = row.cells[j]; j++) {
-                if($("#day_"+(i+1)+"_exp_"+j+"_choice_yes").length && $("#day_"+(i+1)+"_exp_"+j+"_choice_yes").is(':checked'))
-                {
-                    hours += parseFloat($("#day_"+(i+1)+"_exp_"+j+"_duration").text());//future: half hour
-                    items++;
-                    price = parseFloat($("#day_"+(i+1)+"_exp_"+j+"_price").text());
-                    total_price += price;
-                }
-            }
-        }
-        $("#id_total_hours").text(hours.toFixed(0));
-        $("#id_item_selected").text(items);
-        $("#id_price_per_person").text("$"+total_price.toFixed(2));
-        $("#id_total_price").text("$"+(total_price*guest_number).toFixed(2));
-    }
+        var new_city =
+                "<button id=\"button_city_" + i + "\" type=\"button\" class=\"btn btn-grey\" data-container=\"body\" data-toggle=\"popover\" data-placement=\"bottom\" data-html=\"true\" data-content=\"" +
+                    "<div class='form-group'>" +
+                        "<p>{% trans 'Location' %}</p>" +
+                        "<select id='city_list_" + i + "' class='form-control'>";
 
-    $(document).ready(function(){
-
-        $('.ui.dropdown').dropdown();
-        $("#id_start_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "locale": "{{LANGUAGE}}"});
-        $("#id_end_datetime_day_1").datetimepicker({"format": "YYYY-MM-DD", "locale": "{{LANGUAGE}}"});
-
-        city = $("#id_city").val().split(",");
-        if(city.length>0)
+        for(var c=0;c<cities.length;c++)
         {
-            distinct_city = 1;
-            if(city[0])
+            if(cities[c] == city)
             {
-                $("#destination_city_1").text(city[0]);
-            }
-            $("#id_start_datetime_day_1").val($("#id_start_datetime").val());
-            start = new Date(Date.parse($("#id_start_datetime").val(),"YYYY-MM-DD"));
-        }
-
-        for(i=1;i<city.length && city[i]!="";i++)//i starts from 1
-        {
-            if(city[i]!=city[i-1])
-            {
-                distinct_city++;
-                addNewDay(distinct_city);
-                $("#delete_day_button_"+(distinct_city)).click(function(e){
-                    $(this).parent().remove();
-                });
-                $("#destination_city_"+distinct_city).text(city[i]);
-
-                $("#id_end_datetime_day_"+(distinct_city-1)).val((new Date(start.getTime() + (i-1)*24*60*60*1000)).toISOString().substring(0, 10));
-
-                $("#id_start_datetime_day_"+distinct_city).val((new Date(start.getTime() + i*24*60*60*1000)).toISOString().substring(0, 10));
-            }
-        }
-        if(city.length>0)
-        {
-            $("#id_end_datetime_day_"+distinct_city).val($("#id_end_datetime").val());
-        }
-
-        language = $("#id_language").val().split(",");
-        for(i=0;i<language.length;i++)
-        {
-            $("#language_"+language[i]).prop('checked',true);
-            $("#language_"+language[i]+"_label").attr("class","css-label lite-cyan-check");
-        }
-
-        language=['English','Mandarin'];
-        for(i=0;i<language.length;i++)
-        {
-            $("#language_"+language[i]+"_label").click(function(e){
-                id = "language_"+this.id.split("_")[1];
-                if($("#"+id).prop('checked'))
-                {
-                    $("#"+id).prop('checked',false);
-                    $(this).attr("class","css-label lite-x-cyan");
-                }
-                else
-                {
-                    $("#"+id).prop('checked',true);
-                    $(this).attr("class","css-label lite-cyan-check");
-                }
-            });
-        }
-
-        all_tags = $("#id_all_tags").val().split(",");
-        tags = $("#id_tags").val().split(",");
-        for(i=0;i<all_tags.length>0;i++)
-        {
-            if($.inArray(all_tags[i], tags)<0)
-            {
-                new_tag = "<div class=\"tag-box\"><label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10003</button></div>";
+                new_city += "<option value='" + cities[c] + "' selected>" + cities[c] + "</option>";
             }
             else
             {
-                new_tag = "<div class=\"tag-box\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10007</button></div>";
+                new_city += "<option value='" + cities[c] + "'>" + cities[c] + "</option>";
             }
 
-            $("#tags_div").append(new_tag);
-
-            $("#tag_button_"+(i+1)).click(function(e){
-                id = e.target.id.split("_")[2];
-                if($("#tag_"+id).attr("class") == "tag-selected")
-                {
-                    $("#tag_button_"+id).html("&#10003");
-                    $("#tag_"+id).attr("class", "tag-non-selected");
-                }
-                else
-                {
-                    $("#tag_button_"+id).html("&#10007");
-                    $("#tag_"+id).attr("class", "tag-selected");
-                }
-            });
         }
+        new_city +=     "</select>" +
+                    "</div>" +
+                    "<div class='form-goup'>" +
+                        "<p>{% trans 'Duration' %}</p>" +
+                        "<select id='duration_list_" + i +"' class='form-control'>";
 
-        var table = $("#itinerary_table")[0];
-
-        if(table)
+        for(var d=1;d<=10;d++)
         {
-            for (var i = 0, row; row = table.rows[i]; i++) {
-                for (var j = 0, col; col = row.cells[j]; j++) {
-                    if(j==0)//i==0
-                    {
-                        //col.id="day_"+(j+1);
-                        col.id="day_"+(i+1);
-                    }
-                    else
-                    {
-                        day_index = i+1;//j+1;
-                        exp_index = j;//i;
-                        col.id="day_"+day_index+"_exp_"+exp_index;
-                        $($($(col).children()[0]).children()[0]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_id";
-                        $($($(col).children()[0]).children()[0]).children()[1].id="day_"+day_index+"_exp_"+exp_index+"_duration";
-                        $($($(col).children()[0]).children()[0]).children()[2].id="day_"+day_index+"_exp_"+exp_index+"_host";
-                        $($($(col).children()[0]).children()[0]).children()[3].id="day_"+day_index+"_exp_"+exp_index+"_host_image";
-                        $($($(col).children()[0]).children()[0]).children()[4].id="day_"+day_index+"_exp_"+exp_index+"_choice_yes";
-                        //$($($(col).children()[0]).children()[0]).children()[4].name="day_"+day_index+"_exp_"+exp_index+"_radio";
-
-                        $($($(col).children()[0]).children()[1]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_title";
-                        $($($(col).children()[0]).children()[1]).children()[1].id="day_"+day_index+"_exp_"+exp_index+"_timeslot";
-                        $($($(col).children()[0]).children()[1]).children()[2].id="day_"+day_index+"_exp_"+exp_index+"_price";
-                        $($($(col).children()[0]).children()[1]).children()[3].id="day_"+day_index+"_exp_"+exp_index+"_guest_number";
-                        $($($(col).children()[0]).children()[1]).children()[4].id="day_"+day_index+"_exp_"+exp_index+"_subtotal";
-                        $($($(col).children()[0]).children()[1]).children()[5].id="day_"+day_index+"_exp_"+exp_index+"_choice_no";
-                        //$($($(col).children()[0]).children()[1]).children()[5].name="day_"+day_index+"_exp_"+exp_index+"_radio";
-
-                        //$($($(col).children()[0]).children()[2]).children()[0].id="day_"+day_index+"_exp_"+exp_index+"_meetup_spot";
-
-                        number = parseFloat($("#id_guest_number option:selected").text());
-                        p = parseFloat($("#day_"+day_index+"_exp_"+exp_index+"_price").text());
-                        $("#day_"+day_index+"_exp_"+exp_index+"_guest_number").text(number);
-                        $("#day_"+day_index+"_exp_"+exp_index+"_subtotal").text("$"+(number*p).toFixed(2));
-
-                        $("#day_"+day_index+"_exp_"+exp_index+"_choice_yes").click(function(e){
-                            i = e.target.id.split('_')[1];
-                            j = e.target.id.split('_')[3];
-                            if($("#day_"+i+"_exp_"+j+"_timeslot option:selected").val() == "None")
-                            {
-                                alert("Please select the time first. Thank you :)");
-                                $(this).prop('checked', false);
-                            }
-                            else
-                            {
-                                //hideexperience(i, j);
-                                if($(this).prop('checked'))
-                                {
-                                    $("#day_"+i+"_exp_"+j).css('background-color', 'white');
-                                }
-                                else
-                                {
-                                    $("#day_"+i+"_exp_"+j).css('background-color', '#EAEAEA');
-                                }
-                                updatePrice();
-                            }
-                        });
-
-                        $("#day_"+day_index+"_exp_"+exp_index+"_choice_no").click(function(e){
-                            i = e.target.id.split('_')[1];
-                            j = e.target.id.split('_')[3];
-                            hideexperience(i, j);
-                            updatePrice();
-                        });
-                    }
-                }
-            }
-        }
-    });
-
-    $("#add_day_button").click(function(e){
-        id = $("#date_destination_div").children().length-4;
-        addNewDay(id+1);
-        $("#delete_day_button_"+(id+1)).click(function(e){
-            $(this).parent().remove();
-        });
-    });
-
-    $("#itinerary-preview").click(function(e){
-        var table = $("#itinerary_table")[0];
-        var itinerary = [];
-        for (var i = 0, row; row = table.rows[i]; i++) {
-            for (var j = 0, col; col = row.cells[j]; j++) {
-                if($("#day_"+(i+1)+"_exp_"+j+"_choice_yes").length && $("#day_"+(i+1)+"_exp_"+j+"_choice_yes").is(':checked'))
-                {
-                    dict={"id":$("#day_"+(i+1)+"_exp_"+j+"_id").text(),"title":$("#day_"+(i+1)+"_exp_"+j+"_title").text(),
-                          "date":$("#day_"+(i+1)).text().split(" ")[2],"time":$("#day_"+(i+1)+"_exp_"+j+"_timeslot option:selected").text(),
-                          "price":$("#day_"+(i+1)+"_exp_"+j+"_price").text(),"host":$("#day_"+(i+1)+"_exp_"+j+"_host").text(),
-                          "host_image":$("#day_"+(i+1)+"_exp_"+j+"_host_image").text(),
-                          "duration":$("#day_"+(i+1)+"_exp_"+j+"_duration").text(),
-                          "guest_number":$("#id_guest_number option:selected").text()};
-                    itinerary.push(dict);
-/*
-                    host = $("#day_"+(i+1)+"_exp_"+j+"_host").text();
-                    host_image = "/images/" + $("#day_"+(i+1)+"_exp_"+j+"_host_image").text();
-                    price = (parseFloat($("#day_"+(i+1)+"_exp_"+j+"_price").text())).toFixed(2);
-                    sub_total = price * parseInt(dict['guest_number']);
-                    duration = $("#day_"+(i+1)+"_exp_"+j+"_duration").text();
-
-                    new_item = "<div class=\"expList\">" +
-                                    "<div class=\"listingImg\" style=\"background-image:url(/images/thumbnails/experiences/experience" + dict['id'] + "_1.jpg)\">" +
-                                        "<div class=\"profile-md checkout-profile\">" +
-                                            "<img src=\"" + host_image + "\" width=\"40\" height=\"40\">" +
-                                        "</div>" +
-                                    "</div>" +
-                                    "<div class=\"checkoutBox checkoutInfo\">" +
-                                        "<h3 style=\"height:30px;\">" + dict['title'] + " with " + host + "</h3>" +
-                                        "<p>Reservation for <strong>" + dict['guest_number'] + " person(s)</strong><br>" +
-                                           "on <strong>" + dict['date'] + "</strong> from <strong>" + dict['time'] + "</strong><br>" +
-                                        "<hr style=\"margin-bottom:10px;\">" +
-                                        "<p>Rate: $" + price +" per person for " + duration + " hours * " + dict['guest_number'] + " = $" + sub_total + "</p>" +
-                                    "</div>" +
-                                "</div>";
-
-                    $("#preview_content").html($("#preview_content").html() + new_item);
-                    $("#itinerary_div *").prop("disabled", true);
-                    $("#itinerary_div").css('opacity', '0.1');
-                    $("#preview_div").show();
-*/
-                }
-                else
-                {
-                    $("#day_"+(i+1)+"_exp_"+j).css('display','none');
-                }
-            }
-        }
-        if(itinerary.length==0)
-        {
-            alert("You have not selected any experience.");
-        }
-        else
-        {
-            $("#id_itinerary_string").val(JSON.stringify(itinerary));
-            $("#itinerary_div *").prop("disabled", true);
-            $("#preview_div").show();
-        }
-    });
-
-    $("#preview_change").click(function(e){
-/*
-        $("#itinerary_div").css('opacity', '1.0');
-        $("#preview_content").empty();
-*/
-        $("#itinerary_div *").prop("disabled", false);
-        $("#preview_div").hide();
-
-        var table = $("#itinerary_table")[0];
-        var itinerary = [];
-        for (var i = 0, row; row = table.rows[i]; i++) {
-            counter = 0;
-            for (var j = 0, col; col = row.cells[j]; j++) {
-                if(counter<4 && $("#day_"+(i+1)+"_exp_"+j).attr("not-interested")!="yes") //4 instead of 3: the title takes up one
-                {
-                    $("#day_"+(i+1)+"_exp_"+j).css('display','inline-block');
-                    counter++;
-                }
-                if(counter>4)
-                {
-                    break;
-                }
-            }
-        }
-    });
-
-    $("#preview_confirm").click(function(e){
-/*
-        $("#itinerary_div *").prop("disabled", false);
-        $("#itinerary_div").css('opacity', '1.0');
-        $("#preview_content").empty();
-*/
-        $("#preview_div").hide();
-    });
-
-    $("#itinerary-search").click(function(e){
-        //e.preventDefault();
-        $("#id_start_datetime").val($("#id_start_datetime_day_1").val());
-        $("#id_city").val("");
-        for(i=1;$("#destination_city_"+i).length>0;i++)
-        {
-            city = $("#destination_city_"+i).text();
-            start = new Date(Date.parse($("#id_start_datetime_day_"+i).val(),"YYYY-MM-DD"));
-            end = new Date(Date.parse($("#id_end_datetime_day_"+i).val(),"YYYY-MM-DD"));
-
-            days = Math.round((end-start)/(1000*60*60*24))+1;
-            for(j=0;j<days;j++)
+            if(d == parseInt(duration))
             {
-                $("#id_city").val($("#id_city").val()+city+",");
+                new_city += "<option value=" + d + " selected>" + d + "{% trans ' Day' %}</option>";
             }
-        }
-        $("#id_end_datetime").val($("#id_end_datetime_day_"+(i-1)).val());
-
-        city = $("#id_city").val();
-        city = city.substring(0,city.length-1);
-        $("#id_city").val(city);
-
-        $("#id_tags").val("");
-        for(i=1;$("#tag_"+i).length>0;i++)
-        {
-            if($("#tag_"+i).attr("class") == "tag-selected")
+            else
             {
-                $("#id_tags").val($("#id_tags").val() + $("#tag_"+i).text() + ",");
+                new_city += "<option value=" + d + ">" + d + "{% trans ' Day' %}</option>";
             }
         }
-        tags = $("#id_tags").val();
-        tags = tags.substring(0,tags.length-1);
-        $("#id_tags").val(tags);
-
-        $("#id_language").val("");
-
-        language = ['Mandarin','English'];
-        for(i=0;i<language.length;i++)
-        {
-            if($("#language_"+language[i]).prop('checked') == true)
-            {
-                $("#id_language").val($("#id_language").val() + language[i] + ",");
-            }
-        }
-        l = $("#id_language").val();
-        l = l.substring(0,l.length-1);
-        $("#id_language").val(l);
-
-        //$("#itinerary_form").submit();
-    });
-
-    $("#more_filters").click(function(e){
-        tags_div = $("#optional_criteria_div");
-        if(tags_div.css("display")=="none")
-        {
-            tags_div.css("display", "inline-block");
-            $("#more_filters").text("Less Filters");
-        }
-        else
-        {
-            tags_div.css("display", "none");
-            $("#more_filters").text("More Filters");
-        }
-    });
-</script>
-<script>
-/*
-    function UpdateTableHeaders() {
-        $("#itinerary_form").each(function() {
-            var el             = $(this),
-            offset         = el.offset(),
-            scrollTop      = $(window).scrollTop()-130,
-            floatingHeader = $(".floatingHeader", this)
-
-            if ((scrollTop > offset.top) && (scrollTop < offset.top + el.height())) {
-                floatingHeader.css({
-                    "visibility": "visible"
-                });
-            }
-            else {
-                floatingHeader.css({
-                    "visibility": "hidden"
-                });
-            };
-        });
+        new_city +=
+                        "</select>" +
+                    "</div>" +
+                    "<button id='update_city_" + i + "' class='btn btn-primary' onclick='update_city(" + i + ")'>{% trans 'Update' %}</button>" +
+                    "<button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#button_city_" + i + "&quot;).popover(&quot;hide&quot;);'>{% trans 'Cancel' %}</button>" +
+                    "<button id='delete_city_" + i + "' class='btn btn-danger' onclick='delete_city(" + i + ")'>{% trans 'Delete Location' %}</button>" +
+                    "\" city='" + $("#new_city").val() + "' duration=" + duration + ">" + city_name + " <span class=\"badge\">" + duration + "</span>" +
+                "</button>";
+        return new_city;
     }
 
-// DOM Ready
-$(function() {
+    function add_new_city()
+    {
+        var i=-1;
+        //the last city was inserted before $("#add-city")
+        if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').startsWith("button_city_"))
+        {
+            var id = $("#add-city").prev().attr('id').split("_");
+            i = parseInt(id[id.length-1]);
+        }
+        var j=0,k=0;
+        for(k=0;k<i;k++)
+        {
+            if($("#button_city_"+k).length > 0)
+            {
+                j++;
 
-   var clonedHeaderRow;
+                if(j>=10)
+                {
+                    return;
+                }
+            }
+        }
+        i += 1;
+        var city_name = $("#new_city option:selected").text();
+        var duration = $("#new_duration").val();
 
-   $("#itinerary_form").each(function() {
-        clonedHeaderRow = $("#checkout-bar", this);
-        clonedHeaderRow
-            .before(clonedHeaderRow.clone())
-            .css("width", clonedHeaderRow.width())
-            .addClass("floatingHeader");
-    });
+        //add a new button for the city
+        var new_city = construct_data_content(i, cities, $("#new_city").val(), city_name, duration);
+        $(new_city).insertBefore($("#add-city"));
+        // Initialise popovers
+        $('[data-toggle="popover"]').popover();
 
-    $(window)
-    .scroll(UpdateTableHeaders)
-    .trigger("scroll");
-});
-*/
-</script>
+        //add a new item in the right section
+        var new_item =
+                    "<div id=\"city-title-" + i + "\" class=\"section-box-add\" onclick=\"$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');\">" +
+                        "<span class=\"add-sign\">+</span>" +
+                        "<p id=\"city-title-p-" + i + "\">" + city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span></p>" +
+                    "</div>" +
+                    "<div class=\"collapse\" id=\"city-collapse-" + i + "\">";
+        for(var j=1;j<=duration;j++)
+        {
+            new_item +=
+                        "<div id=\"city-collapse-" + i + "-" + j + "\" class=\"section-box\">" +
+                            "<p>{% trans 'Day' %} " + j + "</p>" +
+                            "<div class=\"column\">" +
+                            "</div>" +
+                        "</div>";
+        }
+        new_item += "</div>";
+        $("#right_section").append(new_item);
+        init_drag();
 
+        //reload data
+        $("#itinerary_search").click();
+    }
+
+    function update_city(i)
+    {
+        var city_name = $("#city_list_" + i + " option:selected").text();
+        var duration = parseInt($("#duration_list_" + i).val());
+        $("#button_city_" + i)[0].innerHTML = city_name + " <span class=\"badge\">" + duration + "</span>";
+        $("#button_city_" + i).popover("hide");
+        //update $("#button_city_" + i).attr("data-content")
+        $("#button_city_" + i).replaceWith(construct_data_content(i, cities, $("#city_list_" + i).val(), city_name, duration));
+        // Initialise popovers
+        $('[data-toggle="popover"]').popover();
+
+        $("#city-title-p-" + i)[0].innerHTML = city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span>";
+        for(var j=1;j<=10;j++)
+        {
+            if(j<=duration && $("#city-collapse-" + i + "-" + j).length == 0)
+            {
+                //add a new day
+                var new_day =   "<div id=\"city-collapse-" + i + "-" + j + "\" class=\"section-box\">" +
+                                    "<p>{% trans 'Day' %} " + j + "</p>" +
+                                    "<div class=\"column\">" +
+                                    "</div>" +
+                                "</div>";
+                $("#city-collapse-" + i).append(new_day);
+            }
+            else if(j>duration && $("#city-collapse-" + i + "-" + j).length > 0)
+            {
+                //delete the day
+                $("#city-collapse-" + i + "-" + j).remove();
+            }
+        }
+        init_drag();
+        //reload data
+        $("#itinerary_search").click();
+    }
+
+    function delete_city(i)
+    {
+        $("#button_city_" + i).popover("hide");
+        $("#warning-delete-location").modal("show");
+        $("#confirm-delete").click(function() {
+          $("#button_city_" + i).remove();
+          $("#city-title-" + i).remove();
+          $("#city-collapse-" + i).remove();
+          $("#warning-delete-location").modal("hide");
+        })
+    }
+
+    function set_data_before_submit()
+    {
+        var cities="";
+        //the last city was inserted before $("#add-city"), there must be at least one city
+        if(!($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').startsWith("button_city_")))
+        {
+            //TODO
+        }
+        var id = $("#add-city").prev().attr('id').split("_");
+        var j = parseInt(id[id.length-1]);
+        var number_city = 0;
+        for(var i=0;i<=j;i++)
+        {
+            if($("#button_city_"+i).length > 0)
+            {
+                city = $("#button_city_"+i).attr("city");
+                duration = $("#button_city_"+i).attr("duration");
+                //comment out the following line if availability is considered in the future
+                duration = 1;
+                for(j=0;j<duration;j++)
+                {
+                    cities += city + ",";
+                }
+                number_city += 1;
+            }
+        }
+        cities = cities.substring(0,cities.length-1);
+        $("#id_city").val(cities);
+
+        var d = new Date();
+        //d.setTime(d.getTime() + d.getTimezoneOffset()*60*1000);
+        //$("#id_start_datetime") is already set
+        d.setDate(d.getDate()+number_city);
+        $("#id_end_datetime").val(d.toISOString().substring(0, 10));
+    }
+
+    </script>
 {% endblock %}
