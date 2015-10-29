@@ -579,9 +579,9 @@
         {%for day in itinerary%}
         var i = {{forloop.counter}};
         {% if forloop.first %}
-        var new_day = "<div id='experience_day_" + i + "' class='column' style='overflow-x:hidden;overflow-y:scroll;'></div>";
+        var new_day = "<div id='experience_day_" + i + "' class='column city_{{day.city|title}}' style='overflow-x:hidden;overflow-y:scroll;'></div>";
         {% else %}
-        var new_day = "<div id='experience_day_" + i + "' class='column' style='display:none;'></div>";
+        var new_day = "<div id='experience_day_" + i + "' class='column city_{{day.city|title}}' style='display:none;'></div>";
         {% endif %}
         experience_column.append(new_day);
             {% for experience in day.experiences %}
@@ -615,6 +615,10 @@
             {% endif %}
             {% endfor %}
         {% endfor %}
+
+        $("#itinerary_search").click(function(e){
+            set_data_before_submit();
+        });
 
         $("#button_email").click(function(e){
             var itinerary = [];
@@ -728,6 +732,8 @@
         $("#right_section").append(new_item);
         init_drag();
 
+        //reload data
+        $("#itinerary_search").click();
     }
 
     function update_city(i)
@@ -761,6 +767,8 @@
             }
         }
         init_drag();
+        //reload data
+        $("#itinerary_search").click();
     }
 
     function delete_city(i)
@@ -775,7 +783,7 @@
         })
     }
 
-    function set_city_before_submit()
+    function set_data_before_submit()
     {
         var cities="";
         //the last city was inserted before $("#add-city"), there must be at least one city
@@ -785,20 +793,30 @@
         }
         var id = $("#add-city").prev().attr('id').split("_");
         var j = parseInt(id[id.length-1]);
-        for(var i=0;i<j;i++)
+        var number_city = 0;
+        for(var i=0;i<=j;i++)
         {
             if($("#button_city_"+i).length > 0)
             {
                 city = $("#button_city_"+i).attr("city");
                 duration = $("#button_city_"+i).attr("duration");
+                //comment out the following line if availability is considered in the future
+                duration = 1;
                 for(j=0;j<duration;j++)
                 {
                     cities += city + ",";
                 }
+                number_city += 1;
             }
         }
         cities = cities.substring(0,cities.length-1);
         $("#id_city").val(cities);
+
+        var d = new Date();
+        //d.setTime(d.getTime() + d.getTimezoneOffset()*60*1000);
+        //$("#id_start_datetime") is already set
+        d.setDate(d.getDate()+number_city);
+        $("#id_end_datetime").val(d.toISOString().substring(0, 10));
     }
 
     </script>
