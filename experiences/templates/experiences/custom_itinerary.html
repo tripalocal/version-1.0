@@ -118,7 +118,7 @@
                 <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
                 <input type="text" class="form-control">
               </div>
-              <div class="column" id="experience_column">
+              <div id="experience_column" style='height:360px;'>
 
               </div>
             </div>
@@ -579,9 +579,9 @@
         {%for day in itinerary%}
         var i = {{forloop.counter}};
         {% if forloop.first %}
-        var new_day = "<div id='experience_day_" + i + "'></div>";
+        var new_day = "<div id='experience_day_" + i + "' class='column' style='overflow-x:hidden;overflow-y:scroll;'></div>";
         {% else %}
-        var new_day = "<div id='experience_day_" + i + "' style='display:none;'></div>";
+        var new_day = "<div id='experience_day_" + i + "' class='column' style='display:none;'></div>";
         {% endif %}
         experience_column.append(new_day);
             {% for experience in day.experiences %}
