@@ -13,7 +13,15 @@ body {
   padding: 0;
 }
 
+.footer {
+  display: none;
+}
+
 // Top search bar
+.basic-search {
+  background-color: $off-white;
+}
+
 .basic-search .container {
   width: 990px;
 }
