@@ -517,7 +517,7 @@
         Are you sure you want to delete this location? Everything you have planned for that location will be deleted.
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Delete</button>
+        <button type="button" class="btn btn-primary" id="delete-confirm">Delete</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
       </div>
     </div>
@@ -755,9 +755,13 @@
     function delete_city(i)
     {
         $("#button_city_" + i).popover("hide");
-        $("#button_city_" + i).remove();
-        $("#city-title-" + i).remove();
-        $("#city-collapse-" + i).remove();
+        $("#warning-delete-location").modal("show");
+        $("#delete-confirm").click(function() {
+          $("#button_city_" + i).remove();
+          $("#city-title-" + i).remove();
+          $("#city-collapse-" + i).remove();
+          $("#warning-delete-location").modal("hide");
+        })
     }
 
     function set_city_before_submit()
