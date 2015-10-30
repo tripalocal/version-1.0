@@ -3138,7 +3138,7 @@ def custom_itinerary(request):
                 customer = request.user if request.user.is_authenticated() else None
                 itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort, age_limit, customer)
 
-                return render_to_response('experiences/custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
+                return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)
             else:
                 return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
         else:
