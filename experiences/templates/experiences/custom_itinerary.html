@@ -573,7 +573,7 @@
     {
         $(".loading").hide();
         $("#itinerary_search").click(function(e){
-            event.preventDefault();
+            e.preventDefault();
             set_data_before_submit();
             $(".loading").show();
 
@@ -685,7 +685,7 @@
     {
         var i=-1;
         //the last city was inserted before $("#add-city")
-        if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').startsWith("button_city_"))
+        if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').indexOf("button_city_") === 0)
         {
             var id = $("#add-city").prev().attr('id').split("_");
             i = parseInt(id[id.length-1]);
@@ -794,14 +794,14 @@
     {
         var cities="";
         //the last city was inserted before $("#add-city"), there must be at least one city
-        if(!($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').startsWith("button_city_")))
+        if(!($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').indexOf("button_city_") === 0))
         {
             //TODO
         }
         var id = $("#add-city").prev().attr('id');
         var number_city = 0;
         //users may switch the order of cities, so button_city_1 can be behind button_city_2
-        while(id && id.startsWith("button_city_"))
+        while(id && id.indexOf("button_city_") === 0)
         {
             var id_split = id.split("_");
             var i = parseInt(id_split[id_split.length-1]);
