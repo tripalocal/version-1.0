@@ -19,7 +19,7 @@ from django.template.loader import get_template
 from app.forms import UploadXLSForm, ExperienceTagsXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator, update_pageview_statistics, get_related_experiences
+from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator, update_pageview_statistics, get_related_experiences, get_experience_popularity
 from app.views import getreservation
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
@@ -32,7 +32,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from experiences.constant import  *
 from experiences.telstra_sms_api import send_sms
-
+from experiences.utils import isEnglish
 
 if settings.LANGUAGE_CODE.lower() != "zh-cn":
     from allauth.socialaccount.providers.facebook.views import fb_complete_login
@@ -76,39 +76,45 @@ def updateExperienceTagsFromXLS(request):
             all_tags = []
 
             curr_cell = -1
-            while curr_cell < num_cells:
-                curr_cell += 1
-                # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
-                cell_type = worksheet.cell_type(curr_row, curr_cell)
-                cell_value = worksheet.cell_value(curr_row, curr_cell)
-                if cell_type == 1 or cell_type == 0:
-                    all_tags.append(cell_value)
-                else:
-                    raise Exception("Type error: column name, " + str(curr_cell))
+            while curr_row < 2:
+                #the first two rows are tags
+                while curr_cell < num_cells:
+                    curr_cell += 1
+                    # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                    cell_type = worksheet.cell_type(curr_row, curr_cell)
+                    cell_value = worksheet.cell_value(curr_row, curr_cell)
+                    if cell_type == 1 or cell_type == 0:
+                        all_tags.append(cell_value)
+                    else:
+                        raise Exception("Type error: column name, " + str(curr_cell))
+                curr_row += 1
+                curr_cell = -1
 
             cursor = connections['default'].cursor()
             #delete all existing records
-            cursor.execute("delete from experiences_experience_tags where experiencetag_id in (select id from experiences_experiencetag where language=%s)",[settings.LANGUAGES[0][0]])
-            cursor.execute("delete from experiences_experiencetag where language=%s",[settings.LANGUAGES[0][0]])
+            cursor.execute("delete from experiences_experience_tags")
+            cursor.execute("delete from experiences_newproduct_tags")
+            cursor.execute("delete from experiences_experiencetag")
             #add new tags
             all_tags = [x for x in all_tags if x]
             for i in range(len(all_tags)):
-                tag = ExperienceTag(tag = all_tags[i], language = settings.LANGUAGES[0][0])
+                tag = ExperienceTag(tag = all_tags[i], language = "en" if isEnglish(all_tags[i]) else "zh")
                 tag.save()
                 all_tags.remove(all_tags[i])
                 all_tags.insert(i, tag)
 
-            curr_row = 0
+            curr_row = 1
+            #start from the third row
             while curr_row < num_rows:
                 curr_row += 1
                 row = worksheet.row(curr_row)
 
                 curr_cell = 0
-                id = row[curr_cell].value.split("--")[0]
+                id = row[curr_cell].value
                 id = int(id)
                 try:
-                    exp = Experience.objects.get(id=id)
-                except Experience.DoesNotExist:
+                    exp = AbstractExperience.objects.get(id=id)
+                except AbstractExperience.DoesNotExist:
                     continue
 
                 while curr_cell < num_cells:
@@ -119,12 +125,95 @@ def updateExperienceTagsFromXLS(request):
                     if cell_type == 1 or cell_type == 0:
                         if worksheet.cell_value(curr_row, curr_cell).lower() == "y":
                             exp.tags.add(all_tags[curr_cell-1])
+                            exp.tags.add(all_tags[curr_cell-1+num_cells])
                     else:
                         raise Exception("Type error: row " + str(curr_row) + ", col " + str(curr_cell))
     else:
         form = ExperienceTagsXLSForm()
 
     return render_to_response('app/experience_tags_xls.html', {'form': form}, context)
+
+def get_user(first_name, last_name, email, phone):
+    '''
+    if the user does not exist, create a new one, otherwise return the user
+    '''
+    if email is None and phone is None:
+        return None
+
+    if email is None:
+        profile = RegisteredUser.objects.filter(phone_number = phone)
+        if profile and len(profile):
+            profile = profile[0]
+            return profile.user
+        else:
+            return None
+    else:
+        try:
+            user = User.objects.get(email=email)
+            return user
+        except User.DoesNotExist:
+            if first_name is None or last_name is None or phone is None:
+                return None
+
+            count = len(User.objects.filter(first_name__iexact=first_name)) + len(User.objects.filter(username__iexact=first_name))
+            if count > 0 :
+                user = User(first_name = first_name, last_name = last_name, email = email,
+                            username = first_name+str(count+1),
+                            date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                            last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
+            else:
+                user = User(first_name = first_name, last_name = last_name, email = email,
+                            username = first_name,
+                            date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                            last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
+            user.save()
+            password = User.objects.make_random_password()
+            user.set_password(password)
+            user.save()
+            profile = RegisteredUser(user = user, phone_number = phone)
+            profile.save()
+
+            cursor = connections['default'].cursor()
+            cursor.execute("Insert into account_emailaddress (user_id,email,verified,`primary`) values (%s, %s, %s, %s)", 
+                           [user.id, email, 1, 1])
+
+            username = user.username
+
+            new_email = Users(id = email_account_generator() + ".user@tripalocal.com",
+                                name = username,
+                                maildir = username + "/")
+            new_email.save()
+
+            new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
+            new_alias.save()
+
+            if not settings.DEVELOPMENT:
+                if len(settings.ADMINS) == 0:
+                    with open('/etc/postfix/canonical', 'a') as f:
+                        f.write(user.email + " " + new_email.id + "\n")
+                        f.close()
+
+                    subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
+
+                    with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
+                        f.write(new_email.id + "\n")
+                        f.close()
+                else:
+                    try:
+                        response = requests.post('https://www.tripalocal.com/update_files/',
+                                                 data={'user_email': user.email,'tripalocal_email':new_email.id},
+                                                 auth=(settings.ADMINS[0][1], settings.ADMIN_PASSWORD[0]),
+                                                 timeout=3)
+                    except requests.exceptions.RequestException as err:
+                        #TODO
+                        pass
+
+            #send a welcome email
+            mail.send(subject=_('[Tripalocal] Successfully registered'), message='', sender=settings.DEFAULT_FROM_EMAIL,
+                          recipients = [email], priority='now', html_message=loader.render_to_string('app/email_auto_registration.html',
+                                                                                                     {'email':user.email, 'password':password, 'url':'https://www.tripalocal.com' + GEO_POSTFIX + 'accounts/login?next=' + GEO_POSTFIX + 'accounts/password/change/'}))
+
+            return user
 
 def saveBookingRequest(booking_request):
     first_name = booking_request['first_name']
@@ -141,60 +230,12 @@ def saveBookingRequest(booking_request):
     if not isLegalInput([first_name,last_name,email,city,country,phone,experience_id,guest_number,booking_datetime,booking_extra_information]):
         raise Exception("Illegal input")
 
-    experience = Experience.objects.get(id=experience_id)
+    experience = AbstractExperience.objects.get(id=experience_id)
     experience.title = experience.get_title(settings.LANGUAGES[0][0])
     experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
     #create a new account if the user does not exist
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        count = len(User.objects.filter(first_name__iexact=first_name))
-        if count > 0 :
-            user = User(first_name = first_name, last_name = last_name, email = email,
-                        username = first_name+str(count+1),
-                        date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
-                        last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
-        else:
-            user = User(first_name = first_name, last_name = last_name, email = email,
-                        username = first_name,
-                        date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
-                        last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
-        user.save()
-        password = User.objects.make_random_password()
-        user.set_password(password)
-        user.save()
-        profile = RegisteredUser(user = user, phone_number = phone)
-        profile.save()
-
-        cursor = connections['default'].cursor()
-        cursor.execute("Insert into account_emailaddress (user_id,email,verified,`primary`) values (%s, %s, %s, %s)", 
-                       [user.id, email, 1, 1])
-
-        username = user.username
-
-        new_email = Users(id = email_account_generator() + ".user@tripalocal.com",
-                            name = username,
-                            maildir = username + "/")
-        new_email.save()
-
-        new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
-        new_alias.save()
-
-        with open('/etc/postfix/canonical', 'a') as f:
-            f.write(user.email + " " + new_email.id + "\n")
-            f.close()
-
-        subprocess.Popen(['sudo','postmap','/etc/postfix/canonical'])
-    
-        with open('/etc/postgrey/whitelist_recipients.local', 'a') as f:
-            f.write(new_email.id + "\n")
-            f.close()
-                    
-        #send a welcome email
-        mail.send(subject=_('[Tripalocal] Successfully registered'), message='', sender=settings.DEFAULT_FROM_EMAIL,
-                      recipients = [email], priority='now', html_message=loader.render_to_string('app/email_auto_registration.html',
-                                                                                                 {'email':user.email, 'password':password, 'url':'https://www.tripalocal.com' + GEO_POSTFIX + 'accounts/login?next=' + GEO_POSTFIX + 'accounts/password/change/'}))
+    user = get_user(first_name, last_name, email, phone)
 
     #record the booking request
     local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -752,8 +793,8 @@ def service_search(request, format=None):
 def service_mytrip(request, format=None):
     try:
         user = request.user
-        booking_status = "paid,accepted,rejected"
-        b = Booking.objects.filter(user=user, status__in=booking_status.split(","))
+        booking_status = ["paid","accepted","rejected","paid_archived","accepted_archived","rejected_archived"]
+        b = Booking.objects.filter(user=user, status__in=booking_status)
 
         bookings = []
         for booking in b:
@@ -778,7 +819,7 @@ def service_mytrip(request, format=None):
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
                   'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
                   'experience_title':booking.experience.get_title(settings.LANGUAGES[0][0]),
-                  'experience_photo':photo_url,
+                  'experience_photo':photo_url, 'experience_type':booking.experience.type,
                   'meetup_spot':get_experience_meetup_spot(booking.experience,settings.LANGUAGES[0][0]),
                   'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.',
                   'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
@@ -886,6 +927,73 @@ def service_booking(request, format=None):
         result = {"success":"false"}
         return Response(result, status=status.HTTP_400_BAD_REQUEST)
 
+#{"partner":"test","bookings":[
+#{"first_name":"first","last_name":"last","email":"test@test.com","phone":"123456789","experience_id":"2","datetime":"2015/12/17 12:00","guest_number_adult":2,"guest_number_children":2,"coupon":"abcdefgh"},
+#{"email":"test@test.com","experience_id":"1","datetime":"2015/12/28 17:00","guest_number_adult":3,"guest_number_children":0,"coupon":""},
+#{"phone":"123456789","experience_id":"20","datetime":"2015/12/28 17:00","guest_number_adult":3,"guest_number_children":0,"coupon":""},
+#]}
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def service_booking_request(request, format=None):
+    try:
+        data = request.data
+
+        if type(data) is str:
+            data = ast.literal_eval(data)
+
+        bookings = data['bookings']
+        partner = data['partner']
+        local_timezone = pytz.timezone(settings.TIME_ZONE)
+
+        for item in bookings:
+            first_name = item['first_name'] if 'first_name' in item else None
+            last_name = item['last_name'] if 'last_name' in item else None
+            email = item['email'] if 'email' in item else None
+            phone = item['phone'] if 'phone' in item else None
+            user = get_user(first_name, last_name, email, phone)
+            if user is None:
+                raise Exception("Incomplete/Incorrect user information")
+            experience = AbstractExperience.objects.get(id=str(item['experience_id']))
+            host = get_host(experience)
+            bk_datetime = local_timezone.localize(datetime.strptime(item['datetime'].strip(), "%Y/%m/%d %H:%M")).astimezone(pytz.timezone("UTC"))
+            guest_number_adult = int(item['guest_number_adult'])
+            guest_number_children = int(item['guest_number_children'])
+            coupon = None
+            if 'coupon' in item and len(item['coupon']) > 0:
+                coupon = Coupon.objects.filter(promo_code__iexact = item['coupon'],
+                                               end_datetime__gt = bk_datetime,
+                                               start_datetime__lt = bk_datetime)
+                if len(coupon)>0:
+                    coupon = coupon[0]
+                    valid = check_coupon(coupon, experience.id, guest_number_adult + guest_number_children)
+                    if not valid['valid']:
+                        coupon = None
+                else:
+                    coupon = None
+
+            booking = Booking(user = user, experience = experience, guest_number = guest_number_adult + guest_number_children,
+                              adult_number = guest_number_adult, children_number = guest_number_children,
+							  datetime = bk_datetime, submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC),
+							  status=partner, coupon=coupon)
+            
+            booking.save()
+            send_booking_email_verification(booking, experience, user, False)
+
+        result = {"success":"true"}
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        logger = logging.getLogger("Tripalocal_V1")
+        reason = ""
+        if hasattr(err, 'detail'):
+            reason = err.detail
+        else:
+            reason = err
+        logger.error(reason)
+        result = {"success":"false","error":reason}
+        return Response(result, status=status.HTTP_400_BAD_REQUEST)
+
 #{"coupon":"aasfsaf","id":"20","date":"2015/06/17","time":"4:00 - 6:00","guest_number":2}
 @api_view(['POST'])
 @authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication)) #
@@ -957,7 +1065,8 @@ def get_experience_detail(experience, get_available_date=True):
     for photo in photos:
         experience_images.append(photo.directory+photo.name)
 
-    result = {'experience_language':experience.language,
+    result = {'experience_id':experience.id,
+                'experience_language':experience.language,
                 'experience_duration':experience.duration,
                 'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
                 'experience_currency': str(dict(Currency).get(experience.currency.upper(),experience.currency.upper())),
@@ -967,9 +1076,12 @@ def get_experience_detail(experience, get_available_date=True):
                 'experience_guest_number_max':experience.guest_number_max,
                 'experience_images':experience_images,
                 'experience_city':experience.city,
+                'experience_type':experience.type,
 
                 'experience_rate':math.ceil(rate),
                 'experience_reviews':experience_reviews,
+
+                'experience_popularity':get_experience_popularity(experience),
             }
 
     if get_available_date:
@@ -1043,12 +1155,13 @@ def get_experience_detail(experience, get_available_date=True):
         if ph and len(ph) > 0:
             image = ph[0].directory+ph[0].name
         result_related['related_experiences'].append({'image':image,
-                                                        'title':exp.get_title(settings.LANGUAGE_CODE[0][0]),
-                                                        'price':float(exp.price)*exp.commission, #commission is updated in get_related_experiences 
-                                                        'currency': str(dict(Currency).get(exp.currency.upper(),exp.currency.upper())),
-                                                        'dollarsign': DollarSign.get(exp.currency.upper(),'$'),
-                                                        'duration':exp.duration,
-                                                        'language':exp.language})
+                                                      'id':exp.id,
+                                                      'title':exp.get_title(settings.LANGUAGE_CODE[0][0]),
+                                                      'price':float(exp.price)*exp.commission, #commission is updated in get_related_experiences 
+                                                      'currency': str(dict(Currency).get(exp.currency.upper(),exp.currency.upper())),
+                                                      'dollarsign': DollarSign.get(exp.currency.upper(),'$'),
+                                                      'duration':exp.duration,
+                                                      'language':exp.language})
     result.update(result_related)
     return result
 
@@ -1264,7 +1377,7 @@ def service_email(request, format=None):
     try:
         data = request.data
         start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['start_date'].strip(), "%Y/%m/%d"))
-        exps = Experience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
+        exps = AbstractExperience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
         hosts = []
         exp_urls = []
 

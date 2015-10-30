@@ -90,11 +90,13 @@
           <button class="btn btn-default">Export PDF</button>
           <button class="btn btn-primary">Email</button>
           <!-- TODO -->
-          <input class="btn btn-default" id="itinerary_search" type="submit" value="{% trans "Search" %}" name="Search" style="display:none;">
+          <input class="btn btn-default" id="itinerary_search" type="hidden" value="{% trans "Search" %}" name="Search" style="display:none;">
         </div>
       </div>
     </div>
   </div>
+
+  <div class="loading"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
 
   <div class="container">
     <div class="row">
@@ -569,55 +571,38 @@
 
     $(document).ready(function()
     {
-        //fill out the left panel
-        var experience_column = $("#experience_column");
-        var flight_column = $("#flight_column");
-        var transfer_column = $("#transfer_column");
-        var accommodation_column = $("#accommodation_column");
-        var restaurant_column = $("#restaurant_column");
-
-        {%for day in itinerary%}
-        var i = {{forloop.counter}};
-        {% if forloop.first %}
-        var new_day = "<div id='experience_day_" + i + "' class='column city_{{day.city|title}}' style='overflow-x:hidden;overflow-y:scroll;'></div>";
-        {% else %}
-        var new_day = "<div id='experience_day_" + i + "' class='column city_{{day.city|title}}' style='display:none;'></div>";
-        {% endif %}
-        experience_column.append(new_day);
-            {% for experience in day.experiences %}
-            {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
-            var new_experience = "<div class='exp-box-sm portlet'>" +
-                                "<div class='exp-img portlet-header'>" +
-                                    "<img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='width:inherit;'/>" +
-                                "</div>" +
-                                "<div class='exp-info portlet-header'>" +
-                                    "<h3>{{experience.title}}</h3>" +
-                                    "<p>{{experience.description|escapejs|slice:"0:16"}}</p>" +
-                                    "<p>{{experience.duration}} {% trans 'hr(s)' %} &middot; " +
-                                       "{%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;" +
-                                       "{% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>" +
-                                "</div>"+
-                                "<div class='exp-price portlet-header'>" +
-                                    "<p>{{experience.dollarsign}}{{experience.currency}}</p>" +
-                                    "<h2>{{experience.price}}</h2>" +
-                                    "<p>{% trans 'per person' %}</p>" +
-                                "</div>" +
-                            "</div>";
-            $("#experience_day_"+ i).append(new_experience);
-            {% elif experience.type == "Flight" %}
-            //TODO
-            {% elif experience.type == "Transfer" %}
-            //TODO
-            {% elif experience.type == "Accommodation" %}
-            //TODO
-            {% elif experience.type == "Restaurant" %}
-            //TODO
-            {% endif %}
-            {% endfor %}
-        {% endfor %}
-
+        $(".loading").hide();
         $("#itinerary_search").click(function(e){
+            event.preventDefault();
             set_data_before_submit();
+            $(".loading").show();
+
+            $.ajax({
+                url : '{{GEO_POSTFIX}}itinerary/',
+                type: "POST",
+                data : {
+                            csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
+                            city: $("#id_city").val(),
+                            start_datetime: $("#id_start_datetime").val(),
+                            end_datetime: $("#id_end_datetime").val(),
+                            guest_number: $("#id_guest_number").val(),
+                            language: $("#id_language").val(),
+                            Search: "Search",
+                            tags: $("#id_tags").val(),
+                            all_tags: $("#id_all_tags").val(),
+                            sort: $("#id_sort").val(),
+                            age_limit: $("#id_age_limit").val()
+                        },
+                success: function(data){
+                            $('#experience_column').html(data);
+                            init_drag();
+                            $(".loading").hide();
+                        },
+                failure: function(e) {
+                            $(".loading").hide();
+                            $('#experience_column').text("Sorry but there was an error.");
+                        }
+            });
         });
 
         $("#button_email").click(function(e){
@@ -675,9 +660,25 @@
                     "<button id='update_city_" + i + "' class='btn btn-primary' onclick='update_city(" + i + ")'>{% trans 'Update' %}</button>" +
                     "<button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#button_city_" + i + "&quot;).popover(&quot;hide&quot;);'>{% trans 'Cancel' %}</button>" +
                     "<button id='delete_city_" + i + "' class='btn btn-danger' onclick='delete_city(" + i + ")'>{% trans 'Delete Location' %}</button>" +
-                    "\" city='" + $("#new_city").val() + "' duration=" + duration + ">" + city_name + " <span class=\"badge\">" + duration + "</span>" +
+                    "\" city='" + city + "' duration=" + duration + ">" + city_name + " <span class=\"badge\">" + duration + "</span>" +
                 "</button>";
         return new_city;
+    }
+
+    function update_left_section(city)
+    {
+        //the left section: only show the experiences in the given city
+        for(var i=0;i<cities.length;i++)
+        {
+            if(cities[i]==city)
+            {
+                $(".city_" + cities[i]).show();
+            }
+            else
+            {
+                $(".city_" + cities[i]).hide();
+            }
+        }
     }
 
     function add_new_city()
@@ -703,18 +704,19 @@
             }
         }
         i += 1;
+        var city = $("#new_city").val();
         var city_name = $("#new_city option:selected").text();
         var duration = $("#new_duration").val();
 
         //add a new button for the city
-        var new_city = construct_data_content(i, cities, $("#new_city").val(), city_name, duration);
+        var new_city = construct_data_content(i, cities, city, city_name, duration);
         $(new_city).insertBefore($("#add-city"));
         // Initialise popovers
         $('[data-toggle="popover"]').popover();
 
         //add a new item in the right section
         var new_item =
-                    "<div id=\"city-title-" + i + "\" class=\"section-box-add\" onclick=\"$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');\">" +
+                    "<div id=\"city-title-" + i + "\" class=\"section-box-add\" onclick=\"$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');update_left_section('" + city + "');\">" +
                         "<span class=\"add-sign\">+</span>" +
                         "<p id=\"city-title-p-" + i + "\">" + city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span></p>" +
                     "</div>" +
@@ -722,7 +724,7 @@
         for(var j=1;j<=duration;j++)
         {
             new_item +=
-                        "<div id=\"city-collapse-" + i + "-" + j + "\" class=\"section-box\">" +
+                        "<div id=\"city-collapse-" + i + "-day-" + j + "\" class=\"section-box\">" +
                             "<p>{% trans 'Day' %} " + j + "</p>" +
                             "<div class=\"column\">" +
                             "</div>" +
@@ -738,32 +740,34 @@
 
     function update_city(i)
     {
+        var city = $("#city_list_" + i).val();
         var city_name = $("#city_list_" + i + " option:selected").text();
         var duration = parseInt($("#duration_list_" + i).val());
         $("#button_city_" + i)[0].innerHTML = city_name + " <span class=\"badge\">" + duration + "</span>";
         $("#button_city_" + i).popover("hide");
         //update $("#button_city_" + i).attr("data-content")
-        $("#button_city_" + i).replaceWith(construct_data_content(i, cities, $("#city_list_" + i).val(), city_name, duration));
+        $("#button_city_" + i).replaceWith(construct_data_content(i, cities, city, city_name, duration));
         // Initialise popovers
         $('[data-toggle="popover"]').popover();
 
+        $("#city-title-" + i).attr("onclick","$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');update_left_section('" + city + "')");
         $("#city-title-p-" + i)[0].innerHTML = city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span>";
         for(var j=1;j<=10;j++)
         {
-            if(j<=duration && $("#city-collapse-" + i + "-" + j).length == 0)
+            if(j<=duration && $("#city-collapse-" + i + "-day-" + j).length == 0)
             {
                 //add a new day
-                var new_day =   "<div id=\"city-collapse-" + i + "-" + j + "\" class=\"section-box\">" +
+                var new_day =   "<div id=\"city-collapse-" + i + "-day-" + j + "\" class=\"section-box\">" +
                                     "<p>{% trans 'Day' %} " + j + "</p>" +
                                     "<div class=\"column\">" +
                                     "</div>" +
                                 "</div>";
                 $("#city-collapse-" + i).append(new_day);
             }
-            else if(j>duration && $("#city-collapse-" + i + "-" + j).length > 0)
+            else if(j>duration && $("#city-collapse-" + i + "-day-" + j).length > 0)
             {
                 //delete the day
-                $("#city-collapse-" + i + "-" + j).remove();
+                $("#city-collapse-" + i + "-day-" + j).remove();
             }
         }
         init_drag();
@@ -776,11 +780,14 @@
         $("#button_city_" + i).popover("hide");
         $("#warning-delete-location").modal("show");
         $("#confirm-delete").click(function() {
-          $("#button_city_" + i).remove();
-          $("#city-title-" + i).remove();
-          $("#city-collapse-" + i).remove();
-          $("#warning-delete-location").modal("hide");
-        })
+            //remove experiences in that city from the left section
+            city = $("#button_city_" + i).attr("city");
+            $(".city_" + city).remove();
+            $("#button_city_" + i).remove();
+            $("#city-title-" + i).remove();
+            $("#city-collapse-" + i).remove();
+            $("#warning-delete-location").modal("hide");
+        });
     }
 
     function set_data_before_submit()
@@ -791,11 +798,14 @@
         {
             //TODO
         }
-        var id = $("#add-city").prev().attr('id').split("_");
-        var j = parseInt(id[id.length-1]);
+        var id = $("#add-city").prev().attr('id');
         var number_city = 0;
-        for(var i=0;i<=j;i++)
+        //users may switch the order of cities, so button_city_1 can be behind button_city_2
+        while(id && id.startsWith("button_city_"))
         {
+            var id_split = id.split("_");
+            var i = parseInt(id_split[id_split.length-1]);
+
             if($("#button_city_"+i).length > 0)
             {
                 city = $("#button_city_"+i).attr("city");
@@ -804,10 +814,12 @@
                 duration = 1;
                 for(j=0;j<duration;j++)
                 {
-                    cities += city + ",";
+                    cities = city + "," + cities;
                 }
                 number_city += 1;
             }
+
+            id = $("#"+id).prev().attr('id');
         }
         cities = cities.substring(0,cities.length-1);
         $("#id_city").val(cities);
@@ -815,7 +827,7 @@
         var d = new Date();
         //d.setTime(d.getTime() + d.getTimezoneOffset()*60*1000);
         //$("#id_start_datetime") is already set
-        d.setDate(d.getDate()+number_city);
+        d.setDate(d.getDate()+number_city-1);
         $("#id_end_datetime").val(d.toISOString().substring(0, 10));
     }
 

@@ -44,7 +44,8 @@
 </head>
 
 <body>
-    <!-- Popup Modal -->
+    <!-- Product Popup Modal
+
     <div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="popup">
         <div class="modal-dialog" role="document">
             <div class="modal-content popup">
@@ -63,6 +64,70 @@
             </div>
         </div>
     </div>
+
+    End Modal -->
+
+    <!-- Custom itinerary Popup Modal -->
+    <div class="modal fade" id="help-popup" tabindex="-1" role="dialog" aria-labelledby="help-popup">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content help" style="background-image:url('{% static 'app/img/nightlight_web.jpg' %}')">
+                <div id="popup-page-1">
+                    <h1>{% trans "Do you need help planning your trip to Australia and New Zealand?" %}</h1>
+
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-xs-6" style="float:left;">
+                                  <button class="btn btn-secondary" id="help-no">{% trans "NO" %}</button>
+                                </div>
+                                <div class="col-xs-6" style="float:left;">
+                                  <button class="btn btn-primary" id="help-yes">{% trans "YES" %}</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                              <br>
+                              <p>
+                              {% trans "or check out some of our " %}
+                              {%if LANGUAGE == "zh-CN"%}
+                              <a id="multidaytrip-link" href="https://www.tripalocal.com/cn/multidaytrip/">
+                              {%else%}
+                              <a id="multidaytrip-link" href="https://www.tripalocal.com/multidaytrip/">
+                              {%endif%}
+                              {% trans "most popular trips" %}</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="close-popup">{% trans "close" %}</a>
+                </div>
+                <div id="popup-page-2" hidden="true">
+                    <h1>{% trans "Tell us about your trip" %}</h1>
+
+                    <p>{% trans "and we will get back to you within 48 hours" %}<br>
+                    {% trans "or check out some of our " %}
+                    {%if LANGUAGE == "zh-CN"%}
+                    <a id="multidaytrip-link" href="https://www.tripalocal.com/cn/multidaytrip/">
+                    {%else%}
+                    <a id="multidaytrip-link" href="https://www.tripalocal.com/multidaytrip/">
+                    {%endif%}
+                    {% trans "most popular trips" %}</a></p>
+                    <form id="custom-trip-form" class="popup-form" action="/email_custom_trip" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <textarea class="form-control" id="popup-form-details" rows="4"
+                                      placeholder="{% trans 'Please tell us more details' %}"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="popup-form-email" placeholder="{% trans 'Email address' %}">
+                        </div>
+                        <div id="results"></div>
+                        <button id="popup-send" class="btn btn-primary popup-form-submit" type="submit" value="send">{% trans 'Send' %}</button>
+                    </form>
+                    <a class="close-popup">{% trans "close" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- End Modal -->
 
 
@@ -129,8 +194,8 @@
           {% endif %}
 
         <ul class="nav navbar-nav main-menu">
-          <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
           <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
+          <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
           <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
         </ul>
 
@@ -284,7 +349,7 @@
         $("#wechat-qr").animate({'margin-right': 0}, 500, 'linear');
       }, 2000);
 
-      // Popup logic
+      /* Product Popup logic
         var conversations = [
           "\"{% trans 'Do you want to experience fine dining with the best view in the Southern Hemisphere? Try Skylines Stratosphere Bar & Restaurant in Queenstown, New Zealand.' %}\"",
           "\"{% trans 'Its perfect weather to relax in nature from now until March, why not go camping?' %}\"",
@@ -359,7 +424,77 @@
                 mixpanel.track("closed popup");
             });
         }
-      // END POPUP THINGS
+      // END PRODUCT POPUP THINGS */
+
+      var popupTimer;
+       if ($(window).width() > 520) {
+           var nClose = parseInt($.cookie("closePopup"), 10);
+           if (!nClose || nClose < 3) {
+               if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
+                   $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
+                 popupTimer = setTimeout(function () {
+                     $('#help-popup').modal('show');
+                     mixpanel.track("saw popup01");
+                 }, 15000); // milliseconds
+               }
+           }
+           $('#help-popup').on('hidden.bs.modal', function () {
+               mixpanel.track("closed popup01");
+           });
+           $('.close-popup').click(function () {
+               clearTimeout(popupTimer);
+               if (nClose) {
+                   $.cookie("closePopup", nClose + 1, {path: '/'});
+               } else {
+                   $.cookie("closePopup", 1, {path: '/'});
+               }
+               $('#help-popup').modal('hide');
+               mixpanel.track("closed popup01");
+           });
+           $('#help-no').click(function () {
+               clearTimeout(popupTimer);
+               if (nClose) {
+                   $.cookie("closePopup", nClose + 1, {path: '/'});
+               } else {
+                   $.cookie("closePopup", 1, {path: '/'});
+               }
+               $('#help-popup').modal('hide');
+               mixpanel.track("selected No from popup01");
+           });
+           $('#help-yes').click(function () {
+               $('#popup-page-1').hide();
+               $('#popup-page-2').show();
+               mixpanel.track("selected Yes from popup01");
+           });
+           $('#multidaytrip-link').click(function() {
+             mixpanel.track("checked out designed multi-day from pop up box");
+           });
+           $('#custom-trip-form').on('submit', function (event) {
+               event.preventDefault();
+               $('#results').empty();
+               email = $('#popup-form-email').val();
+               message = $('#popup-form-details').val();
+               if (!message || !email) {
+                   $('#results').html("<p class='popup-result'>{% trans 'Please fill in all fields.' %}</p>");
+               } else {
+                   var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                   if (regex.test(email)) {
+                       $('#popup-send').hide();
+                       create_post(email, message);
+                   } else {
+                       $('#popup-send').hide();
+                       $('#results').html("<br><p class='popup-result'>{% trans 'Invalid email, please' %} <span class='try-again'>{% trans 'try again' %}</span></p>");
+                       $('.try-again').click( function() {
+                         $('#results').html("<br>");
+                         $('#popup-form-email').val('');
+                         $('#popup-send').show();
+                       });
+                   }
+               }
+           });
+       }
+
+
 
         var des_url = window.location.pathname;
         if (des_url.indexOf("/cn") > -1) {
