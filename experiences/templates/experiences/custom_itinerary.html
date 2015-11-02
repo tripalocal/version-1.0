@@ -69,6 +69,8 @@
                 <select id='new_city' class='form-control'>
                     <option value='Melbourne'>{% trans 'Melbourne' %}</option>
                     <option value='Sydney'>{% trans 'Sydney' %}</option>
+                    <option value='Brisbane'>{% trans 'Brisbane' %}</option>
+                    <option value='Goldcoast'>{% trans 'Gold Coast' %}</option>
                 </select>
             </div>
             <div class='form-goup'>
@@ -605,8 +607,7 @@
             });
         });
 
-        $("#button_email").click(function(e){
-            e.preventDefault();
+        $("#button_export").click(function(e){
             set_itinerary_string();
         });
 
@@ -712,7 +713,7 @@
 
         //add a new item in the right section
         var new_item =
-                    "<div id=\"city-title-" + i + "\" class=\"section-box-add\" onclick=\"$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');update_left_section('" + city + "');\">" +
+                    "<div id=\"city-title-" + i + "\" class=\"section-box-add\" onclick=\"$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');update_left_section('" + city + "');\" city=" + city + ">" +
                         "<span class=\"add-sign\">+</span>" +
                         "<p id=\"city-title-p-" + i + "\">" + city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span></p>" +
                     "</div>" +
@@ -747,6 +748,7 @@
         $('[data-toggle="popover"]').popover();
 
         $("#city-title-" + i).attr("onclick","$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');update_left_section('" + city + "')");
+        $("#city-title-" + i).attr("city",city);
         $("#city-title-p-" + i)[0].innerHTML = city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span>";
         for(var j=1;j<=10;j++)
         {
@@ -832,13 +834,16 @@
         var itinerary = [];
         var city = $(".price-line").next().next()[0];
         var number_day = 0;
+        var cities = "";
 
         while(city && city.id.indexOf("city-collapse-") === 0)
         {
+            var c = $(city).prev().attr("city");
             var day = $(city).children()[0];
             while(day && day.id.indexOf("city-collapse-") === 0)
             {
                 number_day += 1;
+                cities += c + ",";
                 var experience = $(day).find(".column")[0].firstChild;
                 while(experience && experience.id.indexOf("experience_id_") === 0)
                 {
@@ -846,6 +851,7 @@
                     var d = Date.parseExact($("#id_start_datetime").val().substring(0, 10), "yyyy-M-dd");
                     d.setDate(d.getDate()+number_day-1);
                     var dict={"id":exp_id[exp_id.length-1],
+                              "title":$(experience).find(".exp-info")[0].firstElementChild.innerText,
                               "date":d.toString('yyyy-M-dd'),
                               "time":"01:00",
                               "guest_number":$("#id_guest_number").val()};
@@ -861,6 +867,8 @@
             }
         }
 
+        cities = cities.substring(0,cities.length-1);
+        $("#id_city").val(cities);
         $("#id_itinerary_string").val(JSON.stringify(itinerary));
     }
 

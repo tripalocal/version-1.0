@@ -3118,7 +3118,7 @@ def custom_itinerary(request):
     if request.method == 'POST':
         form = CustomItineraryForm(request.POST)
 
-        if 'Search' in request.POST:
+        if 'Search' in request.POST and 'itinerary_string' not in request.POST:
             if form.is_valid():
                 start_datetime = form.cleaned_data['start_datetime']
                 end_datetime = form.cleaned_data['end_datetime']
@@ -3181,7 +3181,7 @@ def custom_itinerary(request):
 
                     #save the custom itinerary as draft
                     local_timezone = pytz.timezone(settings.TIME_ZONE)
-                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y/%m/%d"))
+                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
                     booking = Booking(user = request.user, experience= experience, guest_number = guest_number,
@@ -3191,7 +3191,7 @@ def custom_itinerary(request):
 
                     #save to excel sheet
                     cell_format = workbook.add_format({'text_wrap': True})
-                    current_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(str(item['date']), "%Y/%m/%d"))
+                    current_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(str(item['date']), "%Y-%m-%d"))
                     if current_date > last_date:
                         #a new day
                         row += 1
@@ -3236,7 +3236,7 @@ def custom_itinerary(request):
                 col += 1
                 worksheet.write(row, col, total_price/guest_number)
                 workbook.close()
-                return HttpResponseRedirect("https://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
+                return HttpResponseRedirect("http://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
 
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
