@@ -3140,7 +3140,7 @@ def custom_itinerary(request):
 
                 return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)
             else:
-                return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
+                return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form}, context)
         else:
             #submit bookings
             if form.is_valid():

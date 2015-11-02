@@ -10,7 +10,7 @@
     {% endif %}
         {% for experience in day.experiences %}
         {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
-        <div class='exp-box-sm portlet'>
+        <div class='exp-box-sm portlet' id='experience_id_{{experience.id}}'>
             <div class='exp-img portlet-header'>
                 <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
             </div>

@@ -86,9 +86,9 @@
         </div>
         <div class="form-inline right-group">
           <h3 class="form-header"> </h3>
-          <button class="btn btn-default">Preview</button>
-          <button class="btn btn-default">Export PDF</button>
-          <button class="btn btn-primary">Email</button>
+          <button id="button_preview" class="btn btn-default">{% trans "Preview" %}</button>
+          <button id="button_export" class="btn btn-default">{% trans "Export PDF" %}</button>
+          <button id="button_email" class="btn btn-primary">{% trans "Email" %}</button>
           <!-- TODO -->
           <input class="btn btn-default" id="itinerary_search" type="hidden" value="{% trans "Search" %}" name="Search" style="display:none;">
         </div>
@@ -565,7 +565,7 @@
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
     {%endif%}
     <script type="text/javascript" src="{% static 'experiences/scripts/custom_itinerary.js' %}"></script>
-
+    <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
     <script type="text/javascript">
     cities = ["Melbourne","Sydney","Brisbane","Goldcoast"];//TODO
 
@@ -606,12 +606,8 @@
         });
 
         $("#button_email").click(function(e){
-            var itinerary = [];
-            var dict={"id":"",
-                      "date":"","time":"",
-                      "guest_number":1};
-            itinerary.push(dict);
-            $("#id_itinerary_string").val(JSON.stringify(itinerary));
+            e.preventDefault();
+            set_itinerary_string();
         });
 
         init_drag();
@@ -828,7 +824,44 @@
         //d.setTime(d.getTime() + d.getTimezoneOffset()*60*1000);
         //$("#id_start_datetime") is already set
         d.setDate(d.getDate()+number_city-1);
-        $("#id_end_datetime").val(d.toISOString().substring(0, 10));
+        $("#id_end_datetime").val(d.toString('yyyy-M-dd'));
+    }
+
+    function set_itinerary_string()
+    {
+        var itinerary = [];
+        var city = $(".price-line").next().next()[0];
+        var number_day = 0;
+
+        while(city && city.id.indexOf("city-collapse-") === 0)
+        {
+            var day = $(city).children()[0];
+            while(day && day.id.indexOf("city-collapse-") === 0)
+            {
+                number_day += 1;
+                var experience = $(day).find(".column")[0].firstChild;
+                while(experience && experience.id.indexOf("experience_id_") === 0)
+                {
+                    var exp_id = experience.id.split("_");
+                    var d = Date.parseExact($("#id_start_datetime").val().substring(0, 10), "yyyy-M-dd");
+                    d.setDate(d.getDate()+number_day-1);
+                    var dict={"id":exp_id[exp_id.length-1],
+                              "date":d.toString('yyyy-M-dd'),
+                              "time":"01:00",
+                              "guest_number":$("#id_guest_number").val()};
+                    itinerary.push(dict);
+                    experience = $(experience).next()[0];
+                }
+                day = $(day).next()[0];
+            }
+            city = $(city).next()[0];
+            if(city && city.id.indexOf("city-title-") === 0)
+            {
+                city = $(city).next()[0];           
+            }
+        }
+
+        $("#id_itinerary_string").val(JSON.stringify(itinerary));
     }
 
     </script>
