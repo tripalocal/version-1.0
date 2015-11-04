@@ -3118,7 +3118,7 @@ def custom_itinerary(request):
     if request.method == 'POST':
         form = CustomItineraryForm(request.POST)
 
-        if 'Search' in request.POST:
+        if 'Search' in request.POST and 'itinerary_string' not in request.POST:
             if form.is_valid():
                 start_datetime = form.cleaned_data['start_datetime']
                 end_datetime = form.cleaned_data['end_datetime']
@@ -3138,9 +3138,9 @@ def custom_itinerary(request):
                 customer = request.user if request.user.is_authenticated() else None
                 itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort, age_limit, customer)
 
-                return render_to_response('experiences/custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
+                return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)
             else:
-                return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
+                return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form}, context)
         else:
             #submit bookings
             if form.is_valid():
@@ -3181,7 +3181,7 @@ def custom_itinerary(request):
 
                     #save the custom itinerary as draft
                     local_timezone = pytz.timezone(settings.TIME_ZONE)
-                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y/%m/%d"))
+                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
                     booking = Booking(user = request.user, experience= experience, guest_number = guest_number,
@@ -3191,7 +3191,7 @@ def custom_itinerary(request):
 
                     #save to excel sheet
                     cell_format = workbook.add_format({'text_wrap': True})
-                    current_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(str(item['date']), "%Y/%m/%d"))
+                    current_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(str(item['date']), "%Y-%m-%d"))
                     if current_date > last_date:
                         #a new day
                         row += 1
@@ -3236,7 +3236,7 @@ def custom_itinerary(request):
                 col += 1
                 worksheet.write(row, col, total_price/guest_number)
                 workbook.close()
-                return HttpResponseRedirect("https://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
+                return HttpResponseRedirect("http://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
 
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
@@ -3354,7 +3354,7 @@ def itinerary_booking_successful(request):
 
     return render(request,'experiences/itinerary_booking_successful.html',{})
 
-def bring_the_kids(request):
+def topic_family(request):
     set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[911,2041,464,69,408])
     i=0
@@ -3388,7 +3388,7 @@ def bring_the_kids(request):
         else:
             experience.title = t
         i+=1
-    template = "experiences/bring_the_kids.html"
+    template = "experiences/topic_family.html"
     context = RequestContext(request, {
                             'experienceList' : experienceList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
@@ -3397,7 +3397,7 @@ def bring_the_kids(request):
               })
     return render_to_response(template, {}, context)
 
-def hopeless_romance(request):
+def topic_romance(request):
     set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[209,302,911,921,71,852,862,1021])
     i=0
@@ -3432,7 +3432,7 @@ def hopeless_romance(request):
         else:
             experience.title = t
         i+=1
-    template = "experiences/hopeless_romance.html"
+    template = "experiences/topic_romance.html"
     context = RequestContext(request, {
                             'experienceList' : experienceList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
@@ -3441,7 +3441,7 @@ def hopeless_romance(request):
               })
     return render_to_response(template, {}, context)
 
-def local_culture(request):
+def topic_culture(request):
     set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[981,1591,911,921,54,106,2,32,37])
     i=0
@@ -3475,7 +3475,7 @@ def local_culture(request):
         else:
             experience.title = t
         i+=1
-    template = "experiences/local_culture.html"
+    template = "experiences/topic_culture.html"
     context = RequestContext(request, {
                             'experienceList' : experienceList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
