@@ -3354,7 +3354,7 @@ def itinerary_booking_successful(request):
 
     return render(request,'experiences/itinerary_booking_successful.html',{})
 
-def bring_the_kids(request):
+def topic_family(request):
     set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[911,2041,464,69,408])
     i=0
@@ -3388,7 +3388,7 @@ def bring_the_kids(request):
         else:
             experience.title = t
         i+=1
-    template = "experiences/bring_the_kids.html"
+    template = "experiences/topic_family.html"
     context = RequestContext(request, {
                             'experienceList' : experienceList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
@@ -3397,7 +3397,7 @@ def bring_the_kids(request):
               })
     return render_to_response(template, {}, context)
 
-def hopeless_romance(request):
+def topic_romance(request):
     set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[209,302,911,921,71,852,862,1021])
     i=0
@@ -3432,7 +3432,7 @@ def hopeless_romance(request):
         else:
             experience.title = t
         i+=1
-    template = "experiences/hopeless_romance.html"
+    template = "experiences/topic_romance.html"
     context = RequestContext(request, {
                             'experienceList' : experienceList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
@@ -3441,7 +3441,7 @@ def hopeless_romance(request):
               })
     return render_to_response(template, {}, context)
 
-def local_culture(request):
+def topic_culture(request):
     set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[981,1591,911,921,54,106,2,32,37])
     i=0
@@ -3475,7 +3475,7 @@ def local_culture(request):
         else:
             experience.title = t
         i+=1
-    template = "experiences/local_culture.html"
+    template = "experiences/topic_culture.html"
     context = RequestContext(request, {
                             'experienceList' : experienceList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
