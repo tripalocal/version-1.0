@@ -249,24 +249,21 @@
     <div id="footer_div" class="footer">
         <div class="container">
           <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <ul class="footer-head">
                     <li>
                         <select id="id_language_select" class="form-control">
                             <option id="id_language_cn" value="cn">中文</option>
                             <option id="id_language_en" value="en">English</option>
                         </select>
+                        <select id="id_currency_select" class="form-control">
+                            <option id="id_currency_cny" value="CNY">{% trans 'CNY' %}</option>
+                            <option id="id_currency_aud" value="AUD">{% trans 'AUD' %}</option>
+                            <option id="id_currency_nzd" value="NZD">{% trans 'NZD' %}</option>
+                        </select>
                     </li>
                     <li class="footer-logo"></li>
                 </ul>
-            </div>
-
-            <div class="col-sm-2" style="text-align:center;">
-                <select id="id_currency_select" class="form-control" style="margin-bottom:20px; height:50px; max-width:80px; display:inline-block;">
-                    <option id="id_currency_cny" value="CNY">{% trans 'CNY' %}</option>
-                    <option id="id_currency_aud" value="AUD">{% trans 'AUD' %}</option>
-                    <option id="id_currency_nzd" value="NZD">{% trans 'NZD' %}</option>
-                </select>
             </div>
 
             <div class="col-sm-2 col-xs-6">
