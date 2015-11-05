@@ -141,3 +141,28 @@
   height: 35px;
   width: 170px;
 }
+
+// WeChat payment
+.qr-payment {
+  width: 400px;
+  margin: 30px auto;
+  padding-bottom: 15px;
+  background-color: white;
+  border: 1px solid $light-grey;
+  border-radius: 4px;
+}
+
+.media-body {
+  color: $dark-grey;
+  font-size: 12px;
+}
+
+.media-heading {
+  font-weight: normal;
+  font-size: 14px;
+}
+
+.media-object {
+  margin: 0 15px;
+
+}

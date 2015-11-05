@@ -327,7 +327,7 @@
                 $('#popup-form-details').val('');
                 $('#popup-form-email').val('');
                 $('#results').html("<br><p class='popup-result'>{% trans 'Sent!' %}</p>");
-                $.cookie("closePopup", 3, {path: '/'});
+                $.cookie("closePopupPromo", 3, {path: '/'});
             },
 
             error: function (xhr, errmsg, err) {
@@ -437,15 +437,15 @@
       var chosenValue = Math.random() < 0.5 ? 0 : 1;
       var popupTimer;
         if ($(window).width() > 520) {
-           var nClose = parseInt($.cookie("closePopup"), 10);
-           if (!nClose || nClose < 3) {
+           var nClose = parseInt($.cookie("closePopupPromo"), 10);
+           if (!nClose || nClose < 6) {
                if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
                    $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
                  popupTimer = setTimeout(function () {
                      {% if LANGUAGE != "zh-CN" %}
                      $('#help-popup').modal('show');
                      {% else %}
-                     if chosenValue == 0 {
+                     if (chosenValue == 0) {
                        $('#help-popup').modal('show');
                      } else {
                        $('#promo-popup').modal('show');
@@ -461,9 +461,9 @@
            $('.close-popup').click(function () {
                clearTimeout(popupTimer);
                if (nClose) {
-                   $.cookie("closePopup", nClose + 1, {path: '/'});
+                   $.cookie("closePopupPromo", nClose + 1, {path: '/'});
                } else {
-                   $.cookie("closePopup", 1, {path: '/'});
+                   $.cookie("closePopupPromo", 1, {path: '/'});
                }
                $('#help-popup').modal('hide');
                $('#promo-popup').modal('hide');
@@ -472,9 +472,9 @@
            $('#help-no').click(function () {
                clearTimeout(popupTimer);
                if (nClose) {
-                   $.cookie("closePopup", nClose + 1, {path: '/'});
+                   $.cookie("closePopupPromo", nClose + 1, {path: '/'});
                } else {
-                   $.cookie("closePopup", 1, {path: '/'});
+                   $.cookie("closePopupPromo", 1, {path: '/'});
                }
                $('#help-popup').modal('hide');
                mixpanel.track("selected No from popup01");

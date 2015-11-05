@@ -29,4 +29,16 @@ body {
     transform: translateY(-50%);
     margin: 0;
   }
+
+  h2 {
+    color: white;
+    font-weight: normal;
+    position: relative;
+    top: 50%;
+  }
+}
+
+.container {
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
