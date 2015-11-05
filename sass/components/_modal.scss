@@ -183,3 +183,26 @@
   width: 350px;
   height: 40px;
 }
+
+.promo-popup {
+  position: relative;
+  background-color: transparent;
+  box-shadow: none;
+  text-align: center;
+  border: 0;
+  .btn {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 165px;
+    height: 32px;
+    border: 0;
+  }
+  .close-popup {
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+  }
+}
