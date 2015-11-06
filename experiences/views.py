@@ -3527,6 +3527,135 @@ def topic_culture(request):
               })
     return render_to_response(template, {}, context)
 
+def topic_outdoor(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[1581,862,2291,2351,1641,882,2671,2551,2441,1971,2591,2571,2581,2371])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_outdoor.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_extreme(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[2441,1981,2021,852,2411,2381,2291,1031,2361,2081])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_extreme.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_photography(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[2081,2591,2531,2551,2561,2421,1681,1571,862,2681,2411,1651,1611,1621])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_photography.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
 def multi_day_trip(request):
     experienceList = Experience.objects.filter(status='Listed', type='ITINERARY')
     i=0

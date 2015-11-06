@@ -123,8 +123,8 @@
                   </div>
                 </div>
                 <input type="submit" id="submit_booking" name="Stripe" value="{% trans "Credit card / Alipay" %}" class="btn btn-primary btn-lg"/>
-                <!--<input type="submit" id="submit_booking_unionpay" name="UnionPay" value="{% trans "Union Pay" %}" class="btn btn-primary btn-lg" style="margin:0 0 30px 20px;width:180px;"/>-->
-              <input type="submit" id="wechat_booking" name="WeChat" value="{% trans "Pay by WeChat" %}" class="btn btn-primary btn-lg" style="margin:0 0 0 20px;width:180px;"/>
+                <button disabled="disabled" type="submit" id="submit_booking_unionpay" name="UnionPay" class="btn btn-default btn-lg" style="padding-top:6px; padding-bottom:6px;"><img src="{% static 'icon/union.svg' %}">{% trans "Union Pay" %}</button>
+                <button type="submit" id="wechat_booking" name="WeChat" class="btn btn-default btn-lg" style="padding-top:6px; padding-bottom:6px;"><img src="{% static 'icon/qr.svg' %}">{% trans "WeChat Pay" %}</button>
               </form>
             </div>
 
