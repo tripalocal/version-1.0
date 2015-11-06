@@ -801,9 +801,9 @@ class ExperienceAvailabilityForm(forms.Form):
 SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
 AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children')),(4,_('Famili with elderly&children')))
 class CustomItineraryForm(forms.Form):
-    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}), initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()))
-    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}), initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()))
-    guest_number = forms.ChoiceField(choices=Guest_Number_Min, required=True, initial=1)
+    start_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()))
+    end_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()))
+    guest_number = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
     city = forms.CharField(widget=forms.Textarea,  required=True, initial="Melbourne")
     language = forms.CharField(widget=forms.Textarea,  required=True, initial="English,Mandarin")
     tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
@@ -814,10 +814,6 @@ class CustomItineraryForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(CustomItineraryForm, self).__init__(*args, **kwargs)
-        self.fields['start_datetime'].widget.attrs['readonly'] = True
-        self.fields['start_datetime'].widget = forms.HiddenInput()
-        self.fields['end_datetime'].widget.attrs['readonly'] = True
-        self.fields['end_datetime'].widget = forms.HiddenInput()
         self.fields['itinerary_string'].widget.attrs['readonly'] = True
         self.fields['itinerary_string'].widget = forms.HiddenInput()
         self.fields['city'].widget.attrs['readonly'] = True

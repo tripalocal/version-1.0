@@ -53,6 +53,14 @@ body {
   color: white;
 }
 
+.start-date, .end-date {
+  position: relative;
+  width: 100px;
+  .form-control {
+    width: 100%;
+  }
+}
+
 .right-group {
   float: right;
   margin-right: 0;
