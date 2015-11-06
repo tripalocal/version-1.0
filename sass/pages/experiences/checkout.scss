@@ -122,10 +122,14 @@
 }
 
 .btn-lg {
-  width: 180px;
-  margin: 15px 30px 15px 15px;
+  width: 160px;
+  margin: 15px 0 15px 10px;
   border-radius: 3px;
-  font-size: 14px
+  font-size: 14px;
+  font-weight: bold;
+  img {
+    margin-right: 15px;
+  }
 }
 
 #id_promo_code {
