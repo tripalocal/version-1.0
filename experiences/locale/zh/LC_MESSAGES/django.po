@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-06 16:58+1100\n"
+"POT-Creation-Date: 2015-11-06 17:41+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,10 @@ msgstr ""
 #: experiences/templates/experiences/experience_detail.html:394
 #: experiences/templates/experiences/experience_results.html:41
 #: experiences/templates/experiences/topic_culture.html:43
+#: experiences/templates/experiences/topic_extreme.html:43
 #: experiences/templates/experiences/topic_family.html:43
+#: experiences/templates/experiences/topic_outdoor.html:43
+#: experiences/templates/experiences/topic_photography.html:43
 #: experiences/templates/experiences/topic_romance.html:43
 msgid "Private"
 msgstr "私人团"
@@ -230,6 +233,7 @@ msgid "Popularity"
 msgstr "预定次数"
 
 #: experiences/forms.py:801
+#: experiences/templates/experiences/topic_outdoor.html:13
 msgid "Outdoor"
 msgstr "户外运动"
 
@@ -316,14 +320,20 @@ msgstr "【本土客】 注册成功"
 #: experiences/templates/experiences/experience_detail.html:372
 #: experiences/templates/experiences/experience_results.html:21
 #: experiences/templates/experiences/topic_culture.html:24
+#: experiences/templates/experiences/topic_extreme.html:24
 #: experiences/templates/experiences/topic_family.html:24
+#: experiences/templates/experiences/topic_outdoor.html:24
+#: experiences/templates/experiences/topic_photography.html:24
 #: experiences/templates/experiences/topic_romance.html:24
 msgid "From"
 msgstr " "
 
 #: experiences/templates/experiences/1111.html:25
 #: experiences/templates/experiences/topic_culture.html:24
+#: experiences/templates/experiences/topic_extreme.html:24
 #: experiences/templates/experiences/topic_family.html:24
+#: experiences/templates/experiences/topic_outdoor.html:24
+#: experiences/templates/experiences/topic_photography.html:24
 #: experiences/templates/experiences/topic_romance.html:24
 #, python-format
 msgid " %(currency)s/person "
@@ -335,7 +345,10 @@ msgstr "%(currency)s/人起"
 #: experiences/templates/experiences/experience_results.html:40
 #: experiences/templates/experiences/product_description.html:8
 #: experiences/templates/experiences/topic_culture.html:42
+#: experiences/templates/experiences/topic_extreme.html:42
 #: experiences/templates/experiences/topic_family.html:42
+#: experiences/templates/experiences/topic_outdoor.html:42
+#: experiences/templates/experiences/topic_photography.html:42
 #: experiences/templates/experiences/topic_romance.html:42
 msgid "hrs"
 msgstr "小时"
@@ -348,7 +361,10 @@ msgstr "小时"
 #: experiences/templates/experiences/experience_results.html:40
 #: experiences/templates/experiences/product_description.html:8
 #: experiences/templates/experiences/topic_culture.html:42
+#: experiences/templates/experiences/topic_extreme.html:42
 #: experiences/templates/experiences/topic_family.html:42
+#: experiences/templates/experiences/topic_outdoor.html:42
+#: experiences/templates/experiences/topic_photography.html:42
 #: experiences/templates/experiences/topic_romance.html:42
 msgid "days"
 msgstr "天"
@@ -1515,6 +1531,14 @@ msgstr "本土客 风土人情"
 msgid "Local Culture"
 msgstr "风土人情"
 
+#: experiences/templates/experiences/topic_extreme.html:8
+msgid "Tripalocal | Extreme Experiences"
+msgstr "【本土客】 刺激体验"
+
+#: experiences/templates/experiences/topic_extreme.html:13
+msgid "Extreme Experiences"
+msgstr "刺激体验"
+
 #: experiences/templates/experiences/topic_family.html:8
 msgid "Tripalocal | Bring the Kids"
 msgstr "【本土客】 亲子游"
@@ -1523,9 +1547,19 @@ msgstr "【本土客】 亲子游"
 msgid "Bring the Kids"
 msgstr "亲子游"
 
+#: experiences/templates/experiences/topic_outdoor.html:8
+msgid "Tripalocal | Outdoor"
+msgstr "本土客 | 户外之旅"
+
+#: experiences/templates/experiences/topic_photography.html:8
+msgid "Tripalocal | Photography Worthy"
+msgstr "本土客 | 风光摄影"
+
+#: experiences/templates/experiences/topic_photography.html:13
+msgid "Photography Worthy"
+msgstr "风光摄影"
+
 #: experiences/templates/experiences/topic_romance.html:8
-#, fuzzy
-#| msgid "Tripalocal | Hopeless Romance"
 msgid "Tripalocal | Honeymoon"
 msgstr "本土客 蜜月游"
 

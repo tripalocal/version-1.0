@@ -88,6 +88,31 @@
                 </div>
 
                 <div class="row">
+                  <div class="col-sm-4">
+                    <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/outdoor_sm.jpg' %});">
+                        <a class="box-link" href="{{GEO_POSTFIX}}outdoor">
+                            <h1>{% trans "Outdoor" %}</h1>
+                        </a>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/extreme_sm.jpg' %});">
+                        <a class="box-link" href="{{GEO_POSTFIX}}extreme">
+                            <h1>{% trans "Extreme<br>Experiences" %}</h1>
+                        </a>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/photography_sm.jpg' %});">
+                        <a class="box-link" href="{{GEO_POSTFIX}}photography">
+                            <h1>{% trans "Photography<br>Worthy" %}</h1>
+                        </a>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="row">
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter <= 1 %}
                     <div class="col-sm-8">
