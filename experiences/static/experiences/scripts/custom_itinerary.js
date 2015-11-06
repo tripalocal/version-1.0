@@ -55,9 +55,7 @@ $(document).ready(function() {
     $("#add-adults").popover("hide");
   });
   $(document).on("click", "#submit-add-adults", function() {
-    $("#add-adults").popover("hide");
-    $("num-adults").html($("#id_guest_number").val());
-    $("#itinerary_search").click();
+    update_guests();
   });
 
   // Add item buttons (left panel)

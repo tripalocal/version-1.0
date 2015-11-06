@@ -777,6 +777,13 @@
         $("#itinerary_search").click();
     }
 
+    function update_guests() {
+      var guests = $("#id_guest_number").val();
+      $("#add-adults")[0].innerHTML = "Adults" + " <span class=\"badge\">" + guests + "</span>";
+      $("#add-adults").popover("hide");
+      $("#itinerary_search").click();
+    }
+
     function update_city(i)
     {
         var city = $("#city_list_" + i).val();
