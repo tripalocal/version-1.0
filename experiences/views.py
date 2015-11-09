@@ -1351,7 +1351,7 @@ def experience_booking_confirmation(request):
                 if total_price > 0.0:
                     #not free
                     # todo: remove stub money amout
-                    price = int(convert_currency(0.01, experience.currency, "CNY") * 100)
+                    price = int(convert_currency(total_price, experience.currency, "CNY") * 100)
                     pay_info = unified_pay.post(experience.get_title(settings.LANGUAGES[0][0]), out_trade_no,
                                                 str(price), "127.0.0.1", notify_url)
                     if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
@@ -3354,7 +3354,50 @@ def itinerary_booking_successful(request):
 
     return render(request,'experiences/itinerary_booking_successful.html',{})
 
-def bring_the_kids(request):
+def nov_promo(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[209,302,911,921,71,852,862,1021,2291,2301,2311,2321,2341,2351,2371,2381,2391,2401])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/1111.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_family(request):
     set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[911,2041,464,69,408])
     i=0
@@ -3388,7 +3431,7 @@ def bring_the_kids(request):
         else:
             experience.title = t
         i+=1
-    template = "experiences/bring_the_kids.html"
+    template = "experiences/topic_family.html"
     context = RequestContext(request, {
                             'experienceList' : experienceList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
@@ -3397,7 +3440,7 @@ def bring_the_kids(request):
               })
     return render_to_response(template, {}, context)
 
-def hopeless_romance(request):
+def topic_romance(request):
     set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[209,302,911,921,71,852,862,1021])
     i=0
@@ -3432,7 +3475,7 @@ def hopeless_romance(request):
         else:
             experience.title = t
         i+=1
-    template = "experiences/hopeless_romance.html"
+    template = "experiences/topic_romance.html"
     context = RequestContext(request, {
                             'experienceList' : experienceList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,
@@ -3441,7 +3484,7 @@ def hopeless_romance(request):
               })
     return render_to_response(template, {}, context)
 
-def local_culture(request):
+def topic_culture(request):
     set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[981,1591,911,921,54,106,2,32,37])
     i=0
@@ -3475,7 +3518,136 @@ def local_culture(request):
         else:
             experience.title = t
         i+=1
-    template = "experiences/local_culture.html"
+    template = "experiences/topic_culture.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_outdoor(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[1581,862,2291,2351,1641,882,2671,2551,2441,1971,2591,2571,2581,2371])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_outdoor.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_extreme(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[2441,1981,2021,852,2411,2381,2291,1031,2361,2081])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_extreme.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_photography(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[2081,2591,2531,2551,2561,2421,1681,1571,862,2681,2411,1651,1611,1621])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_photography.html"
     context = RequestContext(request, {
                             'experienceList' : experienceList,
                             'user_email':request.user.email if request.user.is_authenticated() else None,

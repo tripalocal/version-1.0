@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-26 14:34+1100\n"
+"POT-Creation-Date: 2015-11-06 17:41+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2253,6 +2253,22 @@ msgstr "请输入合法邮箱"
 
 #: venv/lib/python3.4/site-packages/payments/stripe/widgets.py:20
 msgid "Total payment"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/phonenumber_field/formfields.py:14
+#, fuzzy
+#| msgid "Please enter a valid email"
+msgid "Enter a valid phone number."
+msgstr "请输入合法邮箱"
+
+#: venv/lib/python3.4/site-packages/phonenumber_field/modelfields.py:44
+#, fuzzy
+#| msgid "Please enter a valid email"
+msgid "Phone number"
+msgstr "请输入合法邮箱"
+
+#: venv/lib/python3.4/site-packages/phonenumber_field/validators.py:13
+msgid "The phone number entered is not valid."
 msgstr ""
 
 #: venv/lib/python3.4/site-packages/polymorphic/admin.py:55

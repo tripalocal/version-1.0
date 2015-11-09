@@ -1,36 +1,49 @@
-{% load staticfiles %}
+{% extends "app/layout.html" %}
 {% load i18n %}
 
-<!doctype html>
-
-<html lang="en">
-<head>
-    <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link href="{% static 'app/content/main.css' %}" rel="stylesheet">
-    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+{% block head %}
+  {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'experiences/content/checkout.css' %}">
     <script type="text/javascript" src="{% static 'experiences/scripts/qrcode.min.js' %}"></script>
-
     <title>{% trans "QR Code Payment" %}</title>
-</head>
+{% endblock %}
 
-<body>
+{% block content %}
 
-<div style="height: 160px; margin: auto; text-align: center; position: absolute; top: 0; bottom: 0; left: 0; right: 0">
-
-    <h2 style="margin-top: 0">{% trans "Please scan the QR code below." %}</h2>
-
-    <div id="qrcode" style="width:128px; margin: 0 auto; text-align: center;"></div>
+<div class="qr-payment">
+  <div class="box-header">
+    <h2>{% trans "Scan QR code to complete payment" %}</h2>
+  </div>
+  <div id="qrcode" style="width:256px; margin: 30px auto; text-align: center;"></div>
+  <div class="media">
+    <div class="media-left">
+      <img class="media-object" src="{% static 'icon/downloadWechat.svg' %}">
+    </div>
+    <div class="media-body">
+      <h4 class="media-heading">{% trans 'Log In to Wechat on Phone' %}</h4>
+      <p><a href="http://weixin.qq.com/cgi-bin/readtemplate?t=weixin_download_list&lang={% if LANGUAGE != 'zh-CN' %}en{% else %}zh{% endif %}">{% trans 'Install' %}</a> {% trans 'and open Wechat on phone' %}</p>
+    </div>
+  </div>
+  <div class="media">
+    <div class="media-left">
+      <img class="media-object" src="{% static 'icon/scan.svg' %}">
+    </div>
+    <div class="media-body">
+      <h4 class="media-heading">{% trans 'Scan QR Code' %}</h4>
+      <p>{% trans 'Log in to Web Wechat in Discover -> Scan QR Code' %}</p>
+    </div>
+  </div>
 </div>
 
-</body>
+{% endblock %}
 
+{% block scripts %}
 <script charset="utf-8" type="text/javascript">
     $(document).ready(function () {
         var qrcode = new QRCode("qrcode", {
             text: '{{ code_url }}',
-            width: 128,
-            height: 128,
+            width: 256,
+            height: 256,
             colorDark: "#000000",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H
@@ -51,4 +64,4 @@
     });
 
 </script>
-</html>
+{% endblock %}

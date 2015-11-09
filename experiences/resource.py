@@ -1022,7 +1022,7 @@ def service_couponverification(request, format=None):
 
     return Response(result, status=status.HTTP_200_OK)
 
-def get_experience_detail(experience, get_available_date=True):
+def get_experience_detail(experience, get_available_date=True, partner = False):
     available_options = []
     available_date = ()
 
@@ -1068,10 +1068,11 @@ def get_experience_detail(experience, get_available_date=True):
     result = {'experience_id':experience.id,
                 'experience_language':experience.language,
                 'experience_duration':experience.duration,
-                'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
+                'experience_price':experience_fee_calculator(float(experience.price), 
+                                                             experience.commission if not partner else experience.commission/(2-experience.commission)),
                 'experience_currency': str(dict(Currency).get(experience.currency.upper(),experience.currency.upper())),
                 'experience_dollarsign': DollarSign.get(experience.currency.upper(),'$'),
-                'experience_dynamic_price':dynamic_price,
+                'experience_dynamic_price':dynamic_price if not partner else "",
                 'experience_guest_number_min':experience.guest_number_min,
                 'experience_guest_number_max':experience.guest_number_max,
                 'experience_images':experience_images,
@@ -1190,6 +1191,80 @@ def service_experiencedetail(request, format=None):
 
         experience = AbstractExperience.objects.get(id=data['experience_id'])
         result = get_experience_detail(experience, False)
+
+        return Response(result, status=status.HTTP_200_OK)
+
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+#@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
+#@permission_classes((IsAuthenticated,))
+def service_all_products(request, format=None):
+    try:
+        result=[]
+        cursor = connections['default'].cursor()
+        raw_query = "select experiences_newproducti18n.*,"+\
+	                       "experiences_newproduct.duration,"+\
+                           "experiences_newproduct.guest_number_min,"+\
+                           "experiences_newproduct.guest_number_max,"+\
+                           "round(experiences_newproduct.price*(2 - experiences_newproduct.commission/(2 - 2*experiences_newproduct.commission)),0) as price,"+\
+                           "experiences_newproduct.city,"+\
+                           "experiences_newproduct.language,"+\
+                           "experiences_newproduct.currency"+\
+                    " from experiences_newproduct, experiences_newproducti18n"+\
+                    " where experiences_newproduct.abstractexperience_ptr_id = experiences_newproducti18n.product_id"+\
+                          " and experiences_newproducti18n.language='zh'"
+
+        cursor.execute(raw_query)
+        nps = cursor._rows
+        if nps is not None and len(nps)>0:
+            for product in nps:
+                result.append({"title":product[2],"location":product[3],"background_info":product[4],"description":product[5],"service":product[6],
+                               "highlights":product[7],"schedule":product[8],"ticket_use_instruction":product[9],"refund_policy":product[10],"notice":product[11],
+                               "tips":product[12],"whatsincluded":product[12],"pickup_detail":product[14],"combination_options":product[15],"insurance":product[16],
+                               "disclaimer":product[17],"id":product[17],"duration":product[19],"guest_number_min":product[20],"guest_number_max":product[21],
+                               "price":product[22],"city":product[23],"language":product[24],"currency":product[25],})
+
+        raw_query = "select experiences_experiencetitle.title,"+\
+                           "experiences_experiencedescription.description,"+\
+                           "experiences_experienceactivity.activity,"+\
+                           "experiences_experienceinteraction.interaction,"+\
+                           "experiences_experiencedress.dress,"+\
+                           "experiences_experiencemeetupspot.meetup_spot,"+\
+	                       "experiences_experience.duration,"+\
+                           "experiences_experience.guest_number_min,"+\
+                           "experiences_experience.guest_number_max,"+\
+                           "round(experiences_experience.price*(2 - experiences_experience.commission/(2 - 2*experiences_experience.commission)),0) as price,"+\
+                           "experiences_experience.city,"+\
+                           "experiences_experience.language,"+\
+                           "experiences_experience.currency,"+\
+                           "experiences_experience.abstractexperience_ptr_id as id"+\
+                    " from  experiences_experience,experiences_experiencetitle,experiences_experiencedescription,"+\
+                          "experiences_experienceactivity,experiences_experienceinteraction,experiences_experiencedress,"+\
+                          "experiences_experiencemeetupspot"+\
+                    " where experiences_experience.status=\"Listed\" and experiences_experiencetitle.language=\"zh\""+\
+                          " and experiences_experiencedescription.language=\"zh\" and experiences_experienceactivity.language=\"zh\""+\
+                          " and experiences_experienceinteraction.language=\"zh\" and experiences_experiencedress.language=\"zh\""+\
+                          " and experiences_experiencemeetupspot.language=\"zh\""+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experiencetitle.experience_id"+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experiencedescription.experience_id"+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experienceactivity.experience_id"+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experienceinteraction.experience_id"+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experiencedress.experience_id"+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experiencemeetupspot.experience_id"+\
+                    " order by id;"
+
+        cursor.execute(raw_query)
+        exps = cursor._rows
+        if exps is not None and len(exps)>0:
+            for experience in exps:
+                result.append({"title":experience[0],"description":experience[1],"activity":experience[2],
+                               "interaction":experience[3],"dress":experience[4],"meetup_spot":experience[5],
+                               "duration":experience[6],"guest_number_min":experience[7],"guest_number_max":experience[8],
+                               "price":experience[9],"city":experience[10],"language":experience[11],
+                               "currency":experience[12],"id":experience[13]})
 
         return Response(result, status=status.HTTP_200_OK)
 
