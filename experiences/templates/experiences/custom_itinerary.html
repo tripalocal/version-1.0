@@ -149,32 +149,6 @@
             <div role="tabpanel" class="tab-pane fade" id="flight">
               <div class="column" id="flight_column">
                 <button type="button" class="btn btn-default" id="add-flight-btn">+ Add Flight</button>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Such experience title</h3>
-                    <p>Very description wow</p>
-                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>3239</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Another one</h3>
-                    <p>Very description wow</p>
-                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>339</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
               </div>
               <div class="new-item-form container-fluid" id="add-flight" style="display:none;">
                 <div class="row">
@@ -188,23 +162,23 @@
                     </div>
                     <div class="form-group">
                       <label>{% trans "Title" %}</label>
-                      <input class="form-control">
+                      <input id="flight-title" class="form-control">
                     </div>
                     <div class="form-group">
                       <label>{% trans "Departing Location" %}</label>
-                      <input class="form-control">
+                      <input id="flight-departing-location" class="form-control">
                     </div>
                     <div class="form-group">
                       <label style="display:block;">{% trans "Price" %}</label>
-                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                      <input id="flight-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
                     </div>
                   </div>
                   <div class="col-xs-6">
                     <div class="form-group">
                       <label>{% trans "Details" %}</label>
-                      <textarea class="form-control" style="height: 350px;"></textarea>
+                      <input type="text" id="flight-details" class="form-control" style="height: 350px;"></input>
                     </div>
-                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('flight');">{% trans "Add" %}</button>
                     <button id="add-flight-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                   </div>
                 </div>
@@ -959,5 +933,45 @@
       });
     }
 
+    function add_item(type) {
+        var ids = ["title", "departing-location", "price", "details"];
+        var value = "";
+        var item = {
+            csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
+            Add: "Add",
+            type: type,
+        };
+        for (var i = 0; i < ids.length; i++) {
+            value = $("#" + type + "-" + ids[i]).val();
+            item[ids[i]] = value;
+        }
+        $.ajax({
+            url: '{{GEO_POSTFIX}}itinerary/',
+            type: "POST",
+            data: item,
+            success: function (data) {
+                new_item = "<div class=\"exp-box-sm portlet\">" +
+                              "<div class=\"exp-img portlet-header\"></div>" +
+                              "<div class=\"exp-info portlet-header\">" +
+                                "<h3>" + $("#" + type + "-title").val() + "</h3>" +
+                                "<p>" + $("#" + type + "-details").val().substring(0,15) + "</p>" +
+                                "<p>" + $("#" + type + "-departing-location").val() + "</p>" +
+                              "</div>" +
+                              "<div class=\"exp-price portlet-header\">" +
+                                "<p>$AUD</p>" +
+                                "<h2>" + $("#" + type + "-price").val() + "</h2>" +
+                                "<p>{% trans 'per person' %}</p>" +
+                              "</div>" +
+                            "</div>";
+                $("#"+type+"_column").append(new_item);
+                $("#"+type+"_column").fadeIn();
+                $("#add-"+type).hide();
+                init_drag();
+            },
+            failure: function (e) {
+            
+            }
+        });
+    }
     </script>
 {% endblock %}

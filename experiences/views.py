@@ -3116,6 +3116,18 @@ def custom_itinerary(request):
     form = CustomItineraryForm()
 
     if request.method == 'POST':
+        if 'Add' in request.POST:
+            #add a new item
+            item = request.POST
+            np = NewProduct(provider_id=1, price=item['price'], commission=0.0, currency="aud", type=item['type'].title(), 
+                            duration=1, guest_number_min=1, guest_number_max=10, status="Listed")
+            np.save()
+            npi18n = NewProductI18n(product=np, title=request.POST['title'],
+                                    description=request.POST['details'], location=request.POST['departing-location'])
+            npi18n.save()
+
+            return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form}, context)
+
         form = CustomItineraryForm(request.POST)
 
         if 'Search' in request.POST and 'itinerary_string' not in request.POST:
