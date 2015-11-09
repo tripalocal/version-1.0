@@ -25,6 +25,9 @@
     {{form.tags}}
     {{form.all_tags}}
     {{form.itinerary_string}}
+
+    <!-- Done, but needs to be hidden -->
+    {{form.guest_number}}
   </div>
   <!-- Top search bar -->
   <div class="basic-search">
@@ -47,11 +50,22 @@
           <h3 class="form-header">{% trans "Group size" %}</h3>
           <button id="add-adults" type="button" class="btn btn-grey"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content='
             <div class="form-goup">
-              {{form.guest_number}}
+              <select id="guest-num-select" class="form-control">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+              </select>
             </div>
               <button type="button" class="btn btn-primary" id="submit-add-adults">Add</button>
               <button type="button" class="btn btn-default" style="margin-right:0;" id="cancel-add-adults">Cancel</button>
-            '>Adults <span class="badge" id="num-adults"></span>
+            '>Adults <span class="badge" id="num-adults">1</span>
           </button>
           <button id="add-kids" type="button" class="btn btn-default"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
             <div class='form-goup'>
@@ -87,7 +101,7 @@
             </div>
               <button class='btn btn-primary' onclick='add_new_city();$(&quot;#add-city&quot;).popover(&quot;hide&quot;);'>{% trans 'Add' %}</button>
               <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-city&quot;).popover(&quot;hide&quot;);'>{% trans 'Cancel' %}</button>
-            "> + {% trans 'Add' %} <span class="badge">4 left</span>
+            "> + {% trans 'Add' %} <span class="badge"><span id="days-left"></span> left</span>
           </button>
         </div>
         <div class="form-inline right-group">
@@ -126,7 +140,7 @@
             <div role="tabpanel" class="tab-pane fade in active" id="experience">
               <div class="input-group">
                 <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" id="search-keyword">
               </div>
               <div id="experience_column" style='height:100%;'>
 
@@ -617,11 +631,11 @@
             set_itinerary_string();
         });
 
-        init_drag();
+        init_drag(); // Initialize draggable elements
+
+        filter_experiences(); // Initialize search filter
 
         // Date field
-        $('#id_start_datetime').addClass("form-control");
-        $('#id_end_datetime').addClass("form-control");
         if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
             $(function () {
                 $("#id_start_datetime").datetimepicker({
@@ -778,8 +792,9 @@
     }
 
     function update_guests() {
-      var guests = $("#id_guest_number").val();
+      var guests = $("#guest-num-select").val();
       $("#add-adults")[0].innerHTML = "Adults" + " <span class=\"badge\">" + guests + "</span>";
+      $("#id_guest_number").val(guests);
       $("#add-adults").popover("hide");
       $("#itinerary_search").click();
     }
@@ -871,7 +886,7 @@
         cities = cities.substring(0,cities.length-1);
         $("#id_city").val(cities);
 
-        var d = new Date();
+        var d = new Date($("#id_start_datetime").val());
         //d.setTime(d.getTime() + d.getTimezoneOffset()*60*1000);
         //$("#id_start_datetime") is already set
         d.setDate(d.getDate()+number_city-1);
@@ -919,6 +934,29 @@
         cities = cities.substring(0,cities.length-1);
         $("#id_city").val(cities);
         $("#id_itinerary_string").val(JSON.stringify(itinerary));
+    }
+
+    // Make filter case un-sensitive
+    jQuery.expr[':'].contains = function(a,i,m) {
+      return (a.textContent || a.innerText || "").toUpperCase().indexOf(m[3].toUpperCase())>=0;
+    };
+
+    // Filters experiences on search keyword
+    function filter_experiences() {
+      $("#search-keyword")
+        .change(function() {
+          var filter = $(this).val();
+          if (filter) {
+            $(".exp-box-sm").find("div.exp-info:not(:contains(\'" + filter + "\'))").parent().slideUp();
+            $(".exp-box-sm").find("div.exp-info:contains(\'" + filter + "\')").parent().slideDown();
+          } else {
+            $(".exp-box-sm").slideDown();
+          }
+          return false;
+        })
+        .keyup(function() {
+          $(this).change();
+      });
     }
 
     </script>
