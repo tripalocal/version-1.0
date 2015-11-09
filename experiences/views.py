@@ -1351,7 +1351,7 @@ def experience_booking_confirmation(request):
                 if total_price > 0.0:
                     #not free
                     # todo: remove stub money amout
-                    price = int(convert_currency(0.01, experience.currency, "CNY") * 100)
+                    price = int(convert_currency(total_price, experience.currency, "CNY") * 100)
                     pay_info = unified_pay.post(experience.get_title(settings.LANGUAGES[0][0]), out_trade_no,
                                                 str(price), "127.0.0.1", notify_url)
                     if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
