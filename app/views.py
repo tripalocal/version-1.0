@@ -49,6 +49,7 @@ ALL_CITIES = (('Melbourne', _('Melbourne')), ('Sydney', _('Sydney')), ('Brisbane
               ('Cairns', _('Cairns')),
               ('Goldcoast', _('Gold Coast')), ('Hobart', _('Hobart')), ('Adelaide', _('Adelaide')),
               ('Darwin', _('Darwin')), ('Alicesprings', _('Alice Springs')),
+              ('Perth', _('Perth')),
               ('Christchurch', _('Christchurch')), ('Queenstown', _('Queenstown')),
               ('Auckland', _('Auckland')), ('Wellington', _('Wellington')),)
 
