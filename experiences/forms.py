@@ -28,7 +28,7 @@ Location = (('Melbourne', _('Melbourne, VIC')),('GRVIC', _('Greater Victoria')),
             ('Hobart',_('Hobart, TAS')),('GRTAS', _('Greater Tasmania')),
             ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
-            ('GRWA', _('Greater West Australia')),
+            ('Perth', _('Perth, WA')),('GRWA', _('Greater West Australia')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
@@ -36,6 +36,7 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
                     (_('Gold Coast'), 'Goldcoast'), (_('Hobart'), 'Hobart'),
                     (_('Adelaide'), 'Adelaide'), (_('Darwin'), 'Darwin'),
                     (_('Alice Springs'), 'Alicesprings'),
+                    (_('Perth'), 'Perth'),
                     (_('Christchurch'), 'Christchurch'), (_('Queenstown'), 'Queenstown'),
                     (_('Auckland'), 'Auckland'), (_('Wellington'), 'Wellington'),)
 
@@ -44,12 +45,14 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
 #                    (_('Greater Northern Territory'), 'GRNT'),
 
 Location_relation = {'GRQLD':['Brisbane','Cairns','Goldcoast'], 'GRNT':['Darwin','Alicesprings'],
-                     'GRVIC':['Melbourne'], 'GRSA':['Adelaide'], 'GRNSW':['Sydney'], 'GRTAS':['Hobart']} #for issue 208
+                     'GRVIC':['Melbourne'], 'GRSA':['Adelaide'], 'GRNSW':['Sydney'],
+                     'GRTAS':['Hobart'], 'GRWA':['Perth']} #for issue 208
 
 Locations = [(_('Australia'), [('Melbourne', _('Melbourne'), _('Victoria')), ('Sydney', _('Sydney'), _('New South Wales')),
                            ('Brisbane', _('Brisbane'), _('Queensland')), ('Cairns', _('Cairns'), _('Queensland')),
                            ('Goldcoast', _('Gold Coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
                            ('Adelaide', _('Adelaide'), _('South Australia')),
+                           ('Perth', _('Perth'), _('West Australia')),
                            #('Darwin', _('Darwin'), _('Northern Territory')),
                            #('Alicesprings', _('Alice Springs'), _('Northern Territory'))
                            ]),
@@ -84,6 +87,7 @@ Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Bri
             ('Goldcoast',_('Gold coast, QLD')),('Hobart',_('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
             ('GRVIC', _('Greater Victoria')),('GRNSW', _('Greater New South Wales')),('GRQLD', _('Greater Queensland')),('GRTAS', _('Greater Tasmania')),
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),('GRWA', _('Greater West Australia')),
+            ('Perth', _('Perth, WA')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Currency = (('AUD',_('AUD')),('NZD',_('NZD')),('CNY',_('CNY')),)
@@ -801,9 +805,9 @@ class ExperienceAvailabilityForm(forms.Form):
 SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
 AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children')),(4,_('Famili with elderly&children')))
 class CustomItineraryForm(forms.Form):
-    start_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}), initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()))
-    end_datetime = forms.DateTimeField(required=True, widget=DateTimePicker(options={"format": "YYYY-MM-DD"}), initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()))
-    guest_number = forms.ChoiceField(choices=Guest_Number_Min, required=True, initial=1)
+    start_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
+    end_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
+    guest_number = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
     city = forms.CharField(widget=forms.Textarea,  required=True, initial="Melbourne")
     language = forms.CharField(widget=forms.Textarea,  required=True, initial="English,Mandarin")
     tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
@@ -814,10 +818,6 @@ class CustomItineraryForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(CustomItineraryForm, self).__init__(*args, **kwargs)
-        self.fields['start_datetime'].widget.attrs['readonly'] = True
-        self.fields['start_datetime'].widget = forms.HiddenInput()
-        self.fields['end_datetime'].widget.attrs['readonly'] = True
-        self.fields['end_datetime'].widget = forms.HiddenInput()
         self.fields['itinerary_string'].widget.attrs['readonly'] = True
         self.fields['itinerary_string'].widget = forms.HiddenInput()
         self.fields['city'].widget.attrs['readonly'] = True

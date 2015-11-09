@@ -1351,7 +1351,7 @@ def experience_booking_confirmation(request):
                 if total_price > 0.0:
                     #not free
                     # todo: remove stub money amout
-                    price = int(convert_currency(0.01, experience.currency, "CNY") * 100)
+                    price = int(convert_currency(total_price, experience.currency, "CNY") * 100)
                     pay_info = unified_pay.post(experience.get_title(settings.LANGUAGES[0][0]), out_trade_no,
                                                 str(price), "127.0.0.1", notify_url)
                     if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
@@ -3116,6 +3116,18 @@ def custom_itinerary(request):
     form = CustomItineraryForm()
 
     if request.method == 'POST':
+        if 'Add' in request.POST:
+            #add a new item
+            item = request.POST
+            np = NewProduct(provider_id=1, price=item['price'], commission=0.0, currency="aud", type=item['type'].title(), 
+                            duration=1, guest_number_min=1, guest_number_max=10, status="Listed")
+            np.save()
+            npi18n = NewProductI18n(product=np, title=request.POST['title'],
+                                    description=request.POST['details'], location=request.POST['departing-location'])
+            npi18n.save()
+
+            return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form}, context)
+
         form = CustomItineraryForm(request.POST)
 
         if 'Search' in request.POST and 'itinerary_string' not in request.POST:
@@ -3241,6 +3253,17 @@ def custom_itinerary(request):
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
 
+    #get flight, transfer, ...
+    pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion"])
+    for pd in pds:
+        pd.title = pd.get_title(settings.LANGUAGES[0][0])
+        pd.details = pd.get_description(settings.LANGUAGES[0][0])
+        pd.location = pd.newproducti18n_set.all()[0].location
+    context['flight'] = [e for e in pds if e.type == 'Flight']
+    context['transfer'] = [e for e in pds if e.type == 'Transfer']
+    context['accommodation'] = [e for e in pds if e.type == 'Accommodation']
+    context['restaurant'] = [e for e in pds if e.type == 'Restaurant']
+    context['suggestion'] = [e for e in pds if e.type == 'Suggestion']
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
 def itinerary_booking_confirmation(request):

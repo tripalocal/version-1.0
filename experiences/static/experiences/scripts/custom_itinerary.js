@@ -50,7 +50,15 @@ $(document).ready(function() {
   // Initialize popovers
   $('[data-toggle="popover"]').popover();
 
-  //Add item buttons (left panel)
+  // Filter buttons
+  $(document).on("click", "#cancel-add-adults", function() {
+    $("#add-adults").popover("hide");
+  });
+  $(document).on("click", "#submit-add-adults", function() {
+    update_guests();
+  });
+
+  // Add item buttons (left panel)
   $("#add-flight-btn").click(function() {
     $("#flight_column").hide();
     $("#add-flight").fadeIn();
