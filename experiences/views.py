@@ -3253,6 +3253,17 @@ def custom_itinerary(request):
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
 
+    #get flight, transfer, ...
+    pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion"])
+    for pd in pds:
+        pd.title = pd.get_title(settings.LANGUAGES[0][0])
+        pd.details = pd.get_description(settings.LANGUAGES[0][0])
+        pd.location = pd.newproducti18n_set.all()[0].location
+    context['flight'] = [e for e in pds if e.type == 'Flight']
+    context['transfer'] = [e for e in pds if e.type == 'Transfer']
+    context['accommodation'] = [e for e in pds if e.type == 'Accommodation']
+    context['restaurant'] = [e for e in pds if e.type == 'Restaurant']
+    context['suggestion'] = [e for e in pds if e.type == 'Suggestion']
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
 def itinerary_booking_confirmation(request):
