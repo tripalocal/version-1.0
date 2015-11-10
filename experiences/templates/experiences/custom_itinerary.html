@@ -28,6 +28,7 @@
 
     <!-- Done, but needs to be hidden -->
     {{form.guest_number}}
+    {{form.end_datetime}}
   </div>
   <!-- Top search bar -->
   <div class="basic-search">
@@ -35,15 +36,12 @@
       <div class="row">
         <div class="form-inline">
           <h3 class="form-header">{% trans "Title" %}</h3>
-          <input type="text" class="form-control" id="itinerary-title" style="width:220px;">
+          <input type="text" class="form-control" id="itinerary-title" style="width:370px;">
         </div>
         <div class="form-inline">
-          <h3 class="form-header">{% trans "Date" %}</h3>
+          <h3 class="form-header">{% trans "Start date" %}</h3>
           <div class="start-date">
             {{form.start_datetime}}
-          </div>
-          <div class="end-date">
-            {{form.end_datetime}}
           </div>
         </div>
         <div class="form-inline right-group" style="margin-right:0;">
@@ -63,7 +61,7 @@
                 <option>10</option>
               </select>
             </div>
-              <button type="button" class="btn btn-primary" id="submit-add-adults">Add</button>
+              <button type="button" class="btn btn-primary" id="submit-add-adults">Update</button>
               <button type="button" class="btn btn-default" style="margin-right:0;" id="cancel-add-adults">Cancel</button>
             '>Adults <span class="badge" id="num-adults">1</span>
           </button>
@@ -101,7 +99,7 @@
             </div>
               <button class='btn btn-primary' onclick='add_new_city();$(&quot;#add-city&quot;).popover(&quot;hide&quot;);'>{% trans 'Add' %}</button>
               <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-city&quot;).popover(&quot;hide&quot;);'>{% trans 'Cancel' %}</button>
-            "> + {% trans 'Add' %} <span class="badge"><span id="days-left"></span> left</span>
+            ">+ {% trans 'Add City' %}
           </button>
         </div>
         <div class="form-inline right-group">
@@ -631,12 +629,6 @@
                     format: 'YYYY-MM-DD', locale: 'zh-CN'
                 });
             });
-
-            $(function () {
-                $("#id_end_datetime").datetimepicker({
-                    format: 'YYYY-MM-DD', locale: 'zh-CN'
-                });
-            });
         }
         else {
             $(function () {
@@ -644,15 +636,9 @@
                     format: 'YYYY-MM-DD'
                 });
             });
-
-            $(function () {
-                $("#id_end_datetime").datetimepicker({
-                    format: 'YYYY-MM-DD'
-                });
-            });
         }
 
-        $("#id_start_datetime, #id_end_datetime").focusout(function () {
+        $("#id_start_datetime").focusout(function () {
             if ($("#id_start_datetime").val() != "" && $("#id_end_datetime").val() != "") {
                 $("#itinerary_search").click();
             }
@@ -859,15 +845,16 @@
 
             if($("#button_city_"+i).length > 0)
             {
-                city = $("#button_city_"+i).attr("city");
-                duration = $("#button_city_"+i).attr("duration");
-                //comment out the following line if availability is considered in the future
-                duration = 1;
-                for(j=0;j<duration;j++)
-                {
-                    cities = city + "," + cities;
-                }
-                number_city += 1;
+              city = $("#button_city_"+i).attr("city");
+              duration = $("#button_city_"+i).attr("duration");
+              //comment out the following line if availability is considered in the future
+              duration = 1;
+              for(j=0;j<duration;j++)
+              {
+                  cities = city + "," + cities;
+              }
+              number_city += 1;
+
             }
 
             id = $("#"+id).prev().attr('id');
@@ -984,7 +971,7 @@
                 init_drag();
             },
             failure: function (e) {
-            
+
             }
         });
     }
