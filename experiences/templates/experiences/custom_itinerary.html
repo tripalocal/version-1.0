@@ -103,11 +103,11 @@
         </div>
         <div class="form-inline right-group">
           <h3 class="form-header">Web</h3>
-          <button id="" class="btn btn-sm btn-default">$</button>
-          <button id="button_preview" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
+          <button type="button" id="" class="btn btn-sm btn-default">$</button>
+          <button type="button" id="button_preview" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
           <h3 class="form-header">PDF</h3>
-          <button id="" class="btn btn-sm btn-default">$</button>
-          <button id="button_preview" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
+          <button type="button" id="" class="btn btn-sm btn-default">$</button>
+          <button type="button" id="button_preview" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
           <!-- TODO -->
           <input class="btn btn-default" id="itinerary_search" type="hidden" value="{% trans "Search" %}" name="Search">
         </div>
@@ -146,17 +146,17 @@
             <div role="tabpanel" class="tab-pane fade" id="flight">
               <div class="column" id="flight_column">
                 <button type="button" class="btn btn-default" id="add-flight-btn">+ Add Flight</button>
-                {% for f in flight %}
-                <div class="exp-box-sm portlet">
+                {% for item in flight %}
+                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
-                    <h3>{{f.title}}</h3>
-                    <p>{{f.details}}</p>
-                    <p>{{f.location}}</p>
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
                   </div>
                   <div class="exp-price portlet-header">
                     <p>$AUD</p>
-                    <h2>{{f.price}}</h2>
+                    <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
                 </div>
@@ -199,17 +199,17 @@
             <div role="tabpanel" class="tab-pane fade" id="transfer">
               <div class="column" id="transfer_column">
                 <button type="button" id="add-transfer-btn" class="btn btn-default">+ Add Transfer</button>
-                {% for t in transfer %}
-                <div class="exp-box-sm portlet">
+                {% for item in transfer %}
+                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
-                    <h3>{{t.title}}</h3>
-                    <p>{{t.details}}</p>
-                    <p>{{t.location}}</p>
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
                   </div>
                   <div class="exp-price portlet-header">
                     <p>$AUD</p>
-                    <h2>{{t.price}}</h2>
+                    <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
                 </div>
@@ -252,17 +252,17 @@
             <div role="tabpanel" class="tab-pane fade" id="accommodation">
               <div class="column" id="accommodation_column">
                 <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
-                {% for a in accommodation %}
-                <div class="exp-box-sm portlet">
+                {% for item in accommodation %}
+                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
-                    <h3>{{a.title}}</h3>
-                    <p>{{a.details}}</p>
-                    <p>{{a.location}}</p>
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
                   </div>
                   <div class="exp-price portlet-header">
                     <p>$AUD</p>
-                    <h2>{{a.price}}</h2>
+                    <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
                 </div>
@@ -305,17 +305,17 @@
             <div role="tabpanel" class="tab-pane fade" id="restaurant">
               <div class="column" id="restaurant_column">
                 <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
-                {% for r in restaurant %}
-                <div class="exp-box-sm portlet">
+                {% for item in restaurant %}
+                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
-                    <h3>{{r.title}}</h3>
-                    <p>{{r.details}}</p>
-                    <p>{{r.location}}</p>
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
                   </div>
                   <div class="exp-price portlet-header">
                     <p>$AUD</p>
-                    <h2>{{r.price}}</h2>
+                    <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
                 </div>
@@ -358,17 +358,17 @@
             <div role="tabpanel" class="tab-pane fade" id="suggestion">
               <div class="column" id="suggestion_column">
                 <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
-                {% for s in suggestion %}
-                <div class="exp-box-sm portlet">
+                {% for item in suggestion %}
+                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
-                    <h3>{{s.title}}</h3>
-                    <p>{{s.details}}</p>
-                    <p>{{s.location}}</p>
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
                   </div>
                   <div class="exp-price portlet-header">
                     <p>$AUD</p>
-                    <h2>{{s.price}}</h2>
+                    <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
                 </div>
@@ -411,16 +411,16 @@
             <div role="tabpanel" class="tab-pane fade" id="pricing">
               <div class="column" id="pricing_column">
                 <button type="button" id="add-pricing-btn" class="btn btn-default">+ Add Pricing</button>
-                {% for p in pricing %}
-                <div class="exp-box-sm portlet">
+                {% for item in pricing %}
+                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
-                    <h3>{{p.title}}</h3>
-                    <p>{{p.details}}</p>
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
                   </div>
                   <div class="exp-price portlet-header">
                     <p>$AUD</p>
-                    <h2>{{p.price}}</h2>
+                    <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
                 </div>
@@ -456,7 +456,7 @@
         <!-- Right section -->
         <div id="right_section" class="section" style="overflow:scroll; height:72vh;">
           <h1 class="section-heading">Itinerary</h1>
-          <h2 class="price-line">$AUD 3456 per person (Total of $AUD 23456)</h2>
+          <h2 class="price-line">$AUD <label id="price-pp">0</label> {% trans "per person (Total of "%}$AUD <label id="price-tt">0</label>)</h2>
 
         </div>
       </div>
@@ -908,7 +908,7 @@
                 var location = $("#" + type + "-location").val();
                 var price = $("#" + type + "-price").val();
 
-                var new_item =  "<div class=\"exp-box-sm portlet\">" +
+                var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_\"" + data.new_product_id + ">" +
                                   "<div class=\"exp-img portlet-header\"></div>" +
                                   "<div class=\"exp-info portlet-header\">" +
                                     "<h3>" + title + "</h3>" +
@@ -935,6 +935,36 @@
 
             }
         });
+    }
+
+    function update_price_title()
+    {
+        var city = $(".price-line").next().next()[0];
+        var price = 0;
+
+        while(city && city.id.indexOf("city-collapse-") === 0)
+        {
+            var c = $(city).prev().attr("city");
+            var day = $(city).children()[0];
+            while(day && day.id.indexOf("city-collapse-") === 0)
+            {
+                var experience = $(day).find(".column")[0].firstChild;
+                while(experience && experience.id.indexOf("experience_id_") === 0)
+                {
+                    price += parseFloat($(experience).find(".exp-price")[0].getElementsByTagName("H2")[0].innerText);
+                    experience = $(experience).next()[0];
+                }
+                day = $(day).next()[0];
+            }
+            city = $(city).next()[0];
+            if(city && city.id.indexOf("city-title-") === 0)
+            {
+                city = $(city).next()[0];
+            }
+        }
+        $("#price-pp").text(price);
+        guest_number = $("#id_guest_number").val();
+        $("#price-tt").text(price*guest_number);
     }
     </script>
 {% endblock %}

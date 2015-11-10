@@ -3126,8 +3126,7 @@ def custom_itinerary(request):
             npi18n = NewProductI18n(product=np, title=item.get('title',""),
                                     description=item.get('details', ""), location=item.get('location', ""))
             npi18n.save()
-
-            return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form}, context)
+            return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
 
         form = CustomItineraryForm(request.POST)
 
