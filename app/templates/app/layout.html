@@ -522,6 +522,7 @@
         else if (window.location.href.indexOf(".cn") > -1) {
             $('#id_language_select').val('cn');
             $('#id_language_top').attr("href", "https://www.tripalocal.com" + des_url);
+            $(".navbar-brand").attr("href", "https://www.tripalocal.com.cn{{GEO_POSTFIX}}");
         }
         else {
             $('#id_language_select').val('en');
