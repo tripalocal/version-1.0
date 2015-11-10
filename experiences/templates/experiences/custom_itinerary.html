@@ -83,10 +83,9 @@
             <div class='form-group'>
                 <p>{% trans 'Location' %}</p>
                 <select id='new_city' class='form-control'>
-                    <option value='Melbourne'>{% trans 'Melbourne' %}</option>
-                    <option value='Sydney'>{% trans 'Sydney' %}</option>
-                    <option value='Brisbane'>{% trans 'Brisbane' %}</option>
-                    <option value='Goldcoast'>{% trans 'Gold Coast' %}</option>
+                    {% for tuple in location %}
+                    <option value='{{tuple.0}}'>{{tuple.0}}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class='form-goup'>
@@ -179,7 +178,7 @@
                     </div>
                     <div class="form-group">
                       <label>{% trans "Departing Location" %}</label>
-                      <input id="flight-departing-location" class="form-control">
+                      <input id="flight-location" class="form-control">
                     </div>
                     <div class="form-group">
                       <label style="display:block;">{% trans "Price" %}</label>
@@ -200,32 +199,21 @@
             <div role="tabpanel" class="tab-pane fade" id="transfer">
               <div class="column" id="transfer_column">
                 <button type="button" id="add-transfer-btn" class="btn btn-default">+ Add Transfer</button>
+                {% for t in transfer %}
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
-                    <h3>Such experience title</h3>
-                    <p>Very description wow</p>
-                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                    <h3>{{t.title}}</h3>
+                    <p>{{t.details}}</p>
+                    <p>{{t.location}}</p>
                   </div>
                   <div class="exp-price portlet-header">
                     <p>$AUD</p>
-                    <h2>3239</h2>
+                    <h2>{{t.price}}</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
                 </div>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Another one</h3>
-                    <p>Very description wow</p>
-                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>339</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
+                {% endfor %}
               </div>
               <div class="new-item-form container-fluid" id="add-transfer" style="display:none;">
                 <div class="row">
@@ -239,23 +227,23 @@
                     </div>
                     <div class="form-group">
                       <label>{% trans "Title" %}</label>
-                      <input class="form-control">
+                      <input id="transfer-title" class="form-control">
                     </div>
                     <div class="form-group">
                       <label>{% trans "Departing Location" %}</label>
-                      <input class="form-control">
+                      <input id="transfer-location" class="form-control">
                     </div>
                     <div class="form-group">
                       <label style="display:block;">{% trans "Price" %}</label>
-                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per trip</span>
+                      <input id="transfer-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per trip</span>
                     </div>
                   </div>
                   <div class="col-xs-6">
                     <div class="form-group">
                       <label>{% trans "Details" %}</label>
-                      <textarea class="form-control" style="height: 350px;"></textarea>
+                      <input id="transfer-details" type="text" class="form-control" style="height: 350px;"></input>
                     </div>
-                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('transfer');">{% trans "Add" %}</button>
                     <button id="add-transfer-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                   </div>
                 </div>
@@ -264,32 +252,21 @@
             <div role="tabpanel" class="tab-pane fade" id="accommodation">
               <div class="column" id="accommodation_column">
                 <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
+                {% for a in accommodation %}
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
-                    <h3>Such experience title</h3>
-                    <p>Very description wow</p>
-                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                    <h3>{{a.title}}</h3>
+                    <p>{{a.details}}</p>
+                    <p>{{a.location}}</p>
                   </div>
                   <div class="exp-price portlet-header">
                     <p>$AUD</p>
-                    <h2>3239</h2>
+                    <h2>{{a.price}}</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
                 </div>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Another one</h3>
-                    <p>Very description wow</p>
-                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>339</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
+                {% endfor %}
               </div>
               <div class="new-item-form container-fluid" id="add-accommodation" style="display:none;">
                 <div class="row">
@@ -303,23 +280,23 @@
                     </div>
                     <div class="form-group">
                       <label>{% trans "Title" %}</label>
-                      <input class="form-control">
+                      <input id="accommodation-title" class="form-control">
                     </div>
                     <div class="form-group">
                       <label>{% trans "Location" %}</label>
-                      <input class="form-control">
+                      <input id="accommodation-location" class="form-control">
                     </div>
                     <div class="form-group">
                       <label style="display:block;">{% trans "Price" %}</label>
-                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per night</span>
+                      <input id="accommodation-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per night</span>
                     </div>
                   </div>
                   <div class="col-xs-6">
                     <div class="form-group">
                       <label>{% trans "Details" %}</label>
-                      <textarea class="form-control" style="height: 350px;"></textarea>
+                      <<input id="accommodation-details" type="text" class="form-control" style="height: 350px;"></input>
                     </div>
-                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('accommodation');">{% trans "Add" %}</button>
                     <button id="add-accommodation-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                   </div>
                 </div>
@@ -328,32 +305,21 @@
             <div role="tabpanel" class="tab-pane fade" id="restaurant">
               <div class="column" id="restaurant_column">
                 <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
+                {% for r in restaurant %}
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
-                    <h3>Such experience title</h3>
-                    <p>Very description wow</p>
-                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                    <h3>{{r.title}}</h3>
+                    <p>{{r.details}}</p>
+                    <p>{{r.location}}</p>
                   </div>
                   <div class="exp-price portlet-header">
                     <p>$AUD</p>
-                    <h2>3239</h2>
+                    <h2>{{r.price}}</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
                 </div>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Another one</h3>
-                    <p>Very description wow</p>
-                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>339</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
+                {% endfor %}
               </div>
               <div class="new-item-form container-fluid" id="add-restaurant" style="display:none;">
                 <div class="row">
@@ -367,23 +333,23 @@
                     </div>
                     <div class="form-group">
                       <label>{% trans "Title" %}</label>
-                      <input class="form-control">
+                      <input id="restaurant-title" class="form-control">
                     </div>
                     <div class="form-group">
                       <label>{% trans "Location" %}</label>
-                      <input class="form-control">
+                      <input id="restaurant-location" class="form-control">
                     </div>
                     <div class="form-group">
                       <label style="display:block;">{% trans "Price" %}</label>
-                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                      <input id="restaurant-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
                     </div>
                   </div>
                   <div class="col-xs-6">
                     <div class="form-group">
                       <label>{% trans "Details" %}</label>
-                      <textarea class="form-control" style="height: 350px;"></textarea>
+                      <input id="restaurant-details" type="text" class="form-control" style="height: 350px;"></input>
                     </div>
-                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('restaurant');">{% trans "Add" %}</button>
                     <button id="add-restaurant-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                   </div>
                 </div>
@@ -392,32 +358,21 @@
             <div role="tabpanel" class="tab-pane fade" id="suggestion">
               <div class="column" id="suggestion_column">
                 <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
+                {% for s in suggestion %}
                 <div class="exp-box-sm portlet">
                   <div class="exp-img portlet-header"></div>
                   <div class="exp-info portlet-header">
-                    <h3>Such experience title</h3>
-                    <p>Very description wow</p>
-                    <p>2 hrs &middot; English &middot; <strong>Private</strong></p>
+                    <h3>{{s.title}}</h3>
+                    <p>{{s.details}}</p>
+                    <p>{{s.location}}</p>
                   </div>
                   <div class="exp-price portlet-header">
                     <p>$AUD</p>
-                    <h2>3239</h2>
+                    <h2>{{s.price}}</h2>
                     <p>{% trans "per person" %}</p>
                   </div>
                 </div>
-                <div class="exp-box-sm portlet">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>Another one</h3>
-                    <p>Very description wow</p>
-                    <p>9 hrs &middot; English &middot; <strong>Public</strong></p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>339</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
+                {% endfor %}
               </div>
               <div class="new-item-form container-fluid" id="add-suggestion" style="display:none;">
                 <div class="row">
@@ -431,23 +386,23 @@
                     </div>
                     <div class="form-group">
                       <label>{% trans "Title" %}</label>
-                      <input class="form-control">
+                      <input id="suggestion-title" class="form-control">
                     </div>
                     <div class="form-group">
                       <label>{% trans "Location" %}</label>
-                      <input class="form-control">
+                      <input id="suggestion-location" class="form-control">
                     </div>
                     <div class="form-group">
                       <label style="display:block;">{% trans "Price" %}</label>
-                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                      <input id="suggestion-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
                     </div>
                   </div>
                   <div class="col-xs-6">
                     <div class="form-group">
                       <label>{% trans "Details" %}</label>
-                      <textarea class="form-control" style="height: 350px;"></textarea>
+                      <input id="suggestion-details" type="text" class="form-control" style="height: 350px;"></input>
                     </div>
-                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('suggestion');">{% trans "Add" %}</button>
                     <button id="add-suggestion-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                   </div>
                 </div>
@@ -488,19 +443,19 @@
                   <div class="col-xs-6">
                     <div class="form-group">
                       <label>{% trans "Title" %}</label>
-                      <input class="form-control">
+                      <input id="price-title" class="form-control">
                     </div>
                     <div class="form-group">
                       <label style="display:block;">{% trans "Price" %}</label>
-                      <input class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD</span>
+                      <input id="price-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD</span>
                     </div>
                   </div>
                   <div class="col-xs-6">
                     <div class="form-group">
                       <label>{% trans "Details" %}</label>
-                      <textarea class="form-control" style="height: 350px;"></textarea>
+                      <input id="price-details" type="text" class="form-control" style="height: 350px;"></input>
                     </div>
-                    <button class="btn btn-primary" style="display:inline-block;">{% trans "Add" %}</button>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;">{% trans "Add" %}</button>
                     <button id="add-pricing-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                   </div>
                 </div>
@@ -576,7 +531,7 @@
     <script type="text/javascript" src="{% static 'experiences/scripts/custom_itinerary.js' %}"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
     <script type="text/javascript">
-    cities = ["Melbourne","Sydney","Brisbane","Goldcoast"];//TODO
+    cities = {{location_keys|safe}};
 
     $(document).ready(function()
     {
@@ -936,7 +891,7 @@
     }
 
     function add_item(type) {
-        var ids = ["title", "departing-location", "price", "details"];
+        var ids = ["title", "location", "price", "details"];
         var value = "";
         var item = {
             csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
@@ -945,6 +900,11 @@
         };
         for (var i = 0; i < ids.length; i++) {
             value = $("#" + type + "-" + ids[i]).val();
+            if(!value)
+            {
+                alert("{% trans "Please fill all fields" %}");
+                return;
+            }
             item[ids[i]] = value;
         }
         $.ajax({
@@ -957,7 +917,7 @@
                               "<div class=\"exp-info portlet-header\">" +
                                 "<h3>" + $("#" + type + "-title").val() + "</h3>" +
                                 "<p>" + $("#" + type + "-details").val().substring(0,15) + "</p>" +
-                                "<p>" + $("#" + type + "-departing-location").val() + "</p>" +
+                                "<p>" + $("#" + type + "-location").val() + "</p>" +
                               "</div>" +
                               "<div class=\"exp-price portlet-header\">" +
                                 "<p>$AUD</p>" +
