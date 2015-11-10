@@ -46,7 +46,7 @@
         <div class="column" id="flight_column">
             <button type="button" class="btn btn-default" id="add-flight-btn">+ Add Flight</button>
             {% for item in flight %}
-            <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
+            <div class="exp-box-sm portlet flight_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img portlet-header"></div>
                 <div class="exp-info portlet-header">
                     <h3>{{item.title}}</h3>
@@ -100,7 +100,7 @@
         <div class="column" id="transfer_column">
             <button type="button" id="add-transfer-btn" class="btn btn-default">+ Add Transfer</button>
             {% for item in transfer %}
-            <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
+            <div class="exp-box-sm portlet transfer_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img portlet-header"></div>
                 <div class="exp-info portlet-header">
                     <h3>{{item.title}}</h3>
@@ -154,7 +154,7 @@
         <div class="column" id="accommodation_column">
         <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
         {% for item in accommodation %}
-        <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
+        <div class="exp-box-sm portlet accommodation_{{item.location}}" id="experience_id_{{item.id}}">
             <div class="exp-img portlet-header"></div>
             <div class="exp-info portlet-header">
                 <h3>{{item.title}}</h3>
@@ -208,7 +208,7 @@
         <div class="column" id="restaurant_column">
         <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
         {% for item in restaurant %}
-        <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
+        <div class="exp-box-sm portlet restaurant_{{item.location}}" id="experience_id_{{item.id}}">
             <div class="exp-img portlet-header"></div>
             <div class="exp-info portlet-header">
             <h3>{{item.title}}</h3>
@@ -262,7 +262,7 @@
         <div class="column" id="suggestion_column">
         <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
         {% for item in suggestion %}
-        <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
+        <div class="exp-box-sm portlet suggestion_{{item.location}}" id="experience_id_{{item.id}}">
             <div class="exp-img portlet-header"></div>
             <div class="exp-info portlet-header">
                 <h3>{{item.title}}</h3>
