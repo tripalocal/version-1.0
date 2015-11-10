@@ -3120,14 +3120,13 @@ def custom_itinerary(request):
         if 'Add' in request.POST:
             #add a new item
             item = request.POST
-            np = NewProduct(provider_id=1, price=item['price'], commission=0.0, currency="aud", type=item['type'].title(), 
-                            duration=1, guest_number_min=1, guest_number_max=10, status="Listed")
+            np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency="aud", type=item['type'].title(), 
+                            duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted")
             np.save()
-            npi18n = NewProductI18n(product=np, title=request.POST['title'],
-                                    description=request.POST['details'], location=request.POST['location'])
+            npi18n = NewProductI18n(product=np, title=item.get('title',""),
+                                    description=item.get('details', ""), location=item.get('location', ""))
             npi18n.save()
-
-            return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form}, context)
+            return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
 
         form = CustomItineraryForm(request.POST)
 
@@ -3255,7 +3254,7 @@ def custom_itinerary(request):
                 #          {'form': booking_form,'itinerary':itinerary})
 
     #get flight, transfer, ...
-    pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion"])
+    pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
     for pd in pds:
         pd.title = pd.get_title(settings.LANGUAGES[0][0])
         pd.details = pd.get_description(settings.LANGUAGES[0][0])
@@ -3265,6 +3264,7 @@ def custom_itinerary(request):
     context['accommodation'] = [e for e in pds if e.type == 'Accommodation']
     context['restaurant'] = [e for e in pds if e.type == 'Restaurant']
     context['suggestion'] = [e for e in pds if e.type == 'Suggestion']
+    context['pricing'] = [e for e in pds if e.type == 'Pricing']
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
 def itinerary_booking_confirmation(request):
