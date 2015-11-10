@@ -73,3 +73,16 @@ label {
   background-repeat: no-repeat;
   vertical-align: middle;
 }
+
+// Image upload
+.placeholder {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: inline-block;
+  img {
+    margin-right: 10px;
+    margin-bottom: 2px;
+  }
+}

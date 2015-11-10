@@ -1,0 +1,33 @@
+{% load staticfiles %}
+{% load mathfilters %}
+{% load i18n %}
+
+    {%for day in itinerary%}
+    {% if forloop.first %}
+    <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='overflow-x:hidden;overflow-y:scroll;'>
+    {% else %}
+    <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='display:none;'>
+    {% endif %}
+        {% for experience in day.experiences %}
+        {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
+        <div class='exp-box-sm portlet' id='experience_id_{{experience.id}}'>
+            <div class='exp-img portlet-header'>
+                <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
+            </div>
+            <div class='exp-info portlet-header'>
+                <h3>{{experience.title}}</h3>
+                <p>{{experience.description|escapejs|slice:"0:16"}}</p>
+                <p>{{experience.duration}} {% trans 'hr(s)' %} &middot; 
+                    {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
+                    {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+            </div>
+            <div class='exp-price portlet-header'>
+                <p>{{experience.dollarsign}}{{experience.currency}}</p>
+                <h2>{{experience.price}}</h2>
+                <p>{% trans 'per person' %}</p>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}

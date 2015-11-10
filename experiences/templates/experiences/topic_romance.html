@@ -1,0 +1,57 @@
+{% extends "app/layout.html" %}
+{% load staticfiles %}
+{% load mathfilters %}
+{% load i18n %}
+
+{%block head %}
+  <link href="{% static 'experiences/content/themed_products.css' %}" rel="stylesheet">
+  <title>{% trans "Tripalocal | Honeymoon" %}</title>
+{%endblock%}
+
+{% block content %}
+<div class="jumbotron" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/hopeless_romance_lg.jpg' %})">
+  <h1>{% trans "Honeymoon" %}</h1>
+</div>
+
+<div class="container">
+  <div id="experience-results" class="experience-results">
+      {% for experience in experienceList %}
+
+      <div class="exp-box">
+          <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
+              <div class="listing-img" style="background-image:url({{ MEDIA_URL }}{{ experience.image }});">
+                  <div class="price-box">
+                      {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:experience.commission|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
+                  </div>
+              </div>
+          </a>
+          <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ experience.title }} </h3></a>
+
+          {% if profileImageURL %}
+              <div class="profile-frame-sm">
+                  <div class="profile-sm"
+                       style="background:url(
+                               {{ MEDIA_URL }}{{ profileImageURL|urlencode }}) no-repeat; background-size:cover;
+                               background-position:center;"></div>
+              </div>
+          {% endif %}
+
+          <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ experience.description }}</p>
+
+          <div class="listing-footer">
+              {%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
+              {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}&#8226; <span style="font-weight:500;">{% trans 'Private' %}</span>{% endif %} &#8226; {{experience.city}}
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script charset="utf-8" type="text/javascript">
+$("#navbar").removeClass("navbar-static-top");
+$("#navbar").addClass("navbar-fixed-top");
+</script>
+{% endblock %}

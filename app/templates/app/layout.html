@@ -128,6 +128,17 @@
         </div>
     </div>
 
+    <!-- Promotional popup -->
+    <div class="modal fade" id="promo-popup" tabindex="-1" role="dialog" aria-labelledby="promo-popup">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content promo-popup" style="background-color:transparent;">
+          <img src="{% static 'app/img/1111.png' %}" width="462" height="387">
+          <a class="btn btn-clear" href="{{GEO_POSTFIX}}1111"> </a>
+          <a class="close-popup">{% trans "close" %}</a>
+        </div>
+      </div>
+    </div>
+
     <!-- End Modal -->
 
 
@@ -194,8 +205,8 @@
           {% endif %}
 
         <ul class="nav navbar-nav main-menu">
-          <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
           <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
+          <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
           <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
         </ul>
 
@@ -238,24 +249,21 @@
     <div id="footer_div" class="footer">
         <div class="container">
           <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <ul class="footer-head">
                     <li>
                         <select id="id_language_select" class="form-control">
                             <option id="id_language_cn" value="cn">中文</option>
                             <option id="id_language_en" value="en">English</option>
                         </select>
+                        <select id="id_currency_select" class="form-control">
+                            <option id="id_currency_cny" value="CNY">{% trans 'CNY' %}</option>
+                            <option id="id_currency_aud" value="AUD">{% trans 'AUD' %}</option>
+                            <option id="id_currency_nzd" value="NZD">{% trans 'NZD' %}</option>
+                        </select>
                     </li>
                     <li class="footer-logo"></li>
                 </ul>
-            </div>
-
-            <div class="col-sm-2" style="text-align:center;">
-                <select id="id_currency_select" class="form-control" style="margin-bottom:20px; height:50px; max-width:80px; display:inline-block;">
-                    <option id="id_currency_cny" value="CNY">{% trans 'CNY' %}</option>
-                    <option id="id_currency_aud" value="AUD">{% trans 'AUD' %}</option>
-                    <option id="id_currency_nzd" value="NZD">{% trans 'NZD' %}</option>
-                </select>
             </div>
 
             <div class="col-sm-2 col-xs-6">
@@ -287,7 +295,7 @@
 
         <div class="footer-line">
             <p id="copyright"> &#169; Tripalocal Pty. Ltd. ABN 45 600 546 549</p>
-            <p id="copyright">滇ICP备15003066号-3</p>
+            <p id="copyright">京ICP备15055137号</p>
         </div>
     </div>
 
@@ -319,7 +327,7 @@
                 $('#popup-form-details').val('');
                 $('#popup-form-email').val('');
                 $('#results').html("<br><p class='popup-result'>{% trans 'Sent!' %}</p>");
-                $.cookie("closePopup", 3, {path: '/'});
+                $.cookie("closePopupPromo", 3, {path: '/'});
             },
 
             error: function (xhr, errmsg, err) {
@@ -426,14 +434,23 @@
         }
       // END PRODUCT POPUP THINGS */
 
+      var chosenValue = Math.random() < 0.5 ? 0 : 1;
       var popupTimer;
-       if ($(window).width() > 520) {
-           var nClose = parseInt($.cookie("closePopup"), 10);
-           if (!nClose || nClose < 3) {
+        if ($(window).width() > 520) {
+           var nClose = parseInt($.cookie("closePopupPromo"), 10);
+           if (!nClose || nClose < 6) {
                if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
                    $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
                  popupTimer = setTimeout(function () {
+                     {% if LANGUAGE != "zh-CN" %}
                      $('#help-popup').modal('show');
+                     {% else %}
+                     if (chosenValue == 0) {
+                       $('#help-popup').modal('show');
+                     } else {
+                       $('#promo-popup').modal('show');
+                     }
+                     {% endif %}
                      mixpanel.track("saw popup01");
                  }, 15000); // milliseconds
                }
@@ -444,19 +461,20 @@
            $('.close-popup').click(function () {
                clearTimeout(popupTimer);
                if (nClose) {
-                   $.cookie("closePopup", nClose + 1, {path: '/'});
+                   $.cookie("closePopupPromo", nClose + 1, {path: '/'});
                } else {
-                   $.cookie("closePopup", 1, {path: '/'});
+                   $.cookie("closePopupPromo", 1, {path: '/'});
                }
                $('#help-popup').modal('hide');
+               $('#promo-popup').modal('hide');
                mixpanel.track("closed popup01");
            });
            $('#help-no').click(function () {
                clearTimeout(popupTimer);
                if (nClose) {
-                   $.cookie("closePopup", nClose + 1, {path: '/'});
+                   $.cookie("closePopupPromo", nClose + 1, {path: '/'});
                } else {
-                   $.cookie("closePopup", 1, {path: '/'});
+                   $.cookie("closePopupPromo", 1, {path: '/'});
                }
                $('#help-popup').modal('hide');
                mixpanel.track("selected No from popup01");
@@ -504,6 +522,7 @@
         else if (window.location.href.indexOf(".cn") > -1) {
             $('#id_language_select').val('cn');
             $('#id_language_top').attr("href", "https://www.tripalocal.com" + des_url);
+            $(".navbar-brand").attr("href", "https://www.tripalocal.com.cn{{GEO_POSTFIX}}");
         }
         else {
             $('#id_language_select').val('en');

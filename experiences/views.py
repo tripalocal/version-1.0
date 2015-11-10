@@ -35,6 +35,7 @@ from django.views.decorators.csrf import csrf_exempt
 import itertools
 import xmltodict
 from django.db.models import Q
+from experiences.utils import isEnglish
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -69,16 +70,6 @@ def convert_experience_price(request, experience):
                     experience.dynamic_price = new_dynamic_price
 
         experience.currency = request.session['custom_currency']
-
-def isEnglish(s):
-    try:
-        s.decode('ascii') if isinstance(s, bytes) else s.encode('ascii')
-    except UnicodeDecodeError:
-        return False
-    except UnicodeEncodeError:
-        return False
-    else:
-        return True
 
 def experience_fee_calculator(price, commission_rate):
     if type(price)==int or type(price) == float:
@@ -1107,7 +1098,7 @@ def update_pageview_statistics(user_id, experience_id, length = None):
     except UserPageViewStatistics.DoesNotExist:
         record = UserPageViewStatistics(user_id = user_id, experience_id = experience_id,
                                         times_viewed = 0, average_length = 0.0)
-       
+
     if length:
         #leave an experience page
         try:
@@ -1147,7 +1138,7 @@ def experience_booking_successful(request, experience=None, guest_number=None, b
 
     data = request.GET
     if experience is None and data is not None:
-        experience = Experience.objects.get(id=data['experience_id'])
+        experience = AbstractExperience.objects.get(id=data['experience_id'])
         guest_number = int(data['guest_number'])
         booking_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['booking_datetime'], "%Y-%m-%d%H:%M"))
         price_paid = float(data['price_paid'])
@@ -1360,7 +1351,7 @@ def experience_booking_confirmation(request):
                 if total_price > 0.0:
                     #not free
                     # todo: remove stub money amout
-                    price = int(convert_currency(0.01, experience.currency, "CNY") * 100)
+                    price = int(convert_currency(total_price, experience.currency, "CNY") * 100)
                     pay_info = unified_pay.post(experience.get_title(settings.LANGUAGES[0][0]), out_trade_no,
                                                 str(price), "127.0.0.1", notify_url)
                     if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
@@ -1959,7 +1950,7 @@ def update_booking(id, accepted, user):
             result={'booking_success':booking_success, 'error':'the booking has been cancelled/rejected'}
             return result
 
-        experience = Experience.objects.get(id=booking.experience_id)
+        experience = AbstractExperience.objects.get(id=booking.experience_id)
         experience.title = experience.get_title(settings.LANGUAGES[0][0])
         experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
         if not get_host(experience).id == user.id:
@@ -2690,7 +2681,7 @@ def manage_listing_continue(request, exp_id):
     return redirect(reverse('manage_listing', kwargs={'exp_id': exp.id, 'step': 'location'}))
 
 def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.UTC), end_date=datetime.max.replace(tzinfo=pytz.UTC), guest_number=None, language=None, keywords=None,
-               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False,  type='s'):
+               is_kids_friendly=False, is_host_with_cars=False, is_private_tours=False,  type='product'):
     set_initial_currency(request)
     form = SearchForm()
     form.data = form.data.copy()
@@ -3120,14 +3111,26 @@ def custom_itinerary(request):
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
 
     context = RequestContext(request)
-    context['locations'] = Locations
+    context['location'] = Location
+    context['location_keys'] = list(dict(Location).keys())
     context['LANGUAGE'] = settings.LANGUAGE_CODE
     form = CustomItineraryForm()
 
     if request.method == 'POST':
+        if 'Add' in request.POST:
+            #add a new item
+            item = request.POST
+            np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency="aud", type=item['type'].title(), 
+                            duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted")
+            np.save()
+            npi18n = NewProductI18n(product=np, title=item.get('title',""),
+                                    description=item.get('details', ""), location=item.get('location', ""))
+            npi18n.save()
+            return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
+
         form = CustomItineraryForm(request.POST)
 
-        if 'Search' in request.POST:
+        if 'Search' in request.POST and 'itinerary_string' not in request.POST:
             if form.is_valid():
                 start_datetime = form.cleaned_data['start_datetime']
                 end_datetime = form.cleaned_data['end_datetime']
@@ -3147,9 +3150,9 @@ def custom_itinerary(request):
                 customer = request.user if request.user.is_authenticated() else None
                 itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort, age_limit, customer)
 
-                return render_to_response('experiences/custom_itinerary.html', {'form':form,'itinerary':itinerary}, context)
+                return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)
             else:
-                return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
+                return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form}, context)
         else:
             #submit bookings
             if form.is_valid():
@@ -3190,7 +3193,7 @@ def custom_itinerary(request):
 
                     #save the custom itinerary as draft
                     local_timezone = pytz.timezone(settings.TIME_ZONE)
-                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y/%m/%d"))
+                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
                     booking = Booking(user = request.user, experience= experience, guest_number = guest_number,
@@ -3200,7 +3203,7 @@ def custom_itinerary(request):
 
                     #save to excel sheet
                     cell_format = workbook.add_format({'text_wrap': True})
-                    current_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(str(item['date']), "%Y/%m/%d"))
+                    current_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(str(item['date']), "%Y-%m-%d"))
                     if current_date > last_date:
                         #a new day
                         row += 1
@@ -3245,11 +3248,23 @@ def custom_itinerary(request):
                 col += 1
                 worksheet.write(row, col, total_price/guest_number)
                 workbook.close()
-                return HttpResponseRedirect("https://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
+                return HttpResponseRedirect("http://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
 
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
 
+    #get flight, transfer, ...
+    pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
+    for pd in pds:
+        pd.title = pd.get_title(settings.LANGUAGES[0][0])
+        pd.details = pd.get_description(settings.LANGUAGES[0][0])
+        pd.location = pd.newproducti18n_set.all()[0].location
+    context['flight'] = [e for e in pds if e.type == 'Flight']
+    context['transfer'] = [e for e in pds if e.type == 'Transfer']
+    context['accommodation'] = [e for e in pds if e.type == 'Accommodation']
+    context['restaurant'] = [e for e in pds if e.type == 'Restaurant']
+    context['suggestion'] = [e for e in pds if e.type == 'Suggestion']
+    context['pricing'] = [e for e in pds if e.type == 'Pricing']
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
 def itinerary_booking_confirmation(request):
@@ -3363,6 +3378,308 @@ def itinerary_booking_successful(request):
 
     return render(request,'experiences/itinerary_booking_successful.html',{})
 
+def nov_promo(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[209,302,911,921,71,852,862,1021,2291,2301,2311,2321,2341,2351,2371,2381,2391,2401])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/1111.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_family(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[911,2041,464,69,408])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_family.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_romance(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[209,302,911,921,71,852,862,1021])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_romance.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_culture(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[981,1591,911,921,54,106,2,32,37])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_culture.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_outdoor(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[1581,862,2291,2351,1641,882,2671,2551,2441,1971,2591,2571,2581,2371])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_outdoor.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_extreme(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[2441,1981,2021,852,2411,2381,2291,1031,2361,2081])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_extreme.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
+def topic_photography(request):
+    set_initial_currency(request)
+    experienceList = AbstractExperience.objects.filter(id__in=[2081,2591,2531,2551,2561,2421,1681,1571,862,2681,2411,1651,1611,1621])
+    i=0
+    while i < len(experienceList):
+        experience = experienceList[i]
+
+        setExperienceDisplayPrice(experience)
+
+        experience.image = getBGImageURL(experience.id)
+
+        if float(experience.duration).is_integer():
+            experience.duration = int(experience.duration)
+
+        experience.city = dict(Location).get(experience.city, experience.city)
+
+        if not experience.currency:
+            experience.currency = 'aud'
+        convert_experience_price(request, experience)
+        experience.dollarsign = DollarSign[experience.currency.upper()]
+        experience.currency = str(dict(Currency)[experience.currency.upper()])
+        if experience.commission > 0.0:
+            experience.commission = round(experience.commission/(1-experience.commission),3)+1
+        else:
+            experience.commission = settings.COMMISSION_PERCENT+1
+
+        # Format title & Description
+        experience.description = experience.get_description(settings.LANGUAGES[0][0])
+        t = experience.get_title(settings.LANGUAGES[0][0])
+        if (t != None and len(t) > 30):
+            experience.title = t[:27] + "..."
+        else:
+            experience.title = t
+        i+=1
+    template = "experiences/topic_photography.html"
+    context = RequestContext(request, {
+                            'experienceList' : experienceList,
+                            'user_email':request.user.email if request.user.is_authenticated() else None,
+                            'LANGUAGE':settings.LANGUAGE_CODE,
+                            'GEO_POSTFIX': GEO_POSTFIX,
+              })
+    return render_to_response(template, {}, context)
+
 def multi_day_trip(request):
     experienceList = Experience.objects.filter(status='Listed', type='ITINERARY')
     i=0
@@ -3422,7 +3739,7 @@ def unionpay_payment_callback(request):
                     payment.street1 = ret['txnTime']
                     payment.save()
 
-                    experience = Experience.objects.get(id=bk.experience_id)
+                    experience = AbstractExperience.objects.get(id=bk.experience_id)
                     user = User.objects.get(id=bk.user_id)
                     bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
                     send_booking_email_verification(bk, experience, user,
@@ -3513,7 +3830,7 @@ def wechat_qr_payment_notify(request):
                 payment.charge_id = transaction_id
                 payment.save()
 
-                experience = Experience.objects.get(id=bk.experience_id)
+                experience = AbstractExperience.objects.get(id=bk.experience_id)
                 user = User.objects.get(id=bk.user_id)
                 bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
                 send_booking_email_verification(bk, experience, user,

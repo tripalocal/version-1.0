@@ -1,0 +1,53 @@
+/*
+  bring the kids
+  hopeless romance
+  local culture
+*/
+@import
+  '../../vendor/include-media',
+  '../../utils/variables',
+  '../../utils/mixins',
+  '../../utils/functions',
+  '../../utils/placeholders';
+
+body {
+  padding-top: 50px;
+}
+
+.jumbotron {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  img {
+    margin-top: 100px;
+  }
+
+  h1 {
+    color: white;
+    font-family: $font-stack-homepage;
+    font-weight: normal;
+    font-size: 32px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+  }
+
+  h2 {
+    color: white;
+    font-family: $font-stack-homepage;
+    font-weight: normal;
+    font-size: 32px;
+  }
+
+  h3 {
+    color: white;
+    font-weight: normal;
+  }
+}
+
+.container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}

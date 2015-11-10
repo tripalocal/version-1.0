@@ -49,6 +49,7 @@ ALL_CITIES = (('Melbourne', _('Melbourne')), ('Sydney', _('Sydney')), ('Brisbane
               ('Cairns', _('Cairns')),
               ('Goldcoast', _('Gold Coast')), ('Hobart', _('Hobart')), ('Adelaide', _('Adelaide')),
               ('Darwin', _('Darwin')), ('Alicesprings', _('Alice Springs')),
+              ('Perth', _('Perth')),
               ('Christchurch', _('Christchurch')), ('Queenstown', _('Queenstown')),
               ('Auckland', _('Auckland')), ('Wellington', _('Wellington')),)
 
@@ -271,7 +272,7 @@ def getreservation(user):
     local_timezone = pytz.timezone(settings.TIME_ZONE)
 
     for booking in bookings:
-        experience = Experience.objects.get(id=booking.experience_id)
+        experience = AbstractExperience.objects.get(id=booking.experience_id)
         payment = Payment.objects.get(id=booking.payment_id) if booking.payment_id != None else Payment()
         guest = User.objects.get(id=booking.user_id)
         phone_number = payment.phone_number if payment.phone_number != None and len(payment.phone_number) else guest.registereduser.phone_number
@@ -311,7 +312,8 @@ def mytrip(request):
 
         # Retrieve all bookings the user has made
         user_bookings = []
-        bookings = Booking.objects.filter(user=user_id)
+        booking_status = ["paid","accepted","rejected","paid_archived","accepted_archived","rejected_archived"]
+        bookings = Booking.objects.filter(user=user_id, status__in=booking_status)
 
         for booking in bookings:
             booking.experience.title = booking.experience.get_title(settings.LANGUAGES[0][0])

@@ -32,7 +32,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from experiences.constant import  *
 from experiences.telstra_sms_api import send_sms
-
+from experiences.utils import isEnglish
 
 if settings.LANGUAGE_CODE.lower() != "zh-cn":
     from allauth.socialaccount.providers.facebook.views import fb_complete_login
@@ -76,39 +76,45 @@ def updateExperienceTagsFromXLS(request):
             all_tags = []
 
             curr_cell = -1
-            while curr_cell < num_cells:
-                curr_cell += 1
-                # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
-                cell_type = worksheet.cell_type(curr_row, curr_cell)
-                cell_value = worksheet.cell_value(curr_row, curr_cell)
-                if cell_type == 1 or cell_type == 0:
-                    all_tags.append(cell_value)
-                else:
-                    raise Exception("Type error: column name, " + str(curr_cell))
+            while curr_row < 2:
+                #the first two rows are tags
+                while curr_cell < num_cells:
+                    curr_cell += 1
+                    # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date, 4=Boolean, 5=Error, 6=Blank
+                    cell_type = worksheet.cell_type(curr_row, curr_cell)
+                    cell_value = worksheet.cell_value(curr_row, curr_cell)
+                    if cell_type == 1 or cell_type == 0:
+                        all_tags.append(cell_value)
+                    else:
+                        raise Exception("Type error: column name, " + str(curr_cell))
+                curr_row += 1
+                curr_cell = -1
 
             cursor = connections['default'].cursor()
             #delete all existing records
-            cursor.execute("delete from experiences_experience_tags where experiencetag_id in (select id from experiences_experiencetag where language=%s)",[settings.LANGUAGES[0][0]])
-            cursor.execute("delete from experiences_experiencetag where language=%s",[settings.LANGUAGES[0][0]])
+            cursor.execute("delete from experiences_experience_tags")
+            cursor.execute("delete from experiences_newproduct_tags")
+            cursor.execute("delete from experiences_experiencetag")
             #add new tags
             all_tags = [x for x in all_tags if x]
             for i in range(len(all_tags)):
-                tag = ExperienceTag(tag = all_tags[i], language = settings.LANGUAGES[0][0])
+                tag = ExperienceTag(tag = all_tags[i], language = "en" if isEnglish(all_tags[i]) else "zh")
                 tag.save()
                 all_tags.remove(all_tags[i])
                 all_tags.insert(i, tag)
 
-            curr_row = 0
+            curr_row = 1
+            #start from the third row
             while curr_row < num_rows:
                 curr_row += 1
                 row = worksheet.row(curr_row)
 
                 curr_cell = 0
-                id = row[curr_cell].value.split("--")[0]
+                id = row[curr_cell].value
                 id = int(id)
                 try:
-                    exp = Experience.objects.get(id=id)
-                except Experience.DoesNotExist:
+                    exp = AbstractExperience.objects.get(id=id)
+                except AbstractExperience.DoesNotExist:
                     continue
 
                 while curr_cell < num_cells:
@@ -119,6 +125,7 @@ def updateExperienceTagsFromXLS(request):
                     if cell_type == 1 or cell_type == 0:
                         if worksheet.cell_value(curr_row, curr_cell).lower() == "y":
                             exp.tags.add(all_tags[curr_cell-1])
+                            exp.tags.add(all_tags[curr_cell-1+num_cells])
                     else:
                         raise Exception("Type error: row " + str(curr_row) + ", col " + str(curr_cell))
     else:
@@ -223,7 +230,7 @@ def saveBookingRequest(booking_request):
     if not isLegalInput([first_name,last_name,email,city,country,phone,experience_id,guest_number,booking_datetime,booking_extra_information]):
         raise Exception("Illegal input")
 
-    experience = Experience.objects.get(id=experience_id)
+    experience = AbstractExperience.objects.get(id=experience_id)
     experience.title = experience.get_title(settings.LANGUAGES[0][0])
     experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
 
@@ -812,7 +819,7 @@ def service_mytrip(request, format=None):
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
                   'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
                   'experience_title':booking.experience.get_title(settings.LANGUAGES[0][0]),
-                  'experience_photo':photo_url,
+                  'experience_photo':photo_url, 'experience_type':booking.experience.type,
                   'meetup_spot':get_experience_meetup_spot(booking.experience,settings.LANGUAGES[0][0]),
                   'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.',
                   'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
@@ -1015,7 +1022,7 @@ def service_couponverification(request, format=None):
 
     return Response(result, status=status.HTTP_200_OK)
 
-def get_experience_detail(experience, get_available_date=True):
+def get_experience_detail(experience, get_available_date=True, partner = False):
     available_options = []
     available_date = ()
 
@@ -1061,10 +1068,11 @@ def get_experience_detail(experience, get_available_date=True):
     result = {'experience_id':experience.id,
                 'experience_language':experience.language,
                 'experience_duration':experience.duration,
-                'experience_price':experience_fee_calculator(float(experience.price), experience.commission),
+                'experience_price':experience_fee_calculator(float(experience.price), 
+                                                             experience.commission if not partner else experience.commission/(2-experience.commission)),
                 'experience_currency': str(dict(Currency).get(experience.currency.upper(),experience.currency.upper())),
                 'experience_dollarsign': DollarSign.get(experience.currency.upper(),'$'),
-                'experience_dynamic_price':dynamic_price,
+                'experience_dynamic_price':dynamic_price if not partner else "",
                 'experience_guest_number_min':experience.guest_number_min,
                 'experience_guest_number_max':experience.guest_number_max,
                 'experience_images':experience_images,
@@ -1183,6 +1191,80 @@ def service_experiencedetail(request, format=None):
 
         experience = AbstractExperience.objects.get(id=data['experience_id'])
         result = get_experience_detail(experience, False)
+
+        return Response(result, status=status.HTTP_200_OK)
+
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+#@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
+#@permission_classes((IsAuthenticated,))
+def service_all_products(request, format=None):
+    try:
+        result=[]
+        cursor = connections['default'].cursor()
+        raw_query = "select experiences_newproducti18n.*,"+\
+	                       "experiences_newproduct.duration,"+\
+                           "experiences_newproduct.guest_number_min,"+\
+                           "experiences_newproduct.guest_number_max,"+\
+                           "round(experiences_newproduct.price*(2 - experiences_newproduct.commission/(2 - 2*experiences_newproduct.commission)),0) as price,"+\
+                           "experiences_newproduct.city,"+\
+                           "experiences_newproduct.language,"+\
+                           "experiences_newproduct.currency"+\
+                    " from experiences_newproduct, experiences_newproducti18n"+\
+                    " where experiences_newproduct.abstractexperience_ptr_id = experiences_newproducti18n.product_id"+\
+                          " and experiences_newproducti18n.language='zh'"
+
+        cursor.execute(raw_query)
+        nps = cursor._rows
+        if nps is not None and len(nps)>0:
+            for product in nps:
+                result.append({"title":product[2],"location":product[3],"background_info":product[4],"description":product[5],"service":product[6],
+                               "highlights":product[7],"schedule":product[8],"ticket_use_instruction":product[9],"refund_policy":product[10],"notice":product[11],
+                               "tips":product[12],"whatsincluded":product[12],"pickup_detail":product[14],"combination_options":product[15],"insurance":product[16],
+                               "disclaimer":product[17],"id":product[17],"duration":product[19],"guest_number_min":product[20],"guest_number_max":product[21],
+                               "price":product[22],"city":product[23],"language":product[24],"currency":product[25],})
+
+        raw_query = "select experiences_experiencetitle.title,"+\
+                           "experiences_experiencedescription.description,"+\
+                           "experiences_experienceactivity.activity,"+\
+                           "experiences_experienceinteraction.interaction,"+\
+                           "experiences_experiencedress.dress,"+\
+                           "experiences_experiencemeetupspot.meetup_spot,"+\
+	                       "experiences_experience.duration,"+\
+                           "experiences_experience.guest_number_min,"+\
+                           "experiences_experience.guest_number_max,"+\
+                           "round(experiences_experience.price*(2 - experiences_experience.commission/(2 - 2*experiences_experience.commission)),0) as price,"+\
+                           "experiences_experience.city,"+\
+                           "experiences_experience.language,"+\
+                           "experiences_experience.currency,"+\
+                           "experiences_experience.abstractexperience_ptr_id as id"+\
+                    " from  experiences_experience,experiences_experiencetitle,experiences_experiencedescription,"+\
+                          "experiences_experienceactivity,experiences_experienceinteraction,experiences_experiencedress,"+\
+                          "experiences_experiencemeetupspot"+\
+                    " where experiences_experience.status=\"Listed\" and experiences_experiencetitle.language=\"zh\""+\
+                          " and experiences_experiencedescription.language=\"zh\" and experiences_experienceactivity.language=\"zh\""+\
+                          " and experiences_experienceinteraction.language=\"zh\" and experiences_experiencedress.language=\"zh\""+\
+                          " and experiences_experiencemeetupspot.language=\"zh\""+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experiencetitle.experience_id"+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experiencedescription.experience_id"+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experienceactivity.experience_id"+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experienceinteraction.experience_id"+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experiencedress.experience_id"+\
+                          " and experiences_experience.abstractexperience_ptr_id = experiences_experiencemeetupspot.experience_id"+\
+                    " order by id;"
+
+        cursor.execute(raw_query)
+        exps = cursor._rows
+        if exps is not None and len(exps)>0:
+            for experience in exps:
+                result.append({"title":experience[0],"description":experience[1],"activity":experience[2],
+                               "interaction":experience[3],"dress":experience[4],"meetup_spot":experience[5],
+                               "duration":experience[6],"guest_number_min":experience[7],"guest_number_max":experience[8],
+                               "price":experience[9],"city":experience[10],"language":experience[11],
+                               "currency":experience[12],"id":experience[13]})
 
         return Response(result, status=status.HTTP_200_OK)
 
@@ -1370,7 +1452,7 @@ def service_email(request, format=None):
     try:
         data = request.data
         start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['start_date'].strip(), "%Y/%m/%d"))
-        exps = Experience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
+        exps = AbstractExperience.objects.filter(start_datetime__gte = start_date).filter(status__iexact="Listed")
         hosts = []
         exp_urls = []
 
