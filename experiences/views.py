@@ -3111,7 +3111,8 @@ def custom_itinerary(request):
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
 
     context = RequestContext(request)
-    context['locations'] = Locations
+    context['location'] = Location
+    context['location_keys'] = list(dict(Location).keys())
     context['LANGUAGE'] = settings.LANGUAGE_CODE
     form = CustomItineraryForm()
 
@@ -3123,7 +3124,7 @@ def custom_itinerary(request):
                             duration=1, guest_number_min=1, guest_number_max=10, status="Listed")
             np.save()
             npi18n = NewProductI18n(product=np, title=request.POST['title'],
-                                    description=request.POST['details'], location=request.POST['departing-location'])
+                                    description=request.POST['details'], location=request.POST['location'])
             npi18n.save()
 
             return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form}, context)
