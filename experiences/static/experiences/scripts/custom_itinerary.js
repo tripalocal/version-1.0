@@ -13,6 +13,7 @@ function init_drag() {
       ui.item.removeClass("tilt");
       $("html").unbind('mousemove', ui.item.data("move_handler"));
       ui.item.removeData("move_handler");
+      update_price_title();
     }
   });
 }
