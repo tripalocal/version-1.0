@@ -63,7 +63,7 @@
                 <option>10</option>
               </select>
             </div>
-              <button type="button" class="btn btn-primary" id="submit-add-adults">Add</button>
+              <button type="button" class="btn btn-primary" id="submit-add-adults">Update</button>
               <button type="button" class="btn btn-default" style="margin-right:0;" id="cancel-add-adults">Cancel</button>
             '>Adults <span class="badge" id="num-adults">1</span>
           </button>
@@ -850,7 +850,7 @@
             //TODO
         }
         var id = $("#add-city").prev().attr('id');
-        var number_city = 0;
+        var number_days = 0;
         //users may switch the order of cities, so button_city_1 can be behind button_city_2
         while(id && id.indexOf("button_city_") === 0)
         {
@@ -862,12 +862,13 @@
                 city = $("#button_city_"+i).attr("city");
                 duration = $("#button_city_"+i).attr("duration");
                 //comment out the following line if availability is considered in the future
-                duration = 1;
+                //duration = 1;
                 for(j=0;j<duration;j++)
                 {
                     cities = city + "," + cities;
+                    number_days += 1;
                 }
-                number_city += 1;
+
             }
 
             id = $("#"+id).prev().attr('id');
@@ -878,7 +879,7 @@
         var d = new Date($("#id_start_datetime").val());
         //d.setTime(d.getTime() + d.getTimezoneOffset()*60*1000);
         //$("#id_start_datetime") is already set
-        d.setDate(d.getDate()+number_city-1);
+        d.setDate(d.getDate()+number_days-1);
         $("#id_end_datetime").val(d.toString('yyyy-M-dd'));
     }
 
@@ -984,7 +985,7 @@
                 init_drag();
             },
             failure: function (e) {
-            
+
             }
         });
     }
