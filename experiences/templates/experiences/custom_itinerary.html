@@ -238,7 +238,6 @@
                             $($('.nav-tabs').children()[0]).addClass("active");
                             init_drag(); // Initialize draggable elements
                             filter_experiences(); // Initialize search filter
-                            init_drag();
                             $(".loading").hide();
                         },
                 failure: function(e) {
@@ -401,7 +400,6 @@
         }
         new_item += "</div>";
         $("#right_section").append(new_item);
-        init_drag();
 
         //reload data
         $("#itinerary_search").click();
@@ -448,7 +446,7 @@
                 $("#city-collapse-" + i + "-day-" + j).remove();
             }
         }
-        init_drag();
+
         //reload data
         $("#itinerary_search").click();
     }
