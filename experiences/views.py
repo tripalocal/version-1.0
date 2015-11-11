@@ -3177,7 +3177,18 @@ def custom_itinerary(request):
                 booking_form.data['time'] = ""
                 booking_form.data['status'] = "Requested"
 
-                workbook = xlsxwriter.Workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'itineraries'), 'Itinerary.xlsx'))
+                #save custom itinerary
+                ci = CustomItinerary()
+                ci.user = request.user
+                ci.title = form.cleaned_data['title']
+                while True:
+                    new_id = datetime.now().strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
+                    if len(CustomItinerary.objects.filter(id=new_id)) == 0:
+                        break
+                ci.id = new_id
+                ci.save()
+
+                workbook = xlsxwriter.Workbook(os.path.join(settings.PROJECT_ROOT,'itineraries', str(ci.id)+'.xlsx'))
                 worksheet = workbook.add_worksheet()
                 city = form.cleaned_data['city']
                 city = city.split(',')
@@ -3188,10 +3199,6 @@ def custom_itinerary(request):
                 total_price = 0.0
                 guest_number = 1
 
-                ci = CustomItinerary()
-                ci.user = request.user
-                ci.title = str(request.user.id) + "_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                ci.save()
                 for item in itinerary:
                     booking_form.data['experience_id'] += str(item['id']) + ";"
                     booking_form.data['date'] += str(item['date']) + ";"
@@ -3260,12 +3267,28 @@ def custom_itinerary(request):
                 col += 1
                 worksheet.write(row, col, total_price/guest_number)
                 workbook.close()
-                return HttpResponseRedirect("http://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
+                return HttpResponseRedirect("http://"+settings.ALLOWED_HOSTS[0]+"/itinerary/"+ci.id+"/")
 
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
+
+def itinerary_detail(request,id=None):
+    if id is None:
+        return HttpResponseRedirect(GEO_POSTFIX)
+
+    ci = CustomItinerary.objects.get(id=id)
+    itinerary = {"title":ci.title, "days":{}}
+    for item in ci.booking_set.all():
+        item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
+        item.experience.description = item.experience.get_description(settings.LANGUAGES[0][0])
+        key = item.datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%d")
+        if key not in itinerary["days"]:
+            itinerary["days"][key] = []
+        itinerary["days"][key].append(item.experience)
+
+    return render_to_response('experiences/itinerary_detail.html',{'itinerary':itinerary})
 
 def itinerary_booking_confirmation(request):
     context = RequestContext(request)

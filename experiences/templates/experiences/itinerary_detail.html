@@ -1,0 +1,25 @@
+{% extends "app/layout.html" %}
+{% load mathfilters %}
+{% load i18n %}
+
+{% block head %}
+    {% load staticfiles %}
+    <title>{{ itinerary.title }}</title>
+{% endblock %}
+
+{% block content %}
+
+    <div>
+        {%for date, list in itinerary.days.items %}
+        <div>
+            {% for item in list %}
+                {{item.title}}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}
