@@ -328,10 +328,20 @@
             if(cities[i]==city)
             {
                 $(".city_" + cities[i]).show();
+                $(".flight_" + cities[i]).show();
+                $(".transfer_" + cities[i]).show();
+                $(".accommodation_" + cities[i]).show();
+                $(".restaurant_" + cities[i]).show();
+                $(".suggestion_" + cities[i]).show();
             }
             else
             {
                 $(".city_" + cities[i]).hide();
+                $(".flight_" + cities[i]).hide();
+                $(".transfer_" + cities[i]).hide();
+                $(".accommodation_" + cities[i]).hide();
+                $(".restaurant_" + cities[i]).hide();
+                $(".suggestion_" + cities[i]).hide();
             }
         }
     }
