@@ -3106,7 +3106,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
 
     return itinerary
 
-def custom_itinerary(request):
+def custom_itinerary(request, id=None):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
 
@@ -3115,6 +3115,7 @@ def custom_itinerary(request):
     context['location_keys'] = list(dict(Location).keys())
     context['LANGUAGE'] = settings.LANGUAGE_CODE
     form = CustomItineraryForm()
+    set_initial_currency(request)
 
     if request.method == 'POST':
         if 'Add' in request.POST:
@@ -3267,10 +3268,20 @@ def custom_itinerary(request):
                 col += 1
                 worksheet.write(row, col, total_price/guest_number)
                 workbook.close()
-                return HttpResponseRedirect("http://"+settings.ALLOWED_HOSTS[0]+"/itinerary/"+ci.id+"/")
+                return HttpResponseRedirect(GEO_POSTFIX+"itinerary/"+ci.id+"/")
 
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
+
+    else:
+        if id is not None:
+            existing_ci = CustomItinerary.objects.get(id=id)
+            form.initial["title"] = existing_ci.title
+            form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow())
+            for bking in existing_ci.booking_set.all():
+                form.initial["guest_number"] = bking.guest_number
+                if bking.datetime.astimezone(bking.experience.get_timezone()) < form.initial["start_datetime"]:
+                    form.initial["start_datetime"] = bking.datetime.astimezone(bking.experience.get_timezone())
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
