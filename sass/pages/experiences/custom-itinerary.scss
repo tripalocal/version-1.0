@@ -166,6 +166,7 @@ body {
   height: 75px;
   margin-top: 10px;
   background-color: white;
+  white-space: nowrap;
 }
 
 .exp-img {
@@ -193,14 +194,12 @@ body {
     margin: 0;
     font-size: 14px;
     font-weight: normal;
-    overflow-x: hidden;
   }
   p {
     font-size: 12px;
     margin-top: 5px;
     margin-bottom: 0;
     color: $dark-grey;
-    overflow-x: hidden;
   }
 }
 

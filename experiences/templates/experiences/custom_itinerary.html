@@ -234,7 +234,8 @@
                             $('.tab-content').html(data);
                             $('.nav-tabs').children().removeClass();
                             $($('.nav-tabs').children()[0]).addClass("active");
-                            init_drag();
+                            init_drag(); // Initialize draggable elements
+                            filter_experiences(); // Initialize search filter
                             $(".loading").hide();
                         },
                 failure: function(e) {
@@ -247,10 +248,6 @@
         $("#button_export").click(function(e){
             set_itinerary_string();
         });
-
-        init_drag(); // Initialize draggable elements
-
-        filter_experiences(); // Initialize search filter
 
         // Date field
         if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
@@ -390,7 +387,6 @@
         }
         new_item += "</div>";
         $("#right_section").append(new_item);
-        init_drag();
 
         //reload data
         $("#itinerary_search").click();
@@ -437,7 +433,7 @@
                 $("#city-collapse-" + i + "-day-" + j).remove();
             }
         }
-        init_drag();
+
         //reload data
         $("#itinerary_search").click();
     }
