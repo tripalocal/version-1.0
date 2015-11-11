@@ -3276,12 +3276,42 @@ def custom_itinerary(request, id=None):
     else:
         if id is not None:
             existing_ci = CustomItinerary.objects.get(id=id)
+            itinerary = {}
+            cities = {}
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow())
             for bking in existing_ci.booking_set.all():
                 form.initial["guest_number"] = bking.guest_number
+
                 if bking.datetime.astimezone(bking.experience.get_timezone()) < form.initial["start_datetime"]:
                     form.initial["start_datetime"] = bking.datetime.astimezone(bking.experience.get_timezone())
+
+                bking.experience.title = bking.experience.get_title(settings.LANGUAGES[0][0])
+                bking.experience.description = bking.experience.get_description(settings.LANGUAGES[0][0])
+
+                exp_price = float(bking.experience.price)
+                if bking.experience.dynamic_price != None and \
+                   len(bking.experience.dynamic_price.split(',')) == bking.experience.guest_number_max - bking.experience.guest_number_min + 2 :
+                    exp_price = float(bking.experience.dynamic_price.split(",")[bking.guest_number-bking.experience.guest_number_min])
+
+                bking.experience.price = experience_fee_calculator(exp_price, bking.experience.commission)
+                bking.experience.dollarsign = DollarSign[bking.experience.currency.upper()]
+                bking.experience.currency = str(dict(Currency)[bking.experience.currency.upper()])
+
+                key = bking.datetime.astimezone(bking.experience.get_timezone()).strftime("%Y-%m-%d")
+                if key not in itinerary:
+                    itinerary.update({key:[]})
+                itinerary[key].append(bking.experience)
+                if bking.experience.city not in cities:
+                    cities.update({bking.experience.city:[]})
+                if key not in cities[bking.experience.city]:
+                    cities[bking.experience.city].append(key)
+
+            for key, value in cities.items():
+                cities[key] = len(value)
+
+            context['existing_itinerary'] = itinerary
+            context['existing_cities'] = cities
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
@@ -3294,9 +3324,9 @@ def itinerary_detail(request,id=None):
     for item in ci.booking_set.all():
         item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
         item.experience.description = item.experience.get_description(settings.LANGUAGES[0][0])
-        key = item.datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%d")
+        key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
         if key not in itinerary["days"]:
-            itinerary["days"][key] = []
+            itinerary["days"].update({key:[]})
         itinerary["days"][key].append(item.experience)
 
     return render_to_response('experiences/itinerary_detail.html',{'itinerary':itinerary})
