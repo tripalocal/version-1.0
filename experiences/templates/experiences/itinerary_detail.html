@@ -1,0 +1,43 @@
+{% extends "app/layout.html" %}
+{% load mathfilters %}
+{% load i18n %}
+
+{% block head %}
+    {% load staticfiles %}
+    <title>{{ itinerary.title }}</title>
+{% endblock %}
+
+{% block content %}
+
+    <form method="post" action="{{GEO_POSTFIX}}itinerary/{{itinerary_id}}/">
+        {% csrf_token %}
+        <div>
+            {% if user.is_authenticated %}
+            <button id="pay">{%trans "Pay"%}</button>
+            {% else %}
+            <input type="button" value="{%trans "Pay"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}itinerary/{{itinerary_id}}';"/>
+            {% endif %}
+        </div>
+    </form>
+    <div>
+        {%for date, list in itinerary.days.items %}
+        <div>
+            {% for item in list %}
+                {{item.title}}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+ <script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function()
+    {
+        $("#pay").click(function(e){
+            
+        });
+    })
+</script>
+{% endblock %}

@@ -805,6 +805,9 @@ class ExperienceAvailabilityForm(forms.Form):
 SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
 AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children')),(4,_('Famili with elderly&children')))
 class CustomItineraryForm(forms.Form):
+    title = forms.CharField(max_length=100, required=False, initial="")
+    description = forms.CharField(widget=forms.Textarea, required=False)
+    note = forms.CharField(widget=forms.Textarea, required=False)
     start_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
     end_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
     guest_number = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
@@ -884,18 +887,8 @@ def instant_booking(experience, bk_date, bk_time):
 
 class ItineraryBookingForm(forms.Form):
     user_id = forms.CharField()
-    experience_id = forms.CharField(widget=forms.Textarea)
-    date = forms.CharField(widget=forms.Textarea)
-    time = forms.CharField(widget=forms.Textarea)
-    guest_number = forms.IntegerField(label="People")
-    itinerary_string = forms.CharField(widget=forms.Textarea, required=False)
-    status = forms.CharField(initial="Requested")
+    itinerary_id = forms.CharField()
     promo_code = forms.CharField(required=False)
-
-    card_number = CreditCardField(required=True, label="Card Number")
-    expiration = CCExpField(required=True, label="Expiration")
-    cvv = forms.IntegerField(required=True, label="CVV Number",
-        max_value=9999, widget=forms.TextInput(attrs={'size': '4'}))
 
     first_name = forms.CharField(max_length=50)
     last_name = forms.CharField(max_length=50)
@@ -912,21 +905,12 @@ class ItineraryBookingForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(ItineraryBookingForm, self).__init__(*args, **kwargs)
-        self.fields['experience_id'].widget.attrs['readonly'] = True
         self.fields['user_id'].widget.attrs['readonly'] = True
-        self.fields['guest_number'].widget.attrs['readonly'] = True
-        self.fields['date'].widget.attrs['readonly'] = True
-        self.fields['time'].widget.attrs['readonly'] = True
-        self.fields['status'].widget.attrs['readonly'] = True
-        self.fields['experience_id'].widget = forms.HiddenInput()
         self.fields['user_id'].widget = forms.HiddenInput()
-        self.fields['date'].widget = forms.HiddenInput()
-        self.fields['time'].widget = forms.HiddenInput()
-        self.fields['guest_number'].widget = forms.HiddenInput()
-        self.fields['status'].widget = forms.HiddenInput()
+        self.fields['itinerary_id'].widget.attrs['readonly'] = True
+        self.fields['itinerary_id'].widget = forms.HiddenInput()
         self.fields['coupon_extra_information'].widget = forms.HiddenInput()
-        self.fields['itinerary_string'].widget.attrs['readonly'] = True
-        self.fields['itinerary_string'].widget = forms.HiddenInput()
+        self.fields['booking_extra_information'].widget = forms.HiddenInput()
 
     def booking(self,ids,dates,times,user,guest_number,
                 card_number=None,exp_month=None,exp_year=None,cvv=None,
@@ -1056,34 +1040,10 @@ class ItineraryBookingForm(forms.Form):
         cleaned = super(ItineraryBookingForm, self).clean()
 
         if not self.errors and (not 'Refresh' in self.data):
-            card_number = self.cleaned_data["card_number"]
-            exp_month = self.cleaned_data["expiration"].month
-            exp_year = self.cleaned_data["expiration"].year
-            cvv = self.cleaned_data["cvv"]
-
-            ids = self.cleaned_data['experience_id'].split(';')
-            dates = self.cleaned_data['date'].split(';')
-            times = self.cleaned_data['time'].split(';')
-
-            ids.remove('')
-            dates.remove('')
-            times.remove('')
-
-            date_start = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[0].strip() + " " + times[0].split(":")[0].strip(), "%Y/%m/%d %H"))
-            date_end = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[len(dates)-1].strip() + " " + times[len(dates)-1].split(":")[0].strip(), "%Y/%m/%d %H"))
-            cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
-                                       end_datetime__gt = date_end,
-                                       start_datetime__lt = date_start)
-
-            if len(cp)>0:
-                rules = json.loads(cp[0].rules)
-                #TODO
+            itinerary = CustomItinerary.objects.get(id=self.cleaned_data['itinerary_id'])
 
             user = User.objects.get(id=self.cleaned_data['user_id'])
-            guest_number = int(self.cleaned_data["guest_number"])
-            booking_extra_information="Need Chinese Translation" if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information'] else ""
-            coupon_extra_information=self.cleaned_data['coupon_extra_information'],
-            coupon=cp[0] if len(cp)>0 else None
+
             payment_street1 = self.cleaned_data['street1']
             payment_street2 = self.cleaned_data['street2']
             payment_city = self.cleaned_data['city_town']
@@ -1092,10 +1052,6 @@ class ItineraryBookingForm(forms.Form):
             payment_postcode = self.cleaned_data['postcode']
             payment_phone_number = self.cleaned_data['phone_number']
 
-            self.booking(ids,dates,times,user,guest_number,
-                         card_number,exp_month,exp_year,cvv,
-                         booking_extra_information,coupon_extra_information,coupon,
-                         payment_street1,payment_street2,payment_city,payment_state,payment_country,payment_postcode,payment_phone_number)
 
         return cleaned
 
