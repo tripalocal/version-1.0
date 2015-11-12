@@ -3106,6 +3106,12 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
 
     return itinerary
 
+def custom_itinerary_request(request):
+    context = RequestContext(request)
+    context['LANGUAGE'] = settings.LANGUAGE_CODE
+    form = CustomItineraryRequestForm()
+    return render_to_response('experiences/custom_itinerary_request.html', {'form':form}, context)
+
 def custom_itinerary(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
@@ -3120,7 +3126,7 @@ def custom_itinerary(request):
         if 'Add' in request.POST:
             #add a new item
             item = request.POST
-            np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency="aud", type=item['type'].title(), 
+            np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency="aud", type=item['type'].title(),
                             city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted")
             np.save()
             npi18n = NewProductI18n(product=np, title=item.get('title',""),

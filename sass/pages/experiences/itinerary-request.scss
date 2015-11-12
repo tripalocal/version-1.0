@@ -1,0 +1,116 @@
+/*
+
+  Custom Itinerary request form
+
+*/
+@import '../../vendor/include-media', '../../utils/variables', '../../utils/mixins', '../../utils/functions', '../../utils/placeholders', '../../vendor/animate';
+
+body {
+  overflow: hidden;
+}
+
+h1 {
+  font-family: $font-stack-homepage;
+  font-size: 48px;
+}
+.full-height {
+  height: 100vh;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: relative;
+  .btn {
+    min-width: 120px;
+    height: 40px;
+    border-radius: 2px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  }
+  .btn-bottom {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .btn-top {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .btn-secondary {
+    display: none;
+  }
+}
+.middle {
+  color: white;
+  width: 500px;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  text-shadow: 1px 1px 8px black;
+  -webkit-animation-delay: 1s; /* Chrome, Safari, Opera */
+          animation-delay: 1s;
+}
+
+.container {
+  padding: 50px 0;
+}
+
+.panel {
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  border: 0;
+  display: none;
+  position: relative;
+  h2 {
+    font-size: 24px;
+    font-family: $font-stack-homepage;
+    display: inline;
+    vertical-align: middle;
+  }
+  p {
+    margin-top: 10px;
+  }
+}
+
+.header-icon {
+  margin-right: 10px;
+  width: 32px;
+  height: 32px;
+}
+
+.form-control {
+  width: 100%;
+  height: 40px;
+  margin: 15px 0;
+}
+
+select {
+  min-width: 170px;
+}
+
+.progress-bar {
+  position: fixed;
+  height: 150px;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+}
+
+.indicator {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  margin-bottom: 20px;
+  background: white;
+  color: $medium-grey;
+  border-radius: 100px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.active {
+  color: white;
+  background: $primary-color;
+}

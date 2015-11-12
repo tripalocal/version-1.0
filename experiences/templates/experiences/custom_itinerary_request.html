@@ -1,0 +1,330 @@
+{% extends "app/layout.html" %}
+{% load staticfiles %}
+{% load mathfilters %}
+{% load i18n %}
+
+{% block head %}
+  <title>{% trans 'Request a Custom Itinerary' %}</title>
+  <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
+  <link href="{% static 'experiences/content/itinerary-request.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+<div id="complete" class="full-height" style="display:none;background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %}">
+  <div class="container middle animated fadeIn">
+    <h1>Your request has been submitted!</h1>
+    <h2>A custom itinerary will be sent to you shortly.</h2>
+  </div>
+</div>
+<form id="itinerary-request" action="" method="post">
+  <div id="intro" class="full-height" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %}">
+    <div class="container middle animated fadeIn">
+      <h1>Custom Itinerary</h1>
+      <h2>Complete just a few easy steps and we will<br> send you an itinerary tailor made for your trip</h2>
+      <button type="button" id="start-btn" class="btn btn-primary">Get Started</button>
+    </div>
+  </div>
+  <div class="progress-bar">
+    <div class="indicator" id="indicator1">1</div>
+    <div class="indicator" id="indicator2">2</div>
+    <div class="indicator" id="indicator3">3</div>
+  </div>
+  <div id="step1" class="full-height">
+    <button type="button" id="prev-btn1" class="btn btn-secondary btn-top">Back</button>
+    <div class="container">
+      <div class="panel panel-default" id="destination">
+        <div class="panel-body">
+          <img src="{% static 'experiences/img/itinerary.svg' %}" class="header-icon"><h2>Destinations</h2>
+          <p>List some locations you would like to visit on this trip.</p>
+          {{form.destinations}}
+        </div>
+      </div>
+      <div class="panel panel-default" id="date">
+        <div class="panel-body">
+          <img src="{% static 'experiences/img/calendar.svg' %}" class="header-icon"><h2>Dates</h2>
+          <p>Between which dates would you be travelling?</p>
+          <div class="container" style="width:400px; padding:0;">
+            <div class="form-group" style="display:inline-block; margin-right:20px; margin-bottom:0;">
+              <label>Start date</label>
+              {{form.start_date}}
+            </div>
+            <div class="form-group" style="display:inline-block; margin-bottom:0;">
+              <label>End date</label>
+              {{form.end_date}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default" id="group">
+        <div class="panel-body">
+          <img src="{% static 'experiences/img/group.svg' %}" class="header-icon"><h2>Group Size</h2>
+          <p>How many adults will be travelling? Any children?</p>
+          <div class="container" style="width:400px; padding:0;">
+            <div class="form-group" style="display:inline-block; margin-right:20px; margin-bottom:0;">
+              <label>Adults</label>
+              {{form.guests_adults}}
+            </div>
+            <div class="form-group" style="display:inline-block; margin-bottom:0;">
+              <label>Children (2-12 years old)</label>
+              {{form.guests_children}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" id="next-btn1" class="btn btn-secondary btn-bottom">Next</button>
+  </div>
+  <div id="step2" class="full-height">
+    <button type="button" id="prev-btn2" class="btn btn-secondary btn-top">Back</button>
+    <div class="container">
+      <div class="panel panel-default" id="interests">
+        <div class="panel-body">
+          <img src="{% static 'experiences/img/heart_large_grey.svg' %}" class="header-icon"><h2>Interests</h2>
+          <p>What kind of things are you interested in? Uncheck the topics that don't interest you.</p>
+          <div class="form-box" id="tags_div">
+              {{form.tags}}
+              {{form.all_tags}}
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default" id="included">
+        <div class="panel-body">
+          <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>What's Included</h2>
+          <p>We don't currently provide accommodation or car rental.</p>
+          <div class="checkbox">
+            <label>{{form.flights}}National flights</label>
+          </div>
+          <div class="checkbox">
+            <label>{{form.driver}}Driver</label>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default" id="budget">
+        <div class="panel-body">
+          <img src="{% static 'experiences/img/price.svg' %}" class="header-icon"><h2>Budget</h2>
+          <p>What is your budget for this trip?</p>
+          {{form.budget}}
+        </div>
+      </div>
+    </div>
+    <button type="button" id="next-btn2" class="btn btn-secondary btn-bottom">Next</button>
+  </div>
+  <div id="step3" class="full-height">
+    <button type="button" id="prev-btn3" class="btn btn-secondary btn-top">Back</button>
+    <div class="container">
+      <div class="panel panel-default" id="requirements">
+        <div class="panel-body">
+          <img src="{% static 'experiences/img/discuss.svg' %}" class="header-icon"><h2>Other Requirements</h2>
+          <p>Anything else you would like to let us know?</p>
+          {{form.requirements}}
+        </div>
+      </div>
+      <div class="panel panel-default" id="contact">
+        <div class="panel-body">
+          <img src="{% static 'experiences/img/profile.svg' %}" class="header-icon"><h2>Contact Details</h2>
+          <p>Almost done! Just leave us your contact details so we can get back to you.</p>
+          <div class="container" style="width:600px; padding:15px">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label>Name</label>
+                  {{form.name}}
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  {{form.email}}
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label>WeChat</label>
+                  {{form.wechat}}
+                </div>
+                <div class="form-group">
+                  <label>Mobile</label>
+                  {{form.mobile}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" id="submit-btn" class="btn btn-primary btn-bottom">Submit</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+{%if LANGUAGE == "zh-CN"%}
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+{%endif%}
+<script>
+$(function() {
+  if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
+
+          $("#id_start_date").datetimepicker({
+              format: 'YYYY-MM-DD', locale: 'zh-CN'
+          });
+
+
+          $("#id_end_date").datetimepicker({
+              format: 'YYYY-MM-DD', locale: 'zh-CN'
+          });
+
+  }
+  else {
+
+          $("#id_start_date").datetimepicker({
+              format: 'YYYY-MM-DD'
+          });
+
+
+          $("#id_end_date").datetimepicker({
+              format: 'YYYY-MM-DD'
+          });
+
+  }
+  var all_tags = $("#id_all_tags").val().split(",");
+  var tags = $("#id_tags").val().split(",");
+  for(i=0;i<all_tags.length>0;i++)
+  {
+      if($("#id_tags").val().length>0 && tags.length>0 && $.inArray(all_tags[i], tags)<0)
+      {
+          new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-unselected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10003</button></div>";
+      }
+      else
+      {
+          new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url({% static 'icon/cross_grey.svg' %}\"></button></div>";
+      }
+
+      $("#tags_div").append(new_tag);
+
+      $("#tag_button_"+(i+1)).click(function(e){
+          id = e.target.id.split("_")[2];
+          if($("#tag_"+id).attr("class") == "tag-selected")
+          {
+              $("#tag_button_"+id).css("background-image","url({{ MEDIA_URL }}undo.svg)");
+              $("#tag_"+id).attr("class", "tag-non-selected");
+              $("#tag_box_"+id).removeClass("tag-box-selected");
+              $("#tag_box_"+id).addClass("tag-box-unselected");
+          }
+          else
+          {
+              $("#tag_button_"+id).css("background-image","url({% static 'icon/cross_grey.svg' %})");
+              $("#tag_"+id).attr("class", "tag-selected");
+              $("#tag_box_"+id).removeClass("tag-box-unselected");
+              $("#tag_box_"+id).addClass("tag-box-selected");
+          }
+      });
+  }
+  $("#start-btn").click(function() {
+      $('html,body').animate({
+          scrollTop: $("#step1").offset().top},
+          'slow');
+      $(".progress-bar").delay(500).fadeIn();
+      $("#indicator1").delay(1000).addClass("active animated pulse infinite");
+      $("#prev-btn1").delay(500).fadeIn("slow");
+      $("#destination").delay(800).fadeIn("slow");
+      $("#date").delay(1100).fadeIn("slow");
+      $("#group").delay(1400).fadeIn("slow");
+      $("#next-btn1").delay(1700).fadeIn("slow");
+  });
+  $("#prev-btn1").click(function() {
+    $('html,body').animate({
+        scrollTop: $("body").offset().top},
+        'slow');
+    $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp();
+    $(".progress-bar").fadeOut();
+  });
+  $("#next-btn1").click(function() {
+    $('html,body').animate({
+        scrollTop: $("#step2").offset().top},
+        'slow');
+    $("#indicator1").removeClass("active animated pulse infinite");
+    $("#indicator2").addClass("active animated pulse infinite");
+    $("#prev-btn2").delay(500).fadeIn("slow");
+    $("#interests").delay(800).fadeIn("slow");
+    $("#included").delay(1100).fadeIn("slow");
+    $("#budget").delay(1400).fadeIn("slow");
+    $("#next-btn2").delay(1700).fadeIn("slow");
+    $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp("slow");
+  });
+  $("#prev-btn2").click(function() {
+    $('html,body').animate({
+        scrollTop: $("#step1").offset().top},
+        'slow');
+    $("#indicator2").removeClass("active animated pulse infinite");
+    $("#indicator1").addClass("active animated pulse infinite");
+    $("#prev-btn1").delay(500).fadeIn("slow");
+    $("#destination").delay(800).fadeIn("slow");
+    $("#date").delay(1100).fadeIn("slow");
+    $("#group").delay(1400).fadeIn("slow");
+    $("#next-btn1").delay(1700).fadeIn("slow");
+    $("#prev-btn2, #interests, #included, #budget, #next-btn2").slideUp("slow");
+  });
+  $("#next-btn2").click(function() {
+    $('html,body').animate({
+        scrollTop: $("#step3").offset().top},
+        'slow');
+    $("#indicator2").removeClass("active animated pulse infinite");
+    $("#indicator3").addClass("active animated pulse infinite");
+    $("#prev-btn3").delay(500).fadeIn("slow");
+    $("#requirements").delay(800).fadeIn("slow");
+    $("#contact").delay(1100).fadeIn("slow");
+    $("#submit-btn").delay(1400).fadeIn("slow");
+    $("#prev-btn2, #interests, #included, #budget, #next-btn2").slideUp("slow");
+  });
+  $("#prev-btn3").click(function() {
+    $('html,body').animate({
+        scrollTop: $("#step2").offset().top},
+        'slow');
+    $("#indicator3").removeClass("active animated pulse infinite");
+    $("#indicator2").addClass("active animated pulse infinite");
+    $("#prev-btn2").delay(500).fadeIn("slow");
+    $("#interests").delay(800).fadeIn("slow");
+    $("#included").delay(1100).fadeIn("slow");
+    $("#budget").delay(1400).fadeIn("slow");
+    $("#next-btn2").delay(1700).fadeIn("slow");
+    $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
+  })
+  $("#submit-btn").click(function() {
+    $.ajax({
+        url : '{{GEO_POSTFIX}}itinerary/',
+        type: "POST",
+        data : {
+                    destinations: $("#id_city").val(),
+                    start_date: $("#id_start_date").val(),
+                    end_date: $("#id_end_date").val(),
+                    guests_adults: $("#id_guests_adults").val(),
+                    guests_children: $("#id_guests_children").val(),
+                    tags: $("#id_tags").val(),
+                    all_tags: $("#id_all_tags").val(),
+                    budget: $("#id_budget").val(),
+                    flights: $("#id_flight").val(),
+                    driver: $("#id_driver").val(),
+                    requirements: $("#id_requirements").val(),
+                    name: $("#id_name").val(),
+                    wechat: $("#id_wechat").val(),
+                    email: $("#id_email").val(),
+                    mobile: $("#id_mobile").val()
+                },
+        success: function(data){
+                    $("#complete").show();
+                    $("#intro").hide();
+                    $('html,body').animate({
+                        scrollTop: $("body").offset().top},
+                        'slow');
+                    $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
+
+                },
+        failure: function(e) {
+                    alert("There was a problem submitting your request. Please try again shortly.");
+                }
+    });
+  })
+});
+</script>
+{% endblock %}

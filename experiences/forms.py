@@ -74,6 +74,8 @@ Guest_Number = (('1', '1' + _(' Guest')),('2', '2' + _(' Guests')),('3', '3' + _
 
 Guest_Number_Min = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
+Guest_Number_Child = (('0', 'None'),('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),)
+
 Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
                     ('11', '11'),('12', '12'),('13', '13'),('14', '14'),('15', '15'),('16', '16'),('17', '17'),('18', '18'),('19', '19'),('20', '20'),)
 
@@ -804,6 +806,30 @@ class ExperienceAvailabilityForm(forms.Form):
 
 SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
 AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children')),(4,_('Famili with elderly&children')))
+
+class CustomItineraryRequestForm(forms.Form):
+    destinations = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Eg. Melbourne, Sydney, Brisbane...'}))
+    start_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
+    end_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
+    guests_adults = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
+    guests_children = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
+    tags = forms.CharField(widget=forms.Textarea, required=False, initial=Tags)
+    all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
+    budget = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Eg. Under $3000 per person'}), required=True)
+    flights = forms.CharField(widget=forms.CheckboxInput, required=False)
+    driver = forms.CharField(widget=forms.CheckboxInput, required=False)
+    requirements = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control', 'rows':'5'}), required=False)
+    name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    wechat = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    email = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    mobile = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    def __init__(self, *args, **kwargs):
+        super(CustomItineraryRequestForm, self).__init__(*args, **kwargs)
+        self.fields['tags'].widget.attrs['readonly'] = True
+        self.fields['tags'].widget = forms.HiddenInput()
+        self.fields['all_tags'].widget.attrs['readonly'] = True
+        self.fields['all_tags'].widget = forms.HiddenInput()
+
 class CustomItineraryForm(forms.Form):
     start_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
     end_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control', 'disabled': 'disabled'}))

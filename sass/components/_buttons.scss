@@ -19,6 +19,7 @@
   color: $medium-grey;
   border-color: $secondary-color;
   &:hover {
+    color: $dark-grey;
     background-color: darken($secondary-color, 20%);
     border-color: darken($secondary-color, 20%);
   }
