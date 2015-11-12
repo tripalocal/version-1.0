@@ -3277,7 +3277,6 @@ def custom_itinerary(request, id=None):
         if id is not None:
             existing_ci = CustomItinerary.objects.get(id=id)
             itinerary = {}
-            cities = {}
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow())
             for bking in existing_ci.booking_set.all():
@@ -3297,21 +3296,18 @@ def custom_itinerary(request, id=None):
                 bking.experience.price = experience_fee_calculator(exp_price, bking.experience.commission)
                 bking.experience.dollarsign = DollarSign[bking.experience.currency.upper()]
                 bking.experience.currency = str(dict(Currency)[bking.experience.currency.upper()])
+                if float(bking.experience.duration).is_integer():
+                    bking.experience.duration = int(bking.experience.duration)
 
                 key = bking.datetime.astimezone(bking.experience.get_timezone()).strftime("%Y-%m-%d")
-                if key not in itinerary:
-                    itinerary.update({key:[]})
-                itinerary[key].append(bking.experience)
-                if bking.experience.city not in cities:
-                    cities.update({bking.experience.city:[]})
-                if key not in cities[bking.experience.city]:
-                    cities[bking.experience.city].append(key)
 
-            for key, value in cities.items():
-                cities[key] = len(value)
+                if bking.experience.city not in itinerary:
+                    itinerary.update({bking.experience.city:{}})
+                if key not in itinerary[bking.experience.city]:
+                    itinerary[bking.experience.city].update({key:[]})
+                itinerary[bking.experience.city][key].append(bking.experience)
 
             context['existing_itinerary'] = itinerary
-            context['existing_cities'] = cities
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
