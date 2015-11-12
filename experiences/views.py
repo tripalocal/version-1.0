@@ -3112,7 +3112,7 @@ def custom_itinerary_request(request):
     form = CustomItineraryRequestForm()
     return render_to_response('experiences/custom_itinerary_request.html', {'form':form}, context)
 
-def custom_itinerary(request):
+def custom_itinerary(request, id=None):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
 
@@ -3121,6 +3121,7 @@ def custom_itinerary(request):
     context['location_keys'] = list(dict(Location).keys())
     context['LANGUAGE'] = settings.LANGUAGE_CODE
     form = CustomItineraryForm()
+    set_initial_currency(request)
 
     if request.method == 'POST':
         if 'Add' in request.POST:
@@ -3183,7 +3184,18 @@ def custom_itinerary(request):
                 booking_form.data['time'] = ""
                 booking_form.data['status'] = "Requested"
 
-                workbook = xlsxwriter.Workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'itineraries'), 'Itinerary.xlsx'))
+                #save custom itinerary
+                ci = CustomItinerary()
+                ci.user = request.user
+                ci.title = form.cleaned_data['title']
+                while True:
+                    new_id = datetime.now().strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
+                    if len(CustomItinerary.objects.filter(id=new_id)) == 0:
+                        break
+                ci.id = new_id
+                ci.save()
+
+                workbook = xlsxwriter.Workbook(os.path.join(settings.PROJECT_ROOT,'itineraries', str(ci.id)+'.xlsx'))
                 worksheet = workbook.add_worksheet()
                 city = form.cleaned_data['city']
                 city = city.split(',')
@@ -3194,10 +3206,6 @@ def custom_itinerary(request):
                 total_price = 0.0
                 guest_number = 1
 
-                ci = CustomItinerary()
-                ci.user = request.user
-                ci.title = str(request.user.id) + "_" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                ci.save()
                 for item in itinerary:
                     booking_form.data['experience_id'] += str(item['id']) + ";"
                     booking_form.data['date'] += str(item['date']) + ";"
@@ -3205,7 +3213,7 @@ def custom_itinerary(request):
                     booking_form.data['guest_number'] = item['guest_number']
 
                     experience = AbstractExperience.objects.get(id=str(item['id']))
-                    price = experience_fee_calculator(float(experience.price), experience.commission)
+                    price = experience_fee_calculator(float(experience.price), experience.commission)*1.15 #*1.15 based on the new requirement
                     total_price += price*int(item['guest_number'])
                     guest_number = int(item['guest_number'])
 
@@ -3266,12 +3274,64 @@ def custom_itinerary(request):
                 col += 1
                 worksheet.write(row, col, total_price/guest_number)
                 workbook.close()
-                return HttpResponseRedirect("http://"+settings.ALLOWED_HOSTS[0]+"/itineraries/Itinerary.xlsx")
+                return HttpResponseRedirect(GEO_POSTFIX+"itinerary/"+ci.id+"/")
 
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
 
+    else:
+        if id is not None:
+            existing_ci = CustomItinerary.objects.get(id=id)
+            itinerary = {}
+            form.initial["title"] = existing_ci.title
+            form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow())
+            for bking in existing_ci.booking_set.all():
+                form.initial["guest_number"] = bking.guest_number
+
+                if bking.datetime.astimezone(bking.experience.get_timezone()) < form.initial["start_datetime"]:
+                    form.initial["start_datetime"] = bking.datetime.astimezone(bking.experience.get_timezone())
+
+                bking.experience.title = bking.experience.get_title(settings.LANGUAGES[0][0])
+                bking.experience.description = bking.experience.get_description(settings.LANGUAGES[0][0])
+
+                exp_price = float(bking.experience.price)
+                if bking.experience.dynamic_price != None and \
+                   len(bking.experience.dynamic_price.split(',')) == bking.experience.guest_number_max - bking.experience.guest_number_min + 2 :
+                    exp_price = float(bking.experience.dynamic_price.split(",")[bking.guest_number-bking.experience.guest_number_min])
+
+                bking.experience.price = experience_fee_calculator(exp_price, bking.experience.commission)
+                bking.experience.dollarsign = DollarSign[bking.experience.currency.upper()]
+                bking.experience.currency = str(dict(Currency)[bking.experience.currency.upper()])
+                if float(bking.experience.duration).is_integer():
+                    bking.experience.duration = int(bking.experience.duration)
+
+                key = bking.datetime.astimezone(bking.experience.get_timezone()).strftime("%Y-%m-%d")
+
+                if bking.experience.city not in itinerary:
+                    itinerary.update({bking.experience.city:{}})
+                if key not in itinerary[bking.experience.city]:
+                    itinerary[bking.experience.city].update({key:[]})
+                itinerary[bking.experience.city][key].append(bking.experience)
+
+            context['existing_itinerary'] = itinerary
+
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
+
+def itinerary_detail(request,id=None):
+    if id is None:
+        return HttpResponseRedirect(GEO_POSTFIX)
+
+    ci = CustomItinerary.objects.get(id=id)
+    itinerary = {"title":ci.title, "days":{}}
+    for item in ci.booking_set.all():
+        item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
+        item.experience.description = item.experience.get_description(settings.LANGUAGES[0][0])
+        key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
+        if key not in itinerary["days"]:
+            itinerary["days"].update({key:[]})
+        itinerary["days"][key].append(item.experience)
+
+    return render_to_response('experiences/itinerary_detail.html',{'itinerary':itinerary})
 
 def itinerary_booking_confirmation(request):
     context = RequestContext(request)

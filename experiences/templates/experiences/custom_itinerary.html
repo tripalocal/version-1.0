@@ -15,8 +15,8 @@
   {% csrf_token %}
   <div style="display:none;">
   <!-- TODO -->
-
-
+    {{form.note}}
+    {{form.description}}
     {{form.city}}
 
     {{form.language}}
@@ -36,7 +36,7 @@
       <div class="row">
         <div class="form-inline">
           <h3 class="form-header">{% trans "Title" %}</h3>
-          <input type="text" class="form-control" id="itinerary-title" style="width:370px;">
+          {{form.title}}
         </div>
         <div class="form-inline">
           <h3 class="form-header">{% trans "Start date" %}</h3>
@@ -104,10 +104,10 @@
         <div class="form-inline right-group">
           <h3 class="form-header">Web</h3>
           <button type="button" id="" class="btn btn-sm btn-default">$</button>
-          <button type="button" id="button_preview" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
+          <button id="button_view" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
           <h3 class="form-header">PDF</h3>
           <button type="button" id="" class="btn btn-sm btn-default">$</button>
-          <button type="button" id="button_preview" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
+          <button type="button" id="" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
           <!-- TODO -->
           <input class="btn btn-default" id="itinerary_search" type="hidden" value="{% trans "Search" %}" name="Search">
         </div>
@@ -142,7 +142,40 @@
         <div id="right_section" class="section" style="overflow:scroll; height:72vh;">
           <h1 class="section-heading">Itinerary</h1>
           <h2 class="price-line">$AUD <label id="price-pp">0</label> {% trans "per person (Total of "%}$AUD <label id="price-tt">0</label>)</h2>
-
+          {% for city, dict in existing_itinerary.items %}
+            <div id="city-title-{{forloop.counter0}}" class="section-box-add" onclick="$('.collapse').collapse('hide'); $('#city-collapse-{{forloop.counter0}}').collapse('show');update_left_section('{{city}}');" city="{{city}}">
+              <span class="add-sign">+</span>
+              <p id="city-title-p-{{forloop.counter0}}">{{city}} <span class="badge">{{dict|length}}{% trans ' Day(s)' %}</span></p>
+            </div>
+            <div class="collapse" id="city-collapse-{{forloop.counter0}}">
+              {% for date, experiences in dict.items %}
+              <div id="city-collapse-{{forloop.parentloop.counter0}}-day-{{forloop.counter}}" class="section-box">
+                <p>{% trans 'Day' %} {{forloop.counter}}</p>
+                <div class="column">
+                  {% for experience in experiences %}
+                  <div class='exp-box-sm portlet' id='experience_id_{{experience.id}}'>
+                    <div class='exp-img portlet-header'>
+                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
+                    </div>
+                    <div class='exp-info portlet-header'>
+                        <h3>{{experience.title}}</h3>
+                        <p>{{experience.description|escapejs|slice:"0:16"}}</p>
+                        <p>{{experience.duration}} {% trans 'hr(s)' %} &middot; 
+                            {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
+                            {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+                    </div>
+                    <div class='exp-price portlet-header'>
+                        <p>{{experience.dollarsign}}{{experience.currency}}</p>
+                        <h2>{{experience.price}}</h2>
+                        <p>{% trans 'per person' %}</p>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% endfor %}
         </div>
       </div>
     </div>
@@ -209,6 +242,8 @@
     $(document).ready(function()
     {
         $(".loading").hide();
+        $("#id_title").addClass("form_control");
+        $("#id_title").attr("style","width:370px;");
         $("#itinerary_search").click(function(e){
             e.preventDefault();
             set_data_before_submit();
@@ -245,7 +280,8 @@
             });
         });
 
-        $("#button_export").click(function(e){
+        $("#button_view").click(function(e){
+            set_data_before_submit();
             set_itinerary_string();
         });
 
@@ -270,6 +306,23 @@
                 $("#itinerary_search").click();
             }
         });
+
+        //set initial values if in the editing mode
+        {% for city, dict in existing_itinerary.items %}
+        // add a new button for the city
+        var city = "{{city}}";
+        var city_name = "{{city}}";
+        var duration = {{ dict|length }};
+        var i = {{forloop.counter0}};
+        var new_city = construct_data_content(i, cities, city, city, duration);
+        $(new_city).insertBefore($("#add-city"));
+        // Initialise popovers
+        $('[data-toggle="popover"]').popover();
+        {% if forloop.last %}
+        $("#itinerary_search").click();
+        update_price_title();
+        {% endif %}
+        {% endfor %}
     })
 
     function construct_data_content(i, cities, city, city_name, duration)
@@ -350,6 +403,7 @@
     {
         var i=-1;
         //the last city was inserted before $("#add-city")
+        //TODO: the user may have changed the order of cities
         if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').indexOf("button_city_") === 0)
         {
             var id = $("#add-city").prev().attr('id').split("_");
@@ -520,7 +574,7 @@
             {
                 number_day += 1;
                 cities += c + ",";
-                var experience = $(day).find(".column")[0].firstChild;
+                var experience = $(day).find(".column")[0].firstElementChild;
                 while(experience && experience.id.indexOf("experience_id_") === 0)
                 {
                     var exp_id = experience.id.split("_");
@@ -642,7 +696,7 @@
             var day = $(city).children()[0];
             while(day && day.id.indexOf("city-collapse-") === 0)
             {
-                var experience = $(day).find(".column")[0].firstChild;
+                var experience = $(day).find(".column")[0].firstElementChild;
                 while(experience && experience.id.indexOf("experience_id_") === 0)
                 {
                     var tmp = $(experience).find(".exp-price")[0].getElementsByTagName("H2")[0];
