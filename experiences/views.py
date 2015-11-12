@@ -3106,6 +3106,31 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
 
     return itinerary
 
+def custom_itinerary_request(request):
+    context = RequestContext(request)
+    context['LANGUAGE'] = settings.LANGUAGE_CODE
+    form = CustomItineraryRequestForm()
+
+    if request.method == 'POST':
+        if form.is_valid():
+            data = request.POST
+            email = data.get('email')
+            message = "<h1>Custom itinerary request</h1>";
+            for key, value in data.items:
+                message = message + "<h2>" + key + "</h2>" + "<p>" + value + "</p>"
+            mail.send(
+                'enquiries@tripalocal.com',
+                'enquiries@tripalocal.com',
+                subject="Itinerary request from " + email,
+                html_message=message,
+                priority='now',
+            )
+        else:
+            errors = form.errors
+            return HttpResponse(json.dumps(errors))
+
+    return render_to_response('experiences/custom_itinerary_request.html', {'form':form}, context)
+
 def custom_itinerary(request, id=None):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
@@ -3121,7 +3146,7 @@ def custom_itinerary(request, id=None):
         if 'Add' in request.POST:
             #add a new item
             item = request.POST
-            np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency="aud", type=item['type'].title(), 
+            np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency="aud", type=item['type'].title(),
                             city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted")
             np.save()
             npi18n = NewProductI18n(product=np, title=item.get('title',""),
@@ -3170,13 +3195,6 @@ def custom_itinerary(request, id=None):
             #submit bookings
             if form.is_valid():
                 itinerary = json.loads(form.cleaned_data['itinerary_string'])
-                booking_form = ItineraryBookingForm(request.POST)
-                booking_form.data = booking_form.data.copy()
-                booking_form.data['user_id'] = request.user.id
-                booking_form.data['experience_id'] = ""
-                booking_form.data['date'] = ""
-                booking_form.data['time'] = ""
-                booking_form.data['status'] = "Requested"
 
                 #save custom itinerary
                 ci = CustomItinerary()
@@ -3187,6 +3205,7 @@ def custom_itinerary(request, id=None):
                     if len(CustomItinerary.objects.filter(id=new_id)) == 0:
                         break
                 ci.id = new_id
+                ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
                 ci.save()
 
                 workbook = xlsxwriter.Workbook(os.path.join(settings.PROJECT_ROOT,'itineraries', str(ci.id)+'.xlsx'))
@@ -3201,11 +3220,6 @@ def custom_itinerary(request, id=None):
                 guest_number = 1
 
                 for item in itinerary:
-                    booking_form.data['experience_id'] += str(item['id']) + ";"
-                    booking_form.data['date'] += str(item['date']) + ";"
-                    booking_form.data['time'] += str(item['time']) + ";"
-                    booking_form.data['guest_number'] = item['guest_number']
-
                     experience = AbstractExperience.objects.get(id=str(item['id']))
                     price = experience_fee_calculator(float(experience.price), experience.commission)*1.15 #*1.15 based on the new requirement
                     total_price += price*int(item['guest_number'])
@@ -3315,17 +3329,38 @@ def itinerary_detail(request,id=None):
     if id is None:
         return HttpResponseRedirect(GEO_POSTFIX)
 
-    ci = CustomItinerary.objects.get(id=id)
-    itinerary = {"title":ci.title, "days":{}}
-    for item in ci.booking_set.all():
-        item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
-        item.experience.description = item.experience.get_description(settings.LANGUAGES[0][0])
-        key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
-        if key not in itinerary["days"]:
-            itinerary["days"].update({key:[]})
-        itinerary["days"][key].append(item.experience)
+    context = RequestContext(request)
+    if request.method == 'POST':
+        form = ItineraryBookingForm(request.POST)
+        form.data = form.data.copy()
+        form.data["user_id"] = request.user.id
+        form.data["itinerary_id"] = id
+        #TODO
+        currency = "aud"
+        price_pp = 100
+        subtotal_price = 1000
+        total_price = 1000
+        service_fee = 0
+        return render_to_response('experiences/itinerary_booking_confirmation.html',
+                                  {'form':form,
+                                   "price_pp":price_pp, "subtotal_price":subtotal_price,
+                                   "service_fee":service_fee, "total_price":total_price,
+                                   "currency": currency, "dollarsign": DollarSign[currency.upper()],
+                                   "LANGUAGE":settings.LANGUAGE_CODE,"GEO_POSTFIX":GEO_POSTFIX},
+                                   context)
+    else:
+        ci = CustomItinerary.objects.get(id=id)
+        itinerary = {"title":ci.title, "days":{}}
+        for item in ci.booking_set.all():
+            item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
+            item.experience.description = item.experience.get_description(settings.LANGUAGES[0][0])
+            key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
+            if key not in itinerary["days"]:
+                itinerary["days"].update({key:[]})
+            itinerary["days"][key].append(item.experience)
 
-    return render_to_response('experiences/itinerary_detail.html',{'itinerary':itinerary})
+        return render_to_response('experiences/itinerary_detail.html',
+                                  {'itinerary':itinerary, "itinerary_id":ci.id, "GEO_POSTFIX":GEO_POSTFIX},context)
 
 def itinerary_booking_confirmation(request):
     context = RequestContext(request)
@@ -3337,59 +3372,14 @@ def itinerary_booking_confirmation(request):
     # A HTTP POST?
     if request.method == 'POST':
         form = ItineraryBookingForm(request.POST)
-        #experience = Experience.objects.get(id=form.data['experience_id'])
-
-        #guest_number = int(form.data['guest_number'])
-        #subtotal_price = 0.0
-        #if experience.dynamic_price and type(experience.dynamic_price) == str:
-        #    price = experience.dynamic_price.split(',')
-        #    if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-        #    #these is comma in the end, so the length is max-min+2
-        #        if guest_number <= experience.guest_number_min:
-        #            subtotal_price = float(experience.price) * float(experience.guest_number_min)
-        #        else:
-        #            subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
-        #    else:
-        #        #wrong dynamic settings
-        #        subtotal_price = float(experience.price)*float(form.data['guest_number'])
-        #else:
-        #    subtotal_price = float(experience.price)*float(form.data['guest_number'])
-
-        if 'Refresh' in request.POST:
-            #get coupon information
-            wrong_promo_code = False
-            code = form.data['promo_code']
-            dates = form.data['date'].split(";")
-            times = form.data['time'].split(";")
-            dates = [x for x in dates if x]
-            times = [x for x in times if x]
-            date_start = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[0] + " " + times[0].split(":")[0].strip(), "%Y/%m/%d %H"))
-            date_end = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[len(dates)-1] + " " + times[len(dates)-1].split(":")[0].strip(), "%Y/%m/%d %H"))
-
-            coupons = Coupon.objects.filter(promo_code__iexact = code,
-                                            end_datetime__gt = date_end,
-                                            start_datetime__lt = date_start)
-            if not len(coupons):
-                coupon = Coupon()
-                wrong_promo_code = True
-            else:
-                #TODO
-                wrong_promo_code = False
-
-            #mp = Mixpanel(settings.MIXPANEL_TOKEN)
-            #mp.track(request.user.email, 'Clicked on "Refresh"')
-
-            return render_to_response('experiences/itinerary_booking_confirmation.html', {'form': form,}, context)
+        
+        display_error = True
+        if form.is_valid():
+            return itinerary_booking_successful(request)
 
         else:
-            #submit the form
-            display_error = True
-            if form.is_valid():
-                return itinerary_booking_successful(request)
-
-            else:
-                return render_to_response('experiences/itinerary_booking_confirmation.html', {'form': form,
-                                                                           'display_error':display_error,}, context)
+            return render_to_response('experiences/itinerary_booking_confirmation.html', {'form': form,
+                                                                        'display_error':display_error,}, context)
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()

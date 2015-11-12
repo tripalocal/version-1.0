@@ -160,7 +160,7 @@
                     <div class='exp-info portlet-header'>
                         <h3>{{experience.title}}</h3>
                         <p>{{experience.description|escapejs|slice:"0:16"}}</p>
-                        <p>{{experience.duration}} {% trans 'hr(s)' %} &middot; 
+                        <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
                     </div>
