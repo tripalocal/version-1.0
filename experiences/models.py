@@ -413,6 +413,7 @@ class CustomItinerary(models.Model):
     status = models.CharField(max_length=10, default="draft")
     description = models.TextField(null=True, blank=True)
     note = models.TextField(null=True, blank=True)
+    submitted_datetime = models.DateTimeField(null=True)
 
 class Booking(models.Model):
     user = models.ForeignKey(User)
