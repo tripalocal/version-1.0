@@ -3110,6 +3110,25 @@ def custom_itinerary_request(request):
     context = RequestContext(request)
     context['LANGUAGE'] = settings.LANGUAGE_CODE
     form = CustomItineraryRequestForm()
+
+    if request.method == 'POST':
+        if form.is_valid():
+            data = request.POST
+            email = data.get('email')
+            message = "<h1>Custom itinerary request</h1>";
+            for key, value in data.items:
+                message = message + "<h2>" + key + "</h2>" + "<p>" + value + "</p>"
+            mail.send(
+                'enquiries@tripalocal.com',
+                'enquiries@tripalocal.com',
+                subject="Itinerary request from " + email,
+                html_message=message,
+                priority='now',
+            )
+        else:
+            errors = form.errors
+            return HttpResponse(json.dumps(errors))
+
     return render_to_response('experiences/custom_itinerary_request.html', {'form':form}, context)
 
 def custom_itinerary(request, id=None):

@@ -17,6 +17,7 @@
   </div>
 </div>
 <form id="itinerary-request" action="" method="post">
+  {% csrf_token %}
   <div id="intro" class="full-height" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %}">
     <div class="container middle animated fadeIn">
       <h1>Custom Itinerary</h1>
@@ -92,7 +93,7 @@
           <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>What's Included</h2>
           <p>We don't currently provide accommodation or car rental.</p>
           <div class="checkbox">
-            <label>{{form.flights}}National flights</label>
+            <label>{{form.flights}}Domestic flights at destination</label>
           </div>
           <div class="checkbox">
             <label>{{form.driver}}Driver</label>
@@ -153,6 +154,17 @@
     <button type="button" id="submit-btn" class="btn btn-primary btn-bottom">Submit</button>
   </div>
 </form>
+<!-- Alerts -->
+<div class="alert alert-danger alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <strong>Oops!</strong> There was a problem submitting your request. Please try again shortly.
+</div>
+
+<div class="alert alert-warning alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  Please fill in all required fields before submitting.
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -292,9 +304,10 @@ $(function() {
   })
   $("#submit-btn").click(function() {
     $.ajax({
-        url : '{{GEO_POSTFIX}}itinerary/',
+        url : '{{GEO_POSTFIX}}itinerary/request/',
         type: "POST",
         data : {
+                    csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
                     destinations: $("#id_city").val(),
                     start_date: $("#id_start_date").val(),
                     end_date: $("#id_end_date").val(),
@@ -314,14 +327,16 @@ $(function() {
         success: function(data){
                     $("#complete").show();
                     $("#intro").hide();
+                    $(".progress-bar").hide();
                     $('html,body').animate({
                         scrollTop: $("body").offset().top},
                         'slow');
                     $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
-
                 },
         failure: function(e) {
-                    alert("There was a problem submitting your request. Please try again shortly.");
+                    // Catch exception and display '.alert-warning' for missing fields or '.alert-danger' for any other error
+                    // $(".alert-warning").fadeIn();
+                    // $(".alert-danger").fadeIn();
                 }
     });
   })
