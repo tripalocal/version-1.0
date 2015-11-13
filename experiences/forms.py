@@ -1278,4 +1278,4 @@ class SearchForm(forms.Form):
 def convert_currency(price, current_currency, target_currency):
     file_name = 'experiences/currency_conversion_rate/' + current_currency.upper() + '.yaml'
     conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
-    return float(price)*float(conversion.get(target_currency.upper(), 1.00))
+    return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
