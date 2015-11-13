@@ -34,6 +34,7 @@ from unionpay.util.helper import load_config, make_order_id
 from django.views.decorators.csrf import csrf_exempt
 import itertools
 import xmltodict
+import collections
 from django.db.models import Q
 from experiences.utils import isEnglish
 
@@ -3358,7 +3359,6 @@ def itinerary_detail(request,id=None):
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
-
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id, "GEO_POSTFIX":GEO_POSTFIX},context)
 
@@ -3372,7 +3372,7 @@ def itinerary_booking_confirmation(request):
     # A HTTP POST?
     if request.method == 'POST':
         form = ItineraryBookingForm(request.POST)
-        
+
         display_error = True
         if form.is_valid():
             return itinerary_booking_successful(request)
