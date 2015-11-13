@@ -19,7 +19,8 @@
     <form method="post" action="{{GEO_POSTFIX}}itinerary/{{itinerary_id}}/">
         {% csrf_token %}
         <div class="row">
-          Cool
+          <p>{{ itinerary.days|length }} Day Custom Itinerary</p>
+          <p></p>
         </div>
         <div class="row">
           More Cool
@@ -81,13 +82,17 @@
 <script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-  $(".day-nav").click(function() {
-    var $day = $(this);
-    $(".day-nav").removeClass("active");
-    $day.addClass("active");
-    $(".day-list").hide();
-    $("#" + $day.attr("id") + "-list").fadeIn();
-  })
+  if ($(window).width() > 760) {
+    $(".day-nav").click(function() {
+      var $day = $(this);
+      $(".day-nav").removeClass("active");
+      $day.addClass("active");
+      $(".day-list").hide();
+      $("#" + $day.attr("id") + "-list").fadeIn();
+    });
+    $("#day1").click();
+  }
+  
   $("#pay").click(function(e){
 
   });
