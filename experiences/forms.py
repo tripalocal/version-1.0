@@ -914,7 +914,6 @@ def instant_booking(experience, bk_date, bk_time):
 class ItineraryBookingForm(forms.Form):
     user_id = forms.CharField()
     itinerary_id = forms.CharField()
-    promo_code = forms.CharField(required=False)
 
     first_name = forms.CharField(max_length=50)
     last_name = forms.CharField(max_length=50)
@@ -925,8 +924,6 @@ class ItineraryBookingForm(forms.Form):
     country = forms.ChoiceField(choices=Country, required = False)
     postcode = forms.CharField(max_length=4, required = False)
     phone_number = forms.CharField(max_length=15, required=False)
-
-    coupon_extra_information = forms.CharField(max_length=500, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -935,7 +932,6 @@ class ItineraryBookingForm(forms.Form):
         self.fields['user_id'].widget = forms.HiddenInput()
         self.fields['itinerary_id'].widget.attrs['readonly'] = True
         self.fields['itinerary_id'].widget = forms.HiddenInput()
-        self.fields['coupon_extra_information'].widget = forms.HiddenInput()
         self.fields['booking_extra_information'].widget = forms.HiddenInput()
 
     def booking(self,ids,dates,times,user,guest_number,
@@ -1067,7 +1063,7 @@ class ItineraryBookingForm(forms.Form):
 
         if not self.errors and (not 'Refresh' in self.data):
             itinerary = CustomItinerary.objects.get(id=self.cleaned_data['itinerary_id'])
-
+            itinerary.status= "requested"
             user = User.objects.get(id=self.cleaned_data['user_id'])
 
             payment_street1 = self.cleaned_data['street1']
@@ -1078,6 +1074,44 @@ class ItineraryBookingForm(forms.Form):
             payment_postcode = self.cleaned_data['postcode']
             payment_phone_number = self.cleaned_data['phone_number']
 
+            if 'Stripe' in self.data or 'stripeToken' in self.data:
+                payment = Payment()
+                price = 1000
+                currency = "aud"
+                success, instance = payment.charge(int(price*100), currency, stripe_token = self.data["stripeToken"])
+
+                if not success:
+                    raise forms.ValidationError("Error: %s" % str(instance))
+                else:
+                    instance.save()
+                    payment.charge_id = instance['id']
+                    payment.booking_id = itinerary.booking_set.all()[0].id
+                    payment.street1 = payment_street1 if payment_street1 is not None else ""
+                    payment.street2 = payment_street2 if payment_street2 is not None else ""
+                    payment.city = payment_city if payment_city is not None else ""
+                    payment.state = payment_state if payment_state is not None else ""
+                    payment.country = payment_country if payment_country is not None else ""
+                    payment.postcode = payment_postcode if payment_postcode is not None else ""
+                    payment.phone_number = payment_phone_number if payment_phone_number is not None else ""
+                    payment.save()
+
+                    itinerary.payment = payment
+                    itinerary.save()
+                    #TODO, add the user to the guest list for each of the experiences booked
+
+            elif 'UnionPay' in self.data or 'WeChat' in self.data:
+                booking_extra_information=self.cleaned_data['booking_extra_information']
+                itinerary.note = booking_extra_information
+
+                payment = Payment()
+                payment.booking_id = itinerary.booking_set.all()[0].id
+                payment.phone_number = self.cleaned_data['phone_number']
+                payment.save()
+
+                itinerary.payment_id = payment.id
+                itinerary.save()
+
+                #TODO: add the user to the guest list
 
         return cleaned
 

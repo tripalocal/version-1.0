@@ -123,7 +123,6 @@
                     <hr style="margin-bottom:10px;">
                     {% trans "Subtotal:" %} {{currency|upper}}{{dollarsign}}<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
                     <br>
-                    <p id="id_coupon_extra_fee" style="font-size:14px;"></p>
                     <div id="id_service_fee" style="display:none;">{% trans "Processing Fee:" %} {{currency|upper}}{{dollarsign}}{{ service_fee|stringformat:".2f" }}<br></div>
                     <strong style="font-size:18px;">{% trans "Total:" %} {{currency|upper}}{{dollarsign}}<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
                 </div>

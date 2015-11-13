@@ -3335,11 +3335,13 @@ def itinerary_detail(request,id=None):
         form.data = form.data.copy()
         form.data["user_id"] = request.user.id
         form.data["itinerary_id"] = id
+        form.data["first_name"] = request.user.first_name
+        form.data["last_name"] = request.user.last_name
         #TODO
         currency = "aud"
         price_pp = 100
         subtotal_price = 1000
-        total_price = 1000
+        total_price = 0.01
         service_fee = 0
         return render_to_response('experiences/itinerary_booking_confirmation.html',
                                   {'form':form,
@@ -3373,13 +3375,83 @@ def itinerary_booking_confirmation(request):
     if request.method == 'POST':
         form = ItineraryBookingForm(request.POST)
         
-        display_error = True
-        if form.is_valid():
-            return itinerary_booking_successful(request)
+        if 'Stripe' in request.POST or 'stripeToken' in request.POST:
+            #submit the form
+            display_error = True
+            if form.is_valid():
+                request.user.registereduser.phone_number = form.cleaned_data['phone_number']
+                request.user.registereduser.save()
+
+                return itinerary_booking_successful(request)
+            else:
+                #this should not happen, because all required fields were already set
+                return render_to_response('experiences/itinerary_booking_confirmation.html', {'form': form,
+                                                                        'display_error':display_error,}, context)
+        elif 'UnionPay' in request.POST:
+            display_error = True
+            order_id = make_order_id('Tripalocal')
+            form.data = form.data.copy()
+            form.data['booking_extra_information'] = order_id
+            if form.is_valid():
+                config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
+                #TODO
+                total_price = 1000
+
+                if total_price > 0.0:
+                    #not free
+                    response = client.UnionpayClient(config).pay(int(total_price*100),order_id, channel_type='07',#currency_code=CurrencyCode[experience.currency.upper()],
+                                                                 front_url='http://' + settings.ALLOWED_HOSTS[0] + '/itinerary_booking_successful/?itinerary_id=' + str(form.cleaned_data["itinerary_id"]))
+                    return HttpResponse(response)
+                else:
+                    #free
+                    return itinerary_booking_successful(request)
+
+            else:
+                #this should not happen, because all required fields were already set
+                return render_to_response('experiences/itinerary_booking_confirmation.html', {'form': form}, context)
+
+        elif 'WeChat' in request.POST:
+            display_error = True
+            unified_pay = UnifiedOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
+            from app.views import create_wx_trade_no
+            out_trade_no = create_wx_trade_no(settings.WECHAT_MCH_ID)
+            notify_url = request.build_absolute_uri(reverse('wechat_qr_payment_notify'))
+            form.data = form.data.copy()
+            form.data['booking_extra_information'] = out_trade_no
+
+            if form.is_valid():
+                #TODO
+                total_price = 0.01
+                currency = "aud"
+
+                if total_price > 0.0:
+                    #not free
+                    itinerary = CustomItinerary.objects.get(id=form.cleaned_data["itinerary_id"])
+                    title = itinerary.title if itinerary.title is not None and len(itinerary.title) > 0 else str(itinerary.id)
+                    price = int(convert_currency(total_price, currency, "CNY") * 100)
+                    pay_info = unified_pay.post(title, out_trade_no,
+                                                str(price), "127.0.0.1", notify_url)
+                    if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
+                        code_url = pay_info['code_url']
+                        success_url = 'http://' + settings.ALLOWED_HOSTS[0] \
+                                      + '/itinerary_booking_successful/?itinerary_id=' + str(form.cleaned_data["itinerary_id"])
+
+                        return redirect(url_with_querystring(reverse('wechat_qr_payment'), code_url=code_url,
+                                                             out_trade_no=out_trade_no, success_url=success_url))
+                    else:
+                        return HttpResponse('<html><body>WeChat Payment Error.</body></html>')
+                else:
+                    #free
+                    return itinerary_booking_successful(request)
+
+            else:
+                #this should not happen, because all required fields were already set
+                return render_to_response('experiences/itinerary_booking_confirmation.html', {'form': form}, context)
 
         else:
-            return render_to_response('experiences/itinerary_booking_confirmation.html', {'form': form,
-                                                                        'display_error':display_error,}, context)
+            #TODO
+            #submit name missing in IE
+            return HttpResponseRedirect(GEO_POSTFIX)
     else:
         # If the request was not a POST
         #form = BookingConfirmationForm()
@@ -3786,7 +3858,7 @@ def unionpay_payment_callback(request):
 
                     payment = bk.payment
                     payment.charge_id = ret['queryId']
-                    payment.street1 = ret['txnTime']
+                    payment.street2 = ret['txnTime']
                     payment.save()
 
                     experience = AbstractExperience.objects.get(id=bk.experience_id)
@@ -3795,8 +3867,19 @@ def unionpay_payment_callback(request):
                     send_booking_email_verification(bk, experience, user,
                                                     instant_booking(experience, bk.datetime.date(), bk.datetime.time()))
                     sms_notification(bk, experience, user, payment.phone_number)
+                else:
+                    itinerary = CustomItinerary.objects.filter(note=ret['orderId'])
+                    if itinerary is not None and len(itinerary)>0:
+                        itinerary = itinerary[0]
+                        itinerary.status = "paid"
+                        itinerary.save()
+
+                        payment = itinerary.payment
+                        payment.charge_id = ret['queryId']
+                        payment.street2 = ret['txnTime']
+                        payment.save()
+
                 logger.debug("payment success:"+str(ret['orderId']))
-                pass
             else:
                 #failure
                 #TODO
@@ -3886,6 +3969,16 @@ def wechat_qr_payment_notify(request):
                 send_booking_email_verification(bk, experience, user,
                                                 instant_booking(experience, bk.datetime.date(), bk.datetime.time()))
                 sms_notification(bk, experience, user, payment.phone_number)
+            else:
+                itinerary = CustomItinerary.objects.filter(note=out_trade_no)
+                if itinerary is not None and len(itinerary)>0:
+                    itinerary = itinerary[0]
+                    itinerary.status = "paid"
+                    itinerary.save()
+
+                    payment = itinerary.payment
+                    payment.charge_id = transaction_id
+                    payment.save()
             xml = dict_to_xml({'return_code': 'SUCCESS', 'return_msg': 'OK'})
             return HttpResponse(xml)
     else:
