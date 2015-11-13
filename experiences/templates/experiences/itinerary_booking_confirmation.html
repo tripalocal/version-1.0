@@ -26,9 +26,6 @@
                 </div>
 
                 <div class="form-section">
-                  <h2>{% trans "Traveller Details" %}</h2>
-                </div>
-                <div class="form-section">
 
                   {%if LANGUAGE != "zh-CN"%}
                     <div class="form-group" style="display:inline-block; margin-right: 15px;">
@@ -117,7 +114,6 @@
                 </div>
                 <div class="checkoutInfo">
                     <h3 style="font-weight:bold;">{{ itinerary.title }}</h3>
-                    <hr style="margin-bottom:10px;">
                     <hr style="margin:10px 0">
                     <p>{% trans "Rate:" %} {{currency|upper}}{{dollarsign}}{{price_pp|stringformat:".2f"}}{% trans " per person" %}</p>
                     <hr style="margin-bottom:10px;">
@@ -138,45 +134,43 @@
 $(function(){
     function checkPaymentForm(preparePayment, e) {
         if ($("#isAgreementSelected").is(':checked'))
+        {
+            phone1=$("#id_phone_number").val();
+            phone2=$("#id_roaming_number").val();
+            if(phone1)
             {
-
-                    phone1=$("#id_phone_number").val();
-                    phone2=$("#id_roaming_number").val();
-                    if(phone1)
-                    {
-                        if(phone2)
-                        {
-                            //$("#id_phone_number").val(phone1+','+phone2);
-                        }
-                    }
-                    else if(phone2)
-                    {
-                        $("#id_phone_number").val(phone2);
-                    }
-                    else
-                    {
-                        //must leave at least one number
-                        $("#id_phone_number").css("border-color","red");
-                        $("#id_roaming_number").css("border-color","red");
-                        $("#phone_warning").show();
-                        e.preventDefault();
-                        return;
-                    }
-                    if({{total_price}}>0.00)
-                    {
-                        preparePayment();
-                    }
-                    else
-                    {
-                        //$("#category_form").submit();
-                    }
-
+                if(phone2)
+                {
+                    //$("#id_phone_number").val(phone1+','+phone2);
+                }
+            }
+            else if(phone2)
+            {
+                $("#id_phone_number").val(phone2);
             }
             else
             {
+                //must leave at least one number
+                $("#id_phone_number").css("border-color","red");
+                $("#id_roaming_number").css("border-color","red");
+                $("#phone_warning").show();
                 e.preventDefault();
-                $("#id_term_condition").attr("style","display:inline-block;");
+                return;
             }
+            if({{total_price}}>0.00)
+            {
+                preparePayment();
+            }
+            else
+            {
+                //$("#category_form").submit();
+            }
+        }
+        else
+        {
+            e.preventDefault();
+            $("#id_term_condition").attr("style","display:inline-block;");
+        }
     }
 
     $(document).ready(function(){
@@ -229,7 +223,6 @@ $(function(){
         $("#wechat_booking").bind("click", function (e) {
             checkPaymentForm(function () {}, e)
         });
-
 
         // Close Checkout on page navigation
             $(window).on('popstate', function() {
