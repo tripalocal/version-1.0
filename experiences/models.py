@@ -414,6 +414,7 @@ class CustomItinerary(models.Model):
     description = models.TextField(null=True, blank=True)
     note = models.TextField(null=True, blank=True)
     submitted_datetime = models.DateTimeField(null=True)
+    payment = models.ForeignKey("Payment", null=True, blank=True)
 
 class Booking(models.Model):
     user = models.ForeignKey(User)
