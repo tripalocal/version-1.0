@@ -3351,7 +3351,7 @@ def get_itinerary_price(itinerary_id, currency):
         itinerary_price += subtotal_price
     if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + itinerary.submitted_datetime:
         itinerary_price *= 1.15
-    return itinerary_price
+    return round(itinerary_price,2)
 
 def itinerary_detail(request,id=None):
     if id is None:
@@ -3384,6 +3384,12 @@ def itinerary_detail(request,id=None):
                                    context)
     else:
         ci = CustomItinerary.objects.get(id=id)
+        currency = request.session['custom_currency']
+        price = get_itinerary_price(id, currency)
+
+        start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
+        end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+
         itinerary = {"title":ci.title, "days":{}}
         for item in ci.booking_set.all():
             item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
@@ -3393,10 +3399,19 @@ def itinerary_detail(request,id=None):
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
 
+            if start_datetime > item.datetime:
+                start_datetime = item.datetime.astimezone(item.experience.get_timezone())
+            if end_datetime < item.datetime:
+                end_datetime = item.datetime.astimezone(item.experience.get_timezone())
+
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
         return render_to_response('experiences/itinerary_detail.html',
-                                  {'itinerary':itinerary, "itinerary_id":ci.id, "GEO_POSTFIX":GEO_POSTFIX,
-                                   "guest_number":ci.booking_set.all()[0].guest_number},
+                                  {'itinerary':itinerary, "itinerary_id":ci.id,
+                                   "guest_number":ci.booking_set.all()[0].guest_number,
+                                   "start_date": start_datetime.strftime("%Y-%m-%d"),
+                                   "end_date":end_datetime.strftime("%Y-%m-%d"),
+                                   "price":price,
+                                   "GEO_POSTFIX":GEO_POSTFIX},
                                    context)
 
 def itinerary_booking_confirmation(request):
