@@ -1,286 +1,130 @@
 {% extends "app/layout.html" %}
 {% load mathfilters %}
+{% load i18n %}
 
 {% block head %}
-    <title>Booking Confirmation</title>
+  {% load staticfiles %}
+    <title>{% trans "Itinerary Checkout" %}</title>
+    <link rel="stylesheet" href="{% static 'experiences/content/checkout.css' %}">
+    <script src="https://checkout.stripe.com/checkout.js"></script>
 {% endblock %}
 
 {% block content %}
-<!--<div>
-        {% if form.errors and display_error%}
-            {% if form.non_field_errors %}
-                {% for error in form.non_field_errors %}
-                    {{error}}{% if not forloop.last %}, {%endif%}
-                {% endfor %}
-            {% else %}
-                <p style="color:red">The following fields are required</p>
-                {% for error in form.errors %}
-                    {{error}}{% if not forloop.last %}, {%endif%}
-                {% endfor %}
-            {% endif %}
-        {% endif %}
-    </div>
--->
-    <div class="container-fluid experience">
-        <div class="fixCenter">
+          <div class="container">
             <div class="checkoutBox">
-                <form id="category_form" method="post" action="/itinerary_booking_confirmation/">
-                    {% csrf_token %}
-                    <div style="display:none">
-                    {% for hidden in form.hidden_fields %}
-                        {{ hidden }}
-                    {% endfor %}
-                    </div>
+              <form id="category_form" method="post" action="{{GEO_POSTFIX}}itinerary_booking_confirmation/">
+                {% csrf_token %}
 
-                    <div style="display:inline-block;">
-                        <h2 style="padding-left: 20px;">Payment</h2>
-                    </div>
-
-                    <div class="row">
-				        <div class="">
-                            <p>Promo Code</p>
-                        </div>
-                        <div class="navbar-form " role="search">
-                            <div class="form-group" style="display:inline-block;margin-right:20px">
-                                {{form.promo_code}}
-                                {% if wrong_promo_code %}
-                                <div class="warning-sign">
-                                    <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                    <p>Invalid promo code</p>
-                                </div>
-                                {%endif%}
-                            </div>
-
-               	            <input id="id_refresh_promo_code" class="btn btn-primary" type="submit" name="Refresh" value="Refresh" style="display:inline-block; background-color:#FFFFFF;color: #858585; border:1px solid #c6c6c6; "/>
-                        </div>
-                        {% if coupon and not wrong_promo_code %}
-                        {% include "experiences/coupon_"|add:coupon.title|add:".html" %}
-                        {%endif%}
-                    </div>
-
-                    <div class="row" id="credit_card_div">
-                        <p>Card Number</p>
-                        <div class="navbar-form navbar-left" style="width:100%" role="search">
-                            <div class="form-group" style="float:left;margin-right:20px">
-                                {{ form.card_number }}
-                                {% if 'card_number' in form.errors and display_error%}
-                                <br>
-                                <div class="warning-sign">
-                                    <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                    <p>{{form.card_number.errors.as_text}}</p>
-                                </div>
-                                {%endif%}
-                            </div>
-                            <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/visa.png)"></input>
-                            <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/master.png);"></input>
-                            <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/amex.png)"></input>
-                            <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/discover.png)"></input>
-                            <input id="paymentLogo" type="button" class="btn btn-primary" style="display:inline-block; border:1px solid #c6c6c6; background-image:url(/images/icon/unionPay.jpg)"></input>
-                        </div>
-
-                        <table width="0" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td>
-                                    <p>Expires on</p>
-                                </td>
-                                <td>
-                                    <p>Security Code</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="dropdown">
-                                        {{ form.expiration }}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
-                                            {{ form.cvv }}
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    {% if 'expiration' in form.errors and display_error%}
-                                    <div class="warning-sign">
-                                        <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                        <p>{{form.expiration.errors.as_text}}</p>
-                                    </div>
-                                    {%endif%}
-                                </td>
-                                <td>
-                                    {% if 'cvv' in form.errors and display_error%}
-                                    <div class="warning-sign">
-                                        <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                        <p>{{form.cvv.errors.as_text}}</p>
-                                    </div>
-                                    {%endif%}
-                                </td>
-                            </tr>
-                            <!--<p class="help-message">Booking requests require host to accept the request within 24 hours. We will authorize your card for the full amount, but you will not be charged until the host accepts.</p>-->
-                        </table>
-                    </div>
-                    <div class="row">
-                        <table width="0" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td>
-                                    <p>First Name</p>
-                                    <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
-                                            {{ form.first_name }}
-                                            {% if 'first_name' in form.errors and display_error%}
-                                            <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                                <p>{{form.first_name.errors.as_text}}</p>
-                                            </div>
-                                            {%endif%}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <p>Last Name</p>
-                                    <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
-                                            {{ form.last_name }}
-                                            {% if 'last_name' in form.errors and display_error%}
-                                            <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                                <p>{{form.last_name.errors.as_text}}</p>
-                                            </div>
-                                            {%endif%}
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                        <table class="billingAddress" width="0" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td>
-                                    <p>Billing Address</p>
-                                    <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
-                                            {{ form.street1 }}
-                                            {% if 'street1' in form.errors and display_error%}
-                                            <br>
-                                            <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                                <p>{{form.street1.errors.as_text}}</p>
-                                            </div>
-                                            {%endif%}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td style="display:none">
-                                    <p>Street Address 2</p>
-                                    <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
-                                            {{ form.street2 }}
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                        <table class="billingAddress" width="0" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td>
-                                    <p>City</p>
-                                    <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
-                                            {{ form.city_town }}
-                                            {% if 'city_town' in form.errors and display_error%}
-                                            <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                                <p>{{form.city_town.errors.as_text}}</p>
-                                            </div>
-                                            {%endif%}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <p>State</p>
-                                    <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
-                                            {{ form.state }}
-                                            {% if 'state' in form.errors and display_error%}
-                                            <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                            </div>
-                                            {%endif%}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <p>Postcode</p>
-                                    <div class="navbar-form navbar-left" role="search">
-                                        <div class="form-group">
-                                            {{ form.postcode }}
-                                            {% if 'postcode' in form.errors and display_error%}
-                                            <div class="warning-sign">
-                                                <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                                            </div>
-                                            {%endif%}
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <p>Country</p>
-                                    <div class="dropdown">
-                                        {{ form.country }}
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                        <p style="padding-top:10px;">Destination Mobile Number (optional)</p>
-                        <div class="navbar-form" role="search">
-                            <div class="form-group">
-                                {{ form.phone_number }}
-                            </div>
-                        </div>
-                        {%if experience.language == "NONE"%}
-                        <div class="navbar-form" style="display:none;">
-                            {{form.booking_extra_information}}<p class="help-message">我需要中文翻译</p>
-                        </div>
-                        {%endif%}
-                    </div>
-                    <div class="row">
-                        <input id="isAgreementSelected" type="checkbox" /><p class="help-message">By booking this listing, you agree to <a href="/termsofservice" target="_blank">Terms of Service</a>, <a href="/privacypolicy" target="_blank">Privacy Policy</a> and <a href="/refundpolicy"  target="_blank">Traveller Refund Policy</a>.
-                        </p> <!-- and agree to Tripalocal's Terms and Conditions-->
-                        <div id="id_term_condition" class="warning-sign" style="display:none;">
-                            <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                            <p>Please accept terms and conditions</p>
-                        </div>
-                    </div>
-                    <input type="submit" id="submit_booking" name="Request to Book" value="Request to Book" class="btn btn-primary btn-lg" style="max-width:100%" />
-                </form>
-            </div>
-
-            <div class="expList checkoutDetails">
-            {% for experience in itinerary%}
-                <div id="itinerary_experience_{{forloop.counter}}" style="height:450px;">
-                    <div class="listingImg" style="background-image:url({{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg)">
-                        <div class="profile-md checkout-profile">
-                            <img src="{{MEDIA_URL}}{{experience.host_image}}" width="240" height="240">
-                        </div>
-                    </div>
-                    <div class="checkoutBox checkoutInfo">
-                        <h3>{{ experience.title }}</h3>
-                        <hr style="margin-bottom:10px;">
-                            <p>Reservation for <strong>{{ experience.guest_number }} person(s)</strong><br>
-                                on <strong>{{ experience.date }}</strong> from <strong>{{ experience.time }}</strong><br>
-                            </p>
-                            <p>Rate: ${{ experience.price|floatformat:"0" }} per person for {{ experience.duration }} hours</p>
-                            <hr style="margin-bottom:10px;">
-                            Subtotal: $<div id="id_sub_total" style="display:inline"> {{ experience.price|mul:experience.guest_number|floatformat:"0"}} </div>
-                    </div>
+                <div style="display:none">
+                {% for hidden in form.hidden_fields %}
+                  {{ hidden }}
+                {% endfor %}
                 </div>
-            {% endfor %}
+
+                <div class="form-section">
+                  <h2>{% trans "Payment Details" %}</h2>
+                </div>
+
+                <div class="form-section">
+
+                  {%if LANGUAGE != "zh-CN"%}
+                    <div class="form-group" style="display:inline-block; margin-right: 15px;">
+                      <h3>{% trans "First name" %}</h3>
+                      {{ form.first_name }}
+                      {% if 'first_name' in form.errors and display_error%}
+                      <div class="warning-sign">
+                        <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                        <p>{{form.first_name.errors.as_text}}</p>
+                      </div>
+                      {%endif%}
+                    </div>
+                    <div class="form-group" style="display: inline-block;">
+                      <h3>{% trans "Last name" %}</h3>
+                      {{ form.last_name }}
+                      {% if 'last_name' in form.errors and display_error%}
+                      <div class="warning-sign">
+                          <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                          <p>{{form.last_name.errors.as_text}}</p>
+                      </div>
+                      {%endif%}
+                    </div>
+
+                  {% else %}
+                    <div class="form-group" style="display: inline-block;">
+                      <h3>{% trans "Last name" %}</h3>
+                      {{ form.last_name }}
+                      {% if 'last_name' in form.errors and display_error%}
+                      <div class="warning-sign">
+                          <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                          <p>{{form.last_name.errors.as_text}}</p>
+                      </div>
+                      {%endif%}
+                    </div>
+                    <div class="form-group" style="display:inline-block; margin-right: 15px;">
+                      <h3>{% trans "First name" %}</h3>
+                      {{ form.first_name }}
+                      {% if 'first_name' in form.errors and display_error%}
+                      <div class="warning-sign">
+                        <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                        <p>{{form.first_name.errors.as_text}}</p>
+                      </div>
+                      {%endif%}
+                    </div>
+                  {% endif %}
+
+                  <div class="form-group">
+                    <h3>{% trans 'Country' %}</h3>
+                    <div class="dropdown">
+                      {{ form.country }}
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="display: inline-block; margin-right: 15px;">
+                    <h3>{% trans 'Destination mobile number' %}</h3>
+                    {{ form.phone_number }}
+                  </div>
+
+                  <div class="form-group" style="display: inline-block;">
+                    <h3>{% trans 'Roaming mobile number' %}</h3>
+                    <input id="id_roaming_number" maxlength="15" type="text" class="form-control">
+                  </div>
+
+                  <p>{% trans 'Your host will contact you via this number on the day.' %}</p>
+                  <div class="warning-sign" id="phone_warning" style="display:none;">
+                      <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                      <p>{% trans 'Please enter at least one number' %}</p>
+                  </div>
+                </div>
+
+                <div class="container-fluid">
+                  <input id="isAgreementSelected" type="checkbox" style="vertical-align: top;margin-top:20px;"/><p class="help-message">{% trans "By booking this listing, you agree to " %}<a href="{{GEO_POSTFIX}}termsofservice" target="_blank">{% trans "Terms of Service" %}</a>, <a href="{{GEO_POSTFIX}}privacypolicy" target="_blank">{% trans "Privacy Policy" %}</a> {% trans "and" %} <a href="{{GEO_POSTFIX}}refundpolicy"  target="_blank">{% trans "Traveller Refund Policy" %}</a>.</p>
+                  <div id="id_term_condition" class="warning-sign" style="display:none;">
+                    <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                    <p>{% trans "Please accept terms and conditions" %}</p>
+                  </div>
+                </div>
+                <input type="submit" id="submit_booking" name="Stripe" value="{% trans "Credit card / Alipay" %}" class="btn btn-primary btn-lg"/>
+                {#<button disabled="disabled" type="submit" id="submit_booking_unionpay" name="UnionPay" class="btn btn-default btn-lg" style="padding-top:6px; padding-bottom:6px;"><img src="{% static 'icon/union.svg' %}">{% trans "Union Pay" %}</button>#}
+                <button type="submit" id="wechat_booking" name="WeChat" class="btn btn-default btn-lg" style="padding-top:6px; padding-bottom:6px;"><img src="{% static 'icon/qr.svg' %}">{% trans "WeChat Pay" %}</button>
+              </form>
             </div>
-        </div>
-    </div>
+
+            <div class="exp-box">
+                <div class="listing-img" style="background-image:url(); position: relative;">
+                </div>
+                <div class="checkoutInfo">
+                    <h3 style="font-weight:bold;">{{ itinerary.title }}</h3>
+                    <hr style="margin:10px 0">
+                    <p>{% trans "Rate:" %} {{currency|upper}}{{dollarsign}}{{price_pp|stringformat:".2f"}}{% trans " per person" %}</p>
+                    <hr style="margin-bottom:10px;">
+                    {% trans "Subtotal:" %} {{currency|upper}}{{dollarsign}}<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
+                    <br>
+                    <div id="id_service_fee" style="display:none;">{% trans "Processing Fee:" %} {{currency|upper}}{{dollarsign}}{{ service_fee|stringformat:".2f" }}<br></div>
+                    <strong style="font-size:18px;">{% trans "Total:" %} {{currency|upper}}{{dollarsign}}<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
+                </div>
+            </div>
+          </div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -288,12 +132,50 @@
 <script charset="utf-8" type="text/javascript">
 
 $(function(){
+    function checkPaymentForm(preparePayment, e) {
+        if ($("#isAgreementSelected").is(':checked'))
+        {
+            phone1=$("#id_phone_number").val();
+            phone2=$("#id_roaming_number").val();
+            if(phone1)
+            {
+                if(phone2)
+                {
+                    //$("#id_phone_number").val(phone1+','+phone2);
+                }
+            }
+            else if(phone2)
+            {
+                $("#id_phone_number").val(phone2);
+            }
+            else
+            {
+                //must leave at least one number
+                $("#id_phone_number").css("border-color","red");
+                $("#id_roaming_number").css("border-color","red");
+                $("#phone_warning").show();
+                e.preventDefault();
+                return;
+            }
+            if({{total_price}}>0.00)
+            {
+                preparePayment();
+            }
+            else
+            {
+                //$("#category_form").submit();
+            }
+        }
+        else
+        {
+            e.preventDefault();
+            $("#id_term_condition").attr("style","display:inline-block;");
+        }
+    }
+
     $(document).ready(function(){
-        $("#id_promo_code").attr("class", "form-control");
-        $("#id_card_number").attr("class", "form-control");
-        $("#id_expiration_0").attr("class", "btn btn-default dropdown-toggle");
-        $("#id_expiration_1").attr("class", "btn btn-default dropdown-toggle");
-        $("#id_cvv").attr("class", "form-control");
+        mixpanel.track("itinerary checkout");
+
         $("#id_first_name").attr("class", "form-control");
         $("#id_last_name").attr("class", "form-control");
         $("#id_first_name").attr("style", "width:auto;");
@@ -308,20 +190,43 @@ $(function(){
         $("#id_phone_number").attr("class", "form-control");
         $("#id_country").attr("class", "btn btn-default dropdown-toggle");
 
-        $("#submit_booking").bind("click", function(e) {
-            e.preventDefault();
-            if ($("#isAgreementSelected").is(':checked')) {
-                if (!$("#id_coupon_agreement").length || $("#id_coupon_agreement").is(':checked')) {
+        var handler = StripeCheckout.configure({
+                            key: 'pk_live_62VE04d61Te70oh7IB7dqfjm',
+                            image: '{% static 'img/tripalocal_logo_stripe.jpg'%}',
+                            locale: '{{LANGUAGE}}',
+                            token: function(token) {
+                                // Use the token to create the charge with a server-side script.
+                                // You can access the token ID with `token.id`
+                                var input = $("<input>")
+                                               .attr("type", "hidden")
+                                               .attr("name", "stripeToken").val(token.id);
+                                $('#category_form').append($(input));
+                                $('#category_form').submit();
+                            }
+                        });
 
-                    $("#category_form").submit();
-                }
-                else{
-                    $("#id_coupon_term_condition").attr("style","width:480px; display:inline-block; margin-bottom:10px;");
-                }
-            }
-            else{
-                $("#id_term_condition").attr("style","display:inline-block;");
-            }
+
+        $("#submit_booking").bind("click", function (e) {
+            checkPaymentForm(function () {
+                handler.open({
+                    name: 'Tripalocal 本土客',
+                    description: '',
+                    amount: {{ total_price|mul:100 }},
+                    currency: '{{currency}}',
+                    locale: '{{LANGUAGE}}',
+                    alipay: true
+                });
+                e.preventDefault();
+            }, e);
+        });
+
+        $("#wechat_booking").bind("click", function (e) {
+            checkPaymentForm(function () {}, e)
+        });
+
+        // Close Checkout on page navigation
+            $(window).on('popstate', function() {
+            handler.close();
         });
     })
 })

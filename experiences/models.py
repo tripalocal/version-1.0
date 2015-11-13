@@ -1,4 +1,4 @@
-﻿import traceback
+﻿import traceback, pytz
 
 from django.http import Http404
 from django.db import models
@@ -171,6 +171,10 @@ class Experience(AbstractExperience):
 
         return tags
 
+    def get_timezone(self):
+        #TODO
+        return pytz.timezone(settings.TIME_ZONE)
+
 class ExperienceI18n(models.Model):
     title = models.CharField(max_length=100, null=True)
     description = models.TextField(null=True)
@@ -268,6 +272,10 @@ class NewProduct(AbstractExperience):
     def update_commission(self, commission):
         self.commission = commission
         self.save()
+
+    def get_timezone(self):
+        #TODO
+        return pytz.timezone(settings.TIME_ZONE)
 
 class NewProductI18n(models.Model):
     EN = 'en'
@@ -405,6 +413,8 @@ class CustomItinerary(models.Model):
     status = models.CharField(max_length=10, default="draft")
     description = models.TextField(null=True, blank=True)
     note = models.TextField(null=True, blank=True)
+    submitted_datetime = models.DateTimeField(null=True)
+    payment = models.ForeignKey("Payment", null=True, blank=True)
 
 class Booking(models.Model):
     user = models.ForeignKey(User)
