@@ -927,6 +927,8 @@ class ItineraryBookingForm(forms.Form):
     postcode = forms.CharField(max_length=4, required = False)
     phone_number = forms.CharField(max_length=15, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
+    custom_currency = forms.CharField(max_length=3, required=True)
+    price_paid = forms.DecimalField(max_digits=6, decimal_places=2, required=False)
 
     def __init__(self, *args, **kwargs):
         super(ItineraryBookingForm, self).__init__(*args, **kwargs)
@@ -935,6 +937,8 @@ class ItineraryBookingForm(forms.Form):
         self.fields['itinerary_id'].widget.attrs['readonly'] = True
         self.fields['itinerary_id'].widget = forms.HiddenInput()
         self.fields['booking_extra_information'].widget = forms.HiddenInput()
+        self.fields['custom_currency'].widget.attrs['readonly'] = True
+        self.fields['custom_currency'].widget = forms.HiddenInput()
 
     def booking(self,ids,dates,times,user,guest_number,
                 card_number=None,exp_month=None,exp_year=None,cvv=None,
@@ -1078,8 +1082,8 @@ class ItineraryBookingForm(forms.Form):
 
             if 'Stripe' in self.data or 'stripeToken' in self.data:
                 payment = Payment()
-                price = 1000
-                currency = "aud"
+                price = form.cleaned_data['price_paid']
+                currency = form.cleaned_data['custom_currency']
                 success, instance = payment.charge(int(price*100), currency, stripe_token = self.data["stripeToken"])
 
                 if not success:
