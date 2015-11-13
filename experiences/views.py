@@ -3392,6 +3392,7 @@ def itinerary_detail(request,id=None):
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
 
+        itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id, "GEO_POSTFIX":GEO_POSTFIX},context)
 
