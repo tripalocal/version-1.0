@@ -3366,6 +3366,7 @@ def itinerary_detail(request,id=None):
         form.data["itinerary_id"] = id
         form.data["first_name"] = request.user.first_name
         form.data["last_name"] = request.user.last_name
+        form.data["custom_currency"] = request.session['custom_currency']
 
         itinerary = CustomItinerary.objects.get(id=id)
         currency = request.session['custom_currency']
@@ -3375,7 +3376,7 @@ def itinerary_detail(request,id=None):
         price_pp = total_price/itinerary.booking_set.all()[0].guest_number
 
         return render_to_response('experiences/itinerary_booking_confirmation.html',
-                                  {'form':form,
+                                  {'form':form, "guest_number":itinerary.booking_set.all()[0].guest_number,
                                    "price_pp":price_pp, "subtotal_price":subtotal_price,
                                    "service_fee":service_fee, "total_price":total_price,
                                    "currency": currency, "dollarsign": DollarSign[currency.upper()],
