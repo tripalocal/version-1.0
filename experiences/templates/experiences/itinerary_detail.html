@@ -48,7 +48,24 @@
     <div class="day-list" id="day{{forloop.counter}}-list">
       <h3 class="day-heading">Day {{forloop.counter}} {{date}} {{list.0.city}} </h3>
       {% for item in list %}
-        <div class="item-heading"><span class="item-icon"><img src="{% static 'experiences/img/hot-56.svg' %}"></span><p>{{item.title}}</p></div>
+        <div class="item-heading">
+          <span class="item-icon">
+            {% if item.type == 'PrivateProduct' or item.type == 'PublicProduct' or item.type == 'PRIVATE' or item.type == 'NONPRIVATE' %}
+            <img src="{% static 'experiences/img/hot-56.svg' %}">
+            {% elif item.type == 'Flight' %}
+            <img src="{% static 'experiences/img/flight.svg' %}">
+            {% elif item.type == 'Transfer' %}
+            <img src="{% static 'experiences/img/transfer.svg' %}">
+            {% elif item.type == 'Accommodation' %}
+            <img src="{% static 'experiences/img/accommodation.svg' %}">
+            {% elif item.type == 'Restaurant' %}
+            <img src="{% static 'experiences/img/restaurant.svg' %}">
+            {% elif item.type == 'Suggestion' %}
+            <img src="{% static 'experiences/img/itinerary.svg' %}">
+            {% endif %}
+          </span>
+          <p>{{item.title}}</p>
+        </div>
         <div class="item-description"><p>{{item.description}}</p></div>
       {% endfor %}
     </div>
