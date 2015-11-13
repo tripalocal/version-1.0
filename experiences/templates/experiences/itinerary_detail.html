@@ -46,7 +46,7 @@
     </ul>
     {%for date, list in itinerary.days.items %}
     <div class="day-list" id="day{{forloop.counter}}-list">
-      <h3 class="day-heading">Day {{forloop.counter}} {{date}} </h3>
+      <h3 class="day-heading">Day {{forloop.counter}} {{date}} {{list.0.city}} </h3>
       {% for item in list %}
         <div class="item-heading"><span class="item-icon"><img src="{% static 'experiences/img/hot-56.svg' %}"></span><p>{{item.title}}</p></div>
         <div class="item-description"><p>{{item.description}}</p></div>
