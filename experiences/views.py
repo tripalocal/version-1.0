@@ -61,14 +61,14 @@ def convert_experience_price(request, experience):
         experience.price = convert_currency(experience.price, experience.currency, request.session['custom_currency'])
 
         if experience.dynamic_price and type(experience.dynamic_price) == str:
-                price = experience.dynamic_price.split(',')
-                if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-                #these is comma in the end, so the length is max-min+2
-                    new_dynamic_price=""
-                    for i in range(len(price)-1):
-                        price[i] = convert_currency(float(price[i]), experience.currency, request.session['custom_currency'])
-                        new_dynamic_price += str(price[i]) + ","
-                    experience.dynamic_price = new_dynamic_price
+            price = experience.dynamic_price.split(',')
+            if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
+            #these is comma in the end, so the length is max-min+2
+                new_dynamic_price=""
+                for i in range(len(price)-1):
+                    price[i] = convert_currency(float(price[i]), experience.currency, request.session['custom_currency'])
+                    new_dynamic_price += str(price[i]) + ","
+                experience.dynamic_price = new_dynamic_price
 
         experience.currency = request.session['custom_currency']
 
@@ -2072,9 +2072,9 @@ def update_booking(id, accepted, user):
                             subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
                     else:
                         #wrong dynamic settings
-                        subtotal_price = float(experience.price)*float(booking.guest_number)
+                        subtotal_price = float(experience.price)*float(guest_number)
                 else:
-                    subtotal_price = float(experience.price)*float(booking.guest_number)
+                    subtotal_price = float(experience.price)*float(guest_number)
 
                 #refund_amount does not include process fee: the transaction can't be undone
                 COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
@@ -3326,11 +3326,40 @@ def custom_itinerary(request, id=None):
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
+def get_itinerary_price(itinerary_id, currency):
+    itinerary = CustomItinerary.objects.get(id = itinerary_id)
+    itinerary_price = 0.0
+    for bking in itinerary.booking_set.all():
+        experience = bking.experience
+        guest_number = bking.guest_number
+        if experience.dynamic_price and type(experience.dynamic_price) == str:
+            price = experience.dynamic_price.split(',')
+            if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
+            #these is comma in the end, so the length is max-min+2
+                if guest_number <= experience.guest_number_min:
+                    subtotal_price = float(experience.price) * float(experience.guest_number_min)
+                else:
+                    subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
+            else:
+                #wrong dynamic settings
+                subtotal_price = float(experience.price)*float(guest_number)
+        else:
+            subtotal_price = float(experience.price)*float(guest_number)
+
+        subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
+        if experience.currency != currency:
+            subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
+        itinerary_price += subtotal_price
+    if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + itinerary.submitted_datetime:
+        itinerary_price *= 1.15
+    return itinerary_price
+
 def itinerary_detail(request,id=None):
     if id is None:
         return HttpResponseRedirect(GEO_POSTFIX)
 
     context = RequestContext(request)
+    set_initial_currency(request)
     if request.method == 'POST':
         form = ItineraryBookingForm(request.POST)
         form.data = form.data.copy()
@@ -3338,12 +3367,14 @@ def itinerary_detail(request,id=None):
         form.data["itinerary_id"] = id
         form.data["first_name"] = request.user.first_name
         form.data["last_name"] = request.user.last_name
-        #TODO
-        currency = "aud"
-        price_pp = 100
-        subtotal_price = 1000
-        total_price = 0.01
+
+        itinerary = CustomItinerary.objects.get(id=id)
+        currency = request.session['custom_currency']
+        subtotal_price = get_itinerary_price(id, currency)
         service_fee = 0
+        total_price = subtotal_price + service_fee
+        price_pp = total_price/itinerary.booking_set.all()[0].guest_number
+
         return render_to_response('experiences/itinerary_booking_confirmation.html',
                                   {'form':form,
                                    "price_pp":price_pp, "subtotal_price":subtotal_price,
@@ -3361,11 +3392,14 @@ def itinerary_detail(request,id=None):
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
+
+        itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id, "GEO_POSTFIX":GEO_POSTFIX},context)
 
 def itinerary_booking_confirmation(request):
     context = RequestContext(request)
+    set_initial_currency(request)
     display_error = False
 
     if not request.user.is_authenticated():
@@ -3378,6 +3412,9 @@ def itinerary_booking_confirmation(request):
         if 'Stripe' in request.POST or 'stripeToken' in request.POST:
             #submit the form
             display_error = True
+            form.data = form.data.copy()
+            form.data['custom_currency'] = request.session['custom_currency']
+            form.data['price_paid'] = get_itinerary_price(form.data['itineraray_id'], request.session['custom_currency'])
             if form.is_valid():
                 request.user.registereduser.phone_number = form.cleaned_data['phone_number']
                 request.user.registereduser.save()
@@ -3394,8 +3431,7 @@ def itinerary_booking_confirmation(request):
             form.data['booking_extra_information'] = order_id
             if form.is_valid():
                 config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
-                #TODO
-                total_price = 1000
+                total_price = get_itinerary_price(form.cleaned_data['itinerary_id'], request.session['custom_currency'])
 
                 if total_price > 0.0:
                     #not free
@@ -3421,8 +3457,8 @@ def itinerary_booking_confirmation(request):
 
             if form.is_valid():
                 #TODO
-                total_price = 0.01
-                currency = "aud"
+                total_price = get_itinerary_price(form.cleaned_data['itinerary_id'], request.session['custom_currency'])
+                currency = request.session['custom_currency']
 
                 if total_price > 0.0:
                     #not free
