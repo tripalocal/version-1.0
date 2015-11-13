@@ -3377,7 +3377,7 @@ def itinerary_detail(request,id=None):
         price_pp = total_price/itinerary.booking_set.all()[0].guest_number
 
         return render_to_response('experiences/itinerary_booking_confirmation.html',
-                                  {'form':form, "guest_number":itinerary.booking_set.all()[0].guest_number,
+                                  {'form':form, "itinerary":itinerary,
                                    "price_pp":price_pp, "subtotal_price":subtotal_price,
                                    "service_fee":service_fee, "total_price":total_price,
                                    "currency": currency, "dollarsign": DollarSign[currency.upper()],
@@ -3385,7 +3385,7 @@ def itinerary_detail(request,id=None):
                                    context)
     else:
         ci = CustomItinerary.objects.get(id=id)
-        itinerary = {"title":ci.title, "days":{}}
+        itinerary = {"title":ci.title, "days":{}, "guest_number":ci.booking_set.all()[0].guest_number}
         for item in ci.booking_set.all():
             item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
             item.experience.description = item.experience.get_description(settings.LANGUAGES[0][0])
@@ -3396,7 +3396,9 @@ def itinerary_detail(request,id=None):
 
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
         return render_to_response('experiences/itinerary_detail.html',
-                                  {'itinerary':itinerary, "itinerary_id":ci.id, "GEO_POSTFIX":GEO_POSTFIX},context)
+                                  {'itinerary':itinerary, "itinerary_id":ci.id, "GEO_POSTFIX":GEO_POSTFIX,
+                                   "guest_number":ci.booking_set.all()[0].guest_number},
+                                   context)
 
 def itinerary_booking_confirmation(request):
     context = RequestContext(request)
