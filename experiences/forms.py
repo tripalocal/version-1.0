@@ -10,6 +10,7 @@ from experiences.constant import *
 from experiences.tasks import schedule_sms, schedule_sms_if_no_confirmed
 from experiences.constant import *
 from experiences.models import *
+from experiences.utils import *
 from Tripalocal_V1 import settings
 from experiences.telstra_sms_api import send_sms
 from django.template import loader
@@ -547,21 +548,8 @@ def check_coupon(coupon, experience_id, guest_number, target_currency=None):
         return result
 
     #not free:
-    subtotal_price = 0.0
     experience = AbstractExperience.objects.get(id = experience_id)
-    if experience.dynamic_price and type(experience.dynamic_price) == str:
-        price = experience.dynamic_price.split(',')
-        if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-        #these is comma in the end, so the length is max-min+2
-            if guest_number <= experience.guest_number_min:
-                subtotal_price = float(experience.price) * float(experience.guest_number_min)
-            else:
-                subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
-        else:
-            #wrong dynamic settings
-            subtotal_price = float(experience.price)*float(guest_number)
-    else:
-        subtotal_price = float(experience.price)*float(guest_number)
+    subtotal_price = get_total_price(experience, guest_number)
 
     COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
     if extra_fee == 0.00:
@@ -838,7 +826,8 @@ class CustomItineraryForm(forms.Form):
     note = forms.CharField(widget=forms.Textarea, required=False)
     start_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
     end_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
-    guest_number = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
+    adult_number = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
+    children_number = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
     city = forms.CharField(widget=forms.Textarea,  required=True, initial="Melbourne")
     language = forms.CharField(widget=forms.Textarea,  required=True, initial="English,Mandarin")
     tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
@@ -971,20 +960,7 @@ class ItineraryBookingForm(forms.Form):
                 experience.title = experience.get_title(settings.LANGUAGES[0][0])
 
             if not free:
-                subtotal_price = 0.0
-                if experience.dynamic_price and type(experience.dynamic_price) == str:
-                    price = experience.dynamic_price.split(',')
-                    if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-                    #these is comma in the end, so the length is max-min+2
-                        if guest_number <= experience.guest_number_min:
-                            subtotal_price = float(experience.price) * float(experience.guest_number_min)
-                        else:
-                            subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
-                    else:
-                        #wrong dynamic settings
-                        subtotal_price = float(experience.price)*float(guest_number)
-                else:
-                    subtotal_price = float(experience.price)*float(guest_number)
+                subtotal_price = get_total_price(experience, guest_number)
 
                 COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
                 if extra_fee == 0.00:
