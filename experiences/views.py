@@ -3161,7 +3161,8 @@ def custom_itinerary(request, id=None):
                 start_datetime = form.cleaned_data['start_datetime']
                 end_datetime = form.cleaned_data['end_datetime']
                 end_datetime = end_datetime.replace(hour=22)
-                guest_number = form.cleaned_data['guest_number']
+                adult_number = int(form.cleaned_data['adult_number'])
+                children_number = int(form.cleaned_data['children_number'])
                 city = form.cleaned_data['city']
                 language = form.cleaned_data['language']
                 tags = form.cleaned_data['tags']
@@ -3174,7 +3175,7 @@ def custom_itinerary(request, id=None):
                     raise TypeError("Wrong format: keywords. String or list expected.")
 
                 customer = request.user if request.user.is_authenticated() else None
-                itinerary = get_itinerary("ALL", start_datetime, end_datetime, guest_number, city, language, tags, False, sort, age_limit, customer)
+                itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer)
 
                 #get flight, transfer, ...
                 pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
@@ -3188,6 +3189,8 @@ def custom_itinerary(request, id=None):
                 context['restaurant'] = [e for e in pds if e.type == 'Restaurant' and e.city in str(city).split(",")]
                 context['suggestion'] = [e for e in pds if e.type == 'Suggestion' and e.city in str(city).split(",")]
                 context['pricing'] = [e for e in pds if e.type == 'Pricing']
+                context["adult_number"] = adult_number
+                context["children_number"] = children_number
                 return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)
             else:
                 return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form}, context)
@@ -3217,20 +3220,27 @@ def custom_itinerary(request, id=None):
                 i=-1
                 week_day = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
                 total_price = 0.0
-                guest_number = 1
 
                 for item in itinerary:
                     experience = AbstractExperience.objects.get(id=str(item['id']))
-                    price = experience_fee_calculator(float(experience.price), experience.commission)*1.15 #*1.15 based on the new requirement
-                    total_price += price*int(item['guest_number'])
-                    guest_number = int(item['guest_number'])
+                    adult_number = int(item['adult_number'])
+                    children_number = int(item['children_number'])
+                    if experience.children_price is not None and experience.children > 0:
+                        price = experience_fee_calculator(float(experience.children_price), experience.commission)
+                    else:
+                        price = experience_fee_calculator(float(experience.price), experience.commission)
+                    total_price += price*children_number
+                        
+                    price = experience_fee_calculator(float(experience.price), experience.commission)
+                    total_price += price*adult_number
+                    total_price *= 1.15 #*1.15 based on the new requirement
 
                     #save the custom itinerary as draft
                     local_timezone = pytz.timezone(settings.TIME_ZONE)
                     bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
-                    booking = Booking(user = request.user, experience= experience, guest_number = guest_number,
+                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, children_number = children_number,
                                     datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                     submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                     booking.save()
@@ -3250,7 +3260,7 @@ def custom_itinerary(request, id=None):
                         worksheet.write(row, col, week_day[current_date.weekday()])
                         #number of people
                         col += 1
-                        worksheet.write(row, col, item['guest_number'])
+                        worksheet.write(row, col, str(adult_number + children_number))
                         #accommdation
                         col += 1
                         worksheet.write(row, col, '')
@@ -3280,7 +3290,7 @@ def custom_itinerary(request, id=None):
                 col += 1
                 worksheet.write(row, col, "Price per person:")
                 col += 1
-                worksheet.write(row, col, total_price/guest_number)
+                worksheet.write(row, col, total_price/(adult_number + children_number))
                 workbook.close()
                 return HttpResponseRedirect(GEO_POSTFIX+"itinerary/"+ci.id+"/")
 
@@ -3288,13 +3298,24 @@ def custom_itinerary(request, id=None):
                 #          {'form': booking_form,'itinerary':itinerary})
 
     else:
+        context["adult_number"] = 1
+        context["children_number"] = 0
         if id is not None:
             existing_ci = CustomItinerary.objects.get(id=id)
             itinerary = {}
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow())
             for bking in existing_ci.booking_set.all():
-                form.initial["guest_number"] = bking.guest_number
+                if bking.adult_number is not None and bking.adult_number > 0:
+                    form.initial["adult_number"] = bking.adult_number
+                else:
+                    form.initial["adult_number"] = bking.guest_number
+                context["adult_number"] = form.initial["adult_number"]
+                if bking.children_number is not None and bking.children_number > 0:
+                    form.initial["children_number"] = bking.children_number
+                else:
+                    form.initial["children_number"] = 0
+                context["children_number"] = form.initial["children_number"]
 
                 if bking.datetime.astimezone(bking.experience.get_timezone()) < form.initial["start_datetime"]:
                     form.initial["start_datetime"] = bking.datetime.astimezone(bking.experience.get_timezone())

@@ -65,6 +65,7 @@ class Experience(AbstractExperience):
     guest_number_max = models.IntegerField()
     guest_number_min = models.IntegerField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     currency = models.CharField(max_length=10)
     dynamic_price = models.CharField(max_length=100)
 
