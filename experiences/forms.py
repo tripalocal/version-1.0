@@ -80,6 +80,8 @@ Guest_Number_Child = (('0', 'None'),('1', '1'),('2', '2'),('3', '3'),('4', '4'),
 Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
                     ('11', '11'),('12', '12'),('13', '13'),('14', '14'),('15', '15'),('16', '16'),('17', '17'),('18', '18'),('19', '19'),('20', '20'),)
 
+Budget_Range = (('< AU$ 3000', _('< AU$ 3000')), ('AU$ 3000 - 5000', _('AU$ 3000 - 5000')), ('> AU$ 5000', _('> AU$ 5000')))
+
 Duration = (('1.0', '1 hour'),('1.5', '1.5 hours'),('2.0', '2 hours'),('2.5', '2.5 hours'),('3.0', '3 hours'),('4.0', '4 hours'),('5.0', '5 hours'),('6.0', '6 hours'),('7.0', '7 hours'),('8.0', '8 hours'),('9.0', '9 hours'),('10.0', '10 hours'),
 ('11.0', '11 hours'),('12.0', '12 hours'),('24.0', '1 day'),('48.0', '2 days'),('72.0', '3 days'),('96.0', '4 days'),('120.0', '5 days'),('144.0', '6 days'),('168.0', '7 days'),('192.0', '8 days'),
 ('216.0', '9 days'),('240.0', '10 days'))
@@ -803,7 +805,7 @@ class CustomItineraryRequestForm(forms.Form):
     guests_children = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
     tags = forms.CharField(widget=forms.Textarea, required=False, initial=Tags)
     all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
-    budget = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Eg. Under $3000 per person'}), required=True)
+    budget = forms.ChoiceField(choices=Budget_Range, widget=forms.Select(attrs={'class':'form-control'}), required=True)
     flights = forms.CharField(widget=forms.CheckboxInput, required=False)
     driver = forms.CharField(widget=forms.CheckboxInput, required=False)
     requirements = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control', 'rows':'5'}), required=False)

@@ -34,6 +34,7 @@ from unionpay.util.helper import load_config, make_order_id
 from django.views.decorators.csrf import csrf_exempt
 import itertools
 import xmltodict
+import collections
 from django.db.models import Q
 from experiences.utils import *
 
@@ -3402,7 +3403,7 @@ def itinerary_booking_confirmation(request):
     # A HTTP POST?
     if request.method == 'POST':
         form = ItineraryBookingForm(request.POST)
-        
+
         if 'Stripe' in request.POST or 'stripeToken' in request.POST:
             #submit the form
             display_error = True

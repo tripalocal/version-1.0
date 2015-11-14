@@ -12,17 +12,17 @@
 {% block content %}
 <div id="complete" class="full-height" style="display:none;background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %}">
   <div class="container middle animated fadeIn">
-    <h1>Your request has been submitted!</h1>
-    <h2>A custom itinerary will be sent to you shortly.</h2>
+    <h1>{% trans 'Your request has been submitted!' %}</h1>
+    <h2>{% trans 'A custom itinerary will be sent to you shortly.' %}</h2>
   </div>
 </div>
 <form id="itinerary-request" action="" method="post">
   {% csrf_token %}
   <div id="intro" class="full-height" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %}">
     <div class="container middle animated fadeIn">
-      <h1>Custom Itinerary</h1>
-      <h2>Complete just a few easy steps and we will<br> send you an itinerary tailor made for your trip</h2>
-      <button type="button" id="start-btn" class="btn btn-primary">Get Started</button>
+      <h1>{% trans 'Custom Itinerary' %}</h1>
+      <h2>{% trans 'Complete just a few easy steps and we will<br> send you an itinerary tailor made for your trip' %}</h2>
+      <button type="button" id="start-btn" class="btn btn-primary">{% trans 'Get Started' %}</button>
     </div>
   </div>
   <div class="progress-bar">
@@ -31,26 +31,26 @@
     <div class="indicator" id="indicator3">3</div>
   </div>
   <div id="step1" class="full-height">
-    <button type="button" id="prev-btn1" class="btn btn-secondary btn-top">Back</button>
+    <button type="button" id="prev-btn1" class="btn btn-secondary btn-top">{% trans 'Back' %}</button>
     <div class="container">
       <div class="panel panel-default" id="destination">
         <div class="panel-body">
-          <img src="{% static 'experiences/img/itinerary.svg' %}" class="header-icon"><h2>Destinations</h2>
-          <p>List some locations you would like to visit on this trip.</p>
+          <img src="{% static 'experiences/img/itinerary.svg' %}" class="header-icon"><h2>{% trans 'Destinations' %}</h2>
+          <p>{% trans 'List some locations you would like to visit on this trip.' %}</p>
           {{form.destinations}}
         </div>
       </div>
       <div class="panel panel-default" id="date">
         <div class="panel-body">
-          <img src="{% static 'experiences/img/calendar.svg' %}" class="header-icon"><h2>Dates</h2>
-          <p>Between which dates would you be travelling?</p>
+          <img src="{% static 'experiences/img/calendar.svg' %}" class="header-icon"><h2>{% trans 'Dates' %}</h2>
+          <p>{% trans 'Between which dates would you be travelling?' %}</p>
           <div class="container" style="width:400px; padding:0;">
             <div class="form-group" style="display:inline-block; margin-right:20px; margin-bottom:0;">
-              <label>Start date</label>
+              <label>{% trans 'Start date' %}</label>
               {{form.start_date}}
             </div>
             <div class="form-group" style="display:inline-block; margin-bottom:0;">
-              <label>End date</label>
+              <label>{% trans 'End date' %}</label>
               {{form.end_date}}
             </div>
           </div>
@@ -58,30 +58,30 @@
       </div>
       <div class="panel panel-default" id="group">
         <div class="panel-body">
-          <img src="{% static 'experiences/img/group.svg' %}" class="header-icon"><h2>Group Size</h2>
-          <p>How many adults will be travelling? Any children?</p>
+          <img src="{% static 'experiences/img/group.svg' %}" class="header-icon"><h2>{% trans 'Group Size' %}</h2>
+          <p>{% trans 'How many adults will be travelling? Any children?' %}</p>
           <div class="container" style="width:400px; padding:0;">
             <div class="form-group" style="display:inline-block; margin-right:20px; margin-bottom:0;">
-              <label>Adults</label>
+              <label>{% trans 'Adults' %}</label>
               {{form.guests_adults}}
             </div>
             <div class="form-group" style="display:inline-block; margin-bottom:0;">
-              <label>Children (2-12 years old)</label>
+              <label>{% trans 'Children (2-12 years old)' %}</label>
               {{form.guests_children}}
             </div>
           </div>
         </div>
       </div>
     </div>
-    <button type="button" id="next-btn1" class="btn btn-secondary btn-bottom">Next</button>
+    <button type="button" id="next-btn1" class="btn btn-secondary btn-bottom">{% trans 'Next' %}</button>
   </div>
   <div id="step2" class="full-height">
-    <button type="button" id="prev-btn2" class="btn btn-secondary btn-top">Back</button>
+    <button type="button" id="prev-btn2" class="btn btn-secondary btn-top">{% trans 'Back' %}</button>
     <div class="container">
       <div class="panel panel-default" id="interests">
         <div class="panel-body">
-          <img src="{% static 'experiences/img/heart_large_grey.svg' %}" class="header-icon"><h2>Interests</h2>
-          <p>What kind of things are you interested in? Uncheck the topics that don't interest you.</p>
+          <img src="{% static 'experiences/img/heart_large_grey.svg' %}" class="header-icon"><h2>{% trans 'Interests' %}</h2>
+          <p>{% trans 'What kind of things are you interested in? Uncheck the topics that don't interest you.' %}</p>
           <div class="form-box" id="tags_div">
               {{form.tags}}
               {{form.all_tags}}
@@ -90,59 +90,59 @@
       </div>
       <div class="panel panel-default" id="included">
         <div class="panel-body">
-          <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>What's Included</h2>
-          <p>We don't currently provide accommodation or car rental.</p>
+          <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>{% trans 'What's Included' %}</h2>
+          <p>{% trans "We don't currently provide accommodation or car rental." %}</p>
           <div class="checkbox">
-            <label>{{form.flights}}Domestic flights at destination</label>
+            <label>{{form.flights}}{% trans 'Domestic flights at destination' %}</label>
           </div>
           <div class="checkbox">
-            <label>{{form.driver}}Driver</label>
+            <label>{{form.driver}}{% trans 'Driver' %}</label>
           </div>
         </div>
       </div>
       <div class="panel panel-default" id="budget">
         <div class="panel-body">
-          <img src="{% static 'experiences/img/price.svg' %}" class="header-icon"><h2>Budget</h2>
-          <p>What is your budget for this trip?</p>
+          <img src="{% static 'experiences/img/price.svg' %}" class="header-icon"><h2>{% trans 'Budget' %}</h2>
+          <p>{% trans 'What is your budget for this trip?' %}</p>
           {{form.budget}}
         </div>
       </div>
     </div>
-    <button type="button" id="next-btn2" class="btn btn-secondary btn-bottom">Next</button>
+    <button type="button" id="next-btn2" class="btn btn-secondary btn-bottom">{% trans 'Next' %}</button>
   </div>
   <div id="step3" class="full-height">
-    <button type="button" id="prev-btn3" class="btn btn-secondary btn-top">Back</button>
+    <button type="button" id="prev-btn3" class="btn btn-secondary btn-top">{% trans 'Back' %}</button>
     <div class="container">
       <div class="panel panel-default" id="requirements">
         <div class="panel-body">
-          <img src="{% static 'experiences/img/discuss.svg' %}" class="header-icon"><h2>Other Requirements</h2>
-          <p>Anything else you would like to let us know?</p>
+          <img src="{% static 'experiences/img/discuss.svg' %}" class="header-icon"><h2>{% trans 'Other Requirements' %}</h2>
+          <p>{% trans 'Anything else you would like to let us know?' %}</p>
           {{form.requirements}}
         </div>
       </div>
       <div class="panel panel-default" id="contact">
         <div class="panel-body">
-          <img src="{% static 'experiences/img/profile.svg' %}" class="header-icon"><h2>Contact Details</h2>
-          <p>Almost done! Just leave us your contact details so we can get back to you.</p>
+          <img src="{% static 'experiences/img/profile.svg' %}" class="header-icon"><h2>{% trans 'Contact Details' %}</h2>
+          <p>{% trans 'Almost done! Just leave us your contact details so we can get back to you.' %}</p>
           <div class="container" style="width:600px; padding:15px">
             <div class="row">
               <div class="col-sm-6">
                 <div class="form-group">
-                  <label>Name</label>
+                  <label>{% trans 'Name' %}</label>
                   {{form.name}}
                 </div>
                 <div class="form-group">
-                  <label>Email</label>
+                  <label>{% trans 'Email' %}</label>
                   {{form.email}}
                 </div>
               </div>
               <div class="col-sm-6">
                 <div class="form-group">
-                  <label>WeChat</label>
+                  <label>{% trans 'WeChat' %}</label>
                   {{form.wechat}}
                 </div>
                 <div class="form-group">
-                  <label>Mobile</label>
+                  <label>{% trans 'Mobile' %}</label>
                   {{form.mobile}}
                 </div>
               </div>
@@ -151,18 +151,18 @@
         </div>
       </div>
     </div>
-    <button type="button" id="submit-btn" class="btn btn-primary btn-bottom">Submit</button>
+    <button type="button" id="submit-btn" class="btn btn-primary btn-bottom">{% trans 'Submit' %}</button>
   </div>
 </form>
 <!-- Alerts -->
 <div class="alert alert-danger alert-dismissible" role="alert">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  <strong>Oops!</strong> There was a problem submitting your request. Please try again shortly.
+  <strong>{% trans 'Oops!' %}</strong> {% trans 'There was a problem submitting your request. Please try again shortly.' %}
 </div>
 
 <div class="alert alert-warning alert-dismissible" role="alert">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  Please fill in all required fields before submitting.
+  {% trans 'Please fill in all required fields before submitting.' %}
 </div>
 
 {% endblock %}
