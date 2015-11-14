@@ -3304,13 +3304,25 @@ def custom_itinerary(request, id=None):
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
+def get_itinerary_guest_number(itinerary):
+    guest_number = 0
+    if itinerary.booking_set.all()[0].adult_number is not None and itinerary.booking_set.all()[0].adult_number > 0:
+        guest_number = itinerary.booking_set.all()[0].adult_number
+        if itinerary.booking_set.all()[0].children_number is not None and itinerary.booking_set.all()[0].children_number > 0:
+            guest_number += itinerary.booking_set.all()[0].children_number
+    else:
+        guest_number = itinerary.booking_set.all()[0].guest_number
+    return guest_number
+
 def get_itinerary_price(itinerary_id, currency):
     itinerary = CustomItinerary.objects.get(id = itinerary_id)
     itinerary_price = 0.0
     for bking in itinerary.booking_set.all():
         experience = bking.experience
         guest_number = bking.guest_number
-        subtotal_price = get_total_price(experience, guest_number)
+        adult_number = bking.adult_number
+        children_number = bking.children_number
+        subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
         subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
         if experience.currency != currency:
             subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
@@ -3339,7 +3351,7 @@ def itinerary_detail(request,id=None):
         subtotal_price = get_itinerary_price(id, currency)
         service_fee = 0
         total_price = subtotal_price + service_fee
-        price_pp = total_price/itinerary.booking_set.all()[0].guest_number
+        price_pp = total_price/get_itinerary_guest_number(itinerary)
 
         return render_to_response('experiences/itinerary_booking_confirmation.html',
                                   {'form':form, "itinerary":itinerary,
@@ -3373,7 +3385,7 @@ def itinerary_detail(request,id=None):
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
-                                   "guest_number":ci.booking_set.all()[0].guest_number,
+                                   "guest_number":get_itinerary_guest_number(ci),
                                    "start_date": start_datetime.strftime("%Y-%m-%d"),
                                    "end_date":end_datetime.strftime("%Y-%m-%d"),
                                    "price":price,

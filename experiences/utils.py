@@ -8,7 +8,7 @@ def isEnglish(s):
     else:
         return True
 
-def get_total_price(experience, guest_number, adult_number=0, children_number=0):
+def get_total_price(experience, guest_number=0, adult_number=0, children_number=0):
     '''
     return total price, not including commission or service fee
     either use guest_number, or adult_number + children_number, the latter has a higher priority
