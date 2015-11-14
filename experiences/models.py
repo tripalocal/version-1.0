@@ -417,6 +417,30 @@ class CustomItinerary(models.Model):
     submitted_datetime = models.DateTimeField(null=True)
     payment = models.ForeignKey("Payment", null=True, blank=True)
 
+    def get_guest_number(self):
+        guest_number = 0
+        adult_number = 0
+        children_number = 0
+        if self.booking_set.all()[0].adult_number is not None and self.booking_set.all()[0].adult_number > 0:
+            guest_number = self.booking_set.all()[0].adult_number
+            adult_number = guest_number
+            if self.booking_set.all()[0].children_number is not None and self.booking_set.all()[0].children_number > 0:
+                children_number = self.booking_set.all()[0].children_number
+                guest_number += children_number
+        else:
+            guest_number = self.booking_set.all()[0].guest_number
+            adult_number = guest_number
+        return (guest_number, adult_number, children_number)
+
+    def get_length(self):
+        dates = []
+        for item in self.booking_set.all():
+            key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
+            if key not in dates:
+                dates.append(key)
+
+        return len(dates)
+
 class Booking(models.Model):
     user = models.ForeignKey(User)
     coupon = models.ForeignKey(Coupon, null=True, blank=True)

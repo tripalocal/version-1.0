@@ -3304,16 +3304,6 @@ def custom_itinerary(request, id=None):
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
-def get_itinerary_guest_number(itinerary):
-    guest_number = 0
-    if itinerary.booking_set.all()[0].adult_number is not None and itinerary.booking_set.all()[0].adult_number > 0:
-        guest_number = itinerary.booking_set.all()[0].adult_number
-        if itinerary.booking_set.all()[0].children_number is not None and itinerary.booking_set.all()[0].children_number > 0:
-            guest_number += itinerary.booking_set.all()[0].children_number
-    else:
-        guest_number = itinerary.booking_set.all()[0].guest_number
-    return guest_number
-
 def get_itinerary_price(itinerary_id, currency):
     itinerary = CustomItinerary.objects.get(id = itinerary_id)
     itinerary_price = 0.0
@@ -3351,10 +3341,14 @@ def itinerary_detail(request,id=None):
         subtotal_price = get_itinerary_price(id, currency)
         service_fee = 0
         total_price = subtotal_price + service_fee
-        price_pp = total_price/get_itinerary_guest_number(itinerary)
+        number = itinerary.get_guest_number()
+        price_pp = total_price/number[0]
 
         return render_to_response('experiences/itinerary_booking_confirmation.html',
                                   {'form':form, "itinerary":itinerary,
+                                   "adult_number":number[1],
+                                   "children_number":number[2],
+                                   "length":itinerary.get_length(),
                                    "price_pp":price_pp, "subtotal_price":subtotal_price,
                                    "service_fee":service_fee, "total_price":total_price,
                                    "currency": currency, "dollarsign": DollarSign[currency.upper()],
@@ -3385,7 +3379,7 @@ def itinerary_detail(request,id=None):
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
-                                   "guest_number":get_itinerary_guest_number(ci),
+                                   "guest_number":ci.get_guest_number()[0],
                                    "start_date": start_datetime.strftime("%Y-%m-%d"),
                                    "end_date":end_datetime.strftime("%Y-%m-%d"),
                                    "price":price,

@@ -114,6 +114,7 @@
                 </div>
                 <div class="checkoutInfo">
                     <h3 style="font-weight:bold;">{{ itinerary.title }}</h3>
+                    <h3>{{length}}{% trans "-day " %}{{ adult_number }}{% trans " adult(s) " %} {% if children_number > 0 %}{{ children_number }}{% trans " children " %}{% endif%}{% trans "private tour" %}</h3>
                     <hr style="margin:10px 0">
                     <p>{% trans "Rate:" %} {{currency|upper}}{{dollarsign}}{{price_pp|stringformat:".2f"}}{% trans " per person" %}</p>
                     <hr style="margin-bottom:10px;">
