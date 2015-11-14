@@ -3329,7 +3329,7 @@ def get_itinerary_price(itinerary_id, currency):
         itinerary_price += subtotal_price
     if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + itinerary.submitted_datetime:
         itinerary_price *= 1.15
-    return round(itinerary_price,2)
+    return round(itinerary_price,0)
 
 def itinerary_detail(request,id=None):
     if id is None:

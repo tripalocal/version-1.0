@@ -290,6 +290,11 @@
         $("#button_view").click(function(e){
             set_data_before_submit();
             set_itinerary_string();
+            if($("#id_itinerary_string").val().length <= 2)
+            {
+                e.preventDefault();
+                alert("{% trans "Empty itinerary" %}");
+            }
         });
 
         // Date field
