@@ -35,7 +35,7 @@ from django.views.decorators.csrf import csrf_exempt
 import itertools
 import xmltodict
 from django.db.models import Q
-from experiences.utils import isEnglish
+from experiences.utils import *
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -864,24 +864,7 @@ class ExperienceDetailView(DetailView):
                 experience.duration = int(experience.duration)
 
             guest_number = int(form.data['guest_number'])
-            subtotal_price = 0.0
-            if experience.dynamic_price and type(experience.dynamic_price) == str:
-                price = experience.dynamic_price.split(',')
-                if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-                #these is comma in the end, so the length is max-min+2
-                    if guest_number <= experience.guest_number_min:
-                        subtotal_price = float(experience.price) * float(experience.guest_number_min)
-                    else:
-                        subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
-                        experience_price = float(price[guest_number-experience.guest_number_min])
-                    #if guest_number > experience.guest_number_min:
-                    #    for p_index in range(1, guest_number-experience.guest_number_min+1):
-                    #        subtotal_price += float(price[p_index])
-                else:
-                    #wrong dynamic settings
-                    subtotal_price = float(experience.price)*float(form.data['guest_number'])
-            else:
-                subtotal_price = float(experience.price)*float(form.data['guest_number'])
+            subtotal_price = get_total_price(experience, guest_number)
 
             COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
             return render(request, 'experiences/experience_booking_confirmation.html',
@@ -1194,22 +1177,9 @@ def experience_booking_confirmation(request):
             experience.title = experience.get_title(settings.LANGUAGES[0][0])
 
         guest_number = int(form.data['guest_number'])
-        subtotal_price = 0.0
         experience_price = experience.price
-        if experience.dynamic_price and type(experience.dynamic_price) == str:
-            price = experience.dynamic_price.split(',')
-            if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-            #these is comma in the end, so the length is max-min+2
-                if guest_number <= experience.guest_number_min:
-                    subtotal_price = float(experience.price) * float(experience.guest_number_min)
-                else:
-                    subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
-                    experience_price = float(price[guest_number-experience.guest_number_min])
-            else:
-                #wrong dynamic settings
-                subtotal_price = float(experience.price)*float(form.data['guest_number'])
-        else:
-            subtotal_price = float(experience.price)*float(form.data['guest_number'])
+        subtotal_price = get_total_price(experience, guest_number)
+
         COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
         total_price = experience_fee_calculator(subtotal_price, experience.commission)
         subtotal_price = round(subtotal_price*(1.00+COMMISSION_PERCENT),0)
@@ -2060,20 +2030,7 @@ def update_booking(id, accepted, user):
                 payment = Payment.objects.get(booking_id=booking.id)
 
                 guest_number = int(booking.guest_number)
-                subtotal_price = 0.0
-                if experience.dynamic_price and type(experience.dynamic_price) == str:
-                    price = experience.dynamic_price.split(',')
-                    if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-                    #these is comma in the end, so the length is max-min+2
-                        if guest_number <= experience.guest_number_min:
-                            subtotal_price = float(experience.price) * float(experience.guest_number_min)
-                        else:
-                            subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
-                    else:
-                        #wrong dynamic settings
-                        subtotal_price = float(experience.price)*float(guest_number)
-                else:
-                    subtotal_price = float(experience.price)*float(guest_number)
+                subtotal_price = get_total_price(experience, guest_number)
 
                 #refund_amount does not include process fee: the transaction can't be undone
                 COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
@@ -3352,20 +3309,7 @@ def get_itinerary_price(itinerary_id, currency):
     for bking in itinerary.booking_set.all():
         experience = bking.experience
         guest_number = bking.guest_number
-        if experience.dynamic_price and type(experience.dynamic_price) == str:
-            price = experience.dynamic_price.split(',')
-            if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-            #these is comma in the end, so the length is max-min+2
-                if guest_number <= experience.guest_number_min:
-                    subtotal_price = float(experience.price) * float(experience.guest_number_min)
-                else:
-                    subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
-            else:
-                #wrong dynamic settings
-                subtotal_price = float(experience.price)*float(guest_number)
-        else:
-            subtotal_price = float(experience.price)*float(guest_number)
-
+        subtotal_price = get_total_price(experience, guest_number)
         subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
         if experience.currency != currency:
             subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
