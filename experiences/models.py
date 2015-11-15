@@ -532,7 +532,7 @@ class Payment(models.Model):
     zip_code = models.CharField(max_length=4)
     state = models.CharField(max_length=3)
     country = models.CharField(max_length=15)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=50)
  
     # you could also store other information about the sale
     # but I'll leave that to you!

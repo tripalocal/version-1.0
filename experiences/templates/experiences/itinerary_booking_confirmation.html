@@ -81,12 +81,12 @@
 
                   <div class="form-group" style="display: inline-block; margin-right: 15px;">
                     <h3>{% trans 'Destination mobile number' %}</h3>
-                    {{ form.phone_number }}
+                    <input id="id_local_number" maxlength="15" type="text" class="form-control" value="+61 123456789" onfocus="if (this.value=='+61 123456789') this.value = ''">
                   </div>
 
                   <div class="form-group" style="display: inline-block;">
                     <h3>{% trans 'Roaming mobile number' %}</h3>
-                    <input id="id_roaming_number" maxlength="15" type="text" class="form-control">
+                    <input id="id_roaming_number" maxlength="15" type="text" class="form-control" value="+86 12345678901" onfocus="if (this.value=='+86 12345678901') this.value = ''">
                   </div>
 
                   <p>{% trans 'Your host will contact you via this number on the day.' %}</p>
@@ -131,28 +131,57 @@
 {% block scripts %}
 
 <script charset="utf-8" type="text/javascript">
+    legal_local_number = /\+\d{2} \d{9}/;
+    legal_roaming_number = /\+\d{2} \d{11}/;
 
-$(function(){
     function checkPaymentForm(preparePayment, e) {
         if ($("#isAgreementSelected").is(':checked'))
         {
-            phone1=$("#id_phone_number").val();
-            phone2=$("#id_roaming_number").val();
+            var phone1=$("#id_local_number").val();
+            var phone2=$("#id_roaming_number").val();
+
+            if(phone1 == "+61 123456789")
+            {
+                phone1 = "";
+            }
+
+            if(phone2 == "+86 12345678901")
+            {
+                phone2 = "";
+            }
+
+            if(phone1.length >0 && phone1.match(legal_local_number) == null)
+            {
+                e.preventDefault();
+                $("#id_local_number").css("border-color","red");
+                alert("{% trans "Please enter a legal local phone number" %}");
+                return;
+            }
+
+            if(phone2.length >0 && phone2.match(legal_roaming_number) == null)
+            {
+                e.preventDefault();
+                $("#id_roaming_number").css("border-color","red");
+                alert("{% trans "Please enter a legal roaming phone number" %}");
+                return;
+            }
+
             if(phone1)
             {
+                $("#id_phone_number").val(phone1+',');
                 if(phone2)
                 {
-                    //$("#id_phone_number").val(phone1+','+phone2);
+                    $("#id_phone_number").val(phone1+','+phone2);
                 }
             }
             else if(phone2)
             {
-                $("#id_phone_number").val(phone2);
+                $("#id_phone_number").val(','+phone2);
             }
             else
             {
                 //must leave at least one number
-                $("#id_phone_number").css("border-color","red");
+                $("#id_local_number").css("border-color","red");
                 $("#id_roaming_number").css("border-color","red");
                 $("#phone_warning").show();
                 e.preventDefault();
@@ -191,6 +220,17 @@ $(function(){
         $("#id_phone_number").attr("class", "form-control");
         $("#id_country").attr("class", "btn btn-default dropdown-toggle");
 
+        var phone = $("#id_phone_number").val();
+        if(phone)
+        {
+            phone = phone.split(',');
+            if(phone.length>1)
+            {
+                $("#id_local_number").val(phone[0]);
+                $("#id_roaming_number").val(phone[1]);
+            }
+        }
+
         var handler = StripeCheckout.configure({
                             key: 'pk_live_62VE04d61Te70oh7IB7dqfjm',
                             image: '{% static 'img/tripalocal_logo_stripe.jpg'%}',
@@ -226,10 +266,9 @@ $(function(){
         });
 
         // Close Checkout on page navigation
-            $(window).on('popstate', function() {
+        $(window).on('popstate', function() {
             handler.close();
         });
     })
-})
 </script>
 {% endblock %}

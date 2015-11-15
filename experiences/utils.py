@@ -13,6 +13,13 @@ def get_total_price(experience, guest_number=0, adult_number=0, children_number=
     return total price, not including commission or service fee
     either use guest_number, or adult_number + children_number, the latter has a higher priority
     '''
+    if type(guest_number) != int or guest_number < 0:
+        guest_number = 0
+    if type(adult_number) != int or adult_number < 0:
+        adult_number = 0
+    if type(children_number) != int or children_number < 0:
+        children_number = 0
+
     if adult_number > 0 or children_number > 0:
         guest_number = adult_number
 
