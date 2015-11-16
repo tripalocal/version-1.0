@@ -1767,17 +1767,6 @@ def create_experience(request, id=None):
                     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                         saveExperienceImage(experience, content, extension, index)
 
-                        name = 'experience' + str(experience.id) + '_' + str(index)
-                        if not len(experience.photo_set.filter(name__startswith=name))>0:
-                            photo = Photo(name = filename, directory = 'experiences/' + str(experience.id) + '/',
-                                          image = 'experiences/' + str(experience.id) + '/' + filename, experience = experience)
-                            photo.save()
-                        else:
-                            photo = experience.photo_set.filter(name__startswith=name)[0]
-                            photo.name = filename
-                            photo.image = 'experiences/' + str(experience.id) + '/' + filename
-                            photo.save()
-
             #save host's driver license images
             dirname = settings.MEDIA_ROOT + '/hosts_id/' + str(user.id) + '/'
             if not os.path.isdir(dirname):
@@ -3110,6 +3099,20 @@ def custom_itinerary(request, id=None):
             npi18n = NewProductI18n(product=np, title=item.get('title',""),
                                     description=item.get('details', ""), location=item.get('location', ""))
             npi18n.save()
+            if len(request.FILES) > 0:
+                photo = request.FILES['file']
+                content_type = photo.content_type.split('/')[0]
+                if content_type == "image":
+                    if photo._size > EXPERIENCE_IMAGE_SIZE_LIMIT:
+                        raise forms.ValidationError(_('Image size exceeds the limit'))
+                else:
+                    raise forms.ValidationError(_('File type is not supported'))
+
+                name, extension = os.path.splitext(photo.name)
+                extension = extension.lower()
+                if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
+                    saveExperienceImage(np, photo, extension, 1)
+                
             return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
 
         form = CustomItineraryForm(request.POST)
