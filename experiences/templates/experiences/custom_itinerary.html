@@ -654,27 +654,44 @@
     function add_item(type) {
         var ids = ["title", "location", "price", "details"];
         var value = "";
-        var item = {
-            csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
-            Add: "Add",
-            type: type,
-        };
+        var item = new FormData();
+        item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
+        item.append("Add", "Add");
+        item.append("type", type);
+
         for (var i = 0; i < ids.length; i++) {
             value = $("#" + type + "-" + ids[i]).val();
             if(value)
             {
-                item[ids[i]] = value;
+                item.append([ids[i]], value);
             }
         }
-        if(item.length==3)
+        if(Object.keys(item).length == 3)
         {
             alert("Fill at least one field");
             return;
+        }
+        if($("#"+type+"-photo")[0].files.length > 0)
+        {
+            file = $("#"+type+"-photo")[0].files[0];
+            if(file.size > 2097152)
+            {
+                alert("{% trans "Image size exceeds the limit (2M)" %}");
+                return;
+            }
+            if(file.type.indexOf("image/") < 0)
+            {
+                alert("{% trans "Invalid image type" %}");
+                return;
+            }
+            item.append("file", file);
         }
         $.ajax({
             url: '{{GEO_POSTFIX}}itinerary/',
             type: "POST",
             data: item,
+            processData: false,
+            contentType: false,
             success: function (data) {
                 var title = $("#" + type + "-title").val();
                 var details = $("#" + type + "-details").val();
@@ -682,7 +699,7 @@
                 var price = $("#" + type + "-price").val();
 
                 var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_\"" + data.new_product_id + ">" +
-                                  "<div class=\"exp-img portlet-header\"></div>" +
+                                  "<div class=\"exp-img portlet-header\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
                                   "<div class=\"exp-info portlet-header\">" +
                                     "<h3>" + title + "</h3>" +
                                     "<p>" + details + "</p>";
