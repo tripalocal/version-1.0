@@ -347,9 +347,7 @@ $(function() {
                       $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
                   },
           failure: function(e) {
-                      // Catch exception and display '.alert-warning' for missing fields or '.alert-danger' for any other error
-                      // $(".alert-warning").fadeIn();
-                      // $(".alert-danger").fadeIn();
+                      $(".alert-danger").fadeIn();
                   }
       });
     } else {
