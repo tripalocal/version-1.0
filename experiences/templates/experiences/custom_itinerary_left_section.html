@@ -47,7 +47,9 @@
             <button type="button" class="btn btn-default" id="add-flight-btn">+ Add Flight</button>
             {% for item in flight %}
             <div class="exp-box-sm portlet flight_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img portlet-header"></div>
+                <div class="exp-img portlet-header">
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                </div>
                 <div class="exp-info portlet-header">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
@@ -101,7 +103,9 @@
             <button type="button" id="add-transfer-btn" class="btn btn-default">+ Add Transfer</button>
             {% for item in transfer %}
             <div class="exp-box-sm portlet transfer_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img portlet-header"></div>
+                <div class="exp-img portlet-header">
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                </div>
                 <div class="exp-info portlet-header">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
@@ -152,22 +156,24 @@
 
     <div role="tabpanel" class="tab-pane fade" id="accommodation">
         <div class="column" id="accommodation_column">
-        <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
-        {% for item in accommodation %}
-        <div class="exp-box-sm portlet accommodation_{{item.location}}" id="experience_id_{{item.id}}">
-            <div class="exp-img portlet-header"></div>
-            <div class="exp-info portlet-header">
-                <h3>{{item.title}}</h3>
-                <p>{{item.details}}</p>
-                <p>{{item.location}}</p>
+            <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
+            {% for item in accommodation %}
+            <div class="exp-box-sm portlet accommodation_{{item.location}}" id="experience_id_{{item.id}}">
+                <div class="exp-img portlet-header">
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                </div>
+                <div class="exp-info portlet-header">
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
+                </div>
+                <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>{{item.price}}</h2>
+                    <p>{% trans "per person" %}</p>
+                </div>
             </div>
-            <div class="exp-price portlet-header">
-                <p>$AUD</p>
-                <h2>{{item.price}}</h2>
-                <p>{% trans "per person" %}</p>
-            </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
         </div>
         <div class="new-item-form container-fluid" id="add-accommodation" style="display:none;">
             <div class="row">
@@ -206,22 +212,24 @@
 
     <div role="tabpanel" class="tab-pane fade" id="restaurant">
         <div class="column" id="restaurant_column">
-        <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
-        {% for item in restaurant %}
-        <div class="exp-box-sm portlet restaurant_{{item.location}}" id="experience_id_{{item.id}}">
-            <div class="exp-img portlet-header"></div>
-            <div class="exp-info portlet-header">
-            <h3>{{item.title}}</h3>
-            <p>{{item.details}}</p>
-            <p>{{item.location}}</p>
+            <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
+            {% for item in restaurant %}
+            <div class="exp-box-sm portlet restaurant_{{item.location}}" id="experience_id_{{item.id}}">
+                <div class="exp-img portlet-header">
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                </div>
+                <div class="exp-info portlet-header">
+                <h3>{{item.title}}</h3>
+                <p>{{item.details}}</p>
+                <p>{{item.location}}</p>
+                </div>
+                <div class="exp-price portlet-header">
+                <p>$AUD</p>
+                <h2>{{item.price}}</h2>
+                <p>{% trans "per person" %}</p>
+                </div>
             </div>
-            <div class="exp-price portlet-header">
-            <p>$AUD</p>
-            <h2>{{item.price}}</h2>
-            <p>{% trans "per person" %}</p>
-            </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
         </div>
         <div class="new-item-form container-fluid" id="add-restaurant" style="display:none;">
             <div class="row">
@@ -260,22 +268,24 @@
 
     <div role="tabpanel" class="tab-pane fade" id="suggestion">
         <div class="column" id="suggestion_column">
-        <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
-        {% for item in suggestion %}
-        <div class="exp-box-sm portlet suggestion_{{item.location}}" id="experience_id_{{item.id}}">
-            <div class="exp-img portlet-header"></div>
-            <div class="exp-info portlet-header">
-                <h3>{{item.title}}</h3>
-                <p>{{item.details}}</p>
-                <p>{{item.location}}</p>
+            <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
+            {% for item in suggestion %}
+            <div class="exp-box-sm portlet suggestion_{{item.location}}" id="experience_id_{{item.id}}">
+                <div class="exp-img portlet-header">
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                </div>
+                <div class="exp-info portlet-header">
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
+                </div>
+                <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>{{item.price}}</h2>
+                    <p>{% trans "per person" %}</p>
+                </div>
             </div>
-            <div class="exp-price portlet-header">
-                <p>$AUD</p>
-                <h2>{{item.price}}</h2>
-                <p>{% trans "per person" %}</p>
-            </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
         </div>
         <div class="new-item-form container-fluid" id="add-suggestion" style="display:none;">
             <div class="row">
