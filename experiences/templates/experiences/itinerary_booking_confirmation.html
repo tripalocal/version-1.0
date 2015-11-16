@@ -141,8 +141,8 @@
 {% block scripts %}
 
 <script charset="utf-8" type="text/javascript">
-    legal_local_number = /\+\d{2} \d{9}/;
-    legal_roaming_number = /\+\d{2} \d{11}/;
+    legal_local_number = /\+\d{2} \d{9}$/;
+    legal_roaming_number = /\+\d{2} \d{11}$/;
 
     function checkPaymentForm(preparePayment, e) {
         if ($("#isAgreementSelected").is(':checked'))
