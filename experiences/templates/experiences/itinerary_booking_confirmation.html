@@ -81,12 +81,22 @@
 
                   <div class="form-group" style="display: inline-block; margin-right: 15px;">
                     <h3>{% trans 'Destination mobile number' %}</h3>
-                    <input id="id_local_number" maxlength="15" type="text" class="form-control" value="+61 123456789" onfocus="if (this.value=='+61 123456789') this.value = ''">
+                    <input id="id_local_number" maxlength="15" type="text" class="form-control" value="+61 123456789" style="color:lightgrey;" onfocus="if (this.value=='+61 123456789') this.value = ''; $(this).css('color', '#666');">
                   </div>
 
                   <div class="form-group" style="display: inline-block;">
                     <h3>{% trans 'Roaming mobile number' %}</h3>
-                    <input id="id_roaming_number" maxlength="15" type="text" class="form-control" value="+86 12345678901" onfocus="if (this.value=='+86 12345678901') this.value = ''">
+                    <input id="id_roaming_number" maxlength="15" type="text" class="form-control" value="+86 12345678901" style="color:lightgrey;" onfocus="if (this.value=='+86 12345678901') this.value = ''; $(this).css('color', '#666');">
+                  </div>
+
+                  <div class="warning-sign" id="local_phone_warning" style="display:none;">
+                      <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                      <p>{% trans 'Invalid local number' %}</p>
+                  </div>
+
+                  <div class="warning-sign" id="roaming_phone_warning" style="display:none;">
+                      <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                      <p>{% trans 'Invalid roaming number' %}</p>
                   </div>
 
                   <p>{% trans 'Your host will contact you via this number on the day.' %}</p>
@@ -152,18 +162,29 @@
 
             if(phone1.length >0 && phone1.match(legal_local_number) == null)
             {
+                $("#phone_warning").hide();
+                $("#roaming_phone_warning").hide();
                 e.preventDefault();
                 $("#id_local_number").css("border-color","red");
-                alert("{% trans "Please enter a legal local phone number" %}");
+                $("#local_phone_warning").attr("style","width:180px; display:inline-block;");
                 return;
+            }
+            else
+            {
+                $("#local_phone_warning").hide();
             }
 
             if(phone2.length >0 && phone2.match(legal_roaming_number) == null)
             {
+                $("#phone_warning").hide();
                 e.preventDefault();
                 $("#id_roaming_number").css("border-color","red");
-                alert("{% trans "Please enter a legal roaming phone number" %}");
+                $("#roaming_phone_warning").attr("style","width:200px; margin-left:200px; display:inline-block;");
                 return;
+            }
+            else
+            {
+                $("#roaming_phone_warning").hide();
             }
 
             if(phone1)
@@ -173,10 +194,12 @@
                 {
                     $("#id_phone_number").val(phone1+','+phone2);
                 }
+                $("#phone_warning").hide();
             }
             else if(phone2)
             {
                 $("#id_phone_number").val(','+phone2);
+                $("#phone_warning").hide();
             }
             else
             {
