@@ -127,18 +127,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Promotional popup -->
-    <div class="modal fade" id="promo-popup" tabindex="-1" role="dialog" aria-labelledby="promo-popup">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content promo-popup" style="background-color:transparent;">
-          <img src="{% static 'app/img/1111.png' %}" width="462" height="387">
-          <a class="btn btn-clear" href="{{GEO_POSTFIX}}1111"> </a>
-          <a class="close-popup">{% trans "close" %}</a>
-        </div>
-      </div>
-    </div>
-
     <!-- End Modal -->
 
 
@@ -327,7 +315,7 @@
                 $('#popup-form-details').val('');
                 $('#popup-form-email').val('');
                 $('#results').html("<br><p class='popup-result'>{% trans 'Sent!' %}</p>");
-                $.cookie("closePopupPromo", 3, {path: '/'});
+                $.cookie("closePopup", 3, {path: '/'});
             },
 
             error: function (xhr, errmsg, err) {
@@ -434,23 +422,14 @@
         }
       // END PRODUCT POPUP THINGS */
 
-      var chosenValue = Math.random() < 0.5 ? 0 : 1;
       var popupTimer;
         if ($(window).width() > 520) {
-           var nClose = parseInt($.cookie("closePopupPromo"), 10);
-           if (!nClose || nClose < 6) {
+           var nClose = parseInt($.cookie("closePopup"), 10);
+           if (!nClose || nClose < 3) {
                if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
                    $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
                  popupTimer = setTimeout(function () {
-                     {% if LANGUAGE != "zh-CN" %}
                      $('#help-popup').modal('show');
-                     {% else %}
-                     if (chosenValue == 0) {
-                       $('#help-popup').modal('show');
-                     } else {
-                       $('#promo-popup').modal('show');
-                     }
-                     {% endif %}
                      mixpanel.track("saw popup01");
                  }, 15000); // milliseconds
                }
@@ -461,20 +440,19 @@
            $('.close-popup').click(function () {
                clearTimeout(popupTimer);
                if (nClose) {
-                   $.cookie("closePopupPromo", nClose + 1, {path: '/'});
+                   $.cookie("closePopup", nClose + 1, {path: '/'});
                } else {
-                   $.cookie("closePopupPromo", 1, {path: '/'});
+                   $.cookie("closePopup", 1, {path: '/'});
                }
                $('#help-popup').modal('hide');
-               $('#promo-popup').modal('hide');
                mixpanel.track("closed popup01");
            });
            $('#help-no').click(function () {
                clearTimeout(popupTimer);
                if (nClose) {
-                   $.cookie("closePopupPromo", nClose + 1, {path: '/'});
+                   $.cookie("closePopup", nClose + 1, {path: '/'});
                } else {
-                   $.cookie("closePopupPromo", 1, {path: '/'});
+                   $.cookie("closePopup", 1, {path: '/'});
                }
                $('#help-popup').modal('hide');
                mixpanel.track("selected No from popup01");
