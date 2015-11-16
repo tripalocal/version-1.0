@@ -19,13 +19,13 @@
     <form method="post" action="{{GEO_POSTFIX}}itinerary/{{itinerary_id}}/">
         {% csrf_token %}
         <div class="row">
-          <p>{{ itinerary.days|length }} Day {{ itinerary.guest_number }} Adult Custom Itinerary</p>
-          <p>{% for date, list in itinerary.days.items %}{% if forloop.first %}{{date}}{% endif %} to {% if forloop.last %}{{date}}{% endif %}{% endfor %}</p>
+          <p>{{ itinerary.days|length }} Day {{ guest_number }} Adult Custom Itinerary</p>
+          <p>{{start_date}} to {{end_date}}</p>
         </div>
         <div class="row">
-          More Cool
+          <h1 style="margin:0;">${{price}}</h1>
         </div>
-        <div class="booking-tip">
+        <div class="booking-tip" style="display:none;">
           <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
           <p>{% trans 'Hurry, more than 50&#37; of this tour has been booked within the next 6 months' %}</p>
         </div>
@@ -67,6 +67,9 @@
           </span>
           <p>{{item.title}}</p>
         </div>
+        {% with item.photo_set.all|first as photo %}
+        <div class="item-img"><img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}"></div>
+        {% endwith %}
         <div class="item-description"><p>{{item.description}}</p></div>
       {% endfor %}
     </div>

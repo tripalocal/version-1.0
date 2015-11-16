@@ -81,7 +81,7 @@
       <div class="panel panel-default" id="interests">
         <div class="panel-body">
           <img src="{% static 'experiences/img/heart_large_grey.svg' %}" class="header-icon"><h2>{% trans 'Interests' %}</h2>
-          <p>{% trans 'What kind of things are you interested in? Uncheck the topics that don't interest you.' %}</p>
+          <p>{% trans "What kind of things are you interested in? Uncheck the topics that don't interest you." %}</p>
           <div class="form-box" id="tags_div">
               {{form.tags}}
               {{form.all_tags}}
@@ -90,7 +90,7 @@
       </div>
       <div class="panel panel-default" id="included">
         <div class="panel-body">
-          <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>{% trans 'What's Included' %}</h2>
+          <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>{% trans "What's Included" %}</h2>
           <p>{% trans "We don't currently provide accommodation or car rental." %}</p>
           <div class="checkbox">
             <label>{{form.flights}}{% trans 'Domestic flights at destination' %}</label>
@@ -156,13 +156,13 @@
 </form>
 <!-- Alerts -->
 <div class="alert alert-danger alert-dismissible" role="alert">
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
   <strong>{% trans 'Oops!' %}</strong> {% trans 'There was a problem submitting your request. Please try again shortly.' %}
 </div>
 
-<div class="alert alert-warning alert-dismissible" role="alert">
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  {% trans 'Please fill in all required fields before submitting.' %}
+<div class="alert alert-warning data-dismissible" role="alert">
+  <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  {% trans 'Please fill in all required fields before continuing.' %}
 </div>
 
 {% endblock %}
@@ -232,6 +232,9 @@ $(function() {
           }
       });
   }
+  $("[data-hide]").on("click", function(){
+    $("." + $(this).attr("data-hide")).fadeOut();
+  });
   $("#start-btn").click(function() {
       $('html,body').animate({
           scrollTop: $("#step1").offset().top},
@@ -252,17 +255,25 @@ $(function() {
     $(".progress-bar").fadeOut();
   });
   $("#next-btn1").click(function() {
-    $('html,body').animate({
-        scrollTop: $("#step2").offset().top},
-        'slow');
-    $("#indicator1").removeClass("active animated pulse infinite");
-    $("#indicator2").addClass("active animated pulse infinite");
-    $("#prev-btn2").delay(500).fadeIn("slow");
-    $("#interests").delay(800).fadeIn("slow");
-    $("#included").delay(1100).fadeIn("slow");
-    $("#budget").delay(1400).fadeIn("slow");
-    $("#next-btn2").delay(1700).fadeIn("slow");
-    $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp("slow");
+    if ($("#id_destinations").val() && $("#id_start_date").val() && $("#id_end_date").val() && $("#id_guests_adults").val()) {
+      $('html,body').animate({
+          scrollTop: $("#step2").offset().top},
+          'slow');
+      $("#indicator1").removeClass("active animated pulse infinite");
+      $("#indicator2").addClass("active animated pulse infinite");
+      $("#prev-btn2").delay(500).fadeIn("slow");
+      $("#interests").delay(800).fadeIn("slow");
+      $("#included").delay(1100).fadeIn("slow");
+      $("#budget").delay(1400).fadeIn("slow");
+      $("#next-btn2").delay(1700).fadeIn("slow");
+      $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp("slow");
+      $(".alert-warning").hide();
+      $("#id_destinations").removeAttr('style');
+    } else {
+      $(".alert-warning").fadeIn();
+      $("#id_destinations").css('border-color','red');
+    }
+
   });
   $("#prev-btn2").click(function() {
     $('html,body').animate({
@@ -303,42 +314,65 @@ $(function() {
     $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
   })
   $("#submit-btn").click(function() {
-    $.ajax({
-        url : '{{GEO_POSTFIX}}itinerary/request/',
-        type: "POST",
-        data : {
-                    csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
-                    destinations: $("#id_city").val(),
-                    start_date: $("#id_start_date").val(),
-                    end_date: $("#id_end_date").val(),
-                    guests_adults: $("#id_guests_adults").val(),
-                    guests_children: $("#id_guests_children").val(),
-                    tags: $("#id_tags").val(),
-                    all_tags: $("#id_all_tags").val(),
-                    budget: $("#id_budget").val(),
-                    flights: $("#id_flight").val(),
-                    driver: $("#id_driver").val(),
-                    requirements: $("#id_requirements").val(),
-                    name: $("#id_name").val(),
-                    wechat: $("#id_wechat").val(),
-                    email: $("#id_email").val(),
-                    mobile: $("#id_mobile").val()
-                },
-        success: function(data){
-                    $("#complete").show();
-                    $("#intro").hide();
-                    $(".progress-bar").hide();
-                    $('html,body').animate({
-                        scrollTop: $("body").offset().top},
-                        'slow');
-                    $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
-                },
-        failure: function(e) {
-                    // Catch exception and display '.alert-warning' for missing fields or '.alert-danger' for any other error
-                    // $(".alert-warning").fadeIn();
-                    // $(".alert-danger").fadeIn();
-                }
-    });
+    if ($("#id_name").val() && $("#id_wechat").val() && $("#id_email").val() && $("#id_mobile").val()) {
+      $(".alert-warning").hide();
+      $.ajax({
+          url : '{{GEO_POSTFIX}}itinerary/request/',
+          type: "POST",
+          data : {
+                      csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
+                      destinations: $("#id_destinations").val(),
+                      start_date: $("#id_start_date").val(),
+                      end_date: $("#id_end_date").val(),
+                      guests_adults: $("#id_guests_adults").val(),
+                      guests_children: $("#id_guests_children").val(),
+                      tags: $("#id_tags").val(),
+                      all_tags: $("#id_all_tags").val(),
+                      budget: $("#id_budget").val(),
+                      flights: $("#id_flight").val(),
+                      driver: $("#id_driver").val(),
+                      requirements: $("#id_requirements").val(),
+                      name: $("#id_name").val(),
+                      wechat: $("#id_wechat").val(),
+                      email: $("#id_email").val(),
+                      mobile: $("#id_mobile").val()
+                  },
+          success: function(data){
+                      $("#complete").show();
+                      $("#intro").hide();
+                      $(".progress-bar").hide();
+                      $('html,body').animate({
+                          scrollTop: $("body").offset().top},
+                          'slow');
+                      $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
+                  },
+          failure: function(e) {
+                      $(".alert-danger").fadeIn();
+                  }
+      });
+    } else {
+      $(".alert-warning").fadeIn();
+      if (!$("#id_name").val()) {
+        $("#id_name").css('border-color', 'red');
+      } else {
+        $("#id_name").removeAttr('style');
+      }
+      if (!$("#id_wechat").val()) {
+        $("#id_wechat").css('border-color', 'red');
+      } else {
+        $("#id_wechat").removeAttr('style');
+      }
+      if (!$("#id_email").val()) {
+        $("#id_email").css('border-color', 'red');
+      } else {
+        $("#id_email").removeAttr('style');
+      }
+      if (!$("#id_mobile").val()) {
+        $("#id_mobile").css('border-color', 'red');
+      } else {
+        $("#id_mobile").removeAttr('style');
+      }
+    }
   })
 });
 </script>
