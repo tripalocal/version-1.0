@@ -235,84 +235,91 @@ $(function() {
   $("[data-hide]").on("click", function(){
     $("." + $(this).attr("data-hide")).fadeOut();
   });
-  $("#start-btn").click(function() {
+
+  if ($(window).width() > 864) {
+    $("#start-btn").click(function() {
+        $('html,body').animate({
+            scrollTop: $("#step1").offset().top},
+            'slow');
+        $(".progress-bar").delay(500).fadeIn();
+        $("#indicator1").delay(1000).addClass("active animated pulse infinite");
+        $("#prev-btn1").delay(500).fadeIn("slow");
+        $("#destination").delay(800).fadeIn("slow");
+        $("#date").delay(1100).fadeIn("slow");
+        $("#group").delay(1400).fadeIn("slow");
+        $("#next-btn1").delay(1700).fadeIn("slow");
+    });
+    $("#prev-btn1").click(function() {
+      $('html,body').animate({
+          scrollTop: $("body").offset().top},
+          'slow');
+      $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp();
+      $(".progress-bar").fadeOut();
+    });
+    $("#next-btn1").click(function() {
+      if ($("#id_destinations").val() && $("#id_start_date").val() && $("#id_end_date").val() && $("#id_guests_adults").val()) {
+        $('html,body').animate({
+            scrollTop: $("#step2").offset().top},
+            'slow');
+        $("#indicator1").removeClass("active animated pulse infinite");
+        $("#indicator2").addClass("active animated pulse infinite");
+        $("#prev-btn2").delay(500).fadeIn("slow");
+        $("#interests").delay(800).fadeIn("slow");
+        $("#included").delay(1100).fadeIn("slow");
+        $("#budget").delay(1400).fadeIn("slow");
+        $("#next-btn2").delay(1700).fadeIn("slow");
+        $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp("slow");
+        $(".alert-warning").hide();
+        $("#id_destinations").removeAttr('style');
+      } else {
+        $(".alert-warning").fadeIn();
+        $("#id_destinations").css('border-color','red');
+      }
+
+    });
+    $("#prev-btn2").click(function() {
       $('html,body').animate({
           scrollTop: $("#step1").offset().top},
           'slow');
-      $(".progress-bar").delay(500).fadeIn();
-      $("#indicator1").delay(1000).addClass("active animated pulse infinite");
+      $("#indicator2").removeClass("active animated pulse infinite");
+      $("#indicator1").addClass("active animated pulse infinite");
       $("#prev-btn1").delay(500).fadeIn("slow");
       $("#destination").delay(800).fadeIn("slow");
       $("#date").delay(1100).fadeIn("slow");
       $("#group").delay(1400).fadeIn("slow");
       $("#next-btn1").delay(1700).fadeIn("slow");
-  });
-  $("#prev-btn1").click(function() {
-    $('html,body').animate({
-        scrollTop: $("body").offset().top},
-        'slow');
-    $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp();
-    $(".progress-bar").fadeOut();
-  });
-  $("#next-btn1").click(function() {
-    if ($("#id_destinations").val() && $("#id_start_date").val() && $("#id_end_date").val() && $("#id_guests_adults").val()) {
+      $("#prev-btn2, #interests, #included, #budget, #next-btn2").slideUp("slow");
+    });
+    $("#next-btn2").click(function() {
+      $('html,body').animate({
+          scrollTop: $("#step3").offset().top},
+          'slow');
+      $("#indicator2").removeClass("active animated pulse infinite");
+      $("#indicator3").addClass("active animated pulse infinite");
+      $("#prev-btn3").delay(500).fadeIn("slow");
+      $("#requirements").delay(800).fadeIn("slow");
+      $("#contact").delay(1100).fadeIn("slow");
+      $("#submit-btn").delay(1400).fadeIn("slow");
+      $("#prev-btn2, #interests, #included, #budget, #next-btn2").slideUp("slow");
+    });
+    $("#prev-btn3").click(function() {
       $('html,body').animate({
           scrollTop: $("#step2").offset().top},
           'slow');
-      $("#indicator1").removeClass("active animated pulse infinite");
+      $("#indicator3").removeClass("active animated pulse infinite");
       $("#indicator2").addClass("active animated pulse infinite");
       $("#prev-btn2").delay(500).fadeIn("slow");
       $("#interests").delay(800).fadeIn("slow");
       $("#included").delay(1100).fadeIn("slow");
       $("#budget").delay(1400).fadeIn("slow");
       $("#next-btn2").delay(1700).fadeIn("slow");
-      $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp("slow");
-      $(".alert-warning").hide();
-      $("#id_destinations").removeAttr('style');
-    } else {
-      $(".alert-warning").fadeIn();
-      $("#id_destinations").css('border-color','red');
-    }
+      $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
+    })
+  } else {
+    $(".btn-secondary").hide();
+    $(".full-height").show();
+  }
 
-  });
-  $("#prev-btn2").click(function() {
-    $('html,body').animate({
-        scrollTop: $("#step1").offset().top},
-        'slow');
-    $("#indicator2").removeClass("active animated pulse infinite");
-    $("#indicator1").addClass("active animated pulse infinite");
-    $("#prev-btn1").delay(500).fadeIn("slow");
-    $("#destination").delay(800).fadeIn("slow");
-    $("#date").delay(1100).fadeIn("slow");
-    $("#group").delay(1400).fadeIn("slow");
-    $("#next-btn1").delay(1700).fadeIn("slow");
-    $("#prev-btn2, #interests, #included, #budget, #next-btn2").slideUp("slow");
-  });
-  $("#next-btn2").click(function() {
-    $('html,body').animate({
-        scrollTop: $("#step3").offset().top},
-        'slow');
-    $("#indicator2").removeClass("active animated pulse infinite");
-    $("#indicator3").addClass("active animated pulse infinite");
-    $("#prev-btn3").delay(500).fadeIn("slow");
-    $("#requirements").delay(800).fadeIn("slow");
-    $("#contact").delay(1100).fadeIn("slow");
-    $("#submit-btn").delay(1400).fadeIn("slow");
-    $("#prev-btn2, #interests, #included, #budget, #next-btn2").slideUp("slow");
-  });
-  $("#prev-btn3").click(function() {
-    $('html,body').animate({
-        scrollTop: $("#step2").offset().top},
-        'slow');
-    $("#indicator3").removeClass("active animated pulse infinite");
-    $("#indicator2").addClass("active animated pulse infinite");
-    $("#prev-btn2").delay(500).fadeIn("slow");
-    $("#interests").delay(800).fadeIn("slow");
-    $("#included").delay(1100).fadeIn("slow");
-    $("#budget").delay(1400).fadeIn("slow");
-    $("#next-btn2").delay(1700).fadeIn("slow");
-    $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
-  })
   $("#submit-btn").click(function() {
     if ($("#id_name").val() && $("#id_wechat").val() && $("#id_email").val() && $("#id_mobile").val()) {
       $(".alert-warning").hide();
