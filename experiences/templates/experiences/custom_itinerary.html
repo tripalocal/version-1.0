@@ -686,6 +686,7 @@
             }
             item.append("file", file);
         }
+        $(".loading").show();
         $.ajax({
             url: '{{GEO_POSTFIX}}itinerary/',
             type: "POST",
@@ -719,10 +720,11 @@
                 $("#"+type+"_column").append(new_item);
                 $("#"+type+"_column").fadeIn();
                 $("#add-"+type).hide();
+                $(".loading").hide();
                 init_drag();
             },
             failure: function (e) {
-
+                $(".loading").hide();
             }
         });
     }
