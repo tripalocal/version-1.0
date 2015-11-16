@@ -1,4 +1,4 @@
-﻿import traceback
+﻿import traceback, pytz
 
 from django.http import Http404
 from django.db import models
@@ -65,6 +65,7 @@ class Experience(AbstractExperience):
     guest_number_max = models.IntegerField()
     guest_number_min = models.IntegerField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     currency = models.CharField(max_length=10)
     dynamic_price = models.CharField(max_length=100)
 
@@ -171,6 +172,10 @@ class Experience(AbstractExperience):
 
         return tags
 
+    def get_timezone(self):
+        #TODO
+        return pytz.timezone(settings.TIME_ZONE)
+
 class ExperienceI18n(models.Model):
     title = models.CharField(max_length=100, null=True)
     description = models.TextField(null=True)
@@ -268,6 +273,10 @@ class NewProduct(AbstractExperience):
     def update_commission(self, commission):
         self.commission = commission
         self.save()
+
+    def get_timezone(self):
+        #TODO
+        return pytz.timezone(settings.TIME_ZONE)
 
 class NewProductI18n(models.Model):
     EN = 'en'
@@ -405,6 +414,32 @@ class CustomItinerary(models.Model):
     status = models.CharField(max_length=10, default="draft")
     description = models.TextField(null=True, blank=True)
     note = models.TextField(null=True, blank=True)
+    submitted_datetime = models.DateTimeField(null=True)
+    payment = models.ForeignKey("Payment", null=True, blank=True)
+
+    def get_guest_number(self):
+        guest_number = 0
+        adult_number = 0
+        children_number = 0
+        if self.booking_set.all()[0].adult_number is not None and self.booking_set.all()[0].adult_number > 0:
+            guest_number = self.booking_set.all()[0].adult_number
+            adult_number = guest_number
+            if self.booking_set.all()[0].children_number is not None and self.booking_set.all()[0].children_number > 0:
+                children_number = self.booking_set.all()[0].children_number
+                guest_number += children_number
+        else:
+            guest_number = self.booking_set.all()[0].guest_number
+            adult_number = guest_number
+        return (guest_number, adult_number, children_number)
+
+    def get_length(self):
+        dates = []
+        for item in self.booking_set.all():
+            key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
+            if key not in dates:
+                dates.append(key)
+
+        return len(dates)
 
 class Booking(models.Model):
     user = models.ForeignKey(User)
@@ -497,7 +532,7 @@ class Payment(models.Model):
     zip_code = models.CharField(max_length=4)
     state = models.CharField(max_length=3)
     country = models.CharField(max_length=15)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=50)
  
     # you could also store other information about the sale
     # but I'll leave that to you!

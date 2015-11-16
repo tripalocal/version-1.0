@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-06 17:41+1100\n"
+"POT-Creation-Date: 2015-11-13 11:11+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -446,7 +446,7 @@ msgstr "请填写全部必填项"
 msgid "Invalid email, please"
 msgstr "无效电子邮箱"
 
-#: app/templates/app/layout.html:572
+#: app/templates/app/layout.html:573
 msgid "Please try again later"
 msgstr ""
 
@@ -727,30 +727,34 @@ msgid "Alice Springs"
 msgstr "艾利斯斯普林斯"
 
 #: app/views.py:52
+msgid "Perth"
+msgstr ""
+
+#: app/views.py:53
 msgid "Christchurch"
 msgstr "基督城"
 
-#: app/views.py:52
+#: app/views.py:53
 msgid "Queenstown"
 msgstr "皇后镇"
 
-#: app/views.py:53
+#: app/views.py:54
 msgid "Auckland"
 msgstr "奥克兰"
 
-#: app/views.py:53
+#: app/views.py:54
 msgid "Wellington"
 msgstr "惠灵顿"
 
-#: app/views.py:229
+#: app/views.py:230
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 您的帐户已经成功激活"
 
-#: app/views.py:709
+#: app/views.py:710
 msgid "Image size exceeds the limit"
 msgstr "文件大小超过上限"
 
-#: app/views.py:711
+#: app/views.py:712
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
 

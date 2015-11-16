@@ -2,32 +2,364 @@
 {% load mathfilters %}
 {% load i18n %}
 
-    {%for day in itinerary%}
-    {% if forloop.first %}
-    <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='overflow-x:hidden;overflow-y:scroll;'>
-    {% else %}
-    <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='display:none;'>
-    {% endif %}
-        {% for experience in day.experiences %}
-        {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
-        <div class='exp-box-sm portlet' id='experience_id_{{experience.id}}'>
-            <div class='exp-img portlet-header'>
-                <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
+<script type="text/javascript" src="{% static 'experiences/scripts/custom_itinerary.js' %}"></script>
+
+    <div role="tabpanel" class="tab-pane fade in active" id="experience">
+        <div class="input-group">
+            <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+            <input type="text" class="form-control" id="search-keyword">
+        </div>
+        <div id="experience_column" style='height:100%;'>
+            {%for day in itinerary%}
+            {% if forloop.first %}
+            <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='overflow-x:hidden;overflow-y:scroll;'>
+            {% else %}
+            <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='display:none;'>
+            {% endif %}
+                {% for experience in day.experiences %}
+                {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
+                <div class='exp-box-sm portlet' id='experience_id_{{experience.id}}'>
+                    <div class='exp-img portlet-header'>
+                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
+                    </div>
+                    <div class='exp-info portlet-header'>
+                        <h3>{{experience.title}}</h3>
+                        <p>{{experience.description|escapejs|slice:"0:16"}}</p>
+                        <p>{{experience.duration}} {% trans 'hr(s)' %} &middot; 
+                            {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
+                            {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+                    </div>
+                    <div class='exp-price portlet-header'>
+                        <p>{{experience.dollarsign}}{{experience.currency}}</p>
+                        <h2>{{experience.price}}</h2>
+                        <p>{% trans 'per person' %}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
             </div>
-            <div class='exp-info portlet-header'>
-                <h3>{{experience.title}}</h3>
-                <p>{{experience.description|escapejs|slice:"0:16"}}</p>
-                <p>{{experience.duration}} {% trans 'hr(s)' %} &middot; 
-                    {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
-                    {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div role="tabpanel" class="tab-pane fade" id="flight">
+        <div class="column" id="flight_column">
+            <button type="button" class="btn btn-default" id="add-flight-btn">+ Add Flight</button>
+            {% for item in flight %}
+            <div class="exp-box-sm portlet flight_{{item.location}}" id="experience_id_{{item.id}}">
+                <div class="exp-img portlet-header">
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                </div>
+                <div class="exp-info portlet-header">
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
+                </div>
+                <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>{{item.price}}</h2>
+                    <p>{% trans "per person" %}</p>
+                </div>
             </div>
-            <div class='exp-price portlet-header'>
-                <p>{{experience.dollarsign}}{{experience.currency}}</p>
-                <h2>{{experience.price}}</h2>
-                <p>{% trans 'per person' %}</p>
+            {% endfor %}
+        </div>
+        <div class="new-item-form container-fluid" id="add-flight" style="display:none;">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"><span class="placeholder"><img src="{% static 'icon/plus_green.svg' %}">Add Photos</span></div>
+                        <div style="display:none;">
+                            <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" id="flight-photo"/></span>
+                            <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Title" %}</label>
+                        <input id="flight-title" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Departing Location" %}</label>
+                        <input id="flight-location" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label style="display:block;">{% trans "Price" %}</label>
+                        <input id="flight-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label>{% trans "Details" %}</label>
+                        <input type="text" id="flight-details" class="form-control" style="height: 350px;"></input>
+                    </div>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('flight');">{% trans "Add" %}</button>
+                    <button id="add-flight-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                </div>
             </div>
         </div>
-        {% endif %}
-        {% endfor %}
     </div>
-    {% endfor %}
+
+    <div role="tabpanel" class="tab-pane fade" id="transfer">
+        <div class="column" id="transfer_column">
+            <button type="button" id="add-transfer-btn" class="btn btn-default">+ Add Transfer</button>
+            {% for item in transfer %}
+            <div class="exp-box-sm portlet transfer_{{item.location}}" id="experience_id_{{item.id}}">
+                <div class="exp-img portlet-header">
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                </div>
+                <div class="exp-info portlet-header">
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
+                </div>
+                <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>{{item.price}}</h2>
+                    <p>{% trans "per person" %}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="new-item-form container-fluid" id="add-transfer" style="display:none;">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"><span class="placeholder"><img src="{% static 'icon/plus_green.svg' %}">Add Photos</span></div>
+                        <div style="display:none;">
+                            <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" id="transfer-photo"/></span>
+                            <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Title" %}</label>
+                        <input id="transfer-title" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Departing Location" %}</label>
+                        <input id="transfer-location" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label style="display:block;">{% trans "Price" %}</label>
+                        <input id="transfer-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per trip</span>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label>{% trans "Details" %}</label>
+                        <input id="transfer-details" type="text" class="form-control" style="height: 350px;"></input>
+                    </div>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('transfer');">{% trans "Add" %}</button>
+                    <button id="add-transfer-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div role="tabpanel" class="tab-pane fade" id="accommodation">
+        <div class="column" id="accommodation_column">
+            <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
+            {% for item in accommodation %}
+            <div class="exp-box-sm portlet accommodation_{{item.location}}" id="experience_id_{{item.id}}">
+                <div class="exp-img portlet-header">
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                </div>
+                <div class="exp-info portlet-header">
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
+                </div>
+                <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>{{item.price}}</h2>
+                    <p>{% trans "per person" %}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="new-item-form container-fluid" id="add-accommodation" style="display:none;">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"><span class="placeholder"><img src="{% static 'icon/plus_green.svg' %}">Add Photos</span></div>
+                        <div style="display:none;">
+                            <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" id="accommodation-photo"/></span>
+                            <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Title" %}</label>
+                        <input id="accommodation-title" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Location" %}</label>
+                        <input id="accommodation-location" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label style="display:block;">{% trans "Price" %}</label>
+                        <input id="accommodation-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per night</span>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label>{% trans "Details" %}</label>
+                        <input id="accommodation-details" type="text" class="form-control" style="height: 350px;"></input>
+                    </div>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('accommodation');">{% trans "Add" %}</button>
+                    <button id="add-accommodation-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div role="tabpanel" class="tab-pane fade" id="restaurant">
+        <div class="column" id="restaurant_column">
+            <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
+            {% for item in restaurant %}
+            <div class="exp-box-sm portlet restaurant_{{item.location}}" id="experience_id_{{item.id}}">
+                <div class="exp-img portlet-header">
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                </div>
+                <div class="exp-info portlet-header">
+                <h3>{{item.title}}</h3>
+                <p>{{item.details}}</p>
+                <p>{{item.location}}</p>
+                </div>
+                <div class="exp-price portlet-header">
+                <p>$AUD</p>
+                <h2>{{item.price}}</h2>
+                <p>{% trans "per person" %}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="new-item-form container-fluid" id="add-restaurant" style="display:none;">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"><span class="placeholder"><img src="{% static 'icon/plus_green.svg' %}">Add Photos</span></div>
+                        <div style="display:none;">
+                            <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" id="restaurant-photo"/></span>
+                            <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Title" %}</label>
+                        <input id="restaurant-title" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Location" %}</label>
+                        <input id="restaurant-location" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label style="display:block;">{% trans "Price" %}</label>
+                        <input id="restaurant-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label>{% trans "Details" %}</label>
+                        <input id="restaurant-details" type="text" class="form-control" style="height: 350px;"></input>
+                    </div>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('restaurant');">{% trans "Add" %}</button>
+                    <button id="add-restaurant-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div role="tabpanel" class="tab-pane fade" id="suggestion">
+        <div class="column" id="suggestion_column">
+            <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
+            {% for item in suggestion %}
+            <div class="exp-box-sm portlet suggestion_{{item.location}}" id="experience_id_{{item.id}}">
+                <div class="exp-img portlet-header">
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                </div>
+                <div class="exp-info portlet-header">
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
+                </div>
+                <div class="exp-price portlet-header">
+                    <p>$AUD</p>
+                    <h2>{{item.price}}</h2>
+                    <p>{% trans "per person" %}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="new-item-form container-fluid" id="add-suggestion" style="display:none;">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"><span class="placeholder"><img src="{% static 'icon/plus_green.svg' %}">Add Photos</span></div>
+                        <div style="display:none;">
+                            <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" id="suggestion-photo"/></span>
+                            <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Title" %}</label>
+                        <input id="suggestion-title" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>{% trans "Location" %}</label>
+                        <input id="suggestion-location" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label style="display:block;">{% trans "Price" %}</label>
+                        <input id="suggestion-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label>{% trans "Details" %}</label>
+                        <input id="suggestion-details" type="text" class="form-control" style="height: 350px;"></input>
+                    </div>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('suggestion');">{% trans "Add" %}</button>
+                    <button id="add-suggestion-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div role="tabpanel" class="tab-pane fade" id="pricing">
+        <div class="column" id="pricing_column">
+        <button type="button" id="add-pricing-btn" class="btn btn-default">+ Add Pricing</button>
+        {% for item in pricing %}
+        <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
+            <div class="exp-img portlet-header"></div>
+            <div class="exp-info portlet-header">
+                <h3>{{item.title}}</h3>
+                <p>{{item.details}}</p>
+            </div>
+            <div class="exp-price portlet-header">
+                <p>$AUD</p>
+                <h2>{{item.price}}</h2>
+                <p>{% trans "per person" %}</p>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+        <div class="new-item-form container-fluid" id="add-pricing" style="display:none;">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label>{% trans "Title" %}</label>
+                        <input id="pricing-title" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label style="display:block;">{% trans "Price" %}</label>
+                        <input id="pricing-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD</span>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label>{% trans "Details" %}</label>
+                        <input id="pricing-details" type="text" class="form-control" style="height: 350px;"></input>
+                    </div>
+                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('pricing');">{% trans "Add" %}</button>
+                    <button id="add-pricing-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
