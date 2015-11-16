@@ -413,6 +413,11 @@
                 $(".suggestion_" + cities[i]).hide();
             }
         }
+        var type = ["flight", "transfer", "accommodation", "restaurant", "suggestion"];
+        for(i=0;i<type.length;i++)
+        {
+            $("#"+type[i]+"-location").val(city);
+        }
     }
 
     function add_new_city()
@@ -762,6 +767,17 @@
         $("#price-pp").text(price);
         guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
         $("#price-tt").text(price*guest_number);
+    }
+
+    function set_new_item_location(type)
+    {
+        if($(".collapse.in").length>0)
+        {
+            var id = $(".collapse.in")[0].id.split("-");
+            id = id[id.length-1];
+            var city = $($("#city-title-"+id)[0]).attr("city");
+            $("#"+type+"-location").val(city);
+        }
     }
     </script>
 {% endblock %}

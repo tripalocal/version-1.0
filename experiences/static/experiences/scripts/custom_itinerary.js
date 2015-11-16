@@ -63,6 +63,7 @@ $(document).ready(function() {
   $("#add-flight-btn").click(function() {
     $("#flight_column").hide();
     $("#add-flight").fadeIn();
+    set_new_item_location('flight');
   });
   $("#add-flight-cancel").click(function() {
     $("#flight_column").fadeIn();
@@ -72,6 +73,7 @@ $(document).ready(function() {
   $("#add-transfer-btn").click(function() {
     $("#transfer_column").hide();
     $("#add-transfer").fadeIn();
+    set_new_item_location('transfer');
   });
   $("#add-transfer-cancel").click(function() {
     $("#transfer_column").fadeIn();
@@ -81,6 +83,7 @@ $(document).ready(function() {
   $("#add-accommodation-btn").click(function() {
     $("#accommodation_column").hide();
     $("#add-accommodation").fadeIn();
+    set_new_item_location('accommodation');
   });
   $("#add-accommodation-cancel").click(function() {
     $("#accommodation_column").fadeIn();
@@ -90,6 +93,7 @@ $(document).ready(function() {
   $("#add-restaurant-btn").click(function() {
     $("#restaurant_column").hide();
     $("#add-restaurant").fadeIn();
+    set_new_item_location('restaurant');
   });
   $("#add-restaurant-cancel").click(function() {
     $("#restaurant_column").fadeIn();
@@ -99,6 +103,7 @@ $(document).ready(function() {
   $("#add-suggestion-btn").click(function() {
     $("#suggestion_column").hide();
     $("#add-suggestion").fadeIn();
+    set_new_item_location('suggestion');
   });
   $("#add-suggestion-cancel").click(function() {
     $("#suggestion_column").fadeIn();
