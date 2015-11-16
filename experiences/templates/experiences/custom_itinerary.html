@@ -413,6 +413,11 @@
                 $(".suggestion_" + cities[i]).hide();
             }
         }
+        var type = ["flight", "transfer", "accommodation", "restaurant", "suggestion"];
+        for(i=0;i<type.length;i++)
+        {
+            $("#"+type[i]+"-location").val(city);
+        }
     }
 
     function add_new_city()
@@ -654,35 +659,53 @@
     function add_item(type) {
         var ids = ["title", "location", "price", "details"];
         var value = "";
-        var item = {
-            csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
-            Add: "Add",
-            type: type,
-        };
+        var item = new FormData();
+        item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
+        item.append("Add", "Add");
+        item.append("type", type);
+
         for (var i = 0; i < ids.length; i++) {
             value = $("#" + type + "-" + ids[i]).val();
             if(value)
             {
-                item[ids[i]] = value;
+                item.append([ids[i]], value);
             }
         }
-        if(item.length==3)
+        if(Object.keys(item).length == 3)
         {
             alert("Fill at least one field");
             return;
         }
+        if($("#"+type+"-photo")[0].files.length > 0)
+        {
+            file = $("#"+type+"-photo")[0].files[0];
+            if(file.size > 2097152)
+            {
+                alert("{% trans "Image size exceeds the limit (2M)" %}");
+                return;
+            }
+            if(file.type.indexOf("image/") < 0)
+            {
+                alert("{% trans "Invalid image type" %}");
+                return;
+            }
+            item.append("file", file);
+        }
+        $(".loading").show();
         $.ajax({
             url: '{{GEO_POSTFIX}}itinerary/',
             type: "POST",
             data: item,
+            processData: false,
+            contentType: false,
             success: function (data) {
                 var title = $("#" + type + "-title").val();
                 var details = $("#" + type + "-details").val();
                 var location = $("#" + type + "-location").val();
                 var price = $("#" + type + "-price").val();
 
-                var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_\"" + data.new_product_id + ">" +
-                                  "<div class=\"exp-img portlet-header\"></div>" +
+                var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_" + data.new_product_id + "\">" +
+                                  "<div class=\"exp-img portlet-header\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
                                   "<div class=\"exp-info portlet-header\">" +
                                     "<h3>" + title + "</h3>" +
                                     "<p>" + details + "</p>";
@@ -702,10 +725,11 @@
                 $("#"+type+"_column").append(new_item);
                 $("#"+type+"_column").fadeIn();
                 $("#add-"+type).hide();
+                $(".loading").hide();
                 init_drag();
             },
             failure: function (e) {
-
+                $(".loading").hide();
             }
         });
     }
@@ -743,6 +767,17 @@
         $("#price-pp").text(price);
         guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
         $("#price-tt").text(price*guest_number);
+    }
+
+    function set_new_item_location(type)
+    {
+        if($(".collapse.in").length>0)
+        {
+            var id = $(".collapse.in")[0].id.split("-");
+            id = id[id.length-1];
+            var city = $($("#city-title-"+id)[0]).attr("city");
+            $("#"+type+"-location").val(city);
+        }
     }
     </script>
 {% endblock %}

@@ -9,7 +9,7 @@ class RegisteredUser(models.Model):
     user = models.OneToOneField(User, related_name='registereduser')
     image_url = models.CharField(max_length=200)
     image = models.ImageField(upload_to=upload_path)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=50)
     rate = models.DecimalField(max_digits=2, decimal_places=1)
     wishlist = models.ManyToManyField(Experience, related_name='user_wishlist')
 

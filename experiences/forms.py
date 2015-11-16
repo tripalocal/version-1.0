@@ -589,7 +589,7 @@ class BookingConfirmationForm(forms.Form):
     state = forms.CharField(max_length=10, required = False)
     country = forms.ChoiceField(choices=Country, required = False)
     postcode = forms.CharField(max_length=4, required = False)
-    phone_number = forms.CharField(max_length=15, required=True)
+    phone_number = forms.CharField(max_length=50, required=True)
 
     coupon_extra_information = forms.CharField(max_length=500, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
@@ -613,6 +613,7 @@ class BookingConfirmationForm(forms.Form):
         self.fields['status'].widget = forms.HiddenInput()
         self.fields['coupon_extra_information'].widget = forms.HiddenInput()
         self.fields['custom_currency'].widget = forms.HiddenInput()
+        self.fields['phone_number'].widget = forms.HiddenInput()
 
     def clean(self):
         """
@@ -914,7 +915,7 @@ class ItineraryBookingForm(forms.Form):
     state = forms.CharField(max_length=10, required = False)
     country = forms.ChoiceField(choices=Country, required = False)
     postcode = forms.CharField(max_length=4, required = False)
-    phone_number = forms.CharField(max_length=15, required=False)
+    phone_number = forms.CharField(max_length=50, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
     custom_currency = forms.CharField(max_length=3, required=True)
     price_paid = forms.DecimalField(max_digits=6, decimal_places=2, required=False)
@@ -928,6 +929,7 @@ class ItineraryBookingForm(forms.Form):
         self.fields['booking_extra_information'].widget = forms.HiddenInput()
         self.fields['custom_currency'].widget.attrs['readonly'] = True
         self.fields['custom_currency'].widget = forms.HiddenInput()
+        self.fields['phone_number'].widget = forms.HiddenInput()
 
     def booking(self,ids,dates,times,user,guest_number,
                 card_number=None,exp_month=None,exp_year=None,cvv=None,
@@ -1211,7 +1213,8 @@ def sms_notification(booking, experience, user, phone_number):
         exp_title = experience.get_title(settings.LANGUAGE_CODE)
         return #issue 209
 
-    customer_phone_num = phone_number
+    customer_phone_num = phone_number.split(",")
+    customer_phone_num = customer_phone_num[1] if len(customer_phone_num)>1 and len(customer_phone_num[1])>0 else customer_phone_num[0]
     exp_datetime_local = booking.datetime.astimezone(tzlocal())
     exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y")).format(*'年月日')
     host = get_host(experience)

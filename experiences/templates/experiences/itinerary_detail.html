@@ -20,7 +20,7 @@
         {% csrf_token %}
         <div class="row">
           <p>{{ itinerary.days|length }} Day {{ itinerary.guest_number }} Adult Custom Itinerary</p>
-          <p>{% for date, list in itinerary.days.items %}{% if forloop.first %}{{date}} to {% elif forloop.last %}{{date}}{% endif %}{% endfor %}</p>
+          <p>{% for date, list in itinerary.days.items %}{% if forloop.first %}{{date}}{% endif %} to {% if forloop.last %}{{date}}{% endif %}{% endfor %}</p>
         </div>
         <div class="row">
           More Cool
