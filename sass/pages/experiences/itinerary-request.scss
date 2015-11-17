@@ -7,12 +7,33 @@
 
 body {
   overflow: hidden;
+  @include media('<tablet') {
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
 }
 
 h1 {
   font-family: $font-stack-homepage;
   font-size: 48px;
+  @include media('<tablet') {
+    font-size: 32px;
+  }
 }
+
+h2 {
+  @include media('<tablet') {
+    font-size: 16px;
+  }
+}
+
+.container {
+  padding: 50px 0;
+  @include media('<tablet') {
+    padding: 0;
+  }
+}
+
 .full-height {
   height: 100vh;
   padding-top: 30px;
@@ -21,6 +42,12 @@ h1 {
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
+  @include media('<tablet') {
+    overflow-x: hidden;
+    height: auto;
+    padding: 0;
+  }
+
   .btn {
     min-width: 120px;
     height: 40px;
@@ -32,6 +59,10 @@ h1 {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
+    @include media('<tablet') {
+      position: relative;
+      margin: 20px auto;
+    }
   }
   .btn-top {
     position: absolute;
@@ -52,10 +83,18 @@ h1 {
   text-shadow: 1px 1px 8px black;
   -webkit-animation-delay: 1s; /* Chrome, Safari, Opera */
           animation-delay: 1s;
+  @include media('<tablet') {
+    padding: 15px;
+    transform: none;
+    top: auto;
+  }
 }
 
-.container {
-  padding: 50px 0;
+.center-form {
+  @include media('>=tablet') {
+    width: 400px;
+    padding: 0;
+  }
 }
 
 .panel {
@@ -122,4 +161,15 @@ select {
   min-width: 400px;
   margin: 0 auto;
   display: none;
+  @include media('<tablet') {
+    min-width: 0;
+    width: 100%;
+    right: 0;
+  }
+}
+
+#intro {
+  @include media('<tablet') {
+    margin-bottom: 20px;
+  }
 }

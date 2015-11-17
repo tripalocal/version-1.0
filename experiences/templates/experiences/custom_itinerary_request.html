@@ -44,7 +44,7 @@
         <div class="panel-body">
           <img src="{% static 'experiences/img/calendar.svg' %}" class="header-icon"><h2>{% trans 'Dates' %}</h2>
           <p>{% trans 'Between which dates would you be travelling?' %}</p>
-          <div class="container" style="width:400px; padding:0;">
+          <div class="container center-form">
             <div class="form-group" style="display:inline-block; margin-right:20px; margin-bottom:0;">
               <label>{% trans 'Start date' %}</label>
               {{form.start_date}}
@@ -60,7 +60,7 @@
         <div class="panel-body">
           <img src="{% static 'experiences/img/group.svg' %}" class="header-icon"><h2>{% trans 'Group Size' %}</h2>
           <p>{% trans 'How many adults will be travelling? Any children?' %}</p>
-          <div class="container" style="width:400px; padding:0;">
+          <div class="container center-form">
             <div class="form-group" style="display:inline-block; margin-right:20px; margin-bottom:0;">
               <label>{% trans 'Adults' %}</label>
               {{form.guests_adults}}
@@ -124,7 +124,7 @@
         <div class="panel-body">
           <img src="{% static 'experiences/img/profile.svg' %}" class="header-icon"><h2>{% trans 'Contact Details' %}</h2>
           <p>{% trans 'Almost done! Just leave us your contact details so we can get back to you.' %}</p>
-          <div class="container" style="width:600px; padding:15px">
+          <div class="container center-form">
             <div class="row">
               <div class="col-sm-6">
                 <div class="form-group">
@@ -317,7 +317,9 @@ $(function() {
     })
   } else {
     $(".btn-secondary").hide();
-    $(".full-height").show();
+    $(".progress-bar").hide();
+    $("#start-btn").hide();
+    $(".panel").show();
   }
 
   $("#submit-btn").click(function() {
@@ -351,7 +353,7 @@ $(function() {
                       $('html,body').animate({
                           scrollTop: $("body").offset().top},
                           'slow');
-                      $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
+                      $("#submit-btn").slideUp("slow");
                   },
           failure: function(e) {
                       $(".alert-danger").fadeIn();
