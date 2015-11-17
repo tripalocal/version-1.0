@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-<div id="complete" class="full-height" style="display:none;background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %}">
+<div id="complete" class="full-height" style="display:none;background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %})">
   <div class="container middle animated fadeIn">
     <h1>{% trans 'Your request has been submitted!' %}</h1>
     <h2>{% trans 'A custom itinerary will be sent to you shortly.' %}</h2>
@@ -18,7 +18,7 @@
 </div>
 <form id="itinerary-request" action="" method="post">
   {% csrf_token %}
-  <div id="intro" class="full-height" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %}">
+  <div id="intro" class="full-height" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %})">
     <div class="container middle animated fadeIn">
       <h1>{% trans 'Custom Itinerary' %}</h1>
       <h2>{% trans 'Complete just a few easy steps and we will<br> send you an itinerary tailor made for your trip' %}</h2>
