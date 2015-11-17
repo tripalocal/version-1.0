@@ -1107,6 +1107,12 @@ def get_host(experience):
 
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
     if type(experience) != Experience: #issue 209
+        # only send an email to us
+        mail.send(subject='User ' + str(user.id) + ' has requested experience ' + str(experience.id) + ' , booking id: ' + str(booking.id),
+                  message='',
+                  sender=Aliases.objects.filter(destination__contains=user.email)[0].mail,
+                  recipients = ['enquiries@tripalocal.com'],
+                  priority='now')
         return
 
     host = get_host(experience)
