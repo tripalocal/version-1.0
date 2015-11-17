@@ -3061,23 +3061,18 @@ def custom_itinerary_request(request):
     form = CustomItineraryRequestForm()
 
     if request.method == 'POST':
-        if form.is_valid():
-            data = request.POST
-            email = data.get('email')
-            message = "<h1>Custom itinerary request</h1>";
-            for key, value in data.items:
-                message = message + "<h2>" + key + "</h2>" + "<p>" + value + "</p>"
-            mail.send(
-                'enquiries@tripalocal.com',
-                'enquiries@tripalocal.com',
-                subject="Itinerary request from " + email,
-                html_message=message,
-                priority='now',
-            )
-        else:
-            errors = form.errors
-            return HttpResponse(json.dumps(errors))
-
+        data = request.POST
+        email = data.get('email')
+        message = "<h1>Custom itinerary request</h1>";
+        for key, value in data.items():
+            message = message + "<h2>" + key + "</h2>" + "<p>" + value + "</p>"
+        mail.send(
+            'enquiries@tripalocal.com',
+            'enquiries@tripalocal.com',
+            subject="Itinerary request from " + email,
+            html_message=message,
+            priority='now',
+        )
     return render_to_response('experiences/custom_itinerary_request.html', {'form':form}, context)
 
 def custom_itinerary(request, id=None):
@@ -3114,7 +3109,7 @@ def custom_itinerary(request, id=None):
                 extension = extension.lower()
                 if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                     saveExperienceImage(np, photo, extension, 1)
-                
+
             return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
 
         form = CustomItineraryForm(request.POST)
@@ -3196,7 +3191,7 @@ def custom_itinerary(request, id=None):
                     else:
                         price = experience_fee_calculator(float(experience.price), experience.commission)
                     total_price += price*children_number
-                        
+
                     price = experience_fee_calculator(float(experience.price), experience.commission)
                     total_price += price*adult_number
                     total_price *= 1.15 #*1.15 based on the new requirement
