@@ -822,7 +822,7 @@ class CustomItineraryRequestForm(forms.Form):
         self.fields['all_tags'].widget = forms.HiddenInput()
 
 class CustomItineraryForm(forms.Form):
-    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), max_length=100, required=False, initial="")
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'style':'width:290px;'}), max_length=100, required=False, initial="")
     description = forms.CharField(widget=forms.Textarea, required=False)
     note = forms.CharField(widget=forms.Textarea, required=False)
     start_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
