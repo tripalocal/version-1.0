@@ -822,7 +822,7 @@ class CustomItineraryRequestForm(forms.Form):
         self.fields['all_tags'].widget = forms.HiddenInput()
 
 class CustomItineraryForm(forms.Form):
-    title = forms.CharField(max_length=100, required=False, initial="")
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'style':'width:290px;'}), max_length=100, required=False, initial="")
     description = forms.CharField(widget=forms.Textarea, required=False)
     note = forms.CharField(widget=forms.Textarea, required=False)
     start_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -1107,6 +1107,12 @@ def get_host(experience):
 
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
     if type(experience) != Experience: #issue 209
+        # only send an email to us
+        mail.send(subject='User ' + str(user.id) + ' has requested experience ' + str(experience.id) + ' , booking id: ' + str(booking.id),
+                  message='',
+                  sender=Aliases.objects.filter(destination__contains=user.email)[0].mail,
+                  recipients = ['enquiries@tripalocal.com'],
+                  priority='now')
         return
 
     host = get_host(experience)

@@ -238,7 +238,7 @@ def search_experience(condition, language="zh", type="experience"):
     result = AbstractExperience.objects.filter(id__in=result)
     return result
 
-def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None):
+def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None, currency=None):
     #city/keywords is a string like A,B,C,
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     available_options = []
@@ -329,6 +329,8 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         exp_price = float(experience.price)
         if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
+        if currency is not None and currency != experience.currency:
+            exp_price = convert_currency(exp_price, experience.currency, currency)
 
         photo_url = ''
         photos = experience.photo_set.all()
@@ -2945,7 +2947,7 @@ def get_experience_score(criteria_dict, experience_tags):
         score += criteria_dict.get(tag, 0)
     return score
 
-def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1, age_limit=1, customer=None):
+def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1, age_limit=1, customer=None, currency=None):
     '''
     @sort, 1:most popular, 2:outdoor, 3:urban
     '''
@@ -2965,7 +2967,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
         config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_elderly.yaml').replace('\\', '/')))
         config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_children.yaml').replace('\\', '/')))
 
-    available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords, customer=customer, preference=config)
+    available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords, customer=customer, preference=config, currency=currency)
     itinerary = []
     dt = start_datetime
 
@@ -3059,23 +3061,18 @@ def custom_itinerary_request(request):
     form = CustomItineraryRequestForm()
 
     if request.method == 'POST':
-        if form.is_valid():
-            data = request.POST
-            email = data.get('email')
-            message = "<h1>Custom itinerary request</h1>";
-            for key, value in data.items:
-                message = message + "<h2>" + key + "</h2>" + "<p>" + value + "</p>"
-            mail.send(
-                'enquiries@tripalocal.com',
-                'enquiries@tripalocal.com',
-                subject="Itinerary request from " + email,
-                html_message=message,
-                priority='now',
-            )
-        else:
-            errors = form.errors
-            return HttpResponse(json.dumps(errors))
-
+        data = request.POST
+        email = data.get('email')
+        message = "<h1>Custom itinerary request</h1>";
+        for key, value in data.items():
+            message = message + "<h2>" + key + "</h2>" + "<p>" + value + "</p>"
+        mail.send(
+            sender = 'enquiries@tripalocal.com',
+            recipients = ['enquiries@tripalocal.com'],
+            subject="Itinerary request from " + email,
+            html_message=message,
+            priority='now',
+        )
     return render_to_response('experiences/custom_itinerary_request.html', {'form':form}, context)
 
 def custom_itinerary(request, id=None):
@@ -3112,7 +3109,7 @@ def custom_itinerary(request, id=None):
                 extension = extension.lower()
                 if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                     saveExperienceImage(np, photo, extension, 1)
-                
+
             return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
 
         form = CustomItineraryForm(request.POST)
@@ -3136,7 +3133,10 @@ def custom_itinerary(request, id=None):
                     raise TypeError("Wrong format: keywords. String or list expected.")
 
                 customer = request.user if request.user.is_authenticated() else None
-                itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer)
+                currency = request.session['custom_currency'].lower() if hasattr(request, 'session') and 'custom_currency' in request.session else None
+                #TODO: comment out the following line when currency is ready on the custom itinerary page
+                currency = "aud"
+                itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer, currency)
 
                 #get flight, transfer, ...
                 pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
@@ -3191,7 +3191,7 @@ def custom_itinerary(request, id=None):
                     else:
                         price = experience_fee_calculator(float(experience.price), experience.commission)
                     total_price += price*children_number
-                        
+
                     price = experience_fee_calculator(float(experience.price), experience.commission)
                     total_price += price*adult_number
                     total_price *= 1.15 #*1.15 based on the new requirement

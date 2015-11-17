@@ -23,8 +23,14 @@ body {
   padding-top: 10px;
 }
 
-.basic-search .container {
-  width: 990px;
+.basic-search {
+  .container {
+    width: 990px;
+    padding: 10px;
+  }
+  .row {
+    margin: 0;
+  }
 }
 
 .form-inline {
@@ -104,6 +110,8 @@ body {
   background-color: $pale-grey;
   color: $dark-grey;
   border-color: $light-grey;
+  width: 40px;
+  padding: 10px 5px;
   &:hover {
     background-color: darken($pale-grey, 10%);
   }
@@ -294,4 +302,8 @@ body {
   text-align: center;
   padding: 0 0 10px 0;
   border: 0;
+}
+
+.loading {
+  top: 25%;
 }
