@@ -3083,6 +3083,7 @@ def custom_itinerary(request, id=None):
     context['location'] = Location
     context['location_keys'] = list(dict(Location).keys())
     context['LANGUAGE'] = settings.LANGUAGE_CODE
+    context['guest_num_range'] = range(0,20)
     form = CustomItineraryForm()
     set_initial_currency(request)
 

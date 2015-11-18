@@ -50,7 +50,7 @@
           <button id="add-adults" type="button" class="btn btn-grey"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content='
             <div class="form-goup">
               <select id="guest-num-select" class="form-control">
-                {% for i in "0123456789" %}
+                {% for i in guest_num_range %}
                 {% if forloop.counter == adult_number %}
                 <option value={{forloop.counter}} selected>{{forloop.counter}}</option>
                 {% else %}
