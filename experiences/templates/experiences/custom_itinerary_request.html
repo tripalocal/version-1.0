@@ -168,6 +168,11 @@
   {% trans 'Please fill in all required fields before continuing.' %}
 </div>
 
+<div class="alert alert-info data-dismissible" id="mobile-format-warning" role="alert">
+  <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  {% trans 'Please enter a valid phone number. eg. +61 123456789 or +86 12345678901' %}
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -320,7 +325,9 @@ $(function() {
   }
 
   $("#submit-btn").click(function() {
-    if ($("#id_name").val() && $("#id_wechat").val() && $("#id_email").val() && $("#id_mobile").val()) {
+    var legal_local_number = /\+\d{2} \d{9}$/;
+    var legal_roaming_number = /\+\d{2} \d{11}$/;
+    if ($("#id_name").val() && $("#id_wechat").val() && $("#id_email").val() && ($("#id_mobile").val().match(legal_local_number) || $("#id_mobile").val().match(legal_roaming_number))) {
       $(".alert-warning").hide();
       $("#id_tags").val("");
       for(i=1;$("#tag_"+i).length>0;i++)
@@ -362,6 +369,7 @@ $(function() {
                       mobile: $("#id_mobile").val()
                   },
           success: function(data){
+                      $(".alert").hide();
                       $("#complete").show();
                       $("#intro").hide();
                       $(".progress-bar").hide();
@@ -393,6 +401,9 @@ $(function() {
       }
       if (!$("#id_mobile").val()) {
         $("#id_mobile").css('border-color', 'red');
+      } else if (!$("#id_mobile").val().match(legal_local_number) || $("#id_mobile").val().match(legal_roaming_number)) {
+        $("#id_mobile").css('border-color', 'red');
+        $("#mobile-format-warning").fadeIn();
       } else {
         $("#id_mobile").removeAttr('style');
       }
