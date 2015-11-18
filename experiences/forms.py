@@ -80,7 +80,7 @@ Guest_Number_Child = (('0', 'None'),('1', '1'),('2', '2'),('3', '3'),('4', '4'),
 Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
                     ('11', '11'),('12', '12'),('13', '13'),('14', '14'),('15', '15'),('16', '16'),('17', '17'),('18', '18'),('19', '19'),('20', '20'),)
 
-Budget_Range = (('< AU$ 3000', _('< AU$ 3000')), ('AU$ 3000 - 5000', _('AU$ 3000 - 5000')), ('> AU$ 5000', _('> AU$ 5000')))
+Budget_Range = (('AU$ 3000 - 5000', _('AU$ 3000 - 5000')), ('> AU$ 5000', _('> AU$ 5000')))
 
 Duration = (('1.0', '1 hour'),('1.5', '1.5 hours'),('2.0', '2 hours'),('2.5', '2.5 hours'),('3.0', '3 hours'),('4.0', '4 hours'),('5.0', '5 hours'),('6.0', '6 hours'),('7.0', '7 hours'),('8.0', '8 hours'),('9.0', '9 hours'),('10.0', '10 hours'),
 ('11.0', '11 hours'),('12.0', '12 hours'),('24.0', '1 day'),('48.0', '2 days'),('72.0', '3 days'),('96.0', '4 days'),('120.0', '5 days'),('144.0', '6 days'),('168.0', '7 days'),('192.0', '8 days'),
@@ -805,10 +805,8 @@ class CustomItineraryRequestForm(forms.Form):
     guests_adults = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
     guests_children = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
     tags = forms.CharField(widget=forms.Textarea, required=False, initial=Tags)
-    all_tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
     budget = forms.ChoiceField(choices=Budget_Range, widget=forms.Select(attrs={'class':'form-control'}), required=True)
-    flights = forms.CharField(widget=forms.CheckboxInput, required=False)
-    driver = forms.CharField(widget=forms.CheckboxInput, required=False)
+    whats_included = forms.CharField(widget=forms.TextInput, required=False)
     requirements = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control', 'rows':'5'}), required=False)
     name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
     wechat = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
@@ -816,10 +814,9 @@ class CustomItineraryRequestForm(forms.Form):
     mobile = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
     def __init__(self, *args, **kwargs):
         super(CustomItineraryRequestForm, self).__init__(*args, **kwargs)
-        self.fields['tags'].widget.attrs['readonly'] = True
         self.fields['tags'].widget = forms.HiddenInput()
-        self.fields['all_tags'].widget.attrs['readonly'] = True
-        self.fields['all_tags'].widget = forms.HiddenInput()
+        self.fields['whats_included'].widget = forms.HiddenInput()
+
 
 class CustomItineraryForm(forms.Form):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'style':'width:290px;'}), max_length=100, required=False, initial="")

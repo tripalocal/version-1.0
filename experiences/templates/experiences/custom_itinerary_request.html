@@ -81,10 +81,9 @@
       <div class="panel panel-default" id="interests">
         <div class="panel-body">
           <img src="{% static 'experiences/img/heart_large_grey.svg' %}" class="header-icon"><h2>{% trans 'Interests' %}</h2>
-          <p>{% trans "What kind of things are you interested in? Uncheck the topics that don't interest you." %}</p>
+          <p>{% trans "What kind of things are you interested in? Check the topics that interest you." %}</p>
           <div class="form-box" id="tags_div">
               {{form.tags}}
-              {{form.all_tags}}
           </div>
         </div>
       </div>
@@ -93,10 +92,11 @@
           <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>{% trans "What's Included" %}</h2>
           <p>{% trans "We don't currently provide accommodation or car rental." %}</p>
           <div class="checkbox">
-            <label>{{form.flights}}{% trans 'Domestic flights at destination' %}</label>
+            {{form.whats_included}}
+            <label><input type="checkbox" id="flights" value="Flights">{% trans 'Domestic flights at destination' %}</label>
           </div>
           <div class="checkbox">
-            <label>{{form.driver}}{% trans 'Driver' %}</label>
+            <label><input type="checkbox" id="driver" value="Driver">{% trans 'Driver' %}</label>
           </div>
         </div>
       </div>
@@ -199,18 +199,11 @@ $(function() {
           });
 
   }
-  var all_tags = $("#id_all_tags").val().split(",");
   var tags = $("#id_tags").val().split(",");
-  for(i=0;i<all_tags.length>0;i++)
+  for(i=0;i<tags.length;i++)
   {
-      if($("#id_tags").val().length>0 && tags.length>0 && $.inArray(all_tags[i], tags)<0)
-      {
-          new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-unselected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\">&#10003</button></div>";
-      }
-      else
-      {
-          new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-selected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-selected\">" + all_tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url({% static 'icon/cross_grey.svg' %}\"></button></div>";
-      }
+
+      new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-unselected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url({% static 'icon/plus_grey.svg' %}\"></button></div>";
 
       $("#tags_div").append(new_tag);
 
@@ -218,7 +211,7 @@ $(function() {
           id = e.target.id.split("_")[2];
           if($("#tag_"+id).attr("class") == "tag-selected")
           {
-              $("#tag_button_"+id).css("background-image","url({{ MEDIA_URL }}undo.svg)");
+              $("#tag_button_"+id).css("background-image","url({% static 'icon/plus_grey.svg' %})");
               $("#tag_"+id).attr("class", "tag-non-selected");
               $("#tag_box_"+id).removeClass("tag-box-selected");
               $("#tag_box_"+id).addClass("tag-box-unselected");
@@ -316,6 +309,7 @@ $(function() {
       $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
     })
   } else {
+    $("body").css("overflow-y","scroll");
     $(".btn-secondary").hide();
     $(".progress-bar").hide();
     $("#start-btn").hide();
@@ -325,6 +319,23 @@ $(function() {
   $("#submit-btn").click(function() {
     if ($("#id_name").val() && $("#id_wechat").val() && $("#id_email").val() && $("#id_mobile").val()) {
       $(".alert-warning").hide();
+      $("#id_tags").val("");
+      for(i=1;$("#tag_"+i).length>0;i++)
+      {
+          if($("#tag_"+i).attr("class") == "tag-selected")
+          {
+              $("#id_tags").val($("#id_tags").val() + $("#tag_"+i).text() + ",");
+          }
+      }
+      tags = $("#id_tags").val();
+      tags = tags.substring(0,tags.length-1);
+      $("#id_tags").val(tags);
+      if ($("#flights").is(":checked")) {
+        $("#id_whats_included").val($("#id_whats_included").val() + $("#flights").val() + ",")
+      }
+      if ($("#driver").is(":checked")) {
+        $("#id_whats_included").val($("#id_whats_included").val() + $("#driver").val() + ",")
+      }
       $.ajax({
           url : '{{GEO_POSTFIX}}itinerary/request/',
           type: "POST",
@@ -335,11 +346,9 @@ $(function() {
                       end_date: $("#id_end_date").val(),
                       guests_adults: $("#id_guests_adults").val(),
                       guests_children: $("#id_guests_children").val(),
-                      tags: $("#id_tags").val(),
-                      all_tags: $("#id_all_tags").val(),
+                      interests: tags,
                       budget: $("#id_budget").val(),
-                      flights: $("#id_flight").val(),
-                      driver: $("#id_driver").val(),
+                      whats_included: $("id_whats_included").val(),
                       requirements: $("#id_requirements").val(),
                       name: $("#id_name").val(),
                       wechat: $("#id_wechat").val(),
