@@ -9,7 +9,11 @@
 {% endblock %}
 
 {% block content %}
-
+{% if itinerary.status == "paid" %}
+<div class="paid-banner">
+  <p>{% trans 'You have successfully booked this itinerary!' %}</p>
+</div>
+{% endif %}
 <div class="jumbotron">
   <h1>{{ itinerary.title }}</h1>
 </div>
@@ -22,6 +26,7 @@
           <p>{{ itinerary.days|length }} Day {{ guest_number }} Adult Custom Itinerary</p>
           <p>{{start_date}} to {{end_date}}</p>
         </div>
+        {% if itinerary.status != "draft" and itinerary.status != "paid" %}
         <div class="row">
           <h1 style="margin:0;">${{price}}</h1>
         </div>
@@ -36,6 +41,7 @@
             <input class="btn btn-primary" type="button" value="{%trans "Pay"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}itinerary/{{itinerary_id}}';"/>
             {% endif %}
         </div>
+        {% endif %}
     </form>
   </div>
 
@@ -95,7 +101,9 @@ $(document).ready(function() {
     });
     $("#day1").click();
   }
-
+  {% if itinerary.status == "paid" %}
+  $(".paid-banner").delay(10000).slideUp();
+  {% endif %}
   $("#pay").click(function(e){
 
   });

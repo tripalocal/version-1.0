@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-13 11:11+1100\n"
+"POT-Creation-Date: 2015-11-18 17:32+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,12 +56,12 @@ msgid "Contact Tripalocal"
 msgstr "联系本土客"
 
 #: app/templates/app/aboutus.html:16 app/templates/app/contactus.html:15
-#: app/templates/app/layout.html:274
+#: app/templates/app/layout.html:239
 msgid "Terms of Service"
 msgstr "服务条款"
 
 #: app/templates/app/aboutus.html:17 app/templates/app/contactus.html:16
-#: app/templates/app/layout.html:275
+#: app/templates/app/layout.html:240
 msgid "Privacy Policy"
 msgstr "隐私政策"
 
@@ -166,7 +166,7 @@ msgid " to get notified when we launch in more countries."
 msgstr "第一时间了解新增城市请"
 
 #: app/templates/app/index.html:52 app/templates/app/index.html.py:54
-#: app/templates/app/layout.html:203 app/templates/app/layout.html.py:239
+#: app/templates/app/layout.html:168 app/templates/app/layout.html.py:204
 #: app/templates/app/loginpartial.html:60
 msgid "Sign up"
 msgstr "注册"
@@ -239,214 +239,167 @@ msgstr "到达日期"
 msgid " To "
 msgstr "离开日期"
 
-#: app/templates/app/layout.html:53 app/templates/app/layout.html.py:100
-#: app/templates/app/layout.html:125 app/templates/app/layout.html.py:137
-msgid "close"
-msgstr "关闭"
-
-#: app/templates/app/layout.html:55
-msgid "Edwin"
-msgstr "本土君"
-
-#: app/templates/app/layout.html:56
-msgid "Travel Expert"
-msgstr "旅游专家"
-
-#: app/templates/app/layout.html:62
-msgid "Check it out"
-msgstr "去看看！"
-
-#: app/templates/app/layout.html:75
+#: app/templates/app/layout.html:52
 msgid "Do you need help planning your trip to Australia and New Zealand?"
 msgstr "需要澳大利亚和新西兰的订制吗?"
 
-#: app/templates/app/layout.html:81
+#: app/templates/app/layout.html:58
 msgid "NO"
 msgstr "暂不需要"
 
-#: app/templates/app/layout.html:84
+#: app/templates/app/layout.html:61
 msgid "YES"
 msgstr "需要"
 
-#: app/templates/app/layout.html:90 app/templates/app/layout.html.py:106
+#: app/templates/app/layout.html:67 app/templates/app/layout.html.py:83
 msgid "or check out some of our "
 msgstr "或者浏览"
 
-#: app/templates/app/layout.html:96 app/templates/app/layout.html.py:112
+#: app/templates/app/layout.html:73 app/templates/app/layout.html.py:89
 msgid "most popular trips"
 msgstr "最热门路线"
 
-#: app/templates/app/layout.html:103
+#: app/templates/app/layout.html:77 app/templates/app/layout.html.py:102
+msgid "close"
+msgstr "关闭"
+
+#: app/templates/app/layout.html:80
 msgid "Tell us about your trip"
 msgstr "请告诉我们您的需求"
 
-#: app/templates/app/layout.html:105
+#: app/templates/app/layout.html:82
 msgid "and we will get back to you within 48 hours"
 msgstr "我们会在48小时内给您答复"
 
-#: app/templates/app/layout.html:117
+#: app/templates/app/layout.html:94
 msgid "Please tell us more details"
 msgstr "请告诉我们您的行程计划"
 
-#: app/templates/app/layout.html:120
+#: app/templates/app/layout.html:97
 msgid "Email address"
 msgstr "电子邮箱"
 
-#: app/templates/app/layout.html:123
+#: app/templates/app/layout.html:100
 msgid "Send"
 msgstr "发送"
 
-#: app/templates/app/layout.html:186 app/templates/app/loginpartial.html:38
+#: app/templates/app/layout.html:151 app/templates/app/loginpartial.html:38
 #: app/templates/app/mylisting.html:6 app/templates/app/mylisting.html:15
 #: app/templates/app/myprofile.html:15 app/templates/app/myreservation.html:15
 #: app/templates/app/mytrip.html:15
 msgid "My Listing"
 msgstr "我的体验"
 
-#: app/templates/app/layout.html:187 app/templates/app/loginpartial.html:39
+#: app/templates/app/layout.html:152 app/templates/app/loginpartial.html:39
 #: app/templates/app/myreservation.html:6
 msgid "My Reservations"
 msgstr "体验预约记录"
 
-#: app/templates/app/layout.html:189
+#: app/templates/app/layout.html:154
 msgid "My Trips"
 msgstr "我的预订"
 
-#: app/templates/app/layout.html:191 app/templates/app/loginpartial.html:50
+#: app/templates/app/layout.html:156 app/templates/app/loginpartial.html:50
 msgid "Edit Profile"
 msgstr "编辑个人信息"
 
-#: app/templates/app/layout.html:192 app/templates/app/loginpartial.html:51
+#: app/templates/app/layout.html:157 app/templates/app/loginpartial.html:51
 msgid "Account Settings"
 msgstr "账户设置"
 
-#: app/templates/app/layout.html:193 app/templates/app/layout.html.py:237
+#: app/templates/app/layout.html:158 app/templates/app/layout.html.py:202
 msgid "Logout"
 msgstr "退出"
 
-#: app/templates/app/layout.html:200 app/templates/app/layout.html.py:240
+#: app/templates/app/layout.html:165 app/templates/app/layout.html.py:205
 msgid "Login"
 msgstr "登录"
 
-#: app/templates/app/layout.html:208 app/templates/app/layout.html.py:233
+#: app/templates/app/layout.html:173 app/templates/app/layout.html.py:198
 msgid "Local Experiences"
 msgstr "特色体验"
 
-#: app/templates/app/layout.html:209 app/templates/app/layout.html.py:232
+#: app/templates/app/layout.html:174 app/templates/app/layout.html.py:197
 msgid "Travel with Locals"
 msgstr "旅游达人"
 
-#: app/templates/app/layout.html:210 app/templates/app/layout.html.py:234
+#: app/templates/app/layout.html:175 app/templates/app/layout.html.py:199
 msgid "Itineraries"
 msgstr "精品路线"
 
-#: app/templates/app/layout.html:231
+#: app/templates/app/layout.html:196
 msgid "Homepage"
 msgstr "主页"
 
-#: app/templates/app/layout.html:260
+#: app/templates/app/layout.html:225
 msgid "CNY"
 msgstr "人民币"
 
-#: app/templates/app/layout.html:261
+#: app/templates/app/layout.html:226
 msgid "AUD"
 msgstr "澳元"
 
-#: app/templates/app/layout.html:262
+#: app/templates/app/layout.html:227
 msgid "NZD"
 msgstr "新西兰元"
 
-#: app/templates/app/layout.html:271
+#: app/templates/app/layout.html:236
 msgid "Company"
 msgstr "公司"
 
-#: app/templates/app/layout.html:272
+#: app/templates/app/layout.html:237
 msgid "About Us"
 msgstr "关于我们"
 
-#: app/templates/app/layout.html:273
+#: app/templates/app/layout.html:238
 msgid "Contact Us"
 msgstr "联系我们"
 
-#: app/templates/app/layout.html:281
+#: app/templates/app/layout.html:246
 msgid "Travel"
 msgstr "旅行"
 
-#: app/templates/app/layout.html:282
+#: app/templates/app/layout.html:247
 msgid "Refund Policy"
 msgstr "退款政策"
 
-#: app/templates/app/layout.html:288
+#: app/templates/app/layout.html:253
 msgid "Social"
 msgstr "社交"
 
-#: app/templates/app/layout.html:289
+#: app/templates/app/layout.html:254
 msgid "Facebook"
 msgstr ""
 
-#: app/templates/app/layout.html:290
+#: app/templates/app/layout.html:255
 msgid "Twitter"
 msgstr ""
 
-#: app/templates/app/layout.html:303
+#: app/templates/app/layout.html:268
 msgid "Scan for wechat"
 msgstr "扫一扫微信客服"
 
-#: app/templates/app/layout.html:329
+#: app/templates/app/layout.html:294
 msgid "Sent!"
 msgstr "发送成功"
 
-#: app/templates/app/layout.html:334
+#: app/templates/app/layout.html:299
 msgid "Error sending, please"
 msgstr "发送失败，请重试"
 
-#: app/templates/app/layout.html:334 app/templates/app/layout.html.py:504
+#: app/templates/app/layout.html:299 app/templates/app/layout.html.py:381
 msgid "try again"
 msgstr "请重试"
 
-#: app/templates/app/layout.html:362
-msgid ""
-"Do you want to experience fine dining with the best view in the Southern "
-"Hemisphere? Try Skylines Stratosphere Bar & Restaurant in Queenstown, New "
-"Zealand."
-msgstr ""
-"想看看南半球最佳景致餐厅是怎么样的吗？就一定不能错过新西兰在天际缆车顶端天际"
-"缆车餐厅"
-
-#: app/templates/app/layout.html:363
-msgid ""
-"Its perfect weather to relax in nature from now until March, why not go "
-"camping?"
-msgstr ""
-"从现在起到明年三月，澳洲的天气是最适合在大自然放松的。为什么不去野营呢？"
-
-#: app/templates/app/layout.html:364
-msgid ""
-"An unforgettable thrill awaits you! Feel the power and excitement of the "
-"iconic Harley Davidson."
-msgstr "坐上哈雷戴维森摩托车骑行，在墨尔本公路享受不一样的速度与激情。"
-
-#: app/templates/app/layout.html:372
-msgid "Skylines Stratosphere Restaurant & Bar"
-msgstr "天际缆车餐厅"
-
 #: app/templates/app/layout.html:373
-msgid "2 day camping at Mornington Peninsula Island"
-msgstr "莫宁顿半岛环岛2天1夜野营之旅"
-
-#: app/templates/app/layout.html:374
-msgid "Harley Davidson motorcycle"
-msgstr "哈雷戴维森摩托骑行游览墨尔本市区"
-
-#: app/templates/app/layout.html:496
 msgid "Please fill in all fields."
 msgstr "请填写全部必填项"
 
-#: app/templates/app/layout.html:504
+#: app/templates/app/layout.html:381
 msgid "Invalid email, please"
 msgstr "无效电子邮箱"
 
-#: app/templates/app/layout.html:573
+#: app/templates/app/layout.html:450
 msgid "Please try again later"
 msgstr ""
 
@@ -757,6 +710,43 @@ msgstr "文件大小超过上限"
 #: app/views.py:712
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
+
+#~ msgid "Edwin"
+#~ msgstr "本土君"
+
+#~ msgid "Travel Expert"
+#~ msgstr "旅游专家"
+
+#~ msgid "Check it out"
+#~ msgstr "去看看！"
+
+#~ msgid ""
+#~ "Do you want to experience fine dining with the best view in the Southern "
+#~ "Hemisphere? Try Skylines Stratosphere Bar & Restaurant in Queenstown, New "
+#~ "Zealand."
+#~ msgstr ""
+#~ "想看看南半球最佳景致餐厅是怎么样的吗？就一定不能错过新西兰在天际缆车顶端天"
+#~ "际缆车餐厅"
+
+#~ msgid ""
+#~ "Its perfect weather to relax in nature from now until March, why not go "
+#~ "camping?"
+#~ msgstr ""
+#~ "从现在起到明年三月，澳洲的天气是最适合在大自然放松的。为什么不去野营呢？"
+
+#~ msgid ""
+#~ "An unforgettable thrill awaits you! Feel the power and excitement of the "
+#~ "iconic Harley Davidson."
+#~ msgstr "坐上哈雷戴维森摩托车骑行，在墨尔本公路享受不一样的速度与激情。"
+
+#~ msgid "Skylines Stratosphere Restaurant & Bar"
+#~ msgstr "天际缆车餐厅"
+
+#~ msgid "2 day camping at Mornington Peninsula Island"
+#~ msgstr "莫宁顿半岛环岛2天1夜野营之旅"
+
+#~ msgid "Harley Davidson motorcycle"
+#~ msgstr "哈雷戴维森摩托骑行游览墨尔本市区"
 
 #~ msgid "Hopeless<br>Romance"
 #~ msgstr "蜜月游"
