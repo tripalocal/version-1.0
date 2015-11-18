@@ -90,10 +90,13 @@
       <div class="panel panel-default" id="included">
         <div class="panel-body">
           <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>{% trans "What's Included" %}</h2>
-          <p>{% trans "We don't currently provide accommodation or car rental." %}</p>
+          <p>{% trans "We don't currently provide car rental." %}</p>
           <div class="checkbox">
             {{form.whats_included}}
             <label><input type="checkbox" id="flights" value="Flights">{% trans 'Domestic flights at destination' %}</label>
+          </div>
+          <div class="checkbox">
+            <label><input type="checkbox" id="accommodation" value="Accommodation">{% trans 'Accommodation' %}</label>
           </div>
           <div class="checkbox">
             <label><input type="checkbox" id="driver" value="Driver">{% trans 'Driver' %}</label>
@@ -332,6 +335,9 @@ $(function() {
       $("#id_tags").val(tags);
       if ($("#flights").is(":checked")) {
         $("#id_whats_included").val($("#id_whats_included").val() + $("#flights").val() + ",")
+      }
+      if ($("#accommodation").is(":checked")) {
+        $("#id_whats_included").val($("#id_whats_included").val() + $("#accommodation").val() + ",")
       }
       if ($("#driver").is(":checked")) {
         $("#id_whats_included").val($("#id_whats_included").val() + $("#driver").val() + ",")
