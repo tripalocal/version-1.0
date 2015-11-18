@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-18 14:58+1100\n"
+"POT-Creation-Date: 2015-11-18 17:32+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -277,6 +277,10 @@ msgstr "有小孩"
 #: experiences/forms.py:799
 msgid "Famili with elderly&children"
 msgstr "有老人和小孩"
+
+#: experiences/forms.py:802
+msgid "Eg. Melbourne, Sydney, Brisbane..."
+msgstr "例如：墨尔本、悉尼、布里斯本 ..."
 
 #: experiences/forms.py:855 experiences/forms.py:1232
 #: experiences/forms.py:1236 experiences/resource.py:1384
@@ -1284,7 +1288,7 @@ msgid "Guests"
 msgstr "人数"
 
 #: experiences/templates/experiences/experience_detail.html:198
-#: experiences/templates/experiences/itinerary_detail.html:30
+#: experiences/templates/experiences/itinerary_detail.html:35
 msgid ""
 "Hurry, more than 50&#37; of this tour has been booked within the next 6 "
 "months"
@@ -1456,8 +1460,12 @@ msgstr "每人"
 msgid "Itinerary Confirmed"
 msgstr "行程预订成功"
 
-#: experiences/templates/experiences/itinerary_detail.html:34
-#: experiences/templates/experiences/itinerary_detail.html:36
+#: experiences/templates/experiences/itinerary_detail.html:14
+msgid "You have successfully booked this itinerary!"
+msgstr ""
+
+#: experiences/templates/experiences/itinerary_detail.html:39
+#: experiences/templates/experiences/itinerary_detail.html:41
 msgid "Pay"
 msgstr "付款"
 
@@ -1747,12 +1755,12 @@ msgstr ""
 
 #: experiences/views.py:1384 experiences/views.py:1762
 #: experiences/views.py:1784 experiences/views.py:2450
-#: experiences/views.py:3104
+#: experiences/views.py:3105
 msgid "Image size exceeds the limit"
 msgstr "图片大小超过上限"
 
 #: experiences/views.py:1386 experiences/views.py:1764
-#: experiences/views.py:1786 experiences/views.py:3106
+#: experiences/views.py:1786 experiences/views.py:3107
 msgid "File type is not supported"
 msgstr "不支持的文件类型"
 

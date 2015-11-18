@@ -799,7 +799,7 @@ SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
 AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children')),(4,_('Famili with elderly&children')))
 
 class CustomItineraryRequestForm(forms.Form):
-    destinations = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Eg. Melbourne, Sydney, Brisbane...'}))
+    destinations = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':_('Eg. Melbourne, Sydney, Brisbane...')}))
     start_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
     end_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
     guests_adults = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
