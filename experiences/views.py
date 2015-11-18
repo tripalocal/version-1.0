@@ -3412,7 +3412,7 @@ def itinerary_booking_confirmation(request):
                 request.user.registereduser.phone_number = form.cleaned_data['phone_number']
                 request.user.registereduser.save()
 
-                return itinerary_booking_successful(request)
+                return itinerary_booking_successful(request, str(form.cleaned_data["itinerary_id"]))
             else:
                 #this should not happen, because all required fields were already set
                 return render_to_response('experiences/itinerary_booking_confirmation.html', {'form': form,
@@ -3433,7 +3433,7 @@ def itinerary_booking_confirmation(request):
                     return HttpResponse(response)
                 else:
                     #free
-                    return itinerary_booking_successful(request)
+                    return itinerary_booking_successful(request, str(form.cleaned_data["itinerary_id"]))
 
             else:
                 #this should not happen, because all required fields were already set
@@ -3471,7 +3471,7 @@ def itinerary_booking_confirmation(request):
                         return HttpResponse('<html><body>WeChat Payment Error.</body></html>')
                 else:
                     #free
-                    return itinerary_booking_successful(request)
+                    return itinerary_booking_successful(request, str(form.cleaned_data["itinerary_id"]))
 
             else:
                 #this should not happen, because all required fields were already set
@@ -3523,11 +3523,11 @@ def set_response_exp_includes_detail_other_lang(data, includes):
             data['included_ticket_detail_other'] = includes[index].details
 
 #TODO: add the template
-def itinerary_booking_successful(request):
+def itinerary_booking_successful(request, itinerary_id):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
 
-    return render(request,'experiences/itinerary_booking_successful.html',{})
+    return itinerary_detail(request,itinerary_id)
 
 def nov_promo(request):
     set_initial_currency(request)
