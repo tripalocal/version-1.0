@@ -202,12 +202,16 @@ body {
     margin: 0;
     font-size: 14px;
     font-weight: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   p {
     font-size: 12px;
     margin-top: 5px;
     margin-bottom: 0;
     color: $dark-grey;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
