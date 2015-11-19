@@ -674,7 +674,7 @@
             alert("Fill at least one field");
             return;
         }
-        if($("#"+type+"-photo")[0].files.length > 0)
+        if($("#"+type+"-photo")[0] && $("#"+type+"-photo")[0].files.length > 0)
         {
             file = $("#"+type+"-photo")[0].files[0];
             if(file.size > 2097152)
