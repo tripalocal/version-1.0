@@ -3095,7 +3095,9 @@ def custom_itinerary(request, id=None):
             #add a new item
             item = request.POST
             np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency=request.session["custom_currency"].lower(), type=item['type'].title(),
-                            city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted")
+                            city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted",
+                            start_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)),
+                            end_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)) + timedelta(weeks=520))
             np.save()
             npi18n = NewProductI18n(product=np, title=item.get('title',""),
                                     description=item.get('details', ""), location=item.get('location', ""))
