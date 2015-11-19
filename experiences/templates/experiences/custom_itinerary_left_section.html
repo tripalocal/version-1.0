@@ -23,7 +23,7 @@
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
                     </div>
                     <div class='exp-info portlet-header'>
-                        <h3>{{experience.title}}</h3>
+                        <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}" target="_blank" style="color:#333;">{{experience.title}}</a></h3>
                         <p>{{experience.description|escapejs|slice:"0:16"}}</p>
                         <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
@@ -56,7 +56,7 @@
                     <p>{{item.location}}</p>
                 </div>
                 <div class="exp-price portlet-header">
-                    <p>$AUD</p>
+                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                 </div>
@@ -83,7 +83,7 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="flight-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                        <input id="flight-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}/pp</span>
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -112,7 +112,7 @@
                     <p>{{item.location}}</p>
                 </div>
                 <div class="exp-price portlet-header">
-                    <p>$AUD</p>
+                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                 </div>
@@ -139,7 +139,7 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="transfer-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per trip</span>
+                        <input id="transfer-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}/per trip</span>
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -168,7 +168,7 @@
                     <p>{{item.location}}</p>
                 </div>
                 <div class="exp-price portlet-header">
-                    <p>$AUD</p>
+                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                 </div>
@@ -195,7 +195,7 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="accommodation-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per night</span>
+                        <input id="accommodation-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}/per night</span>
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -224,7 +224,7 @@
                 <p>{{item.location}}</p>
                 </div>
                 <div class="exp-price portlet-header">
-                <p>$AUD</p>
+                <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                 <h2>{{item.price}}</h2>
                 <p>{% trans "per person" %}</p>
                 </div>
@@ -251,7 +251,7 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="restaurant-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                        <input id="restaurant-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}/pp</span>
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -280,7 +280,7 @@
                     <p>{{item.location}}</p>
                 </div>
                 <div class="exp-price portlet-header">
-                    <p>$AUD</p>
+                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                 </div>
@@ -307,7 +307,7 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="suggestion-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
+                        <input id="suggestion-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}/pp</span>
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -333,7 +333,7 @@
                 <p>{{item.details}}</p>
             </div>
             <div class="exp-price portlet-header">
-                <p>$AUD</p>
+                <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                 <h2>{{item.price}}</h2>
                 <p>{% trans "per person" %}</p>
             </div>
@@ -349,7 +349,7 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="pricing-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD</span>
+                        <input id="pricing-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}</span>
                     </div>
                 </div>
                 <div class="col-xs-6">

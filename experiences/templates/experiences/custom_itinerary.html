@@ -147,7 +147,7 @@
         <!-- Right section -->
         <div id="right_section" class="section" style="overflow:scroll; height:72vh;">
           <h1 class="section-heading">Itinerary</h1>
-          <h2 class="price-line">$AUD <label id="price-pp">0</label> {% trans "per person (Total of "%}$AUD <label id="price-tt">0</label>)</h2>
+          <h2 class="price-line">{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-pp">0</label> {% trans "per person (Total of "%}{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-tt">0</label>)</h2>
           {% for city, dict in existing_itinerary.items %}
             <div id="city-title-{{forloop.counter0}}" class="section-box-add" onclick="$('.collapse').collapse('hide'); $('#city-collapse-{{forloop.counter0}}').collapse('show');update_left_section('{{city}}');" city="{{city}}">
               <span class="add-sign">+</span>
@@ -715,7 +715,7 @@
                 new_item +=
                                   "</div>" +
                                   "<div class=\"exp-price portlet-header\">" +
-                                    "<p>$AUD</p>" +
+                                    "<p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>" +
                                     "<h2>" + price + "</h2>" +
                                     "<p>{% trans 'per person' %}</p>" +
                                   "</div>" +

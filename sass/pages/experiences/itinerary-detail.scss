@@ -11,6 +11,10 @@
   '../../utils/functions',
   '../../utils/placeholders';
 
+body {
+  position: relative;
+}
+
 .jumbotron {
   color: white;
   h1 {
@@ -27,7 +31,10 @@
 .container {
   padding-top: 30px;
   padding-bottom: 30px;
-  min-height: 50vh;
+}
+
+.affix {
+  top: 30px;
 }
 
 .booking-box {
@@ -49,6 +56,13 @@
   }
 }
 
+.top-aligned-text {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 5px;
+  line-height: 20px;
+}
+
 .booking-tip {
   margin-bottom: 10px;
   color: $pink;
@@ -56,42 +70,40 @@
 
 .detail-box {
   color: $dark-grey;
-  overflow: hidden;
+  float: right;
+  width: 550px;
+  @include media('<desktop') {
+    width: 500px;
+  }
   @include media('<tablet') {
     display: block;
+    float: none;
     width: 100%;
   }
 }
 
 .timeline {
   padding: 0;
-  float: left;
-  width: 30px;
+  float:left;
   margin-right: 15px;
   border-right: 1px solid $light-grey;
   @include media('<tablet') {
     display:none;
   }
+
   .day-nav {
-    margin-bottom: 5px;
-    cursor: pointer;
+    color: $dark-grey;
   }
 
-  .day-nav.active {
+  li.active {
     color: $primary-color;
     border-right: 3px solid $primary-color;
   }
-
 }
 
 .day-list {
-  display: none;
   overflow: hidden;
-  @include media('<tablet') {
-    display: block;
-    overflow: auto;
-    margin-bottom: 20px;
-  }
+  margin-bottom: 20px;
 }
 
 .day-heading {
