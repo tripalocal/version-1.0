@@ -37,6 +37,10 @@ body {
   top: 30px;
 }
 
+.affix-bottom {
+  position: absolute;
+}
+
 .booking-box {
   margin-right: 30px;
   @include media('<tablet') {
@@ -99,6 +103,10 @@ body {
     color: $primary-color;
     border-right: 3px solid $primary-color;
   }
+}
+
+.nav>li>a {
+  padding: 5px 15px;
 }
 
 .day-list {

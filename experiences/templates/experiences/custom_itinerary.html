@@ -702,6 +702,12 @@
                 var location = $("#" + type + "-location").val();
                 var price = $("#" + type + "-price").val();
 
+                // For certain items, we calculate for group rather than per guest
+                var guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
+                if (type == 'transfer' || type == 'suggestion' || type == 'accommodation') {
+                  price = (parseFloat(price) / guest_number);
+                }
+
                 var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_" + data.new_product_id + "\">" +
                                   "<div class=\"exp-img portlet-header\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
                                   "<div class=\"exp-info portlet-header\">" +
