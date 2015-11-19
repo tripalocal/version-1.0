@@ -3272,7 +3272,7 @@ def custom_itinerary(request, id=None):
         context["children_number"] = 0
         if id is not None:
             existing_ci = CustomItinerary.objects.get(id=id)
-            itinerary = {}
+            itinerary = OrderedDict()
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow())
             for bking in existing_ci.booking_set.order_by('datetime').all():
@@ -3307,9 +3307,9 @@ def custom_itinerary(request, id=None):
                 key = bking.datetime.astimezone(bking.experience.get_timezone()).strftime("%Y-%m-%d")
 
                 if bking.experience.city not in itinerary:
-                    itinerary.update({bking.experience.city:{}})
+                    itinerary[bking.experience.city] = OrderedDict()
                 if key not in itinerary[bking.experience.city]:
-                    itinerary[bking.experience.city].update({key:[]})
+                    itinerary[bking.experience.city][key] = []
                 itinerary[bking.experience.city][key].append(bking.experience)
 
             context['existing_itinerary'] = itinerary
