@@ -307,7 +307,7 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="suggestion-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}/pp</span>
+                        <input id="suggestion-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}</span>
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -324,22 +324,21 @@
 
     <div role="tabpanel" class="tab-pane fade" id="pricing">
         <div class="column" id="pricing_column">
-            <button type="button" id="add-pricing-btn" class="btn btn-default">+ Add Pricing</button>
-            {% for item in pricing %}
-            <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
-                <div class="exp-img portlet-header"></div>
-                <div class="exp-info portlet-header">
-                    <h3>{{item.title}}</h3>
-                    <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
-                </div>
-                <div class="exp-price portlet-header">
-                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.price}}</h2>
-                    <p>{% trans "per person" %}</p>
-                </div>
+        <button type="button" id="add-pricing-btn" class="btn btn-default">+ Add Pricing</button>
+        {% for item in pricing %}
+        <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
+            <div class="exp-img portlet-header"></div>
+            <div class="exp-info portlet-header">
+                <h3>{{item.title}}</h3>
+                <p>{{item.details}}</p>
             </div>
-            {% endfor %}
+            <div class="exp-price portlet-header">
+                <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
+                <h2>{{item.price}}</h2>
+                <p>{% trans "per person" %}</p>
+            </div>
+        </div>
+        {% endfor %}
         </div>
         <div class="new-item-form container-fluid" id="add-pricing" style="display:none;">
             <div class="row">
@@ -347,10 +346,6 @@
                     <div class="form-group">
                         <label>{% trans "Title" %}</label>
                         <input id="pricing-title" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>{% trans "Location" %}</label>
-                        <input id="pricing-location" class="form-control">
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price" %}</label>
