@@ -3367,6 +3367,10 @@ def itinerary_detail(request,id=None):
         ci = CustomItinerary.objects.get(id=id)
         currency = request.session['custom_currency']
         price = get_itinerary_price(id, currency)
+        if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + ci.submitted_datetime:
+            full_price = True
+        else:
+            full_price = False
 
         start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
         end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
@@ -3386,12 +3390,16 @@ def itinerary_detail(request,id=None):
                 end_datetime = item.datetime.astimezone(item.experience.get_timezone())
 
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
+        guest_number = ci.get_guest_number()
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
-                                   "guest_number":ci.get_guest_number()[0],
+                                   "guest_number":guest_number[0],
+                                   "adult_number":guest_number[1],
+                                   "children_number":guest_number[2],
                                    "start_date": start_datetime.strftime("%Y-%m-%d"),
                                    "end_date":end_datetime.strftime("%Y-%m-%d"),
                                    "price":price,
+                                   "full_price":full_price,
                                    "GEO_POSTFIX":GEO_POSTFIX},
                                    context)
 
