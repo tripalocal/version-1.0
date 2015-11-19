@@ -3172,6 +3172,8 @@ def custom_itinerary(request, id=None):
                 #save custom itinerary
                 if id is not None:
                     ci = CustomItinerary.objects.get(id=id)
+                    for bking in ci.booking_set.all():
+                        bking.delete()
                 else:
                     ci = CustomItinerary()
                     while True:
@@ -3266,7 +3268,7 @@ def custom_itinerary(request, id=None):
                 col += 1
                 worksheet.write(row, col, total_price/(adult_number + children_number))
                 workbook.close()
-                return HttpResponseRedirect(GEO_POSTFIX+"itinerary/"+ci.id+"/")
+                return HttpResponseRedirect(GEO_POSTFIX+"itinerary/"+str(ci.id)+"/")
 
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
@@ -3386,7 +3388,7 @@ def itinerary_detail(request,id=None):
         for item in ci.booking_set.order_by('datetime').all():
             item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
             item.experience.description = item.experience.get_description(settings.LANGUAGES[0][0])
-            key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y年%m月%d日")
+            key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
