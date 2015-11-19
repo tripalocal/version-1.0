@@ -3167,7 +3167,10 @@ def custom_itinerary(request, id=None):
                 itinerary = json.loads(form.cleaned_data['itinerary_string'])
 
                 #save custom itinerary
-                ci = CustomItinerary()
+                if id is not None:
+                    ci = CustomItinerary.objects.get(id=id)
+                else:
+                    ci = CustomItinerary()
                 ci.user = request.user
                 ci.title = form.cleaned_data['title']
                 while True:
