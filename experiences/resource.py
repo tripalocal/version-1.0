@@ -1501,7 +1501,8 @@ def service_update_session(request):
 
     try:
         data = request.POST
-        request.session[data['key']] = data['value']
+        for key, value in data.items():
+            request.session[key] = value
         response={'success':True}
     except Exception as err:
         response={'success':False}
