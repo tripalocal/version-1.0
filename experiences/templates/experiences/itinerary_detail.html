@@ -75,9 +75,11 @@
             </span>
             <p>{{item.title}}</p>
           </div>
+          {% if item.photo_set.all %}
           {% with item.photo_set.all|first as photo %}
           <div class="item-img"><img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}"></div>
           {% endwith %}
+          {% endif %}
           <div class="item-description"><p>{{item.description}}</p></div>
         {% endfor %}
       </div>
