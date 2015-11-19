@@ -51,9 +51,11 @@ def set_initial_currency(request):
     if 'custom_currency' not in request.session:
         if settings.LANGUAGES[0][0] == "zh":
             request.session["custom_currency"] = "CNY"
+            request.session["dollar_sign"] = "￥"
         else:
             #TODO
             request.session["custom_currency"] = "AUD"
+            request.session["dollar_sign"] = "$"
 
 def convert_experience_price(request, experience):
     if hasattr(request, 'session') and 'custom_currency' in request.session\
@@ -331,6 +333,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
         if currency is not None and currency != experience.currency:
             exp_price = convert_currency(exp_price, experience.currency, currency)
+            experience.currency = currency
 
         photo_url = ''
         photos = experience.photo_set.all()
@@ -3091,7 +3094,7 @@ def custom_itinerary(request, id=None):
         if 'Add' in request.POST:
             #add a new item
             item = request.POST
-            np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency="aud", type=item['type'].title(),
+            np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency=request.session["custom_currency"].lower(), type=item['type'].title(),
                             city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted")
             np.save()
             npi18n = NewProductI18n(product=np, title=item.get('title',""),
@@ -3136,7 +3139,7 @@ def custom_itinerary(request, id=None):
                 customer = request.user if request.user.is_authenticated() else None
                 currency = request.session['custom_currency'].lower() if hasattr(request, 'session') and 'custom_currency' in request.session else None
                 #TODO: comment out the following line when currency is ready on the custom itinerary page
-                currency = "aud"
+                #currency = "aud"
                 itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer, currency)
 
                 #get flight, transfer, ...
@@ -3145,6 +3148,8 @@ def custom_itinerary(request, id=None):
                     pd.title = pd.get_title(settings.LANGUAGES[0][0])
                     pd.details = pd.get_description(settings.LANGUAGES[0][0])
                     pd.location = pd.city
+                    if 'custom_currency' in request.session and request.session["custom_currency"].lower() != pd.currency.lower():
+                        pd.price = convert_currency(pd.price, pd.currency, request.session["custom_currency"])
                 context['flight'] = [e for e in pds if e.type == 'Flight' and e.city in str(city).split(",")]
                 context['transfer'] = [e for e in pds if e.type == 'Transfer' and e.city in str(city).split(",")]
                 context['accommodation'] = [e for e in pds if e.type == 'Accommodation' and e.city in str(city).split(",")]
@@ -3362,6 +3367,10 @@ def itinerary_detail(request,id=None):
         ci = CustomItinerary.objects.get(id=id)
         currency = request.session['custom_currency']
         price = get_itinerary_price(id, currency)
+        if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + ci.submitted_datetime:
+            full_price = True
+        else:
+            full_price = False
 
         start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
         end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
@@ -3381,12 +3390,16 @@ def itinerary_detail(request,id=None):
                 end_datetime = item.datetime.astimezone(item.experience.get_timezone())
 
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
+        guest_number = ci.get_guest_number()
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
-                                   "guest_number":ci.get_guest_number()[0],
+                                   "guest_number":guest_number[0],
+                                   "adult_number":guest_number[1],
+                                   "children_number":guest_number[2],
                                    "start_date": start_datetime.strftime("%Y-%m-%d"),
                                    "end_date":end_datetime.strftime("%Y-%m-%d"),
                                    "price":price,
+                                   "full_price":full_price,
                                    "GEO_POSTFIX":GEO_POSTFIX},
                                    context)
 

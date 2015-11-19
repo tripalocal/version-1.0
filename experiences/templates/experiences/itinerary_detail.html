@@ -95,7 +95,7 @@
 $(document).ready(function() {
   if ($(window).width() > 760) {
     // Scrollspy
-    $('body').scrollspy({ target: '.sticky-section' });
+    $('body').scrollspy({ target: '.sticky-section', offset: 30 });
 
     // Stick the sticky-section
     $('.sticky-section').affix({
