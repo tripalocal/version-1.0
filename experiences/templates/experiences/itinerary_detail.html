@@ -19,67 +19,69 @@
 </div>
 
 <div class="container">
-  <div class="booking-box">
-    <form method="post" action="{{GEO_POSTFIX}}itinerary/{{itinerary_id}}/">
-        {% csrf_token %}
-        <div class="row">
-          <p>{{ itinerary.days|length }} Day {{ guest_number }} Adult Custom Itinerary</p>
-          <p>{{start_date}} to {{end_date}}</p>
-        </div>
-        {% if itinerary.status != "draft" and itinerary.status != "paid" %}
-        <div class="row">
-          <h1 style="margin:0;">{{request.session.dollar_sign}}{{price}}</h1>
-        </div>
-        <div class="booking-tip" style="display:none;">
-          <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
-          <p>{% trans 'Hurry, more than 50&#37; of this tour has been booked within the next 6 months' %}</p>
-        </div>
-        <div>
-            {% if user.is_authenticated %}
-            <button id="pay" class="btn btn-primary"><img src="{% static 'icon/coins_white.svg' %}" style="margin-right:10px;">{%trans "Pay"%}</button>
-            {% else %}
-            <input class="btn btn-primary" type="button" value="{%trans "Pay"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}itinerary/{{itinerary_id}}';"/>
-            {% endif %}
-        </div>
-        {% endif %}
-    </form>
+  <div class="sticky-section">
+    <div class="booking-box">
+      <form method="post" action="{{GEO_POSTFIX}}itinerary/{{itinerary_id}}/">
+          {% csrf_token %}
+          <div class="row">
+            <p>{{ itinerary.days|length }}天{{ guest_number }}个成人私人订制行程</p>
+            <p>{{start_date}} - {{end_date}}</p>
+          </div>
+          {% if itinerary.status != "draft" and itinerary.status != "paid" %}
+          <div class="row">
+            <span class="top-aligned-text">平均每人¥</span><h1 style="margin:0; display:inline-block;">{{price}}</h1><span class="top-aligned-text">元</span>
+          </div>
+          <div class="booking-tip" style="display:none;">
+            <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
+            <p>{% trans 'Hurry, more than 50&#37; of this tour has been booked within the next 6 months' %}</p>
+          </div>
+          <div>
+              {% if user.is_authenticated %}
+              <button id="pay" class="btn btn-primary"><img src="{% static 'icon/coins_white.svg' %}" style="margin-right:10px;">锁定优惠价格</button>
+              {% else %}
+              <input class="btn btn-primary" type="button" value="锁定优惠价格" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}itinerary/{{itinerary_id}}';"/>
+              {% endif %}
+          </div>
+          {% endif %}
+      </form>
+    </div>
+    <ul class="nav timeline" id="timeline">
+      {% for day in itinerary.days.items %}
+      <li><a class="day-nav" href="#day{{ forloop.counter }}-list" id="day{{ forloop.counter }}">D{{ forloop.counter }}</a></li>
+      {% endfor %}
+    </ul>
   </div>
 
   <div class="detail-box">
-    <ul class="timeline">
-      {% for day in itinerary.days.items %}
-      <li class="day-nav" id="day{{ forloop.counter }}">D{{ forloop.counter }}</li>
+      {%for date, list in itinerary.days.items %}
+      <div class="day-list" id="day{{forloop.counter}}-list">
+        <h3 class="day-heading">Day {{forloop.counter}} {{date}} {{list.0.city}} </h3>
+        {% for item in list %}
+          <div class="item-heading">
+            <span class="item-icon">
+              {% if item.type == 'PrivateProduct' or item.type == 'PublicProduct' or item.type == 'PRIVATE' or item.type == 'NONPRIVATE' %}
+              <img src="{% static 'experiences/img/hot-56.svg' %}">
+              {% elif item.type == 'Flight' %}
+              <img src="{% static 'experiences/img/flight.svg' %}">
+              {% elif item.type == 'Transfer' %}
+              <img src="{% static 'experiences/img/transfer.svg' %}">
+              {% elif item.type == 'Accommodation' %}
+              <img src="{% static 'experiences/img/accommodation.svg' %}">
+              {% elif item.type == 'Restaurant' %}
+              <img src="{% static 'experiences/img/restaurant.svg' %}">
+              {% elif item.type == 'Suggestion' %}
+              <img src="{% static 'experiences/img/itinerary.svg' %}">
+              {% endif %}
+            </span>
+            <p>{{item.title}}</p>
+          </div>
+          {% with item.photo_set.all|first as photo %}
+          <div class="item-img"><img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}"></div>
+          {% endwith %}
+          <div class="item-description"><p>{{item.description}}</p></div>
+        {% endfor %}
+      </div>
       {% endfor %}
-    </ul>
-    {%for date, list in itinerary.days.items %}
-    <div class="day-list" id="day{{forloop.counter}}-list">
-      <h3 class="day-heading">Day {{forloop.counter}} {{date}} {{list.0.city}} </h3>
-      {% for item in list %}
-        <div class="item-heading">
-          <span class="item-icon">
-            {% if item.type == 'PrivateProduct' or item.type == 'PublicProduct' or item.type == 'PRIVATE' or item.type == 'NONPRIVATE' %}
-            <img src="{% static 'experiences/img/hot-56.svg' %}">
-            {% elif item.type == 'Flight' %}
-            <img src="{% static 'experiences/img/flight.svg' %}">
-            {% elif item.type == 'Transfer' %}
-            <img src="{% static 'experiences/img/transfer.svg' %}">
-            {% elif item.type == 'Accommodation' %}
-            <img src="{% static 'experiences/img/accommodation.svg' %}">
-            {% elif item.type == 'Restaurant' %}
-            <img src="{% static 'experiences/img/restaurant.svg' %}">
-            {% elif item.type == 'Suggestion' %}
-            <img src="{% static 'experiences/img/itinerary.svg' %}">
-            {% endif %}
-          </span>
-          <p>{{item.title}}</p>
-        </div>
-        {% with item.photo_set.all|first as photo %}
-        <div class="item-img"><img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}"></div>
-        {% endwith %}
-        <div class="item-description"><p>{{item.description}}</p></div>
-      {% endfor %}
-    </div>
-    {% endfor %}
   </div>
 </div>
 
@@ -92,15 +94,27 @@
 <script type="text/javascript">
 $(document).ready(function() {
   if ($(window).width() > 760) {
-    $(".day-nav").click(function() {
-      var $day = $(this);
-      $(".day-nav").removeClass("active");
-      $day.addClass("active");
-      $(".day-list").hide();
-      $("#" + $day.attr("id") + "-list").fadeIn();
+    // Scrollspy
+    $('body').scrollspy({ target: '.sticky-section', offset: 30 });
+
+    // Stick the sticky-section
+    $('.sticky-section').affix({
+      offset: {
+        top: 480,
+      }
     });
-    $("#day1").click();
+
+    // Scroll to section
+    var $root = $('html, body');
+    $('.day-nav').click(function() {
+      var href = $.attr(this, 'href');
+      $root.animate({
+        scrollTop: $(href).offset().top
+      }, 500);
+      return false;
+    });
   }
+
   {% if itinerary.status == "paid" %}
   $(".paid-banner").delay(10000).slideUp();
   {% endif %}
