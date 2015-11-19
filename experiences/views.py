@@ -3088,14 +3088,19 @@ def custom_itinerary(request, id=None):
     context['LANGUAGE'] = settings.LANGUAGE_CODE
     context['guest_num_range'] = range(0,20)
     form = CustomItineraryForm()
-    set_initial_currency(request)
+    #set_initial_currency(request)
+    #force using AUD
+    request.session['custom_currency'] = "AUD"
+    request.session['dollar_sign'] = "$"
 
     if request.method == 'POST':
         if 'Add' in request.POST:
             #add a new item
             item = request.POST
             np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency=request.session["custom_currency"].lower(), type=item['type'].title(),
-                            city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted")
+                            city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted",
+                            start_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)),
+                            end_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)) + timedelta(weeks=520))
             np.save()
             npi18n = NewProductI18n(product=np, title=item.get('title',""),
                                     description=item.get('details', ""), location=item.get('location', ""))
@@ -3138,8 +3143,6 @@ def custom_itinerary(request, id=None):
 
                 customer = request.user if request.user.is_authenticated() else None
                 currency = request.session['custom_currency'].lower() if hasattr(request, 'session') and 'custom_currency' in request.session else None
-                #TODO: comment out the following line when currency is ready on the custom itinerary page
-                #currency = "aud"
                 itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer, currency)
 
                 #get flight, transfer, ...
@@ -3171,13 +3174,14 @@ def custom_itinerary(request, id=None):
                     ci = CustomItinerary.objects.get(id=id)
                 else:
                     ci = CustomItinerary()
+                    while True:
+                        new_id = datetime.now().strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
+                        if len(CustomItinerary.objects.filter(id=new_id)) == 0:
+                            break
+                    ci.id = new_id
                 ci.user = request.user
                 ci.title = form.cleaned_data['title']
-                while True:
-                    new_id = datetime.now().strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
-                    if len(CustomItinerary.objects.filter(id=new_id)) == 0:
-                        break
-                ci.id = new_id
+
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
                 ci.save()
 
@@ -3399,8 +3403,8 @@ def itinerary_detail(request,id=None):
                                    "guest_number":guest_number[0],
                                    "adult_number":guest_number[1],
                                    "children_number":guest_number[2],
-                                   "start_date": start_datetime.strftime("%Y年%m月%d日"),
-                                   "end_date":end_datetime.strftime("%Y年%m月%d日"),
+                                   "start_date": start_datetime.strftime("%Y-%m-%d"),
+                                   "end_date":end_datetime.strftime("%Y-%m-%d"),
                                    "price":price,
                                    "full_price":full_price,
                                    "GEO_POSTFIX":GEO_POSTFIX},

@@ -29,7 +29,7 @@
           </div>
           {% if itinerary.status != "draft" and itinerary.status != "paid" %}
           <div class="row">
-            <span class="top-aligned-text">平均每人¥</span><h1 style="margin:0; display:inline-block;">{{price}}</h1><span class="top-aligned-text">元</span>
+            <span class="top-aligned-text">平均每人{{request.session.dollar_sign}}</span><h1 style="margin:0; display:inline-block;">{{price}}</h1><span class="top-aligned-text">{{request.session.custom_currency}}</span>
           </div>
           <div class="booking-tip" style="display:none;">
             <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
@@ -75,11 +75,9 @@
             </span>
             <p>{{item.title}}</p>
           </div>
-          {% if item.photo_set.all %}
-            {% with item.photo_set.all|first as photo %}
-            <div class="item-img"><img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}"></div>
-            {% endwith %}
-          {% endif %}
+          {% with item.photo_set.all|first as photo %}
+          <div class="item-img"><img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}"></div>
+          {% endwith %}
           <div class="item-description"><p>{{item.description}}</p></div>
         {% endfor %}
       </div>
