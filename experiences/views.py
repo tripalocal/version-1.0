@@ -3178,7 +3178,7 @@ def custom_itinerary(request, id=None):
                         new_id = datetime.now().strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
                         if len(CustomItinerary.objects.filter(id=new_id)) == 0:
                             break
-                ci.id = new_id
+                    ci.id = new_id
                 ci.user = request.user
                 ci.title = form.cleaned_data['title']
 
