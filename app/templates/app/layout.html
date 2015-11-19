@@ -425,14 +425,23 @@
 
         $('#id_currency_select').val('{{request.session.custom_currency}}');
         $('#id_currency_select').change(function () {
+            if($("#id_currency_select").val() != "CNY")
+            {
+                dollar_sign = "$";
+            }
+            else
+            {
+                dollar_sign = "￥";
+            }
+
             $.ajax({
                     type: 'POST',
                     url: "/service_update_session/",
                     dataType: 'json',
                     data: {
                         "csrfmiddlewaretoken": "{{ csrf_token }}",
-                        "key": "custom_currency",
-                        "value": $("#id_currency_select").val()
+                        "custom_currency": $("#id_currency_select").val(),
+                        "dollar_sign": dollar_sign
                     },
                     success: function (data) {
                         result = data; //$.parseJSON(data)
