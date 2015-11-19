@@ -28,7 +28,7 @@
         </div>
         {% if itinerary.status != "draft" and itinerary.status != "paid" %}
         <div class="row">
-          <h1 style="margin:0;">${{price}}</h1>
+          <h1 style="margin:0;">{{request.session.dollar_sign}}{{price}}</h1>
         </div>
         <div class="booking-tip" style="display:none;">
           <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
