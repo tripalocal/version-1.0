@@ -55,7 +55,7 @@
   <div class="detail-box">
       {%for date, list in itinerary.days.items %}
       <div class="day-list" id="day{{forloop.counter}}-list">
-        <h3 class="day-heading">Day {{forloop.counter}} {{date}} {{list.0.city}} </h3>
+        <h3 class="day-heading">第{{forloop.counter}}天 {{date}} {{list.0.city}} </h3>
         {% for item in list %}
           <div class="item-heading">
             <span class="item-icon">
@@ -103,6 +103,9 @@ $(document).ready(function() {
     $('.sticky-section').affix({
       offset: {
         top: 480,
+        bottom: function () {
+          return (this.bottom = $('.footer').outerHeight(true) + 30)
+        }
       }
     });
 

@@ -3382,7 +3382,7 @@ def itinerary_detail(request,id=None):
         for item in ci.booking_set.order_by('datetime').all():
             item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
             item.experience.description = item.experience.get_description(settings.LANGUAGES[0][0])
-            key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
+            key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y年%m月%d日")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
