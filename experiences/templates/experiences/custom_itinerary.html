@@ -722,6 +722,10 @@
                                 "</div>";
                 $("#"+type+"_column").append(new_item);
                 $("#"+type+"_column").fadeIn();
+                $("#" + type + "-title").val("");
+                $("#" + type + "-details").val("");
+                $("#" + type + "-location").val("");
+                $("#" + type + "-price").val("");
                 $("#add-"+type).hide();
                 $(".loading").hide();
                 init_drag();
