@@ -24,8 +24,8 @@
       <form method="post" action="{{GEO_POSTFIX}}itinerary/{{itinerary_id}}/">
           {% csrf_token %}
           <div class="row">
-            <p>{{ itinerary.days|length }} Day {{ guest_number }} Adult Custom Itinerary</p>
-            <p>{{start_date}} to {{end_date}}</p>
+            <p>{{ itinerary.days|length }}天{{ guest_number }}个成人私人订制行程</p>
+            <p>{{start_date}} - {{end_date}}</p>
           </div>
           {% if itinerary.status != "draft" and itinerary.status != "paid" %}
           <div class="row">
@@ -37,9 +37,9 @@
           </div>
           <div>
               {% if user.is_authenticated %}
-              <button id="pay" class="btn btn-primary"><img src="{% static 'icon/coins_white.svg' %}" style="margin-right:10px;">{%trans "Lock in discount price"%}</button>
+              <button id="pay" class="btn btn-primary"><img src="{% static 'icon/coins_white.svg' %}" style="margin-right:10px;">锁定优惠价格</button>
               {% else %}
-              <input class="btn btn-primary" type="button" value="{%trans "Lock in discount price"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}itinerary/{{itinerary_id}}';"/>
+              <input class="btn btn-primary" type="button" value="锁定优惠价格" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}itinerary/{{itinerary_id}}';"/>
               {% endif %}
           </div>
           {% endif %}
