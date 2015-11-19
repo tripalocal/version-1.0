@@ -83,7 +83,7 @@ class Experience(AbstractExperience):
     guests = models.ManyToManyField(User, related_name='experience_guests')
     status = models.CharField(max_length=50)
 
-    tags = models.ManyToManyField(ExperienceTag, related_name='experience_tags')
+    tags = models.ManyToManyField(ExperienceTag, related_name='experience_tags', blank=True)
     commission = models.FloatField(default=0.3)
 
     def __str__(self):
@@ -230,7 +230,7 @@ class NewProduct(AbstractExperience):
     free_translation = models.BooleanField(default=False)
     order_on_holiday = models.BooleanField(default=False, help_text="If supplier take order during weekend and holiday "
                                                                     "particularly instant order during holiday")
-    tags = models.ManyToManyField(ExperienceTag, related_name='newproduct_tags')
+    tags = models.ManyToManyField(ExperienceTag, related_name='newproduct_tags', blank=True)
 
     def __str__(self):
         t = self.get_title(settings.LANGUAGES[0][0])
