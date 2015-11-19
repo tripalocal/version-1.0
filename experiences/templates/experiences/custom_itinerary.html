@@ -27,7 +27,8 @@
     {{form.itinerary_string}}
 
     <!-- Done, but needs to be hidden -->
-    {{form.guest_number}}
+    {{form.adult_number}}
+    {{form.children_number}}
     {{form.end_datetime}}
   </div>
   <!-- Top search bar -->
@@ -49,16 +50,13 @@
           <button id="add-adults" type="button" class="btn btn-grey"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content='
             <div class="form-goup">
               <select id="guest-num-select" class="form-control">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-                <option>5</option>
-                <option>6</option>
-                <option>7</option>
-                <option>8</option>
-                <option>9</option>
-                <option>10</option>
+                {% for i in guest_num_range %}
+                {% if forloop.counter == adult_number %}
+                <option value={{forloop.counter}} selected>{{forloop.counter}}</option>
+                {% else %}
+                <option value={{forloop.counter}}>{{forloop.counter}}</option>
+                {% endif %}
+                {% endfor %}
               </select>
             </div>
               <button type="button" class="btn btn-primary" id="submit-add-adults">Update</button>
@@ -67,11 +65,19 @@
           </button>
           <button id="add-kids" type="button" class="btn btn-default"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
             <div class='form-goup'>
-              <select class='form-control'><option>1 Kid</option></select>
+              <select id='kid-num-select' class='form-control'>
+                {% for i in "0123456789" %}
+                {% if forloop.counter0 == children_number %}
+                <option value={{forloop.counter0}} selected>{{forloop.counter0}}</option>
+                {% else %}
+                <option value={{forloop.counter0}}>{{forloop.counter0}}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
             </div>
-              <button class='btn btn-primary'>Add</button>
-              <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-kids&quot;).popover(&quot;hide&quot;);'>Cancel</button>
-            ">+ Add Kids
+              <button type='button' class='btn btn-primary' id='submit-add-kids'>Update</button>
+              <button type='button' class='btn btn-default' id='cancel-add-kids' style='margin-right:0;' onclick='$(&quot;#add-kids&quot;).popover(&quot;hide&quot;);'>Cancel</button>
+            ">Kids (2-12 yo) <span class="badge" id="num-kids">0</span>
           </button>
         </div>
       </div>
@@ -141,7 +147,7 @@
         <!-- Right section -->
         <div id="right_section" class="section" style="overflow:scroll; height:72vh;">
           <h1 class="section-heading">Itinerary</h1>
-          <h2 class="price-line">$AUD <label id="price-pp">0</label> {% trans "per person (Total of "%}$AUD <label id="price-tt">0</label>)</h2>
+          <h2 class="price-line">{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-pp">0</label> {% trans "per person (Total of "%}{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-tt">0</label>)</h2>
           {% for city, dict in existing_itinerary.items %}
             <div id="city-title-{{forloop.counter0}}" class="section-box-add" onclick="$('.collapse').collapse('hide'); $('#city-collapse-{{forloop.counter0}}').collapse('show');update_left_section('{{city}}');" city="{{city}}">
               <span class="add-sign">+</span>
@@ -160,7 +166,7 @@
                     <div class='exp-info portlet-header'>
                         <h3>{{experience.title}}</h3>
                         <p>{{experience.description|escapejs|slice:"0:16"}}</p>
-                        <p>{{experience.duration}} {% trans 'hr(s)' %} &middot; 
+                        <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
                     </div>
@@ -242,8 +248,6 @@
     $(document).ready(function()
     {
         $(".loading").hide();
-        $("#id_title").addClass("form_control");
-        $("#id_title").attr("style","width:370px;");
         $("#itinerary_search").click(function(e){
             e.preventDefault();
             set_data_before_submit();
@@ -257,7 +261,8 @@
                             city: $("#id_city").val(),
                             start_datetime: $("#id_start_datetime").val(),
                             end_datetime: $("#id_end_datetime").val(),
-                            guest_number: $("#id_guest_number").val(),
+                            adult_number: $("#id_adult_number").val(),
+                            children_number: $("#id_children_number").val(),
                             language: $("#id_language").val(),
                             Search: "Search",
                             tags: $("#id_tags").val(),
@@ -283,6 +288,11 @@
         $("#button_view").click(function(e){
             set_data_before_submit();
             set_itinerary_string();
+            if($("#id_itinerary_string").val().length <= 2)
+            {
+                e.preventDefault();
+                alert("{% trans "Empty itinerary" %}");
+            }
         });
 
         // Date field
@@ -323,6 +333,10 @@
         update_price_title();
         {% endif %}
         {% endfor %}
+
+        $(document).on("click", "#submit-add-kids", function() {
+            update_kids();
+        });
     })
 
     function construct_data_content(i, cities, city, city_name, duration)
@@ -397,26 +411,31 @@
                 $(".suggestion_" + cities[i]).hide();
             }
         }
+        var type = ["flight", "transfer", "accommodation", "restaurant", "suggestion", "pricing"];
+        for(i=0;i<type.length;i++)
+        {
+            $("#"+type[i]+"-location").val(city);
+        }
     }
 
     function add_new_city()
     {
         var i=-1;
         //the last city was inserted before $("#add-city")
-        //TODO: the user may have changed the order of cities
-        if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').indexOf("button_city_") === 0)
-        {
-            var id = $("#add-city").prev().attr('id').split("_");
-            i = parseInt(id[id.length-1]);
-        }
-        var j=0,k=0;
-        for(k=0;k<i;k++)
+        //but the user may have changed the order of cities
+        //if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').indexOf("button_city_") === 0)
+        //{
+        //    var id = $("#add-city").prev().attr('id').split("_");
+        //    i = parseInt(id[id.length-1]);
+        //}
+        var k=0;
+        for(k=0;k<10;k++)
         {
             if($("#button_city_"+k).length > 0)
             {
-                j++;
+                i++;
 
-                if(j>=10)
+                if(i>=9)
                 {
                     return;
                 }
@@ -458,9 +477,17 @@
 
     function update_guests() {
       var guests = $("#guest-num-select").val();
-      $("#add-adults")[0].innerHTML = "Adults" + " <span class=\"badge\">" + guests + "</span>";
-      $("#id_guest_number").val(guests);
+      $("#add-adults")[0].innerHTML = "Adults" + " <span class=\"badge\" id=\"num-adults\">" + guests + "</span>";
+      $("#id_adult_number").val(guests);
       $("#add-adults").popover("hide");
+      $("#itinerary_search").click();
+    }
+
+    function update_kids() {
+      var kids = $("#kid-num-select").val();
+      $("#add-kids")[0].innerHTML = "Kids (2-12 yo) " + " <span class=\"badge\" id=\"num-kids\">" + kids + "</span>";
+      $("#id_children_number").val(kids);
+      $("#add-kids").popover("hide");
       $("#itinerary_search").click();
     }
 
@@ -585,7 +612,8 @@
                               "title":tmp.innerText || tmp.textContent,
                               "date":d.toString('yyyy-M-dd'),
                               "time":"01:00",
-                              "guest_number":$("#id_guest_number").val()};
+                              "adult_number":$("#id_adult_number").val(),
+                              "children_number":$("#id_children_number").val()};
                     itinerary.push(dict);
                     experience = $(experience).next()[0];
                 }
@@ -629,35 +657,53 @@
     function add_item(type) {
         var ids = ["title", "location", "price", "details"];
         var value = "";
-        var item = {
-            csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
-            Add: "Add",
-            type: type,
-        };
+        var item = new FormData();
+        item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
+        item.append("Add", "Add");
+        item.append("type", type);
+
         for (var i = 0; i < ids.length; i++) {
             value = $("#" + type + "-" + ids[i]).val();
             if(value)
             {
-                item[ids[i]] = value;
+                item.append([ids[i]], value);
             }
         }
-        if(item.length==3)
+        if(Object.keys(item).length == 3)
         {
             alert("Fill at least one field");
             return;
         }
+        if($("#"+type+"-photo")[0] && $("#"+type+"-photo")[0].files.length > 0)
+        {
+            file = $("#"+type+"-photo")[0].files[0];
+            if(file.size > 2097152)
+            {
+                alert("{% trans "Image size exceeds the limit (2M)" %}");
+                return;
+            }
+            if(file.type.indexOf("image/") < 0)
+            {
+                alert("{% trans "Invalid image type" %}");
+                return;
+            }
+            item.append("file", file);
+        }
+        $(".loading").show();
         $.ajax({
             url: '{{GEO_POSTFIX}}itinerary/',
             type: "POST",
             data: item,
+            processData: false,
+            contentType: false,
             success: function (data) {
                 var title = $("#" + type + "-title").val();
                 var details = $("#" + type + "-details").val();
                 var location = $("#" + type + "-location").val();
                 var price = $("#" + type + "-price").val();
 
-                var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_\"" + data.new_product_id + ">" +
-                                  "<div class=\"exp-img portlet-header\"></div>" +
+                var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_" + data.new_product_id + "\">" +
+                                  "<div class=\"exp-img portlet-header\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
                                   "<div class=\"exp-info portlet-header\">" +
                                     "<h3>" + title + "</h3>" +
                                     "<p>" + details + "</p>";
@@ -669,7 +715,7 @@
                 new_item +=
                                   "</div>" +
                                   "<div class=\"exp-price portlet-header\">" +
-                                    "<p>$AUD</p>" +
+                                    "<p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>" +
                                     "<h2>" + price + "</h2>" +
                                     "<p>{% trans 'per person' %}</p>" +
                                   "</div>" +
@@ -677,10 +723,11 @@
                 $("#"+type+"_column").append(new_item);
                 $("#"+type+"_column").fadeIn();
                 $("#add-"+type).hide();
+                $(".loading").hide();
                 init_drag();
             },
             failure: function (e) {
-
+                $(".loading").hide();
             }
         });
     }
@@ -716,8 +763,19 @@
             price=0;
         }
         $("#price-pp").text(price);
-        guest_number = $("#id_guest_number").val();
+        guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
         $("#price-tt").text(price*guest_number);
+    }
+
+    function set_new_item_location(type)
+    {
+        if($(".collapse.in").length>0)
+        {
+            var id = $(".collapse.in")[0].id.split("-");
+            id = id[id.length-1];
+            var city = $($("#city-title-"+id)[0]).attr("city");
+            $("#"+type+"-location").val(city);
+        }
     }
     </script>
 {% endblock %}
