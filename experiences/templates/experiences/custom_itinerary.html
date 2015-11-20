@@ -879,8 +879,22 @@
         });
     }
 
-    function update_price_title()
+    function update_price_title(event, ui)
     {
+        if(event && ui && $(ui.item[0].lastElementChild).attr("class").indexOf("exp-price") < 0)
+        {
+            if(ui.item.parent()[0].id && ui.item.parent()[0].id.indexOf("_column") > 0)
+            {
+                //dropped in the left section
+                $(ui.item[0].lastElementChild).show();
+            }
+            else
+            {
+                //dropped in the right section
+                $(ui.item[0].lastElementChild).hide();
+            }
+        }
+
         var city = $(".price-line").next().next()[0];
         var price = 0;
 
