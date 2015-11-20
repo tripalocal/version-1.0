@@ -175,6 +175,12 @@
                         <h2>{{experience.price}}</h2>
                         <p>{% trans 'per person' %}</p>
                     </div>
+                    {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
+                    <div class="portlet-header" style="display:none;">
+                        <button type="button" onclick="edit_item({{experience.id}}, '{{experience.type|lower}}');">{% trans "Edit" %}</button>
+                        <button type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</button>
+                    </div>
+                    {% endif %}
                   </div>
                   {% endfor %}
                 </div>
