@@ -34,7 +34,7 @@
             <p>{{ itinerary.days|length }}{% trans ' Day ' %}{{ guest_number }}{% trans ' Person Custom Itinerary' %}</p>
             <p>{{start_date}} - {{end_date}}</p>
           </div>
-          {% if itinerary.status != "draft" and itinerary.status != "paid" %}
+          {% if itinerary.status == "ready" %}
           <div class="row">
             <span class="top-aligned-text">{% trans 'Per Person ' %}{{request.session.dollar_sign}}</span><h1 style="margin:0; display:inline-block;">{{price|floatformat:"0"}}</h1><span class="top-aligned-text">{{request.session.custom_currency}}</span>
           </div>

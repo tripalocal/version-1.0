@@ -3386,7 +3386,7 @@ def itinerary_detail(request,id=None):
         start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
         end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
 
-        itinerary = {"title":ci.title, "days":{}}
+        itinerary = {"title":ci.title, "days":{}, "status":ci.status}
         for item in ci.booking_set.order_by('datetime').all():
             item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
             item.experience.description = item.experience.get_description(settings.LANGUAGES[0][0])
