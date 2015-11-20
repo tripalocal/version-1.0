@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-20 11:26+1100\n"
+"POT-Creation-Date: 2015-11-20 13:42+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -437,7 +437,7 @@ msgstr "人数"
 
 #: experiences/templates/experiences/custom_itinerary.html:86
 #: experiences/templates/experiences/custom_itinerary.html:90
-#: experiences/templates/experiences/custom_itinerary.html:347
+#: experiences/templates/experiences/custom_itinerary.html:357
 #: experiences/templates/experiences/custom_itinerary_left_section.html:193
 #: experiences/templates/experiences/custom_itinerary_left_section.html:249
 #: experiences/templates/experiences/custom_itinerary_left_section.html:305
@@ -448,13 +448,13 @@ msgid "Location"
 msgstr "目的地"
 
 #: experiences/templates/experiences/custom_itinerary.html:98
-#: experiences/templates/experiences/custom_itinerary.html:365
+#: experiences/templates/experiences/custom_itinerary.html:375
 msgid "Duration"
 msgstr "天数"
 
 #: experiences/templates/experiences/custom_itinerary.html:101
-#: experiences/templates/experiences/custom_itinerary.html:372
-#: experiences/templates/experiences/custom_itinerary.html:376
+#: experiences/templates/experiences/custom_itinerary.html:382
+#: experiences/templates/experiences/custom_itinerary.html:386
 msgid " Day"
 msgstr "天"
 
@@ -469,7 +469,7 @@ msgid "Add"
 msgstr "添加"
 
 #: experiences/templates/experiences/custom_itinerary.html:106
-#: experiences/templates/experiences/custom_itinerary.html:383
+#: experiences/templates/experiences/custom_itinerary.html:393
 #: experiences/templates/experiences/custom_itinerary_left_section.html:95
 #: experiences/templates/experiences/custom_itinerary_left_section.html:151
 #: experiences/templates/experiences/custom_itinerary_left_section.html:207
@@ -494,14 +494,14 @@ msgid "per person (Total of "
 msgstr "每人,(共计"
 
 #: experiences/templates/experiences/custom_itinerary.html:154
-#: experiences/templates/experiences/custom_itinerary.html:459
-#: experiences/templates/experiences/custom_itinerary.html:508
+#: experiences/templates/experiences/custom_itinerary.html:469
+#: experiences/templates/experiences/custom_itinerary.html:518
 msgid " Day(s)"
 msgstr "天"
 
 #: experiences/templates/experiences/custom_itinerary.html:159
-#: experiences/templates/experiences/custom_itinerary.html:466
-#: experiences/templates/experiences/custom_itinerary.html:515
+#: experiences/templates/experiences/custom_itinerary.html:476
+#: experiences/templates/experiences/custom_itinerary.html:525
 msgid "Day"
 msgstr "天"
 
@@ -511,7 +511,7 @@ msgid "hr(s)"
 msgstr "小时"
 
 #: experiences/templates/experiences/custom_itinerary.html:176
-#: experiences/templates/experiences/custom_itinerary.html:726
+#: experiences/templates/experiences/custom_itinerary.html:736
 #: experiences/templates/experiences/custom_itinerary_left_section.html:35
 #: experiences/templates/experiences/custom_itinerary_left_section.html:61
 #: experiences/templates/experiences/custom_itinerary_left_section.html:117
@@ -526,23 +526,24 @@ msgid "per person"
 msgstr "每人"
 
 #: experiences/templates/experiences/custom_itinerary.html:294
+#: experiences/templates/experiences/custom_itinerary.html:304
 msgid "Empty itinerary"
 msgstr "无效行程"
 
-#: experiences/templates/experiences/custom_itinerary.html:382
+#: experiences/templates/experiences/custom_itinerary.html:392
 #: experiences/templates/experiences/search_result.html:88
 msgid "Update"
 msgstr "刷新"
 
-#: experiences/templates/experiences/custom_itinerary.html:384
+#: experiences/templates/experiences/custom_itinerary.html:394
 msgid "Delete Location"
 msgstr "删除该目的地"
 
-#: experiences/templates/experiences/custom_itinerary.html:682
+#: experiences/templates/experiences/custom_itinerary.html:692
 msgid "Image size exceeds the limit (2M)"
 msgstr "图片大小超过上限(2M)"
 
-#: experiences/templates/experiences/custom_itinerary.html:687
+#: experiences/templates/experiences/custom_itinerary.html:697
 msgid "Invalid image type"
 msgstr "不支持的图片类型"
 
@@ -1118,7 +1119,7 @@ msgid " per person for "
 msgstr "每人, 约"
 
 #: experiences/templates/experiences/experience_booking_confirmation.html:165
-#: experiences/templates/experiences/itinerary_detail.html:83
+#: experiences/templates/experiences/itinerary_detail.html:85
 msgid " hours"
 msgstr "小时"
 
@@ -1486,12 +1487,16 @@ msgstr "平均每人"
 msgid "Lock in price"
 msgstr "锁定优惠价格"
 
-#: experiences/templates/experiences/itinerary_detail.html:65
+#: experiences/templates/experiences/itinerary_detail.html:53
+msgid "Enquire about this itinerary"
+msgstr "定制咨询"
+
+#: experiences/templates/experiences/itinerary_detail.html:67
 #, python-format
 msgid "Day %(forloop.counter)s"
 msgstr "第%(forloop.counter)s天"
 
-#: experiences/templates/experiences/itinerary_detail.html:83
+#: experiences/templates/experiences/itinerary_detail.html:85
 msgid " days"
 msgstr "天"
 

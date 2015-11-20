@@ -3187,6 +3187,8 @@ def custom_itinerary(request, id=None):
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
                 if "ready" in request.POST:
                     ci.status = "ready"
+                if "draft" in request.POST:
+                    ci.status = "draft"
                 ci.save()
 
                 workbook = xlsxwriter.Workbook(os.path.join(settings.PROJECT_ROOT,'itineraries', str(ci.id)+'.xlsx'))
