@@ -3384,7 +3384,7 @@ def itinerary_detail(request,id=None):
             full_price = True
         else:
             full_price = False
-
+        discount_deadline = ci.submitted_datetime + timedelta(days=7)
         start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
         end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
 
@@ -3411,6 +3411,7 @@ def itinerary_detail(request,id=None):
                                    "children_number":guest_number[2],
                                    "start_date": start_datetime.strftime("%Y-%m-%d"),
                                    "end_date":end_datetime.strftime("%Y-%m-%d"),
+                                   "discount_deadline":discount_deadline.strftime("%Y-%m-%d"),
                                    "price":price,
                                    "full_price":full_price,
                                    "GEO_POSTFIX":GEO_POSTFIX},
