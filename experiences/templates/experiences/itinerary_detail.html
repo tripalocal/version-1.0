@@ -14,7 +14,7 @@
   <p>{% trans 'You have successfully booked this itinerary!' %}</p>
 </div>
 {% endif %}
-<div class="jumbotron">
+<div class="jumbotron" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({%for date, list in itinerary.days.items %}{% if forloop.first %}{% for item in list %}{% if forloop.first %}{% with item.photo_set.all|first as photo %}{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}{% endwith %}{% endif %}{% endfor %}{% endif %}{% endfor %})">
   <div class="middle">
     {% if LANGUAGE != "zh-CN" %}
     <img src="{% static 'img/top_logo-en.svg' %}" width="240">
