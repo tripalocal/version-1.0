@@ -15,16 +15,21 @@ body {
   position: relative;
 }
 
+.footer {
+  display: none;
+}
+
 .jumbotron {
   color: white;
   h1 {
+    font-family: $font-stack-homepage;
+    font-size: 32px;
+    text-shadow: 1px 1px 8px black;
+  }
+  .middle {
     position: relative;
     top: 50%;
     transform: translateY(-50%);
-    font-family: $font-stack-homepage;
-    font-size: 32px;
-    margin: 0;
-    text-shadow: 1px 1px 8px black;
   }
 }
 

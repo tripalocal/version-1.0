@@ -15,7 +15,14 @@
 </div>
 {% endif %}
 <div class="jumbotron">
-  <h1>{{ itinerary.title }}</h1>
+  <div class="middle">
+    {% if LANGUAGE != "zh-CN" %}
+    <img src="{% static 'img/top_logo-en.svg' %}" width="240">
+    {% else %}
+    <img src="{% static 'img/top_logo-cn.svg' %}" width="240">
+    {% endif %}
+    <h1>{{ itinerary.title }}</h1>
+  </div>
 </div>
 
 <div class="container">
@@ -24,22 +31,22 @@
       <form method="post" action="{{GEO_POSTFIX}}itinerary/{{itinerary_id}}/">
           {% csrf_token %}
           <div class="row">
-            <p>{{ itinerary.days|length }}天{{ guest_number }}个成人私人订制行程</p>
+            <p>{{ itinerary.days|length }}{% trans ' Day ' %}{{ guest_number }}{% trans ' Person Custom Itinerary' %}</p>
             <p>{{start_date}} - {{end_date}}</p>
           </div>
           {% if itinerary.status != "draft" and itinerary.status != "paid" %}
           <div class="row">
-            <span class="top-aligned-text">平均每人{{request.session.dollar_sign}}</span><h1 style="margin:0; display:inline-block;">{{price}}</h1><span class="top-aligned-text">{{request.session.custom_currency}}</span>
+            <span class="top-aligned-text">{% trans 'Per Person ' %}{{request.session.dollar_sign}}</span><h1 style="margin:0; display:inline-block;">{{price}}</h1><span class="top-aligned-text">{{request.session.custom_currency}}</span>
           </div>
           <div class="booking-tip" style="display:none;">
             <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
-            <p>{% trans 'Hurry, more than 50&#37; of this tour has been booked within the next 6 months' %}</p>
+            <p>{% trans '' %}</p>
           </div>
           <div>
               {% if user.is_authenticated %}
-              <button id="pay" class="btn btn-primary"><img src="{% static 'icon/coins_white.svg' %}" style="margin-right:10px;">锁定优惠价格</button>
+              <button id="pay" class="btn btn-primary"><img src="{% static 'icon/coins_white.svg' %}" style="margin-right:10px;">{% trans 'Lock in price' %}</button>
               {% else %}
-              <input class="btn btn-primary" type="button" value="锁定优惠价格" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}itinerary/{{itinerary_id}}';"/>
+              <input class="btn btn-primary" type="button" value="{% trans 'Lock in price' %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}itinerary/{{itinerary_id}}';"/>
               {% endif %}
           </div>
           {% endif %}
@@ -55,7 +62,7 @@
   <div class="detail-box">
       {%for date, list in itinerary.days.items %}
       <div class="day-list" id="day{{forloop.counter}}-list">
-        <h3 class="day-heading">第{{forloop.counter}}天 {{date}} {{list.0.city}} </h3>
+        <h3 class="day-heading">{% blocktrans %}Day {{forloop.counter}}{% endblocktrans %} {{date}} {{list.0.city}} </h3>
         {% for item in list %}
           <div class="item-heading">
             <span class="item-icon">
