@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-18 17:32+1100\n"
+"POT-Creation-Date: 2015-11-20 13:42+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -171,71 +171,71 @@ msgstr "第一时间了解新增城市请"
 msgid "Sign up"
 msgstr "注册"
 
-#: app/templates/app/index.html:62
+#: app/templates/app/index.html:65
 msgid "Discover authentic experiences"
 msgstr "探索本土化的生活轨迹"
 
-#: app/templates/app/index.html:63
+#: app/templates/app/index.html:66
 msgid "Explore local places"
 msgstr "发现当地的吃喝玩乐"
 
-#: app/templates/app/index.html:70
+#: app/templates/app/index.html:73
 msgid "Bring<br>the Kids"
 msgstr "亲子游"
 
-#: app/templates/app/index.html:77
+#: app/templates/app/index.html:80
 msgid "Honeymoon"
 msgstr "蜜月游"
 
-#: app/templates/app/index.html:84
+#: app/templates/app/index.html:87
 msgid "Local<br>Culture"
 msgstr "风土人情"
 
-#: app/templates/app/index.html:94
+#: app/templates/app/index.html:97
 msgid "Outdoor"
 msgstr "户外之旅"
 
-#: app/templates/app/index.html:101
+#: app/templates/app/index.html:104
 msgid "Extreme<br>Experiences"
 msgstr "刺激体验"
 
-#: app/templates/app/index.html:108
+#: app/templates/app/index.html:111
 msgid "Photography<br>Worthy"
 msgstr "风光摄影"
 
-#: app/templates/app/index.html:129
+#: app/templates/app/index.html:132
 msgid "Request a trip"
 msgstr "订制行程"
 
-#: app/templates/app/index.html:176
+#: app/templates/app/index.html:179
 msgid "Travel with Tripalocal"
 msgstr "本土客带您去旅行"
 
-#: app/templates/app/index.html:177
+#: app/templates/app/index.html:180
 msgid "See how it works"
 msgstr "了解更多"
 
-#: app/templates/app/index.html:189
+#: app/templates/app/index.html:192
 msgid "Your browser does not support the video tag."
 msgstr "您的浏览器不支持video标签"
 
-#: app/templates/app/index.html:196
+#: app/templates/app/index.html:199
 msgid "Our Community"
 msgstr "我们的社区"
 
-#: app/templates/app/index.html:200
+#: app/templates/app/index.html:203
 msgid "Travelling"
 msgstr "旅行心得"
 
-#: app/templates/app/index.html:205
+#: app/templates/app/index.html:208
 msgid "Hosting"
 msgstr "旅游达人"
 
-#: app/templates/app/index.html:252
+#: app/templates/app/index.html:255
 msgid " From "
 msgstr "到达日期"
 
-#: app/templates/app/index.html:253
+#: app/templates/app/index.html:256
 msgid " To "
 msgstr "离开日期"
 
@@ -399,7 +399,7 @@ msgstr "请填写全部必填项"
 msgid "Invalid email, please"
 msgstr "无效电子邮箱"
 
-#: app/templates/app/layout.html:450
+#: app/templates/app/layout.html:459
 msgid "Please try again later"
 msgstr ""
 

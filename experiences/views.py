@@ -3185,6 +3185,10 @@ def custom_itinerary(request, id=None):
                 ci.title = form.cleaned_data['title']
 
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+                if "ready" in request.POST:
+                    ci.status = "ready"
+                if "draft" in request.POST:
+                    ci.status = "draft"
                 ci.save()
 
                 workbook = xlsxwriter.Workbook(os.path.join(settings.PROJECT_ROOT,'itineraries', str(ci.id)+'.xlsx'))
@@ -3384,7 +3388,7 @@ def itinerary_detail(request,id=None):
         start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
         end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
 
-        itinerary = {"title":ci.title, "days":{}}
+        itinerary = {"title":ci.title, "days":{}, "status":ci.status}
         for item in ci.booking_set.order_by('datetime').all():
             item.experience.title = item.experience.get_title(settings.LANGUAGES[0][0])
             item.experience.description = item.experience.get_description(settings.LANGUAGES[0][0])
@@ -3429,7 +3433,7 @@ def itinerary_booking_confirmation(request):
             display_error = True
             form.data = form.data.copy()
             form.data['custom_currency'] = request.session['custom_currency']
-            form.data['price_paid'] = get_itinerary_price(form.data['itineraray_id'], request.session['custom_currency'])
+            form.data['price_paid'] = get_itinerary_price(form.data['itinerary_id'], request.session['custom_currency'])
             if form.is_valid():
                 request.user.registereduser.phone_number = form.cleaned_data['phone_number']
                 request.user.registereduser.save()
@@ -3544,12 +3548,11 @@ def set_response_exp_includes_detail_other_lang(data, includes):
         elif includes[index].item == "Ticket":
             data['included_ticket_detail_other'] = includes[index].details
 
-#TODO: add the template
 def itinerary_booking_successful(request, itinerary_id):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
 
-    return itinerary_detail(request,itinerary_id)
+    return HttpResponseRedirect(GEO_POSTFIX + "itinerary/" + itinerary_id)
 
 def nov_promo(request):
     set_initial_currency(request)

@@ -915,7 +915,7 @@ class ItineraryBookingForm(forms.Form):
     phone_number = forms.CharField(max_length=50, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
     custom_currency = forms.CharField(max_length=3, required=True)
-    price_paid = forms.DecimalField(max_digits=6, decimal_places=2, required=False)
+    price_paid = forms.FloatField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(ItineraryBookingForm, self).__init__(*args, **kwargs)
@@ -1044,7 +1044,8 @@ class ItineraryBookingForm(forms.Form):
 
         if not self.errors and (not 'Refresh' in self.data):
             itinerary = CustomItinerary.objects.get(id=self.cleaned_data['itinerary_id'])
-            itinerary.status= "requested"
+            itinerary.status= "beforepayment"
+            itinerary.save()
             user = User.objects.get(id=self.cleaned_data['user_id'])
 
             payment_street1 = self.cleaned_data['street1']
@@ -1057,8 +1058,8 @@ class ItineraryBookingForm(forms.Form):
 
             if 'Stripe' in self.data or 'stripeToken' in self.data:
                 payment = Payment()
-                price = form.cleaned_data['price_paid']
-                currency = form.cleaned_data['custom_currency']
+                price = self.cleaned_data['price_paid']
+                currency = self.cleaned_data['custom_currency']
                 success, instance = payment.charge(int(price*100), currency, stripe_token = self.data["stripeToken"])
 
                 if not success:
@@ -1077,6 +1078,7 @@ class ItineraryBookingForm(forms.Form):
                     payment.save()
 
                     itinerary.payment = payment
+                    itinerary.status= "paid"
                     itinerary.save()
                     #TODO, add the user to the guest list for each of the experiences booked
 
