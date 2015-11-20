@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-20 13:42+1100\n"
+"POT-Creation-Date: 2015-11-20 14:30+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1492,9 +1492,10 @@ msgid "Enquire about this itinerary"
 msgstr "定制咨询"
 
 #: experiences/templates/experiences/itinerary_detail.html:67
-#, python-format
-msgid "Day %(forloop.counter)s"
-msgstr "第%(forloop.counter)s天"
+#, fuzzy, python-format
+#| msgid "Card number"
+msgid "Day %(number)s"
+msgstr "第%(number)s天"
 
 #: experiences/templates/experiences/itinerary_detail.html:85
 msgid " days"
@@ -1819,6 +1820,9 @@ msgstr "领路人自驾"
 msgid "Private group"
 msgstr "私人团"
 
+#~ msgid "Day %(forloop.counter)s"
+#~ msgstr "第%(forloop.counter)s天"
+
 #~ msgid " day "
 #~ msgstr "天"
 
@@ -1926,9 +1930,6 @@ msgstr "私人团"
 
 #~ msgid "Leave a review for "
 #~ msgstr "请留下评价给"
-
-#~ msgid "Card number"
-#~ msgstr "信用卡号"
 
 #~ msgid "Expires on"
 #~ msgstr "到期"
