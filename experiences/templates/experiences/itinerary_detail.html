@@ -64,7 +64,7 @@
   <div class="detail-box">
       {%for date, list in itinerary.days.items %}
       <div class="day-list" id="day{{forloop.counter}}-list">
-        <h3 class="day-heading">{% blocktrans %}Day {{forloop.counter}}{% endblocktrans %} {{date}} {{list.0.city}} </h3>
+        <h3 class="day-heading">{% blocktrans with number=forloop.counter %}Day {{number}}{% endblocktrans %} {{date}} {{list.0.city}} </h3>
         {% for item in list %}
           <div class="item-heading">
             <span class="item-icon">
@@ -82,7 +82,7 @@
               <img src="{% static 'experiences/img/itinerary.svg' %}">
               {% endif %}
             </span>
-            <p>{{item.title}} ({%if item.duration < 24 %}{{item.duration|floatformat:"0"}}{% trans " hours" %}{%else%}{{item.duration|intdiv:24}}{% trans " days" %}{%endif%} &#8226; {% if item.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %})</p>
+            <p>{{item.title}} {% if item.type == 'PrivateProduct' or item.type == 'PublicProduct' or item.type == 'PRIVATE' or item.type == 'NONPRIVATE' %}({%if item.duration < 24 %}{{item.duration|floatformat:"0"}}{% trans " hours" %}{%else%}{{item.duration|intdiv:24}}{% trans " days" %}{%endif%} &#8226; {% if item.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}){% endif %}</p>
           </div>
           {% if item.photo_set.all %}
           {% with item.photo_set.all|first as photo %}
