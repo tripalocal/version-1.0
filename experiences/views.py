@@ -3198,7 +3198,7 @@ def custom_itinerary(request, id=None):
                 context['accommodation'] = [e for e in pds if e.type == 'Accommodation' and e.city in str(city).split(",")]
                 context['restaurant'] = [e for e in pds if e.type == 'Restaurant' and e.city in str(city).split(",")]
                 context['suggestion'] = [e for e in pds if e.type == 'Suggestion' and e.city in str(city).split(",")]
-                context['pricing'] = [e for e in pds if e.type == 'Pricing']
+                context['pricing'] = [e for e in pds if e.type == 'Pricing' and e.city in str(city).split(",")]
                 context["adult_number"] = adult_number
                 context["children_number"] = children_number
                 return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)
