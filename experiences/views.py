@@ -3121,6 +3121,46 @@ def custom_itinerary(request, id=None):
 
             return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
 
+        if 'Edit' in request.POST:
+            #edit an item
+            item = request.POST
+            np = NewProduct.objects.get(id=item.get('id'))
+            np.price = item.get('price', 0)
+            np.city = city=item.get('location', "")
+            #np.currency=request.session["custom_currency"].lower()
+            np.save()
+
+            npi18n = np.newproducti18n_set.all()[0]
+            npi18n.title=item.get('title',"")
+            npi18n.description=item.get('details', "")
+            npi18n.location=item.get('location', "")
+            npi18n.save()
+
+            if len(request.FILES) > 0:
+                for p in np.photo_set.all():
+                    p.delete()
+                photo = request.FILES['file']
+                content_type = photo.content_type.split('/')[0]
+                if content_type == "image":
+                    if photo._size > EXPERIENCE_IMAGE_SIZE_LIMIT:
+                        raise forms.ValidationError(_('Image size exceeds the limit'))
+                else:
+                    raise forms.ValidationError(_('File type is not supported'))
+
+                name, extension = os.path.splitext(photo.name)
+                extension = extension.lower()
+                if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
+                    saveExperienceImage(np, photo, extension, 1)
+
+            return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
+
+        if 'Delete' in request.POST:
+            #delete an item
+            item = request.POST
+            np = NewProduct.objects.get(id=item.get('id'))
+            np.delete()
+            return HttpResponse(json.dumps({'success':True}),content_type="application/json")
+
         form = CustomItineraryForm(request.POST)
 
         if 'Search' in request.POST and 'itinerary_string' not in request.POST:
@@ -3158,7 +3198,7 @@ def custom_itinerary(request, id=None):
                 context['accommodation'] = [e for e in pds if e.type == 'Accommodation' and e.city in str(city).split(",")]
                 context['restaurant'] = [e for e in pds if e.type == 'Restaurant' and e.city in str(city).split(",")]
                 context['suggestion'] = [e for e in pds if e.type == 'Suggestion' and e.city in str(city).split(",")]
-                context['pricing'] = [e for e in pds if e.type == 'Pricing']
+                context['pricing'] = [e for e in pds if e.type == 'Pricing' and e.city in str(city).split(",")]
                 context["adult_number"] = adult_number
                 context["children_number"] = children_number
                 return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)
@@ -3187,8 +3227,6 @@ def custom_itinerary(request, id=None):
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
                 if "ready" in request.POST:
                     ci.status = "ready"
-                if "draft" in request.POST:
-                    ci.status = "draft"
                 ci.save()
 
                 workbook = xlsxwriter.Workbook(os.path.join(settings.PROJECT_ROOT,'itineraries', str(ci.id)+'.xlsx'))

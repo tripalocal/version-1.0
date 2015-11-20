@@ -175,6 +175,12 @@
                         <h2>{{experience.price}}</h2>
                         <p>{% trans 'per person' %}</p>
                     </div>
+                    {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
+                    <div class="portlet-header" style="display:none;">
+                        <button type="button" onclick="edit_item({{experience.id}}, '{{experience.type|lower}}');">{% trans "Edit" %}</button>
+                        <button type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</button>
+                    </div>
+                    {% endif %}
                   </div>
                   {% endfor %}
                 </div>
@@ -612,16 +618,31 @@
                 number_day += 1;
                 cities += c + ",";
                 var experience = $(day).find(".column")[0].firstElementChild;
+                var hour = 0;
+                var hour_string = "00";
                 while(experience && experience.id.indexOf("experience_id_") === 0)
                 {
                     var exp_id = experience.id.split("_");
                     var d = Date.parseExact($("#id_start_datetime").val().substring(0, 10), "yyyy-M-dd");
                     d.setDate(d.getDate()+number_day-1);
                     var tmp = $(experience).find(".exp-info")[0].firstElementChild;
+                    hour += 1;
+                    if(hour<10)
+                    {
+                        hour_string = "0" + hour;
+                    }
+                    else if(hour>23)
+                    {
+                        hour_string = "23";
+                    }
+                    else
+                    {
+                        hour_string = "" + hour;
+                    }
                     var dict={"id":exp_id[exp_id.length-1],
                               "title":tmp.innerText || tmp.textContent,
                               "date":d.toString('yyyy-M-dd'),
-                              "time":"01:00",
+                              "time":hour_string+":00",
                               "adult_number":$("#id_adult_number").val(),
                               "children_number":$("#id_children_number").val()};
                     itinerary.push(dict);
@@ -715,7 +736,8 @@
                 // For certain items, we calculate for group rather than per guest
                 var guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
                 if (type == 'transfer' || type == 'suggestion' || type == 'accommodation') {
-                  price = (parseFloat(price) / guest_number);
+                  //do not supprt this yet
+                  //price = (parseFloat(price) / guest_number);
                 }
 
                 var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_" + data.new_product_id + "\">" +
@@ -735,6 +757,10 @@
                                     "<h2>" + price + "</h2>" +
                                     "<p>{% trans 'per person' %}</p>" +
                                   "</div>" +
+                                  "<div class=\"portlet-header\">" +
+                                    "<button type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</button>" +
+                                    "<button type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</button>" +
+                                  "</div>" +
                                 "</div>";
                 $("#"+type+"_column").append(new_item);
                 $("#"+type+"_column").fadeIn();
@@ -746,6 +772,107 @@
                 $(".loading").hide();
                 init_drag();
             },
+            failure: function (e) {
+                $(".loading").hide();
+            }
+        });
+    }
+
+    function edit_item(id, type)
+    {
+        $("#add-" + type + "-btn").click();
+        var experience = $("#experience_id_" + id);
+        var price = experience.find(".exp-price.portlet-header").find("h2").text();
+        var title = experience.find(".exp-info.portlet-header").find("h3").text();
+        var details = $(experience.find(".exp-info.portlet-header").find("p")[0]).text();
+        $("#" + type + "-price").val(price);
+        $("#" + type + "-title").val(title);
+        $("#" + type + "-details").val(details);
+        $("#add-" + type + "-add").text("{% trans "Save" %}");
+        $("#add-" + type + "-add").attr("onclick", "");
+        $("#add-" + type + "-add").click(function(e){
+            var item = new FormData();
+            item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
+            item.append("Edit", "Edit");
+            item.append("id", id);
+
+            var ids = ["title", "location", "price", "details"];
+            var value = "";
+
+            for (var i = 0, j = 0; i < ids.length; i++) {
+                value = $("#" + type + "-" + ids[i]).val();
+                if(value)
+                {
+                    item.append([ids[i]], value);
+                    j++;
+                }
+            }
+
+            if(j == 0)
+            {
+                alert("Fill at least one field");
+                return;
+            }
+            if($("#"+type+"-photo")[0] && $("#"+type+"-photo")[0].files.length > 0)
+            {
+                file = $("#"+type+"-photo")[0].files[0];
+                if(file.size > 2097152)
+                {
+                    alert("{% trans "Image size exceeds the limit (2M)" %}");
+                    return;
+                }
+                if(file.type.indexOf("image/") < 0)
+                {
+                    alert("{% trans "Invalid image type" %}");
+                    return;
+                }
+                item.append("file", file);
+            }
+            $(".loading").show();
+            $.ajax({
+                url: '{{GEO_POSTFIX}}itinerary/',
+                type: "POST",
+                data: item,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                                experience.find(".exp-price.portlet-header").find("h2").text($("#" + type + "-price").val());
+                                experience.find(".exp-info.portlet-header").find("h3").text($("#" + type + "-title").val());
+                                $(experience.find(".exp-info.portlet-header").find("p")[0]).text($("#" + type + "-details").val());
+                                $("#add-" + type + "-add").text("{% trans "Add" %}");
+                                $("#add-" + type + "-add").unbind("click");
+                                $("#add-" + type + "-add").attr("onclick", "add_item('" + type + "');");
+                                $("#" + type + "_column").fadeIn();
+                                $("#" + type + "-title").val("");
+                                $("#" + type + "-details").val("");
+                                $("#" + type + "-location").val("");
+                                $("#" + type + "-price").val("");
+                                $("#add-" + type).hide();
+                                $(".loading").hide();
+                                init_drag();
+                },
+                failure: function (e) {
+                    $(".loading").hide();
+                }
+            });
+        });
+    }
+
+    function delete_item(id)
+    {
+        var item = new FormData();
+        item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
+        item.append("Delete", "Delete");
+        item.append("id", id);
+        $.ajax({
+            url: '{{GEO_POSTFIX}}itinerary/',
+            type: "POST",
+            data: item,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                        $("#experience_id_" + id).remove();
+                    },
             failure: function (e) {
                 $(".loading").hide();
             }

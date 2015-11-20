@@ -60,6 +60,10 @@
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
                 </div>
+                <div class="portlet-header">
+                    <button type="button" onclick="edit_item({{item.id}}, 'flight');">{% trans "Edit" %}</button>
+                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -91,7 +95,7 @@
                         <label>{% trans "Details" %}</label>
                         <textarea type="text" id="flight-details" class="form-control" style="height: 330px;"></textarea>
                     </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('flight');">{% trans "Add" %}</button>
+                    <button id="add-flight-add" class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('flight');">{% trans "Add" %}</button>
                     <button id="add-flight-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                 </div>
             </div>
@@ -115,6 +119,10 @@
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
+                </div>
+                <div class="portlet-header">
+                    <button type="button" onclick="edit_item({{item.id}}, 'transfer');">{% trans "Edit" %}</button>
+                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
@@ -147,7 +155,7 @@
                         <label>{% trans "Details" %}</label>
                         <textarea id="transfer-details" type="text" class="form-control" style="height: 330px;"></textarea>
                     </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('transfer');">{% trans "Add" %}</button>
+                    <button id="add-transfer-add" class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('transfer');">{% trans "Add" %}</button>
                     <button id="add-transfer-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                 </div>
             </div>
@@ -171,6 +179,10 @@
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
+                </div>
+                <div class="portlet-header">
+                    <button type="button" onclick="edit_item({{item.id}}, 'accommodation');">{% trans "Edit" %}</button>
+                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
@@ -203,7 +215,7 @@
                         <label>{% trans "Details" %}</label>
                         <textarea id="accommodation-details" type="text" class="form-control" style="height: 330px;"></textarea>
                     </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('accommodation');">{% trans "Add" %}</button>
+                    <button id="add-accommodation-add" class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('accommodation');">{% trans "Add" %}</button>
                     <button id="add-accommodation-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                 </div>
             </div>
@@ -219,14 +231,18 @@
                     <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info portlet-header">
-                <h3>{{item.title}}</h3>
-                <p>{{item.details}}</p>
-                <p>{{item.location}}</p>
+                    <h3>{{item.title}}</h3>
+                    <p>{{item.details}}</p>
+                    <p>{{item.location}}</p>
                 </div>
                 <div class="exp-price portlet-header">
-                <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                <h2>{{item.price}}</h2>
-                <p>{% trans "per person" %}</p>
+                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
+                    <h2>{{item.price}}</h2>
+                    <p>{% trans "per person" %}</p>
+                </div>
+                <div class="portlet-header">
+                    <button type="button" onclick="edit_item({{item.id}}, 'restaurant');">{% trans "Edit" %}</button>
+                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
@@ -259,7 +275,7 @@
                         <label>{% trans "Details" %}</label>
                         <textarea id="restaurant-details" type="text" class="form-control" style="height: 330px;"></textarea>
                     </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('restaurant');">{% trans "Add" %}</button>
+                    <button id="add-restaurant-add" class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('restaurant');">{% trans "Add" %}</button>
                     <button id="add-restaurant-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                 </div>
             </div>
@@ -283,6 +299,10 @@
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
+                </div>
+                <div class="portlet-header">
+                    <button type="button" onclick="edit_item({{item.id}}, 'suggestion');">{% trans "Edit" %}</button>
+                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
@@ -315,7 +335,7 @@
                         <label>{% trans "Details" %}</label>
                         <textarea id="suggestion-details" type="text" class="form-control" style="height: 330px;"></textarea>
                     </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('suggestion');">{% trans "Add" %}</button>
+                    <button id="add-suggestion-add" class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('suggestion');">{% trans "Add" %}</button>
                     <button id="add-suggestion-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                 </div>
             </div>
@@ -337,6 +357,10 @@
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
+                </div>
+                <div class="portlet-header">
+                    <button type="button" onclick="edit_item({{item.id}}, 'pricing');">{% trans "Edit" %}</button>
+                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
@@ -362,7 +386,7 @@
                         <label>{% trans "Details" %}</label>
                         <textarea id="pricing-details" type="text" class="form-control" style="height: 330px;"></textarea>
                     </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('pricing');">{% trans "Add" %}</button>
+                    <button id="add-pricing-add" class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('pricing');">{% trans "Add" %}</button>
                     <button id="add-pricing-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
                 </div>
             </div>
