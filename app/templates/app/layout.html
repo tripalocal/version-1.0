@@ -126,8 +126,7 @@
           </a>
         </div>
 
-          <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right"
-          href="https://www.tripalocal.com{% if LANGUAGE == "zh-CN" %}{{ request.path|slice:"3:" }}{% else %}/cn{{ request.path }}{% endif %}">
+          <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right">
           {% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}
           </a>
 
@@ -394,16 +393,16 @@
         var des_url = window.location.pathname;
         if (des_url.indexOf("/cn") > -1) {
             $('#id_language_select').val('cn');
-            $('#id_language_top').attr("href", "https://www.tripalocal.com" + des_url.substring(3));
+            $('#language_switch_topbar').attr("href", "https://www.tripalocal.com" + des_url.substring(3));
         }
         else if (window.location.href.indexOf(".cn") > -1) {
             $('#id_language_select').val('cn');
-            $('#id_language_top').attr("href", "https://www.tripalocal.com" + des_url);
+            $('#language_switch_topbar').attr("href", "https://www.tripalocal.com" + des_url);
             $(".navbar-brand").attr("href", "https://www.tripalocal.com.cn{{GEO_POSTFIX}}");
         }
         else {
             $('#id_language_select').val('en');
-            $('#id_language_top').attr("href", "https://www.tripalocal.com/cn" + des_url);
+            $('#language_switch_topbar').attr("href", "https://www.tripalocal.com/cn" + des_url);
         }
 
         $('#id_language_select').change(function () {
