@@ -176,7 +176,7 @@
                         <h2>{{experience.fixed_price}}</h2> + <h2>{{experience.price}}</h2>
                         <p>{% trans "base + per person" %}</p>
                         {% else %}
-                        <h2>{{experience.price}}</h2>
+                        <h2 style="display:none;">0</h2><h2>{{experience.price}}</h2>
                         <p>{% trans 'per person' %}</p>
                         {% endif %}
                     </div>
