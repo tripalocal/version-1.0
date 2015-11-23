@@ -1044,7 +1044,7 @@ class ItineraryBookingForm(forms.Form):
 
         if not self.errors and (not 'Refresh' in self.data):
             itinerary = CustomItinerary.objects.get(id=self.cleaned_data['itinerary_id'])
-            itinerary.status= "beforepayment"
+            itinerary.status= "paying"
             itinerary.save()
             user = User.objects.get(id=self.cleaned_data['user_id'])
 
