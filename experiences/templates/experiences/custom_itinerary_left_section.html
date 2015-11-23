@@ -53,17 +53,19 @@
                 <div class="exp-info portlet-header">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
+                    <p>
+                      {{item.location}}
+                      &middot;
+                      <a type="button" onclick="edit_item({{item.id}}, 'flight');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
+                    </p>
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
-                </div>
-                <div class="portlet-header">
-                    <button type="button" onclick="edit_item({{item.id}}, 'flight');">{% trans "Edit" %}</button>
-                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
@@ -118,17 +120,19 @@
                 <div class="exp-info portlet-header">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
+                    <p>
+                      {{item.location}}
+                      &middot;
+                      <a type="button" onclick="edit_item({{item.id}}, 'transfer');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
+                    </p>
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
-                </div>
-                <div class="portlet-header">
-                    <button type="button" onclick="edit_item({{item.id}}, 'transfer');">{% trans "Edit" %}</button>
-                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
@@ -183,17 +187,19 @@
                 <div class="exp-info portlet-header">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
+                    <p>
+                      {{item.location}}
+                      &middot;
+                      <a type="button" onclick="edit_item({{item.id}}, 'accommodation');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
+                    </p>
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
-                </div>
-                <div class="portlet-header">
-                    <button type="button" onclick="edit_item({{item.id}}, 'accommodation');">{% trans "Edit" %}</button>
-                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
@@ -248,17 +254,19 @@
                 <div class="exp-info portlet-header">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
+                    <p>
+                      {{item.location}}
+                      &middot;
+                      <a type="button" onclick="edit_item({{item.id}}, 'restaurant');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
+                    </p>
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
-                </div>
-                <div class="portlet-header">
-                    <button type="button" onclick="edit_item({{item.id}}, 'restaurant');">{% trans "Edit" %}</button>
-                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
@@ -313,17 +321,19 @@
                 <div class="exp-info portlet-header">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
+                    <p>
+                      {{item.location}}
+                      &middot;
+                      <a type="button" onclick="edit_item({{item.id}}, 'suggestion');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
+                    </p>
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
-                </div>
-                <div class="portlet-header">
-                    <button type="button" onclick="edit_item({{item.id}}, 'suggestion');">{% trans "Edit" %}</button>
-                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
@@ -376,17 +386,19 @@
                 <div class="exp-info portlet-header">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
+                    <p>
+                      {{item.location}}
+                      &middot;
+                      <a type="button" onclick="edit_item({{item.id}}, 'pricing');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
+                    </p>
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
                     <h2>{{item.price}}</h2>
                     <p>{% trans "per person" %}</p>
-                </div>
-                <div class="portlet-header">
-                    <button type="button" onclick="edit_item({{item.id}}, 'pricing');">{% trans "Edit" %}</button>
-                    <button type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</button>
                 </div>
             </div>
             {% endfor %}
