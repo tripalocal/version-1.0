@@ -3186,6 +3186,7 @@ def custom_itinerary(request, id=None):
                     pd.location = pd.city
                     if 'custom_currency' in request.session and request.session["custom_currency"].lower() != pd.currency.lower():
                         pd.price = convert_currency(pd.price, pd.currency, request.session["custom_currency"])
+                        pd.fixed_price = convert_currency(pd.fixed_price, pd.currency, request.session["custom_currency"])
                 context['flight'] = [e for e in pds if e.type == 'Flight' and e.city in str(city).split(",")]
                 context['transfer'] = [e for e in pds if e.type == 'Transfer' and e.city in str(city).split(",")]
                 context['accommodation'] = [e for e in pds if e.type == 'Accommodation' and e.city in str(city).split(",")]
