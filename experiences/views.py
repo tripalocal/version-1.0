@@ -2166,15 +2166,6 @@ def getNReviews(experienceKey):
 
     return len(reviewList)
 
-#TODO move to models
-# Takes the experience primary key and returns the background image
-def getBGImageURL(experienceKey):
-    BGImageURL = ""
-    photoList = Photo.objects.filter(experience_id=experienceKey)
-    if len(photoList):
-        BGImageURL = 'thumbnails/experiences/'+ photoList[0].name.split('.')[0] + '.jpg'
-    return BGImageURL
-
 def tagsOnly(tag, exp):
     experience_tags = exp.get_tags(settings.LANGUAGES[0][0])
     return tag in experience_tags
@@ -2810,7 +2801,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             cityExperienceList.insert(counter, experience)
             cityExperienceReviewList.insert(counter, getNReviews(experience.id))
             # Fetch BGImageURL
-            BGImageURL = getBGImageURL(experience.id)
+            BGImageURL = experience.get_background_image()
             if (BGImageURL):
                 BGImageURLList.insert(counter, BGImageURL)
             else:
@@ -3582,7 +3573,7 @@ def nov_promo(request):
 
         setExperienceDisplayPrice(experience)
 
-        experience.image = getBGImageURL(experience.id)
+        experience.image = experience.get_background_image()
 
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
@@ -3625,7 +3616,7 @@ def topic_family(request):
 
         setExperienceDisplayPrice(experience)
 
-        experience.image = getBGImageURL(experience.id)
+        experience.image = experience.get_background_image()
 
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
@@ -3668,7 +3659,7 @@ def topic_romance(request):
 
         setExperienceDisplayPrice(experience)
 
-        experience.image = getBGImageURL(experience.id)
+        experience.image = experience.get_background_image()
 
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
@@ -3712,7 +3703,7 @@ def topic_culture(request):
 
         setExperienceDisplayPrice(experience)
 
-        experience.image = getBGImageURL(experience.id)
+        experience.image = experience.get_background_image()
 
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
@@ -3755,7 +3746,7 @@ def topic_outdoor(request):
 
         setExperienceDisplayPrice(experience)
 
-        experience.image = getBGImageURL(experience.id)
+        experience.image = experience.get_background_image()
 
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
@@ -3798,7 +3789,7 @@ def topic_extreme(request):
 
         setExperienceDisplayPrice(experience)
 
-        experience.image = getBGImageURL(experience.id)
+        experience.image = experience.get_background_image()
 
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
@@ -3841,7 +3832,7 @@ def topic_photography(request):
 
         setExperienceDisplayPrice(experience)
 
-        experience.image = getBGImageURL(experience.id)
+        experience.image = experience.get_background_image()
 
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
@@ -3883,7 +3874,7 @@ def multi_day_trip(request):
 
         setExperienceDisplayPrice(experience)
 
-        experience.image = getBGImageURL(experience.id)
+        experience.image = experience.get_background_image()
 
         if not experience.currency:
             experience.currency = 'aud'

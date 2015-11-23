@@ -24,7 +24,7 @@ from django.contrib import messages
 import string, random, pytz, subprocess, geoip2.database, requests
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
-from experiences.views import SearchView, getBGImageURL, set_initial_currency, convert_experience_price
+from experiences.views import SearchView, set_initial_currency, convert_experience_price
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment, get_experience_meetup_spot, \
     WechatProduct, WechatBooking
@@ -113,7 +113,7 @@ def home(request):
     idxList = random.sample(range(len(experienceList)), 3)
     featuredExperienceList = [experienceList[i] for i in idxList]
 
-    BGImages = [getBGImageURL(exp.id) for exp in featuredExperienceList]
+    BGImages = [exp.get_background_image() for exp in featuredExperienceList]
     profileImages = [exp.get_profile_image() for exp in featuredExperienceList]
 
     featuredExperience = []

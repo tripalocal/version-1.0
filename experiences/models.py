@@ -188,6 +188,13 @@ class Experience(AbstractExperience):
         else:
             'profile_default.jpg'
 
+    def get_background_image(self):
+        BGImageURL = ""
+        photoList = Photo.objects.filter(experience=self)
+        if len(photoList):
+            BGImageURL = 'thumbnails/experiences/experience'+ str(self.id) + '_1.jpg'
+        return BGImageURL
+
 class ExperienceI18n(models.Model):
     title = models.CharField(max_length=100, null=True)
     description = models.TextField(null=True)
@@ -310,6 +317,13 @@ class NewProduct(AbstractExperience):
             return profileImage
         else:
             'profile_default.jpg'
+
+    def get_background_image(self):
+        BGImageURL = ""
+        photoList = Photo.objects.filter(experience=self)
+        if len(photoList):
+            BGImageURL = 'thumbnails/experiences/experience'+ str(self.id) + '_1.jpg'
+        return BGImageURL
 
 class NewProductI18n(models.Model):
     EN = 'en'
