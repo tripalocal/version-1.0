@@ -236,6 +236,16 @@ class NewProduct(AbstractExperience):
         t = self.get_title(settings.LANGUAGES[0][0])
         return str(self.id) + '--' + t
 
+    def get_information(self, language):
+        if hasattr(self, "newproducti18n_set") and self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
+            t = self.newproducti18n_set.filter(language=language)
+            if len(t)>0:
+                return t[0]
+            else:
+                return self.newproducti18n_set.all()[0]
+        else:
+            return None
+
     def get_title(self, lang):
         if self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
             t = self.newproducti18n_set.filter(language=lang)
@@ -612,6 +622,7 @@ class Coordinate(models.Model):
     order = models.IntegerField(null=True, blank=True)
     experience = models.ForeignKey(AbstractExperience)
 
+#TODO: move to the models of experience, newproduct
 def get_experience_activity(experience, language):
     if hasattr(experience, 'experienceactivity_set') and experience.experienceactivity_set is not None and len(experience.experienceactivity_set.all()) > 0:
         t = experience.experienceactivity_set.filter(language=language)

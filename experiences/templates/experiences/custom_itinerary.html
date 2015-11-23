@@ -686,21 +686,22 @@
     }
 
     function add_item(type) {
-        var ids = ["title", "location", "price", "details"];
+        var ids = ["title", "location", "price", "details", "notes"];
         var value = "";
         var item = new FormData();
         item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
         item.append("Add", "Add");
         item.append("type", type);
 
-        for (var i = 0; i < ids.length; i++) {
+        for (var i = 0, j = 0; i < ids.length; i++) {
             value = $("#" + type + "-" + ids[i]).val();
             if(value)
             {
                 item.append([ids[i]], value);
+                j++;
             }
         }
-        if(Object.keys(item).length == 3)
+        if(j == 0)
         {
             alert("Fill at least one field");
             return;
@@ -732,6 +733,7 @@
                 var details = $("#" + type + "-details").val();
                 var location = $("#" + type + "-location").val();
                 var price = $("#" + type + "-price").val();
+                var notes = $("#" + type + "-notes").val();
 
                 // For certain items, we calculate for group rather than per guest
                 var guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
@@ -744,7 +746,8 @@
                                   "<div class=\"exp-img portlet-header\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
                                   "<div class=\"exp-info portlet-header\">" +
                                     "<h3>" + title + "</h3>" +
-                                    "<p>" + details + "</p>";
+                                    "<p>" + details + "</p>" +
+                                    "<label style=\"display:none;\">" + notes + "</label>";
                 if(location)
                 {
                     new_item +=
@@ -768,6 +771,7 @@
                 $("#" + type + "-details").val("");
                 $("#" + type + "-location").val("");
                 $("#" + type + "-price").val("");
+                $("#" + type + "-notes").val("");
                 $("#add-"+type).hide();
                 $(".loading").hide();
                 init_drag();
@@ -785,9 +789,11 @@
         var price = experience.find(".exp-price.portlet-header").find("h2").text();
         var title = experience.find(".exp-info.portlet-header").find("h3").text();
         var details = $(experience.find(".exp-info.portlet-header").find("p")[0]).text();
+        var notes = experience.find(".exp-info.portlet-header").find("label").text();
         $("#" + type + "-price").val(price);
         $("#" + type + "-title").val(title);
         $("#" + type + "-details").val(details);
+        $("#" + type + "-notes").val(notes);
         $("#add-" + type + "-add").text("{% trans "Save" %}");
         $("#add-" + type + "-add").attr("onclick", "");
         $("#add-" + type + "-add").click(function(e){
@@ -796,7 +802,7 @@
             item.append("Edit", "Edit");
             item.append("id", id);
 
-            var ids = ["title", "location", "price", "details"];
+            var ids = ["title", "location", "price", "details", "notes"];
             var value = "";
 
             for (var i = 0, j = 0; i < ids.length; i++) {
@@ -839,12 +845,14 @@
                                 experience.find(".exp-price.portlet-header").find("h2").text($("#" + type + "-price").val());
                                 experience.find(".exp-info.portlet-header").find("h3").text($("#" + type + "-title").val());
                                 $(experience.find(".exp-info.portlet-header").find("p")[0]).text($("#" + type + "-details").val());
+                                experience.find(".exp-info.portlet-header").find("label").text($("#" + type + "-notes").val());
                                 $("#add-" + type + "-add").text("{% trans "Add" %}");
                                 $("#add-" + type + "-add").unbind("click");
                                 $("#add-" + type + "-add").attr("onclick", "add_item('" + type + "');");
                                 $("#" + type + "_column").fadeIn();
                                 $("#" + type + "-title").val("");
                                 $("#" + type + "-details").val("");
+                                $("#" + type + "-notes").val("");
                                 $("#" + type + "-location").val("");
                                 $("#" + type + "-price").val("");
                                 $("#add-" + type).hide();

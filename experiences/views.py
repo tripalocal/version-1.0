@@ -3102,7 +3102,7 @@ def custom_itinerary(request, id=None):
                             start_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)),
                             end_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)) + timedelta(weeks=520))
             np.save()
-            npi18n = NewProductI18n(product=np, title=item.get('title',""),
+            npi18n = NewProductI18n(product=np, title=item.get('title',""), notice=item.get('notes', ""),
                                     description=item.get('details', ""), location=item.get('location', ""))
             npi18n.save()
             if len(request.FILES) > 0:
@@ -3134,6 +3134,7 @@ def custom_itinerary(request, id=None):
             npi18n.title=item.get('title',"")
             npi18n.description=item.get('details', "")
             npi18n.location=item.get('location', "")
+            npi18n.notice=item.get('notes', "")
             npi18n.save()
 
             if len(request.FILES) > 0:
@@ -3188,8 +3189,10 @@ def custom_itinerary(request, id=None):
                 #get flight, transfer, ...
                 pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
                 for pd in pds:
-                    pd.title = pd.get_title(settings.LANGUAGES[0][0])
-                    pd.details = pd.get_description(settings.LANGUAGES[0][0])
+                    information = pd.get_information(settings.LANGUAGES[0][0])
+                    pd.title = information.title
+                    pd.details = information.description
+                    pd.notes = information.notice
                     pd.location = pd.city
                     if 'custom_currency' in request.session and request.session["custom_currency"].lower() != pd.currency.lower():
                         pd.price = convert_currency(pd.price, pd.currency, request.session["custom_currency"])
@@ -3423,6 +3426,7 @@ def itinerary_detail(request,id=None):
         else:
             full_price = False
         discount_deadline = ci.submitted_datetime + timedelta(days=7)
+
         start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
         end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
 
