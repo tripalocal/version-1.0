@@ -70,6 +70,9 @@
               {{form.guests_children}}
             </div>
           </div>
+          <div class="checkbox">
+            <label><input type="checkbox" id="id_first_time">{% trans "This is my first time here" %}</label>
+          </div>
         </div>
       </div>
     </div>
@@ -349,6 +352,11 @@ $(function() {
       if ($("#driver").is(":checked")) {
         $("#id_whats_included").val($("#id_whats_included").val() + $("#driver").val() + ",")
       }
+      if ($("#id_first_time").is(":checked")) {
+        isFirstTime = "Yes";
+      } else {
+        isFirstTime = "No";
+      }
       $.ajax({
           url : '{{GEO_POSTFIX}}itinerary/request/',
           type: "POST",
@@ -359,6 +367,7 @@ $(function() {
                       end_date: $("#id_end_date").val(),
                       guests_adults: $("#id_guests_adults").val(),
                       guests_children: $("#id_guests_children").val(),
+                      first_time: isFirstTime,
                       interests: tags,
                       budget: $("#id_budget").val(),
                       whats_included: $("#id_whats_included").val(),

@@ -751,7 +751,19 @@
                 if(location)
                 {
                     new_item +=
-                                    "<p>" + location.substring(0,15) + "</p>";
+                                    "<p>" + location.substring(0,15) +
+                                    " &middot; " +
+                                    "<a type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
+                                    " &middot; " +
+                                    "<a type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
+                                    "</p>";
+                } else {
+                  new_item +=
+                  "<p>" +
+                  "<a type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
+                  " &middot; " +
+                  "<a type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
+                  "</p>";
                 }
                 new_item +=
                                   "</div>" +
@@ -759,12 +771,7 @@
                                     "<p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>" +
                                     "<h2>" + price + "</h2>" +
                                     "<p>{% trans 'per person' %}</p>" +
-                                  "</div>" +
-                                  "<div class=\"portlet-header\">" +
-                                    "<button type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</button>" +
-                                    "<button type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</button>" +
-                                  "</div>" +
-                                "</div>";
+                                  "</div>";
                 $("#"+type+"_column").append(new_item);
                 $("#"+type+"_column").fadeIn();
                 $("#" + type + "-title").val("");
