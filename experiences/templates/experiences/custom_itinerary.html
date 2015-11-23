@@ -261,7 +261,11 @@
         $(".loading").hide();
         $("#itinerary_search").click(function(e){
             e.preventDefault();
-            set_data_before_submit();
+            if(!set_data_before_submit())
+            {
+                alert("Please fill all fields");
+                return;
+            }
             $(".loading").show();
 
             $.ajax({
@@ -298,7 +302,12 @@
         });
 
         $("#button_draft").click(function(e){
-            set_data_before_submit();
+            if(!set_data_before_submit())
+            {
+                e.preventDefault();
+                alert("Please fill all fields");
+                return;
+            }
             set_itinerary_string();
             if($("#id_itinerary_string").val().length <= 2)
             {
@@ -308,7 +317,12 @@
         });
 
         $("#button_ready").click(function(e){
-            set_data_before_submit();
+            if(!set_data_before_submit())
+            {
+                e.preventDefault();
+                alert("Please fill all fields");
+                return;
+            }
             set_itinerary_string();
             if($("#id_itinerary_string").val().length <= 2)
             {
@@ -608,11 +622,16 @@
         cities = cities.substring(0,cities.length-1);
         $("#id_city").val(cities);
 
+        if(!$("#id_start_datetime").val())
+        {
+            return false;
+        }
+
         var d = new Date($("#id_start_datetime").val());
         //d.setTime(d.getTime() + d.getTimezoneOffset()*60*1000);
-        //$("#id_start_datetime") is already set
         d.setDate(d.getDate()+number_city-1);
         $("#id_end_datetime").val(d.toString('yyyy-M-dd'));
+        return true;
     }
 
     function set_itinerary_string()
