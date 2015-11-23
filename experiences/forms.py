@@ -990,7 +990,7 @@ class ItineraryBookingForm(forms.Form):
             else:
                 #save the booking record
                 #user = User.objects.get(id=self.cleaned_data['user_id']) #moved outside of the for loop
-                host = get_host(experience)
+                host = experience.get_host()
                 bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
                 bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
                 local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -1098,12 +1098,6 @@ class ItineraryBookingForm(forms.Form):
 
         return cleaned
 
-def get_host(experience):
-    if type(experience) == Experience:
-        return experience.hosts.all()[0]
-    else:
-        return experience.provider.user
-
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
     if type(experience) != Experience: #issue 209
         # only send an email to us
@@ -1114,7 +1108,7 @@ def send_booking_email_verification(booking, experience, user, is_instant_bookin
                   priority='now')
         return
 
-    host = get_host(experience)
+    host = experience.get_host()
     if not is_instant_booking:
         if not settings.DEVELOPMENT:
             # send an email to the host
@@ -1222,7 +1216,7 @@ def sms_notification(booking, experience, user, phone_number):
     customer_phone_num = customer_phone_num[1] if len(customer_phone_num)>1 and len(customer_phone_num[1])>0 else customer_phone_num[0]
     exp_datetime_local = booking.datetime.astimezone(tzlocal())
     exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y")).format(*'年月日')
-    host = get_host(experience)
+    host = experience.get_host()
     send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
     schedule_request_reminder_sms(booking.id, host.id, user.first_name, booking.datetime + timedelta(days=1))
 
@@ -1259,7 +1253,3 @@ class SearchForm(forms.Form):
         self.fields['language'].widget.attrs['readonly'] = True
         self.fields['language'].widget = forms.HiddenInput()
 
-def convert_currency(price, current_currency, target_currency):
-    file_name = 'experiences/currency_conversion_rate/' + current_currency.upper() + '.yaml'
-    conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
-    return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)

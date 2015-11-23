@@ -4,12 +4,13 @@ from django.http import Http404
 from django.db import models
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from django.utils import timezone
 from allauth.socialaccount.models import SocialAccount
 from Tripalocal_V1 import settings
 from polymorphic import PolymorphicModel
-
+from experiences.utils import *
+import app.models
 
 class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
@@ -64,6 +65,7 @@ class Experience(AbstractExperience):
 
     guest_number_max = models.IntegerField()
     guest_number_min = models.IntegerField()
+    fixed_price = models.FloatField(default=0.0)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     currency = models.CharField(max_length=10)
@@ -176,6 +178,16 @@ class Experience(AbstractExperience):
         #TODO
         return pytz.timezone(settings.TIME_ZONE)
 
+    def get_host(self):
+        return self.hosts.all()[0]
+
+    def get_profile_image(self):
+        profileImage = app.models.RegisteredUser.objects.get(user_id=self.get_host().id).image_url
+        if profileImage:
+            return profileImage
+        else:
+            'profile_default.jpg'
+
 class ExperienceI18n(models.Model):
     title = models.CharField(max_length=100, null=True)
     description = models.TextField(null=True)
@@ -216,6 +228,7 @@ class NewProduct(AbstractExperience):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=UNLISTED)
     price_type = models.CharField(max_length=6, choices=PRICE_CHOICES, default=NORMAL,
                                   help_text="Only one of the price type will take effact.")
+    fixed_price = models.FloatField(default=0.0)
     price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     commission = models.FloatField(default=0.3)
     dynamic_price = models.CharField(max_length=100, blank=True)
@@ -287,6 +300,16 @@ class NewProduct(AbstractExperience):
     def get_timezone(self):
         #TODO
         return pytz.timezone(settings.TIME_ZONE)
+
+    def get_host(self):
+        return self.provider.user
+
+    def get_profile_image(self):
+        profileImage = RegisteredUser.objects.get(user_id=get_host(self).id).image_url
+        if profileImage:
+            return profileImage
+        else:
+            'profile_default.jpg'
 
 class NewProductI18n(models.Model):
     EN = 'en'
@@ -450,6 +473,22 @@ class CustomItinerary(models.Model):
                 dates.append(key)
 
         return len(dates)
+
+    def get_price(self, currency):
+        itinerary_price = 0.0
+        for bking in self.booking_set.all():
+            experience = bking.experience
+            guest_number = bking.guest_number
+            adult_number = bking.adult_number
+            children_number = bking.children_number
+            subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
+            subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
+            if experience.currency != currency:
+                subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
+            itinerary_price += subtotal_price
+        if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + self.submitted_datetime:
+            itinerary_price *= 1.15
+        return round(itinerary_price,0)
 
 class Booking(models.Model):
     user = models.ForeignKey(User)

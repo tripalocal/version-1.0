@@ -19,7 +19,7 @@ from django.template.loader import get_template
 from app.forms import UploadXLSForm, ExperienceTagsXLSForm
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from experiences.views import get_itinerary, update_booking, getAvailableOptions, experience_fee_calculator, update_pageview_statistics, get_related_experiences, get_experience_popularity
+from experiences.views import get_itinerary, update_booking, getAvailableOptions, update_pageview_statistics, get_related_experiences, get_experience_popularity
 from app.views import getreservation
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
@@ -32,7 +32,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from experiences.constant import  *
 from experiences.telstra_sms_api import send_sms
-from experiences.utils import isEnglish
+from experiences.utils import *
 
 if settings.LANGUAGE_CODE.lower() != "zh-cn":
     from allauth.socialaccount.providers.facebook.views import fb_complete_login
@@ -254,7 +254,7 @@ def saveBookingRequest(booking_request):
     if user not in experience.guests.all():
         experience.guests.add(user)
 
-    host = get_host(experience)
+    host = experience.get_host()
     #send an email to the traveller
     mail.send(subject=_('[Tripalocal] Booking confirmed'), message='', 
                 sender=_('Tripalocal <') + Aliases.objects.filter(destination__contains=host.email)[0].mail + '>',
@@ -634,7 +634,7 @@ def service_wishlist(request):
                                     'language':experience.language,
                                     'duration':experience.duration,
                                     'photo_url':photo_url,
-                                    'host_image':get_host(experience).registereduser.image_url})
+                                    'host_image':experience.get_host().registereduser.image_url})
 
             return Response(experiences,status=status.HTTP_200_OK)
 
@@ -955,7 +955,7 @@ def service_booking_request(request, format=None):
             if user is None:
                 raise Exception("Incomplete/Incorrect user information")
             experience = AbstractExperience.objects.get(id=str(item['experience_id']))
-            host = get_host(experience)
+            host = experience.get_host()
             bk_datetime = local_timezone.localize(datetime.strptime(item['datetime'].strip(), "%Y/%m/%d %H:%M")).astimezone(pytz.timezone("UTC"))
             guest_number_adult = int(item['guest_number_adult'])
             guest_number_children = int(item['guest_number_children'])
@@ -1035,7 +1035,7 @@ def get_experience_detail(experience, get_available_date=True, partner = False):
         included_ticket = WhatsIncludedList.filter(item='Ticket', language=settings.LANGUAGES[0][0])[0]
         included_transport = WhatsIncludedList.filter(item='Transport', language=settings.LANGUAGES[0][0])[0]
 
-        host = get_host(experience)
+        host = experience.get_host()
         host_image = host.registereduser.image_url
         host_bio = get_user_bio(host.registereduser, settings.LANGUAGES[0][0])
 

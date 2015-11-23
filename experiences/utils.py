@@ -1,3 +1,8 @@
+import os
+
+from Tripalocal_V1 import settings
+from unionpay.util.helper import load_config
+
 def isEnglish(s):
     try:
         s.decode('ascii') if isinstance(s, bytes) else s.encode('ascii')
@@ -7,6 +12,18 @@ def isEnglish(s):
         return False
     else:
         return True
+
+def experience_fee_calculator(price, commission_rate):
+    if type(price)==int or type(price) == float:
+        COMMISSION_PERCENT = round(commission_rate/(1-commission_rate),3)
+        return round(price*(1.00+COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+
+    return price
+
+def convert_currency(price, current_currency, target_currency):
+    file_name = 'experiences/currency_conversion_rate/' + current_currency.upper() + '.yaml'
+    conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
+    return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
 
 def get_total_price(experience, guest_number=0, adult_number=0, children_number=0):
     '''
@@ -43,4 +60,4 @@ def get_total_price(experience, guest_number=0, adult_number=0, children_number=
     else:
         subtotal_price += float(experience.price)*float(guest_number)
 
-    return subtotal_price
+    return subtotal_price + experience.fixed_price
