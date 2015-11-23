@@ -54,8 +54,10 @@
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p>
+                      {% if item.location %}
                       {{item.location}}
                       &middot;
+                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'flight');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
@@ -121,8 +123,10 @@
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p>
+                      {% if item.location %}
                       {{item.location}}
                       &middot;
+                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'transfer');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
@@ -188,8 +192,10 @@
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p>
+                      {% if item.location %}
                       {{item.location}}
                       &middot;
+                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'accommodation');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
@@ -255,8 +261,10 @@
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p>
+                      {% if item.location %}
                       {{item.location}}
                       &middot;
+                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'restaurant');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
@@ -322,8 +330,10 @@
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p>
+                      {% if item.location %}
                       {{item.location}}
                       &middot;
+                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'suggestion');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
@@ -387,8 +397,10 @@
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p>
+                      {% if item.location %}
                       {{item.location}}
                       &middot;
+                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'pricing');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
