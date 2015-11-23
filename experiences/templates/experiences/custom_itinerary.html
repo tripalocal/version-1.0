@@ -282,6 +282,7 @@
                             $($('.nav-tabs').children()[0]).addClass("active");
                             init_drag(); // Initialize draggable elements
                             filter_experiences(); // Initialize search filter
+                            update_dates();
                             $(".loading").hide();
                         },
                 failure: function(e) {
@@ -489,6 +490,13 @@
 
         //reload data
         $("#itinerary_search").click();
+    }
+
+    function update_dates() {
+      var $startDate = $('#id_start_datetime').val();
+      $('.section-box>p').each(function(index) {
+        $(this).html("{% trans 'Day' %} " + (index+1) + " " + moment($startDate).add(index,'days').format('YYYY-MM-DD'))
+      })
     }
 
     function update_guests() {
