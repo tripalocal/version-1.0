@@ -196,7 +196,7 @@
         <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
         <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
         <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
-        <li><a href="https://www.tripalocal.com{% if LANGUAGE == 'zh-CN' %}{{ request.path|slice:'3:' }}{% else %}/cn{{ request.path }}{% endif %}" style="border: 0;">{% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a></li>
+        <li><a id="language_switch_topbar_mobile" style="border: 0;">{% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a></li>
         {% if user.is_authenticated %}
         <li><a href="{{ GEO_POSTFIX }}accounts/logout/">{% trans "Logout" %}</a></li>
         {% else %}
@@ -388,21 +388,22 @@
            });
        }
 
-
-
         var des_url = window.location.pathname;
         if (des_url.indexOf("/cn") > -1) {
             $('#id_language_select').val('cn');
             $('#language_switch_topbar').attr("href", "https://www.tripalocal.com" + des_url.substring(3));
+            $('#language_switch_topbar_mobile').attr("href", "https://www.tripalocal.com" + des_url.substring(3));
         }
         else if (window.location.href.indexOf(".cn") > -1) {
             $('#id_language_select').val('cn');
             $('#language_switch_topbar').attr("href", "https://www.tripalocal.com" + des_url);
+            $('#language_switch_topbar_mobile').attr("href", "https://www.tripalocal.com" + des_url);
             $(".navbar-brand").attr("href", "https://www.tripalocal.com.cn{{GEO_POSTFIX}}");
         }
         else {
             $('#id_language_select').val('en');
             $('#language_switch_topbar').attr("href", "https://www.tripalocal.com/cn" + des_url);
+            $('#language_switch_topbar_mobile').attr("href", "https://www.tripalocal.com/cn" + des_url);
         }
 
         $('#id_language_select').change(function () {
