@@ -1,15 +1,16 @@
-﻿import traceback
+﻿import traceback, pytz
 
 from django.http import Http404
 from django.db import models
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from django.utils import timezone
 from allauth.socialaccount.models import SocialAccount
 from Tripalocal_V1 import settings
 from polymorphic import PolymorphicModel
-
+from experiences.utils import *
+import app.models
 
 class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
@@ -64,7 +65,9 @@ class Experience(AbstractExperience):
 
     guest_number_max = models.IntegerField()
     guest_number_min = models.IntegerField()
+    fixed_price = models.FloatField(default=0.0)
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     currency = models.CharField(max_length=10)
     dynamic_price = models.CharField(max_length=100)
 
@@ -82,7 +85,7 @@ class Experience(AbstractExperience):
     guests = models.ManyToManyField(User, related_name='experience_guests')
     status = models.CharField(max_length=50)
 
-    tags = models.ManyToManyField(ExperienceTag, related_name='experience_tags')
+    tags = models.ManyToManyField(ExperienceTag, related_name='experience_tags', blank=True)
     commission = models.FloatField(default=0.3)
 
     def __str__(self):
@@ -171,6 +174,20 @@ class Experience(AbstractExperience):
 
         return tags
 
+    def get_timezone(self):
+        #TODO
+        return pytz.timezone(settings.TIME_ZONE)
+
+    def get_host(self):
+        return self.hosts.all()[0]
+
+    def get_profile_image(self):
+        profileImage = app.models.RegisteredUser.objects.get(user_id=self.get_host().id).image_url
+        if profileImage:
+            return profileImage
+        else:
+            'profile_default.jpg'
+
 class ExperienceI18n(models.Model):
     title = models.CharField(max_length=100, null=True)
     description = models.TextField(null=True)
@@ -211,6 +228,7 @@ class NewProduct(AbstractExperience):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=UNLISTED)
     price_type = models.CharField(max_length=6, choices=PRICE_CHOICES, default=NORMAL,
                                   help_text="Only one of the price type will take effact.")
+    fixed_price = models.FloatField(default=0.0)
     price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     commission = models.FloatField(default=0.3)
     dynamic_price = models.CharField(max_length=100, blank=True)
@@ -225,11 +243,21 @@ class NewProduct(AbstractExperience):
     free_translation = models.BooleanField(default=False)
     order_on_holiday = models.BooleanField(default=False, help_text="If supplier take order during weekend and holiday "
                                                                     "particularly instant order during holiday")
-    tags = models.ManyToManyField(ExperienceTag, related_name='newproduct_tags')
+    tags = models.ManyToManyField(ExperienceTag, related_name='newproduct_tags', blank=True)
 
     def __str__(self):
         t = self.get_title(settings.LANGUAGES[0][0])
         return str(self.id) + '--' + t
+
+    def get_information(self, language):
+        if hasattr(self, "newproducti18n_set") and self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
+            t = self.newproducti18n_set.filter(language=language)
+            if len(t)>0:
+                return t[0]
+            else:
+                return self.newproducti18n_set.all()[0]
+        else:
+            return None
 
     def get_title(self, lang):
         if self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
@@ -268,6 +296,20 @@ class NewProduct(AbstractExperience):
     def update_commission(self, commission):
         self.commission = commission
         self.save()
+
+    def get_timezone(self):
+        #TODO
+        return pytz.timezone(settings.TIME_ZONE)
+
+    def get_host(self):
+        return self.provider.user
+
+    def get_profile_image(self):
+        profileImage = RegisteredUser.objects.get(user_id=get_host(self).id).image_url
+        if profileImage:
+            return profileImage
+        else:
+            'profile_default.jpg'
 
 class NewProductI18n(models.Model):
     EN = 'en'
@@ -405,6 +447,48 @@ class CustomItinerary(models.Model):
     status = models.CharField(max_length=10, default="draft")
     description = models.TextField(null=True, blank=True)
     note = models.TextField(null=True, blank=True)
+    submitted_datetime = models.DateTimeField(null=True)
+    payment = models.ForeignKey("Payment", null=True, blank=True)
+
+    def get_guest_number(self):
+        guest_number = 0
+        adult_number = 0
+        children_number = 0
+        if self.booking_set.all()[0].adult_number is not None and self.booking_set.all()[0].adult_number > 0:
+            guest_number = self.booking_set.all()[0].adult_number
+            adult_number = guest_number
+            if self.booking_set.all()[0].children_number is not None and self.booking_set.all()[0].children_number > 0:
+                children_number = self.booking_set.all()[0].children_number
+                guest_number += children_number
+        else:
+            guest_number = self.booking_set.all()[0].guest_number
+            adult_number = guest_number
+        return (guest_number, adult_number, children_number)
+
+    def get_length(self):
+        dates = []
+        for item in self.booking_set.all():
+            key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
+            if key not in dates:
+                dates.append(key)
+
+        return len(dates)
+
+    def get_price(self, currency):
+        itinerary_price = 0.0
+        for bking in self.booking_set.all():
+            experience = bking.experience
+            guest_number = bking.guest_number
+            adult_number = bking.adult_number
+            children_number = bking.children_number
+            subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
+            subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
+            if experience.currency != currency:
+                subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
+            itinerary_price += subtotal_price
+        if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + self.submitted_datetime:
+            itinerary_price *= 1.15
+        return round(itinerary_price,0)
 
 class Booking(models.Model):
     user = models.ForeignKey(User)
@@ -497,7 +581,7 @@ class Payment(models.Model):
     zip_code = models.CharField(max_length=4)
     state = models.CharField(max_length=3)
     country = models.CharField(max_length=15)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=50)
  
     # you could also store other information about the sale
     # but I'll leave that to you!
@@ -577,6 +661,7 @@ class Coordinate(models.Model):
     order = models.IntegerField(null=True, blank=True)
     experience = models.ForeignKey(AbstractExperience)
 
+#TODO: move to the models of experience, newproduct
 def get_experience_activity(experience, language):
     if hasattr(experience, 'experienceactivity_set') and experience.experienceactivity_set is not None and len(experience.experienceactivity_set.all()) > 0:
         t = experience.experienceactivity_set.filter(language=language)

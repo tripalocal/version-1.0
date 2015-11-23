@@ -10,6 +10,7 @@ from experiences.constant import *
 from experiences.tasks import schedule_sms, schedule_sms_if_no_confirmed
 from experiences.constant import *
 from experiences.models import *
+from experiences.utils import *
 from Tripalocal_V1 import settings
 from experiences.telstra_sms_api import send_sms
 from django.template import loader
@@ -74,8 +75,12 @@ Guest_Number = (('1', '1' + _(' Guest')),('2', '2' + _(' Guests')),('3', '3' + _
 
 Guest_Number_Min = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),)
 
+Guest_Number_Child = (('0', 'None'),('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),)
+
 Guest_Number_Max = (('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),
                     ('11', '11'),('12', '12'),('13', '13'),('14', '14'),('15', '15'),('16', '16'),('17', '17'),('18', '18'),('19', '19'),('20', '20'),)
+
+Budget_Range = (('AU$ 3000 - 5000', _('AU$ 3000 - 5000')), ('AU$ 5000 - 6500', _('AU$ 5000 - 6500')), ('> AU$ 6500', _('> AU$ 6500')))
 
 Duration = (('1.0', '1 hour'),('1.5', '1.5 hours'),('2.0', '2 hours'),('2.5', '2.5 hours'),('3.0', '3 hours'),('4.0', '4 hours'),('5.0', '5 hours'),('6.0', '6 hours'),('7.0', '7 hours'),('8.0', '8 hours'),('9.0', '9 hours'),('10.0', '10 hours'),
 ('11.0', '11 hours'),('12.0', '12 hours'),('24.0', '1 day'),('48.0', '2 days'),('72.0', '3 days'),('96.0', '4 days'),('120.0', '5 days'),('144.0', '6 days'),('168.0', '7 days'),('192.0', '8 days'),
@@ -543,21 +548,8 @@ def check_coupon(coupon, experience_id, guest_number, target_currency=None):
         return result
 
     #not free:
-    subtotal_price = 0.0
     experience = AbstractExperience.objects.get(id = experience_id)
-    if experience.dynamic_price and type(experience.dynamic_price) == str:
-        price = experience.dynamic_price.split(',')
-        if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-        #these is comma in the end, so the length is max-min+2
-            if guest_number <= experience.guest_number_min:
-                subtotal_price = float(experience.price) * float(experience.guest_number_min)
-            else:
-                subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
-        else:
-            #wrong dynamic settings
-            subtotal_price = float(experience.price)*float(guest_number)
-    else:
-        subtotal_price = float(experience.price)*float(guest_number)
+    subtotal_price = get_total_price(experience, guest_number)
 
     COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
     if extra_fee == 0.00:
@@ -597,7 +589,7 @@ class BookingConfirmationForm(forms.Form):
     state = forms.CharField(max_length=10, required = False)
     country = forms.ChoiceField(choices=Country, required = False)
     postcode = forms.CharField(max_length=4, required = False)
-    phone_number = forms.CharField(max_length=15, required=True)
+    phone_number = forms.CharField(max_length=50, required=True)
 
     coupon_extra_information = forms.CharField(max_length=500, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
@@ -621,6 +613,7 @@ class BookingConfirmationForm(forms.Form):
         self.fields['status'].widget = forms.HiddenInput()
         self.fields['coupon_extra_information'].widget = forms.HiddenInput()
         self.fields['custom_currency'].widget = forms.HiddenInput()
+        self.fields['phone_number'].widget = forms.HiddenInput()
 
     def clean(self):
         """
@@ -804,10 +797,35 @@ class ExperienceAvailabilityForm(forms.Form):
 
 SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
 AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children')),(4,_('Famili with elderly&children')))
+
+class CustomItineraryRequestForm(forms.Form):
+    destinations = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':_('Eg. Melbourne, Sydney, Brisbane...')}))
+    start_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
+    end_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
+    guests_adults = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
+    guests_children = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
+    tags = forms.CharField(widget=forms.Textarea, required=False, initial=Tags)
+    budget = forms.ChoiceField(choices=Budget_Range, widget=forms.Select(attrs={'class':'form-control'}), required=True)
+    whats_included = forms.CharField(widget=forms.TextInput, required=False)
+    requirements = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control', 'rows':'5'}), required=False)
+    name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    wechat = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    email = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    mobile = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    def __init__(self, *args, **kwargs):
+        super(CustomItineraryRequestForm, self).__init__(*args, **kwargs)
+        self.fields['tags'].widget = forms.HiddenInput()
+        self.fields['whats_included'].widget = forms.HiddenInput()
+
+
 class CustomItineraryForm(forms.Form):
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'style':'width:290px;'}), max_length=100, required=False, initial="")
+    description = forms.CharField(widget=forms.Textarea, required=False)
+    note = forms.CharField(widget=forms.Textarea, required=False)
     start_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
-    end_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control', 'disabled': 'disabled'}))
-    guest_number = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
+    end_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
+    adult_number = forms.ChoiceField(choices=Guest_Number_Max, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
+    children_number = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
     city = forms.CharField(widget=forms.Textarea,  required=True, initial="Melbourne")
     language = forms.CharField(widget=forms.Textarea,  required=True, initial="English,Mandarin")
     tags = forms.CharField(widget=forms.Textarea, required=True, initial=Tags)
@@ -884,18 +902,7 @@ def instant_booking(experience, bk_date, bk_time):
 
 class ItineraryBookingForm(forms.Form):
     user_id = forms.CharField()
-    experience_id = forms.CharField(widget=forms.Textarea)
-    date = forms.CharField(widget=forms.Textarea)
-    time = forms.CharField(widget=forms.Textarea)
-    guest_number = forms.IntegerField(label="People")
-    itinerary_string = forms.CharField(widget=forms.Textarea, required=False)
-    status = forms.CharField(initial="Requested")
-    promo_code = forms.CharField(required=False)
-
-    card_number = CreditCardField(required=True, label="Card Number")
-    expiration = CCExpField(required=True, label="Expiration")
-    cvv = forms.IntegerField(required=True, label="CVV Number",
-        max_value=9999, widget=forms.TextInput(attrs={'size': '4'}))
+    itinerary_id = forms.CharField()
 
     first_name = forms.CharField(max_length=50)
     last_name = forms.CharField(max_length=50)
@@ -905,28 +912,21 @@ class ItineraryBookingForm(forms.Form):
     state = forms.CharField(max_length=10, required = False)
     country = forms.ChoiceField(choices=Country, required = False)
     postcode = forms.CharField(max_length=4, required = False)
-    phone_number = forms.CharField(max_length=15, required=False)
-
-    coupon_extra_information = forms.CharField(max_length=500, required=False)
+    phone_number = forms.CharField(max_length=50, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
+    custom_currency = forms.CharField(max_length=3, required=True)
+    price_paid = forms.FloatField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(ItineraryBookingForm, self).__init__(*args, **kwargs)
-        self.fields['experience_id'].widget.attrs['readonly'] = True
         self.fields['user_id'].widget.attrs['readonly'] = True
-        self.fields['guest_number'].widget.attrs['readonly'] = True
-        self.fields['date'].widget.attrs['readonly'] = True
-        self.fields['time'].widget.attrs['readonly'] = True
-        self.fields['status'].widget.attrs['readonly'] = True
-        self.fields['experience_id'].widget = forms.HiddenInput()
         self.fields['user_id'].widget = forms.HiddenInput()
-        self.fields['date'].widget = forms.HiddenInput()
-        self.fields['time'].widget = forms.HiddenInput()
-        self.fields['guest_number'].widget = forms.HiddenInput()
-        self.fields['status'].widget = forms.HiddenInput()
-        self.fields['coupon_extra_information'].widget = forms.HiddenInput()
-        self.fields['itinerary_string'].widget.attrs['readonly'] = True
-        self.fields['itinerary_string'].widget = forms.HiddenInput()
+        self.fields['itinerary_id'].widget.attrs['readonly'] = True
+        self.fields['itinerary_id'].widget = forms.HiddenInput()
+        self.fields['booking_extra_information'].widget = forms.HiddenInput()
+        self.fields['custom_currency'].widget.attrs['readonly'] = True
+        self.fields['custom_currency'].widget = forms.HiddenInput()
+        self.fields['phone_number'].widget = forms.HiddenInput()
 
     def booking(self,ids,dates,times,user,guest_number,
                 card_number=None,exp_month=None,exp_year=None,cvv=None,
@@ -959,20 +959,7 @@ class ItineraryBookingForm(forms.Form):
                 experience.title = experience.get_title(settings.LANGUAGES[0][0])
 
             if not free:
-                subtotal_price = 0.0
-                if experience.dynamic_price and type(experience.dynamic_price) == str:
-                    price = experience.dynamic_price.split(',')
-                    if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
-                    #these is comma in the end, so the length is max-min+2
-                        if guest_number <= experience.guest_number_min:
-                            subtotal_price = float(experience.price) * float(experience.guest_number_min)
-                        else:
-                            subtotal_price = float(price[guest_number-experience.guest_number_min]) * float(guest_number)
-                    else:
-                        #wrong dynamic settings
-                        subtotal_price = float(experience.price)*float(guest_number)
-                else:
-                    subtotal_price = float(experience.price)*float(guest_number)
+                subtotal_price = get_total_price(experience, guest_number)
 
                 COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
                 if extra_fee == 0.00:
@@ -1003,7 +990,7 @@ class ItineraryBookingForm(forms.Form):
             else:
                 #save the booking record
                 #user = User.objects.get(id=self.cleaned_data['user_id']) #moved outside of the for loop
-                host = get_host(experience)
+                host = experience.get_host()
                 bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
                 bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
                 local_timezone = pytz.timezone(settings.TIME_ZONE)
@@ -1056,34 +1043,11 @@ class ItineraryBookingForm(forms.Form):
         cleaned = super(ItineraryBookingForm, self).clean()
 
         if not self.errors and (not 'Refresh' in self.data):
-            card_number = self.cleaned_data["card_number"]
-            exp_month = self.cleaned_data["expiration"].month
-            exp_year = self.cleaned_data["expiration"].year
-            cvv = self.cleaned_data["cvv"]
-
-            ids = self.cleaned_data['experience_id'].split(';')
-            dates = self.cleaned_data['date'].split(';')
-            times = self.cleaned_data['time'].split(';')
-
-            ids.remove('')
-            dates.remove('')
-            times.remove('')
-
-            date_start = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[0].strip() + " " + times[0].split(":")[0].strip(), "%Y/%m/%d %H"))
-            date_end = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[len(dates)-1].strip() + " " + times[len(dates)-1].split(":")[0].strip(), "%Y/%m/%d %H"))
-            cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
-                                       end_datetime__gt = date_end,
-                                       start_datetime__lt = date_start)
-
-            if len(cp)>0:
-                rules = json.loads(cp[0].rules)
-                #TODO
-
+            itinerary = CustomItinerary.objects.get(id=self.cleaned_data['itinerary_id'])
+            itinerary.status= "paying"
+            itinerary.save()
             user = User.objects.get(id=self.cleaned_data['user_id'])
-            guest_number = int(self.cleaned_data["guest_number"])
-            booking_extra_information="Need Chinese Translation" if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information'] else ""
-            coupon_extra_information=self.cleaned_data['coupon_extra_information'],
-            coupon=cp[0] if len(cp)>0 else None
+
             payment_street1 = self.cleaned_data['street1']
             payment_street2 = self.cleaned_data['street2']
             payment_city = self.cleaned_data['city_town']
@@ -1092,24 +1056,59 @@ class ItineraryBookingForm(forms.Form):
             payment_postcode = self.cleaned_data['postcode']
             payment_phone_number = self.cleaned_data['phone_number']
 
-            self.booking(ids,dates,times,user,guest_number,
-                         card_number,exp_month,exp_year,cvv,
-                         booking_extra_information,coupon_extra_information,coupon,
-                         payment_street1,payment_street2,payment_city,payment_state,payment_country,payment_postcode,payment_phone_number)
+            if 'Stripe' in self.data or 'stripeToken' in self.data:
+                payment = Payment()
+                price = self.cleaned_data['price_paid']
+                currency = self.cleaned_data['custom_currency']
+                success, instance = payment.charge(int(price*100), currency, stripe_token = self.data["stripeToken"])
+
+                if not success:
+                    raise forms.ValidationError("Error: %s" % str(instance))
+                else:
+                    instance.save()
+                    payment.charge_id = instance['id']
+                    payment.booking_id = itinerary.booking_set.all()[0].id
+                    payment.street1 = payment_street1 if payment_street1 is not None else ""
+                    payment.street2 = payment_street2 if payment_street2 is not None else ""
+                    payment.city = payment_city if payment_city is not None else ""
+                    payment.state = payment_state if payment_state is not None else ""
+                    payment.country = payment_country if payment_country is not None else ""
+                    payment.postcode = payment_postcode if payment_postcode is not None else ""
+                    payment.phone_number = payment_phone_number if payment_phone_number is not None else ""
+                    payment.save()
+
+                    itinerary.payment = payment
+                    itinerary.status= "paid"
+                    itinerary.save()
+                    #TODO, add the user to the guest list for each of the experiences booked
+
+            elif 'UnionPay' in self.data or 'WeChat' in self.data:
+                booking_extra_information=self.cleaned_data['booking_extra_information']
+                itinerary.note = booking_extra_information
+
+                payment = Payment()
+                payment.booking_id = itinerary.booking_set.all()[0].id
+                payment.phone_number = self.cleaned_data['phone_number']
+                payment.save()
+
+                itinerary.payment_id = payment.id
+                itinerary.save()
+
+                #TODO: add the user to the guest list
 
         return cleaned
 
-def get_host(experience):
-    if type(experience) == Experience:
-        return experience.hosts.all()[0]
-    else:
-        return experience.provider.user
-
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
     if type(experience) != Experience: #issue 209
+        # only send an email to us
+        mail.send(subject='User ' + str(user.id) + ' has requested experience ' + str(experience.id) + ' , booking id: ' + str(booking.id),
+                  message='',
+                  sender=Aliases.objects.filter(destination__contains=user.email)[0].mail,
+                  recipients = ['enquiries@tripalocal.com'],
+                  priority='now')
         return
 
-    host = get_host(experience)
+    host = experience.get_host()
     if not is_instant_booking:
         if not settings.DEVELOPMENT:
             # send an email to the host
@@ -1213,10 +1212,11 @@ def sms_notification(booking, experience, user, phone_number):
         exp_title = experience.get_title(settings.LANGUAGE_CODE)
         return #issue 209
 
-    customer_phone_num = phone_number
+    customer_phone_num = phone_number.split(",")
+    customer_phone_num = customer_phone_num[1] if len(customer_phone_num)>1 and len(customer_phone_num[1])>0 else customer_phone_num[0]
     exp_datetime_local = booking.datetime.astimezone(tzlocal())
     exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y")).format(*'年月日')
-    host = get_host(experience)
+    host = experience.get_host()
     send_booking_request_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, user)
     schedule_request_reminder_sms(booking.id, host.id, user.first_name, booking.datetime + timedelta(days=1))
 
@@ -1253,7 +1253,3 @@ class SearchForm(forms.Form):
         self.fields['language'].widget.attrs['readonly'] = True
         self.fields['language'].widget = forms.HiddenInput()
 
-def convert_currency(price, current_currency, target_currency):
-    file_name = 'experiences/currency_conversion_rate/' + current_currency.upper() + '.yaml'
-    conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
-    return float(price)*float(conversion.get(target_currency.upper(), 1.00))

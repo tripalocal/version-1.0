@@ -96,10 +96,8 @@
 
 <div class="jumbotron bottom">
   <h1>{% trans "Prefer a personally tailored trip?" %}</h1>
-  <p>{% trans "Please contact our lovely custom service"%}</p>
-  <form action="mailto:enquiries@tripalocal.com">
-  <button class="btn btn-primary">{% trans "Help me plan my trip" %}</button>
-  </form>
+  <p>{% trans "We can help you out with that"%}</p>
+  <button class="btn btn-primary" onclick="window.location.href = '{{GEO_POSTFIX}}itinerary/request/';">{% trans "Help me plan my trip" %}</button>
 </div>
 {%endblock%}
 

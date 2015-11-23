@@ -103,3 +103,9 @@
 .footer-col li {
   margin: 6px 0;
 }
+
+@media print {
+  .footer {
+    display: none;
+  }
+}

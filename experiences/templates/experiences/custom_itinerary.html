@@ -15,8 +15,8 @@
   {% csrf_token %}
   <div style="display:none;">
   <!-- TODO -->
-
-
+    {{form.note}}
+    {{form.description}}
     {{form.city}}
 
     {{form.language}}
@@ -27,7 +27,8 @@
     {{form.itinerary_string}}
 
     <!-- Done, but needs to be hidden -->
-    {{form.guest_number}}
+    {{form.adult_number}}
+    {{form.children_number}}
     {{form.end_datetime}}
   </div>
   <!-- Top search bar -->
@@ -36,7 +37,7 @@
       <div class="row">
         <div class="form-inline">
           <h3 class="form-header">{% trans "Title" %}</h3>
-          <input type="text" class="form-control" id="itinerary-title" style="width:370px;">
+          {{form.title}}
         </div>
         <div class="form-inline">
           <h3 class="form-header">{% trans "Start date" %}</h3>
@@ -49,16 +50,13 @@
           <button id="add-adults" type="button" class="btn btn-grey"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content='
             <div class="form-goup">
               <select id="guest-num-select" class="form-control">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-                <option>5</option>
-                <option>6</option>
-                <option>7</option>
-                <option>8</option>
-                <option>9</option>
-                <option>10</option>
+                {% for i in guest_num_range %}
+                {% if forloop.counter == adult_number %}
+                <option value={{forloop.counter}} selected>{{forloop.counter}}</option>
+                {% else %}
+                <option value={{forloop.counter}}>{{forloop.counter}}</option>
+                {% endif %}
+                {% endfor %}
               </select>
             </div>
               <button type="button" class="btn btn-primary" id="submit-add-adults">Update</button>
@@ -67,11 +65,19 @@
           </button>
           <button id="add-kids" type="button" class="btn btn-default"data-container="body" data-toggle="popover" data-placement="bottom" data-html="true" data-content="
             <div class='form-goup'>
-              <select class='form-control'><option>1 Kid</option></select>
+              <select id='kid-num-select' class='form-control'>
+                {% for i in "0123456789" %}
+                {% if forloop.counter0 == children_number %}
+                <option value={{forloop.counter0}} selected>{{forloop.counter0}}</option>
+                {% else %}
+                <option value={{forloop.counter0}}>{{forloop.counter0}}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
             </div>
-              <button class='btn btn-primary'>Add</button>
-              <button class='btn btn-default' style='margin-right:0;' onclick='$(&quot;#add-kids&quot;).popover(&quot;hide&quot;);'>Cancel</button>
-            ">+ Add Kids
+              <button type='button' class='btn btn-primary' id='submit-add-kids'>Update</button>
+              <button type='button' class='btn btn-default' id='cancel-add-kids' style='margin-right:0;' onclick='$(&quot;#add-kids&quot;).popover(&quot;hide&quot;);'>Cancel</button>
+            ">Kids (2-12 yo) <span class="badge" id="num-kids">0</span>
           </button>
         </div>
       </div>
@@ -103,11 +109,11 @@
         </div>
         <div class="form-inline right-group">
           <h3 class="form-header">Web</h3>
-          <button type="button" id="" class="btn btn-sm btn-default">$</button>
-          <button type="button" id="button_preview" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
+          <button id="button_ready" name="ready" class="btn btn-sm btn-default">$</button>
+          <button id="button_draft" name="draft" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
           <h3 class="form-header">PDF</h3>
           <button type="button" id="" class="btn btn-sm btn-default">$</button>
-          <button type="button" id="button_preview" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
+          <button type="button" id="" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
           <!-- TODO -->
           <input class="btn btn-default" id="itinerary_search" type="hidden" value="{% trans "Search" %}" name="Search">
         </div>
@@ -134,321 +140,6 @@
           </ul>
           <!-- Tab panes -->
           <div class="tab-content">
-            <div role="tabpanel" class="tab-pane fade in active" id="experience">
-              <div class="input-group">
-                <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
-                <input type="text" class="form-control" id="search-keyword">
-              </div>
-              <div id="experience_column" style='height:100%;'>
-
-              </div>
-            </div>
-            <div role="tabpanel" class="tab-pane fade" id="flight">
-              <div class="column" id="flight_column">
-                <button type="button" class="btn btn-default" id="add-flight-btn">+ Add Flight</button>
-                {% for item in flight %}
-                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>{{item.title}}</h3>
-                    <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>{{item.price}}</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                {% endfor %}
-              </div>
-              <div class="new-item-form container-fluid" id="add-flight" style="display:none;">
-                <div class="row">
-                  <div class="col-xs-6">
-                    <div class="fileinput fileinput-new" data-provides="fileinput">
-                      <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"><span class="placeholder"><img src="{% static 'icon/plus_green.svg' %}">Add Photos</span></div>
-                      <div style="display:none;">
-                        <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="..."></span>
-                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label>{% trans "Title" %}</label>
-                      <input id="flight-title" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label>{% trans "Departing Location" %}</label>
-                      <input id="flight-location" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label style="display:block;">{% trans "Price" %}</label>
-                      <input id="flight-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
-                    </div>
-                  </div>
-                  <div class="col-xs-6">
-                    <div class="form-group">
-                      <label>{% trans "Details" %}</label>
-                      <input type="text" id="flight-details" class="form-control" style="height: 350px;"></input>
-                    </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('flight');">{% trans "Add" %}</button>
-                    <button id="add-flight-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div role="tabpanel" class="tab-pane fade" id="transfer">
-              <div class="column" id="transfer_column">
-                <button type="button" id="add-transfer-btn" class="btn btn-default">+ Add Transfer</button>
-                {% for item in transfer %}
-                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>{{item.title}}</h3>
-                    <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>{{item.price}}</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                {% endfor %}
-              </div>
-              <div class="new-item-form container-fluid" id="add-transfer" style="display:none;">
-                <div class="row">
-                  <div class="col-xs-6">
-                    <div class="fileinput fileinput-new" data-provides="fileinput">
-                      <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"><span class="placeholder"><img src="{% static 'icon/plus_green.svg' %}">Add Photos</span></div>
-                      <div style="display:none;">
-                        <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="..."></span>
-                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label>{% trans "Title" %}</label>
-                      <input id="transfer-title" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label>{% trans "Departing Location" %}</label>
-                      <input id="transfer-location" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label style="display:block;">{% trans "Price" %}</label>
-                      <input id="transfer-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per trip</span>
-                    </div>
-                  </div>
-                  <div class="col-xs-6">
-                    <div class="form-group">
-                      <label>{% trans "Details" %}</label>
-                      <input id="transfer-details" type="text" class="form-control" style="height: 350px;"></input>
-                    </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('transfer');">{% trans "Add" %}</button>
-                    <button id="add-transfer-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div role="tabpanel" class="tab-pane fade" id="accommodation">
-              <div class="column" id="accommodation_column">
-                <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
-                {% for item in accommodation %}
-                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>{{item.title}}</h3>
-                    <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>{{item.price}}</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                {% endfor %}
-              </div>
-              <div class="new-item-form container-fluid" id="add-accommodation" style="display:none;">
-                <div class="row">
-                  <div class="col-xs-6">
-                    <div class="fileinput fileinput-new" data-provides="fileinput">
-                      <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"><span class="placeholder"><img src="{% static 'icon/plus_green.svg' %}">Add Photos</span></div>
-                      <div style="display:none;">
-                        <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="..."></span>
-                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label>{% trans "Title" %}</label>
-                      <input id="accommodation-title" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label>{% trans "Location" %}</label>
-                      <input id="accommodation-location" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label style="display:block;">{% trans "Price" %}</label>
-                      <input id="accommodation-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/per night</span>
-                    </div>
-                  </div>
-                  <div class="col-xs-6">
-                    <div class="form-group">
-                      <label>{% trans "Details" %}</label>
-                      <input id="accommodation-details" type="text" class="form-control" style="height: 350px;"></input>
-                    </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('accommodation');">{% trans "Add" %}</button>
-                    <button id="add-accommodation-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div role="tabpanel" class="tab-pane fade" id="restaurant">
-              <div class="column" id="restaurant_column">
-                <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
-                {% for item in restaurant %}
-                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>{{item.title}}</h3>
-                    <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>{{item.price}}</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                {% endfor %}
-              </div>
-              <div class="new-item-form container-fluid" id="add-restaurant" style="display:none;">
-                <div class="row">
-                  <div class="col-xs-6">
-                    <div class="fileinput fileinput-new" data-provides="fileinput">
-                      <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"><span class="placeholder"><img src="{% static 'icon/plus_green.svg' %}">Add Photos</span></div>
-                      <div style="display:none;">
-                        <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="..."></span>
-                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label>{% trans "Title" %}</label>
-                      <input id="restaurant-title" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label>{% trans "Location" %}</label>
-                      <input id="restaurant-location" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label style="display:block;">{% trans "Price" %}</label>
-                      <input id="restaurant-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
-                    </div>
-                  </div>
-                  <div class="col-xs-6">
-                    <div class="form-group">
-                      <label>{% trans "Details" %}</label>
-                      <input id="restaurant-details" type="text" class="form-control" style="height: 350px;"></input>
-                    </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('restaurant');">{% trans "Add" %}</button>
-                    <button id="add-restaurant-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div role="tabpanel" class="tab-pane fade" id="suggestion">
-              <div class="column" id="suggestion_column">
-                <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
-                {% for item in suggestion %}
-                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>{{item.title}}</h3>
-                    <p>{{item.details}}</p>
-                    <p>{{item.location}}</p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>{{item.price}}</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                {% endfor %}
-              </div>
-              <div class="new-item-form container-fluid" id="add-suggestion" style="display:none;">
-                <div class="row">
-                  <div class="col-xs-6">
-                    <div class="fileinput fileinput-new" data-provides="fileinput">
-                      <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"><span class="placeholder"><img src="{% static 'icon/plus_green.svg' %}">Add Photos</span></div>
-                      <div style="display:none;">
-                        <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" name="..."></span>
-                        <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label>{% trans "Title" %}</label>
-                      <input id="suggestion-title" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label>{% trans "Location" %}</label>
-                      <input id="suggestion-location" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label style="display:block;">{% trans "Price" %}</label>
-                      <input id="suggestion-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD/pp</span>
-                    </div>
-                  </div>
-                  <div class="col-xs-6">
-                    <div class="form-group">
-                      <label>{% trans "Details" %}</label>
-                      <input id="suggestion-details" type="text" class="form-control" style="height: 350px;"></input>
-                    </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('suggestion');">{% trans "Add" %}</button>
-                    <button id="add-suggestion-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div role="tabpanel" class="tab-pane fade" id="pricing">
-              <div class="column" id="pricing_column">
-                <button type="button" id="add-pricing-btn" class="btn btn-default">+ Add Pricing</button>
-                {% for item in pricing %}
-                <div class="exp-box-sm portlet" id="experience_id_{{item.id}}">
-                  <div class="exp-img portlet-header"></div>
-                  <div class="exp-info portlet-header">
-                    <h3>{{item.title}}</h3>
-                    <p>{{item.details}}</p>
-                  </div>
-                  <div class="exp-price portlet-header">
-                    <p>$AUD</p>
-                    <h2>{{item.price}}</h2>
-                    <p>{% trans "per person" %}</p>
-                  </div>
-                </div>
-                {% endfor %}
-              </div>
-              <div class="new-item-form container-fluid" id="add-pricing" style="display:none;">
-                <div class="row">
-                  <div class="col-xs-6">
-                    <div class="form-group">
-                      <label>{% trans "Title" %}</label>
-                      <input id="pricing-title" class="form-control">
-                    </div>
-                    <div class="form-group">
-                      <label style="display:block;">{% trans "Price" %}</label>
-                      <input id="pricing-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">$AUD</span>
-                    </div>
-                  </div>
-                  <div class="col-xs-6">
-                    <div class="form-group">
-                      <label>{% trans "Details" %}</label>
-                      <input id="pricing-details" type="text" class="form-control" style="height: 350px;"></input>
-                    </div>
-                    <button class="btn btn-primary" type="button" style="display:inline-block;" onclick="add_item('pricing');">{% trans "Add" %}</button>
-                    <button id="add-pricing-cancel" type="button" class="btn btn-secondary" style="display:inline-block;">{% trans "Cancel" %}</button>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -456,8 +147,52 @@
         <!-- Right section -->
         <div id="right_section" class="section" style="overflow:scroll; height:72vh;">
           <h1 class="section-heading">Itinerary</h1>
-          <h2 class="price-line">$AUD <label id="price-pp">0</label> {% trans "per person (Total of "%}$AUD <label id="price-tt">0</label>)</h2>
-
+          <h2 class="price-line">{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-pp">0</label> {% trans "per person (Total of "%}{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-tt">0</label>)</h2>
+          {% for city, dict in existing_itinerary.items %}
+            <div id="city-title-{{forloop.counter0}}" class="section-box-add" onclick="$('.collapse').collapse('hide'); $('#city-collapse-{{forloop.counter0}}').collapse('show');update_left_section('{{city}}');" city="{{city}}">
+              <span class="add-sign">+</span>
+              <p id="city-title-p-{{forloop.counter0}}">{{city}} <span class="badge">{{dict|length}}{% trans ' Day(s)' %}</span></p>
+            </div>
+            <div class="collapse" id="city-collapse-{{forloop.counter0}}">
+              {% for date, experiences in dict.items %}
+              <div id="city-collapse-{{forloop.parentloop.counter0}}-day-{{forloop.counter}}" class="section-box">
+                <p>{% trans 'Day' %} {{forloop.counter}}</p>
+                <div class="column">
+                  {% for experience in experiences %}
+                  <div class='exp-box-sm portlet' id='experience_id_{{experience.id}}'>
+                    <div class='exp-img portlet-header'>
+                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
+                    </div>
+                    <div class='exp-info portlet-header'>
+                        <h3>{{experience.title}}</h3>
+                        <p>{{experience.description|escapejs|slice:"0:16"}}</p>
+                        <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
+                            {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
+                            {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+                    </div>
+                    <div class='exp-price portlet-header'>
+                        <p>{{experience.dollarsign}}{{experience.currency}}</p>
+                        {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
+                        <h2>{{item.fixed_price}}</h2> + <h2>{{item.price}}</h2>
+                        <p>{% trans "base + per person" %}</p>
+                        {% else %}
+                        <h2>{{experience.price}}</h2>
+                        <p>{% trans 'per person' %}</p>
+                        {% endif %}
+                    </div>
+                    {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
+                    <div class="portlet-header" style="display:none;">
+                        <button type="button" onclick="edit_item({{experience.id}}, '{{experience.type|lower}}');">{% trans "Edit" %}</button>
+                        <button type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</button>
+                    </div>
+                    {% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% endfor %}
         </div>
       </div>
     </div>
@@ -537,7 +272,8 @@
                             city: $("#id_city").val(),
                             start_datetime: $("#id_start_datetime").val(),
                             end_datetime: $("#id_end_datetime").val(),
-                            guest_number: $("#id_guest_number").val(),
+                            adult_number: $("#id_adult_number").val(),
+                            children_number: $("#id_children_number").val(),
                             language: $("#id_language").val(),
                             Search: "Search",
                             tags: $("#id_tags").val(),
@@ -546,24 +282,40 @@
                             age_limit: $("#id_age_limit").val()
                         },
                 success: function(data){
-                            $('#experience_column').html(data);
-                            init_drag();
+                            $('.tab-content').html(data);
+                            $('.nav-tabs').children().removeClass();
+                            $($('.nav-tabs').children()[0]).addClass("active");
+                            init_drag(); // Initialize draggable elements
+                            filter_experiences(); // Initialize search filter
+                            update_dates();
                             $(".loading").hide();
                         },
                 failure: function(e) {
                             $(".loading").hide();
-                            $('#experience_column').text("Sorry but there was an error.");
+                            $('.tab-content').text("Sorry but there was an error.");
                         }
             });
         });
 
-        $("#button_export").click(function(e){
+        $("#button_draft").click(function(e){
+            set_data_before_submit();
             set_itinerary_string();
+            if($("#id_itinerary_string").val().length <= 2)
+            {
+                e.preventDefault();
+                alert("{% trans "Empty itinerary" %}");
+            }
         });
 
-        init_drag(); // Initialize draggable elements
-
-        filter_experiences(); // Initialize search filter
+        $("#button_ready").click(function(e){
+            set_data_before_submit();
+            set_itinerary_string();
+            if($("#id_itinerary_string").val().length <= 2)
+            {
+                e.preventDefault();
+                alert("{% trans "Empty itinerary" %}");
+            }
+        });
 
         // Date field
         if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
@@ -585,6 +337,27 @@
             if ($("#id_start_datetime").val() != "" && $("#id_end_datetime").val() != "") {
                 $("#itinerary_search").click();
             }
+        });
+
+        //set initial values if in the editing mode
+        {% for city, dict in existing_itinerary.items %}
+        // add a new button for the city
+        var city = "{{city}}";
+        var city_name = "{{city}}";
+        var duration = {{ dict|length }};
+        var i = {{forloop.counter0}};
+        var new_city = construct_data_content(i, cities, city, city, duration);
+        $(new_city).insertBefore($("#add-city"));
+        // Initialise popovers
+        $('[data-toggle="popover"]').popover();
+        {% if forloop.last %}
+        $("#itinerary_search").click();
+        update_price_title();
+        {% endif %}
+        {% endfor %}
+
+        $(document).on("click", "#submit-add-kids", function() {
+            update_kids();
         });
     })
 
@@ -644,11 +417,26 @@
             if(cities[i]==city)
             {
                 $(".city_" + cities[i]).show();
+                $(".flight_" + cities[i]).show();
+                $(".transfer_" + cities[i]).show();
+                $(".accommodation_" + cities[i]).show();
+                $(".restaurant_" + cities[i]).show();
+                $(".suggestion_" + cities[i]).show();
             }
             else
             {
                 $(".city_" + cities[i]).hide();
+                $(".flight_" + cities[i]).hide();
+                $(".transfer_" + cities[i]).hide();
+                $(".accommodation_" + cities[i]).hide();
+                $(".restaurant_" + cities[i]).hide();
+                $(".suggestion_" + cities[i]).hide();
             }
+        }
+        var type = ["flight", "transfer", "accommodation", "restaurant", "suggestion", "pricing"];
+        for(i=0;i<type.length;i++)
+        {
+            $("#"+type[i]+"-location").val(city);
         }
     }
 
@@ -656,19 +444,20 @@
     {
         var i=-1;
         //the last city was inserted before $("#add-city")
-        if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').indexOf("button_city_") === 0)
-        {
-            var id = $("#add-city").prev().attr('id').split("_");
-            i = parseInt(id[id.length-1]);
-        }
-        var j=0,k=0;
-        for(k=0;k<i;k++)
+        //but the user may have changed the order of cities
+        //if($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').indexOf("button_city_") === 0)
+        //{
+        //    var id = $("#add-city").prev().attr('id').split("_");
+        //    i = parseInt(id[id.length-1]);
+        //}
+        var k=0;
+        for(k=0;k<10;k++)
         {
             if($("#button_city_"+k).length > 0)
             {
-                j++;
+                i++;
 
-                if(j>=10)
+                if(i>=9)
                 {
                     return;
                 }
@@ -703,17 +492,31 @@
         }
         new_item += "</div>";
         $("#right_section").append(new_item);
-        init_drag();
 
         //reload data
         $("#itinerary_search").click();
     }
 
+    function update_dates() {
+      var $startDate = $('#id_start_datetime').val();
+      $('.section-box>p').each(function(index) {
+        $(this).html("{% trans 'Day' %} " + (index+1) + " " + moment($startDate).add(index,'days').format('YYYY-MM-DD'))
+      })
+    }
+
     function update_guests() {
       var guests = $("#guest-num-select").val();
-      $("#add-adults")[0].innerHTML = "Adults" + " <span class=\"badge\">" + guests + "</span>";
-      $("#id_guest_number").val(guests);
+      $("#add-adults")[0].innerHTML = "Adults" + " <span class=\"badge\" id=\"num-adults\">" + guests + "</span>";
+      $("#id_adult_number").val(guests);
       $("#add-adults").popover("hide");
+      $("#itinerary_search").click();
+    }
+
+    function update_kids() {
+      var kids = $("#kid-num-select").val();
+      $("#add-kids")[0].innerHTML = "Kids (2-12 yo) " + " <span class=\"badge\" id=\"num-kids\">" + kids + "</span>";
+      $("#id_children_number").val(kids);
+      $("#add-kids").popover("hide");
       $("#itinerary_search").click();
     }
 
@@ -750,7 +553,7 @@
                 $("#city-collapse-" + i + "-day-" + j).remove();
             }
         }
-        init_drag();
+
         //reload data
         $("#itinerary_search").click();
     }
@@ -827,17 +630,34 @@
             {
                 number_day += 1;
                 cities += c + ",";
-                var experience = $(day).find(".column")[0].firstChild;
+                var experience = $(day).find(".column")[0].firstElementChild;
+                var hour = 0;
+                var hour_string = "00";
                 while(experience && experience.id.indexOf("experience_id_") === 0)
                 {
                     var exp_id = experience.id.split("_");
                     var d = Date.parseExact($("#id_start_datetime").val().substring(0, 10), "yyyy-M-dd");
                     d.setDate(d.getDate()+number_day-1);
+                    var tmp = $(experience).find(".exp-info")[0].firstElementChild;
+                    hour += 1;
+                    if(hour<10)
+                    {
+                        hour_string = "0" + hour;
+                    }
+                    else if(hour>23)
+                    {
+                        hour_string = "23";
+                    }
+                    else
+                    {
+                        hour_string = "" + hour;
+                    }
                     var dict={"id":exp_id[exp_id.length-1],
-                              "title":$(experience).find(".exp-info")[0].firstElementChild.innerText,
+                              "title":tmp.innerText || tmp.textContent,
                               "date":d.toString('yyyy-M-dd'),
-                              "time":"01:00",
-                              "guest_number":$("#id_guest_number").val()};
+                              "time":hour_string+":00",
+                              "adult_number":$("#id_adult_number").val(),
+                              "children_number":$("#id_children_number").val()};
                     itinerary.push(dict);
                     experience = $(experience).next()[0];
                 }
@@ -879,68 +699,232 @@
     }
 
     function add_item(type) {
-        var ids = ["title", "location", "price", "details"];
+        var ids = ["title", "location", "fixed_price", "price", "details", "notes"];
         var value = "";
-        var item = {
-            csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
-            Add: "Add",
-            type: type,
-        };
-        for (var i = 0; i < ids.length; i++) {
+        var item = new FormData();
+        item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
+        item.append("Add", "Add");
+        item.append("type", type);
+
+        for (var i = 0, j = 0; i < ids.length; i++) {
             value = $("#" + type + "-" + ids[i]).val();
             if(value)
             {
-                item[ids[i]] = value;
+                item.append([ids[i]], value);
+                j++;
             }
         }
-        if(item.length==3)
+        if(j == 0)
         {
             alert("Fill at least one field");
             return;
         }
+        if($("#"+type+"-photo")[0] && $("#"+type+"-photo")[0].files.length > 0)
+        {
+            file = $("#"+type+"-photo")[0].files[0];
+            if(file.size > 2097152)
+            {
+                alert("{% trans "Image size exceeds the limit (2M)" %}");
+                return;
+            }
+            if(file.type.indexOf("image/") < 0)
+            {
+                alert("{% trans "Invalid image type" %}");
+                return;
+            }
+            item.append("file", file);
+        }
+        $(".loading").show();
         $.ajax({
             url: '{{GEO_POSTFIX}}itinerary/',
             type: "POST",
             data: item,
+            processData: false,
+            contentType: false,
             success: function (data) {
                 var title = $("#" + type + "-title").val();
                 var details = $("#" + type + "-details").val();
                 var location = $("#" + type + "-location").val();
+                var fixed_price = $("#" + type + "-fixed_price").val();
                 var price = $("#" + type + "-price").val();
+                var notes = $("#" + type + "-notes").val();
 
-                var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_\"" + data.new_product_id + ">" +
-                                  "<div class=\"exp-img portlet-header\"></div>" +
+                var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_" + data.new_product_id + "\">" +
+                                  "<div class=\"exp-img portlet-header\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
                                   "<div class=\"exp-info portlet-header\">" +
                                     "<h3>" + title + "</h3>" +
-                                    "<p>" + details + "</p>";
+                                    "<p>" + details + "</p>" +
+                                    "<label style=\"display:none;\">" + notes + "</label>";
                 if(location)
                 {
                     new_item +=
-                                    "<p>" + location.substring(0,15) + "</p>";
+                                    "<p>" + location.substring(0,15) +
+                                    " &middot; " +
+                                    "<a type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
+                                    " &middot; " +
+                                    "<a type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
+                                    "</p>";
+                } else {
+                  new_item +=
+                  "<p>" +
+                  "<a type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
+                  " &middot; " +
+                  "<a type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
+                  "</p>";
                 }
                 new_item +=
                                   "</div>" +
                                   "<div class=\"exp-price portlet-header\">" +
-                                    "<p>$AUD</p>" +
-                                    "<h2>" + price + "</h2>" +
-                                    "<p>{% trans 'per person' %}</p>" +
-                                  "</div>" +
-                                "</div>";
+                                    "<p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>" +
+                                    "<h2>" + fixed_price + "</h2> + " + "<h2>" + price + "</h2>"
+                                    "<p>{% trans 'base + per person' %}</p>" +
+                                  "</div>";
                 $("#"+type+"_column").append(new_item);
                 $("#"+type+"_column").fadeIn();
+                $("#" + type + "-title").val("");
+                $("#" + type + "-details").val("");
+                $("#" + type + "-location").val("");
+                $("#" + type + "-fixed_price").val("");
+                $("#" + type + "-price").val("");
+                $("#" + type + "-notes").val("");
                 $("#add-"+type).hide();
+                $(".loading").hide();
                 init_drag();
             },
             failure: function (e) {
-
+                $(".loading").hide();
             }
         });
     }
 
-    function update_price_title()
+    function edit_item(id, type)
     {
+        $("#add-" + type + "-btn").click();
+        var experience = $("#experience_id_" + id);
+        var fixed_price = $(experience.find(".exp-price.portlet-header").find("h2")[0]).text();
+        var price = $(experience.find(".exp-price.portlet-header").find("h2")[1]).text();
+        var title = experience.find(".exp-info.portlet-header").find("h3").text();
+        var details = $(experience.find(".exp-info.portlet-header").find("p")[0]).text();
+        var notes = experience.find(".exp-info.portlet-header").find("label").text();
+        $("#" + type + "-fixed_price").val(fixed_price);
+        $("#" + type + "-price").val(price);
+        $("#" + type + "-title").val(title);
+        $("#" + type + "-details").val(details);
+        $("#" + type + "-notes").val(notes);
+        $("#add-" + type + "-add").text("{% trans "Save" %}");
+        $("#add-" + type + "-add").attr("onclick", "");
+        $("#add-" + type + "-add").click(function(e){
+            var item = new FormData();
+            item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
+            item.append("Edit", "Edit");
+            item.append("id", id);
+
+            var ids = ["title", "location", "fixed_price", "price", "details", "notes"];
+            var value = "";
+
+            for (var i = 0, j = 0; i < ids.length; i++) {
+                value = $("#" + type + "-" + ids[i]).val();
+                if(value)
+                {
+                    item.append([ids[i]], value);
+                    j++;
+                }
+            }
+
+            if(j == 0)
+            {
+                alert("Fill at least one field");
+                return;
+            }
+            if($("#"+type+"-photo")[0] && $("#"+type+"-photo")[0].files.length > 0)
+            {
+                file = $("#"+type+"-photo")[0].files[0];
+                if(file.size > 2097152)
+                {
+                    alert("{% trans "Image size exceeds the limit (2M)" %}");
+                    return;
+                }
+                if(file.type.indexOf("image/") < 0)
+                {
+                    alert("{% trans "Invalid image type" %}");
+                    return;
+                }
+                item.append("file", file);
+            }
+            $(".loading").show();
+            $.ajax({
+                url: '{{GEO_POSTFIX}}itinerary/',
+                type: "POST",
+                data: item,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                                $(experience.find(".exp-price.portlet-header").find("h2")[0]).text($("#" + type + "-fixed_price").val());
+                                $(experience.find(".exp-price.portlet-header").find("h2")[1]).text($("#" + type + "-price").val());
+                                experience.find(".exp-info.portlet-header").find("h3").text($("#" + type + "-title").val());
+                                $(experience.find(".exp-info.portlet-header").find("p")[0]).text($("#" + type + "-details").val());
+                                experience.find(".exp-info.portlet-header").find("label").text($("#" + type + "-notes").val());
+                                $("#add-" + type + "-add").text("{% trans "Add" %}");
+                                $("#add-" + type + "-add").unbind("click");
+                                $("#add-" + type + "-add").attr("onclick", "add_item('" + type + "');");
+                                $("#" + type + "_column").fadeIn();
+                                $("#" + type + "-title").val("");
+                                $("#" + type + "-details").val("");
+                                $("#" + type + "-notes").val("");
+                                $("#" + type + "-location").val("");
+                                $("#" + type + "-fixed_price").val("");
+                                $("#" + type + "-price").val("");
+                                $("#add-" + type).hide();
+                                $(".loading").hide();
+                                init_drag();
+                },
+                failure: function (e) {
+                    $(".loading").hide();
+                }
+            });
+        });
+    }
+
+    function delete_item(id)
+    {
+        var item = new FormData();
+        item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
+        item.append("Delete", "Delete");
+        item.append("id", id);
+        $.ajax({
+            url: '{{GEO_POSTFIX}}itinerary/',
+            type: "POST",
+            data: item,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                        $("#experience_id_" + id).remove();
+                    },
+            failure: function (e) {
+                $(".loading").hide();
+            }
+        });
+    }
+
+    function update_price_title(event, ui)
+    {
+        if(event && ui && $(ui.item[0].lastElementChild).attr("class").indexOf("exp-price") < 0)
+        {
+            if(ui.item.parent()[0].id && ui.item.parent()[0].id.indexOf("_column") > 0)
+            {
+                //dropped in the left section
+                $(ui.item[0].lastElementChild).show();
+            }
+            else
+            {
+                //dropped in the right section
+                $(ui.item[0].lastElementChild).hide();
+            }
+        }
+
         var city = $(".price-line").next().next()[0];
         var price = 0;
+        var fixed_price = 0;
 
         while(city && city.id.indexOf("city-collapse-") === 0)
         {
@@ -948,10 +932,13 @@
             var day = $(city).children()[0];
             while(day && day.id.indexOf("city-collapse-") === 0)
             {
-                var experience = $(day).find(".column")[0].firstChild;
+                var experience = $(day).find(".column")[0].firstElementChild;
                 while(experience && experience.id.indexOf("experience_id_") === 0)
                 {
-                    price += parseFloat($(experience).find(".exp-price")[0].getElementsByTagName("H2")[0].innerText);
+                    var fixed = $(experience).find(".exp-price")[0].getElementsByTagName("H2")[0];
+                    var tmp = $(experience).find(".exp-price")[0].getElementsByTagName("H2")[1];
+                    price += parseFloat(tmp.innerText || tmp.textContent);
+                    fixed_price += parseFloat(fixed.innerText || fixed.textContent);
                     experience = $(experience).next()[0];
                 }
                 day = $(day).next()[0];
@@ -962,9 +949,24 @@
                 city = $(city).next()[0];
             }
         }
-        $("#price-pp").text(price);
-        guest_number = $("#id_guest_number").val();
-        $("#price-tt").text(price*guest_number);
+        if(price < 0)
+        {
+            price=0;
+        }
+        guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
+        $("#price-pp").text(price+fixed_price/guest_number);
+        $("#price-tt").text(price*guest_number+fixed_price);
+    }
+
+    function set_new_item_location(type)
+    {
+        if($(".collapse.in").length>0)
+        {
+            var id = $(".collapse.in")[0].id.split("-");
+            id = id[id.length-1];
+            var city = $($("#city-title-"+id)[0]).attr("city");
+            $("#"+type+"-location").val(city);
+        }
     }
     </script>
 {% endblock %}

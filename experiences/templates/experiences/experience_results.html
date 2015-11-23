@@ -8,9 +8,7 @@
         {% for experience, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
         {% if forloop.counter == 5 %}
         <div class="exp-box custom-itinerary-searchpage" >
-          <form action="mailto:enquiries@tripalocal.com">
-          <button class="btn btn-primary request-btn">{% trans "Request a trip" %}</button>
-          </form>
+          <button class="btn btn-primary request-btn" onclick="window.location.href = '{{GEO_POSTFIX}}itinerary/request/';">{% trans "Request a trip" %}</button>
         </div>
         {% endif %}
 
@@ -37,7 +35,7 @@
             <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ experience.description }}</p>
 
             <div class="listing-footer">
-                {%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
+                {%if experience.duration < 24 %}{{experience.duration|floatformat:"0"}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
                 &#8226; <span style="font-weight:500;">{% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}{% trans 'Private' %}{% endif %}</span>
             </div>
         </div>

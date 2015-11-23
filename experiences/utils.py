@@ -1,3 +1,8 @@
+import os
+
+from Tripalocal_V1 import settings
+from unionpay.util.helper import load_config
+
 def isEnglish(s):
     try:
         s.decode('ascii') if isinstance(s, bytes) else s.encode('ascii')
@@ -7,3 +12,52 @@ def isEnglish(s):
         return False
     else:
         return True
+
+def experience_fee_calculator(price, commission_rate):
+    if type(price)==int or type(price) == float:
+        COMMISSION_PERCENT = round(commission_rate/(1-commission_rate),3)
+        return round(price*(1.00+COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
+
+    return price
+
+def convert_currency(price, current_currency, target_currency):
+    file_name = 'experiences/currency_conversion_rate/' + current_currency.upper() + '.yaml'
+    conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
+    return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
+
+def get_total_price(experience, guest_number=0, adult_number=0, children_number=0):
+    '''
+    return total price, not including commission or service fee
+    either use guest_number, or adult_number + children_number, the latter has a higher priority
+    '''
+    if type(guest_number) != int or guest_number < 0:
+        guest_number = 0
+    if type(adult_number) != int or adult_number < 0:
+        adult_number = 0
+    if type(children_number) != int or children_number < 0:
+        children_number = 0
+
+    if adult_number > 0 or children_number > 0:
+        guest_number = adult_number
+
+    subtotal_price = 0.0    
+    if experience.children_price is not None and experience.children_price > 0:
+        subtotal_price += float(experience.children_price) * float(children_number)
+    else:
+        guest_number += children_number
+
+    if experience.dynamic_price and type(experience.dynamic_price) == str:
+        price = experience.dynamic_price.split(',')
+        if len(price)+experience.guest_number_min-2 == experience.guest_number_max:
+        #these is comma in the end, so the length is max-min+2
+            if guest_number <= experience.guest_number_min:
+                subtotal_price += float(experience.price) * float(experience.guest_number_min)
+            else:
+                subtotal_price += float(price[guest_number-experience.guest_number_min]) * float(guest_number)
+        else:
+            #wrong dynamic settings
+            subtotal_price += float(experience.price)*float(guest_number)
+    else:
+        subtotal_price += float(experience.price)*float(guest_number)
+
+    return subtotal_price + experience.fixed_price
