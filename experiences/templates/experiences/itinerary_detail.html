@@ -71,6 +71,7 @@
       <div class="day-list" id="day{{forloop.counter}}-list">
         <h3 class="day-heading">{% blocktrans with number=forloop.counter %}Day {{number}}{% endblocktrans %} {{date}} {{list.0.city}} </h3>
         {% for item in list %}
+          {% if item.type != 'Pricing' %}
           <div class="item-heading">
             <span class="item-icon">
               {% if item.type == 'PrivateProduct' or item.type == 'PublicProduct' or item.type == 'PRIVATE' or item.type == 'NONPRIVATE' %}
@@ -95,6 +96,7 @@
           {% endwith %}
           {% endif %}
           <div class="item-description"><p>{{item.description}}</p></div>
+          {% endif %}
         {% endfor %}
       </div>
       {% endfor %}
