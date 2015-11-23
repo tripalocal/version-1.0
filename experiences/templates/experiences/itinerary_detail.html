@@ -36,12 +36,17 @@
           </div>
           {% if itinerary.status == "ready" %}
           <div class="row">
-            <span class="top-aligned-text">{% trans 'Per Person ' %}{{request.session.dollar_sign}}</span><h1 style="margin:0; display:inline-block;">{{price|floatformat:"0"}}</h1><span class="top-aligned-text">{{request.session.custom_currency}}</span>
+            {% if not full_price %}
+            <p><strike style="margin-right:15px;">{% trans 'Before: ' %}{{request.session.dollar_sign}}{{ price|div:0.85|floatformat:"0" }}{{request.session.custom_currency}}</strike> {% trans 'After: ' %}{{request.session.dollar_sign}}{{price|floatformat:"0"}}{{request.session.custom_currency}}</p>
+            {% endif %}
+            <span class="top-aligned-text">{% trans 'Per Person ' %}{{request.session.dollar_sign}}</span><h1 style="margin:0; display:inline-block;">{{ price|div:guest_number|floatformat:"0" }}</h1><span class="top-aligned-text">{{request.session.custom_currency}}</span>
           </div>
-          <div class="booking-tip" style="display:none;">
+          {% if not full_price %}
+          <div class="booking-tip">
             <img src="{% static 'experiences/img/time2.svg' %}" width="45" height="45">
-            <p>{% trans '' %}</p>
+            <p>{% trans 'The discount period will end in' %}<span id="clock"> <span class="days"></span>{% trans " days " %}<span class="hours"></span>{% trans " hrs " %}<span class="minutes"></span>{% trans " mins " %}<span class="seconds"></span>{% trans " secs " %}</span></p>
           </div>
+          {% endif %}
           <div>
               {% if user.is_authenticated %}
               <button id="pay" class="btn btn-primary"><img src="{% static 'icon/coins_white.svg' %}" style="margin-right:10px;">{% trans 'Lock in price' %}</button>
@@ -66,6 +71,7 @@
       <div class="day-list" id="day{{forloop.counter}}-list">
         <h3 class="day-heading">{% blocktrans with number=forloop.counter %}Day {{number}}{% endblocktrans %} {{date}} {{list.0.city}} </h3>
         {% for item in list %}
+          {% if item.type != 'Pricing' %}
           <div class="item-heading">
             <span class="item-icon">
               {% if item.type == 'PrivateProduct' or item.type == 'PublicProduct' or item.type == 'PRIVATE' or item.type == 'NONPRIVATE' %}
@@ -90,6 +96,7 @@
           {% endwith %}
           {% endif %}
           <div class="item-description"><p>{{item.description}}</p></div>
+          {% endif %}
         {% endfor %}
       </div>
       {% endfor %}
@@ -102,8 +109,50 @@
 
 {% block scripts %}
 <script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
 <script type="text/javascript">
+function getTimeRemaining(endtime){
+  var t = Date.parse(endtime) - Date.parse(new Date());
+  var seconds = Math.floor( (t/1000) % 60 );
+  var minutes = Math.floor( (t/1000/60) % 60 );
+  var hours = Math.floor( (t/(1000*60*60)) % 24 );
+  var days = Math.floor( t/(1000*60*60*24) );
+  return {
+    'total': t,
+    'days': days,
+    'hours': hours,
+    'minutes': minutes,
+    'seconds': seconds
+  };
+}
+
+function initializeClock(id, endtime){
+  var clock = document.getElementById(id);
+  var daysSpan = clock.querySelector('.days');
+  var hoursSpan = clock.querySelector('.hours');
+  var minutesSpan = clock.querySelector('.minutes');
+  var secondsSpan = clock.querySelector('.seconds');
+
+  function updateClock(){
+    var t = getTimeRemaining(endtime);
+
+    daysSpan.innerHTML = t.days;
+    hoursSpan.innerHTML = ('0' + t.hours).slice(-2);
+    minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
+    secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
+
+    if(t.total<=0){
+      clearInterval(timeinterval);
+    }
+  }
+
+  updateClock();
+  var timeinterval = setInterval(updateClock,1000);
+}
+
 $(document).ready(function() {
+  var deadline = "{{discount_deadline}}";
+  initializeClock('clock', deadline);
   if ($(window).width() > 760) {
     // Scrollspy
     $('body').scrollspy({ target: '.sticky-section', offset: 30 });

@@ -74,13 +74,6 @@ def convert_experience_price(request, experience):
 
         experience.currency = request.session['custom_currency']
 
-def experience_fee_calculator(price, commission_rate):
-    if type(price)==int or type(price) == float:
-        COMMISSION_PERCENT = round(commission_rate/(1-commission_rate),3)
-        return round(price*(1.00+COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
-
-    return price
-
 def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, current_datetime, daylightsaving):
     #daylightsaving: whether it was in daylightsaving when this blockout/instant booking record was created
     current_datetime_local = current_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
@@ -327,7 +320,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         if len(experience.instantbookingtimeperiod_set.all()) > 0 or len(experience.blockouttimeperiod_set.all()) > 0:
             calendar_updated = True
 
-        host = get_host(experience)
+        host = experience.get_host()
         exp_price = float(experience.price)
         if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
@@ -915,7 +908,7 @@ class ExperienceDetailView(DetailView):
         context['cover_photo'] = cover_photo
 
         if experience.end_datetime < datetime.utcnow().replace(tzinfo=pytz.UTC):
-            if self.request.user.id != get_host(experience).id:
+            if self.request.user.id != experience.get_host().id:
                 # other user, experience already expired
                 context['expired'] = True
                 return context
@@ -925,7 +918,7 @@ class ExperienceDetailView(DetailView):
                 return context
 
         if not experience.status.lower() == "listed":
-            owner_id = get_host(experience).id
+            owner_id = experience.get_host().id
 
             if self.request.user.id != owner_id and not self.request.user.is_superuser:
                 # other user, experience not published
@@ -961,8 +954,8 @@ class ExperienceDetailView(DetailView):
             context["user_email"] = self.request.user.email
 
         if type(experience) is Experience:
-            context["host_bio"] = get_user_bio(get_host(experience).registereduser, settings.LANGUAGES[0][0])
-            host_image = get_host(experience).registereduser.image_url
+            context["host_bio"] = get_user_bio(experience.get_host().registereduser, settings.LANGUAGES[0][0])
+            host_image = experience.get_host().registereduser.image_url
             if host_image == None or len(host_image) == 0:
                 context['host_image'] = 'profile_default.jpg'
             else:
@@ -1134,11 +1127,11 @@ def experience_booking_successful(request, experience=None, guest_number=None, b
         is_instant_booking = True if data['is_instant_booking'] == "True" else False
 
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.track(request.user.email, 'Sent request to '+ get_host(experience).first_name)
+    mp.track(request.user.email, 'Sent request to '+ experience.get_host().first_name)
 
     if not settings.DEVELOPMENT:
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(request.user.email, 'Sent request to '+ get_host(experience).first_name)
+        mp.track(request.user.email, 'Sent request to '+ experience.get_host().first_name)
 
     template = 'experiences/experience_booking_successful_requested.html'
     if is_instant_booking:
@@ -1568,7 +1561,7 @@ def create_experience(request, id=None):
             experience = get_object_or_404(Experience, pk=id)
             if experience.currency is None:
                 experience.currency = 'aud'
-            host = get_host(experience)
+            host = experience.get_host()
             registerUser = host.registereduser
             list = experience.whatsincluded_set.filter(item="Food", language=settings.LANGUAGES[0][0])
             if len(list) > 0:
@@ -1611,9 +1604,9 @@ def create_experience(request, id=None):
             else:
                 COMMISSION_PERCENT = settings.COMMISSION_PERCENT
             data = {"id":experience.id,
-                "host":get_host(experience).email,
-                "host_first_name":get_host(experience).first_name,
-                "host_last_name":get_host(experience).last_name,
+                "host":experience.get_host().email,
+                "host_first_name":experience.get_host().first_name,
+                "host_last_name":experience.get_host().last_name,
                 "host_bio": get_user_bio(registerUser, settings.LANGUAGES[0][0]),
                 "host_image":registerUser.image,
                 "host_image_url":registerUser.image_url,
@@ -1918,7 +1911,7 @@ def update_booking(id, accepted, user):
         experience = AbstractExperience.objects.get(id=booking.experience_id)
         experience.title = experience.get_title(settings.LANGUAGES[0][0])
         experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
-        if not get_host(experience).id == user.id:
+        if not experience.get_host().id == user.id:
             booking_success = False
             result={'booking_success':booking_success, 'error':'only the host can accept/reject the booking'}
             return result
@@ -2162,6 +2155,7 @@ def booking_accepted(request, id=None):
     else:
         return HttpResponseRedirect(GEO_POSTFIX)
 
+#TODO move to models
 # Takes the experience primary key and returns the number of reviews it has received.
 def getNReviews(experienceKey):
     #nReviews = 0
@@ -2172,6 +2166,7 @@ def getNReviews(experienceKey):
 
     return len(reviewList)
 
+#TODO move to models
 # Takes the experience primary key and returns the background image
 def getBGImageURL(experienceKey):
     BGImageURL = ""
@@ -2183,13 +2178,6 @@ def getBGImageURL(experienceKey):
 def tagsOnly(tag, exp):
     experience_tags = exp.get_tags(settings.LANGUAGES[0][0])
     return tag in experience_tags
-
-def getProfileImage(experience):
-    profileImage = RegisteredUser.objects.get(user_id=get_host(experience).id).image_url
-    if profileImage:
-        return profileImage
-    else:
-        'profile_default.jpg'
 
 def setExperienceDisplayPrice(experience):
     if experience.dynamic_price and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 and experience.guest_number_min < 4:
@@ -2563,7 +2551,7 @@ def check_upload_filled(experience):
 def manage_listing(request, exp_id, step, ):
     experience = get_object_or_404(Experience, pk=exp_id)
     if not request.user.is_superuser:
-        if request.user.id != get_host(experience).id:
+        if request.user.id != experience.get_host().id:
             raise Http404("Sorry, but you can only edit your own experience.")
 
     experience_title_cn = get_object_or_404(ExperienceTitle, experience_id=exp_id, language='zh')
@@ -2759,7 +2747,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
             photoset = experience.photo_set.all()
             if type != 'product':
-                image_url = get_host(experience).registereduser.image_url
+                image_url = experience.get_host().registereduser.image_url
 
                 if photoset!= None and len(photoset) > 0 and image_url != None and len(image_url) > 0:
                     for review in experience.review_set.all():
@@ -2830,7 +2818,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
             if type != 'product':
                 # Fetch profileImageURL
-                profileImageURL = RegisteredUser.objects.get(user_id=get_host(experience).id).image_url
+                profileImageURL = RegisteredUser.objects.get(user_id=experience.get_host().id).image_url
                 if (profileImageURL):
                     profileImageURLList.insert(counter, profileImageURL)
                 else:
@@ -3097,12 +3085,13 @@ def custom_itinerary(request, id=None):
         if 'Add' in request.POST:
             #add a new item
             item = request.POST
-            np = NewProduct(provider_id=1, price=item.get('price', 0), commission=0.0, currency=request.session["custom_currency"].lower(), type=item['type'].title(),
+            np = NewProduct(provider_id=1, price=item.get('price', 0), fixed_price=item.get('fixed_price', 0),
+                            commission=0.0, currency=request.session["custom_currency"].lower(), type=item['type'].title(),
                             city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted",
                             start_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)),
                             end_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)) + timedelta(weeks=520))
             np.save()
-            npi18n = NewProductI18n(product=np, title=item.get('title',""),
+            npi18n = NewProductI18n(product=np, title=item.get('title',""), notice=item.get('notes', ""),
                                     description=item.get('details', ""), location=item.get('location', ""))
             npi18n.save()
             if len(request.FILES) > 0:
@@ -3126,6 +3115,7 @@ def custom_itinerary(request, id=None):
             item = request.POST
             np = NewProduct.objects.get(id=item.get('id'))
             np.price = item.get('price', 0)
+            np.fixed_price = item.get('fixed_price', 0)
             np.city = city=item.get('location', "")
             #np.currency=request.session["custom_currency"].lower()
             np.save()
@@ -3134,6 +3124,7 @@ def custom_itinerary(request, id=None):
             npi18n.title=item.get('title',"")
             npi18n.description=item.get('details', "")
             npi18n.location=item.get('location', "")
+            npi18n.notice=item.get('notes', "")
             npi18n.save()
 
             if len(request.FILES) > 0:
@@ -3188,11 +3179,14 @@ def custom_itinerary(request, id=None):
                 #get flight, transfer, ...
                 pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
                 for pd in pds:
-                    pd.title = pd.get_title(settings.LANGUAGES[0][0])
-                    pd.details = pd.get_description(settings.LANGUAGES[0][0])
+                    information = pd.get_information(settings.LANGUAGES[0][0])
+                    pd.title = information.title
+                    pd.details = information.description
+                    pd.notes = information.notice
                     pd.location = pd.city
                     if 'custom_currency' in request.session and request.session["custom_currency"].lower() != pd.currency.lower():
                         pd.price = convert_currency(pd.price, pd.currency, request.session["custom_currency"])
+                        pd.fixed_price = convert_currency(pd.fixed_price, pd.currency, request.session["custom_currency"])
                 context['flight'] = [e for e in pds if e.type == 'Flight' and e.city in str(city).split(",")]
                 context['transfer'] = [e for e in pds if e.type == 'Transfer' and e.city in str(city).split(",")]
                 context['accommodation'] = [e for e in pds if e.type == 'Accommodation' and e.city in str(city).split(",")]
@@ -3364,23 +3358,6 @@ def custom_itinerary(request, id=None):
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
-def get_itinerary_price(itinerary_id, currency):
-    itinerary = CustomItinerary.objects.get(id = itinerary_id)
-    itinerary_price = 0.0
-    for bking in itinerary.booking_set.all():
-        experience = bking.experience
-        guest_number = bking.guest_number
-        adult_number = bking.adult_number
-        children_number = bking.children_number
-        subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
-        subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
-        if experience.currency != currency:
-            subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
-        itinerary_price += subtotal_price
-    if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + itinerary.submitted_datetime:
-        itinerary_price *= 1.15
-    return round(itinerary_price,0)
-
 def itinerary_detail(request,id=None):
     if id is None:
         return HttpResponseRedirect(GEO_POSTFIX)
@@ -3398,7 +3375,7 @@ def itinerary_detail(request,id=None):
 
         itinerary = CustomItinerary.objects.get(id=id)
         currency = request.session['custom_currency']
-        subtotal_price = get_itinerary_price(id, currency)
+        subtotal_price = itinerary.get_price(currency)
         service_fee = 0
         total_price = subtotal_price + service_fee
         number = itinerary.get_guest_number()
@@ -3417,11 +3394,12 @@ def itinerary_detail(request,id=None):
     else:
         ci = CustomItinerary.objects.get(id=id)
         currency = request.session['custom_currency']
-        price = get_itinerary_price(id, currency)
+        price = ci.get_price(currency)
         if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + ci.submitted_datetime:
             full_price = True
         else:
             full_price = False
+        discount_deadline = ci.submitted_datetime + timedelta(days=7)
 
         start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
         end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
@@ -3449,6 +3427,7 @@ def itinerary_detail(request,id=None):
                                    "children_number":guest_number[2],
                                    "start_date": start_datetime.strftime("%Y-%m-%d"),
                                    "end_date":end_datetime.strftime("%Y-%m-%d"),
+                                   "discount_deadline":discount_deadline.strftime("%Y-%m-%d"),
                                    "price":price,
                                    "full_price":full_price,
                                    "GEO_POSTFIX":GEO_POSTFIX},
@@ -3471,7 +3450,8 @@ def itinerary_booking_confirmation(request):
             display_error = True
             form.data = form.data.copy()
             form.data['custom_currency'] = request.session['custom_currency']
-            form.data['price_paid'] = get_itinerary_price(form.data['itinerary_id'], request.session['custom_currency'])
+            itinerary = CustomItinerary.objects.get(id=form.data['itinerary_id'])
+            form.data['price_paid'] = itinerary.get_price(request.session['custom_currency'])
             if form.is_valid():
                 request.user.registereduser.phone_number = form.cleaned_data['phone_number']
                 request.user.registereduser.save()
@@ -3488,7 +3468,8 @@ def itinerary_booking_confirmation(request):
             form.data['booking_extra_information'] = order_id
             if form.is_valid():
                 config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
-                total_price = get_itinerary_price(form.cleaned_data['itinerary_id'], request.session['custom_currency'])
+                itinerary = CustomItinerary.objects.get(id=form.cleaned_data['itinerary_id'])
+                total_price = itinerary.get_price(request.session['custom_currency'])
 
                 if total_price > 0.0:
                     #not free
@@ -3513,8 +3494,8 @@ def itinerary_booking_confirmation(request):
             form.data['booking_extra_information'] = out_trade_no
 
             if form.is_valid():
-                #TODO
-                total_price = get_itinerary_price(form.cleaned_data['itinerary_id'], request.session['custom_currency'])
+                itinerary = CustomItinerary.objects.get(id=form.cleaned_data['itinerary_id'])
+                total_price = itinerary.get_price(request.session['custom_currency'])
                 currency = request.session['custom_currency']
 
                 if total_price > 0.0:

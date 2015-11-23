@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-20 14:30+1100\n"
+"POT-Creation-Date: 2015-11-20 18:10+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -282,8 +282,8 @@ msgstr "有老人和小孩"
 msgid "Eg. Melbourne, Sydney, Brisbane..."
 msgstr "例如：墨尔本、悉尼、布里斯本 ..."
 
-#: experiences/forms.py:855 experiences/forms.py:1232
-#: experiences/forms.py:1236 experiences/resource.py:1384
+#: experiences/forms.py:855 experiences/forms.py:1234
+#: experiences/forms.py:1238 experiences/resource.py:1384
 #: experiences/views.py:1886 experiences/views.py:1894
 #: experiences/views.py:1898 experiences/views.py:2112
 #: experiences/views.py:2117 experiences/views.py:2126
@@ -292,17 +292,17 @@ msgstr "例如：墨尔本、悉尼、布里斯本 ..."
 msgid "%s"
 msgstr ""
 
-#: experiences/forms.py:1119
+#: experiences/forms.py:1121
 msgid "[Tripalocal] "
 msgstr "【本土客】 "
 
-#: experiences/forms.py:1119
+#: experiences/forms.py:1121
 msgid " has requested your experience"
 msgstr " 预约了您的体验"
 
-#: experiences/forms.py:1120 experiences/forms.py:1134
-#: experiences/forms.py:1154 experiences/forms.py:1166
-#: experiences/forms.py:1178 experiences/forms.py:1202
+#: experiences/forms.py:1122 experiences/forms.py:1136
+#: experiences/forms.py:1156 experiences/forms.py:1168
+#: experiences/forms.py:1180 experiences/forms.py:1204
 #: experiences/resource.py:260 experiences/resource.py:284
 #: experiences/resource.py:296 experiences/resource.py:308
 #: experiences/views.py:1946 experiences/views.py:1962
@@ -311,28 +311,28 @@ msgstr " 预约了您的体验"
 msgid "Tripalocal <"
 msgstr "本土客 <"
 
-#: experiences/forms.py:1133
+#: experiences/forms.py:1135
 msgid "[Tripalocal] Your booking request is sent to the host"
 msgstr "【本土客】 您的预约已经发送"
 
-#: experiences/forms.py:1153 experiences/forms.py:1201
+#: experiences/forms.py:1155 experiences/forms.py:1203
 #: experiences/resource.py:259 experiences/resource.py:283
 #: experiences/views.py:1945 experiences/views.py:2000
 msgid "[Tripalocal] Booking confirmed"
 msgstr "【本土客】 预订确认"
 
-#: experiences/forms.py:1165 experiences/forms.py:1177
+#: experiences/forms.py:1167 experiences/forms.py:1179
 #: experiences/resource.py:295 experiences/resource.py:307
 #: experiences/views.py:1961 experiences/views.py:1973
 msgid "[Tripalocal] Booking reminder"
 msgstr "【本土客】 预订提醒"
 
-#: experiences/forms.py:1189 experiences/resource.py:271
+#: experiences/forms.py:1191 experiences/resource.py:271
 #: experiences/views.py:1988
 msgid "[Tripalocal] How was your experience?"
 msgstr "【本土客】 您对我们的体验还满意吗？"
 
-#: experiences/forms.py:1222 experiences/views.py:1940
+#: experiences/forms.py:1224 experiences/views.py:1940
 #: experiences/views.py:2064
 msgid "%H:%M %d %b %Y"
 msgstr "%Y{0}%m{1}%d{2}%H:%M"
@@ -1119,7 +1119,7 @@ msgid " per person for "
 msgstr "每人, 约"
 
 #: experiences/templates/experiences/experience_booking_confirmation.html:165
-#: experiences/templates/experiences/itinerary_detail.html:85
+#: experiences/templates/experiences/itinerary_detail.html:90
 msgid " hours"
 msgstr "小时"
 
@@ -1478,26 +1478,54 @@ msgstr "天"
 msgid " Person Custom Itinerary"
 msgstr "个成人私人订制行程"
 
-#: experiences/templates/experiences/itinerary_detail.html:39
+#: experiences/templates/experiences/itinerary_detail.html:40
+msgid "Before: "
+msgstr "原价"
+
+#: experiences/templates/experiences/itinerary_detail.html:40
+msgid "After: "
+msgstr "折后价"
+
+#: experiences/templates/experiences/itinerary_detail.html:42
 msgid "Per Person "
 msgstr "平均每人"
 
 #: experiences/templates/experiences/itinerary_detail.html:47
-#: experiences/templates/experiences/itinerary_detail.html:49
+msgid "The discount period will end in"
+msgstr "限时折扣在"
+
+#: experiences/templates/experiences/itinerary_detail.html:47
+msgid " days "
+msgstr "天"
+
+#: experiences/templates/experiences/itinerary_detail.html:47
+msgid " hrs "
+msgstr "小时"
+
+#: experiences/templates/experiences/itinerary_detail.html:47
+msgid " mins "
+msgstr "分钟"
+
+#: experiences/templates/experiences/itinerary_detail.html:47
+msgid " secs "
+msgstr "秒后过期"
+
+#: experiences/templates/experiences/itinerary_detail.html:52
+#: experiences/templates/experiences/itinerary_detail.html:54
 msgid "Lock in price"
 msgstr "锁定优惠价格"
 
-#: experiences/templates/experiences/itinerary_detail.html:53
+#: experiences/templates/experiences/itinerary_detail.html:58
 msgid "Enquire about this itinerary"
 msgstr "定制咨询"
 
-#: experiences/templates/experiences/itinerary_detail.html:67
+#: experiences/templates/experiences/itinerary_detail.html:72
 #, fuzzy, python-format
 #| msgid "Card number"
 msgid "Day %(number)s"
 msgstr "第%(number)s天"
 
-#: experiences/templates/experiences/itinerary_detail.html:85
+#: experiences/templates/experiences/itinerary_detail.html:90
 msgid " days"
 msgstr "天"
 
