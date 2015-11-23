@@ -1015,6 +1015,7 @@ class ExperienceDetailView(DetailView):
                 experience.pickup_detail = t.pickup_detail
                 experience.refund_policy = t.refund_policy
                 experience.whatsincluded = t.whatsincluded
+                experience.notice = t.notice
 
         if experience.commission > 0.0:
             experience.commission = round(experience.commission/(1-experience.commission),3)+1
@@ -3331,6 +3332,7 @@ def custom_itinerary(request, id=None):
                    len(bking.experience.dynamic_price.split(',')) == bking.experience.guest_number_max - bking.experience.guest_number_min + 2 :
                     exp_price = float(bking.experience.dynamic_price.split(",")[bking.guest_number-bking.experience.guest_number_min])
 
+                bking.experience.fixed_price = experience_fee_calculator(bking.experience.fixed_price, bking.experience.commission)
                 bking.experience.price = experience_fee_calculator(exp_price, bking.experience.commission)
                 bking.experience.dollarsign = DollarSign[bking.experience.currency.upper()]
                 bking.experience.currency = str(dict(Currency)[bking.experience.currency.upper()])
