@@ -173,10 +173,10 @@
                     <div class='exp-price portlet-header'>
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
                         {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
-                        <h2>{{experience.fixed_price}}</h2> + <h2>{{experience.price}}</h2>
+                        <h2>{{experience.fixed_price|floatformat:"0"}}</h2> + <h2>{{experience.price|floatformat:"0"}}</h2>
                         <p>{% trans "base + per person" %}</p>
                         {% else %}
-                        <h2 style="display:none;">0</h2><h2>{{experience.price}}</h2>
+                        <h2 style="display:none;">0</h2><h2>{{experience.price|floatformat:"0"}}</h2>
                         <p>{% trans 'per person' %}</p>
                         {% endif %}
                     </div>
