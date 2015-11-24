@@ -31,12 +31,12 @@
                 </div>
             {% endif %}
 
-
-            <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ experience.description }}</p>
-
+            <div class="listing-description">
+            <p>{{ experience.description }}</p>
+            </div>
             <div class="listing-footer">
                 {%if experience.duration < 24 %}{{experience.duration|floatformat:"0"}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
-                &#8226; <span style="font-weight:500;">{% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}{% trans 'Private' %}{% endif %}</span>
+                {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%} &#8226; <span style="font-weight:500;">{% trans 'Private' %}</span>{% endif %}
             </div>
         </div>
         {% endfor %}

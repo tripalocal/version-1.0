@@ -11,6 +11,14 @@
   '../../utils/functions',
   '../../utils/placeholders';
 
+.affix {
+  top: 150px;
+}
+
+.affix-bottom {
+  position: absolute;
+}
+
 .jumbotron {
   height: 220px;
   background-position: center;
@@ -20,30 +28,19 @@
   }
 }
 
-// Center main
-.stickem-container {
-  padding: 30px 0px;
-  @include media('>desktop') {
-    width: 960px;
-  }
-  @include media('<=tablet') {
-    width: 100%;
-  }
-}
-
 .booking-box {
   float: none;
   margin: auto;
   @include media('>=desktop') {
     float: left;
-    margin: 0;
+    margin: 30px 0;
   }
 }
 
 .description-box {
   float: none;
   width: 100%;
-  margin: 40px auto;
+  margin: 30px auto;
   @include media('>=desktop') {
     width: 560px;
     float: right;
