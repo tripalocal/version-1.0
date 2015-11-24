@@ -159,18 +159,18 @@
                 <p>{% trans 'Day' %} {{forloop.counter}}</p>
                 <div class="column">
                   {% for experience in experiences %}
-                  <div class='exp-box-sm portlet' id='experience_id_{{experience.id}}'>
-                    <div class='exp-img portlet-header'>
+                  <div class='exp-box-sm' id='experience_id_{{experience.id}}'>
+                    <div class='exp-img'>
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
                     </div>
-                    <div class='exp-info portlet-header'>
+                    <div class='exp-info'>
                         <h3>{{experience.title}}</h3>
                         <p>{{experience.description|escapejs|slice:"0:16"}}</p>
                         <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
                     </div>
-                    <div class='exp-price portlet-header'>
+                    <div class='exp-price'>
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
                         {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
                         <h2>{{experience.fixed_price|floatformat:"0"}}</h2> + <h2>{{experience.price|floatformat:"0"}}</h2>
@@ -181,7 +181,7 @@
                         {% endif %}
                     </div>
                     {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
-                    <div class="portlet-header" style="display:none;">
+                    <div class="" style="display:none;">
                         <button type="button" onclick="edit_item({{experience.id}}, '{{experience.type|lower}}');">{% trans "Edit" %}</button>
                         <button type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</button>
                     </div>
@@ -768,9 +768,9 @@
                 var price = $("#" + type + "-price").val();
                 var notes = $("#" + type + "-notes").val();
 
-                var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_" + data.new_product_id + "\">" +
-                                  "<div class=\"exp-img portlet-header\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
-                                  "<div class=\"exp-info portlet-header\">" +
+                var new_item =  "<div class=\"exp-box-sm\" id=\"experience_id_" + data.new_product_id + "\">" +
+                                  "<div class=\"exp-img\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
+                                  "<div class=\"exp-info\">" +
                                     "<h3>" + title + "</h3>" +
                                     "<p>" + details + "</p>" +
                                     "<label style=\"display:none;\">" + notes + "</label>";
@@ -793,7 +793,7 @@
                 }
                 new_item +=
                                   "</div>" +
-                                  "<div class=\"exp-price portlet-header\">" +
+                                  "<div class=\"exp-price\">" +
                                     "<p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>" +
                                     "<h2>" + fixed_price + "</h2> + " + "<h2>" + price + "</h2>"
                                     "<p>{% trans 'base + per person' %}</p>" +
@@ -820,11 +820,11 @@
     {
         $("#add-" + type + "-btn").click();
         var experience = $("#experience_id_" + id);
-        var fixed_price = $(experience.find(".exp-price.portlet-header").find("h2")[0]).text();
-        var price = $(experience.find(".exp-price.portlet-header").find("h2")[1]).text();
-        var title = experience.find(".exp-info.portlet-header").find("h3").text();
-        var details = $(experience.find(".exp-info.portlet-header").find("p")[0]).text();
-        var notes = experience.find(".exp-info.portlet-header").find("label").text();
+        var fixed_price = $(experience.find(".exp-price").find("h2")[0]).text();
+        var price = $(experience.find(".exp-price").find("h2")[1]).text();
+        var title = experience.find(".exp-info").find("h3").text();
+        var details = $(experience.find(".exp-info").find("p")[0]).text();
+        var notes = experience.find(".exp-info").find("label").text();
         $("#" + type + "-fixed_price").val(fixed_price);
         $("#" + type + "-price").val(price);
         $("#" + type + "-title").val(title);
@@ -878,11 +878,11 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                                $(experience.find(".exp-price.portlet-header").find("h2")[0]).text($("#" + type + "-fixed_price").val());
-                                $(experience.find(".exp-price.portlet-header").find("h2")[1]).text($("#" + type + "-price").val());
-                                experience.find(".exp-info.portlet-header").find("h3").text($("#" + type + "-title").val());
-                                $(experience.find(".exp-info.portlet-header").find("p")[0]).text($("#" + type + "-details").val());
-                                experience.find(".exp-info.portlet-header").find("label").text($("#" + type + "-notes").val());
+                                $(experience.find(".exp-price").find("h2")[0]).text($("#" + type + "-fixed_price").val());
+                                $(experience.find(".exp-price").find("h2")[1]).text($("#" + type + "-price").val());
+                                experience.find(".exp-info").find("h3").text($("#" + type + "-title").val());
+                                $(experience.find(".exp-info").find("p")[0]).text($("#" + type + "-details").val());
+                                experience.find(".exp-info").find("label").text($("#" + type + "-notes").val());
                                 $("#add-" + type + "-add").text("{% trans "Add" %}");
                                 $("#add-" + type + "-add").unbind("click");
                                 $("#add-" + type + "-add").attr("onclick", "add_item('" + type + "');");
