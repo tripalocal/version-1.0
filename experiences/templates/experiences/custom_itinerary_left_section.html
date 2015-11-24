@@ -31,7 +31,7 @@
                     </div>
                     <div class='exp-price portlet-header'>
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
-                        <h2 style="display:none;">0</h2><h2>{{experience.price}}</h2>
+                        <h2 style="display:none;">0</h2><h2>{{experience.price|floatformat:"0"}}</h2>
                         <p>{% trans 'per person' %}</p>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price}}</h2> + <h2>{{item.price}}</h2>
+                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
                     <p>{% trans "base + per person" %}</p>
                 </div>
             </div>
@@ -139,7 +139,7 @@
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price}}</h2> + <h2>{{item.price}}</h2>
+                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
                     <p>{% trans "base + per person" %}</p>
                 </div>
             </div>
@@ -212,7 +212,7 @@
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price}}</h2> + <h2>{{item.price}}</h2>
+                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
                     <p>{% trans "base + per person" %}</p></p>
                 </div>
             </div>
@@ -285,7 +285,7 @@
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price}}</h2> + <h2>{{item.price}}</h2>
+                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
                     <p>{% trans "base + per person" %}</p>
                 </div>
             </div>
@@ -358,7 +358,7 @@
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price}}</h2> + <h2>{{item.price}}</h2>
+                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
                     <p>{% trans "base + per person" %}</p>
                 </div>
             </div>
@@ -429,7 +429,7 @@
                 </div>
                 <div class="exp-price portlet-header">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price}}</h2> + <h2>{{item.price}}</h2>
+                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
                     <p>{% trans "base + per person" %}</p>
                 </div>
             </div>
