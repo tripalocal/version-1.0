@@ -421,7 +421,7 @@
     {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
     <style>
       .affix {
-        top: 30px;
+        top: 50px;
       }
       .affix-bottom {
         position: absolute;
@@ -481,18 +481,18 @@ $(function(){
           {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
           $('.booking-box').affix({
             offset: {
-              top: 250,
+              top: 350,
               bottom: function() {
-                return (this.bottom = $('.also').outerHeight(true) + 60)
+                return (this.bottom = $('.also').outerHeight(true) + 30)
               }
             }
           })
           {% else %}
           $('.booking-box').affix({
             offset: {
-              top: 480,
+              top: 250,
               bottom: function() {
-                return (this.bottom = $('.also').outerHeight(true) + 30)
+                return (this.bottom = $('.also').outerHeight(true) + 60)
               }
             }
           })
