@@ -231,8 +231,9 @@ def saveBookingRequest(booking_request):
         raise Exception("Illegal input")
 
     experience = AbstractExperience.objects.get(id=experience_id)
-    experience.title = experience.get_title(settings.LANGUAGES[0][0])
-    experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
+    exp_information = experience.get_information(settings.LANGUAGES[0][0])
+    experience.title = exp_information.title
+    experience.meetup_spot = exp_information.meetup_spot
 
     #create a new account if the user does not exist
     user = get_user(first_name, last_name, email, phone)
@@ -626,10 +627,10 @@ def service_wishlist(request):
                 photos = experience.photo_set.all()
                 if photos is not None and len(photos) > 0:
                     photo_url = photos[0].directory+photos[0].name
-
+                exp_information = experience.get_information(settings.LANGUAGES[0][0])
                 experiences.append({'id':experience.id,
-                                    'title':experience.get_title(settings.LANGUAGES[0][0]),
-                                    'description':experience.get_description(settings.LANGUAGES[0][0]),
+                                    'title':exp_information.title,
+                                    'description':exp_information.description,
                                     'price':experience_fee_calculator(exp_price, experience.commission),
                                     'language':experience.language,
                                     'duration':experience.duration,
@@ -815,12 +816,13 @@ def service_mytrip(request, format=None):
             photos = booking.experience.photo_set.all()
             if photos is not None and len(photos) > 0:
                 photo_url = photos[0].directory+photos[0].name
-            
+
+            exp_information = booking.experience.get_information(settings.LANGUAGES[0][0])
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
                   'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
-                  'experience_title':booking.experience.get_title(settings.LANGUAGES[0][0]),
+                  'experience_title':exp_information.title,
                   'experience_photo':photo_url, 'experience_type':booking.experience.type,
-                  'meetup_spot':get_experience_meetup_spot(booking.experience,settings.LANGUAGES[0][0]),
+                  'meetup_spot':exp_information.meetup_spot,
                   'host_id':host.id, 'host_name':host.first_name + ' ' + host.last_name[:1] + '.',
                   'host_phone_number':phone_number,'host_image':host.registereduser.image_url}
 
@@ -1091,12 +1093,13 @@ def get_experience_detail(experience, get_available_date=True, partner = False):
         result.update(avail_date)
 
     if type(experience) == Experience:
-        result_experience = {'experience_title':experience.get_title(settings.LANGUAGES[0][0]),
-                'experience_description':experience.get_description(settings.LANGUAGES[0][0]),
-                'experience_activity':get_experience_activity(experience, settings.LANGUAGES[0][0]),
-                'experience_interaction':get_experience_interaction(experience, settings.LANGUAGES[0][0]),
-                'experience_dress':get_experience_dress(experience, settings.LANGUAGES[0][0]),
-                'experience_meetup_spot':get_experience_meetup_spot(experience, settings.LANGUAGES[0][0]),
+        exp_information = experience.get_information(settings.LANGUAGES[0][0])
+        result_experience = {'experience_title':exp_information.title,
+                'experience_description':exp_information.description,
+                'experience_activity':exp_information.activity,
+                'experience_interaction':exp_information.interaction,
+                'experience_dress':exp_information.dress,
+                'experience_meetup_spot':exp_information.meetup_spot,
                     
                 'included_food':included_food.included,
                 'included_food_detail':included_food.details,
@@ -1157,7 +1160,7 @@ def get_experience_detail(experience, get_available_date=True, partner = False):
             image = ph[0].directory+ph[0].name
         result_related['related_experiences'].append({'image':image,
                                                       'id':exp.id,
-                                                      'title':exp.get_title(settings.LANGUAGE_CODE[0][0]),
+                                                      'title':exp.get_information(settings.LANGUAGE_CODE[0][0]).title,
                                                       'price':float(exp.price)*exp.commission, #commission is updated in get_related_experiences 
                                                       'currency': str(dict(Currency).get(exp.currency.upper(),exp.currency.upper())),
                                                       'dollarsign': DollarSign.get(exp.currency.upper(),'$'),

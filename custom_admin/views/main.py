@@ -34,8 +34,14 @@ class ExperienceView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(ExperienceView, self).get_context_data(**kwargs)
         for exp in context['experience_list']:
-            exp.get_experience_i18n_info()
-            exp.title = exp.get_title(settings.LANGUAGES[0][0])
+            exp_information = exp.get_information()
+            exp.title = exp_information.title
+            exp.description = exp_information.description
+            exp.activity = exp_information.activity
+            exp.dress = exp_information.dress
+            exp.interaction = exp_information.interaction
+            exp.meetup_spot = exp_information.meetup_spot
+            exp.dropoff_spot = exp_information.dropoff_spot
         return context
 
     @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
@@ -58,7 +64,7 @@ class NewProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(NewProductView, self).get_context_data(**kwargs)
         for exp in context['newproduct_list']:
-            exp.title = exp.get_title(settings.LANGUAGES[0][0])
+            exp.title = exp.get_information(settings.LANGUAGES[0][0]).title
         return context
 
     @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
