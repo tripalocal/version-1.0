@@ -514,7 +514,7 @@
     function update_dates() {
       var startDate = $('#id_start_datetime').val();
       $('.section-box>p').each(function(index) {
-        $(this).html("{% trans 'Day' %} " + (index+1) + " " + moment(startDate).add(index,'days').format('YYYY-MM-DD'))
+        $(this).html("{% trans 'Day' %} " + (index+1) + " " + moment(startDate).add(index,'days').format('YYYY-MM-DD dddd'))
       })
     }
 
