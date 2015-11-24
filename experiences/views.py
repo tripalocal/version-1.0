@@ -1472,76 +1472,22 @@ def updateExperience(experience, id, start_datetime, end_datetime, repeat_cycle,
     experience.save()
 
     #save title
-    t = experience.experiencetitle_set.filter(experience = experience, language=lan) if experience.experiencetitle_set is not None else None
-    if t is not None and len(t):
-        t[0].title = title
-        t[0].save()
-    else:
-        t = ExperienceTitle(experience = experience, title = title, language = lan)
-        t.save()
-    if lan2 is not None:
-        t = ExperienceTitle(experience = experience, title = title, language = lan2)
-        t.save()
+    set_exp_title_all_langs(experience, title, lan, lan2)
 
     #save description
-    t = experience.experiencedescription_set.filter(experience = experience, language=lan) if experience.experiencedescription_set is not None else None
-    if t is not None and len(t):
-        t[0].description = description
-        t[0].save()
-    else:
-        t = ExperienceDescription(experience = experience, description = description, language = lan)
-        t.save()
-    if lan2 is not None:
-        t = ExperienceDescription(experience = experience, description = description, language = lan2)
-        t.save()
+    set_exp_desc_all_langs(experience, description, lan ,lan2)
 
     #save activity
-    t = experience.experienceactivity_set.filter(experience = experience, language=lan) if experience.experienceactivity_set is not None else None
-    if t is not None and len(t):
-        t[0].activity = activity
-        t[0].save()
-    else:
-        t = ExperienceActivity(experience = experience, activity = activity, language = lan)
-        t.save()
-    if lan2 is not None:
-        t = ExperienceActivity(experience = experience, activity = activity, language = lan2)
-        t.save()
+    set_exp_activity_all_langs(experience, activity, lan, lan2)
 
     #save interaction
-    t = experience.experienceinteraction_set.filter(experience = experience, language=lan) if experience.experienceinteraction_set is not None else None
-    if t is not None and len(t):
-        t[0].interaction = interaction
-        t[0].save()
-    else:
-        t = ExperienceInteraction(experience = experience, interaction = interaction, language = lan)
-        t.save()
-    if lan2 is not None:
-        t = ExperienceInteraction(experience = experience, interaction = interaction, language = lan2)
-        t.save()
+    set_exp_interaction_all_langs(experience, interaction, lan, lan2)
 
     #save dress
-    t = experience.experiencedress_set.filter(experience = experience, language=lan) if experience.experiencedress_set is not None else None
-    if t is not None and len(t):
-        t[0].dress = dress
-        t[0].save()
-    else:
-        t = ExperienceDress(experience = experience, dress = dress, language = lan)
-        t.save()
-    if lan2 is not None:
-        t = ExperienceDress(experience = experience, dress = dress, language = lan2)
-        t.save()
+    set_exp_dress_all_langs(experience, dress, lan, lan2)
 
     #save meetup_spot
-    t = experience.experiencemeetupspot_set.filter(experience = experience, language=lan) if experience.experiencemeetupspot_set is not None else None
-    if t is not None and len(t):
-        t[0].meetup_spot = meetup_spot
-        t[0].save()
-    else:
-        t = ExperienceMeetupSpot(experience = experience, meetup_spot = meetup_spot, language = lan)
-        t.save()
-    if lan2 is not None:
-        t = ExperienceMeetupSpot(experience = experience, meetup_spot = meetup_spot, language = lan2)
-        t.save()
+    set_exp_meetup_spot_all_langs(experience, meetup_spot, lan, lan2)
 
     return experience
 
@@ -2553,8 +2499,8 @@ def manage_listing(request, exp_id, step, ):
         if request.user.id != experience.get_host().id:
             raise Http404("Sorry, but you can only edit your own experience.")
 
-    experience_title_cn = get_object_or_404(ExperienceTitle, experience_id=exp_id, language='zh')
-    experience_title_en = get_object_or_404(ExperienceTitle, experience_id=exp_id, language='en')
+    experience_title_cn = experience.get_information("zh").title
+    experience_title_en = experience.get_information("en").title
 
     context = RequestContext(request)
     context['experience_title_cn'] = experience_title_cn

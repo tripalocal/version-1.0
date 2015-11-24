@@ -34,7 +34,7 @@ class ExperienceView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(ExperienceView, self).get_context_data(**kwargs)
         for exp in context['experience_list']:
-            exp_information = exp.get_information()
+            exp_information = exp.get_information(settings.LANGUAGES[0][0])
             exp.title = exp_information.title
             exp.description = exp_information.description
             exp.activity = exp_information.activity

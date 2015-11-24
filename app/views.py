@@ -317,7 +317,7 @@ def mytrip(request):
         for booking in bookings:
             exp_information = booking.experience.get_information(settings.LANGUAGES[0][0])
             booking.experience.title = exp_information.title
-            booking.experience.meetup_spot = exp_information.meetup_spot
+            booking.experience.meetup_spot = exp_information.meetup_spot if hasattr(exp_information, "meetup_spot") else ""
             user_bookings.append(booking)
 
         # Sort user_bookings with their dates
