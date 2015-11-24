@@ -793,7 +793,7 @@ def get_related_experiences(experience, request):
 
     for i in range(0,len(related_experiences)):
         convert_experience_price(request, related_experiences[i])
-        exp_information = related_experience[i].get_information(settings.LANGUAGES[0][0])
+        exp_information = related_experiences[i].get_information(settings.LANGUAGES[0][0])
         related_experiences[i].dollarsign = DollarSign[related_experiences[i].currency.upper()]
         related_experiences[i].currency = str(dict(Currency)[related_experiences[i].currency.upper()])
         related_experiences[i].title = exp_information.title
