@@ -215,6 +215,10 @@ body {
     font-weight: normal;
     overflow: hidden;
     text-overflow: ellipsis;
+    &:hover {
+      color: $primary-color;
+      text-decoration: underline;
+    }
   }
   p {
     font-size: 12px;

@@ -3360,6 +3360,7 @@ def itinerary_detail(request,id=None):
             exp_information = item.experience.get_information(settings.LANGUAGES[0][0])
             item.experience.title = exp_information.title
             item.experience.description = exp_information.description
+            item.experience.whatsincluded = exp_information.whatsincluded
             key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
