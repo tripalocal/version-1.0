@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-20 18:10+1100\n"
+"POT-Creation-Date: 2015-11-25 12:18+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2285,12 +2285,117 @@ msgstr ""
 msgid "Contents"
 msgstr ""
 
+#: venv/lib/python3.4/site-packages/post_office/admin.py:97
+msgid "Default Content"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/admin.py:111
+msgid "Description"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/admin.py:117
+msgid "Languages"
+msgstr ""
+
 #: venv/lib/python3.4/site-packages/post_office/fields.py:11
 msgid "Comma-separated emails"
 msgstr ""
 
 #: venv/lib/python3.4/site-packages/post_office/fields.py:20
 msgid "Only comma separated emails are allowed."
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:38
+msgid "low"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:38
+msgid "medium"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:39
+msgid "high"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:39
+msgid "now"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:40
+#: venv/lib/python3.4/site-packages/post_office/models.py:157
+msgid "sent"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:40
+#: venv/lib/python3.4/site-packages/post_office/models.py:157
+msgid "failed"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:41
+msgid "queued"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:43
+#, fuzzy
+#| msgid "Email"
+msgid "Email From"
+msgstr "邮箱"
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:45
+#, fuzzy
+#| msgid "Email"
+msgid "Email To"
+msgstr "邮箱"
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:46
+msgid "Cc"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:48
+#: venv/lib/python3.4/site-packages/post_office/models.py:182
+msgid "Subject"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:49
+msgid "Message"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:50
+msgid "HTML Message"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:176
+msgid "e.g: 'welcome_email'"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:178
+msgid "Description of this template."
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:184
+msgid "Content"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:186
+msgid "HTML content"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:188
+msgid "Render template in alternative language"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:196
+msgid "Email Template"
+msgstr ""
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:197
+#, fuzzy
+#| msgid "Email address"
+msgid "Email Templates"
+msgstr "邮箱"
+
+#: venv/lib/python3.4/site-packages/post_office/models.py:228
+msgid "The original filename"
 msgstr ""
 
 #: venv/lib/python3.4/site-packages/rest_framework/authtoken/serializers.py:20
