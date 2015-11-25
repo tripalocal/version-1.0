@@ -11,7 +11,7 @@
     <link rel="icon" href="{% static 'app/img/favicon.ico'%}" />
     <link href='https://fonts.googleapis.com/css?family=Exo' rel='stylesheet' type='text/css'>
     <link href="{% static 'app/content/main.css' %}" rel="stylesheet">
-    {%if LANGUAGE == "zh-CN"%}
+    {% if LANGUAGE == "zh-CN" or form != None and form.language != None and form.language.value == "zh-CN" %}
     <link href="{% static 'app/content/tripalocal_cn.css' %}" rel="stylesheet">
     {%else%}
     <link href="{% static 'app/content/tripalocal_en.css' %}" rel="stylesheet">
@@ -65,7 +65,7 @@
                               <br>
                               <p>
                               {% trans "or check out some of our " %}
-                              {%if LANGUAGE == "zh-CN"%}
+                              {% if LANGUAGE == "zh-CN" or form != None and form.language != None and form.language.value == "zh-CN" %}
                               <a id="multidaytrip-link" href="https://www.tripalocal.com/cn/multidaytrip/">
                               {%else%}
                               <a id="multidaytrip-link" href="https://www.tripalocal.com/multidaytrip/">
@@ -81,7 +81,7 @@
 
                     <p>{% trans "and we will get back to you within 48 hours" %}<br>
                     {% trans "or check out some of our " %}
-                    {%if LANGUAGE == "zh-CN"%}
+                    {% if LANGUAGE == "zh-CN" or form != None and form.language != None and form.language.value == "zh-CN" %}
                     <a id="multidaytrip-link" href="https://www.tripalocal.com/cn/multidaytrip/">
                     {%else%}
                     <a id="multidaytrip-link" href="https://www.tripalocal.com/multidaytrip/">
@@ -118,7 +118,7 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="https://www.tripalocal.com{{GEO_POSTFIX}}">
-            {% if LANGUAGE == "zh-CN" %}
+            {% if LANGUAGE == "zh-CN" or form != None and form.language != None and form.language.value == "zh-CN" %}
             <img alt="Tripalocal" src="{% static 'img/top_logo-cn.svg' %}" width="90">
             {% else %}
             <img alt="Tripalocal" src="{% static 'img/top_logo-en.svg' %}" width="115">
@@ -127,7 +127,7 @@
         </div>
 
           <a type="button" id="language_switch_topbar" class="btn btn-clear navbar-btn navbar-right">
-          {% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}
+          {% if LANGUAGE == "zh-CN" or form != None and form.language != None and form.language.value == "zh-CN" %}English{% else %}中文{% endif %}
           </a>
 
           {% if user.is_authenticated %}
@@ -196,7 +196,7 @@
         <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
         <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
         <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
-        <li><a href="https://www.tripalocal.com{% if LANGUAGE == 'zh-CN' %}{{ request.path|slice:'3:' }}{% else %}/cn{{ request.path }}{% endif %}" style="border: 0;">{% if LANGUAGE == "zh-CN" %}English{% else %}中文{% endif %}</a></li>
+        <li><a id="language_switch_topbar_mobile" style="border: 0;">{% if LANGUAGE == "zh-CN" or form != None and form.language != None and form.language.value == "zh-CN" %}English{% else %}中文{% endif %}</a></li>
         {% if user.is_authenticated %}
         <li><a href="{{ GEO_POSTFIX }}accounts/logout/">{% trans "Logout" %}</a></li>
         {% else %}
@@ -388,21 +388,22 @@
            });
        }
 
-
-
         var des_url = window.location.pathname;
         if (des_url.indexOf("/cn") > -1) {
             $('#id_language_select').val('cn');
             $('#language_switch_topbar').attr("href", "https://www.tripalocal.com" + des_url.substring(3));
+            $('#language_switch_topbar_mobile').attr("href", "https://www.tripalocal.com" + des_url.substring(3));
         }
         else if (window.location.href.indexOf(".cn") > -1) {
             $('#id_language_select').val('cn');
             $('#language_switch_topbar').attr("href", "https://www.tripalocal.com" + des_url);
+            $('#language_switch_topbar_mobile').attr("href", "https://www.tripalocal.com" + des_url);
             $(".navbar-brand").attr("href", "https://www.tripalocal.com.cn{{GEO_POSTFIX}}");
         }
         else {
             $('#id_language_select').val('en');
             $('#language_switch_topbar').attr("href", "https://www.tripalocal.com/cn" + des_url);
+            $('#language_switch_topbar_mobile').attr("href", "https://www.tripalocal.com/cn" + des_url);
         }
 
         $('#id_language_select').change(function () {

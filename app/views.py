@@ -26,8 +26,7 @@ from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, set_initial_currency, convert_experience_price
 from allauth.account.signals import email_confirmed, password_changed
-from experiences.models import Booking, Experience, Payment, get_experience_meetup_spot, \
-    WechatProduct, WechatBooking
+from experiences.models import Booking, Experience, Payment, WechatProduct, WechatBooking
 from experiences.forms import Currency, DollarSign, email_account_generator
 from django.utils.translation import ugettext_lazy as _
 from post_office import mail
@@ -255,7 +254,7 @@ def mylisting(request):
     exps = Experience.objects.raw('select abstractexperience_ptr_id from experiences_experience where abstractexperience_ptr_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime', [request.user.id])
 
     for experience in exps:
-        experience.title = experience.experience.get_title(settings.LANGUAGES[0][0])
+        experience.title = experience.experience.get_information(settings.LANGUAGES[0][0]).title
         experiences.append(experience)
 
     context['experiences'] = experiences
@@ -278,7 +277,7 @@ def getreservation(user):
         phone_number = payment.phone_number if payment.phone_number != None and len(payment.phone_number) else guest.registereduser.phone_number
         reservation = {"booking_datetime":booking.datetime.astimezone(local_timezone), "booking_status":booking.status,
                        "booking_guest_number":booking.guest_number,"booking_id":booking.id,
-                       "experience_id":experience.id,"experience_title":experience.get_title(settings.LANGUAGES[0][0]),
+                       "experience_id":experience.id,"experience_title":experience.get_information(settings.LANGUAGES[0][0]).title,
                        "payment_city":payment.city, "payment_country":payment.country,
                        "guest_first_name":guest.first_name, "guest_last_name":guest.last_name, "guest_phone_number":phone_number}
 
@@ -316,8 +315,9 @@ def mytrip(request):
         bookings = Booking.objects.filter(user=user_id, status__in=booking_status)
 
         for booking in bookings:
-            booking.experience.title = booking.experience.get_title(settings.LANGUAGES[0][0])
-            booking.experience.meetup_spot = get_experience_meetup_spot(booking.experience, settings.LANGUAGES[0][0])
+            exp_information = booking.experience.get_information(settings.LANGUAGES[0][0])
+            booking.experience.title = exp_information.title
+            booking.experience.meetup_spot = exp_information.meetup_spot if hasattr(exp_information, "meetup_spot") else ""
             user_bookings.append(booking)
 
         # Sort user_bookings with their dates

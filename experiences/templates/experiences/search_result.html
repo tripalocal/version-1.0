@@ -131,6 +131,7 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
   <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+  <script type="text/javascript" src="{% static 'experiences/scripts/jquery.dotdotdot.min.js' %}"></script>
 
 
 <script charset="utf-8" type="text/javascript">
@@ -216,6 +217,7 @@
         }, data)).done(function (response) {
             $('#ajax-experience-result').html($(response).find('#experience-results'));
             $('#ajax-experience-count').html($(response).find('#experience-count'));
+            $('.listing-description').dotdotdot();
         }).fail(function () {
             $('#ajax-experience-result').text("Sorry but there was an error.");
         });
