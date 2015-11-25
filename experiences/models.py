@@ -11,6 +11,7 @@ from Tripalocal_V1 import settings
 from polymorphic import PolymorphicModel
 from experiences.utils import *
 import app.models
+from unionpay.util.helper import load_config
 
 class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
@@ -129,8 +130,8 @@ class Experience(AbstractExperience):
         return tags
 
     def get_timezone(self):
-        #TODO
-        return pytz.timezone(settings.TIME_ZONE)
+        timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
+        return pytz.timezone(timezones.get(self.city.lower(), settings.TIME_ZONE))
 
     def get_host(self):
         return self.hosts.all()[0]
@@ -239,8 +240,8 @@ class NewProduct(AbstractExperience):
         self.save()
 
     def get_timezone(self):
-        #TODO
-        return pytz.timezone(settings.TIME_ZONE)
+        timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
+        return pytz.timezone(timezones.get(self.city.lower(), settings.TIME_ZONE))
 
     def get_host(self):
         return self.provider.user
