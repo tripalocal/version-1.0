@@ -1201,8 +1201,8 @@ def service_experiencedetail(request, format=None):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-#@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
-#@permission_classes((IsAuthenticated,))
+@authentication_classes((TokenAuthentication,))# SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated, IsAdminUser))
 def service_all_products(request, format=None):
     try:
         result=[]
