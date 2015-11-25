@@ -622,7 +622,6 @@ class BookingConfirmationForm(forms.Form):
         Stripe's library as a standard ValidationError for proper feedback.
         """
         cleaned = super(BookingConfirmationForm, self).clean()
-        local_timezone = pytz.timezone(settings.TIME_ZONE)
 
         if not self.errors and ('Refresh' not in self.data):
             stripeToken = self.data["stripeToken"] if "stripeToken" in self.data else None
@@ -631,6 +630,7 @@ class BookingConfirmationForm(forms.Form):
             #exp_year = self.cleaned_data["expiration"].year
             #cvv = self.cleaned_data["cvv"]
             experience = AbstractExperience.objects.get(id=self.cleaned_data['experience_id'])
+            local_timezone = pytz.timezone(experience.get_timezone())
 
             extra_fee = 0.00
             free = False
@@ -857,11 +857,11 @@ def schedule_request_reminder_sms(booking_id, host_id, guest_name, schedule_time
 
 def instant_booking(experience, bk_date, bk_time):
     is_instant_booking = False
-    local_timezone = pytz.timezone(settings.TIME_ZONE)
+    local_timezone = pytz.timezone(experience.get_timezone())
     instant_bookings = experience.instantbookingtimeperiod_set.all()
     for ib in instant_bookings:
-        ib_start = ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
-        ib_end = ib.end_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+        ib_start = ib.start_datetime.astimezone(local_timezone)
+        ib_end = ib.end_datetime.astimezone(local_timezone)
         if ib.repeat:
             if ib.repeat_cycle.lower() == "daily":
                 if (ib_start.date() - bk_date).days % ib.repeat_frequency == 0:
@@ -992,9 +992,9 @@ class ItineraryBookingForm(forms.Form):
                 #save the booking record
                 #user = User.objects.get(id=self.cleaned_data['user_id']) #moved outside of the for loop
                 host = experience.get_host()
-                bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
-                bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
-                local_timezone = pytz.timezone(settings.TIME_ZONE)
+                local_timezone = pytz.timezone(experience.get_timezone())
+                bk_date = local_timezone.localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
+                bk_time = local_timezone.localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
 
                 is_instant_booking = instant_booking(experience, bk_date, bk_time)
 
