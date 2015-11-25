@@ -3004,7 +3004,7 @@ def custom_itinerary_request(request):
         for key, value in data.items():
             message = message + "<h2>" + key + "</h2>" + "<p>" + value + "</p>"
         mail.send(
-            sender = 'enquiries@tripalocal.com',
+            sender = 'admin@tripalocal.com',
             recipients = ['enquiries@tripalocal.com'],
             subject="Itinerary request from " + email,
             html_message=message,

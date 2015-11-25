@@ -402,6 +402,22 @@ class CustomItinerary(models.Model):
             itinerary_price *= 1.15
         return round(itinerary_price,0)
 
+class CustomItineraryRequest(models.Model):
+    is_first_time = models.BooleanField(default=True)
+    destinations = models.TextField()
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    adults_number = models.IntegerField(default=1)
+    children_number = models.IntegerField(default=0)
+    tags = models.TextField()
+    whatsincluded = models.TextField()
+    budget = models.TextField()
+    requirements = models.TextField(blank=True, null=True)
+    customer_name = models.CharField(max_length=40)
+    email = models.EmailField()
+    wechat = models.CharField(max_length=50)
+    mobile = models.CharField(max_length=50)
+
 class Booking(models.Model):
     user = models.ForeignKey(User)
     coupon = models.ForeignKey(Coupon, null=True, blank=True)

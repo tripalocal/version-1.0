@@ -726,8 +726,8 @@ def email_custom_trip(request):
     message = request.POST.get("message", "Blank")
 
     mail.send(
-        'enquiries@tripalocal.com',
-        'enquiries@tripalocal.com',
+        sender = 'admin@tripalocal.com',
+        recipients = ['enquiries@tripalocal.com'],
         subject="Trip suggestion from " + email,
         message=message,
     )
