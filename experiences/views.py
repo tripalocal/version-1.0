@@ -76,7 +76,7 @@ def convert_experience_price(request, experience):
 
 def next_time_slot(experience, repeat_cycle, repeat_frequency, repeat_extra_information, current_datetime, daylightsaving):
     #daylightsaving: whether it was in daylightsaving when this blockout/instant booking record was created
-    current_datetime_local = current_datetime.astimezone(experience.get_timezone())
+    current_datetime_local = current_datetime.astimezone(pytz.timezone(experience.get_timezone()))
 
     if daylightsaving:#daylight saving
         if current_datetime_local.dst() == timedelta(0):# not daylight saving
@@ -3278,8 +3278,8 @@ def custom_itinerary(request, id=None):
                     form.initial["children_number"] = 0
                 context["children_number"] = form.initial["children_number"]
 
-                if bking.datetime.astimezone(bking.experience.get_timezone()) < form.initial["start_datetime"]:
-                    form.initial["start_datetime"] = bking.datetime.astimezone(bking.experience.get_timezone())
+                if bking.datetime.astimezone(pytz.timezone(bking.experience.get_timezone())) < form.initial["start_datetime"]:
+                    form.initial["start_datetime"] = bking.datetime.astimezone(pytz.timezone(bking.experience.get_timezone()))
 
                 exp_information = bking.experience.get_information(settings.LANGUAGES[0][0])
                 bking.experience.title = exp_information.title
@@ -3297,7 +3297,7 @@ def custom_itinerary(request, id=None):
                 if float(bking.experience.duration).is_integer():
                     bking.experience.duration = int(bking.experience.duration)
 
-                key = bking.datetime.astimezone(bking.experience.get_timezone()).strftime("%Y-%m-%d")
+                key = bking.datetime.astimezone(pytz.timezone(bking.experience.get_timezone())).strftime("%Y-%m-%d")
 
                 if bking.experience.city not in itinerary:
                     itinerary[bking.experience.city] = OrderedDict()
@@ -3364,15 +3364,15 @@ def itinerary_detail(request,id=None):
                 item.experience.whatsincluded = exp_information.whatsincluded
             else:
                 item.experience.whatsincluded = item.experience.get_whatsincluded(settings.LANGUAGES[0][0])
-            key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
+            key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%Y-%m-%d")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
 
             if start_datetime > item.datetime:
-                start_datetime = item.datetime.astimezone(item.experience.get_timezone())
+                start_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
             if end_datetime < item.datetime:
-                end_datetime = item.datetime.astimezone(item.experience.get_timezone())
+                end_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
 
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
         guest_number = ci.get_guest_number()
