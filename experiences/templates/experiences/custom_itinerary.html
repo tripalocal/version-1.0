@@ -494,6 +494,7 @@
 
         //add a new item in the right section
         var new_item =
+                    "<div class=\"city-sortable\">" +
                     "<div id=\"city-title-" + i + "\" class=\"section-box-add\" onclick=\"$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');update_left_section('" + city + "');\" city=" + city + ">" +
                         "<span class=\"add-sign\">+</span>" +
                         "<p id=\"city-title-p-" + i + "\">" + city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span></p>" +
@@ -508,8 +509,8 @@
                             "</div>" +
                         "</div>";
         }
-        new_item += "</div>";
-        $("#right_section").append(new_item);
+        new_item += "</div></div>";
+        $("#sortable").append(new_item);
 
         //reload data
         $("#itinerary_search").click();
