@@ -23,3 +23,8 @@
     margin-top: 10px;
     background-color: $pale-grey;
 }
+
+.drop-placeholder-sm {
+  @extend .drop-placeholder;
+  height: 30px;
+}

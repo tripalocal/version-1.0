@@ -15,6 +15,20 @@ function init_drag() {
       update_price_title(event, ui);
     }
   });
+  $("#sortable").sortable({
+    connectwith: "#sortable",
+    placeholder: "drop-placeholder-sm",
+    start: function(event, ui) {
+      ui.item.addClass('tilt');
+      tilt_direction(ui.item);
+    },
+    stop: function(event, ui) {
+      ui.item.removeClass("tilt");
+      $("html").unbind('mousemove', ui.item.data("move_handler"));
+      ui.item.removeData("move_handler");
+      update_dates();
+    }
+  });
 }
 
 // Tilting of draggable components
