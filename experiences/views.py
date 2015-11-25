@@ -74,9 +74,9 @@ def convert_experience_price(request, experience):
 
         experience.currency = request.session['custom_currency']
 
-def next_time_slot(repeat_cycle, repeat_frequency, repeat_extra_information, current_datetime, daylightsaving):
+def next_time_slot(experience, repeat_cycle, repeat_frequency, repeat_extra_information, current_datetime, daylightsaving):
     #daylightsaving: whether it was in daylightsaving when this blockout/instant booking record was created
-    current_datetime_local = current_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+    current_datetime_local = current_datetime.astimezone(experience.get_timezone())
 
     if daylightsaving:#daylight saving
         if current_datetime_local.dst() == timedelta(0):# not daylight saving
@@ -235,7 +235,6 @@ def search_experience(condition, language="zh", type="experience"):
 
 def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None, currency=None):
     #city/keywords is a string like A,B,C,
-    local_timezone = pytz.timezone(settings.TIME_ZONE)
     available_options = []
     end_datetime = end_datetime.replace(hour=22)
 
@@ -304,6 +303,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
         sdt = start_datetime
         last_sdt = pytz.timezone('UTC').localize(datetime.min)
+        local_timezone = pytz.timezone(experience.get_timezone())
 
         #calculate rate
         rate = 0.0
@@ -356,7 +356,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
         #calculate all the blockout time periods
         for blk in blockouts:
-            if blk.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+            if blk.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
                 daylightsaving = True
             else:
                 daylightsaving = False
@@ -370,7 +370,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                     blockout_start.append(blk.start_datetime)
                     blockout_end.append(blk.start_datetime + b_l)
 
-                    blk.start_datetime = next_time_slot(blk.repeat_cycle, blk.repeat_frequency,
+                    blk.start_datetime = next_time_slot(experience, blk.repeat_cycle, blk.repeat_frequency,
                                                         blk.repeat_extra_information, blk.start_datetime,daylightsaving)
 
             else:
@@ -388,7 +388,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
         #calculate all the instant booking time periods
         for ib in instantbookings :
-            if ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+            if ib.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
                 daylightsaving = True
             else:
                 daylightsaving = False
@@ -402,7 +402,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                     instantbooking_start.append(ib.start_datetime)
                     instantbooking_end.append(ib.start_datetime + ib_l)
 
-                    ib.start_datetime = next_time_slot(ib.repeat_cycle, ib.repeat_frequency,
+                    ib.start_datetime = next_time_slot(experience, ib.repeat_cycle, ib.repeat_frequency,
                                                        ib.repeat_extra_information, ib.start_datetime, daylightsaving)
 
             else:
@@ -419,7 +419,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         instantbooking_i=0
         while (sdt <= end_datetime):
             sdt_local = sdt.astimezone(local_timezone)
-            if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+            if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
                 #daylight saving
                 if not sdt_local.dst() != timedelta(0):
                     # not daylight saving
@@ -556,7 +556,7 @@ def getAvailableOptions(experience, available_options, available_date):
     top_instant_bookings = -1
 
     last_sdt = pytz.timezone('UTC').localize(datetime.min)
-    local_timezone = pytz.timezone(settings.TIME_ZONE)
+    local_timezone = pytz.timezone(experience.get_timezone())
 
     #requirement change: all timeslots are considered available unless being explicitly blocked
     #while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(hours=+6)):
@@ -582,7 +582,7 @@ def getAvailableOptions(experience, available_options, available_date):
 
     #calculate all the blockout time periods
     for blk in blockouts :
-        if blk.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+        if blk.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
             daylightsaving = True
         else:
             daylightsaving = False
@@ -596,7 +596,7 @@ def getAvailableOptions(experience, available_options, available_date):
                 blockout_start.append(blk.start_datetime)
                 blockout_end.append(blk.start_datetime + b_l)
 
-                blk.start_datetime = next_time_slot(blk.repeat_cycle, blk.repeat_frequency,
+                blk.start_datetime = next_time_slot(experience, blk.repeat_cycle, blk.repeat_frequency,
                                                     blk.repeat_extra_information, blk.start_datetime, daylightsaving)
 
         else:
@@ -614,7 +614,7 @@ def getAvailableOptions(experience, available_options, available_date):
 
     #calculate all the instant booking time periods
     for ib in instantbookings :
-        if ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+        if ib.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
             daylightsaving = True
         else:
             daylightsaving = False
@@ -628,7 +628,7 @@ def getAvailableOptions(experience, available_options, available_date):
                 instantbooking_start.append(ib.start_datetime)
                 instantbooking_end.append(ib.start_datetime + ib_l)
 
-                ib.start_datetime = next_time_slot(ib.repeat_cycle, ib.repeat_frequency,
+                ib.start_datetime = next_time_slot(experience, ib.repeat_cycle, ib.repeat_frequency,
                                                    ib.repeat_extra_information, ib.start_datetime, daylightsaving)
 
         else:
@@ -649,7 +649,7 @@ def getAvailableOptions(experience, available_options, available_date):
 
         #block 10pm-7am if repeated hourly
         sdt_local = sdt.astimezone(local_timezone)
-        if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).dst() != timedelta(0):
+        if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
             #daylight saving
             if not sdt_local.dst() != timedelta(0):
                 # not daylight saving
@@ -890,7 +890,7 @@ class ExperienceDetailView(DetailView):
 
         sdt = experience.start_datetime
         last_sdt = pytz.timezone('UTC').localize(datetime.min)
-        local_timezone = pytz.timezone(settings.TIME_ZONE)
+        local_timezone = pytz.timezone(experience.get_timezone())
         available_options = []
         available_date = ()
 
@@ -1123,7 +1123,7 @@ def experience_booking_successful(request, experience=None, guest_number=None, b
     if experience is None and data is not None:
         experience = AbstractExperience.objects.get(id=data['experience_id'])
         guest_number = int(data['guest_number'])
-        booking_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(data['booking_datetime'], "%Y-%m-%d%H:%M"))
+        booking_datetime = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(data['booking_datetime'], "%Y-%m-%d%H:%M"))
         price_paid = float(data['price_paid'])
         is_instant_booking = True if data['is_instant_booking'] == "True" else False
 
@@ -1186,7 +1186,7 @@ def experience_booking_confirmation(request):
             #get coupon information
             wrong_promo_code = False
             code = form.data['promo_code']
-            bk_dt = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['date'].strip()+form.data['time'].strip(),"%Y-%m-%d%H:%M"))
+            bk_dt = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['date'].strip()+form.data['time'].strip(),"%Y-%m-%d%H:%M"))
             coupons = Coupon.objects.filter(promo_code__iexact = code,
                                             end_datetime__gt = bk_dt,
                                             start_datetime__lt = bk_dt)
@@ -1264,8 +1264,8 @@ def experience_booking_confirmation(request):
             form.data['booking_extra_information'] = order_id
             if form.is_valid():
                 config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
-                bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
-                bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
+                bk_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
+                bk_time = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
                 total_price = form.cleaned_data['price_paid'] if form.cleaned_data['price_paid'] != -1.0 else total_price
 
                 if total_price > 0.0:
@@ -1312,8 +1312,8 @@ def experience_booking_confirmation(request):
             form.data['booking_extra_information'] = out_trade_no
 
             if form.is_valid():
-                bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
-                bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
+                bk_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
+                bk_time = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
                 total_price = form.cleaned_data['price_paid'] if form.cleaned_data['price_paid'] != -1.0 else total_price
 
                 if total_price > 0.0:
@@ -1652,8 +1652,8 @@ def create_experience(request, id=None):
 
             experience = updateExperience(experience=experience,
                                         id=int(form.data['id']),
-                                        start_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2015-01-01 00:00", "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),#form.data['start_datetime']
-                                        end_datetime = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2025-01-01 00:00", "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),#form.data['end_datetime']
+                                        start_datetime = pytz.timezone(experience.get_timezone()).localize(datetime.strptime("2015-01-01 00:00", "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),#form.data['start_datetime']
+                                        end_datetime = pytz.timezone(experience.get_timezone()).localize(datetime.strptime("2025-01-01 00:00", "%Y-%m-%d %H:%M")).astimezone(pytz.timezone('UTC')),#form.data['end_datetime']
                                         repeat_cycle = "Hourly",
                                         repeat_frequency = 1,
                                         guest_number_min = int(form.data['guest_number_min']),
@@ -2845,7 +2845,7 @@ def review_experience (request, id=None):
 
         if (bookings and not hasLeftReview):
             context['experience'] = experience
-            bookings[0].datetime = bookings[0].datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+            bookings[0].datetime = bookings[0].datetime.astimezone(pytz.timezone(experience.get_timezone()))
             context['booking'] = bookings[0]
 
             if request.method == 'POST':
@@ -3197,7 +3197,7 @@ def custom_itinerary(request, id=None):
                     total_price *= 1.15 #*1.15 based on the new requirement
 
                     #save the custom itinerary as draft
-                    local_timezone = pytz.timezone(settings.TIME_ZONE)
+                    local_timezone = pytz.timezone(experience.get_timezone())
                     bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
@@ -3208,7 +3208,7 @@ def custom_itinerary(request, id=None):
 
                     #save to excel sheet
                     cell_format = workbook.add_format({'text_wrap': True})
-                    current_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(str(item['date']), "%Y-%m-%d"))
+                    current_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(str(item['date']), "%Y-%m-%d"))
                     if current_date > last_date:
                         #a new day
                         row += 1
@@ -3360,6 +3360,10 @@ def itinerary_detail(request,id=None):
             exp_information = item.experience.get_information(settings.LANGUAGES[0][0])
             item.experience.title = exp_information.title
             item.experience.description = exp_information.description
+            if type(item.experience) == NewProduct:
+                item.experience.whatsincluded = exp_information.whatsincluded
+            else:
+                item.experience.whatsincluded = item.experience.get_whatsincluded(settings.LANGUAGES[0][0])
             key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
@@ -3896,7 +3900,7 @@ def unionpay_payment_callback(request):
 
                     experience = AbstractExperience.objects.get(id=bk.experience_id)
                     user = User.objects.get(id=bk.user_id)
-                    bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+                    bk.datetime = bk.datetime.astimezone(pytz.timezone(experience.get_timezone()))
                     send_booking_email_verification(bk, experience, user,
                                                     instant_booking(experience, bk.datetime.date(), bk.datetime.time()))
                     sms_notification(bk, experience, user, payment.phone_number)
@@ -3998,7 +4002,7 @@ def wechat_qr_payment_notify(request):
 
                 experience = AbstractExperience.objects.get(id=bk.experience_id)
                 user = User.objects.get(id=bk.user_id)
-                bk.datetime = bk.datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+                bk.datetime = bk.datetime.astimezone(pytz.timezone(experience.get_timezone()))
                 send_booking_email_verification(bk, experience, user,
                                                 instant_booking(experience, bk.datetime.date(), bk.datetime.time()))
                 sms_notification(bk, experience, user, payment.phone_number)

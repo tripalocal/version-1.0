@@ -130,8 +130,7 @@ class Experience(AbstractExperience):
         return tags
 
     def get_timezone(self):
-        timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
-        return pytz.timezone(timezones.get(self.city.lower(), settings.TIME_ZONE))
+        return get_timezone(self.city)
 
     def get_host(self):
         return self.hosts.all()[0]
@@ -240,8 +239,7 @@ class NewProduct(AbstractExperience):
         self.save()
 
     def get_timezone(self):
-        timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
-        return pytz.timezone(timezones.get(self.city.lower(), settings.TIME_ZONE))
+        return get_timezone(self.city)
 
     def get_host(self):
         return self.provider.user

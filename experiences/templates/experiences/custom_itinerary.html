@@ -109,8 +109,8 @@
         </div>
         <div class="form-inline right-group">
           <h3 class="form-header">Web</h3>
-          <button id="button_ready" name="ready" class="btn btn-sm btn-default">$</button>
-          <button id="button_draft" name="draft" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
+          <button {% if existing_itinerary.status == "paid" %}disabled="disabled"{% endif %} id="button_ready" name="ready" class="btn btn-sm btn-default">$</button>
+          <button {% if existing_itinerary.status == "paid" %}disabled="disabled"{% endif %} id="button_draft" name="draft" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
           <h3 class="form-header">PDF</h3>
           <button type="button" id="" class="btn btn-sm btn-default">$</button>
           <button type="button" id="" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
@@ -166,7 +166,7 @@
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
                     </div>
                     <div class='exp-info'>
-                        <h3>{{experience.title}}</h3>
+                        <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}">{{experience.title}}</a></h3>
                         <p>{{experience.description|escapejs|slice:"0:16"}}</p>
                         <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
@@ -494,6 +494,7 @@
 
         //add a new item in the right section
         var new_item =
+                    "<div class=\"city-sortable\">" +
                     "<div id=\"city-title-" + i + "\" class=\"section-box-add\" onclick=\"$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');update_left_section('" + city + "');\" city=" + city + ">" +
                         "<span class=\"add-sign\">+</span>" +
                         "<p id=\"city-title-p-" + i + "\">" + city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span></p>" +
@@ -508,8 +509,8 @@
                             "</div>" +
                         "</div>";
         }
-        new_item += "</div>";
-        $("#right_section").append(new_item);
+        new_item += "</div></div>";
+        $("#sortable").append(new_item);
 
         //reload data
         $("#itinerary_search").click();

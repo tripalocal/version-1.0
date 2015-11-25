@@ -239,7 +239,7 @@ def saveBookingRequest(booking_request):
     user = get_user(first_name, last_name, email, phone)
 
     #record the booking request
-    local_timezone = pytz.timezone(settings.TIME_ZONE)
+    local_timezone = pytz.timezone(experience.get_timezone())
     booking = Booking(user = user, experience = experience, guest_number = guest_number, 
                         datetime = local_timezone.localize(datetime.strptime(booking_datetime, '%Y-%m-%d %H:%M')).astimezone(pytz.timezone("UTC")),
                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="accepted", booking_extra_information=booking_extra_information)
@@ -803,9 +803,6 @@ def service_mytrip(request, format=None):
 
         bookings = sorted(bookings, key=lambda booking: booking.datetime, reverse=True)
 
-        # Convert timezone
-        local_timezone = pytz.timezone(settings.TIME_ZONE)
-
         bks = []
         for booking in bookings:
             payment = booking.payment if booking.payment_id != None else Payment()
@@ -818,6 +815,8 @@ def service_mytrip(request, format=None):
                 photo_url = photos[0].directory+photos[0].name
 
             exp_information = booking.experience.get_information(settings.LANGUAGES[0][0])
+            # Convert timezone
+            local_timezone = pytz.timezone(experience.get_timezone())
             bk = {'datetime':booking.datetime.astimezone(local_timezone).isoformat(), 'status':booking.status,
                   'guest_number':booking.guest_number, 'experience_id':booking.experience.id,
                   'experience_title':exp_information.title,
@@ -946,7 +945,6 @@ def service_booking_request(request, format=None):
 
         bookings = data['bookings']
         partner = data['partner']
-        local_timezone = pytz.timezone(settings.TIME_ZONE)
 
         for item in bookings:
             first_name = item['first_name'] if 'first_name' in item else None
@@ -957,6 +955,7 @@ def service_booking_request(request, format=None):
             if user is None:
                 raise Exception("Incomplete/Incorrect user information")
             experience = AbstractExperience.objects.get(id=str(item['experience_id']))
+            local_timezone = pytz.timezone(experience.get_timezone())
             host = experience.get_host()
             bk_datetime = local_timezone.localize(datetime.strptime(item['datetime'].strip(), "%Y/%m/%d %H:%M")).astimezone(pytz.timezone("UTC"))
             guest_number_adult = int(item['guest_number_adult'])
