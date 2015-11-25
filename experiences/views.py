@@ -3152,6 +3152,9 @@ def custom_itinerary(request, id=None):
                 #save custom itinerary
                 if id is not None:
                     ci = CustomItinerary.objects.get(id=id)
+                    if ci.status.lower() == "paid":
+                        #cannot edit a paid itinerary
+                        return HttpResponseRedirect(GEO_POSTFIX+"itinerary/"+str(ci.id)+"/")
                     for bking in ci.booking_set.all():
                         bking.delete()
                 else:
@@ -3262,7 +3265,7 @@ def custom_itinerary(request, id=None):
             existing_ci = CustomItinerary.objects.get(id=id)
             itinerary = OrderedDict()
             form.initial["title"] = existing_ci.title
-            form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow())
+            form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
             for bking in existing_ci.booking_set.order_by('datetime').all():
                 if bking.adult_number is not None and bking.adult_number > 0:
                     form.initial["adult_number"] = bking.adult_number
