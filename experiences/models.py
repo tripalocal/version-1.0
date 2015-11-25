@@ -380,7 +380,7 @@ class CustomItinerary(models.Model):
     def get_length(self):
         dates = []
         for item in self.booking_set.all():
-            key = item.datetime.astimezone(item.experience.get_timezone()).strftime("%Y-%m-%d")
+            key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%Y-%m-%d")
             if key not in dates:
                 dates.append(key)
 
