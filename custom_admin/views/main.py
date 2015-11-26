@@ -13,6 +13,9 @@ from custom_admin.views.base import StatusGenerator
 from custom_admin.mail import MailService
 from Tripalocal_V1 import settings
 
+import pytz
+from datetime import *
+
 class AdminCommonOperation(object):
 
     @method_decorator(ajax_form_validate(form_class=BookingForm))
@@ -30,13 +33,18 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     template_name = 'custom_admin/itineraries.html'
     context_object_name = 'itinerary_list'
     paginate_by = None
-    #def get_context_data(self, **kwargs):
-        #context = super(ItineraryView, self).get_context_data(**kwargs)
-        #for ci in context['itinerary_list']:
-            #ci.guest_number = ci.get_guest_number()
-            #ci.price_aud = ci.get_price('aud')
-            #ci.price_cny = ci.get_price('cny')
-        #return context
+    def get_context_data(self, **kwargs):
+        context = super(ItineraryView, self).get_context_data(**kwargs)
+        for ci in context['itinerary_list']:
+            ci.guest_number = ci.get_guest_number()
+            ci.price_aud = ci.get_price('aud')
+            ci.price_cny = ci.get_price('cny')
+            if ci.status != "paid":
+                if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + ci.submitted_datetime:
+                    ci.status = "Full price"
+                else:
+                    ci.status = "Discount price"
+        return context
 
 class ExperienceView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     model = Experience
@@ -97,6 +105,9 @@ class BookingView(AjaxDisptcherProcessorMixin, BookingInfoMixin, MailSupportMixi
     form_class = BookingForm
     context_object_name = 'booking_list'
     paginate_by = None
+
+    def get_queryset(self):
+        return self.model.objects.exclude(status__iexact="draft")
 
     def get_context_data(self, **kwargs):
         context = super(BookingView, self).get_context_data(**kwargs)

@@ -49,14 +49,14 @@
                 <td>{{itinerary.price_cny}}</td>
                 <td id="td-status-{{itinerary.id}}">
                     <p>{{itinerary.status}}</p>
-                    <select name="select" id="select-status-{{itinerary.id}}">
+                    <!--<select name="select" id="select-status-{{itinerary.id}}">
                         <option value="draft">Draft</option>
                         <option value="paid">Paid</option>
                         <option value="ready">Discount Price</option>
                         <option value="ready">Full Price</option>
-                    </select>
+                    </select>-->
                 </td>
-                <td><p><a href="/itinerary/edot/{{itinerary.id}}" target="_blank">Edit</a></p></td>
+                <td><p><a href="/itinerary/edit/{{itinerary.id}}" target="_blank">Edit</a></p></td>
             </tr>
             {% endfor %}
         </table>

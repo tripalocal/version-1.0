@@ -8,8 +8,8 @@ class BookingInfoMixin(object):
         context = super(BookingInfoMixin, self).get_context_data(**kwargs)
         # Add booking info to the context.
         booking_list = context['booking_list']
-        for booking in booking_list:
-            print(booking.status)
+        #for booking in booking_list:
+        #    print(booking.status)
         status_generator = StatusGenerator(booking_list)
         status_generator.generate_status_description()
         context['booking_list'] = booking_list
@@ -127,5 +127,5 @@ class StatusGenerator:
     def _manipulate_paid_booking(self, booking):
         self._manipulate_requested_booking(booking)
 
-    def _manipulate_draft_booking(self, booking):
-        self._manipulate_requested_booking(booking)
+    #def _manipulate_draft_booking(self, booking):
+    #    self._manipulate_requested_booking(booking)
