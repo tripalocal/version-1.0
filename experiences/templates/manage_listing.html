@@ -151,9 +151,11 @@
                         $("#id_dynamic_price").val($("#id_dynamic_price").val() + $("#dynamic_price_input_" + i).val() + ',');
                     }
                     else {
+                        $("#id_dynamic_price").val("");
+                        return false;
                         //alert("Make sure valid input. Price pr person should be integer and not empty");
-                        $("#dynamic_price_input_" + i).val(0);
-                        $("#id_dynamic_price").val($("#id_dynamic_price").val() + $("#dynamic_price_input_" + i).val() + ',');
+                        //$("#dynamic_price_input_" + i).val($("#id_price").val());
+                        //$("#id_dynamic_price").val($("#id_dynamic_price").val() + $("#dynamic_price_input_" + i).val() + ',');
                         //break;
                     }
                 }
@@ -211,11 +213,11 @@
 
 
                 for (i = min; i < max; i++) {
-                    if(dynamicPrice.length == max - min) {
+                    if(dynamicPrice.length == max - min + 1) {
                         $("#dynamic_price_div_" + i).attr("style", "");
                         $("#dynamic_price_input_" + i).css("background-color", "rgb(255, 255, 255)").css("border", "1px solid #AAA");
                         $("#dynamic_price_with_fee_input_" + i).css("background-color", "rgb(245, 245, 245)").css("border", "0px").prop('disabled', true);
-                        var dynamicHostGet = dynamicPrice[i-min];
+                        var dynamicHostGet = dynamicPrice[i+1-min];
                         var dynamicCustomerPay = (dynamicHostGet * window.COMMISSION_PERCENT * 1.000 + 0.0).toFixed(2);
                         var dynamicCustomerPay = Math.round(dynamicCustomerPay,0);
                         $("#dynamic_price_input_" + i).val(dynamicHostGet);
@@ -435,9 +437,15 @@
                 $("#add_dynamic_price").attr("style", "display:none;");
                 $("#cancel_dynamic_price").attr("style", "");
                 $("#dynamic_price_div").attr("style", "");
-                for (i = 1; i < 10; i++) {
+                var initial = "";
+                for (i = parseInt($("#id_min_guest_number").val())-1; i < parseInt($("#id_max_guest_number").val()); i++) {
                     $("#dynamic_price_input_" + i).val($("#id_price").val());
                     $("#dynamic_price_with_fee_input_" + i).val($("#id_price_with_booking_fee").val());
+                    initial = initial + parseInt($("#dynamic_price_input_" + i).val()) + ',';
+                }
+                if(!$("#id_dynamic_price").val() || $("#id_dynamic_price").val()=="")
+                {
+                    $("#id_dynamic_price").val(initial);
                 }
                 setDynamicPriceInputDisplay();
                 if (updateDynamicPrice()) {
@@ -455,9 +463,7 @@
                     $("#dynamic_price_div_" + i).attr("style", "display:none;");
                 }
 
-                if (updateDynamicPrice()) {
-                    postDatum(location.href, {'dynamic_price': ""})
-                }
+                postDatum(location.href, {'dynamic_price': ""})
             });
 
             $("#change-pricing-type-button").click(function() {
