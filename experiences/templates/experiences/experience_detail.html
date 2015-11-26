@@ -32,10 +32,8 @@
 		{{ MEDIA_URL }}{{cover_photo.directory}}{{cover_photo.name}})">
 	</div>
 
-    <div class="container stickem-container">
-            <div class="stickem">
+    <div class="container">
                 <div class="booking-box">
-
                     <table style="display:none;">
                         {% for op in available_options %}
                         <p id="date_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.date_string}} </p>
@@ -227,7 +225,6 @@
                     </form>
                     {% endif %}
                 </div>
-            </div>
 
             {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
                 {% include "experiences/product_description.html" %}
@@ -423,9 +420,12 @@
     </div>
     {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
     <style>
-    .stickit {
-      padding-top: 80px;
-    }
+      .affix {
+        top: 50px;
+      }
+      .affix-bottom {
+        position: absolute;
+      }
     </style>
     {% endif %}
 {%else%}
@@ -434,7 +434,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script language="javascript" type="text/javascript" src="{% static 'app/scripts/jquery.stickem.js' %}"></script>
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 <script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
@@ -478,15 +477,27 @@ $(function(){
     $(document).ready(function(){
 
         mixpanel.track("viewed an experience");
-        if(screen.width > 767){
-            $(document.body).stickem();
+        if (screen.width > 767) {
+          {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
+          $('.booking-box').affix({
+            offset: {
+              top: 350,
+              bottom: function() {
+                return (this.bottom = $('.also').outerHeight(true) + 60)
+              }
+            }
+          })
+          {% else %}
+          $('.booking-box').affix({
+            offset: {
+              top: 250,
+              bottom: function() {
+                return (this.bottom = $('.also').outerHeight(true) + 60)
+              }
+            }
+          })
+          {% endif %}
         }
-
-        {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
-        if (screen.width < 767) {
-          $(".booking-box").attr("style", "margin-top:-60px;");
-        }
-        {% endif %}
 
         if($("#div_experience_activity").text().length>0)
         {
@@ -905,7 +916,7 @@ $(function(){
 
     {% if not request.user.is_staff %}
     var myEvent = window.attachEvent || window.addEventListener;
-    var chkevent = window.attachEvent ? 'onbeforeunload' : 'beforeunload'; 
+    var chkevent = window.attachEvent ? 'onbeforeunload' : 'beforeunload';
     myEvent(chkevent, function(e) {
         {% if request.user.is_authenticated %}
         user_id = {{request.user.id}};

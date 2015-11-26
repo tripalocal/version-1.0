@@ -1,4 +1,4 @@
-import os
+import os, pytz
 
 from Tripalocal_V1 import settings
 from unionpay.util.helper import load_config
@@ -61,3 +61,7 @@ def get_total_price(experience, guest_number=0, adult_number=0, children_number=
         subtotal_price += float(experience.price)*float(guest_number)
 
     return subtotal_price + experience.fixed_price
+
+def get_timezone(city):
+    timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
+    return timezones.get(city.lower(), settings.TIME_ZONE)

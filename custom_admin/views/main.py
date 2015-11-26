@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from app.decorators import ajax_form_validate
 from app.base import AjaxDisptcherProcessorMixin
 from app.utils import MailSupportMixin
-from experiences.models import Booking, Experience, NewProduct
+from experiences.models import Booking, Experience, NewProduct, CustomItinerary
 from custom_admin.views.base import BookingInfoMixin
 from custom_admin.forms import BookingForm, ExperienceUploadForm, CreateExperienceForm
 from custom_admin.views.base import StatusGenerator
@@ -25,6 +25,19 @@ class AdminCommonOperation(object):
             booking.change_status(new_status=kwargs['form'].cleaned_data['status'])
         return {'id':[booking.id for booking in booking_list]}
 
+class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
+    model = CustomItinerary
+    template_name = 'custom_admin/itineraries.html'
+    context_object_name = 'itinerary_list'
+    paginate_by = None
+    #def get_context_data(self, **kwargs):
+        #context = super(ItineraryView, self).get_context_data(**kwargs)
+        #for ci in context['itinerary_list']:
+            #ci.guest_number = ci.get_guest_number()
+            #ci.price_aud = ci.get_price('aud')
+            #ci.price_cny = ci.get_price('cny')
+        #return context
+
 class ExperienceView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     model = Experience
     template_name = 'custom_admin/experiences.html'
@@ -34,8 +47,14 @@ class ExperienceView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(ExperienceView, self).get_context_data(**kwargs)
         for exp in context['experience_list']:
-            exp.get_experience_i18n_info()
-            exp.title = exp.get_title(settings.LANGUAGES[0][0])
+            exp_information = exp.get_information(settings.LANGUAGES[0][0])
+            exp.title = exp_information.title
+            exp.description = exp_information.description
+            exp.activity = exp_information.activity
+            exp.dress = exp_information.dress
+            exp.interaction = exp_information.interaction
+            exp.meetup_spot = exp_information.meetup_spot
+            exp.dropoff_spot = exp_information.dropoff_spot
         return context
 
     @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
@@ -58,7 +77,7 @@ class NewProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(NewProductView, self).get_context_data(**kwargs)
         for exp in context['newproduct_list']:
-            exp.title = exp.get_title(settings.LANGUAGES[0][0])
+            exp.title = exp.get_information(settings.LANGUAGES[0][0]).title
         return context
 
     @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))

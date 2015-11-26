@@ -622,7 +622,6 @@ class BookingConfirmationForm(forms.Form):
         Stripe's library as a standard ValidationError for proper feedback.
         """
         cleaned = super(BookingConfirmationForm, self).clean()
-        local_timezone = pytz.timezone(settings.TIME_ZONE)
 
         if not self.errors and ('Refresh' not in self.data):
             stripeToken = self.data["stripeToken"] if "stripeToken" in self.data else None
@@ -631,6 +630,7 @@ class BookingConfirmationForm(forms.Form):
             #exp_year = self.cleaned_data["expiration"].year
             #cvv = self.cleaned_data["cvv"]
             experience = AbstractExperience.objects.get(id=self.cleaned_data['experience_id'])
+            local_timezone = pytz.timezone(experience.get_timezone())
 
             extra_fee = 0.00
             free = False
@@ -822,8 +822,8 @@ class CustomItineraryForm(forms.Form):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'style':'width:290px;'}), max_length=100, required=False, initial="")
     description = forms.CharField(widget=forms.Textarea, required=False)
     note = forms.CharField(widget=forms.Textarea, required=False)
-    start_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
-    end_datetime = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
+    start_datetime = forms.DateTimeField(required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    end_datetime = forms.DateTimeField(required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
     adult_number = forms.ChoiceField(choices=Guest_Number_Max, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
     children_number = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
     city = forms.CharField(widget=forms.Textarea,  required=True, initial="Melbourne")
@@ -857,11 +857,11 @@ def schedule_request_reminder_sms(booking_id, host_id, guest_name, schedule_time
 
 def instant_booking(experience, bk_date, bk_time):
     is_instant_booking = False
-    local_timezone = pytz.timezone(settings.TIME_ZONE)
+    local_timezone = pytz.timezone(experience.get_timezone())
     instant_bookings = experience.instantbookingtimeperiod_set.all()
     for ib in instant_bookings:
-        ib_start = ib.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
-        ib_end = ib.end_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+        ib_start = ib.start_datetime.astimezone(local_timezone)
+        ib_end = ib.end_datetime.astimezone(local_timezone)
         if ib.repeat:
             if ib.repeat_cycle.lower() == "daily":
                 if (ib_start.date() - bk_date).days % ib.repeat_frequency == 0:
@@ -951,12 +951,13 @@ class ItineraryBookingForm(forms.Form):
                 booking_extra_information = card_number
 
             experience = AbstractExperience.objects.get(id=ids[i])
+            exp_information = experience.get_information(settings.LANGUAGES[0][0])
             if type(experience) == Experience:
-                experience.title = experience.get_title(settings.LANGUAGES[0][0])
-                experience.meetup_spot = get_experience_meetup_spot(experience, settings.LANGUAGES[0][0])
-                experience.dropoff_spot = get_experience_dropoff_spot(experience, settings.LANGUAGES[0][0])
+                experience.title = exp_information.title
+                experience.meetup_spot = exp_information.meetup_spot
+                experience.dropoff_spot = exp_information.dropoff_spot
             else:
-                experience.title = experience.get_title(settings.LANGUAGES[0][0])
+                experience.title = exp_information.title
 
             if not free:
                 subtotal_price = get_total_price(experience, guest_number)
@@ -991,9 +992,9 @@ class ItineraryBookingForm(forms.Form):
                 #save the booking record
                 #user = User.objects.get(id=self.cleaned_data['user_id']) #moved outside of the for loop
                 host = experience.get_host()
-                bk_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
-                bk_time = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
-                local_timezone = pytz.timezone(settings.TIME_ZONE)
+                local_timezone = pytz.timezone(experience.get_timezone())
+                bk_date = local_timezone.localize(datetime.strptime(dates[i].strip(), "%Y/%m/%d"))
+                bk_time = local_timezone.localize(datetime.strptime(times[i].split(":")[0].strip(), "%H"))
 
                 is_instant_booking = instant_booking(experience, bk_date, bk_time)
 
@@ -1206,10 +1207,11 @@ def send_booking_email_verification(booking, experience, user, is_instant_bookin
                                                             'LANGUAGE':settings.LANGUAGE_CODE}))
 
 def sms_notification(booking, experience, user, phone_number):
+    exp_information = experience.get_information(settings.LANGUAGES[0][0])
     if type(experience) == Experience:
-        exp_title = experience.get_title(settings.LANGUAGE_CODE)
+        exp_title = exp_information.title
     else:
-        exp_title = experience.get_title(settings.LANGUAGE_CODE)
+        exp_title = exp_information.title
         return #issue 209
 
     customer_phone_num = phone_number.split(",")

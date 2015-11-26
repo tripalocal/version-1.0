@@ -24,10 +24,9 @@ from django.contrib import messages
 import string, random, pytz, subprocess, geoip2.database, requests
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
-from experiences.views import SearchView, getBGImageURL, set_initial_currency, convert_experience_price
+from experiences.views import SearchView, set_initial_currency, convert_experience_price
 from allauth.account.signals import email_confirmed, password_changed
-from experiences.models import Booking, Experience, Payment, get_experience_meetup_spot, \
-    WechatProduct, WechatBooking
+from experiences.models import Booking, Experience, Payment, WechatProduct, WechatBooking
 from experiences.forms import Currency, DollarSign, email_account_generator
 from django.utils.translation import ugettext_lazy as _
 from post_office import mail
@@ -37,7 +36,7 @@ from tripalocal_messages.models import Aliases, Users
 from urllib.parse import quote_plus
 import json, os
 import xmltodict
-
+from experiences.utils import *
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
@@ -66,15 +65,15 @@ def home(request):
             if len(form.data['start_date']):
                 if len(form.data['end_date']):
                     return SearchView(request, form.data['city'],
-                                             start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")), 
-                                             end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
+                                             start_date = pytz.timezone(get_timezone(form.data['city'])).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")), 
+                                             end_date = pytz.timezone(get_timezone(form.data['city'])).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
                 else:
                     return SearchView(request, form.data['city'],
-                                             start_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")))    
+                                             start_date = pytz.timezone(get_timezone(form.data['city'])).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")))    
 
             if len(form.data['end_date']):
                 return SearchView(request, form.data['city'],
-                                             end_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
+                                             end_date = pytz.timezone(get_timezone(form.data['city'])).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
             else:
                 return SearchView(request, form.data['city'])
     else:
@@ -113,7 +112,7 @@ def home(request):
     idxList = random.sample(range(len(experienceList)), 3)
     featuredExperienceList = [experienceList[i] for i in idxList]
 
-    BGImages = [getBGImageURL(exp.id) for exp in featuredExperienceList]
+    BGImages = [exp.get_background_image() for exp in featuredExperienceList]
     profileImages = [exp.get_profile_image() for exp in featuredExperienceList]
 
     featuredExperience = []
@@ -255,7 +254,7 @@ def mylisting(request):
     exps = Experience.objects.raw('select abstractexperience_ptr_id from experiences_experience where abstractexperience_ptr_id in (select experience_id from experiences_experience_hosts where user_id= %s) order by start_datetime', [request.user.id])
 
     for experience in exps:
-        experience.title = experience.experience.get_title(settings.LANGUAGES[0][0])
+        experience.title = experience.experience.get_information(settings.LANGUAGES[0][0]).title
         experiences.append(experience)
 
     context['experiences'] = experiences
@@ -269,16 +268,16 @@ def getreservation(user):
 
     current_reservations = []
     past_reservations = []
-    local_timezone = pytz.timezone(settings.TIME_ZONE)
 
     for booking in bookings:
         experience = AbstractExperience.objects.get(id=booking.experience_id)
+        local_timezone = pytz.timezone(experience.get_timezone())
         payment = Payment.objects.get(id=booking.payment_id) if booking.payment_id != None else Payment()
         guest = User.objects.get(id=booking.user_id)
         phone_number = payment.phone_number if payment.phone_number != None and len(payment.phone_number) else guest.registereduser.phone_number
         reservation = {"booking_datetime":booking.datetime.astimezone(local_timezone), "booking_status":booking.status,
                        "booking_guest_number":booking.guest_number,"booking_id":booking.id,
-                       "experience_id":experience.id,"experience_title":experience.get_title(settings.LANGUAGES[0][0]),
+                       "experience_id":experience.id,"experience_title":experience.get_information(settings.LANGUAGES[0][0]).title,
                        "payment_city":payment.city, "payment_country":payment.country,
                        "guest_first_name":guest.first_name, "guest_last_name":guest.last_name, "guest_phone_number":phone_number}
 
@@ -316,15 +315,13 @@ def mytrip(request):
         bookings = Booking.objects.filter(user=user_id, status__in=booking_status)
 
         for booking in bookings:
-            booking.experience.title = booking.experience.get_title(settings.LANGUAGES[0][0])
-            booking.experience.meetup_spot = get_experience_meetup_spot(booking.experience, settings.LANGUAGES[0][0])
+            exp_information = booking.experience.get_information(settings.LANGUAGES[0][0])
+            booking.experience.title = exp_information.title
+            booking.experience.meetup_spot = exp_information.meetup_spot if hasattr(exp_information, "meetup_spot") else ""
             user_bookings.append(booking)
 
         # Sort user_bookings with their dates
         user_bookings = sorted(user_bookings, key=lambda booking: booking.datetime, reverse=True)
-
-        # Convert timezones
-        local_timezone = pytz.timezone(settings.TIME_ZONE)
 
         # Place bookings into a list of lists where each index is a date
         bookings_all = []
@@ -335,6 +332,7 @@ def mytrip(request):
             placedIn = False
 
             # convert timezone
+            local_timezone = pytz.timezone(booking.experience.get_timezone())
             booking_time_local = booking.datetime.astimezone(local_timezone)
             booking.datetime = booking_time_local
 
@@ -728,8 +726,8 @@ def email_custom_trip(request):
     message = request.POST.get("message", "Blank")
 
     mail.send(
-        'enquiries@tripalocal.com',
-        'enquiries@tripalocal.com',
+        sender = 'admin@tripalocal.com',
+        recipients = ['enquiries@tripalocal.com'],
         subject="Trip suggestion from " + email,
         message=message,
     )

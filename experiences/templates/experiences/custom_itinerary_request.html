@@ -13,7 +13,7 @@
 <div id="complete" class="full-height" style="display:none;background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %})">
   <div class="container middle animated fadeIn">
     <h1>{% trans 'Your request has been submitted!' %}</h1>
-    <h2>{% trans 'A custom itinerary will be sent to you shortly.' %}</h2>
+    <h2>{% trans 'If we have any further questions we will be in touch on WeChat' %}</h2>
   </div>
 </div>
 <form id="itinerary-request" action="" method="post">
@@ -21,7 +21,7 @@
   <div id="intro" class="full-height" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %})">
     <div class="container middle animated fadeIn">
       <h1>{% trans 'Custom Itinerary' %}</h1>
-      <h2>{% trans 'Complete just a few easy steps and we will<br> send you an itinerary tailor made for your trip' %}</h2>
+      <h2>{% trans 'Please answer a few questions and we will <br>build a custom itinerary for your trip' %}</h2>
       <button type="button" id="start-btn" class="btn btn-primary">{% trans 'Get Started' %}</button>
     </div>
   </div>
@@ -357,6 +357,10 @@ $(function() {
       } else {
         isFirstTime = "No";
       }
+      $(this).css({
+        'background-color': '#009999',
+        'border': '0'
+      }).html('{% trans "Submitting" %}<i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>').attr('disabled', 'disabled');
       $.ajax({
           url : '{{GEO_POSTFIX}}itinerary/request/',
           type: "POST",
@@ -387,8 +391,11 @@ $(function() {
                           'slow');
                       $("#submit-btn").slideUp("slow");
                   },
-          failure: function(e) {
-                      $(".alert-danger").fadeIn();
+          error: function(e) {
+                      $(".alert-danger").delay(2000).fadeIn();
+                      setTimeout(function() {
+                        $("#submit-btn").removeAttr("disabled").removeAttr("style").text("{% trans 'Submit' %}");
+                      }, 2000);
                   }
       });
     } else {

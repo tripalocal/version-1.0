@@ -1,0 +1,33 @@
+melbourne: Australia/Melbourne
+sydney: Australia/Sydney
+grvic: Australia/Victoria
+grnsw: Australia/NSW
+brisbane: Australia/Brisbane
+cairns: Australia/Brisbane
+goldcoast: Australia/Brisbane
+grqld: Australia/Queensland
+hobart: Australia/Hobart
+grtas: Australia/Tasmania
+adelaide: Australia/Adelaide
+grsa: Australia/South
+darwin: Australia/Darwin
+alicesprings: Australia/North
+grnt: Australia/North
+perth: Australia/Perth
+grwa: Australia/West
+christchurch: NZ
+queenstown: NZ
+auckland: NZ
+wellington: NZ
+
+#Australia/ACT
+#Australia/Broken_Hill
+#Australia/Canberra
+#Australia/Currie
+#Australia/Eucla
+#Australia/LHI
+#Australia/Lindeman
+#Australia/Lord_Howe
+#Australia/Yancowinna
+
+#NZ-CHAT

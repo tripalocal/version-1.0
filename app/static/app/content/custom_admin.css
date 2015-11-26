@@ -4,8 +4,6 @@ html{
 height: 100%;
 }
 body{
-	background-image: url(../../admin%20CSS/images/bg.png);
-	background-repeat: repeat-x;
 	background-color: #F9F9F9;
 	font-family: lucida grande, tahoma, verdana, arial, sans-serif;
 	font-size: 14px;
@@ -39,20 +37,17 @@ body a:hover{
 	text-decoration: underline;
 }
 .logo {
-	margin-top: 18px;
+	margin-top: 50px;
 	width: 105px;
 	float: left;
 }
 .menu {
 	width: 600px;
-	margin-top: 65px;
+	margin-top: 45px;
 	margin-left: 40px;
 	float: left;
 }
-.menu li {
-	float: left;
-	margin-right: 35px;
-}
+
 .account {
 	float: right;
 	margin-top: 60px;
@@ -165,9 +160,7 @@ table tr td, table tr th{
 	text-align: left;
 }
 table {
-	border-bottom-width: 2px;
-	border-bottom-style: solid;
-	border-bottom-color: #CCC;
+	box-shadow: 1px 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 	font-size: 12px;
 	width: 100%;
 }
@@ -230,7 +223,7 @@ table tr .rowspan {
 	opacity:.80;
 	filter: alpha(opacity=80);
 }
- 
+
 .white_content {
 	display: block;
 	position: absolute;
@@ -261,16 +254,16 @@ table tr .rowspan {
 	min-width:140px;
 	height:45px;
 	outline:none;
-	cursor:pointer; 
-	text-align: center; 
-	text-decoration:none; 
-	font-size:14px; 
+	cursor:pointer;
+	text-align: center;
+	text-decoration:none;
+	font-size:14px;
 	text-shadow: 0 1px 1px rgba(0,0,0,.3);
 	-webkit-border-radius: .3em;
 	-moz-border-radius: .3em;
 	border-radius: .3em;
 	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
-	-moz-box-shadow:0 1px 2px rgba(0,0,0,.2); 
+	-moz-box-shadow:0 1px 2px rgba(0,0,0,.2);
 	box-shadow:0 1px 2px rgba(0,0,0,.2); color: #fef4e9;
 	border: solid 1px #da7c0c;
 	background: #f78d1d;
@@ -283,16 +276,16 @@ table tr .rowspan {
 	min-width:100px;
 	height:35px;
 	outline:none;
-	cursor:pointer; 
-	text-align: center; 
-	text-decoration:none; 
-	font-size:14px; 
+	cursor:pointer;
+	text-align: center;
+	text-decoration:none;
+	font-size:14px;
 	text-shadow: 0 1px 1px rgba(0,0,0,.3);
 	-webkit-border-radius: .3em;
 	-moz-border-radius: .3em;
 	border-radius: .3em;
 	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
-	-moz-box-shadow:0 1px 2px rgba(0,0,0,.2); 
+	-moz-box-shadow:0 1px 2px rgba(0,0,0,.2);
 	box-shadow:0 1px 2px rgba(0,0,0,.2); color: #fef4e9;
 	border: solid 1px #da7c0c;
 	background: #f78d1d;
@@ -308,7 +301,7 @@ table tr .rowspan {
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 	-webkit-box-shadow: 0 3px 3px rgba(0,0,0,.2);
-	-moz-box-shadow:0 3px 3px rgba(0,0,0,.2); 
+	-moz-box-shadow:0 3px 3px rgba(0,0,0,.2);
 	box-shadow:0 3px 3px rgba(0,0,0,.2);
 }
 
@@ -380,8 +373,8 @@ table tr .rowspan {
 -moz-border-radius-topright: 5px;
 border-top-left-radius: 5px;
 border-top-right-radius: 5px;
-	
-	
+
+
 }
 #activated  {
     background:#E5E5E5;

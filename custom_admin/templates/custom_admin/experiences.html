@@ -1,31 +1,6 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-{% load staticfiles %}
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Travel with Locals</title>
-    <link href="{% static 'app/content/globalReset.css' %}" rel="stylesheet" type="text/css"/>
-    <link href="{% static 'app/content/browserStyle.css' %}" rel="stylesheet" type="text/css"/>
-    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/admin_experience.js' %}"></script>
-
-</head>
-
-<body>
-<div class="container">
-    <div class="header">
-        <div class="logo"><img src="images/tripalocalLog.png" width="105" height="60"/></div>
-        <ul class="menu">
-            <li><a href="/custom_admin/newproduct">Local Experiences</li>
-            <li>Travel with Locals</li>
-            <li><a href="#">Hosts</a></li>
-            <li><a href="/custom_admin/booking">Bookings</a></li>
-            <li><a href="/custom_admin/payment">Payment</a></li>
-        </ul>
-        <div class="account">Hi, {{user.username}} | <a href="#">Logout</a></div>
-    </div>
+{% extends "custom_admin/base.html" %}
+{% block head %}<title>Travel with Locals</title>{% endblock %}
+{% block content %}
     <div class="fullColumn">
         <div class="operation"></div>
         <ul class="subMenu">
@@ -117,7 +92,4 @@
         </tr>
     </div>
     <div class="push"></div>
-</div>
-<div class="footer">© TRIPALOCAL Pty Ltd. All Rights Reserved, 2014</div>
-</body>
-</html>
+{% endblock %}

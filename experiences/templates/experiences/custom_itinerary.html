@@ -109,8 +109,8 @@
         </div>
         <div class="form-inline right-group">
           <h3 class="form-header">Web</h3>
-          <button id="button_ready" name="ready" class="btn btn-sm btn-default">$</button>
-          <button id="button_draft" name="draft" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
+          <button {% if existing_itinerary.status == "paid" %}disabled="disabled"{% endif %} id="button_ready" name="ready" class="btn btn-sm btn-default">$</button>
+          <button {% if existing_itinerary.status == "paid" %}disabled="disabled"{% endif %} id="button_draft" name="draft" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
           <h3 class="form-header">PDF</h3>
           <button type="button" id="" class="btn btn-sm btn-default">$</button>
           <button type="button" id="" class="btn btn-sm btn-default"><img src="{% static 'icon/locked.svg' %}" width="18" height="18"></button>
@@ -148,7 +148,9 @@
         <div id="right_section" class="section" style="overflow:scroll; height:72vh;">
           <h1 class="section-heading">Itinerary</h1>
           <h2 class="price-line">{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-pp">0</label> {% trans "per person (Total of "%}{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-tt">0</label>)</h2>
+          <div id="sortable">
           {% for city, dict in existing_itinerary.items %}
+          <div class="city-sortable">
             <div id="city-title-{{forloop.counter0}}" class="section-box-add" onclick="$('.collapse').collapse('hide'); $('#city-collapse-{{forloop.counter0}}').collapse('show');update_left_section('{{city}}');" city="{{city}}">
               <span class="add-sign">+</span>
               <p id="city-title-p-{{forloop.counter0}}">{{city}} <span class="badge">{{dict|length}}{% trans ' Day(s)' %}</span></p>
@@ -159,29 +161,29 @@
                 <p>{% trans 'Day' %} {{forloop.counter}}</p>
                 <div class="column">
                   {% for experience in experiences %}
-                  <div class='exp-box-sm portlet' id='experience_id_{{experience.id}}'>
-                    <div class='exp-img portlet-header'>
+                  <div class='exp-box-sm' id='experience_id_{{experience.id}}'>
+                    <div class='exp-img'>
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
                     </div>
-                    <div class='exp-info portlet-header'>
-                        <h3>{{experience.title}}</h3>
+                    <div class='exp-info'>
+                        <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}">{{experience.title}}</a></h3>
                         <p>{{experience.description|escapejs|slice:"0:16"}}</p>
                         <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
                     </div>
-                    <div class='exp-price portlet-header'>
+                    <div class='exp-price'>
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
                         {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
-                        <h2>{{item.fixed_price}}</h2> + <h2>{{item.price}}</h2>
+                        <h2>{{experience.fixed_price|floatformat:"0"}}</h2> + <h2>{{experience.price|floatformat:"0"}}</h2>
                         <p>{% trans "base + per person" %}</p>
                         {% else %}
-                        <h2>{{experience.price}}</h2>
+                        <h2 style="display:none;">0</h2><h2>{{experience.price|floatformat:"0"}}</h2>
                         <p>{% trans 'per person' %}</p>
                         {% endif %}
                     </div>
                     {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
-                    <div class="portlet-header" style="display:none;">
+                    <div class="" style="display:none;">
                         <button type="button" onclick="edit_item({{experience.id}}, '{{experience.type|lower}}');">{% trans "Edit" %}</button>
                         <button type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</button>
                     </div>
@@ -192,7 +194,9 @@
               </div>
               {% endfor %}
             </div>
+          </div>
           {% endfor %}
+        </div>
         </div>
       </div>
     </div>
@@ -261,7 +265,11 @@
         $(".loading").hide();
         $("#itinerary_search").click(function(e){
             e.preventDefault();
-            set_data_before_submit();
+            if(!set_data_before_submit())
+            {
+                alert("Please fill all fields");
+                return;
+            }
             $(".loading").show();
 
             $.ajax({
@@ -298,7 +306,12 @@
         });
 
         $("#button_draft").click(function(e){
-            set_data_before_submit();
+            if(!set_data_before_submit())
+            {
+                e.preventDefault();
+                alert("Please fill all fields");
+                return;
+            }
             set_itinerary_string();
             if($("#id_itinerary_string").val().length <= 2)
             {
@@ -308,7 +321,12 @@
         });
 
         $("#button_ready").click(function(e){
-            set_data_before_submit();
+            if(!set_data_before_submit())
+            {
+                e.preventDefault();
+                alert("Please fill all fields");
+                return;
+            }
             set_itinerary_string();
             if($("#id_itinerary_string").val().length <= 2)
             {
@@ -476,6 +494,7 @@
 
         //add a new item in the right section
         var new_item =
+                    "<div class=\"city-sortable\">" +
                     "<div id=\"city-title-" + i + "\" class=\"section-box-add\" onclick=\"$('.collapse').collapse('hide'); $('#city-collapse-" + i + "').collapse('show');update_left_section('" + city + "');\" city=" + city + ">" +
                         "<span class=\"add-sign\">+</span>" +
                         "<p id=\"city-title-p-" + i + "\">" + city_name + " <span class=\"badge\">" + duration + "{% trans ' Day(s)' %}</span></p>" +
@@ -490,17 +509,17 @@
                             "</div>" +
                         "</div>";
         }
-        new_item += "</div>";
-        $("#right_section").append(new_item);
+        new_item += "</div></div>";
+        $("#sortable").append(new_item);
 
         //reload data
         $("#itinerary_search").click();
     }
 
     function update_dates() {
-      var $startDate = $('#id_start_datetime').val();
+      var startDate = $('#id_start_datetime').val();
       $('.section-box>p').each(function(index) {
-        $(this).html("{% trans 'Day' %} " + (index+1) + " " + moment($startDate).add(index,'days').format('YYYY-MM-DD'))
+        $(this).html("{% trans 'Day' %} " + (index+1) + " " + moment(startDate).add(index,'days').format('YYYY-MM-DD dddd'))
       })
     }
 
@@ -608,17 +627,22 @@
         cities = cities.substring(0,cities.length-1);
         $("#id_city").val(cities);
 
+        if(!$("#id_start_datetime").val())
+        {
+            return false;
+        }
+
         var d = new Date($("#id_start_datetime").val());
         //d.setTime(d.getTime() + d.getTimezoneOffset()*60*1000);
-        //$("#id_start_datetime") is already set
         d.setDate(d.getDate()+number_city-1);
         $("#id_end_datetime").val(d.toString('yyyy-M-dd'));
+        return true;
     }
 
     function set_itinerary_string()
     {
         var itinerary = [];
-        var city = $(".price-line").next().next()[0];
+        var city = $("#sortable > :nth-child(1) > :nth-child(2)")[0];
         var number_day = 0;
         var cities = "";
 
@@ -663,11 +687,7 @@
                 }
                 day = $(day).next()[0];
             }
-            city = $(city).next()[0];
-            if(city && city.id.indexOf("city-title-") === 0)
-            {
-                city = $(city).next()[0];
-            }
+            city = $(city).parent().next().children()[1];
         }
 
         cities = cities.substring(0,cities.length-1);
@@ -749,9 +769,9 @@
                 var price = $("#" + type + "-price").val();
                 var notes = $("#" + type + "-notes").val();
 
-                var new_item =  "<div class=\"exp-box-sm portlet\" id=\"experience_id_" + data.new_product_id + "\">" +
-                                  "<div class=\"exp-img portlet-header\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
-                                  "<div class=\"exp-info portlet-header\">" +
+                var new_item =  "<div class=\"exp-box-sm\" id=\"experience_id_" + data.new_product_id + "\">" +
+                                  "<div class=\"exp-img\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
+                                  "<div class=\"exp-info\">" +
                                     "<h3>" + title + "</h3>" +
                                     "<p>" + details + "</p>" +
                                     "<label style=\"display:none;\">" + notes + "</label>";
@@ -774,7 +794,7 @@
                 }
                 new_item +=
                                   "</div>" +
-                                  "<div class=\"exp-price portlet-header\">" +
+                                  "<div class=\"exp-price\">" +
                                     "<p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>" +
                                     "<h2>" + fixed_price + "</h2> + " + "<h2>" + price + "</h2>"
                                     "<p>{% trans 'base + per person' %}</p>" +
@@ -801,11 +821,11 @@
     {
         $("#add-" + type + "-btn").click();
         var experience = $("#experience_id_" + id);
-        var fixed_price = $(experience.find(".exp-price.portlet-header").find("h2")[0]).text();
-        var price = $(experience.find(".exp-price.portlet-header").find("h2")[1]).text();
-        var title = experience.find(".exp-info.portlet-header").find("h3").text();
-        var details = $(experience.find(".exp-info.portlet-header").find("p")[0]).text();
-        var notes = experience.find(".exp-info.portlet-header").find("label").text();
+        var fixed_price = $(experience.find(".exp-price").find("h2")[0]).text();
+        var price = $(experience.find(".exp-price").find("h2")[1]).text();
+        var title = experience.find(".exp-info").find("h3").text();
+        var details = $(experience.find(".exp-info").find("p")[0]).text();
+        var notes = experience.find(".exp-info").find("label").text();
         $("#" + type + "-fixed_price").val(fixed_price);
         $("#" + type + "-price").val(price);
         $("#" + type + "-title").val(title);
@@ -859,11 +879,11 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                                $(experience.find(".exp-price.portlet-header").find("h2")[0]).text($("#" + type + "-fixed_price").val());
-                                $(experience.find(".exp-price.portlet-header").find("h2")[1]).text($("#" + type + "-price").val());
-                                experience.find(".exp-info.portlet-header").find("h3").text($("#" + type + "-title").val());
-                                $(experience.find(".exp-info.portlet-header").find("p")[0]).text($("#" + type + "-details").val());
-                                experience.find(".exp-info.portlet-header").find("label").text($("#" + type + "-notes").val());
+                                $(experience.find(".exp-price").find("h2")[0]).text($("#" + type + "-fixed_price").val());
+                                $(experience.find(".exp-price").find("h2")[1]).text($("#" + type + "-price").val());
+                                experience.find(".exp-info").find("h3").text($("#" + type + "-title").val());
+                                $(experience.find(".exp-info").find("p")[0]).text($("#" + type + "-details").val());
+                                experience.find(".exp-info").find("label").text($("#" + type + "-notes").val());
                                 $("#add-" + type + "-add").text("{% trans "Add" %}");
                                 $("#add-" + type + "-add").unbind("click");
                                 $("#add-" + type + "-add").attr("onclick", "add_item('" + type + "');");
@@ -922,7 +942,7 @@
             }
         }
 
-        var city = $(".price-line").next().next()[0];
+        var city = $("#sortable > :nth-child(1) > :nth-child(2)")[0];
         var price = 0;
         var fixed_price = 0;
 
@@ -943,11 +963,7 @@
                 }
                 day = $(day).next()[0];
             }
-            city = $(city).next()[0];
-            if(city && city.id.indexOf("city-title-") === 0)
-            {
-                city = $(city).next()[0];
-            }
+            city = $(city).parent().next().children()[1];
         }
         if(price < 0)
         {

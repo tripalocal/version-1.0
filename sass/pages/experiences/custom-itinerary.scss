@@ -175,6 +175,15 @@ body {
   margin-top: 10px;
   background-color: white;
   white-space: nowrap;
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  &:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+  }
 }
 
 .exp-img {
@@ -185,6 +194,7 @@ body {
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
+  float: left;
 }
 
 .exp-info {
@@ -194,16 +204,21 @@ body {
   vertical-align: top;
   margin-left: 10px;
   margin-right: 10px;
-  width: 240px;
+  width: 200px;
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+  float: left;
   h3 {
     margin: 0;
     font-size: 14px;
     font-weight: normal;
     overflow: hidden;
     text-overflow: ellipsis;
+    &:hover {
+      color: $primary-color;
+      text-decoration: underline;
+    }
   }
   p {
     font-size: 12px;
@@ -225,6 +240,7 @@ body {
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+  float: right;
   p {
     margin-bottom: 3px;
   }
@@ -233,6 +249,7 @@ body {
     margin-bottom: 3px;
     font-weight: normal;
     font-size: 20px;
+    display: inline;
   }
 }
 

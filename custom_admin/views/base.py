@@ -126,3 +126,6 @@ class StatusGenerator:
 
     def _manipulate_paid_booking(self, booking):
         self._manipulate_requested_booking(booking)
+
+    def _manipulate_draft_booking(self, booking):
+        self._manipulate_requested_booking(booking)
