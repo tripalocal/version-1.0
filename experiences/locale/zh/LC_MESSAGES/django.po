@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-26 14:14+1100\n"
+"POT-Creation-Date: 2015-11-26 14:33+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1879,7 +1879,7 @@ msgstr "长按二维码"
 msgid ""
 "If you are not in WeChat, please save above QR Code, press and hold the "
 "image in WeChat"
-msgstr "If you are not in WeChat, please save above QR Code, press and hold the image in WeChat"
+msgstr "如果你不在微信浏览器，请储存以上二维图片在微信中长按"
 
 #: views.py:1379 views.py:1704 views.py:1726 views.py:2382 views.py:3048
 #: views.py:3083
