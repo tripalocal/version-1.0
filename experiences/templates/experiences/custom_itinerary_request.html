@@ -357,6 +357,10 @@ $(function() {
       } else {
         isFirstTime = "No";
       }
+      $(this).css({
+        'background-color': '#009999',
+        'border': '0'
+      }).html('{% trans "Submitting" %}<i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>').attr('disabled', 'disabled');
       $.ajax({
           url : '{{GEO_POSTFIX}}itinerary/request/',
           type: "POST",
@@ -387,8 +391,11 @@ $(function() {
                           'slow');
                       $("#submit-btn").slideUp("slow");
                   },
-          failure: function(e) {
-                      $(".alert-danger").fadeIn();
+          error: function(e) {
+                      $(".alert-danger").delay(2000).fadeIn();
+                      setTimeout(function() {
+                        $("#submit-btn").removeAttr("disabled").removeAttr("style").text("{% trans 'Submit' %}");
+                      }, 2000);
                   }
       });
     } else {
