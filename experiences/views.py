@@ -3386,6 +3386,7 @@ def itinerary_detail(request,id=None):
                                    "discount_deadline":discount_deadline.strftime("%Y-%m-%d"),
                                    "price":price,
                                    "full_price":full_price,
+                                   'LANGUAGE':settings.LANGUAGE_CODE,
                                    "GEO_POSTFIX":GEO_POSTFIX},
                                    context)
 

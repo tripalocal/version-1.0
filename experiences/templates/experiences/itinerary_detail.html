@@ -95,9 +95,18 @@
           <div class="item-img"><img src="{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}"></div>
           {% endwith %}
           {% endif %}
-          <div class="item-description"><p>{{item.description}}</p></div>
-          <div class="item-description"><p>{{item.whatsincluded}}</p></div>
-
+          <div class="item-description">{{item.description|linebreaks}}</div>
+          {% if item.type == 'PrivateProduct' or item.type == 'PublicProduct' %}
+          <div class="item-description">{{item.whatsincluded|linebreaks}}</div>
+          {% elif item.type == 'PRIVATE' or item.type == 'NONPRIVATE' %}
+          {% for w in item.whatsincluded %}
+          {% if w.details %}
+          <div class="item-description">
+            <p><strong>{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%elif w.item.lower == "transport"%}交通{%elif w.item.lower == "accommodation"%}住宿{%elif w.item.lower == "private guide"%}旅游达人{%endif%}{%endif%}:</strong>{{w.details}}</p>
+          </div>
+          {% endif %}
+					{% endfor %}
+          {% endif %}
           {% endif %}
         {% endfor %}
       </div>
