@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  {% load staticfiles %}
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link href="{% static 'app/content/custom_admin.css' %}" rel="stylesheet" type="text/css"/>
+  <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/admin_experience.js' %}"></script>
+  {% block head %}
+  {% endblock %}
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+        <div class="logo"><img src="{% static 'app/img/top_logo-en.svg' %}" width="105"/></div>
+        <ul class="menu nav nav-pills">
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Listings<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/custom_admin/itinerary">Custom Itinerary</a></li>
+                <li><a href="/custom_admin/newproduct">Local Experiences</a></li>
+                <li><a href="/custom_admin/experience">Travel with Locals</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">People<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Suppliers</a></li>
+                <li><a href="#">Hosts</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Orders<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/custom_admin/booking">Custom Itinerary</a></li>
+                <li><a href="/custom_admin/booking">Local Experiences</a></li>
+                <li><a href="/custom_admin/booking">Travel with Locals</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Payment<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/custom_admin/payment">Suppliers</a></li>
+                <li><a href="/custom_admin/payment">Hosts</a></li>
+              </ul>
+            </li>
+        </ul>
+        <div class="account">Hi, {{user.username}} | <a href="#">Logout</a></div>
+    </div>
+    {% block content %}
+    {% endblock %}
+    <div class="footer">© TRIPALOCAL Pty Ltd. All Rights Reserved, 2014</div>
+  </div>
+</body>
+</html>
