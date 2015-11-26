@@ -99,7 +99,9 @@ class Experience(AbstractExperience):
             else:
                 return self.experiencei18n_set.all()[0]
         else:
-            return None
+            new = ExperienceI18n(experience = self, language = settings.LANGUAGES[0][0])
+            new.save()
+            return new
 
     def get_whatsincluded(self, language):
         return WhatsIncluded.objects.filter(experience = self, language = language)
@@ -218,7 +220,9 @@ class NewProduct(AbstractExperience):
             else:
                 return self.newproducti18n_set.all()[0]
         else:
-            return None
+            new = NewProductI18n(product = self, language = settings.LANGUAGES[0][0])
+            new.save()
+            return new
 
     def get_tags(self, language):
         tags = []
