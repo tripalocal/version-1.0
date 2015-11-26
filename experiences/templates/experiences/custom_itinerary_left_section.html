@@ -48,7 +48,7 @@
             {% for item in flight %}
             <div class="exp-box-sm flight_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/flight.svg" %}';" style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
@@ -121,7 +121,7 @@
             {% for item in transfer %}
             <div class="exp-box-sm transfer_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/transfer.svg" %}';" style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
@@ -194,7 +194,7 @@
             {% for item in accommodation %}
             <div class="exp-box-sm accommodation_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/accommodation.svg" %}';" style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
@@ -267,7 +267,7 @@
             {% for item in restaurant %}
             <div class="exp-box-sm restaurant_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/restaurant.svg" %}';" style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
@@ -340,7 +340,7 @@
             {% for item in suggestion %}
             <div class="exp-box-sm suggestion_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/itinerary.svg" %}';" style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>

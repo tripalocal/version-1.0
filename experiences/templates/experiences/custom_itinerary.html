@@ -168,9 +168,22 @@
                     <div class='exp-info'>
                         <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}">{{experience.title}}</a></h3>
                         <p>{{experience.description|escapejs|slice:"0:16"}}</p>
+                        {% if experience.type == 'PrivateProduct' or experience.type == 'PublicProduct' or experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
                         <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+                        {% else %}
+                        <p>
+                          {% if experience.location %}
+                          {{experience.location}}
+                          &middot;
+                          {% endif %}
+                          <a type="button" onclick="edit_item({{experience.id}}, 'suggestion');">{% trans "Edit" %}</a>
+                          &middot;
+                          <a type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</a>
+                        </p>
+                        <label style="display:none;">{{item.notes}}</label>
+                        {% endif %}
                     </div>
                     <div class='exp-price'>
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
@@ -182,12 +195,6 @@
                         <p>{% trans 'per person' %}</p>
                         {% endif %}
                     </div>
-                    {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
-                    <div class="" style="display:none;">
-                        <button type="button" onclick="edit_item({{experience.id}}, '{{experience.type|lower}}');">{% trans "Edit" %}</button>
-                        <button type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</button>
-                    </div>
-                    {% endif %}
                   </div>
                   {% endfor %}
                 </div>

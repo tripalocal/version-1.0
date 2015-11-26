@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-25 12:18+1100\n"
+"POT-Creation-Date: 2015-11-26 18:01+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -703,11 +703,11 @@ msgstr "惠灵顿"
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 您的帐户已经成功激活"
 
-#: app/views.py:710
+#: app/views.py:708
 msgid "Image size exceeds the limit"
 msgstr "文件大小超过上限"
 
-#: app/views.py:712
+#: app/views.py:710
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
 
