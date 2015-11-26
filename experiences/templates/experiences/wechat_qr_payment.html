@@ -20,8 +20,8 @@
       <img class="media-object" src="{% static 'icon/downloadWechat.svg' %}">
     </div>
     <div class="media-body">
-      <h4 class="media-heading">{% trans 'Log In to Wechat on Phone' %}</h4>
-      <p><a href="http://weixin.qq.com/cgi-bin/readtemplate?t=weixin_download_list&lang={% if LANGUAGE != 'zh-CN' %}en{% else %}zh{% endif %}">{% trans 'Install' %}</a> {% trans 'and open Wechat on phone' %}</p>
+      <h4 id="instruction-1" class="media-heading">{% trans 'Log In to Wechat on Phone' %}</h4>
+      <p id="instruction-2"><a href="http://weixin.qq.com/cgi-bin/readtemplate?t=weixin_download_list&lang={% if LANGUAGE != 'zh-CN' %}en{% else %}zh{% endif %}">{% trans 'Install' %}</a> {% trans 'and open Wechat on phone' %}</p>
     </div>
   </div>
   <div class="media">
@@ -29,8 +29,8 @@
       <img class="media-object" src="{% static 'icon/scan.svg' %}">
     </div>
     <div class="media-body">
-      <h4 class="media-heading">{% trans 'Scan QR Code' %}</h4>
-      <p>{% trans 'Log in to Web Wechat in Discover -> Scan QR Code' %}</p>
+      <h4 id="instruction-3" class="media-heading">{% trans 'Scan QR Code' %}</h4>
+      <p id="instruction-4">{% trans 'Scan QR Code to visit the wechat payment page' %}</p>
     </div>
   </div>
 </div>
@@ -61,6 +61,14 @@
                 }
             }, "json");
         }, 10000);
+
+        if(window.mobilecheck())
+        {
+            $("#instruction-1").text("{%trans "Login to WeChat on your mobile" %}");
+            $("#instruction-2").html("<a href=\"http://weixin.qq.com/cgi-bin/readtemplate?t=weixin_download_list&lang={% if LANGUAGE != 'zh-CN' %}en{% else %}zh{% endif %}\">{% trans 'Install' %}</a> {%trans " and open WeChat on your mobile (please skip to next step if you are already on)" %}");
+            $("#instruction-3").text("{%trans "Press and hold QR Code" %}");
+            $("#instruction-4").text("{%trans "If you are not in WeChat, please save above QR Code, press and hold the image in WeChat" %}");
+        }
     });
 
 </script>
