@@ -162,8 +162,12 @@ function initializeClock(id, endtime){
 }
 
 $(document).ready(function() {
+  {% if itinerary.status == "ready" %}
+  {% if not full_price %}
   var deadline = "{{discount_deadline}}";
   initializeClock('clock', deadline);
+  {% endif %}
+  {% endif %}
   if ($(window).width() > 760) {
     // Scrollspy
     $('body').scrollspy({ target: '.sticky-section', offset: 30 });
