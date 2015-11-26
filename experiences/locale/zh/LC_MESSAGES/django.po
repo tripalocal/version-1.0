@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-25 17:43+1100\n"
+"POT-Creation-Date: 2015-11-26 14:14+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -755,6 +755,7 @@ msgid "Mobile"
 msgstr "移动电话"
 
 #: templates/experiences/custom_itinerary_request.html:160
+#: templates/experiences/custom_itinerary_request.html:397
 #: templates/experiences/review_experience.html:85
 msgid "Submit"
 msgstr "提交"
@@ -773,7 +774,11 @@ msgstr "请完成所有必填项"
 
 #: templates/experiences/custom_itinerary_request.html:176
 msgid "Please enter a valid phone number. eg. +61 123456789 or +86 12345678901"
-msgstr ""
+msgstr "请输入格式正确的手机号，如+61 123456789 或者 +86 12345678901"
+
+#: templates/experiences/custom_itinerary_request.html:363
+msgid "Submitting"
+msgstr "提交中"
 
 #: templates/experiences/email_booking_cancelled_host.html:6
 #: templates/experiences/email_booking_cancelled_traveler.html:6
@@ -1563,6 +1568,7 @@ msgid "Enquire about this itinerary"
 msgstr "定制咨询"
 
 #: templates/experiences/itinerary_detail.html:72
+#, python-format
 msgid "Day %(number)s"
 msgstr "第%(number)s天"
 
@@ -1839,6 +1845,7 @@ msgid "Log In to Wechat on Phone"
 msgstr "登录手机微信"
 
 #: templates/experiences/wechat_qr_payment.html:24
+#: templates/experiences/wechat_qr_payment.html:68
 msgid "Install"
 msgstr "手机上安装"
 
@@ -1851,8 +1858,28 @@ msgid "Scan QR Code"
 msgstr "进入扫一扫"
 
 #: templates/experiences/wechat_qr_payment.html:33
-msgid "Log in to Web Wechat in Discover -> Scan QR Code"
-msgstr "从’发现‘进入’扫一扫‘，扫码登录微信网页版"
+msgid "Scan QR Code to visit the wechat payment page"
+msgstr "从‘发现’，进入‘扫一扫’，扫码进入微信支付页面"
+
+#: templates/experiences/wechat_qr_payment.html:67
+msgid "Login to WeChat on your mobile"
+msgstr "登录手机微信"
+
+#: templates/experiences/wechat_qr_payment.html:68
+msgid ""
+" and open WeChat on your mobile (please skip to next step if you are already "
+"on)"
+msgstr "并登录微信（若已在手机微信请跳到下一步）"
+
+#: templates/experiences/wechat_qr_payment.html:69
+msgid "Press and hold QR Code"
+msgstr "长按二维码"
+
+#: templates/experiences/wechat_qr_payment.html:70
+msgid ""
+"If you are not in WeChat, please save above QR Code, press and hold the "
+"image in WeChat"
+msgstr "If you are not in WeChat, please save above QR Code, press and hold the image in WeChat"
 
 #: views.py:1379 views.py:1704 views.py:1726 views.py:2382 views.py:3048
 #: views.py:3083
@@ -1886,6 +1913,9 @@ msgstr "领路人自驾"
 #: views.py:2634
 msgid "Private group"
 msgstr "私人团"
+
+#~ msgid "Log in to Web Wechat in Discover -> Scan QR Code"
+#~ msgstr "从’发现‘进入’扫一扫‘，扫码登录微信网页版"
 
 #~ msgid "A custom itinerary will be sent to you shortly."
 #~ msgstr "我们会在48小时内发送给你私人订制的方案"
