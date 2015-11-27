@@ -2,14 +2,15 @@ from datetime import datetime, timezone, timedelta
 
 from experiences.models import Booking, Review
 from django.utils.timezone import localtime
+from Tripalocal_V1 import settings
 
 class BookingInfoMixin(object):
     def get_context_data(self, **kwargs):
         context = super(BookingInfoMixin, self).get_context_data(**kwargs)
         # Add booking info to the context.
         booking_list = context['booking_list']
-        #for booking in booking_list:
-        #    print(booking.status)
+        for booking in booking_list:
+            booking.experience.title = booking.experience.get_information(settings.LANGUAGES[0][0]).title
         status_generator = StatusGenerator(booking_list)
         status_generator.generate_status_description()
         context['booking_list'] = booking_list

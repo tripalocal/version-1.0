@@ -160,6 +160,9 @@ class BookingArchiveView(AjaxDisptcherProcessorMixin, BookingInfoMixin, AdminCom
     context_object_name = 'booking_list'
     paginate_by = None
 
+    def get_queryset(self):
+        return self.model.objects.exclude(status__iexact="draft")
+
 class PaymentView(BookingInfoMixin, ListView):
     model = Booking
     template_name = 'custom_admin/payment.html'
