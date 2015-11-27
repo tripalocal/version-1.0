@@ -1,5 +1,9 @@
 {% extends "custom_admin/base.html" %}
-{% block head %}<title>Travel with Locals</title>{% endblock %}
+{% block head %}
+  {% load staticfiles %}
+  <title>Travel with Locals</title>
+  <script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/admin_experience.js' %}"></script>
+{% endblock %}
 {% block content %}
     <div class="fullColumn">
         <div class="operation"></div>

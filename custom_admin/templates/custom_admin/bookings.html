@@ -1,6 +1,11 @@
 {% extends "custom_admin/base.html" %}
-{% block head %}<title>Bookings</title>{% endblock %}
+{% block head %}
+  {% load staticfiles %}
+  <title>Bookings</title>
+  <script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/admin_booking.js' %}"></script>
+{% endblock %}
 {% block content %}
+  {% csrf_token %}
   {{time_changed_status}}
   <div class="fullColumn">
     {% ifequal status 'success'%}
