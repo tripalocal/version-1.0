@@ -956,7 +956,7 @@ class ExperienceDetailView(DetailView):
             context["host_bio"] = get_user_bio(experience.get_host().registereduser, settings.LANGUAGES[0][0])
             host_image = experience.get_host().registereduser.image_url
             if host_image == None or len(host_image) == 0:
-                context['host_image'] = 'profile_default.jpg'
+                context['host_image'] = "hosts/profile_default/" + random.choice(['1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k']) + ".svg"
             else:
                 context['host_image'] = host_image
 
@@ -2768,7 +2768,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 if (profileImageURL):
                     profileImageURLList.insert(counter, profileImageURL)
                 else:
-                    profileImageURLList.insert(counter, "profile_default.jpg")
+                    profileImageURLList.insert(counter, "hosts/profile_default/" + random.choice(['1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k']) + ".svg")
 
             # Format title & Description
             exp_information = experience.get_information(settings.LANGUAGES[0][0])

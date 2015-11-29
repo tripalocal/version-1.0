@@ -1,4 +1,5 @@
 from post_office import mail
+from genderize import Genderize
 
 class MailSupportMixin(object):
     subject = None
@@ -15,4 +16,3 @@ class MailSupportMixin(object):
                   recipients = self.recipients,
                   priority = self.priority,
                   html_message = self.html_message)
-

@@ -44,3 +44,4 @@ pyOpenSSL==0.15.1
 PyYAML==3.11
 openpyxl==2.2.6
 django-polymorphic==0.7.1
+genderize==0.1.5
