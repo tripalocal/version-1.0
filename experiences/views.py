@@ -3874,6 +3874,18 @@ def unionpay_payment_callback(request):
                         payment.street2 = ret['txnTime']
                         payment.save()
 
+                        #issue 284
+                        mail.send(subject=_('[Tripalocal] Your booking request has been sent'),
+                                  message='',
+                                  sender=Aliases.objects.filter(destination__contains=user.email)[0].mail,
+                                  recipients = ['order@tripalocal.com'],
+                                  priority='now',
+                                  html_message=loader.render_to_string('experiences/email_product_requested.html',
+                                                                        {'product_title': itinerary.title,
+                                                                        'product_url':settings.DOMAIN_NAME + '/itinerary/' + str(itinerary.id),
+                                                                        'booking':bk,
+                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
+
                 logger.debug("payment success:"+str(ret['orderId']))
             else:
                 #failure

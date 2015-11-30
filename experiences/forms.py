@@ -1100,13 +1100,26 @@ class ItineraryBookingForm(forms.Form):
         return cleaned
 
 def send_booking_email_verification(booking, experience, user, is_instant_booking):
-    if type(experience) != Experience: #issue 209
-        # only send an email to us
+    if type(experience) != Experience:
+        #issue 209, 284
+        #send an email to us
         mail.send(subject='User ' + str(user.id) + ' has requested experience ' + str(experience.id) + ' , booking id: ' + str(booking.id),
                   message='',
                   sender=Aliases.objects.filter(destination__contains=user.email)[0].mail,
                   recipients = ['enquiries@tripalocal.com'],
                   priority='now')
+        #send an email to the customer
+        title = experience.get_information(settings.LANGUAGES[0][0]).title
+        mail.send(subject=_('[Tripalocal] Your booking request has been sent'),
+                  message='',
+                  sender=Aliases.objects.filter(destination__contains=user.email)[0].mail,
+                  recipients = ['order@tripalocal.com'],
+                  priority='now',
+                  html_message=loader.render_to_string('experiences/email_product_requested.html',
+                                                        {'product_title': title,
+                                                        'product_url':settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                                        'booking':booking,
+                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
         return
 
     host = experience.get_host()
