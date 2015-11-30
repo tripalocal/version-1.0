@@ -134,8 +134,11 @@ class Experience(AbstractExperience):
     def get_timezone(self):
         return get_timezone(self.city)
 
-    def get_host(self):
-        return self.hosts.all()[0]
+    def get_host(self, booking=None):
+        if booking is not None and booking.host is not None:
+            return booking.host
+        else:
+            return self.hosts.all()[0]
 
     def get_profile_image(self):
         profileImage = app.models.RegisteredUser.objects.get(user_id=self.get_host().id).image_url
@@ -184,7 +187,7 @@ class NewProduct(AbstractExperience):
     type = models.CharField(max_length=50, default="PublicProduct")
     start_datetime = models.DateTimeField(null=True)
     end_datetime = models.DateTimeField(null=True)
-    provider = models.ForeignKey(Provider)
+    suppliers = models.ManyToManyField(Provider, related_name='product_suppliers')
     city = models.CharField(max_length=50)
     language = models.CharField(max_length=50, default="english;")
     currency = models.CharField(max_length=10, default="aud")
@@ -245,8 +248,11 @@ class NewProduct(AbstractExperience):
     def get_timezone(self):
         return get_timezone(self.city)
 
-    def get_host(self):
-        return self.provider.user
+    def get_host(self, booking=None):
+        if booking is not None and booking.host is not None:
+            return booking.host
+        else:
+            return self.suppliers.all()[0].user
 
     def get_profile_image(self):
         profileImage = RegisteredUser.objects.get(user_id=get_host(self).id).image_url
@@ -423,7 +429,7 @@ class CustomItineraryRequest(models.Model):
     mobile = models.CharField(max_length=50)
 
 class Booking(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name='booking_user')
     coupon = models.ForeignKey(Coupon, null=True, blank=True)
     coupon_extra_information = models.TextField()
     guest_number = models.IntegerField()
@@ -437,6 +443,7 @@ class Booking(models.Model):
     refund_id = models.CharField(max_length=50, null=True, blank=True)
     booking_extra_information = models.TextField(null=True, blank=True)
     custom_itinerary = models.ForeignKey(CustomItinerary, null=True, blank=True)
+    host = models.ForeignKey(User, null=True, blank=True, related_name='booking_host')
 
     def __str__(self):
         return self.user.email + "--" + self.experience.get_information(settings.LANGUAGES[0][0]).title

@@ -413,7 +413,7 @@ def updateNewProduct(experience):
 
     exp.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
     exp.end_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
-    exp.provider = Provider.objects.get(id=1)
+    exp.suppliers.add(Provider.objects.get(id=1))
     exp.language = language.lower() + ";"
     exp.guest_number_min = guest_number_min
     exp.guest_number_max = guest_number_max

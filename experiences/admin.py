@@ -54,7 +54,7 @@ class ProductAdmin(admin.ModelAdmin):
         qs = super(ProductAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
-        return qs.filter(provider=request.user.provider)
+        return qs.filter(suppliers__id__exact=request.user.id)
 
     # def get_form(self, request, obj=None, **kwargs):
         # fieldsets = (
@@ -88,8 +88,8 @@ class ProductAdmin(admin.ModelAdmin):
         # return super(ProductAdmin, self).get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
-        if not request.user.is_superuser:
-            obj.provider = request.user.provider
+        if not request.user.is_superuser and len(obj.suppliers.filter(user_id__in=[request.user.id])) == 0:
+            obj.suppliers.add(Provider.objects.get(id=request.user.id))
         super(ProductAdmin, self).save_model(request, obj, form, change)
 
     def save_formset(self, request, form, formset, change):

@@ -86,6 +86,7 @@ class NewProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
         context = super(NewProductView, self).get_context_data(**kwargs)
         for exp in context['newproduct_list']:
             exp.title = exp.get_information(settings.LANGUAGES[0][0]).title
+            exp.host = exp.get_host()
         return context
 
     @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
