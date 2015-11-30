@@ -98,7 +98,8 @@
                 <p>{% trans 'Duration' %}</p>
                 <select id='new_duration' class='form-control'>
                     {% for i in "0123456789" %}
-                    <option value={{i|add:1}}>{{i|add:1}}{% trans ' Day' %}</option>
+                    <option value={{i|mul:2|add:1}}>{{i|mul:2|add:1}}{% trans ' Day' %}</option>
+                    <option value={{i|mul:2|add:2}}>{{i|mul:2|add:2}}{% trans ' Day' %}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -414,7 +415,7 @@
                         "<p>{% trans 'Duration' %}</p>" +
                         "<select id='duration_list_" + i +"' class='form-control'>";
 
-        for(var d=1;d<=10;d++)
+        for(var d=1;d<=20;d++)
         {
             if(d == parseInt(duration))
             {
