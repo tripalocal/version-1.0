@@ -33,6 +33,10 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     template_name = 'custom_admin/itineraries.html'
     context_object_name = 'itinerary_list'
     paginate_by = None
+
+    def get_queryset(self):
+        return self.model.objects.all().order_by('-submitted_datetime')
+
     def get_context_data(self, **kwargs):
         context = super(ItineraryView, self).get_context_data(**kwargs)
         for ci in context['itinerary_list']:
