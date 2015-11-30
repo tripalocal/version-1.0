@@ -17,6 +17,9 @@ class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
     language = models.CharField(max_length=2)
 
+    def __str__(self):
+        return self.tag
+
 class WechatProduct(models.Model):
     title = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=6, decimal_places=2)
@@ -164,6 +167,9 @@ class ExperienceI18n(models.Model):
     meetup_spot = models.TextField(null=True)
     dropoff_spot = models.TextField(null=True)
     experience = models.ForeignKey(Experience)
+
+    def __str__(self):
+        return self.title
 
 class NewProduct(AbstractExperience):
     NORMAL = 'NORMAL'
@@ -331,6 +337,9 @@ class WhatsIncluded(models.Model):
     language = models.CharField(max_length=2)
     experience = models.ForeignKey(Experience)
 
+    def __str__(self):
+        return str(self.experience.id) + "--" + self.item
+
 class Photo(models.Model):
     def upload_path(self, name):
         return self.directory + self.name
@@ -339,6 +348,9 @@ class Photo(models.Model):
     directory = models.CharField(max_length=50)
     image = models.ImageField(upload_to=upload_path)
     experience = models.ForeignKey(AbstractExperience)
+
+    def __str__(self):
+        return self.name
 
 class Review(models.Model):
     user = models.ForeignKey(User)
@@ -371,6 +383,9 @@ class CustomItinerary(models.Model):
     note = models.TextField(null=True, blank=True)
     submitted_datetime = models.DateTimeField(null=True)
     payment = models.ForeignKey("Payment", null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username + "--" + self.title
 
     def get_guest_number(self):
         guest_number = 0
@@ -599,6 +614,9 @@ class Coordinate(models.Model):
     type = models.CharField(max_length=100, null=True, blank=True)
     order = models.IntegerField(null=True, blank=True)
     experience = models.ForeignKey(AbstractExperience)
+
+    def __str__(self):
+        return self.name
 
 #TODO: move to the models of experience, newproduct
 # add new or update experience title
