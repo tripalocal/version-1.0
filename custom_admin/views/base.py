@@ -11,6 +11,7 @@ class BookingInfoMixin(object):
         booking_list = context['booking_list']
         for booking in booking_list:
             booking.experience.title = booking.experience.get_information(settings.LANGUAGES[0][0]).title
+            booking.host = booking.experience.get_host() if booking.host is None else booking.host
         status_generator = StatusGenerator(booking_list)
         status_generator.generate_status_description()
         context['booking_list'] = booking_list

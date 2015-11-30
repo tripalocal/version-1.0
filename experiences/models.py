@@ -431,7 +431,7 @@ class CustomItineraryRequest(models.Model):
 class Booking(models.Model):
     user = models.ForeignKey(User, related_name='booking_user')
     coupon = models.ForeignKey(Coupon, null=True, blank=True)
-    coupon_extra_information = models.TextField()
+    coupon_extra_information = models.TextField(null=True, blank=True)
     guest_number = models.IntegerField()
     adult_number = models.IntegerField(null=True, blank=True)
     children_number = models.IntegerField(null=True, blank=True)

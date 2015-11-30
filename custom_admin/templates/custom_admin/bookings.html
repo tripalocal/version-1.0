@@ -55,11 +55,9 @@
         <td id="td-booking-datetime-{{ booking.id }}" >{{ booking.datetime }}</td>
         <td><a href="/experience/{{booking.experience.id}}" target="_blank">{{ booking.experience.title }}</a></td>
         <td>{{ booking.experience.city }}</td>
-        <td>
-          {% for host in booking.experience.hosts.all %}
-            <p>{{ host.first_name }}&nbsp;{{ host.last_name }}</p>
-            <p>{{ host.registereduser.phone_number }}</p>
-          {% endfor %}
+        <td><a href="/admin/experiences/booking/{{booking.id}}/" target="_blank">
+          <p>{{ booking.host.first_name }}&nbsp;{{ booking.host.last_name }}</p>
+          <p>{{ booking.host.registereduser.phone_number }}</p>
         </td>
         <td>
           <p>{{ booking.user.first_name }}&nbsp;{{ booking.user.last_name }}</p>
