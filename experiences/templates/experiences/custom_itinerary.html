@@ -178,7 +178,9 @@
                           {{experience.location}}
                           &middot;
                           {% endif %}
-                          <a type="button" onclick="edit_item({{experience.id}}, 'suggestion');">{% trans "Edit" %}</a>
+                          <a type="button" onclick="edit_item({{experience.id}}, {{experience.type}});">{% trans "Edit" %}</a>
+                          &middot;
+                          <a type="button" onclick="duplicate_item({{item.id}}, {{experience.type}});">{% trans "Duplicate" %}</a>
                           &middot;
                           <a type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</a>
                         </p>
@@ -823,6 +825,17 @@
             }
         });
     }
+
+    function duplicate_item(id, type) {
+      var experience = $("#experience_id_" + id);
+      $("#" + type + "-title").val(experience.find(".exp-info").find("h3").text());
+      $("#" + type + "-details").val($(experience.find(".exp-info").find("p")[0]).text());
+      $("#" + type + "-fixed_price").val($(experience.find(".exp-price").find("h2")[0]).text());
+      $("#" + type + "-price").val($(experience.find(".exp-price").find("h2")[0]).text());
+      $("#" + type + "-notes").val(experience.find(".exp-info").find("label").text());
+      add_item(type);
+    }
+
 
     function edit_item(id, type)
     {
