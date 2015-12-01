@@ -267,7 +267,8 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
     experiences = sort_experiences(experiences, customer, preference)
 
     for experience in experiences:
-        if guest_number is not None and (experience.guest_number_max < int(guest_number) or experience.guest_number_min > int(guest_number)):
+        #new requirement: if the guest_number is smaller than the min value, increase the price per person instead of excluding the experience
+        if guest_number is not None and (experience.guest_number_max < int(guest_number) or int(guest_number) <= 0):
             continue
 
         if guest_number is None:
@@ -324,7 +325,9 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
         host = experience.get_host()
         exp_price = float(experience.price)
-        if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
+        if int(guest_number) < experience.guest_number_min:
+            exp_price = exp_price * float(experience.guest_number_min / int(guest_number))
+        elif experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
         if currency is not None and currency != experience.currency:
             exp_price = convert_currency(exp_price, experience.currency, currency)
