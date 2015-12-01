@@ -281,13 +281,15 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         if keywords is not None:
             experience_tags = experience.get_tags(settings.LANGUAGES[0][0])
             tags = keywords.strip().split(",")
-            match = False
-            for tag in tags:
-                if tag.strip() in experience_tags:
-                    match = True
-                    break
-            if not match:
-                continue
+            #new requirement: if the tags are not set for an experience, do not exclude it
+            if experience_tags is not None and len(experience_tags) > 0:
+                match = False
+                for tag in tags:
+                    if tag.strip() in experience_tags:
+                        match = True
+                        break
+                if not match:
+                    continue
 
         if language is not None:
             experience_language = experience.language.split(";") if experience.language is not None else ''
@@ -3095,8 +3097,9 @@ def custom_itinerary(request, id=None):
         if 'Delete' in request.POST:
             #delete an item
             item = request.POST
-            np = NewProduct.objects.get(id=item.get('id'))
-            np.delete()
+            np = NewProduct.objects.filter(id=item.get('id'))
+            if len(np) > 0:
+                np[0].delete()
             return HttpResponse(json.dumps({'success':True}),content_type="application/json")
 
         form = CustomItineraryForm(request.POST)
