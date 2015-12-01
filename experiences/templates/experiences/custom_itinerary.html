@@ -779,6 +779,15 @@
                 var price = $("#" + type + "-price").val();
                 var notes = $("#" + type + "-notes").val();
 
+                if(isNaN(parseFloat(fixed_price)))
+                {
+                    fixed_price = 0;
+                }
+                if(isNaN(parseFloat(price)))
+                {
+                    price = 0;
+                }
+
                 var new_item =  "<div class=\"exp-box-sm\" id=\"experience_id_" + data.new_product_id + "\">" +
                                   "<div class=\"exp-img\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
                                   "<div class=\"exp-info\">" +
@@ -851,6 +860,16 @@
         var title = experience.find(".exp-info").find("h3").text();
         var details = $(experience.find(".exp-info").find("p")[0]).text();
         var notes = experience.find(".exp-info").find("label").text();
+
+        if(isNaN(parseFloat(fixed_price)))
+        {
+            fixed_price = 0;
+        }
+        if(isNaN(parseFloat(price)))
+        {
+            price = 0;
+        }
+
         $("#" + type + "-fixed_price").val(fixed_price);
         $("#" + type + "-price").val(price);
         $("#" + type + "-title").val(title);
