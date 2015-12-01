@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-<form id="itinerary_form" action="" method="post">
+<form id="itinerary_form" action="" method="post" target="_blank">
   {% csrf_token %}
   <div style="display:none;">
   <!-- TODO -->
@@ -98,7 +98,8 @@
                 <p>{% trans 'Duration' %}</p>
                 <select id='new_duration' class='form-control'>
                     {% for i in "0123456789" %}
-                    <option value={{i|add:1}}>{{i|add:1}}{% trans ' Day' %}</option>
+                    <option value={{i|mul:2|add:1}}>{{i|mul:2|add:1}}{% trans ' Day' %}</option>
+                    <option value={{i|mul:2|add:2}}>{{i|mul:2|add:2}}{% trans ' Day' %}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -168,9 +169,24 @@
                     <div class='exp-info'>
                         <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}">{{experience.title}}</a></h3>
                         <p>{{experience.description|escapejs|slice:"0:16"}}</p>
+                        {% if experience.type == 'PrivateProduct' or experience.type == 'PublicProduct' or experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
                         <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+                        {% else %}
+                        <p class='exp-edit'>
+                          {% if experience.location %}
+                          {{experience.location}}
+                          &middot;
+                          {% endif %}
+                          <a type="button" onclick="edit_item({{experience.id}}, {{experience.type}});">{% trans "Edit" %}</a>
+                          &middot;
+                          <a type="button" onclick="duplicate_item({{item.id}}, {{experience.type}});">{% trans "Duplicate" %}</a>
+                          &middot;
+                          <a type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</a>
+                        </p>
+                        <label style="display:none;">{{item.notes}}</label>
+                        {% endif %}
                     </div>
                     <div class='exp-price'>
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
@@ -182,12 +198,6 @@
                         <p>{% trans 'per person' %}</p>
                         {% endif %}
                     </div>
-                    {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
-                    <div class="" style="display:none;">
-                        <button type="button" onclick="edit_item({{experience.id}}, '{{experience.type|lower}}');">{% trans "Edit" %}</button>
-                        <button type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</button>
-                    </div>
-                    {% endif %}
                   </div>
                   {% endfor %}
                 </div>
@@ -405,7 +415,7 @@
                         "<p>{% trans 'Duration' %}</p>" +
                         "<select id='duration_list_" + i +"' class='form-control'>";
 
-        for(var d=1;d<=10;d++)
+        for(var d=1;d<=20;d++)
         {
             if(d == parseInt(duration))
             {
@@ -769,6 +779,15 @@
                 var price = $("#" + type + "-price").val();
                 var notes = $("#" + type + "-notes").val();
 
+                if(isNaN(parseFloat(fixed_price)))
+                {
+                    fixed_price = 0;
+                }
+                if(isNaN(parseFloat(price)))
+                {
+                    price = 0;
+                }
+
                 var new_item =  "<div class=\"exp-box-sm\" id=\"experience_id_" + data.new_product_id + "\">" +
                                   "<div class=\"exp-img\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
                                   "<div class=\"exp-info\">" +
@@ -778,16 +797,20 @@
                 if(location)
                 {
                     new_item +=
-                                    "<p>" + location.substring(0,15) +
+                                    "<p class=\"exp-edit\">" + location.substring(0,15) +
                                     " &middot; " +
                                     "<a type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
+                                    " &middot; " +
+                                    "<a type=\"button\" onclick=\"duplicate_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
                                     " &middot; " +
                                     "<a type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
                                     "</p>";
                 } else {
                   new_item +=
-                  "<p>" +
+                  "<p class=\"exp-edit\">" +
                   "<a type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
+                  " &middot; " +
+                  "<a type=\"button\" onclick=\"duplicate_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
                   " &middot; " +
                   "<a type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
                   "</p>";
@@ -807,6 +830,8 @@
                 $("#" + type + "-fixed_price").val("");
                 $("#" + type + "-price").val("");
                 $("#" + type + "-notes").val("");
+                $("#" + type + "-photo").val("");
+                $(".fileinput").fileinput('clear');
                 $("#add-"+type).hide();
                 $(".loading").hide();
                 init_drag();
@@ -817,6 +842,17 @@
         });
     }
 
+    function duplicate_item(id, type) {
+      var experience = $("#experience_id_" + id);
+      $("#" + type + "-title").val(experience.find(".exp-info").find("h3").text());
+      $("#" + type + "-details").val($(experience.find(".exp-info").find("p")[0]).text());
+      $("#" + type + "-fixed_price").val($(experience.find(".exp-price").find("h2")[0]).text());
+      $("#" + type + "-price").val($(experience.find(".exp-price").find("h2")[0]).text());
+      $("#" + type + "-notes").val(experience.find(".exp-info").find("label").text());
+      add_item(type);
+    }
+
+
     function edit_item(id, type)
     {
         $("#add-" + type + "-btn").click();
@@ -826,6 +862,16 @@
         var title = experience.find(".exp-info").find("h3").text();
         var details = $(experience.find(".exp-info").find("p")[0]).text();
         var notes = experience.find(".exp-info").find("label").text();
+
+        if(isNaN(parseFloat(fixed_price)))
+        {
+            fixed_price = 0;
+        }
+        if(isNaN(parseFloat(price)))
+        {
+            price = 0;
+        }
+
         $("#" + type + "-fixed_price").val(fixed_price);
         $("#" + type + "-price").val(price);
         $("#" + type + "-title").val(title);
@@ -928,17 +974,17 @@
 
     function update_price_title(event, ui)
     {
-        if(event && ui && $(ui.item[0].lastElementChild).attr("class").indexOf("exp-price") < 0)
+        if(event && ui && $(ui.item[0]).find(".exp-edit").length > 0)
         {
             if(ui.item.parent()[0].id && ui.item.parent()[0].id.indexOf("_column") > 0)
             {
                 //dropped in the left section
-                $(ui.item[0].lastElementChild).show();
+                $($(ui.item[0]).find(".exp-edit")[0]).show();
             }
             else
             {
                 //dropped in the right section
-                $(ui.item[0].lastElementChild).hide();
+                $($(ui.item[0]).find(".exp-edit")[0]).hide();
             }
         }
 

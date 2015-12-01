@@ -1,0 +1,16 @@
+{% extends "app/email_notification.html" %}
+{% load staticfiles %}
+{% load mathfilters %}
+{% load i18n %}
+
+{% block heading %}
+  {% trans "You have requested "%}
+{% endblock %}
+
+{% block subheading %}
+  <a href="{{ product_url }}" target="_blank">{{product_title}}</a>{% trans " on "%}{% if LANGUAGE != "zh-CN"%}{{ booking.datetime|date:'d/m/Y' }}{%else%}{{ booking.datetime|date:'Y-m-d' }}{%endif%}
+{% endblock %}
+
+{% block content %}
+  {% trans "You will receive a confirmation within 24 hours" %}
+{% endblock %}

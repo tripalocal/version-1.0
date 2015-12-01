@@ -138,7 +138,7 @@
                        {% elif user.registereduser.image_url and user.registereduser.image_url.strip %}
                            {{ MEDIA_URL }}{{ user.registereduser.image_url }}
                        {% else %}
-                           {{ MEDIA_URL }}img/profile_default.jpg
+                           {{ MEDIA_URL }}hosts/profile_default/{{rand|add:"123456789abcdefghijk"|make_list|random}}.svg
                        {% endif %});
                       background-size: cover; background-repeat: no-repeat; background-position:center; margin-top: 8px; margin-bottom: 8px;"><a style="display:block; width:34px; height:34px; border-radius:100px;"
                           href="{{ GEO_POSTFIX }}myprofile"></a>
@@ -186,7 +186,7 @@
                    {% elif user.registereduser.image_url and user.registereduser.image_url.strip %}
                        {{ MEDIA_URL }}{{ user.registereduser.image_url }}
                    {% else %}
-                       {{ MEDIA_URL }}img/profile_default.jpg
+                       {{ MEDIA_URL }}hosts/profile_default/{{rand|add:"123456789abcdefghijk"|make_list|random}}.svg
                    {% endif %});
                   background-size: cover; background-repeat: no-repeat; background-position:center;">
               </div><p style="display:inline; margin-left:10px; position:relative; bottom:10px;">{{ user.first_name }}</p></a>

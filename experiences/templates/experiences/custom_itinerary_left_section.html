@@ -48,17 +48,19 @@
             {% for item in flight %}
             <div class="exp-box-sm flight_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/flight.svg" %}';" style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>
+                    <p class="exp-edit">
                       {% if item.location %}
                       {{item.location}}
                       &middot;
                       {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'flight');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="duplicate_item({{item.id}}, 'flight');">{% trans "Duplicate" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
@@ -121,17 +123,19 @@
             {% for item in transfer %}
             <div class="exp-box-sm transfer_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/transfer.svg" %}';" style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>
+                    <p class="exp-edit">
                       {% if item.location %}
                       {{item.location}}
                       &middot;
                       {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'transfer');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="duplicate_item({{item.id}}, 'transfer');">{% trans "Duplicate" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
@@ -194,17 +198,19 @@
             {% for item in accommodation %}
             <div class="exp-box-sm accommodation_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/accommodation.svg" %}';" style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>
+                    <p class="exp-edit">
                       {% if item.location %}
                       {{item.location}}
                       &middot;
                       {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'accommodation');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="duplicate_item({{item.id}}, 'accommodation');">{% trans "Duplicate" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
@@ -267,17 +273,19 @@
             {% for item in restaurant %}
             <div class="exp-box-sm restaurant_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/restaurant.svg" %}';" style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>
+                    <p class="exp-edit">
                       {% if item.location %}
                       {{item.location}}
                       &middot;
                       {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'restaurant');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="duplicate_item({{item.id}}, 'restaurant');">{% trans "Duplicate" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
@@ -340,17 +348,19 @@
             {% for item in suggestion %}
             <div class="exp-box-sm suggestion_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' style='height:inherit;width:inherit;'/>
+                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/itinerary.svg" %}';" style='height:inherit;width:inherit;'/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>
+                    <p class="exp-edit">
                       {% if item.location %}
                       {{item.location}}
                       &middot;
                       {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'suggestion');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="duplicate_item({{item.id}}, 'suggestion');">{% trans "Duplicate" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
@@ -416,12 +426,14 @@
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
-                    <p>
+                    <p class="exp-edit">
                       {% if item.location %}
                       {{item.location}}
                       &middot;
                       {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'pricing');">{% trans "Edit" %}</a>
+                      &middot;
+                      <a type="button" onclick="duplicate_item({{item.id}}, 'pricing');">{% trans "Duplicate" %}</a>
                       &middot;
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>

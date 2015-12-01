@@ -1,6 +1,11 @@
 {% extends "custom_admin/base.html" %}
-{% block head %}<title>Bookings</title>{% endblock %}
+{% block head %}
+  {% load staticfiles %}
+  <title>Bookings</title>
+  <script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/admin_booking.js' %}"></script>
+{% endblock %}
 {% block content %}
+  {% csrf_token %}
   {{time_changed_status}}
   <div class="fullColumn">
     {% ifequal status 'success'%}
@@ -34,11 +39,12 @@
       </span></th>
     <th scope="col"><p>Booking Time</p></th>
     <th scope="col">Experience Name</th>
-    <th scope="col"  width="120">Host</th>
-    <th scope="col"  width="120">Traveller</th>
+    <th scope="col" width="120">Location</th>
+    <th scope="col" width="120">Host</th>
+    <th scope="col" width="120">Traveller</th>
     <th scope="col">Group Size</th>
-    <th scope="col"> Status</th>
-    <th scope="col"  width="120">Actions</th>
+    <th scope="col">Status</th>
+    <th scope="col" width="120">Actions</th>
 
   </tr>
 
@@ -48,11 +54,10 @@
         <td><input type="checkbox" name="admin-panel-booking-id-checkbox" value="{{booking.id}}"/></td>
         <td id="td-booking-datetime-{{ booking.id }}" >{{ booking.datetime }}</td>
         <td><a href="/experience/{{booking.experience.id}}" target="_blank">{{ booking.experience.title }}</a></td>
-        <td>
-          {% for host in booking.experience.hosts.all %}
-            <p>{{ host.first_name }}&nbsp;{{ host.last_name }}</p>
-            <p>{{ host.registereduser.phone_number }}</p>
-          {% endfor %}
+        <td>{{ booking.experience.city }}</td>
+        <td><a href="/admin/experiences/booking/{{booking.id}}/" target="_blank">
+          <p>{{ booking.host.first_name }}&nbsp;{{ booking.host.last_name }}</p>
+          <p>{{ booking.host.registereduser.phone_number }}</p>
         </td>
         <td>
           <p>{{ booking.user.first_name }}&nbsp;{{ booking.user.last_name }}</p>

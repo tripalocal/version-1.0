@@ -65,11 +65,11 @@ def home(request):
             if len(form.data['start_date']):
                 if len(form.data['end_date']):
                     return SearchView(request, form.data['city'],
-                                             start_date = pytz.timezone(get_timezone(form.data['city'])).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")), 
+                                             start_date = pytz.timezone(get_timezone(form.data['city'])).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")),
                                              end_date = pytz.timezone(get_timezone(form.data['city'])).localize(datetime.strptime(form.data['end_date'], "%Y-%m-%d")))
                 else:
                     return SearchView(request, form.data['city'],
-                                             start_date = pytz.timezone(get_timezone(form.data['city'])).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")))    
+                                             start_date = pytz.timezone(get_timezone(form.data['city'])).localize(datetime.strptime(form.data['start_date'], "%Y-%m-%d")))
 
             if len(form.data['end_date']):
                 return SearchView(request, form.data['city'],
@@ -92,7 +92,7 @@ def home(request):
                 if len(proxies) > 0:
                     ip = proxies[0]
 
-        if not settings.DEVELOPMENT: 
+        if not settings.DEVELOPMENT:
             if settings.LANGUAGES[0][0] != "zh":
                 try:
                     reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
@@ -393,7 +393,7 @@ def myprofile(request, **kwargs):
     if profile.image_url:
         context["image_url"] = profile.image_url
     else:
-        context["image_url"] = "hosts/no_img.jpg"
+        context["image_url"] = "hosts/profile_default/" + random.choice(['1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k'])
 
     if profile.phone_number:
         data["phone_number"]=profile.phone_number
@@ -815,4 +815,3 @@ def wechat_payment_notify(request):
 #         return HttpResponse(json.dumps({'code_url':code_url}), content_type='application/json')
 #
 #     return HttpResponse(json.dumps(pay_info), content_type='application/json')
-

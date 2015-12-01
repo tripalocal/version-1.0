@@ -1,6 +1,7 @@
 {% extends "custom_admin/base.html" %}
 {% block head %}<title>Payments</title>{% endblock %}
 {% block content %}
+  {% csrf_token %}
   <div class="fullColumn">
   	<div class="operation"></div>
   	<ul class="subMenu">

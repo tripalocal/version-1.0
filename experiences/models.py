@@ -17,6 +17,9 @@ class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
     language = models.CharField(max_length=2)
 
+    def __str__(self):
+        return self.tag
+
 class WechatProduct(models.Model):
     title = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=6, decimal_places=2)
@@ -99,7 +102,9 @@ class Experience(AbstractExperience):
             else:
                 return self.experiencei18n_set.all()[0]
         else:
-            return None
+            new = ExperienceI18n(experience = self, language = settings.LANGUAGES[0][0])
+            new.save()
+            return new
 
     def get_whatsincluded(self, language):
         return WhatsIncluded.objects.filter(experience = self, language = language)
@@ -132,8 +137,11 @@ class Experience(AbstractExperience):
     def get_timezone(self):
         return get_timezone(self.city)
 
-    def get_host(self):
-        return self.hosts.all()[0]
+    def get_host(self, booking=None):
+        if booking is not None and booking.host is not None:
+            return booking.host
+        else:
+            return self.hosts.all()[0]
 
     def get_profile_image(self):
         profileImage = app.models.RegisteredUser.objects.get(user_id=self.get_host().id).image_url
@@ -160,6 +168,9 @@ class ExperienceI18n(models.Model):
     dropoff_spot = models.TextField(null=True)
     experience = models.ForeignKey(Experience)
 
+    def __str__(self):
+        return self.title
+
 class NewProduct(AbstractExperience):
     NORMAL = 'NORMAL'
     AGE_PRICE = 'AGE'
@@ -182,7 +193,7 @@ class NewProduct(AbstractExperience):
     type = models.CharField(max_length=50, default="PublicProduct")
     start_datetime = models.DateTimeField(null=True)
     end_datetime = models.DateTimeField(null=True)
-    provider = models.ForeignKey(Provider)
+    suppliers = models.ManyToManyField(Provider, related_name='product_suppliers')
     city = models.CharField(max_length=50)
     language = models.CharField(max_length=50, default="english;")
     currency = models.CharField(max_length=10, default="aud")
@@ -218,7 +229,9 @@ class NewProduct(AbstractExperience):
             else:
                 return self.newproducti18n_set.all()[0]
         else:
-            return None
+            new = NewProductI18n(product = self, language = settings.LANGUAGES[0][0])
+            new.save()
+            return new
 
     def get_tags(self, language):
         tags = []
@@ -241,8 +254,11 @@ class NewProduct(AbstractExperience):
     def get_timezone(self):
         return get_timezone(self.city)
 
-    def get_host(self):
-        return self.provider.user
+    def get_host(self, booking=None):
+        if booking is not None and booking.host is not None:
+            return booking.host
+        else:
+            return self.suppliers.all()[0].user
 
     def get_profile_image(self):
         profileImage = RegisteredUser.objects.get(user_id=get_host(self).id).image_url
@@ -321,6 +337,9 @@ class WhatsIncluded(models.Model):
     language = models.CharField(max_length=2)
     experience = models.ForeignKey(Experience)
 
+    def __str__(self):
+        return str(self.experience.id) + "--" + self.item
+
 class Photo(models.Model):
     def upload_path(self, name):
         return self.directory + self.name
@@ -329,6 +348,9 @@ class Photo(models.Model):
     directory = models.CharField(max_length=50)
     image = models.ImageField(upload_to=upload_path)
     experience = models.ForeignKey(AbstractExperience)
+
+    def __str__(self):
+        return self.name
 
 class Review(models.Model):
     user = models.ForeignKey(User)
@@ -361,6 +383,9 @@ class CustomItinerary(models.Model):
     note = models.TextField(null=True, blank=True)
     submitted_datetime = models.DateTimeField(null=True)
     payment = models.ForeignKey("Payment", null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username + "--" + self.title
 
     def get_guest_number(self):
         guest_number = 0
@@ -419,9 +444,9 @@ class CustomItineraryRequest(models.Model):
     mobile = models.CharField(max_length=50)
 
 class Booking(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name='booking_user')
     coupon = models.ForeignKey(Coupon, null=True, blank=True)
-    coupon_extra_information = models.TextField()
+    coupon_extra_information = models.TextField(null=True, blank=True)
     guest_number = models.IntegerField()
     adult_number = models.IntegerField(null=True, blank=True)
     children_number = models.IntegerField(null=True, blank=True)
@@ -433,6 +458,7 @@ class Booking(models.Model):
     refund_id = models.CharField(max_length=50, null=True, blank=True)
     booking_extra_information = models.TextField(null=True, blank=True)
     custom_itinerary = models.ForeignKey(CustomItinerary, null=True, blank=True)
+    host = models.ForeignKey(User, null=True, blank=True, related_name='booking_host')
 
     def __str__(self):
         return self.user.email + "--" + self.experience.get_information(settings.LANGUAGES[0][0]).title
@@ -588,6 +614,9 @@ class Coordinate(models.Model):
     type = models.CharField(max_length=100, null=True, blank=True)
     order = models.IntegerField(null=True, blank=True)
     experience = models.ForeignKey(AbstractExperience)
+
+    def __str__(self):
+        return self.name
 
 #TODO: move to the models of experience, newproduct
 # add new or update experience title

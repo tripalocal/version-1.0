@@ -267,7 +267,8 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
     experiences = sort_experiences(experiences, customer, preference)
 
     for experience in experiences:
-        if guest_number is not None and (experience.guest_number_max < int(guest_number) or experience.guest_number_min > int(guest_number)):
+        #new requirement: if the guest_number is smaller than the min value, increase the price per person instead of excluding the experience
+        if guest_number is not None and (experience.guest_number_max < int(guest_number) or int(guest_number) <= 0):
             continue
 
         if guest_number is None:
@@ -281,13 +282,15 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         if keywords is not None:
             experience_tags = experience.get_tags(settings.LANGUAGES[0][0])
             tags = keywords.strip().split(",")
-            match = False
-            for tag in tags:
-                if tag.strip() in experience_tags:
-                    match = True
-                    break
-            if not match:
-                continue
+            #new requirement: if the tags are not set for an experience, do not exclude it
+            if experience_tags is not None and len(experience_tags) > 0:
+                match = False
+                for tag in tags:
+                    if tag.strip() in experience_tags:
+                        match = True
+                        break
+                if not match:
+                    continue
 
         if language is not None:
             experience_language = experience.language.split(";") if experience.language is not None else ''
@@ -322,7 +325,9 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
         host = experience.get_host()
         exp_price = float(experience.price)
-        if experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
+        if int(guest_number) < experience.guest_number_min:
+            exp_price = exp_price * float(experience.guest_number_min / int(guest_number))
+        elif experience.dynamic_price != None and len(experience.dynamic_price.split(',')) == experience.guest_number_max - experience.guest_number_min + 2 :
             exp_price = float(experience.dynamic_price.split(",")[int(guest_number)-experience.guest_number_min])
         if currency is not None and currency != experience.currency:
             exp_price = convert_currency(exp_price, experience.currency, currency)
@@ -956,7 +961,7 @@ class ExperienceDetailView(DetailView):
             context["host_bio"] = get_user_bio(experience.get_host().registereduser, settings.LANGUAGES[0][0])
             host_image = experience.get_host().registereduser.image_url
             if host_image == None or len(host_image) == 0:
-                context['host_image'] = 'profile_default.jpg'
+                context['host_image'] = "hosts/profile_default/" + random.choice(['1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k']) + ".svg"
             else:
                 context['host_image'] = host_image
 
@@ -2768,7 +2773,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 if (profileImageURL):
                     profileImageURLList.insert(counter, profileImageURL)
                 else:
-                    profileImageURLList.insert(counter, "profile_default.jpg")
+                    profileImageURLList.insert(counter, "hosts/profile_default/" + random.choice(['1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','g','h','i','j','k']) + ".svg")
 
             # Format title & Description
             exp_information = experience.get_information(settings.LANGUAGES[0][0])
@@ -3031,12 +3036,13 @@ def custom_itinerary(request, id=None):
         if 'Add' in request.POST:
             #add a new item
             item = request.POST
-            np = NewProduct(provider_id=1, price=item.get('price', 0), fixed_price=item.get('fixed_price', 0),
+            np = NewProduct(price=item.get('price', 0), fixed_price=item.get('fixed_price', 0),
                             commission=0.0, currency=request.session["custom_currency"].lower(), type=item['type'].title(),
                             city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted",
                             start_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)),
                             end_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)) + timedelta(weeks=520))
             np.save()
+            np.suppliers.add(Provider.objects.get(id=1))
             npi18n = NewProductI18n(product=np, title=item.get('title',""), notice=item.get('notes', ""),
                                     description=item.get('details', ""), location=item.get('location', ""))
             npi18n.save()
@@ -3094,8 +3100,9 @@ def custom_itinerary(request, id=None):
         if 'Delete' in request.POST:
             #delete an item
             item = request.POST
-            np = NewProduct.objects.get(id=item.get('id'))
-            np.delete()
+            np = NewProduct.objects.filter(id=item.get('id'))
+            if len(np) > 0:
+                np[0].delete()
             return HttpResponse(json.dumps({'success':True}),content_type="application/json")
 
         form = CustomItineraryForm(request.POST)
@@ -3530,50 +3537,6 @@ def itinerary_booking_successful(request, itinerary_id):
 
     return HttpResponseRedirect(GEO_POSTFIX + "itinerary/" + itinerary_id)
 
-def nov_promo(request):
-    set_initial_currency(request)
-    experienceList = AbstractExperience.objects.filter(id__in=[209,302,911,921,71,852,862,1021,2291,2301,2311,2321,2341,2351,2371,2381,2391,2401])
-    i=0
-    while i < len(experienceList):
-        experience = experienceList[i]
-
-        setExperienceDisplayPrice(experience)
-
-        experience.image = experience.get_background_image()
-
-        if float(experience.duration).is_integer():
-            experience.duration = int(experience.duration)
-
-        experience.city = dict(Location).get(experience.city, experience.city)
-
-        if not experience.currency:
-            experience.currency = 'aud'
-        convert_experience_price(request, experience)
-        experience.dollarsign = DollarSign[experience.currency.upper()]
-        experience.currency = str(dict(Currency)[experience.currency.upper()])
-        if experience.commission > 0.0:
-            experience.commission = round(experience.commission/(1-experience.commission),3)+1
-        else:
-            experience.commission = settings.COMMISSION_PERCENT+1
-
-        # Format title & Description
-        exp_information = experience.get_information(settings.LANGUAGES[0][0])
-        experience.description = exp_information.description
-        t = exp_information.title
-        if (t != None and len(t) > 30):
-            experience.title = t[:27] + "..."
-        else:
-            experience.title = t
-        i+=1
-    template = "experiences/1111.html"
-    context = RequestContext(request, {
-                            'experienceList' : experienceList,
-                            'user_email':request.user.email if request.user.is_authenticated() else None,
-                            'LANGUAGE':settings.LANGUAGE_CODE,
-                            'GEO_POSTFIX': GEO_POSTFIX,
-              })
-    return render_to_response(template, {}, context)
-
 def topic_family(request):
     set_initial_currency(request)
     experienceList = AbstractExperience.objects.filter(id__in=[911,2041,464,69,408])
@@ -3916,6 +3879,18 @@ def unionpay_payment_callback(request):
                         payment.charge_id = ret['queryId']
                         payment.street2 = ret['txnTime']
                         payment.save()
+
+                        #issue 284
+                        mail.send(subject=_('[Tripalocal] Your booking request has been sent'),
+                                  message='',
+                                  sender=Aliases.objects.filter(destination__contains=user.email)[0].mail,
+                                  recipients = ['order@tripalocal.com'],
+                                  priority='now',
+                                  html_message=loader.render_to_string('experiences/email_product_requested.html',
+                                                                        {'product_title': itinerary.title,
+                                                                        'product_url':settings.DOMAIN_NAME + '/itinerary/' + str(itinerary.id),
+                                                                        'booking':bk,
+                                                                        'LANGUAGE':settings.LANGUAGE_CODE}))
 
                 logger.debug("payment success:"+str(ret['orderId']))
             else:

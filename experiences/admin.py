@@ -54,7 +54,7 @@ class ProductAdmin(admin.ModelAdmin):
         qs = super(ProductAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
-        return qs.filter(provider=request.user.provider)
+        return qs.filter(suppliers__id__exact=Provider.objects.get(id=request.user.id).id)
 
     # def get_form(self, request, obj=None, **kwargs):
         # fieldsets = (
@@ -88,8 +88,8 @@ class ProductAdmin(admin.ModelAdmin):
         # return super(ProductAdmin, self).get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
-        if not request.user.is_superuser:
-            obj.provider = request.user.provider
+        if not request.user.is_superuser and len(obj.suppliers.filter(user_id__in=[request.user.id])) == 0:
+            obj.suppliers.add(Provider.objects.get(id=request.user.id))
         super(ProductAdmin, self).save_model(request, obj, form, change)
 
     def save_formset(self, request, form, formset, change):
@@ -125,7 +125,15 @@ class ProviderAdmin(admin.ModelAdmin):
             self.exclude.append('user')
         return super(ProviderAdmin, self).get_form(request, obj, **kwargs)
 
-
+class BookingAdmin(admin.ModelAdmin):
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(BookingAdmin,self).get_form(request, obj,**kwargs)
+        # form class is created per request by modelform_factory function
+        # so it's safe to modify
+        #we modify the the queryset
+        if obj is not None:
+            form.base_fields['host'].queryset = form.base_fields['host'].queryset.filter(id__in=[e.id for e in obj.experience.hosts.all()])
+        return form
 
 # Re-register UserAdmin
 admin.site.unregister(User)
@@ -137,7 +145,7 @@ admin.site.register(Photo)
 admin.site.register(WhatsIncluded)
 admin.site.register(RegisteredUser)
 admin.site.register(Review)
-admin.site.register(Booking)
+admin.site.register(Booking, BookingAdmin)
 admin.site.register(Coupon)
 admin.site.register(WechatProduct)
 admin.site.register(WechatBooking, WechatBookingAdmin)
