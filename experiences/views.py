@@ -3072,7 +3072,7 @@ def custom_itinerary(request, id=None):
             np = NewProduct.objects.get(id=item.get('id'))
             np.price = item.get('price', 0)
             np.fixed_price = item.get('fixed_price', 0)
-            np.city = city=item.get('location', "")
+            np.city = item.get('location', "")
             #np.currency=request.session["custom_currency"].lower()
             np.save()
 
