@@ -58,7 +58,10 @@ def get_total_price(experience, guest_number=0, adult_number=0, children_number=
             #wrong dynamic settings
             subtotal_price += float(experience.price)*float(guest_number)
     else:
-        subtotal_price += float(experience.price)*float(guest_number)
+        if guest_number <= experience.guest_number_min:
+            subtotal_price += float(experience.price) * float(experience.guest_number_min)
+        else:
+            subtotal_price += float(experience.price)*float(guest_number)
 
     return subtotal_price + experience.fixed_price
 
