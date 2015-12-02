@@ -237,6 +237,7 @@ def search_experience(condition, language="zh", type="experience"):
 def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None, currency=None, skip_availability=False):
     #city/keywords is a string like A,B,C,
     available_options = []
+    start_datetime = start_datetime.replace(hour=2)
     end_datetime = end_datetime.replace(hour=22)
 
     exp_type = exp_type.lower()
