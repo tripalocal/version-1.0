@@ -175,10 +175,6 @@
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
                         {% else %}
                         <p class='exp-edit'>
-                          {% if experience.location %}
-                          {{experience.location}}
-                          &middot;
-                          {% endif %}
                           <a type="button" onclick="edit_item({{experience.id}}, {{experience.type}});">{% trans "Edit" %}</a>
                           &middot;
                           <a type="button" onclick="duplicate_item({{item.id}}, {{experience.type}});">{% trans "Duplicate" %}</a>
