@@ -3316,7 +3316,7 @@ def custom_itinerary(request, id=None):
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
-def itinerary_detail(request,id=None):
+def itinerary_detail(request,id=None,preview=None):
     if id is None:
         return HttpResponseRedirect(GEO_POSTFIX)
 
@@ -3400,6 +3400,7 @@ def itinerary_detail(request,id=None):
                                    "price":price,
                                    "full_price":full_price,
                                    "cover_photo":cover_photo,
+                                   "preview":preview,
                                    'LANGUAGE':settings.LANGUAGE_CODE,
                                    "GEO_POSTFIX":GEO_POSTFIX},
                                    context)
