@@ -75,6 +75,7 @@ def convert_experience_price(request, experience):
         experience.currency = request.session['custom_currency']
 
 def next_time_slot(experience, repeat_cycle, repeat_frequency, repeat_extra_information, current_datetime, daylightsaving):
+    #TODO:always return the next time slot in the future, even if "current_datetime" is earlier than now
     #daylightsaving: whether it was in daylightsaving when this blockout/instant booking record was created
     current_datetime_local = current_datetime.astimezone(pytz.timezone(experience.get_timezone()))
 
@@ -367,7 +368,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                 daylightsaving = False
 
             if blk.repeat:
-                b_l =  blk.end_datetime - blk.start_datetime
+                b_l = blk.end_datetime - blk.start_datetime
                 if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
                     blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
                 while blk.start_datetime.date() <= blk.repeat_end_date:
@@ -399,7 +400,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                 daylightsaving = False
 
             if ib.repeat:
-                ib_l =  ib.end_datetime - ib.start_datetime
+                ib_l = ib.end_datetime - ib.start_datetime
                 if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
                     ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
                 while ib.start_datetime.date() <= ib.repeat_end_date:
@@ -1323,7 +1324,6 @@ def experience_booking_confirmation(request):
 
                 if total_price > 0.0:
                     #not free
-                    # todo: remove stub money amout
                     price = int(convert_currency(total_price, experience.currency, "CNY") * 100)
                     pay_info = unified_pay.post(experience.get_information(settings.LANGUAGES[0][0]).title, out_trade_no,
                                                 str(price), "127.0.0.1", notify_url)
@@ -2174,7 +2174,6 @@ def new_experience(request):
                 host = User.objects.get(id=user_id)
             experience.hosts.add(host)
             set_exp_title_all_langs(experience, form.cleaned_data['title'], LANG_EN, LANG_CN)
-            #todo: add record to chinese database
 
             first_step = 'price'
             return redirect(reverse('manage_listing', kwargs={'exp_id': experience.id, 'step': first_step}))
@@ -2220,7 +2219,6 @@ def manage_listing_price(request, experience, context):
             if 'currency' in form.data:
                 experience.currency = form.cleaned_data['currency']
 
-            # todo: add to chinese db
             experience.save()
             return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
