@@ -3345,7 +3345,7 @@ def itinerary_detail(request,id=None,preview=None):
         total_price = subtotal_price + service_fee
         number = itinerary.get_guest_number()
         price_pp = total_price/number[0]
-
+        cover_photo = ""
         for item in itinerary.booking_set.order_by('datetime').all():
             if item.experience.photo_set.all():
                 cover_photo = item.experience.photo_set.all()[0]
@@ -3395,6 +3395,7 @@ def itinerary_detail(request,id=None,preview=None):
                 end_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
 
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
+        cover_photo = ""
         for key, value in itinerary["days"].items():
             for item in value:
                 if item.photo_set.all():
