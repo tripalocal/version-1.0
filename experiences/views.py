@@ -3382,6 +3382,12 @@ def itinerary_detail(request,id=None):
                 end_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
 
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
+        for key, value in itinerary["days"].items():
+            for item in value:
+                if item.photo_set.all():
+                    cover_photo = item.photo_set.all()[0]
+                    break
+            break
         guest_number = ci.get_guest_number()
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
@@ -3393,6 +3399,7 @@ def itinerary_detail(request,id=None):
                                    "discount_deadline":discount_deadline.strftime("%Y-%m-%d"),
                                    "price":price,
                                    "full_price":full_price,
+                                   "cover_photo":cover_photo,
                                    'LANGUAGE':settings.LANGUAGE_CODE,
                                    "GEO_POSTFIX":GEO_POSTFIX},
                                    context)
