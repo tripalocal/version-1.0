@@ -47,8 +47,8 @@
             <button type="button" class="btn btn-default" id="add-flight-btn">+ Add Flight</button>
             {% for item in flight %}
             <div class="exp-box-sm flight_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/flight.svg" %}';this.style.height='27px';this.style.width='27px';"/>
+                <div class="exp-img" style="background-image:url({% static "experiences/img/flight.svg" %})">
+                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
@@ -118,8 +118,8 @@
             <button type="button" id="add-transfer-btn" class="btn btn-default">+ Add Transfer</button>
             {% for item in transfer %}
             <div class="exp-box-sm transfer_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/transfer.svg" %}';this.style.height='27px';this.style.width='27px';"/>
+                <div class="exp-img" style="background-image:url({% static "experiences/img/transfer.svg" %})">
+                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
@@ -189,8 +189,8 @@
             <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
             {% for item in accommodation %}
             <div class="exp-box-sm accommodation_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/accommodation.svg" %}';this.style.height='27px';this.style.width='27px';"/>
+                <div class="exp-img" style="background-image:url({% static "experiences/img/accommodation.svg" %})">
+                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
@@ -260,8 +260,8 @@
             <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
             {% for item in restaurant %}
             <div class="exp-box-sm restaurant_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onError=null;this.src='{% static "experiences/img/restaurant.svg" %}';this.style.height='27px';this.style.width='27px';"/>
+                <div class="exp-img" style="background-image:url({% static "experiences/img/restaurant.svg" %})">
+                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
@@ -331,8 +331,8 @@
             <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
             {% for item in suggestion %}
             <div class="exp-box-sm suggestion_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/itinerary.svg" %}';this.style.height='27px';this.style.width='27px';"/>
+                <div class="exp-img" style="background-image:url({% static "experiences/img/itinerary.svg" %})">
+                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>

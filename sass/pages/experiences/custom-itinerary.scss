@@ -193,16 +193,9 @@ body {
   width: 105px;
   height: 100%;
   background-position: center;
-  background-size: cover;
   background-repeat: no-repeat;
   float: left;
   img {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    margin: auto;
     height: inherit;
     width: inherit;
   }

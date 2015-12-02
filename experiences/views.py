@@ -3345,6 +3345,11 @@ def itinerary_detail(request,id=None,preview=None):
         number = itinerary.get_guest_number()
         price_pp = total_price/number[0]
 
+        for item in itinerary.booking_set.order_by('datetime').all():
+            if item.experience.photo_set.all():
+                cover_photo = item.experience.photo_set.all()[0]
+                break
+
         return render_to_response('experiences/itinerary_booking_confirmation.html',
                                   {'form':form, "itinerary":itinerary,
                                    "adult_number":number[1],
@@ -3353,6 +3358,7 @@ def itinerary_detail(request,id=None,preview=None):
                                    "price_pp":price_pp, "subtotal_price":subtotal_price,
                                    "service_fee":service_fee, "total_price":total_price,
                                    "currency": currency, "dollarsign": DollarSign[currency.upper()],
+                                   "cover_photo": cover_photo,
                                    "LANGUAGE":settings.LANGUAGE_CODE,"GEO_POSTFIX":GEO_POSTFIX},
                                    context)
     else:
