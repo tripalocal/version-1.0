@@ -843,7 +843,7 @@
       $("#" + type + "-title").val(experience.find(".exp-info").find("h3").text());
       $("#" + type + "-details").val($(experience.find(".exp-info").find("p")[0]).text());
       $("#" + type + "-fixed_price").val($(experience.find(".exp-price").find("h2")[0]).text());
-      $("#" + type + "-price").val($(experience.find(".exp-price").find("h2")[0]).text());
+      $("#" + type + "-price").val($(experience.find(".exp-price").find("h2")[1]).text());
       $("#" + type + "-notes").val(experience.find(".exp-info").find("label").text());
       add_item(type);
     }
