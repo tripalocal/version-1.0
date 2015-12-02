@@ -3260,7 +3260,10 @@ def custom_itinerary(request, id=None):
                 col += 1
                 worksheet.write(row, col, total_price/(adult_number + children_number))
                 workbook.close()
-                return HttpResponseRedirect(GEO_POSTFIX+"itinerary/"+str(ci.id)+"/")
+                if "draft" in request.POST:
+                    return HttpResponseRedirect(GEO_POSTFIX+"itinerary/preview/"+str(ci.id)+"/")
+                else:
+                    return HttpResponseRedirect(GEO_POSTFIX+"itinerary/"+str(ci.id)+"/")
 
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
