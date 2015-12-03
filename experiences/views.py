@@ -3568,7 +3568,7 @@ def campaign(request):
     romance = AbstractExperience.objects.filter(id__in=[3031,2411,2341])
     culture = AbstractExperience.objects.filter(id__in=[2871,991,2171])
     outdoor = AbstractExperience.objects.filter(id__in=[2141,2371,2241])
-    extreme = AbstractExperience.objects.filter(id__in=[2681,2801,2481])
+    extreme = AbstractExperience.objects.filter(id__in=[862,2441,2481])
     photography = AbstractExperience.objects.filter(id__in=[872,2921,1111])
     topics = [family, romance, culture, outdoor, extreme, photography]
     for experienceList in topics:

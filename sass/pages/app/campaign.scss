@@ -14,8 +14,12 @@ h1 {
   font-family: $font-stack-homepage;
   text-align: center;
   a {
-    color: $slate-grey;
+    color: $dark-grey;
   }
+}
+
+.container {
+  position: relative;
 }
 
 .jumbotron {
@@ -36,9 +40,12 @@ h1 {
   @include media('<phablet') {
     height: 180px;
     margin-bottom: 75px;
+    background-position: top;
+
   }
   @include media('<phone') {
-    height: 150px;
+    background-position: top;
+    margin-bottom: 70px;
   }
   img {
     @include media('<desktop') {
@@ -63,10 +70,8 @@ h1 {
   color: white;
   background-color: $primary-color;
   padding: 15px;
-  font-size: 16px;
-  @include media('<phablet') {
-    font-size: 14px;
-  }
+  font-size: 14px;
+  position: relative;
   a {
     color: inherit;
     cursor: pointer;
@@ -74,4 +79,15 @@ h1 {
       text-decoration: underline;
     }
   }
+  h1 {
+    margin-top: 10px;
+  }
+}
+
+.ribbon {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  margin: -110px auto;
 }
