@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-03 14:55+1100\n"
+"POT-Creation-Date: 2015-12-03 16:17+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -255,6 +255,7 @@ msgstr "预定次数"
 
 #: experiences/forms.py:798
 #: experiences/templates/experiences/topic_outdoor.html:13
+#: experiences/views.py:3607
 msgid "Outdoor"
 msgstr "户外运动"
 
@@ -292,7 +293,7 @@ msgstr "例如：墨尔本、悉尼、布里斯本 ..."
 msgid "%s"
 msgstr ""
 
-#: experiences/forms.py:1113 experiences/views.py:3908
+#: experiences/forms.py:1113 experiences/views.py:3960
 #, fuzzy
 #| msgid "[Tripalocal] Your booking request is sent to the host"
 msgid "[Tripalocal] Your booking request has been sent"
@@ -1835,6 +1836,7 @@ msgid "Tripalocal | Local Culture"
 msgstr "本土客 风土人情"
 
 #: experiences/templates/experiences/topic_culture.html:13
+#: experiences/views.py:3607
 msgid "Local Culture"
 msgstr "风土人情"
 
@@ -1843,6 +1845,7 @@ msgid "Tripalocal | Extreme Experiences"
 msgstr "【本土客】 刺激体验"
 
 #: experiences/templates/experiences/topic_extreme.html:13
+#: experiences/views.py:3607
 msgid "Extreme Experiences"
 msgstr "刺激体验"
 
@@ -1851,6 +1854,7 @@ msgid "Tripalocal | Bring the Kids"
 msgstr "【本土客】 亲子游"
 
 #: experiences/templates/experiences/topic_family.html:13
+#: experiences/views.py:3607
 msgid "Bring the Kids"
 msgstr "亲子游"
 
@@ -1863,6 +1867,7 @@ msgid "Tripalocal | Photography Worthy"
 msgstr "本土客 | 风光摄影"
 
 #: experiences/templates/experiences/topic_photography.html:13
+#: experiences/views.py:3607
 msgid "Photography Worthy"
 msgstr "风光摄影"
 
@@ -1871,6 +1876,7 @@ msgid "Tripalocal | Honeymoon"
 msgstr "本土客 蜜月游"
 
 #: experiences/templates/experiences/topic_romance.html:13
+#: experiences/views.py:3607
 msgid "Honeymoon"
 msgstr "蜜月游"
 
