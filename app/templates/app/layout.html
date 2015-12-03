@@ -377,8 +377,7 @@
                mixpanel.track("selected No from popup01");
            });
            $('#help-yes').click(function () {
-               $('#popup-page-1').hide();
-               $('#popup-page-2').show();
+               window.location.href = "{{GEO_POSTFIX}}itinerary/request/";
                mixpanel.track("selected Yes from popup01");
            });
            $('#multidaytrip-link').click(function() {

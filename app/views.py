@@ -142,6 +142,7 @@ def home(request):
     return render_to_response('app/index.html', {'form': form}, context)
 
 def campaign(request):
+    set_initial_currency(request)
     # NOTE: in the future, we should define these topics globally
     family = AbstractExperience.objects.filter(id__in=[2611,2561,2581])
     romance = AbstractExperience.objects.filter(id__in=[3031,2411,2341])
@@ -150,6 +151,39 @@ def campaign(request):
     extreme = AbstractExperience.objects.filter(id__in=[2681,2801,2481])
     photography = AbstractExperience.objects.filter(id__in=[872,2921,1111])
     topics = [family, romance, culture, outdoor, extreme, photography]
+    for experienceList in topics:
+        i=0
+        while i < len(experienceList):
+            experience = experienceList[i]
+
+            setExperienceDisplayPrice(experience)
+
+            experience.image = experience.get_background_image()
+
+            if float(experience.duration).is_integer():
+                experience.duration = int(experience.duration)
+
+            experience.city = dict(Location).get(experience.city, experience.city)
+
+            if not experience.currency:
+                experience.currency = 'aud'
+            convert_experience_price(request, experience)
+            experience.dollarsign = DollarSign[experience.currency.upper()]
+            experience.currency = str(dict(Currency)[experience.currency.upper()])
+            if experience.commission > 0.0:
+                experience.commission = round(experience.commission/(1-experience.commission),3)+1
+            else:
+                experience.commission = settings.COMMISSION_PERCENT+1
+
+            # Format title & Description
+            exp_information = experience.get_information(settings.LANGUAGES[0][0])
+            experience.description = exp_information.description
+            t = exp_information.title
+            if (t != None and len(t) > 30):
+                experience.title = t[:27] + "..."
+            else:
+                experience.title = t
+            i+=1
     titles = [_('Bring the Kids'), _('Honeymoon'), _('Local Culture'), _('Outdoor'), _('Extreme Experiences'), _('Photography Worthy')]
     urls = ['family', 'romance', 'culture', 'outdoor', 'extreme', 'photography']
     context = RequestContext(request, {
@@ -157,7 +191,6 @@ def campaign(request):
         'GEO_POSTFIX': settings.GEO_POSTFIX,
         'LANGUAGE': settings.LANGUAGE_CODE
     })
-    set_initial_currency(request)
     return render_to_response('app/campaign.html', context)
 
 def contact(request):
