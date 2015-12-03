@@ -142,6 +142,7 @@ def home(request):
     return render_to_response('app/index.html', {'form': form}, context)
 
 def campaign(request):
+    # NOTE: in the future, we should define these topics globally
     family = AbstractExperience.objects.filter(id__in=[2611,2561,2581])
     romance = AbstractExperience.objects.filter(id__in=[3031,2411,2341])
     culture = AbstractExperience.objects.filter(id__in=[2871,991,2171])
@@ -150,8 +151,9 @@ def campaign(request):
     photography = AbstractExperience.objects.filter(id__in=[872,2921,1111])
     topics = [family, romance, culture, outdoor, extreme, photography]
     titles = [_('Bring the Kids'), _('Honeymoon'), _('Local Culture'), _('Outdoor'), _('Extreme Experiences'), _('Photography Worthy')]
+    urls = ['family', 'romance', 'culture', 'outdoor', 'extreme', 'photography']
     context = RequestContext(request, {
-        'topicList': zip(titles, topics),
+        'topicList': zip(titles, topics, urls),
         'GEO_POSTFIX': settings.GEO_POSTFIX,
         'LANGUAGE': settings.LANGUAGE_CODE
     })

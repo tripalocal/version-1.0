@@ -22,9 +22,9 @@
 </div>
 <div class="container">
 
-  {% for title, topic in topicList %}
+  {% for title, topic, link in topicList %}
   <div class="row">
-    <h1>{{ title }}</h1>
+    <h1><a href="{{GEO_POSTFIX}}{{link}}">{{ title }}</a></h1>
     {% for experience in topic %}
     <div class="col-sm-4">
       <div class="exp-box">

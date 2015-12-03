@@ -13,6 +13,9 @@
 h1 {
   font-family: $font-stack-homepage;
   text-align: center;
+  a {
+    color: $slate-grey;
+  }
 }
 
 .jumbotron {
@@ -68,7 +71,7 @@ h1 {
     color: inherit;
     cursor: pointer;
     &:hover {
-      text-decoration: underline;    
+      text-decoration: underline;
     }
   }
 }
