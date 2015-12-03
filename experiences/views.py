@@ -3401,6 +3401,8 @@ def itinerary_detail(request,id=None,preview=None):
                 if item.photo_set.all():
                     cover_photo = item.photo_set.all()[0]
                     break
+            else:
+                continue
             break
         guest_number = ci.get_guest_number()
         return render_to_response('experiences/itinerary_detail.html',
