@@ -1,0 +1,101 @@
+import json, os, collections, requests, pytz
+from datetime import *
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.http import HttpResponseRedirect
+from experiences.models import NewProduct, NewProductI18n
+from experiences.views import saveExperienceImage
+from io import BytesIO
+
+def convert_location(city):
+    locations = {'cairns':'Cairns','port-douglas':'Cairns','sydney':'Sydney','melbourne':'Melbourne',
+                'brisbane':'Brisbane','hobart':'Hobart','launceston':'GRTAS','adelaide':'Adelaide',
+                'gold-coast':'Goldcoast','sunshine-coast':'GRQLD','byron-bay':'GRNSW','perth':'Perth',
+                'darwin':'Darwin','auckland':'Auckland','west-coast':'Westcoast','doubtful-sound':'Doubtfulsound',
+                'rotorua':'Rotorua','bay-of-islands':'Bayofislands','christchurch':'Christchurch','canberra':'Canberra',
+                'wellington':'Wellington','port-arthur':'GRTAS','broome':'GRWA','qld-other':'GRQLD',
+                'nsw-other':'GRNSW','townsville':'GRQLD','whitsundays':'GRQLD','alice-springs':'Alicesprings',
+                'queenstown':'Queenstown','hanmer-springs':'Canterbury','mt-cook':'Canterbury','marlborough':'Marlborough',
+                'hervey-bay':'GRQLD','milford-sound':'Milfordsound','snowy-mountains':'GRNSW','taupo':'Taupo',
+                'ningaloo-reef':'GRWA','margaret-river':'GRWA','the-coromandel':'Coromandel','ayers-rock':'GRNA',
+                'te-anau':'Teanau','stewart-island':'Stewartisland','cradle-coast':'GRTAS','hawkes-bay':'Hawkesbay',
+                'port-stephens':'GRNSW','wa-other':'GRWA','kaikoura':'Canterbury'}
+    return locations.get(city, city)
+
+def import_experienceoz_products(request):
+    if not request.user.is_authenticated() or not request.user.is_staff:
+        return HttpResponseRedirect("/")
+
+    partner_id = "001"
+    #the ids of products imported from partners will be in the format:
+    #<the original id at the partner side><partner_id><length_of_partner_id>
+    #e.g., 59340013
+    keys = ["id", "name", "operatorName", "operatorPublicName", "urlSegment",\
+            "bookingRequired", "bookingNotesRequired", "bookingNotesPlaceholder",\
+            "availabilityModel", "description", "productOptionGroups",\
+            "moreInfo", "image", "hotDealMessage", "status", "operatorId", "operatorUrl",\
+            "primaryRegionId", "primaryRegionUrl", "primaryCategoryId", "primaryCategoryUrl",\
+            "timestamp"]
+
+    file_name = os.path.join('C:\\experienceoz\\', 'experienceoz.json')
+
+    with open(file_name, "rb") as file:
+        products = json.loads(file.read().decode("utf-8"))
+        for product in products:
+            product = collections.OrderedDict(sorted(product.items()))
+            for key, value in product.items():
+                if key not in keys:
+                    raise Exception("New key: " + str(key))
+
+            #add str(len(partner_id))), in case one partner's id is a postfix of another id
+            pid = int(str(product['id']) + partner_id + str(len(partner_id)))
+            np = NewProduct.objects.filter(abstractexperience_ptr_id = pid)
+            if len(np) > 0:
+                np = np[0]
+            else:
+                np = NewProduct()
+                np.id = pid
+
+            np.partner = partner_id
+            npi18n = np.newproducti18n_set.all()
+            if len(npi18n) > 0:
+                npi18n = npi18n[0]
+            else:
+                npi18n = NewProductI18n()
+            npi18n.language = "cn"
+            npi18n.title = product['name'] if product['name'] else ""
+            npi18n.background_info = product['urlSegment'] if product['urlSegment'] else ""
+            np.book_in_advance = product['bookingRequired']
+            if product['bookingNotesRequired']:
+                npi18n.ticket_use_instruction = product['bookingNotesPlaceholder'] if product['bookingNotesPlaceholder'] else ""
+            npi18n.description = product['description'] if product['description'] else ""
+            npi18n.combination_options = product['productOptionGroups'] if product['productOptionGroups'] else ""
+            npi18n.service = product['moreInfo'] if product['moreInfo'] else ""
+            npi18n.notice = product['hotDealMessage'] if product['hotDealMessage'] else ""
+            npi18n.location = product['primaryRegionUrl'] if product['primaryRegionUrl'] else ""
+            np.city = convert_location(npi18n.location)
+            np.type = product['primaryCategoryUrl'] if product['primaryCategoryUrl'] else ""
+            np.price = 0
+            np.fixed_price = 0
+            np.duration = 1
+            np.guest_number_min = 1
+            np.guest_number_max = 10
+            np.commission = 0
+            np.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+            np.end_datetime = np.start_datetime + timedelta(weeks = 520)
+
+            np.save()
+            npi18n.product = np
+            npi18n.save()
+
+            extension = "." + product['image'].split(".")[-1]
+            response = requests.get(product['image'])
+            if response.status_code == 200:
+                image_io = BytesIO(response.content)
+                image_io.seek(0, 2)  # Seek to the end of the stream, so we can get its length with `image_io.tell()`
+                image_file = InMemoryUploadedFile(image_io, None, product['image'].split("/")[-1], "image", image_io.tell(), None, None)
+                saveExperienceImage(np, image_file, extension, 1)
+
+    return HttpResponseRedirect("/")
+
+def import_experienceoz_operators(request):
+    pass

@@ -145,4 +145,6 @@ urlpatterns = patterns('',
     url(r'^wechat_qr_payment/$', 'experiences.views.wechat_qr_payment', name='wechat_qr_payment'),
     url(r'^wechat/qr_payment_notify/$', 'experiences.views.wechat_qr_payment_notify', name='wechat_qr_payment_notify'),
     url(r'^wechat_qr_payment_query/(?P<out_trade_no>.*)/$', 'experiences.views.wechat_qr_payment_query', name='wechat_qr_payment_query'),
+    url(r'^import_experienceoz_products/$', 'import_from_partners.views.import_experienceoz_products', name='import_experienceoz_products'),
+    url(r'^import_experienceoz_operators/$', 'import_from_partners.views.import_experienceoz_operators', name='import_experienceoz_operators'),
 )
