@@ -5,17 +5,23 @@
 
 // Custom itinerary homepage
 .custom-itinerary {
-  background-size: contain;
+  background-image: url(../../img/itinerary_banner.gif);
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-color: white;
   position: relative;
   height: 220px;
-  @include media('>tablet') {
-    border-style: solid;
-    border-width: 1px;
-    border-color: $light-grey;
-    border-radius: 3px;
+  border: 5px solid $slate-grey;
+  h2, h3 {
+    max-width: 160px;
+    color: $slate-grey;
+    text-align: center;
+    margin: 20px auto;
+  }
+  @include media('>phone', '<=tablet') {
+    background-size: contain;
+    background-image: url(../../img/itinerary_banner_wide.gif);
   }
   .request-btn {
     position: absolute;
@@ -24,11 +30,10 @@
     right: 0;
     margin-left: auto;
     margin-right: auto;
-    width: 210px;
-    height: 45px;
-
+    width: 150px;
+    height: 40px;
+    border-radius: 0;
     @include media('>tablet', '<desktop') {
-      width: 150px;
       bottom: 30px;
     }
   }
@@ -50,6 +55,39 @@
     border-width: 1px;
     border-color: $light-grey;
     border-radius: 3px;
+  }
+}
+
+.custom-itinerary-wide {
+  background-image: url(../../img/itinerary_banner_wide.gif);
+  background-color: white;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: 5px solid $slate-grey;
+  height: 200px;
+  margin-top: 15px;
+  margin-bottom: 30px;
+  position: relative;
+  h2, h3 {
+    max-width: 180px;
+    color: $slate-grey;
+    text-align: center;
+    margin: 20px auto;
+  }
+  @include media('<phone') {
+    background-image: url(../../img/itinerary_banner.gif);
+  }
+  .request-btn {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: 150px;
+    height: 4d0px;
+    border-radius: 0;
   }
 }
 

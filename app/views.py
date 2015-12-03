@@ -141,6 +141,23 @@ def home(request):
 
     return render_to_response('app/index.html', {'form': form}, context)
 
+def campaign(request):
+    family = AbstractExperience.objects.filter(id__in=[2611,2561,2581])
+    romance = AbstractExperience.objects.filter(id__in=[3031,2411,2341])
+    culture = AbstractExperience.objects.filter(id__in=[2871,991,2171])
+    outdoor = AbstractExperience.objects.filter(id__in=[2141,2371,2241])
+    extreme = AbstractExperience.objects.filter(id__in=[2681,2801,2481])
+    photography = AbstractExperience.objects.filter(id__in=[872,2921,1111])
+    topics = [family, romance, culture, outdoor, extreme, photography]
+    titles = [_('Bring the Kids'), _('Honeymoon'), _('Local Culture'), _('Outdoor'), _('Extreme Experiences'), _('Photography Worthy')]
+    context = RequestContext(request, {
+        'topicList': zip(titles, topics),
+        'GEO_POSTFIX': settings.GEO_POSTFIX,
+        'LANGUAGE': settings.LANGUAGE_CODE
+    })
+    set_initial_currency(request)
+    return render_to_response('app/campaign.html', context)
+
 def contact(request):
     """Renders the contact page."""
     assert isinstance(request, HttpRequest)

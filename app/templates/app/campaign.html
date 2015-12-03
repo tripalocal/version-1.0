@@ -1,0 +1,60 @@
+{% extends "app/layout.html" %}
+{% load mathfilters %}
+{% load i18n %}
+
+{% block head %}
+{% load staticfiles %}
+<title></title>
+<link href="{% static 'app/content/campaign.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+  <img src="{% static 'app/img/campaign_banner.png' %}" alt="">
+</div>
+<div class="bar-primary">
+  <p>
+    {% trans "Most popular destinations" %}
+  </p>
+  <p>
+    <a href="{{GEO_POSTFIX}}product/Melbourne">{% trans "Melbourne" %}</a> | <a href="{{GEO_POSTFIX}}product/Sydney">{% trans "Sydney" %}</a> | <a href="{{GEO_POSTFIX}}product/Brisbane">{% trans "Brisbane" %}</a> | <a href="{{GEO_POSTFIX}}product/Goldcoast">{% trans  "Gold Coast" %}</a>
+  </p>
+</div>
+<div class="container">
+
+  {% for title, topic in topicList %}
+  <div class="row">
+    <h1>{{ title }}</h1>
+    {% for experience in topic %}
+    <div class="col-sm-4">
+      <div class="exp-box">
+        <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
+          <div class="listing-img" style="background-image:url({{ MEDIA_URL }}{{ experience.image }});">
+            <div class="price-box">
+              {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:experience.commission|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
+            </div>
+          </div>
+        </a>
+        <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ experience.title }} </h3></a>
+        <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ experience.description }}</p>
+        <div class="listing-footer">
+          {%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
+          {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}&#8226; <span style="font-weight:500;">{% trans 'Private' %}</span>{% endif %} &#8226; {{experience.city}}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+  <div class="custom-itinerary-wide">
+    <h2>
+      {% trans "Australia and New Zealand <br> Custom Itineraries" %}
+    </h2>
+    <h3>
+      {% trans "Save time and effort and let us build your dream trip!" %}
+    </h3>
+    <a href="{{GEO_POSTFIX}}itinerary/request" class="btn btn-dark request-btn">{% trans 'Request a trip' %}</a>
+  </div>
+</div>
+{% endblock %}

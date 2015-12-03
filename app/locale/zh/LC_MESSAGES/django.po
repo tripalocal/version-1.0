@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-26 18:01+1100\n"
+"POT-Creation-Date: 2015-12-03 14:55+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,6 +94,59 @@ msgid ""
 "We hope to bring you on this journey with us. Go on, see it and experience "
 "it like a local!"
 msgstr "我们欢迎您加入到我们的行列，与我们一起寻找最原汁原味的旅行。"
+
+#: app/templates/app/campaign.html:17
+msgid "Most popular destinations"
+msgstr "最热门路线"
+
+#: app/templates/app/campaign.html:20 app/views.py:47
+msgid "Melbourne"
+msgstr "墨尔本"
+
+#: app/templates/app/campaign.html:20 app/views.py:47
+msgid "Sydney"
+msgstr "悉尼"
+
+#: app/templates/app/campaign.html:20 app/views.py:47
+msgid "Brisbane"
+msgstr "布里斯班"
+
+#: app/templates/app/campaign.html:20 app/views.py:49
+msgid "Gold Coast"
+msgstr "黄金海岸"
+
+#: app/templates/app/campaign.html:34
+msgid "From"
+msgstr " "
+
+#: app/templates/app/campaign.html:34
+#, python-format
+msgid " %(currency)s/person "
+msgstr " %(currency)s/人 起"
+
+#: app/templates/app/campaign.html:41
+msgid "hrs"
+msgstr "小时"
+
+#: app/templates/app/campaign.html:41
+msgid "days"
+msgstr "天"
+
+#: app/templates/app/campaign.html:42
+msgid "Private"
+msgstr "私人团"
+
+#: app/templates/app/campaign.html:52 app/templates/app/index.html:133
+msgid "Australia and New Zealand <br> Custom Itineraries"
+msgstr "澳新路线<br>私人订制 "
+
+#: app/templates/app/campaign.html:55 app/templates/app/index.html:136
+msgid "Save time and effort and let us build your dream trip!"
+msgstr "最本土，最科学的路线 我要订制"
+
+#: app/templates/app/campaign.html:57 app/templates/app/index.html:138
+msgid "Request a trip"
+msgstr "订制行程"
 
 #: app/templates/app/contactus.html:6
 msgid "Tripalocal | Contact us"
@@ -183,7 +236,7 @@ msgstr "发现当地的吃喝玩乐"
 msgid "Bring<br>the Kids"
 msgstr "亲子游"
 
-#: app/templates/app/index.html:80
+#: app/templates/app/index.html:80 app/views.py:152
 msgid "Honeymoon"
 msgstr "蜜月游"
 
@@ -191,7 +244,7 @@ msgstr "蜜月游"
 msgid "Local<br>Culture"
 msgstr "风土人情"
 
-#: app/templates/app/index.html:97
+#: app/templates/app/index.html:97 app/views.py:152
 msgid "Outdoor"
 msgstr "户外之旅"
 
@@ -203,39 +256,35 @@ msgstr "刺激体验"
 msgid "Photography<br>Worthy"
 msgstr "风光摄影"
 
-#: app/templates/app/index.html:132
-msgid "Request a trip"
-msgstr "订制行程"
-
-#: app/templates/app/index.html:179
+#: app/templates/app/index.html:185
 msgid "Travel with Tripalocal"
 msgstr "本土客带您去旅行"
 
-#: app/templates/app/index.html:180
+#: app/templates/app/index.html:186
 msgid "See how it works"
 msgstr "了解更多"
 
-#: app/templates/app/index.html:192
+#: app/templates/app/index.html:198
 msgid "Your browser does not support the video tag."
 msgstr "您的浏览器不支持video标签"
 
-#: app/templates/app/index.html:199
+#: app/templates/app/index.html:205
 msgid "Our Community"
 msgstr "我们的社区"
 
-#: app/templates/app/index.html:203
+#: app/templates/app/index.html:209
 msgid "Travelling"
 msgstr "旅行心得"
 
-#: app/templates/app/index.html:208
+#: app/templates/app/index.html:214
 msgid "Hosting"
 msgstr "旅游达人"
 
-#: app/templates/app/index.html:255
+#: app/templates/app/index.html:261
 msgid " From "
 msgstr "到达日期"
 
-#: app/templates/app/index.html:256
+#: app/templates/app/index.html:262
 msgid " To "
 msgstr "离开日期"
 
@@ -643,25 +692,9 @@ msgstr "您用 %(user_email)注册的账户已经激活。"
 msgid "Show me around"
 msgstr "去主页逛逛"
 
-#: app/views.py:47
-msgid "Melbourne"
-msgstr "墨尔本"
-
-#: app/views.py:47
-msgid "Sydney"
-msgstr "悉尼"
-
-#: app/views.py:47
-msgid "Brisbane"
-msgstr "布里斯班"
-
 #: app/views.py:48
 msgid "Cairns"
 msgstr "凯恩斯"
-
-#: app/views.py:49
-msgid "Gold Coast"
-msgstr "黄金海岸"
 
 #: app/views.py:49
 msgid "Hobart"
@@ -699,15 +732,39 @@ msgstr "奥克兰"
 msgid "Wellington"
 msgstr "惠灵顿"
 
-#: app/views.py:229
+#: app/views.py:152
+#, fuzzy
+#| msgid "Bring<br>the Kids"
+msgid "Bring the Kids"
+msgstr "亲子游"
+
+#: app/views.py:152
+#, fuzzy
+#| msgid "Local<br>Culture"
+msgid "Local Culture"
+msgstr "风土人情"
+
+#: app/views.py:152
+#, fuzzy
+#| msgid "Extreme<br>Experiences"
+msgid "Extreme Experiences"
+msgstr "刺激体验"
+
+#: app/views.py:152
+#, fuzzy
+#| msgid "Photography<br>Worthy"
+msgid "Photography Worthy"
+msgstr "风光摄影"
+
+#: app/views.py:246
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 您的帐户已经成功激活"
 
-#: app/views.py:708
+#: app/views.py:725
 msgid "Image size exceeds the limit"
 msgstr "文件大小超过上限"
 
-#: app/views.py:710
+#: app/views.py:727
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
 
@@ -750,9 +807,6 @@ msgstr "不支持该文件类型"
 
 #~ msgid "Hopeless<br>Romance"
 #~ msgstr "蜜月游"
-
-#~ msgid " %(currency)s/person "
-#~ msgstr " %(currency)s/人 起"
 
 #~ msgid "%(country)s"
 #~ msgstr "%(country)s"

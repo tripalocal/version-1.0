@@ -1,0 +1,74 @@
+/*
+  for:
+  campaign.html
+
+*/
+@import
+  '../../vendor/include-media',
+  '../../utils/variables',
+  '../../utils/mixins',
+  '../../utils/functions',
+  '../../utils/placeholders';
+
+h1 {
+  font-family: $font-stack-homepage;
+  text-align: center;
+}
+
+.jumbotron {
+  background-image: url(../img/campaign_bg.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 380px;
+  margin-bottom: 130px;
+  @include media('<desktop') {
+    height: 300px;
+    margin-bottom: 90px;
+  }
+  @include media('<tablet') {
+    height: 230px;
+    margin-bottom: 80px;
+  }
+  @include media('<phablet') {
+    height: 180px;
+    margin-bottom: 75px;
+  }
+  @include media('<phone') {
+    height: 150px;
+  }
+  img {
+    @include media('<desktop') {
+      height: 350px;
+    }
+    @include media('<tablet') {
+      height: 280px;
+    }
+    @include media('<phablet') {
+      height: 220px;
+    }
+    @include media('<phone') {
+      height: auto;
+      width: 100%;
+    }
+  }
+}
+
+.bar-primary {
+  width: 100%;
+  text-align: center;
+  color: white;
+  background-color: $primary-color;
+  padding: 15px;
+  font-size: 16px;
+  @include media('<phablet') {
+    font-size: 14px;
+  }
+  a {
+    color: inherit;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;    
+    }
+  }
+}

@@ -171,7 +171,7 @@ function initializeClock(id, endtime){
 }
 
 $(document).ready(function() {
-  {% if not full_price %}
+  {% if not full_price and not preview %}
   var deadline = "{{discount_deadline}}";
   initializeClock('clock', deadline);
   {% endif %}
