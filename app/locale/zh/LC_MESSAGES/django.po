@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-03 16:52+1100\n"
+"POT-Creation-Date: 2015-12-04 14:48+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -115,38 +115,38 @@ msgstr "布里斯班"
 msgid "Gold Coast"
 msgstr "黄金海岸"
 
-#: app/templates/app/campaign.html:37
+#: app/templates/app/campaign.html:46
 msgid "From"
 msgstr " "
 
-#: app/templates/app/campaign.html:37
+#: app/templates/app/campaign.html:46
 #, python-format
 msgid " %(currency)s/person "
 msgstr " %(currency)s/人 起"
 
-#: app/templates/app/campaign.html:44
+#: app/templates/app/campaign.html:53
 msgid "hrs"
 msgstr "小时"
 
-#: app/templates/app/campaign.html:44
+#: app/templates/app/campaign.html:53
 msgid "days"
 msgstr "天"
 
-#: app/templates/app/campaign.html:45
+#: app/templates/app/campaign.html:54
 msgid "Private"
 msgstr "私人团"
 
-#: app/templates/app/campaign.html:55 app/templates/app/index.html:133
+#: app/templates/app/campaign.html:64 app/templates/app/index.html:133
 msgid "Australia and New Zealand <br> Custom Itineraries"
 msgstr "澳新路线<br>私人订制 "
 
-#: app/templates/app/campaign.html:58 app/templates/app/index.html:136
+#: app/templates/app/campaign.html:67 app/templates/app/index.html:136
 msgid "Save time and effort and let us build your dream trip!"
-msgstr "最本土，最科学的路线 我要订制"
+msgstr "最本土，最科学的路线"
 
-#: app/templates/app/campaign.html:60 app/templates/app/index.html:138
+#: app/templates/app/campaign.html:69 app/templates/app/index.html:138
 msgid "Request a trip"
-msgstr "我要订制"
+msgstr "我要定制"
 
 #: app/templates/app/contactus.html:6
 msgid "Tripalocal | Contact us"
