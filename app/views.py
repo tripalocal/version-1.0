@@ -534,7 +534,7 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
         new_registereduser = RegisteredUser(user_id = user.id)
     new_registereduser.phone_number = kwargs['phone_number'] if 'phone_number' in kwargs else ""
     new_registereduser.save()
-    if 'image_url' in kwargs:
+    if 'image_url' in kwargs and kwargs['image_url'] is not None and len(kwargs['image_url'])>0:
         extension = "." + kwargs['image_url'].split(".")[-1]
         response = requests.get(kwargs['image_url'])
         if response.status_code == 200:
@@ -543,7 +543,7 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
             image_file = InMemoryUploadedFile(image_io, None, kwargs['image_url'].split("/")[-1], "image", image_io.tell(), None, None)
             saveProfileImage(user, new_registereduser, image_file)
         
-    if 'bio' in kwargs:
+    if 'bio' in kwargs and kwargs['bio'] is not None and len(kwargs['bio'])>0:
         save_user_bio(user.registereduser, kwargs['bio'], settings.LANGUAGES[0][0])
 
     username = user.username
