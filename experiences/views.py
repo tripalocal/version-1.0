@@ -1743,24 +1743,16 @@ def create_experience(request, id=None):
                     extension = extension.lower()
                     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                         filename = 'host_id' + str(user.id) + '_' + str(index) + extension
-                        destination = open(dirname + filename, 'wb+')
-                        for chunk in request.FILES['host_id_photo_'+str(index)].chunks():
-                            destination.write(chunk)
-                        destination.close()
 
-                        #copy to the other website -- folder+file
-                        if settings.LANGUAGES[0][0] == "en":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts_id/' + str(user.id) + '/'
-                        elif settings.LANGUAGES[0][0] == "zh":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/hosts_id/' + str(user.id) + '/'
-                        if not os.path.isdir(dirname_other):
-                            os.mkdir(dirname_other)
-                        subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
-
-                        if not len(user.userphoto_set.filter(name__startswith=filename))>0:
+                        photo = user.userphoto_set.filter(name__startswith=filename)
+                        if not len(photo)>0:
                             photo = UserPhoto(name = filename, directory = 'hosts_id/' + str(user.id) + '/',
                                           image = 'hosts_id/' + str(user.id) + '/' + filename, user = user)
-                            photo.save()
+                        else:
+                            photo = photo[0]
+                            photo.image.delete()
+                        photo.image = request.FILES['host_id_photo_'+str(index)]
+                        photo.save()
 
             #save profile image
             if 'host_image' in request.FILES:

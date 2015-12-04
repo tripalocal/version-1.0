@@ -42,9 +42,10 @@ class WechatBooking(models.Model):
 class Provider(models.Model):
     user = models.OneToOneField(User, null=True)
     company = models.CharField(max_length=100)
-    website = models.CharField(max_length=50, blank=True)
-    email = models.CharField(max_length=30, blank=True)
+    website = models.CharField(max_length=254, blank=True)
+    email = models.CharField(max_length=100, blank=True)
     phone_number = models.CharField(max_length=15, blank=True)
+    partner = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.company

@@ -1,10 +1,14 @@
 import json, os, collections, requests, pytz
+from allauth.account.signals import user_signed_up
 from datetime import *
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponseRedirect
-from experiences.models import NewProduct, NewProductI18n
+from experiences.models import NewProduct, NewProductI18n, Provider
 from experiences.views import saveExperienceImage
 from io import BytesIO
+
+PARTNER_IDS = {"experienceoz":"001"}
 
 def convert_location(city):
     locations = {'cairns':'Cairns','port-douglas':'Cairns','sydney':'Sydney','melbourne':'Melbourne',
@@ -25,7 +29,7 @@ def import_experienceoz_products(request):
     if not request.user.is_authenticated() or not request.user.is_staff:
         return HttpResponseRedirect("/")
 
-    partner_id = "001"
+    partner_id = PARTNER_IDS['experienceoz']
     #the ids of products imported from partners will be in the format:
     #<the original id at the partner side><partner_id><length_of_partner_id>
     #e.g., 59340013
@@ -98,4 +102,42 @@ def import_experienceoz_products(request):
     return HttpResponseRedirect("/")
 
 def import_experienceoz_operators(request):
-    pass
+    if not request.user.is_authenticated() or not request.user.is_staff:
+        return HttpResponseRedirect("/")
+
+    partner_id = PARTNER_IDS['experienceoz']
+    folder = os.path.join('C:\\experienceoz\\', 'experienceoz_operators\\')
+    for filename in os.listdir(folder):
+        if os.path.isfile(os.path.join(folder, filename)):
+            with open(os.path.join(folder, filename), "r") as file:
+                operators = json.loads(file.read())['operators']
+                for operator in operators:
+                    oid = int(str(operator['id']) + partner_id + str(len(partner_id)))
+                    email = "experienceoz_" + str(operator['id']) + ".user@tripalocal.com"
+                    user = User.objects.filter(id = oid)
+                    if len(user) > 0:
+                        user = user[0]
+                    else:
+                        user = User(id = oid, email = email, username = "experienceoz_" + str(operator['id']),
+                                    first_name = operator['name'][:30] if operator['name'] else "",
+                                    last_name = partner_id,
+                                    date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC))
+                    user.save()
+                    user.set_password(user.username)
+                    user.save()
+                    user_signed_up.send(sender=user.__class__, request=request, user=user,
+                                        partner_operator = True,
+                                        image_url = operator['image'] if operator['image'] else "",
+                                        bio = operator['summary'] if operator['summary'] else "")
+                    if hasattr(user, "provider"):
+                        provider = user.provider
+                    else:
+                        provider = Provider()
+                        provider.user = user
+                    provider.partner = partner_id
+                    provider.company = operator['name'] if operator['name'] else ""
+                    provider.website = operator['urlSegment'] if operator['urlSegment'] else ""
+                    provider.email = user.email
+                    provider.save()
+
+    return HttpResponseRedirect("/")

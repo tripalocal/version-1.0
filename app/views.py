@@ -37,6 +37,8 @@ from urllib.parse import quote_plus
 import json, os
 import xmltodict
 from experiences.utils import *
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
@@ -530,19 +532,59 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
         new_registereduser = RegisteredUser.objects.get(user_id = user.id)
     except RegisteredUser.DoesNotExist:
         new_registereduser = RegisteredUser(user_id = user.id)
-        if 'phone_number' in kwargs:
-            new_registereduser.phone_number = kwargs['phone_number']
-        new_registereduser.save()
+    new_registereduser.phone_number = kwargs['phone_number'] if 'phone_number' in kwargs else ""
+    new_registereduser.save()
+    if 'image_url' in kwargs:
+        extension = "." + kwargs['image_url'].split(".")[-1]
+        response = requests.get(kwargs['image_url'])
+        if response.status_code == 200:
+            image_io = BytesIO(response.content)
+            image_io.seek(0, 2)  # Seek to the end of the stream, so we can get its length with `image_io.tell()`
+            image_file = InMemoryUploadedFile(image_io, None, kwargs['image_url'].split("/")[-1], "image", image_io.tell(), None, None)
+            saveProfileImage(user, new_registereduser, image_file)
+        
+    if 'bio' in kwargs:
+        save_user_bio(user.registereduser, kwargs['bio'], settings.LANGUAGES[0][0])
 
     username = user.username
+    if kwargs.get('partner_operator', False):
+        new_email = Users.objects.filter(id=user.email)
+        if len(new_email) > 0:
+            new_email = new_email[0]
+            new_alias = Aliases.objects.filter(mail = new_email.id)
+            if len(new_alias):
+                new_alias = new_alias[0]
+                new_alias.destination = "enquiries@tripalocal.com, " + new_email.id
+            else:
+                new_alias = Aliases(mail = new_email.id, destination = "enquiries@tripalocal.com, " + new_email.id)
+            new_alias.save()
+        else:
+            new_email = Users(id = user.email,
+                              name = username,
+                              maildir = username + "/")
+            new_email.save()
 
-    new_email = Users(id = email_account_generator() + ".user@tripalocal.com",
-                        name = username,
-                        maildir = username + "/")
-    new_email.save()
+            new_alias = Aliases(mail = new_email.id, destination = "enquiries@tripalocal.com, " + new_email.id)
+            new_alias.save()
+    else:
+        new_email = Users.objects.filter(id=user.email)
+        if len(new_email) > 0:
+            new_email = new_email[0]
+            new_alias = Aliases.objects.filter(mail = new_email.id)
+            if len(new_alias):
+                new_alias = new_alias[0]
+                new_alias.destination = "enquiries@tripalocal.com, " + new_email.id
+            else:
+                new_alias = Aliases(mail = new_email.id, destination = "enquiries@tripalocal.com, " + new_email.id)
+            new_alias.save()
+        else:
+            new_email = Users(id = email_account_generator() + ".user@tripalocal.com",
+                              name = username,
+                              maildir = username + "/")
+            new_email.save()
 
-    new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
-    new_alias.save()
+            new_alias = Aliases(mail = new_email.id, destination = user.email + ", " + new_email.id)
+            new_alias.save()
 
     if not settings.DEVELOPMENT:
         if len(settings.ADMINS) == 0:
