@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-04 14:48+1100\n"
+"POT-Creation-Date: 2015-12-07 13:36+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,19 +99,19 @@ msgstr "我们欢迎您加入到我们的行列，与我们一起寻找最原汁
 msgid "Most popular destinations"
 msgstr "最热门目的地"
 
-#: app/templates/app/campaign.html:20 app/views.py:47
+#: app/templates/app/campaign.html:20 app/views.py:49
 msgid "Melbourne"
 msgstr "墨尔本"
 
-#: app/templates/app/campaign.html:20 app/views.py:47
+#: app/templates/app/campaign.html:20 app/views.py:49
 msgid "Sydney"
 msgstr "悉尼"
 
-#: app/templates/app/campaign.html:20 app/views.py:47
+#: app/templates/app/campaign.html:20 app/views.py:49
 msgid "Brisbane"
 msgstr "布里斯班"
 
-#: app/templates/app/campaign.html:20 app/views.py:49
+#: app/templates/app/campaign.html:20 app/views.py:51
 msgid "Gold Coast"
 msgstr "黄金海岸"
 
@@ -692,55 +692,55 @@ msgstr "您用 %(user_email)注册的账户已经激活。"
 msgid "Show me around"
 msgstr "去主页逛逛"
 
-#: app/views.py:48
+#: app/views.py:50
 msgid "Cairns"
 msgstr "凯恩斯"
 
-#: app/views.py:49
+#: app/views.py:51
 msgid "Hobart"
 msgstr "霍巴特"
 
-#: app/views.py:49
+#: app/views.py:51
 msgid "Adelaide"
 msgstr "阿德莱德"
 
-#: app/views.py:50
+#: app/views.py:52
 msgid "Darwin"
 msgstr "达尔文"
 
-#: app/views.py:50
+#: app/views.py:52
 msgid "Alice Springs"
 msgstr "艾利斯斯普林斯"
 
-#: app/views.py:51
+#: app/views.py:53
 msgid "Perth"
 msgstr ""
 
-#: app/views.py:52
+#: app/views.py:54
 msgid "Christchurch"
 msgstr "基督城"
 
-#: app/views.py:52
+#: app/views.py:54
 msgid "Queenstown"
 msgstr "皇后镇"
 
-#: app/views.py:53
+#: app/views.py:55
 msgid "Auckland"
 msgstr "奥克兰"
 
-#: app/views.py:53
+#: app/views.py:55
 msgid "Wellington"
 msgstr "惠灵顿"
 
-#: app/views.py:229
+#: app/views.py:231
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 您的帐户已经成功激活"
 
-#: app/views.py:708
+#: app/views.py:750
 msgid "Image size exceeds the limit"
 msgstr "文件大小超过上限"
 
-#: app/views.py:710
+#: app/views.py:752
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
 
