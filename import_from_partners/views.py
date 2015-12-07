@@ -122,8 +122,8 @@ def import_experienceoz_operators(request):
     folder = os.path.join(settings.PROJECT_ROOT, 'import_from_partners', 'experienceoz_operators')
     for filename in os.listdir(folder):
         if os.path.isfile(os.path.join(folder, filename)):
-            with open(os.path.join(folder, filename), "r") as file:
-                operators = json.loads(file.read())['operators']
+            with open(os.path.join(folder, filename), "rb") as file:
+                operators = json.loads(file.read().decode('utf-8'))['operators']
                 for operator in operators:
                     create_operator(operator, partner_id, request)
 
