@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from experiences.models import NewProduct, NewProductI18n, Provider
 from experiences.views import saveExperienceImage
 from io import BytesIO
+from Tripalocal_V1 import settings
 
 PARTNER_IDS = {"experienceoz":"001"}
 
@@ -40,7 +41,7 @@ def import_experienceoz_products(request):
             "primaryRegionId", "primaryRegionUrl", "primaryCategoryId", "primaryCategoryUrl",\
             "timestamp"]
 
-    file_name = os.path.join('C:\\experienceoz\\', 'experienceoz.json')
+    file_name = os.path.join(settings.PROJECT_ROOT, 'import_from_partners', 'experienceoz.json')
     missing_operators = []
     with open(file_name, "rb") as file:
         products = json.loads(file.read().decode("utf-8"))
@@ -52,64 +53,65 @@ def import_experienceoz_products(request):
 
             #add str(len(partner_id))), in case one partner's id is a postfix of another id
             pid = int(str(product['id']) + partner_id + str(len(partner_id)))
-            np = NewProduct.objects.filter(abstractexperience_ptr_id = pid)
-            if len(np) > 0:
-                np = np[0]
-            else:
-                np = NewProduct()
-                np.id = pid
-
-            np.partner = partner_id
-            npi18n = np.newproducti18n_set.all()
-            if len(npi18n) > 0:
-                npi18n = npi18n[0]
-            else:
-                npi18n = NewProductI18n()
-            npi18n.language = "cn"
-            npi18n.title = product['name'] if product['name'] else ""
-            npi18n.background_info = product['urlSegment'] if product['urlSegment'] else ""
-            np.book_in_advance = product['bookingRequired']
-            if product['bookingNotesRequired']:
-                npi18n.ticket_use_instruction = product['bookingNotesPlaceholder'] if product['bookingNotesPlaceholder'] else ""
-            npi18n.description = product['description'] if product['description'] else ""
-            npi18n.combination_options = product['productOptionGroups'] if product['productOptionGroups'] else ""
-            npi18n.service = product['moreInfo'] if product['moreInfo'] else ""
-            npi18n.notice = product['hotDealMessage'] if product['hotDealMessage'] else ""
-            npi18n.location = product['primaryRegionUrl'] if product['primaryRegionUrl'] else ""
-            np.city = convert_location(npi18n.location)
-            np.type = product['primaryCategoryUrl'] if product['primaryCategoryUrl'] else ""
-            np.price = 0
-            np.fixed_price = 0
-            np.duration = 1
-            np.guest_number_min = 1
-            np.guest_number_max = 10
-            np.commission = 0
-            np.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
-            np.end_datetime = np.start_datetime + timedelta(weeks = 520)
-
             oid = int(str(product['operatorId']) + partner_id + str(len(partner_id)))
             try:
-                np.suppliers.add(Provider.objects.get(user_id=oid))
+                operator = Provider.objects.get(user_id=oid)
             except Provider.DoesNotExist:
                 operator = get_operator(product['operatorUrl'], partner_id, request)
-                if operator:
+            if operator:
+                np = NewProduct.objects.filter(abstractexperience_ptr_id = pid)
+                if len(np) > 0:
+                    np = np[0]
+                else:
+                    np = NewProduct()
+                    np.id = pid
+
+                np.partner = partner_id
+                npi18n = np.newproducti18n_set.all()
+                if len(npi18n) > 0:
+                    npi18n = npi18n[0]
+                else:
+                    npi18n = NewProductI18n()
+                npi18n.language = "cn"
+                npi18n.title = product['name'] if product['name'] else ""
+                npi18n.background_info = product['urlSegment'] if product['urlSegment'] else ""
+                np.book_in_advance = product['bookingRequired']
+                if product['bookingNotesRequired']:
+                    npi18n.ticket_use_instruction = product['bookingNotesPlaceholder'] if product['bookingNotesPlaceholder'] else ""
+                npi18n.description = product['description'] if product['description'] else ""
+                npi18n.combination_options = product['productOptionGroups'] if product['productOptionGroups'] else ""
+                npi18n.service = product['moreInfo'] if product['moreInfo'] else ""
+                npi18n.notice = product['hotDealMessage'] if product['hotDealMessage'] else ""
+                npi18n.location = product['primaryRegionUrl'] if product['primaryRegionUrl'] else ""
+                np.city = convert_location(npi18n.location)
+                np.type = product['primaryCategoryUrl'] if product['primaryCategoryUrl'] else ""
+                np.price = 0
+                np.fixed_price = 0
+                np.duration = 1
+                np.guest_number_min = 1
+                np.guest_number_max = 10
+                np.commission = 0
+                np.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+                np.end_datetime = np.start_datetime + timedelta(weeks = 520)
+
+                np.save()
+                npi18n.product = np
+                npi18n.save()
+                if len(np.suppliers.filter(user_id=oid)) == 0:
                     np.suppliers.add(operator)
-                elif product['operatorId'] not in missing_operators:
-                    missing_operators.append(product['operatorId'])
-                    print(product['operatorId'])
-            np.save()
-            npi18n.product = np
-            npi18n.save()
+                    np.save()
 
-            extension = "." + product['image'].split(".")[-1]
-            response = requests.get(product['image'])
-            if response.status_code == 200:
-                image_io = BytesIO(response.content)
-                image_io.seek(0, 2)  # Seek to the end of the stream, so we can get its length with `image_io.tell()`
-                image_file = InMemoryUploadedFile(image_io, None, product['image'].split("/")[-1], "image", image_io.tell(), None, None)
-                saveExperienceImage(np, image_file, extension, 1)
+                extension = "." + product['image'].split(".")[-1]
+                response = requests.get(product['image'])
+                if response.status_code == 200:
+                    image_io = BytesIO(response.content)
+                    image_io.seek(0, 2)  # Seek to the end of the stream, so we can get its length with `image_io.tell()`
+                    image_file = InMemoryUploadedFile(image_io, None, product['image'].split("/")[-1], "image", image_io.tell(), None, None)
+                    saveExperienceImage(np, image_file, extension, 1)
+            elif product['operatorId'] not in missing_operators:
+                missing_operators.append(product['operatorId'])
+                print(product['operatorId'])
 
-    print(*missing_operators, sep='\n', file="C:\\experienceoz\\missing_operators.txt")
     return HttpResponseRedirect("/")
 
 def import_experienceoz_operators(request):
@@ -117,7 +119,7 @@ def import_experienceoz_operators(request):
         return HttpResponseRedirect("/")
 
     partner_id = PARTNER_IDS['experienceoz']
-    folder = os.path.join('C:\\experienceoz\\', 'experienceoz_operators\\')
+    folder = os.path.join(settings.PROJECT_ROOT, 'import_from_partners', 'experienceoz_operators')
     for filename in os.listdir(folder):
         if os.path.isfile(os.path.join(folder, filename)):
             with open(os.path.join(folder, filename), "r") as file:
