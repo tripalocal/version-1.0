@@ -18,7 +18,7 @@ from django.contrib import admin
 from rest_framework.authtoken import views
 
 from app.decorators import superuser_required
-from custom_admin.views.main import BookingView, BookingArchiveView, ExperienceView, PaymentView, NewProductView, ItineraryView
+from custom_admin.views.main import BookingView, BookingArchiveView, ExperienceView, PaymentView, NewProductView, ItineraryView, PartnerProductView
 from django.conf.urls import *
 from django.views.i18n import javascript_catalog
 
@@ -128,6 +128,7 @@ urlpatterns = patterns('',
     url(r'^custom_admin/payment/$', PaymentView.as_view(), name='admin_payment'),
     url(r'^custom_admin/experience/$', ExperienceView.as_view(), name='admin_experience'),
     url(r'^custom_admin/newproduct/$', NewProductView.as_view(), name='admin_newproduct'),
+    url(r'^custom_admin/partnerproduct/$', PartnerProductView.as_view(), name='admin_partnerproduct'),
     url(r'^custom_admin/itinerary/$', ItineraryView.as_view(), name='admin_itinerary'),
     url(r'^multidaytrip/$','experiences.views.multi_day_trip'),
     url(r'^family/$','experiences.views.topic_family'),

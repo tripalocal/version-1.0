@@ -86,9 +86,39 @@ class NewProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     context_object_name = 'newproduct_list'
     paginate_by = None
 
+    def get_queryset(self):
+        return self.model.objects.filter(partner__isnull=True)
+
     def get_context_data(self, **kwargs):
         context = super(NewProductView, self).get_context_data(**kwargs)
         for exp in context['newproduct_list']:
+            exp.title = exp.get_information(settings.LANGUAGES[0][0]).title
+            exp.host = exp.get_host()
+        return context
+
+    @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
+    def post(self, request, **kwargs):
+        return self._process_request_with_general_return(request, model_class=NewProduct, **kwargs)
+
+    def _manipulate_post_status(self, request, experience, **kwargs):
+        experience.change_status(kwargs['form'].cleaned_data['status'])
+
+    def _manipulate_post_commission(self, request, experience, **kwargs):
+        experience.update_commission(kwargs['form'].cleaned_data['commission'])
+        return {'commission': kwargs['form'].cleaned_data['commission']}
+
+class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
+    model = NewProduct
+    template_name = 'custom_admin/partnerproduct.html'
+    context_object_name = 'partnerproduct_list'
+    paginate_by = None
+
+    def get_queryset(self):
+        return self.model.objects.exclude(partner__isnull=True)
+
+    def get_context_data(self, **kwargs):
+        context = super(PartnerProductView, self).get_context_data(**kwargs)
+        for exp in context['partnerproduct_list']:
             exp.title = exp.get_information(settings.LANGUAGES[0][0]).title
             exp.host = exp.get_host()
         return context
