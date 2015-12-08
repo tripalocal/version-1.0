@@ -15,6 +15,7 @@ from Tripalocal_V1 import settings
 
 import pytz
 from datetime import *
+from django.db.models import Q
 
 class AdminCommonOperation(object):
 
@@ -87,7 +88,7 @@ class NewProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     paginate_by = None
 
     def get_queryset(self):
-        return self.model.objects.filter(partner__isnull=True)
+        return self.model.objects.filter(Q(partner__isnull=True) | Q(partner__exact=''))
 
     def get_context_data(self, **kwargs):
         context = super(NewProductView, self).get_context_data(**kwargs)
@@ -114,7 +115,7 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     paginate_by = None
 
     def get_queryset(self):
-        return self.model.objects.exclude(partner__isnull=True)
+        return self.model.objects.exclude(partner__isnull=True).exclude(partner__exact='')
 
     def get_context_data(self, **kwargs):
         context = super(PartnerProductView, self).get_context_data(**kwargs)
