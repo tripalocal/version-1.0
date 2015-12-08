@@ -72,7 +72,7 @@ def import_experienceoz_products(request):
                     npi18n = npi18n[0]
                 else:
                     npi18n = NewProductI18n()
-                npi18n.language = "cn"
+                npi18n.language = "zh"
                 npi18n.title = product['name'] if product['name'] else ""
                 npi18n.background_info = product['urlSegment'] if product['urlSegment'] else ""
                 np.book_in_advance = product['bookingRequired']
