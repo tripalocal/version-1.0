@@ -19,7 +19,7 @@ class ForceDefaultLanguageMiddleware(object):
 class HandleExceptionMiddleware:
 
     def process_exception(self, request, exception):
-        if isinstance(exception, IOError) and 'request data read error' in unicode(exception):
+        if isinstance(exception, OSError) and 'request data read error' in unicode(exception):
             logging.getLogger("Tripalocal_V1").info('%s %s: %s: Request was canceled by the client.' % (
                     request.build_absolute_uri(), request.user, exception))
             return HttpResponseServerError()
