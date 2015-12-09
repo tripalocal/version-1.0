@@ -245,6 +245,7 @@ $(function() {
         $('html,body').animate({
             scrollTop: $("#step1").offset().top},
             'slow');
+        $("#navbar").fadeOut();
         $(".progress-bar").delay(500).fadeIn();
         $("#indicator1").delay(1000).addClass("active animated pulse infinite");
         $("#prev-btn1").delay(500).fadeIn("slow");
@@ -257,6 +258,7 @@ $(function() {
       $('html,body').animate({
           scrollTop: $("body").offset().top},
           'slow');
+          $("#navbar").fadeIn();
       $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp();
       $(".progress-bar").fadeOut();
     });
@@ -390,6 +392,7 @@ $(function() {
                           scrollTop: $("body").offset().top},
                           'slow');
                       $("#submit-btn").slideUp("slow");
+                      $("#navbar").fadeIn();
                   },
           error: function(e) {
                       $(".alert-danger").delay(2000).fadeIn();

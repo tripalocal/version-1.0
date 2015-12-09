@@ -17,6 +17,10 @@ body {
   display: none;
 }
 
+.navbar {
+  position: relative;
+}
+
 // Top search bar
 .basic-search {
   background-color: $off-white;
