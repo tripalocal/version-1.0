@@ -132,11 +132,9 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
   <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
   <script type="text/javascript" src="{% static 'experiences/scripts/jquery.dotdotdot.min.js' %}"></script>
-
+  <script type="text/javascript" src="{% static 'app/scripts/wow.min.js' %}"></script>
 
 <script charset="utf-8" type="text/javascript">
-  $("#navbar").removeClass("navbar-static-top");
-  $("#navbar").addClass("navbar-fixed-top");
   $(document).ajaxStart(function() {
 		$(".loading").show();
 	});
@@ -151,6 +149,16 @@
 </script>
 
 <script charset="utf-8" type="text/javascript">
+wow = new WOW(
+  {
+    boxClass:     'scroll-animate',
+    animateClass: 'animated',
+    offset:       100,
+    mobile:       true,
+    live:         true
+  }
+)
+wow.init();
     function getCityName(city)
     {
         cities = $('.item');

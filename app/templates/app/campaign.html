@@ -39,7 +39,7 @@
     <h1><a href="{{GEO_POSTFIX}}{{link}}">{{ title }}</a></h1>
     {% for experience in topic %}
     <div class="col-sm-4">
-      <div class="exp-box">
+      <div class="exp-box scroll-animate slideInUp">
         <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
           <div class="listing-img" style="background-image:url({{ MEDIA_URL }}{{ experience.image }});">
             <div class="price-box">
@@ -59,7 +59,7 @@
   </div>
   {% endfor %}
 
-  <div class="custom-itinerary-wide">
+  <div class="custom-itinerary-wide scroll-animate slideInUp">
     <h2>
       {% trans "Australia and New Zealand <br> Custom Itineraries" %}
     </h2>
@@ -69,4 +69,19 @@
     <a href="{{GEO_POSTFIX}}itinerary/request" class="btn btn-dark request-btn">{% trans 'Request a trip' %}</a>
   </div>
 </div>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript" src="{% static 'app/scripts/wow.min.js' %}"></script>
+<script>
+wow = new WOW(
+  {
+    boxClass:     'scroll-animate',
+    animateClass: 'animated',
+    offset:       100,
+    mobile:       true,
+    live:         true
+  }
+)
+wow.init();
+</script>
 {% endblock %}

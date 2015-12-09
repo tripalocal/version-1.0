@@ -7,12 +7,12 @@
     <div id="experience-results" class="experience-results">
         {% for experience, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
         {% if forloop.counter == 5 %}
-        <div class="exp-box custom-itinerary-searchpage" >
+        <div class="exp-box custom-itinerary-searchpage scroll-animate fadeInUp" >
           <button class="btn btn-primary request-btn" onclick="window.location.href = '{{GEO_POSTFIX}}itinerary/request/';">{% trans "Request a trip" %}</button>
         </div>
         {% endif %}
 
-        <div class="exp-box">
+        <div class="exp-box scroll-animate fadeInUp">
             <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
                 <div class="listing-img" style="background-image:url({{ MEDIA_URL }}{{ BGImageURL }});">
                     <div class="price-box">
