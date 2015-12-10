@@ -5,6 +5,7 @@
 
 @import
   '../../vendor/include-media',
+  '../../vendor/animate',
   '../../utils/variables',
   '../../utils/mixins',
   '../../utils/functions',
@@ -104,6 +105,7 @@ h1 {
 
 // Brand logo with centred search bar
 .jumbotron {
+  background-attachment: fixed;
 
   .homepage-logo {
     height: 200px;
@@ -292,6 +294,7 @@ h1 {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
+    background-attachment: fixed;
     position: relative;
     display: table;
   }

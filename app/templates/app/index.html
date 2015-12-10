@@ -68,21 +68,21 @@
             <div class="container">
                 <div class="row">
                   <div class="col-sm-4">
-                    <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/bring_the_kids_sm.jpg' %});">
+                    <div class="city scroll-animate fadeInUp" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/bring_the_kids_sm.jpg' %});">
                         <a class="box-link" href="{{GEO_POSTFIX}}family">
                             <h1>{% trans "Bring<br>the Kids" %}</h1>
                         </a>
                     </div>
                   </div>
                   <div class="col-sm-4">
-                    <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/hopeless_romance_sm.jpg' %});">
+                    <div class="city scroll-animate fadeInUp" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/hopeless_romance_sm.jpg' %});">
                         <a class="box-link" href="{{GEO_POSTFIX}}romance">
                             <h1>{% trans "Honeymoon" %}</h1>
                         </a>
                     </div>
                   </div>
                   <div class="col-sm-4">
-                    <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/local_culture_sm.jpg' %});">
+                    <div class="city scroll-animate fadeInUp" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/local_culture_sm.jpg' %});">
                         <a class="box-link" href="{{GEO_POSTFIX}}culture">
                             <h1>{% trans "Local<br>Culture" %}</h1>
                         </a>
@@ -92,21 +92,21 @@
 
                 <div class="row">
                   <div class="col-sm-4">
-                    <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/outdoor_sm.jpg' %});">
+                    <div class="city scroll-animate fadeInUp" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/outdoor_sm.jpg' %});">
                         <a class="box-link" href="{{GEO_POSTFIX}}outdoor">
                             <h1>{% trans "Outdoor" %}</h1>
                         </a>
                     </div>
                   </div>
                   <div class="col-sm-4">
-                    <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/extreme_sm.jpg' %});">
+                    <div class="city scroll-animate fadeInUp" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/extreme_sm.jpg' %});">
                         <a class="box-link" href="{{GEO_POSTFIX}}extreme">
                             <h1>{% trans "Extreme<br>Experiences" %}</h1>
                         </a>
                     </div>
                   </div>
                   <div class="col-sm-4">
-                    <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/photography_sm.jpg' %});">
+                    <div class="city scroll-animate fadeInUp" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/photography_sm.jpg' %});">
                         <a class="box-link" href="{{GEO_POSTFIX}}photography">
                             <h1>{% trans "Photography<br>Worthy" %}</h1>
                         </a>
@@ -119,7 +119,7 @@
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter <= 1 %}
                     <div class="col-sm-8">
-                      <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                      <div class="city scroll-animate fadeInUp" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                           <a class="box-link" href="{% url 'product_search' city %}">
                               <h1>{{ cityDisplayName }}</h1>
                           </a>
@@ -128,8 +128,14 @@
                     {% endif %}
                 {% endfor %}
                 <div class="col-sm-4">
-                    <div class="custom-itinerary">
-                        <button class="btn btn-primary request-btn">{% trans 'Request a trip' %}</button>
+                    <div class="custom-itinerary scroll-animate fadeInUp">
+                        <h2>
+                          {% trans "Australia and New Zealand <br> Custom Itineraries" %}
+                        </h2>
+                        <h3>
+                          {% trans "Save time and effort and let us build your dream trip!" %}
+                        </h3>
+                        <button class="btn btn-dark request-btn">{% trans 'Request a trip' %}</button>
                     </div>
                 </div>
                 </div>
@@ -138,7 +144,7 @@
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 2 %}
                     <div class="col-sm-4">
-                      <div class="city" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                      <div class="city scroll-animate fadeInUp" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                           <a class="box-link" href="{% url 'product_search' city %}">
                               <h1>{{ cityDisplayName }}</h1>
                           </a>
@@ -149,7 +155,7 @@
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 3 %}
                         <div class="col-sm-4">
-                            <div class="city"
+                            <div class="city scroll-animate fadeInUp"
                                  style="background-image: linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                                 <a class="box-link" href="{% url 'product_search' city %}">
                                     <h1>{{ cityDisplayName }}</h1>
@@ -161,7 +167,7 @@
                 {% for city, cityDisplayName in cityList %}
                     {% if forloop.counter == 4 %}
                     <div class="col-sm-4">
-                      <div class="city " style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
+                      <div class="city scroll-animate fadeInUp" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}city/{{ city }}.jpg);">
                           <a class="box-link" href="{% url 'product_search' city %}">
                               <h1>{{ cityDisplayName }}</h1>
                           </a>
@@ -259,5 +265,18 @@
                 mixpanel.track("checked out designed multi-day from homepage");
             });
         });
+    </script>
+    <script type="text/javascript" src="{% static 'app/scripts/wow.min.js' %}"></script>
+    <script>
+    wow = new WOW(
+      {
+        boxClass:     'scroll-animate',
+        animateClass: 'animated',
+        offset:       100,
+        mobile:       true,
+        live:         true
+      }
+    )
+    wow.init();
     </script>
 {% endblock %}

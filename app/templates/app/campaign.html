@@ -1,0 +1,87 @@
+{% extends "app/layout.html" %}
+{% load mathfilters %}
+{% load i18n %}
+
+{% block head %}
+{% load staticfiles %}
+<title>你敢来，我敢送！反季节游南半球，红酒奶粉等你来</title>
+<link href="{% static 'app/content/campaign.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+  <img src="{% static 'app/img/campaign_banner.png' %}" alt="">
+</div>
+<div class="bar-primary">
+  <p>
+    {% trans "Most popular destinations" %}
+  </p>
+  <p>
+    <a href="{{GEO_POSTFIX}}product/Melbourne">{% trans "Melbourne" %}</a> | <a href="{{GEO_POSTFIX}}product/Sydney">{% trans "Sydney" %}</a> | <a href="{{GEO_POSTFIX}}product/Brisbane">{% trans "Brisbane" %}</a> | <a href="{{GEO_POSTFIX}}product/Goldcoast">{% trans  "Gold Coast" %}</a>
+  </p>
+</div>
+<div class="container">
+
+  {% for title, topic, link in topicList %}
+  {% if forloop.counter == 4 %}
+</div>
+<div class="bar-primary" style="margin: 100px 0;">
+  <img class="ribbon" src="{% static 'app/img/ribbon.png' %}">
+  <h1>领奖细则</h1>
+  <p style="max-width: 960px; margin: 10px auto;">
+凡在12月4日至12月20日期间，私人定制下单超过5天行程就送2罐澳新奶粉或2瓶澳新红酒。若推荐好友下单成功，推荐人也会同时赢得礼品 （每单价值可达1000元，推荐人和被推荐人须是tripalocal.com.cn 的注册用户，每一单限一名推荐人）。礼品为a2奶粉两罐（可选1段或2段）或奔富BIN系列红酒两瓶。请在下单时向客服人员说明您选择的礼品为奶粉还是红酒。奖品将在1月8日以后送出，活动期间下单路线一律不得退改。礼品全部为澳洲直邮，绝无假货，数量有限，送完即止！手快有，手慢无，不要犹豫，立刻找Tripalocal要要要！本活动最终解释权归Tripalocal本土客所有。
+  </p>
+</div>
+<div class="container">
+
+  {% endif %}
+  <div class="row">
+    <h1><a href="{{GEO_POSTFIX}}{{link}}">{{ title }}</a></h1>
+    {% for experience in topic %}
+    <div class="col-sm-4">
+      <div class="exp-box scroll-animate slideInUp">
+        <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
+          <div class="listing-img" style="background-image:url({{ MEDIA_URL }}{{ experience.image }});">
+            <div class="price-box">
+              {% trans "From" %} {{experience.dollarsign}}<span>{{ experience.price|mul:experience.commission|floatformat:"0" }}</span> {% blocktrans with currency=experience.currency %} {{currency}}/person {% endblocktrans %}
+            </div>
+          </div>
+        </a>
+        <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}"><h3>{{ experience.title }} </h3></a>
+        <p style="overflow-y:hidden; height:70px; margin-bottom:15px;">{{ experience.description }}</p>
+        <div class="listing-footer">
+          {%if experience.duration < 24 %}{{experience.duration}} {% trans "hrs" %}{%else%}{{experience.duration|intdiv:24}} {% trans "days" %}{%endif%} &#8226; {% if experience.language == "english;mandarin;" %}English / 中文{% else %}English{% endif %}
+          {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}&#8226; <span style="font-weight:500;">{% trans 'Private' %}</span>{% endif %} &#8226; {{experience.city}}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+  <div class="custom-itinerary-wide scroll-animate slideInUp">
+    <h2>
+      {% trans "Australia and New Zealand <br> Custom Itineraries" %}
+    </h2>
+    <h3>
+      {% trans "Save time and effort and let us build your dream trip!" %}
+    </h3>
+    <a href="{{GEO_POSTFIX}}itinerary/request" class="btn btn-dark request-btn">{% trans 'Request a trip' %}</a>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript" src="{% static 'app/scripts/wow.min.js' %}"></script>
+<script>
+wow = new WOW(
+  {
+    boxClass:     'scroll-animate',
+    animateClass: 'animated',
+    offset:       100,
+    mobile:       true,
+    live:         true
+  }
+)
+wow.init();
+</script>
+{% endblock %}

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-26 18:01+1100\n"
+"POT-Creation-Date: 2015-12-07 13:36+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,12 +56,12 @@ msgid "Contact Tripalocal"
 msgstr "联系本土客"
 
 #: app/templates/app/aboutus.html:16 app/templates/app/contactus.html:15
-#: app/templates/app/layout.html:238
+#: app/templates/app/layout.html:248
 msgid "Terms of Service"
 msgstr "服务条款"
 
 #: app/templates/app/aboutus.html:17 app/templates/app/contactus.html:16
-#: app/templates/app/layout.html:239
+#: app/templates/app/layout.html:249
 msgid "Privacy Policy"
 msgstr "隐私政策"
 
@@ -94,6 +94,59 @@ msgid ""
 "We hope to bring you on this journey with us. Go on, see it and experience "
 "it like a local!"
 msgstr "我们欢迎您加入到我们的行列，与我们一起寻找最原汁原味的旅行。"
+
+#: app/templates/app/campaign.html:17
+msgid "Most popular destinations"
+msgstr "最热门目的地"
+
+#: app/templates/app/campaign.html:20 app/views.py:49
+msgid "Melbourne"
+msgstr "墨尔本"
+
+#: app/templates/app/campaign.html:20 app/views.py:49
+msgid "Sydney"
+msgstr "悉尼"
+
+#: app/templates/app/campaign.html:20 app/views.py:49
+msgid "Brisbane"
+msgstr "布里斯班"
+
+#: app/templates/app/campaign.html:20 app/views.py:51
+msgid "Gold Coast"
+msgstr "黄金海岸"
+
+#: app/templates/app/campaign.html:46
+msgid "From"
+msgstr " "
+
+#: app/templates/app/campaign.html:46
+#, python-format
+msgid " %(currency)s/person "
+msgstr " %(currency)s/人 起"
+
+#: app/templates/app/campaign.html:53
+msgid "hrs"
+msgstr "小时"
+
+#: app/templates/app/campaign.html:53
+msgid "days"
+msgstr "天"
+
+#: app/templates/app/campaign.html:54
+msgid "Private"
+msgstr "私人团"
+
+#: app/templates/app/campaign.html:64 app/templates/app/index.html:133
+msgid "Australia and New Zealand <br> Custom Itineraries"
+msgstr "澳新路线<br>私人订制 "
+
+#: app/templates/app/campaign.html:67 app/templates/app/index.html:136
+msgid "Save time and effort and let us build your dream trip!"
+msgstr "最本土，最科学的路线"
+
+#: app/templates/app/campaign.html:69 app/templates/app/index.html:138
+msgid "Request a trip"
+msgstr "我要定制"
 
 #: app/templates/app/contactus.html:6
 msgid "Tripalocal | Contact us"
@@ -166,7 +219,7 @@ msgid " to get notified when we launch in more countries."
 msgstr "第一时间了解新增城市请"
 
 #: app/templates/app/index.html:52 app/templates/app/index.html.py:54
-#: app/templates/app/layout.html:167 app/templates/app/layout.html.py:203
+#: app/templates/app/layout.html:177 app/templates/app/layout.html.py:213
 #: app/templates/app/loginpartial.html:60
 msgid "Sign up"
 msgstr "注册"
@@ -203,39 +256,35 @@ msgstr "刺激体验"
 msgid "Photography<br>Worthy"
 msgstr "风光摄影"
 
-#: app/templates/app/index.html:132
-msgid "Request a trip"
-msgstr "订制行程"
-
-#: app/templates/app/index.html:179
+#: app/templates/app/index.html:185
 msgid "Travel with Tripalocal"
 msgstr "本土客带您去旅行"
 
-#: app/templates/app/index.html:180
+#: app/templates/app/index.html:186
 msgid "See how it works"
 msgstr "了解更多"
 
-#: app/templates/app/index.html:192
+#: app/templates/app/index.html:198
 msgid "Your browser does not support the video tag."
 msgstr "您的浏览器不支持video标签"
 
-#: app/templates/app/index.html:199
+#: app/templates/app/index.html:205
 msgid "Our Community"
 msgstr "我们的社区"
 
-#: app/templates/app/index.html:203
+#: app/templates/app/index.html:209
 msgid "Travelling"
 msgstr "旅行心得"
 
-#: app/templates/app/index.html:208
+#: app/templates/app/index.html:214
 msgid "Hosting"
 msgstr "旅游达人"
 
-#: app/templates/app/index.html:255
+#: app/templates/app/index.html:261
 msgid " From "
 msgstr "到达日期"
 
-#: app/templates/app/index.html:256
+#: app/templates/app/index.html:262
 msgid " To "
 msgstr "离开日期"
 
@@ -283,123 +332,123 @@ msgstr "电子邮箱"
 msgid "Send"
 msgstr "发送"
 
-#: app/templates/app/layout.html:150 app/templates/app/loginpartial.html:38
+#: app/templates/app/layout.html:160 app/templates/app/loginpartial.html:38
 #: app/templates/app/mylisting.html:6 app/templates/app/mylisting.html:15
 #: app/templates/app/myprofile.html:15 app/templates/app/myreservation.html:15
 #: app/templates/app/mytrip.html:15
 msgid "My Listing"
 msgstr "我的体验"
 
-#: app/templates/app/layout.html:151 app/templates/app/loginpartial.html:39
+#: app/templates/app/layout.html:161 app/templates/app/loginpartial.html:39
 #: app/templates/app/myreservation.html:6
 msgid "My Reservations"
 msgstr "体验预约记录"
 
-#: app/templates/app/layout.html:153
+#: app/templates/app/layout.html:163
 msgid "My Trips"
 msgstr "我的预订"
 
-#: app/templates/app/layout.html:155 app/templates/app/loginpartial.html:50
+#: app/templates/app/layout.html:165 app/templates/app/loginpartial.html:50
 msgid "Edit Profile"
 msgstr "编辑个人信息"
 
-#: app/templates/app/layout.html:156 app/templates/app/loginpartial.html:51
+#: app/templates/app/layout.html:166 app/templates/app/loginpartial.html:51
 msgid "Account Settings"
 msgstr "账户设置"
 
-#: app/templates/app/layout.html:157 app/templates/app/layout.html.py:201
+#: app/templates/app/layout.html:167 app/templates/app/layout.html.py:211
 msgid "Logout"
 msgstr "退出"
 
-#: app/templates/app/layout.html:164 app/templates/app/layout.html.py:204
+#: app/templates/app/layout.html:174 app/templates/app/layout.html.py:214
 msgid "Login"
 msgstr "登录"
 
-#: app/templates/app/layout.html:172 app/templates/app/layout.html.py:197
+#: app/templates/app/layout.html:182 app/templates/app/layout.html.py:207
 msgid "Local Experiences"
 msgstr "特色体验"
 
-#: app/templates/app/layout.html:173 app/templates/app/layout.html.py:196
+#: app/templates/app/layout.html:183 app/templates/app/layout.html.py:206
 msgid "Travel with Locals"
 msgstr "旅游达人"
 
-#: app/templates/app/layout.html:174 app/templates/app/layout.html.py:198
+#: app/templates/app/layout.html:184 app/templates/app/layout.html.py:208
 msgid "Itineraries"
 msgstr "精品路线"
 
-#: app/templates/app/layout.html:195
+#: app/templates/app/layout.html:205
 msgid "Homepage"
 msgstr "主页"
 
-#: app/templates/app/layout.html:224
+#: app/templates/app/layout.html:234
 msgid "CNY"
 msgstr "人民币"
 
-#: app/templates/app/layout.html:225
+#: app/templates/app/layout.html:235
 msgid "AUD"
 msgstr "澳元"
 
-#: app/templates/app/layout.html:226
+#: app/templates/app/layout.html:236
 msgid "NZD"
 msgstr "新西兰元"
 
-#: app/templates/app/layout.html:235
+#: app/templates/app/layout.html:245
 msgid "Company"
 msgstr "公司"
 
-#: app/templates/app/layout.html:236
+#: app/templates/app/layout.html:246
 msgid "About Us"
 msgstr "关于我们"
 
-#: app/templates/app/layout.html:237
+#: app/templates/app/layout.html:247
 msgid "Contact Us"
 msgstr "联系我们"
 
-#: app/templates/app/layout.html:245
+#: app/templates/app/layout.html:255
 msgid "Travel"
 msgstr "旅行"
 
-#: app/templates/app/layout.html:246
+#: app/templates/app/layout.html:256
 msgid "Refund Policy"
 msgstr "退款政策"
 
-#: app/templates/app/layout.html:252
+#: app/templates/app/layout.html:262
 msgid "Social"
 msgstr "社交"
 
-#: app/templates/app/layout.html:253
+#: app/templates/app/layout.html:263
 msgid "Facebook"
 msgstr ""
 
-#: app/templates/app/layout.html:254
+#: app/templates/app/layout.html:264
 msgid "Twitter"
 msgstr ""
 
-#: app/templates/app/layout.html:267
+#: app/templates/app/layout.html:277
 msgid "Scan for wechat"
 msgstr "扫一扫微信客服"
 
-#: app/templates/app/layout.html:293
+#: app/templates/app/layout.html:303
 msgid "Sent!"
 msgstr "发送成功"
 
-#: app/templates/app/layout.html:298
+#: app/templates/app/layout.html:308
 msgid "Error sending, please"
 msgstr "发送失败，请重试"
 
-#: app/templates/app/layout.html:298 app/templates/app/layout.html.py:380
+#: app/templates/app/layout.html:308 app/templates/app/layout.html.py:400
 msgid "try again"
 msgstr "请重试"
 
-#: app/templates/app/layout.html:372
+#: app/templates/app/layout.html:392
 msgid "Please fill in all fields."
 msgstr "请填写全部必填项"
 
-#: app/templates/app/layout.html:380
+#: app/templates/app/layout.html:400
 msgid "Invalid email, please"
 msgstr "无效电子邮箱"
 
-#: app/templates/app/layout.html:459
+#: app/templates/app/layout.html:479
 msgid "Please try again later"
 msgstr ""
 
@@ -643,73 +692,77 @@ msgstr "您用 %(user_email)注册的账户已经激活。"
 msgid "Show me around"
 msgstr "去主页逛逛"
 
-#: app/views.py:47
-msgid "Melbourne"
-msgstr "墨尔本"
-
-#: app/views.py:47
-msgid "Sydney"
-msgstr "悉尼"
-
-#: app/views.py:47
-msgid "Brisbane"
-msgstr "布里斯班"
-
-#: app/views.py:48
+#: app/views.py:50
 msgid "Cairns"
 msgstr "凯恩斯"
 
-#: app/views.py:49
-msgid "Gold Coast"
-msgstr "黄金海岸"
-
-#: app/views.py:49
+#: app/views.py:51
 msgid "Hobart"
 msgstr "霍巴特"
 
-#: app/views.py:49
+#: app/views.py:51
 msgid "Adelaide"
 msgstr "阿德莱德"
 
-#: app/views.py:50
+#: app/views.py:52
 msgid "Darwin"
 msgstr "达尔文"
 
-#: app/views.py:50
+#: app/views.py:52
 msgid "Alice Springs"
 msgstr "艾利斯斯普林斯"
 
-#: app/views.py:51
+#: app/views.py:53
 msgid "Perth"
 msgstr ""
 
-#: app/views.py:52
+#: app/views.py:54
 msgid "Christchurch"
 msgstr "基督城"
 
-#: app/views.py:52
+#: app/views.py:54
 msgid "Queenstown"
 msgstr "皇后镇"
 
-#: app/views.py:53
+#: app/views.py:55
 msgid "Auckland"
 msgstr "奥克兰"
 
-#: app/views.py:53
+#: app/views.py:55
 msgid "Wellington"
 msgstr "惠灵顿"
 
-#: app/views.py:229
+#: app/views.py:231
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 您的帐户已经成功激活"
 
-#: app/views.py:708
+#: app/views.py:750
 msgid "Image size exceeds the limit"
 msgstr "文件大小超过上限"
 
-#: app/views.py:710
+#: app/views.py:752
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
+
+#, fuzzy
+#~| msgid "Bring<br>the Kids"
+#~ msgid "Bring the Kids"
+#~ msgstr "亲子游"
+
+#, fuzzy
+#~| msgid "Local<br>Culture"
+#~ msgid "Local Culture"
+#~ msgstr "风土人情"
+
+#, fuzzy
+#~| msgid "Extreme<br>Experiences"
+#~ msgid "Extreme Experiences"
+#~ msgstr "刺激体验"
+
+#, fuzzy
+#~| msgid "Photography<br>Worthy"
+#~ msgid "Photography Worthy"
+#~ msgstr "风光摄影"
 
 #~ msgid "Edwin"
 #~ msgstr "本土君"
@@ -750,9 +803,6 @@ msgstr "不支持该文件类型"
 
 #~ msgid "Hopeless<br>Romance"
 #~ msgstr "蜜月游"
-
-#~ msgid " %(currency)s/person "
-#~ msgstr " %(currency)s/人 起"
 
 #~ msgid "%(country)s"
 #~ msgstr "%(country)s"

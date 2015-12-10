@@ -20,7 +20,7 @@
                 {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
                 <div class='exp-box-sm' id='experience_id_{{experience.id}}'>
                     <div class='exp-img'>
-                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
+                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}'/>
                     </div>
                     <div class='exp-info'>
                         <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}" target="_blank" style="color:#333;">{{experience.title}}</a></h3>
@@ -47,17 +47,13 @@
             <button type="button" class="btn btn-default" id="add-flight-btn">+ Add Flight</button>
             {% for item in flight %}
             <div class="exp-box-sm flight_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/flight.svg" %}';" style='height:inherit;width:inherit;'/>
+                <div class="exp-img" style="background-image:url({% static "experiences/img/flight.svg" %})">
+                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p class="exp-edit">
-                      {% if item.location %}
-                      {{item.location}}
-                      &middot;
-                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'flight');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="duplicate_item({{item.id}}, 'flight');">{% trans "Duplicate" %}</a>
@@ -122,17 +118,13 @@
             <button type="button" id="add-transfer-btn" class="btn btn-default">+ Add Transfer</button>
             {% for item in transfer %}
             <div class="exp-box-sm transfer_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/transfer.svg" %}';" style='height:inherit;width:inherit;'/>
+                <div class="exp-img" style="background-image:url({% static "experiences/img/transfer.svg" %})">
+                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p class="exp-edit">
-                      {% if item.location %}
-                      {{item.location}}
-                      &middot;
-                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'transfer');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="duplicate_item({{item.id}}, 'transfer');">{% trans "Duplicate" %}</a>
@@ -197,17 +189,13 @@
             <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
             {% for item in accommodation %}
             <div class="exp-box-sm accommodation_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/accommodation.svg" %}';" style='height:inherit;width:inherit;'/>
+                <div class="exp-img" style="background-image:url({% static "experiences/img/accommodation.svg" %})">
+                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p class="exp-edit">
-                      {% if item.location %}
-                      {{item.location}}
-                      &middot;
-                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'accommodation');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="duplicate_item({{item.id}}, 'accommodation');">{% trans "Duplicate" %}</a>
@@ -272,17 +260,13 @@
             <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
             {% for item in restaurant %}
             <div class="exp-box-sm restaurant_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/restaurant.svg" %}';" style='height:inherit;width:inherit;'/>
+                <div class="exp-img" style="background-image:url({% static "experiences/img/restaurant.svg" %})">
+                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p class="exp-edit">
-                      {% if item.location %}
-                      {{item.location}}
-                      &middot;
-                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'restaurant');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="duplicate_item({{item.id}}, 'restaurant');">{% trans "Duplicate" %}</a>
@@ -347,17 +331,13 @@
             <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
             {% for item in suggestion %}
             <div class="exp-box-sm suggestion_{{item.location}}" id="experience_id_{{item.id}}">
-                <div class="exp-img">
-                    <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg' alt='{{item.title}}' onError="this.onerror=null;this.src='{% static "experiences/img/itinerary.svg" %}';" style='height:inherit;width:inherit;'/>
+                <div class="exp-img" style="background-image:url({% static "experiences/img/itinerary.svg" %})">
+                    <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p class="exp-edit">
-                      {% if item.location %}
-                      {{item.location}}
-                      &middot;
-                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'suggestion');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="duplicate_item({{item.id}}, 'suggestion');">{% trans "Duplicate" %}</a>
@@ -427,10 +407,6 @@
                     <h3>{{item.title}}</h3>
                     <p>{{item.details}}</p>
                     <p class="exp-edit">
-                      {% if item.location %}
-                      {{item.location}}
-                      &middot;
-                      {% endif %}
                       <a type="button" onclick="edit_item({{item.id}}, 'pricing');">{% trans "Edit" %}</a>
                       &middot;
                       <a type="button" onclick="duplicate_item({{item.id}}, 'pricing');">{% trans "Duplicate" %}</a>

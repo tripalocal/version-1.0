@@ -75,6 +75,7 @@ def convert_experience_price(request, experience):
         experience.currency = request.session['custom_currency']
 
 def next_time_slot(experience, repeat_cycle, repeat_frequency, repeat_extra_information, current_datetime, daylightsaving):
+    #TODO:always return the next time slot in the future, even if "current_datetime" is earlier than now
     #daylightsaving: whether it was in daylightsaving when this blockout/instant booking record was created
     current_datetime_local = current_datetime.astimezone(pytz.timezone(experience.get_timezone()))
 
@@ -233,9 +234,10 @@ def search_experience(condition, language="zh", type="experience"):
     result = AbstractExperience.objects.filter(id__in=result)
     return result
 
-def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None, currency=None):
+def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None, currency=None, skip_availability=False):
     #city/keywords is a string like A,B,C,
     available_options = []
+    start_datetime = start_datetime.replace(hour=2)
     end_datetime = end_datetime.replace(hour=22)
 
     exp_type = exp_type.lower()
@@ -354,69 +356,72 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
             experience_avail['host_image'] = host.registereduser.image_url
             experience_avail['host'] = host.first_name + ' ' + host.last_name
 
-        blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
         blockout_start = []
         blockout_end = []
         blockout_index=0
 
-        #calculate all the blockout time periods
-        for blk in blockouts:
-            if blk.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
-                daylightsaving = True
-            else:
-                daylightsaving = False
-
-            if blk.repeat:
-                b_l =  blk.end_datetime - blk.start_datetime
-                if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                    blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
-                while blk.start_datetime.date() <= blk.repeat_end_date:
-                    blockout_index += 1
-                    blockout_start.append(blk.start_datetime)
-                    blockout_end.append(blk.start_datetime + b_l)
-
-                    blk.start_datetime = next_time_slot(experience, blk.repeat_cycle, blk.repeat_frequency,
-                                                        blk.repeat_extra_information, blk.start_datetime,daylightsaving)
-
-            else:
-                blockout_index += 1
-                blockout_start.append(blk.start_datetime)
-                blockout_end.append(blk.end_datetime)
-
-        blockout_start.sort()
-        blockout_end.sort()
-
-        instantbookings = experience.instantbookingtimeperiod_set.filter(experience_id=experience.id)
         instantbooking_start = []
         instantbooking_end = []
         instantbooking_index=0
 
-        #calculate all the instant booking time periods
-        for ib in instantbookings :
-            if ib.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
-                daylightsaving = True
-            else:
-                daylightsaving = False
+        if not skip_availability:
+            blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
 
-            if ib.repeat:
-                ib_l =  ib.end_datetime - ib.start_datetime
-                if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                    ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
-                while ib.start_datetime.date() <= ib.repeat_end_date:
+            #calculate all the blockout time periods
+            for blk in blockouts:
+                if blk.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+                    daylightsaving = True
+                else:
+                    daylightsaving = False
+
+                if blk.repeat:
+                    b_l = blk.end_datetime - blk.start_datetime
+                    if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
+                        blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+                    while blk.start_datetime.date() <= blk.repeat_end_date:
+                        blockout_index += 1
+                        blockout_start.append(blk.start_datetime)
+                        blockout_end.append(blk.start_datetime + b_l)
+
+                        blk.start_datetime = next_time_slot(experience, blk.repeat_cycle, blk.repeat_frequency,
+                                                            blk.repeat_extra_information, blk.start_datetime,daylightsaving)
+
+                else:
+                    blockout_index += 1
+                    blockout_start.append(blk.start_datetime)
+                    blockout_end.append(blk.end_datetime)
+
+            blockout_start.sort()
+            blockout_end.sort()
+
+            instantbookings = experience.instantbookingtimeperiod_set.filter(experience_id=experience.id)
+
+            #calculate all the instant booking time periods
+            for ib in instantbookings :
+                if ib.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+                    daylightsaving = True
+                else:
+                    daylightsaving = False
+
+                if ib.repeat:
+                    ib_l = ib.end_datetime - ib.start_datetime
+                    if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
+                        ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+                    while ib.start_datetime.date() <= ib.repeat_end_date:
+                        instantbooking_index += 1
+                        instantbooking_start.append(ib.start_datetime)
+                        instantbooking_end.append(ib.start_datetime + ib_l)
+
+                        ib.start_datetime = next_time_slot(experience, ib.repeat_cycle, ib.repeat_frequency,
+                                                           ib.repeat_extra_information, ib.start_datetime, daylightsaving)
+
+                else:
                     instantbooking_index += 1
                     instantbooking_start.append(ib.start_datetime)
-                    instantbooking_end.append(ib.start_datetime + ib_l)
+                    instantbooking_end.append(ib.end_datetime)
 
-                    ib.start_datetime = next_time_slot(experience, ib.repeat_cycle, ib.repeat_frequency,
-                                                       ib.repeat_extra_information, ib.start_datetime, daylightsaving)
-
-            else:
-                instantbooking_index += 1
-                instantbooking_start.append(ib.start_datetime)
-                instantbooking_end.append(ib.end_datetime)
-
-        instantbooking_start.sort()
-        instantbooking_end.sort()
+            instantbooking_start.sort()
+            instantbooking_end.sort()
 
         bookings = experience.booking_set.filter(experience_id=experience.id).exclude(status__iexact="rejected")
 
@@ -484,8 +489,10 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                                 'time_string': sdt_local.strftime("%H").lstrip('0') if sdt_local.strftime("%H")!="00" else "0",
                                 'instant_booking': instant_booking}
                         experience_avail['dates'][sdt_local.strftime("%Y/%m/%d")].append(d)
-
-            sdt += timedelta(hours=1)
+            if not skip_availability:
+                sdt += timedelta(hours=1)
+            else:
+                sdt += timedelta(days=1)
         experience_avail['dates'] = OrderedDict(sorted(experience_avail['dates'].items(), key=lambda t: t[0]))
         available_options.append(experience_avail)
     return available_options
@@ -1323,7 +1330,6 @@ def experience_booking_confirmation(request):
 
                 if total_price > 0.0:
                     #not free
-                    # todo: remove stub money amout
                     price = int(convert_currency(total_price, experience.currency, "CNY") * 100)
                     pay_info = unified_pay.post(experience.get_information(settings.LANGUAGES[0][0]).title, out_trade_no,
                                                 str(price), "127.0.0.1", notify_url)
@@ -1737,24 +1743,16 @@ def create_experience(request, id=None):
                     extension = extension.lower()
                     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                         filename = 'host_id' + str(user.id) + '_' + str(index) + extension
-                        destination = open(dirname + filename, 'wb+')
-                        for chunk in request.FILES['host_id_photo_'+str(index)].chunks():
-                            destination.write(chunk)
-                        destination.close()
 
-                        #copy to the other website -- folder+file
-                        if settings.LANGUAGES[0][0] == "en":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_V1","Tripalocal_CN") + '/hosts_id/' + str(user.id) + '/'
-                        elif settings.LANGUAGES[0][0] == "zh":
-                            dirname_other = settings.MEDIA_ROOT.replace("Tripalocal_CN","Tripalocal_V1") + '/hosts_id/' + str(user.id) + '/'
-                        if not os.path.isdir(dirname_other):
-                            os.mkdir(dirname_other)
-                        subprocess.Popen(['cp',dirname + filename, dirname_other + filename])
-
-                        if not len(user.userphoto_set.filter(name__startswith=filename))>0:
+                        photo = user.userphoto_set.filter(name__startswith=filename)
+                        if not len(photo)>0:
                             photo = UserPhoto(name = filename, directory = 'hosts_id/' + str(user.id) + '/',
                                           image = 'hosts_id/' + str(user.id) + '/' + filename, user = user)
-                            photo.save()
+                        else:
+                            photo = photo[0]
+                            photo.image.delete()
+                        photo.image = request.FILES['host_id_photo_'+str(index)]
+                        photo.save()
 
             #save profile image
             if 'host_image' in request.FILES:
@@ -2174,7 +2172,6 @@ def new_experience(request):
                 host = User.objects.get(id=user_id)
             experience.hosts.add(host)
             set_exp_title_all_langs(experience, form.cleaned_data['title'], LANG_EN, LANG_CN)
-            #todo: add record to chinese database
 
             first_step = 'price'
             return redirect(reverse('manage_listing', kwargs={'exp_id': experience.id, 'step': first_step}))
@@ -2220,7 +2217,6 @@ def manage_listing_price(request, experience, context):
             if 'currency' in form.data:
                 experience.currency = form.cleaned_data['currency']
 
-            # todo: add to chinese db
             experience.save()
             return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
@@ -2889,7 +2885,7 @@ def get_experience_score(criteria_dict, experience_tags):
         score += criteria_dict.get(tag, 0)
     return score
 
-def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1, age_limit=1, customer=None, currency=None):
+def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1, age_limit=1, customer=None, currency=None, skip_availability=False):
     '''
     @sort, 1:most popular, 2:outdoor, 3:urban
     '''
@@ -2909,7 +2905,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
         config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_elderly.yaml').replace('\\', '/')))
         config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_children.yaml').replace('\\', '/')))
 
-    available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords, customer=customer, preference=config, currency=currency)
+    available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords, customer=customer, preference=config, currency=currency, skip_availability=skip_availability)
     itinerary = []
     dt = start_datetime
 
@@ -3068,7 +3064,7 @@ def custom_itinerary(request, id=None):
             np = NewProduct.objects.get(id=item.get('id'))
             np.price = item.get('price', 0)
             np.fixed_price = item.get('fixed_price', 0)
-            np.city = city=item.get('location', "")
+            np.city = item.get('location', "")
             #np.currency=request.session["custom_currency"].lower()
             np.save()
 
@@ -3127,7 +3123,7 @@ def custom_itinerary(request, id=None):
 
                 customer = request.user if request.user.is_authenticated() else None
                 currency = request.session['custom_currency'].lower() if hasattr(request, 'session') and 'custom_currency' in request.session else None
-                itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer, currency)
+                itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer, currency, skip_availability=True)
 
                 #get flight, transfer, ...
                 pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
@@ -3260,7 +3256,10 @@ def custom_itinerary(request, id=None):
                 col += 1
                 worksheet.write(row, col, total_price/(adult_number + children_number))
                 workbook.close()
-                return HttpResponseRedirect(GEO_POSTFIX+"itinerary/"+str(ci.id)+"/")
+                if "draft" in request.POST:
+                    return HttpResponseRedirect(GEO_POSTFIX+"itinerary/preview/"+str(ci.id)+"/")
+                else:
+                    return HttpResponseRedirect(GEO_POSTFIX+"itinerary/"+str(ci.id)+"/")
 
                 #return render(request, 'experiences/itinerary_booking_confirmation.html',
                 #          {'form': booking_form,'itinerary':itinerary})
@@ -3316,7 +3315,7 @@ def custom_itinerary(request, id=None):
 
     return render_to_response('experiences/custom_itinerary.html', {'form':form}, context)
 
-def itinerary_detail(request,id=None):
+def itinerary_detail(request,id=None,preview=None):
     if id is None:
         return HttpResponseRedirect(GEO_POSTFIX)
 
@@ -3338,6 +3337,11 @@ def itinerary_detail(request,id=None):
         total_price = subtotal_price + service_fee
         number = itinerary.get_guest_number()
         price_pp = total_price/number[0]
+        cover_photo = ""
+        for item in itinerary.booking_set.order_by('datetime').all():
+            if item.experience.photo_set.all():
+                cover_photo = item.experience.photo_set.all()[0]
+                break
 
         return render_to_response('experiences/itinerary_booking_confirmation.html',
                                   {'form':form, "itinerary":itinerary,
@@ -3347,6 +3351,7 @@ def itinerary_detail(request,id=None):
                                    "price_pp":price_pp, "subtotal_price":subtotal_price,
                                    "service_fee":service_fee, "total_price":total_price,
                                    "currency": currency, "dollarsign": DollarSign[currency.upper()],
+                                   "cover_photo": cover_photo,
                                    "LANGUAGE":settings.LANGUAGE_CODE,"GEO_POSTFIX":GEO_POSTFIX},
                                    context)
     else:
@@ -3382,6 +3387,15 @@ def itinerary_detail(request,id=None):
                 end_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
 
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
+        cover_photo = ""
+        for key, value in itinerary["days"].items():
+            for item in value:
+                if item.photo_set.all():
+                    cover_photo = item.photo_set.all()[0]
+                    break
+            else:
+                continue
+            break
         guest_number = ci.get_guest_number()
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
@@ -3393,6 +3407,8 @@ def itinerary_detail(request,id=None):
                                    "discount_deadline":discount_deadline.strftime("%Y-%m-%d"),
                                    "price":price,
                                    "full_price":full_price,
+                                   "cover_photo":cover_photo,
+                                   "preview":preview,
                                    'LANGUAGE':settings.LANGUAGE_CODE,
                                    "GEO_POSTFIX":GEO_POSTFIX},
                                    context)
@@ -3536,6 +3552,58 @@ def itinerary_booking_successful(request, itinerary_id):
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
 
     return HttpResponseRedirect(GEO_POSTFIX + "itinerary/" + itinerary_id)
+
+def campaign(request):
+    set_initial_currency(request)
+    # NOTE: in the future, we should define these topics globally
+    family = AbstractExperience.objects.filter(id__in=[2611,2561,2581])
+    romance = AbstractExperience.objects.filter(id__in=[3031,2411,2341])
+    culture = AbstractExperience.objects.filter(id__in=[2871,991,2171])
+    outdoor = AbstractExperience.objects.filter(id__in=[2141,2371,2241])
+    extreme = AbstractExperience.objects.filter(id__in=[862,2441,2481])
+    photography = AbstractExperience.objects.filter(id__in=[872,2921,1111])
+    topics = [family, romance, culture, outdoor, extreme, photography]
+    for experienceList in topics:
+        i=0
+        while i < len(experienceList):
+            experience = experienceList[i]
+
+            setExperienceDisplayPrice(experience)
+
+            experience.image = experience.get_background_image()
+
+            if float(experience.duration).is_integer():
+                experience.duration = int(experience.duration)
+
+            experience.city = dict(Location).get(experience.city, experience.city)
+
+            if not experience.currency:
+                experience.currency = 'aud'
+            convert_experience_price(request, experience)
+            experience.dollarsign = DollarSign[experience.currency.upper()]
+            experience.currency = str(dict(Currency)[experience.currency.upper()])
+            if experience.commission > 0.0:
+                experience.commission = round(experience.commission/(1-experience.commission),3)+1
+            else:
+                experience.commission = settings.COMMISSION_PERCENT+1
+
+            # Format title & Description
+            exp_information = experience.get_information(settings.LANGUAGES[0][0])
+            experience.description = exp_information.description
+            t = exp_information.title
+            if (t != None and len(t) > 30):
+                experience.title = t[:27] + "..."
+            else:
+                experience.title = t
+            i+=1
+    titles = [_('Bring the Kids'), _('Honeymoon'), _('Local Culture'), _('Outdoor'), _('Extreme Experiences'), _('Photography Worthy')]
+    urls = ['family', 'romance', 'culture', 'outdoor', 'extreme', 'photography']
+    context = RequestContext(request, {
+        'topicList': zip(titles, topics, urls),
+        'GEO_POSTFIX': settings.GEO_POSTFIX,
+        'LANGUAGE': settings.LANGUAGE_CODE
+    })
+    return render_to_response('app/campaign.html', context)
 
 def topic_family(request):
     set_initial_currency(request)

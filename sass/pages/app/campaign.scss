@@ -1,0 +1,96 @@
+/*
+  for:
+  campaign.html
+
+*/
+@import
+  '../../vendor/include-media',
+  '../../vendor/animate',
+  '../../utils/variables',
+  '../../utils/mixins',
+  '../../utils/functions',
+  '../../utils/placeholders';
+
+h1 {
+  font-family: $font-stack-homepage;
+  text-align: center;
+  a {
+    color: $dark-grey;
+  }
+}
+
+.container {
+  position: relative;
+}
+
+.jumbotron {
+  background-image: url(../img/campaign_bg.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 380px;
+  margin-bottom: 130px;
+  @include media('<desktop') {
+    height: 300px;
+    margin-bottom: 90px;
+  }
+  @include media('<tablet') {
+    height: 230px;
+    margin-bottom: 80px;
+  }
+  @include media('<phablet') {
+    padding-top: 20px;
+    height: 170px;
+    margin-bottom: 75px;
+    background-position: 40% 40%;
+  }
+  @include media('<phone') {
+    padding-top: 20px;
+    height: 140px;
+    margin-bottom: 60px;
+    background-position: 30% 30%;
+  }
+  img {
+    @include media('<desktop') {
+      height: 350px;
+    }
+    @include media('<tablet') {
+      height: 280px;
+    }
+    @include media('<phablet') {
+      height: 220px;
+    }
+    @include media('<phone') {
+      height: 180px;
+      width: auto;
+    }
+  }
+}
+
+.bar-primary {
+  width: 100%;
+  text-align: center;
+  color: white;
+  background-color: $primary-color;
+  padding: 15px;
+  font-size: 14px;
+  position: relative;
+  a {
+    color: inherit;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  h1 {
+    margin-top: 10px;
+  }
+}
+
+.ribbon {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  margin: -110px auto;
+}

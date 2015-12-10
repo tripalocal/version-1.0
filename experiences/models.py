@@ -42,9 +42,10 @@ class WechatBooking(models.Model):
 class Provider(models.Model):
     user = models.OneToOneField(User, null=True)
     company = models.CharField(max_length=100)
-    website = models.CharField(max_length=50, blank=True)
-    email = models.CharField(max_length=30, blank=True)
+    website = models.CharField(max_length=254, blank=True)
+    email = models.CharField(max_length=100, blank=True)
     phone_number = models.CharField(max_length=15, blank=True)
+    partner = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.company
@@ -216,6 +217,7 @@ class NewProduct(AbstractExperience):
     order_on_holiday = models.BooleanField(default=False, help_text="If supplier take order during weekend and holiday "
                                                                     "particularly instant order during holiday")
     tags = models.ManyToManyField(ExperienceTag, related_name='newproduct_tags', blank=True)
+    partner = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         t = self.get_information(settings.LANGUAGES[0][0]).title

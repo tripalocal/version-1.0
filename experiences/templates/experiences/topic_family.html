@@ -17,7 +17,7 @@
   <div id="experience-results" class="experience-results">
       {% for experience in experienceList %}
 
-      <div class="exp-box">
+      <div class="exp-box scroll-animate fadeInUp">
           <a href="{{GEO_POSTFIX}}experience/{{ experience.id }}">
               <div class="listing-img" style="background-image:url({{ MEDIA_URL }}{{ experience.image }});">
                   <div class="price-box">
@@ -50,8 +50,17 @@
 {% endblock %}
 
 {% block scripts %}
+<script type="text/javascript" src="{% static 'app/scripts/wow.min.js' %}"></script>
 <script charset="utf-8" type="text/javascript">
-$("#navbar").removeClass("navbar-static-top");
-$("#navbar").addClass("navbar-fixed-top");
+wow = new WOW(
+  {
+    boxClass:     'scroll-animate',
+    animateClass: 'animated',
+    offset:       100,
+    mobile:       true,
+    live:         true
+  }
+)
+wow.init();
 </script>
 {% endblock %}

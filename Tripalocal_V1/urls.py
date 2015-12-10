@@ -18,7 +18,7 @@ from django.contrib import admin
 from rest_framework.authtoken import views
 
 from app.decorators import superuser_required
-from custom_admin.views.main import BookingView, BookingArchiveView, ExperienceView, PaymentView, NewProductView, ItineraryView
+from custom_admin.views.main import BookingView, BookingArchiveView, ExperienceView, PaymentView, NewProductView, ItineraryView, PartnerProductView
 from django.conf.urls import *
 from django.views.i18n import javascript_catalog
 
@@ -37,7 +37,7 @@ urlpatterns = patterns('',
     url(r'^privacypolicy', 'app.views.privacypolicy'),
     url(r'^refundpolicy', 'app.views.refundpolicy'),
     url(r'^email_custom_trip', 'app.views.email_custom_trip'),
-
+    url(r'^december', 'experiences.views.campaign', name='campaign'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
@@ -93,6 +93,7 @@ urlpatterns = patterns('',
     url(r'^itinerary/request/$', 'experiences.views.custom_itinerary_request'),
     url(r'^itinerary/edit/(?P<id>\d+)/$', custom_itinerary, name='custom_itinerary'),
     url(r'^itinerary/(?P<id>\d+)/$', itinerary_detail, name='itinerary_detail'),
+    url(r'^itinerary/preview/(?P<id>\d+)/$', itinerary_detail,{'preview': 'true'}, name='itinerary_detail'),
     url(r'^service_search/$', 'experiences.resource.service_search', name='service_search'),
     url(r'^service_mytrip/$', 'experiences.resource.service_mytrip', name='service_mytrip'),
     url(r'^service_myreservation/$', 'experiences.resource.service_myreservation', name='service_myreservation'),
@@ -127,6 +128,7 @@ urlpatterns = patterns('',
     url(r'^custom_admin/payment/$', PaymentView.as_view(), name='admin_payment'),
     url(r'^custom_admin/experience/$', ExperienceView.as_view(), name='admin_experience'),
     url(r'^custom_admin/newproduct/$', NewProductView.as_view(), name='admin_newproduct'),
+    url(r'^custom_admin/partnerproduct/$', PartnerProductView.as_view(), name='admin_partnerproduct'),
     url(r'^custom_admin/itinerary/$', ItineraryView.as_view(), name='admin_itinerary'),
     url(r'^multidaytrip/$','experiences.views.multi_day_trip'),
     url(r'^family/$','experiences.views.topic_family'),
@@ -144,4 +146,6 @@ urlpatterns = patterns('',
     url(r'^wechat_qr_payment/$', 'experiences.views.wechat_qr_payment', name='wechat_qr_payment'),
     url(r'^wechat/qr_payment_notify/$', 'experiences.views.wechat_qr_payment_notify', name='wechat_qr_payment_notify'),
     url(r'^wechat_qr_payment_query/(?P<out_trade_no>.*)/$', 'experiences.views.wechat_qr_payment_query', name='wechat_qr_payment_query'),
+    url(r'^import_experienceoz_products/$', 'import_from_partners.views.import_experienceoz_products', name='import_experienceoz_products'),
+    url(r'^import_experienceoz_operators/$', 'import_from_partners.views.import_experienceoz_operators', name='import_experienceoz_operators'),
 )

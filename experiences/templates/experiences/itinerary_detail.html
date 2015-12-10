@@ -14,7 +14,7 @@
   <p>{% trans 'You have successfully booked this itinerary!' %}</p>
 </div>
 {% endif %}
-<div class="jumbotron" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({%for date, list in itinerary.days.items %}{% if forloop.first %}{% for item in list %}{% if forloop.first %}{% with item.photo_set.all|first as photo %}{{ MEDIA_URL }}{{photo.directory}}{{photo.name}}{% endwith %}{% endif %}{% endfor %}{% endif %}{% endfor %})">
+<div class="jumbotron" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({{ MEDIA_URL }}{{cover_photo.directory}}{{cover_photo.name}}">
   <div class="middle">
     {% if LANGUAGE != "zh-CN" %}
     <img src="{% static 'img/top_logo-en.svg' %}" width="240">
@@ -34,7 +34,7 @@
             <p>{{ itinerary.days|length }}{% trans ' Day ' %}{{ guest_number }}{% trans ' Person Custom Itinerary' %}</p>
             <p>{{start_date}} - {{end_date}}</p>
           </div>
-          {% if itinerary.status == "ready" %}
+          {% if not preview %}
           <div class="row">
             {% if not full_price %}
             <p><strike style="margin-right:15px;">{% trans 'Before: ' %}{{request.session.dollar_sign}}{{ price|div:0.85|floatformat:"0" }}{{request.session.custom_currency}}</strike> {% trans 'After: ' %}{{request.session.dollar_sign}}{{price|floatformat:"0"}}{{request.session.custom_currency}}</p>
@@ -54,7 +54,7 @@
               <input class="btn btn-primary" type="button" value="{% trans 'Lock in price' %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}itinerary/{{itinerary_id}}';"/>
               {% endif %}
           </div>
-          {% elif itinerary.status != "paid" %}
+          {% else %}
           <a class="btn btn-primary" href="mailto:enquiries@tripalocal.com?subject={{itinerary.title}}" style="padding: 12px;"><img src="{% static 'icon/discuss.svg' %}" style="margin-right:10px;">{% trans 'Enquire about this itinerary' %}</a>
           {% endif %}
       </form>
@@ -171,11 +171,9 @@ function initializeClock(id, endtime){
 }
 
 $(document).ready(function() {
-  {% if itinerary.status == "ready" %}
-  {% if not full_price %}
+  {% if not full_price and not preview %}
   var deadline = "{{discount_deadline}}";
   initializeClock('clock', deadline);
-  {% endif %}
   {% endif %}
   if ($(window).width() > 760) {
     // Scrollspy
