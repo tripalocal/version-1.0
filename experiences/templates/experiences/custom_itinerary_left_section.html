@@ -31,7 +31,7 @@
                     </div>
                     <div class='exp-price'>
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
-                        <h2 style="display:none;">0</h2><h2>{{experience.price|floatformat:"0"}}</h2>
+                        <h2 style="display:none;" class="price-base">0</h2><h2 class="price-pp">{{experience.price|floatformat:"0"}}</h2>
                         <p>{% trans 'per person' %}</p>
                     </div>
                 </div>
@@ -43,8 +43,8 @@
     </div>
 
     <div role="tabpanel" class="tab-pane fade" id="flight">
+        <button type="button" class="btn btn-default btn-right" id="add-flight-btn">+ Add Flight</button>
         <div class="column" id="flight_column">
-            <button type="button" class="btn btn-default" id="add-flight-btn">+ Add Flight</button>
             {% for item in flight %}
             <div class="exp-box-sm flight_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img" style="background-image:url({% static "experiences/img/flight.svg" %})">
@@ -64,8 +64,16 @@
                 </div>
                 <div class="exp-price">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
-                    <p>{% trans "base + per person" %}</p>
+                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
+                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
+                </div>
+                <div class="exp-price-set">
+                  <div class="container-fluid">
+                    <span id="{{item.id}}fixed-price-min">{{item.fixed_price_min}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span id="{{item.id}}fixed-price-max">{{item.fixed_price_max}}</span>
+                  </div>
+                  <div class="container-fluid">
+                    <span id="{{item.id}}price-min">{{item.price_min}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span id="{{item.id}}price-max">{{item.price_max}}</span>
+                  </div>
                 </div>
             </div>
             {% endfor %}
@@ -90,11 +98,13 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="flight-fixed_price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}</span>
+                        <input id="flight-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="flight-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                     <div class="form-group">
-                        <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="flight-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}/pp</span>
+                        <label style="display:block;">{% trans "Price PP" %}</label>
+                        <input id="flight-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="flight-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -114,8 +124,8 @@
     </div>
 
     <div role="tabpanel" class="tab-pane fade" id="transfer">
+        <button type="button" id="add-transfer-btn" class="btn btn-default btn-right">+ Add Transfer</button>
         <div class="column" id="transfer_column">
-            <button type="button" id="add-transfer-btn" class="btn btn-default">+ Add Transfer</button>
             {% for item in transfer %}
             <div class="exp-box-sm transfer_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img" style="background-image:url({% static "experiences/img/transfer.svg" %})">
@@ -135,8 +145,16 @@
                 </div>
                 <div class="exp-price">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
-                    <p>{% trans "base + per person" %}</p>
+                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
+                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
+                </div>
+                <div class="exp-price-set">
+                  <div class="container-fluid">
+                    <span id="{{item.id}}fixed-price-min">{{item.fixed_price_min}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span id="{{item.id}}fixed-price-max">{{item.fixed_price_max}}</span>
+                  </div>
+                  <div class="container-fluid">
+                    <span id="{{item.id}}price-min">{{item.price_min}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span id="{{item.id}}price-max">{{item.price_max}}</span>
+                  </div>
                 </div>
             </div>
             {% endfor %}
@@ -161,11 +179,13 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="transfer-fixed_price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}</span>
+                        <input id="transfer-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="transfer-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                     <div class="form-group">
-                        <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="transfer-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}/per trip</span>
+                        <label style="display:block;">{% trans "Price PP" %}</label>
+                        <input id="transfer-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="transfer-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -185,8 +205,8 @@
     </div>
 
     <div role="tabpanel" class="tab-pane fade" id="accommodation">
+        <button type="button" id="add-accommodation-btn" class="btn btn-default btn-right">+ Add Accommodation</button>
         <div class="column" id="accommodation_column">
-            <button type="button" id="add-accommodation-btn" class="btn btn-default">+ Add Accommodation</button>
             {% for item in accommodation %}
             <div class="exp-box-sm accommodation_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img" style="background-image:url({% static "experiences/img/accommodation.svg" %})">
@@ -206,8 +226,16 @@
                 </div>
                 <div class="exp-price">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
-                    <p>{% trans "base + per person" %}</p></p>
+                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
+                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
+                </div>
+                <div class="exp-price-set">
+                  <div class="container-fluid">
+                    <span id="{{item.id}}fixed-price-min">{{item.fixed_price_min}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span id="{{item.id}}fixed-price-max">{{item.fixed_price_max}}</span>
+                  </div>
+                  <div class="container-fluid">
+                    <span id="{{item.id}}price-min">{{item.price_min}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span id="{{item.id}}price-max">{{item.price_max}}</span>
+                  </div>
                 </div>
             </div>
             {% endfor %}
@@ -232,11 +260,13 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="accommodation-fixed_price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}</span>
+                        <input id="accommodation-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="accommodation-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                     <div class="form-group">
-                        <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="accommodation-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}/per night</span>
+                        <label style="display:block;">{% trans "Price PP" %}</label>
+                        <input id="accommodation-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="accommodation-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -256,8 +286,8 @@
     </div>
 
     <div role="tabpanel" class="tab-pane fade" id="restaurant">
+        <button type="button" id="add-restaurant-btn" class="btn btn-default btn-right">+ Add Restaurant</button>
         <div class="column" id="restaurant_column">
-            <button type="button" id="add-restaurant-btn" class="btn btn-default">+ Add Restaurant</button>
             {% for item in restaurant %}
             <div class="exp-box-sm restaurant_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img" style="background-image:url({% static "experiences/img/restaurant.svg" %})">
@@ -277,8 +307,16 @@
                 </div>
                 <div class="exp-price">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
-                    <p>{% trans "base + per person" %}</p>
+                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
+                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
+                </div>
+                <div class="exp-price-set">
+                  <div class="container-fluid">
+                    <span id="{{item.id}}fixed-price-min">{{item.fixed_price_min}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span id="{{item.id}}fixed-price-max">{{item.fixed_price_max}}</span>
+                  </div>
+                  <div class="container-fluid">
+                    <span id="{{item.id}}price-min">{{item.price_min}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span id="{{item.id}}price-max">{{item.price_max}}</span>
+                  </div>
                 </div>
             </div>
             {% endfor %}
@@ -303,11 +341,13 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="restaurant-fixed_price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}</span>
+                        <input id="restaurant-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="restaurant-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                     <div class="form-group">
-                        <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="restaurant-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}/pp</span>
+                        <label style="display:block;">{% trans "Price PP" %}</label>
+                        <input id="restaurant-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="restaurant-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -327,8 +367,8 @@
     </div>
 
     <div role="tabpanel" class="tab-pane fade" id="suggestion">
+        <button type="button" id="add-suggestion-btn" class="btn btn-default btn-right">+ Add Suggestion</button>
         <div class="column" id="suggestion_column">
-            <button type="button" id="add-suggestion-btn" class="btn btn-default">+ Add Suggestion</button>
             {% for item in suggestion %}
             <div class="exp-box-sm suggestion_{{item.location}}" id="experience_id_{{item.id}}">
                 <div class="exp-img" style="background-image:url({% static "experiences/img/itinerary.svg" %})">
@@ -348,8 +388,16 @@
                 </div>
                 <div class="exp-price">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
-                    <p>{% trans "base + per person" %}</p>
+                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
+                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
+                </div>
+                <div class="exp-price-set">
+                  <div class="container-fluid">
+                    <span id="{{item.id}}fixed-price-min">{{item.fixed_price_min}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span id="{{item.id}}fixed-price-max">{{item.fixed_price_max}}</span>
+                  </div>
+                  <div class="container-fluid">
+                    <span id="{{item.id}}price-min">{{item.price_min}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span id="{{item.id}}price-max">{{item.price_max}}</span>
+                  </div>
                 </div>
             </div>
             {% endfor %}
@@ -374,11 +422,13 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="suggestion-fixed_price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}</span>
+                        <input id="suggestion-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="suggestion-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                     <div class="form-group">
-                        <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="suggestion-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}</span>
+                        <label style="display:block;">{% trans "Price PP" %}</label>
+                        <input id="suggestion-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="suggestion-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -398,8 +448,8 @@
     </div>
 
     <div role="tabpanel" class="tab-pane fade" id="pricing">
+        <button type="button" id="add-pricing-btn" class="btn btn-default btn-right">+ Add Pricing</button>
         <div class="column" id="pricing_column">
-            <button type="button" id="add-pricing-btn" class="btn btn-default">+ Add Pricing</button>
             {% for item in pricing %}
             <div class="exp-box-sm" id="experience_id_{{item.id}}">
                 <div class="exp-img"></div>
@@ -417,8 +467,16 @@
                 </div>
                 <div class="exp-price">
                     <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <h2>{{item.fixed_price|floatformat:"0"}}</h2> + <h2>{{item.price|floatformat:"0"}}</h2>
-                    <p>{% trans "base + per person" %}</p>
+                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
+                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
+                </div>
+                <div class="exp-price-set">
+                  <div class="container-fluid">
+                    <span id="{{item.id}}fixed-price-min">{{item.fixed_price_min}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span id="{{item.id}}fixed-price-max">{{item.fixed_price_max}}</span>
+                  </div>
+                  <div class="container-fluid">
+                    <span id="{{item.id}}price-min">{{item.price_min}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span id="{{item.id}}price-max">{{item.price_max}}</span>
+                  </div>
                 </div>
             </div>
             {% endfor %}
@@ -436,11 +494,13 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="pricing-fixed_price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}</span>
+                        <input id="pricing-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="pricing-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                     <div class="form-group">
-                        <label style="display:block;">{% trans "Price" %}</label>
-                        <input id="pricing-price" class="form-control" style="width:50%; display:inline-block; margin-right:15px;"><span style="display:inline;">{{request.session.dollar_sign}}{{request.session.custom_currency}}</span>
+                        <label style="display:block;">{% trans "Price PP" %}</label>
+                        <input id="pricing-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
+                        <input id="pricing-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
                     </div>
                 </div>
                 <div class="col-xs-6">

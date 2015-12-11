@@ -3033,6 +3033,7 @@ def custom_itinerary(request, id=None):
             #add a new item
             item = request.POST
             np = NewProduct(price=item.get('price', 0), fixed_price=item.get('fixed_price', 0),
+                            price_min=item.get('price-min'), price_max=item.get('price-max'), fixed_price_min=item.get('fixed_price-min'), fixed_price_max=item.get('fixed_price-max'),
                             commission=0.0, currency=request.session["custom_currency"].lower(), type=item['type'].title(),
                             city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted",
                             start_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)),
@@ -3062,6 +3063,10 @@ def custom_itinerary(request, id=None):
             #edit an item
             item = request.POST
             np = NewProduct.objects.get(id=item.get('id'))
+            np.price_min = item.get('price_min')
+            np.price_max = item.get('price_max')
+            np.fixed_price_min = item.get('fixed_price_min')
+            np.fixed_price_max = item.get('fixed_price_max')
             np.price = item.get('price', 0)
             np.fixed_price = item.get('fixed_price', 0)
             np.city = item.get('location', "")
@@ -3136,6 +3141,10 @@ def custom_itinerary(request, id=None):
                     if 'custom_currency' in request.session and request.session["custom_currency"].lower() != pd.currency.lower():
                         pd.price = convert_currency(pd.price, pd.currency, request.session["custom_currency"])
                         pd.fixed_price = convert_currency(pd.fixed_price, pd.currency, request.session["custom_currency"])
+                        pr.price_min = convert_currency(pd.price_min, pd.currency, request.session["custom_currency"])
+                        pr.price_max = convert_currency(pd.price_max, pd.currency, request.session["custom_currency"])
+                        pr.fixed_price_min = convert_currency(pd.fixed_price_min, pd.currency, request.session["custom_currency"])
+                        pr.fixed_price_max = convert_currency(pd.fixed_price_max, pd.currency, request.session["custom_currency"])
                 context['flight'] = [e for e in pds if e.type == 'Flight' and e.city in str(city).split(",")]
                 context['transfer'] = [e for e in pds if e.type == 'Transfer' and e.city in str(city).split(",")]
                 context['accommodation'] = [e for e in pds if e.type == 'Accommodation' and e.city in str(city).split(",")]

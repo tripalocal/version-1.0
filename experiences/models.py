@@ -68,6 +68,10 @@ class Experience(AbstractExperience):
 
     guest_number_max = models.IntegerField()
     guest_number_min = models.IntegerField()
+    fixed_price_min = models.FloatField(blank=True, null=True)
+    fixed_price_max = models.FloatField(blank=True, null=True)
+    price_min = models.FloatField(blank=True, null=True)
+    price_max = models.FloatField(blank=True, null=True)
     fixed_price = models.FloatField(default=0.0)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     children_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
@@ -76,7 +80,7 @@ class Experience(AbstractExperience):
 
     city = models.CharField(max_length=50)
     address = models.TextField()
-    
+
     hosts = models.ManyToManyField(User, related_name='experience_hosts')
     guests = models.ManyToManyField(User, related_name='experience_guests')
     status = models.CharField(max_length=50)
@@ -203,6 +207,10 @@ class NewProduct(AbstractExperience):
                                   help_text="Only one of the price type will take effact.")
     fixed_price = models.FloatField(default=0.0)
     price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    fixed_price_min = models.FloatField(blank=True, null=True)
+    fixed_price_max = models.FloatField(blank=True, null=True)
+    price_min = models.FloatField(blank=True, null=True)
+    price_max = models.FloatField(blank=True, null=True)
     commission = models.FloatField(default=0.3)
     dynamic_price = models.CharField(max_length=100, blank=True)
     adult_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
@@ -517,17 +525,17 @@ class Booking(models.Model):
 class Payment(models.Model):
     def __init__(self, *args, **kwargs):
         super(Payment, self).__init__(*args, **kwargs)
- 
+
         # bring in stripe, and get the api key from settings.py
         import stripe
         stripe.api_key = settings.STRIPE_SECRET_KEY
- 
+
         self.stripe = stripe
 
     def __str__(self):
         return self.charge_id
 
- 
+
     # store the stripe charge id for this sale
     charge_id = models.CharField(max_length=32)
     booking = models.ForeignKey(Booking, related_name="booking")
@@ -538,23 +546,23 @@ class Payment(models.Model):
     state = models.CharField(max_length=3)
     country = models.CharField(max_length=15)
     phone_number = models.CharField(max_length=50)
- 
+
     # you could also store other information about the sale
     # but I'll leave that to you!
- 
+
     def charge(self, price_in_cents, currency, number=None, exp_month=None, exp_year=None, cvc=None, stripe_token=None):
         """
         Takes a the price and credit card details: number, currency, exp_month,
         exp_year, cvc.
- 
+
         Returns a tuple: (Boolean, Class) where the boolean is if
         the charge was successful, and the class is response (or error)
         instance.
         """
- 
+
         if self.charge_id: # don't let this be charged twice!
             return False, Exception(message="Already charged.")
- 
+
         try:
             if stripe_token is not None:
                 response = self.stripe.Charge.create(
@@ -571,7 +579,7 @@ class Payment(models.Model):
                                 "exp_month" : exp_month,
                                 "exp_year" : exp_year,
                                 "cvc" : cvc,
- 
+
                                 #### it is recommended to include the address!
                                 "address_line1" : self.street1,
                                 "address_line2" : self.street2,
@@ -581,24 +589,24 @@ class Payment(models.Model):
                                 "address_country" : self.country,
                             },
                             description='')
- 
+
             self.charge_id = response.id
- 
+
         except self.stripe.CardError as ce:
             # charge failed
             return False, ce
         except Exception as ex:
             return False, ex
- 
+
         return True, response
 
     def refund(self, charge_id, amount):
         try:
             ch = self.stripe.Charge.retrieve(charge_id)
             if amount != None:
-                re = ch.refund(amount = amount) # ch.refunds.create() 
+                re = ch.refund(amount = amount) # ch.refunds.create()
             else:
-                re = ch.refund() # ch.refunds.create() 
+                re = ch.refund() # ch.refunds.create()
             booking = Booking.objects.get(payment_id = Payment.objects.get(charge_id = ch.id).id)
             booking.status = "rejected"
             booking.refund_id = re.id
@@ -827,4 +835,3 @@ def set_exp_dropoff_spot_all_langs(exp, meetup_spot, lang, other_lang):
     set_exp_dropoff_spot(exp, meetup_spot, lang)
     if not has_dropoff_spot_in_other_lang(exp, other_lang):
         set_exp_dropoff_spot(exp, meetup_spot, other_lang)
-

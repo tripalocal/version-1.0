@@ -174,7 +174,7 @@
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
                         {% else %}
-                        <p class='exp-edit'>
+                        <p class='exp-edit' style="display:none;">
                           <a type="button" onclick="edit_item({{experience.id}}, {{experience.type}});">{% trans "Edit" %}</a>
                           &middot;
                           <a type="button" onclick="duplicate_item({{item.id}}, {{experience.type}});">{% trans "Duplicate" %}</a>
@@ -184,15 +184,31 @@
                         <label style="display:none;">{{item.notes}}</label>
                         {% endif %}
                     </div>
-                    <div class='exp-price'>
+                    <div class='exp-price' style="display:none;">
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
                         {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
-                        <h2>{{experience.fixed_price|floatformat:"0"}}</h2> + <h2>{{experience.price|floatformat:"0"}}</h2>
-                        <p>{% trans "base + per person" %}</p>
+                        <p class="price-base">{{experience.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
+                        <p class="price-pp">{{experience.price|floatformat:"0"}} {% trans "pp" %}</p>
                         {% else %}
-                        <h2 style="display:none;">0</h2><h2>{{experience.price|floatformat:"0"}}</h2>
+                        <h2 style="display:none;" class="price-base">0</h2><h2 class="price-pp">{{experience.price|floatformat:"0"}}</h2>
                         <p>{% trans 'per person' %}</p>
                         {% endif %}
+                    </div>
+                    <div class="exp-price-set" style="display:block;">
+                      <div class="container-fluid">
+                        <span id="{{experience.id}}fixed-price-min">{{experience.fixed_price_min}}</span><div class="slider" id="{{experience.id}}slider-price-base"></div><span id="{{experience.id}}fixed-price-max">{{experience.fixed_price_max}}</span>
+                        <p>
+                          <input typy="text" id="{{experience.id}}fixed-price" readonly>
+                          <label for="{{experience.id}}fixed-price">{% trans "base" %}</label>
+                        </p>
+                      </div>
+                      <div class="container-fluid">
+                        <span id="{{experience.id}}price-min">{{experience.price_min}}</span><div class="slider" id="{{experience.id}}slider-price-pp"></div><span id="{{experience.id}}price-max">{{experience.price_max}}</span>
+                        <p>
+                          <input type="text" id="{{experience.id}}price" readonly>
+                          <label for="{{experience.id}}price">{% trans "pp" %}</label>
+                        </p>
+                      </div>
                     </div>
                   </div>
                   {% endfor %}
@@ -725,7 +741,7 @@
     }
 
     function add_item(type) {
-        var ids = ["title", "location", "fixed_price", "price", "details", "notes"];
+        var ids = ["title", "location", "fixed_price-min", "fixed_price-max", "price-min", "price-max", "fixed_price", "price", "details", "notes"];
         var value = "";
         var item = new FormData();
         item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
@@ -771,8 +787,12 @@
                 var title = $("#" + type + "-title").val();
                 var details = $("#" + type + "-details").val();
                 var location = $("#" + type + "-location").val();
-                var fixed_price = $("#" + type + "-fixed_price").val();
-                var price = $("#" + type + "-price").val();
+                var fixed_price_min = parseFloat($("#" + type + "-fixed_price-min").val());
+                var fixed_price_max = parseFloat($("#" + type + "-fixed_price-max").val());
+                var fixed_price =  (fixed_price_min + fixed_price_max)/2;
+                var price_min = parseFloat($("#" + type + "-price-min").val());
+                var price_max = parseFloat($("#" + type + "-price-max").val());
+                var price = (price_min + price_max)/2;
                 var notes = $("#" + type + "-notes").val();
 
                 if(isNaN(parseFloat(fixed_price)))
@@ -790,34 +810,39 @@
                                     "<h3>" + title + "</h3>" +
                                     "<p>" + details + "</p>" +
                                     "<label style=\"display:none;\">" + notes + "</label>";
-                if(location)
-                {
-                    new_item +=
-                                    "<p class=\"exp-edit\">" + location.substring(0,15) +
-                                    " &middot; " +
-                                    "<a type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
-                                    " &middot; " +
-                                    "<a type=\"button\" onclick=\"duplicate_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
-                                    " &middot; " +
-                                    "<a type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
-                                    "</p>";
-                } else {
-                  new_item +=
-                  "<p class=\"exp-edit\">" +
+
+                new_item +=
+                "<p class=\"exp-edit\">" +
                   "<a type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
                   " &middot; " +
                   "<a type=\"button\" onclick=\"duplicate_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
                   " &middot; " +
                   "<a type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
-                  "</p>";
-                }
+                "</p>";
                 new_item +=
-                                  "</div>" +
-                                  "<div class=\"exp-price\">" +
-                                    "<p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>" +
-                                    "<h2>" + fixed_price + "</h2> + " + "<h2>" + price + "</h2>"
-                                    "<p>{% trans 'base + per person' %}</p>" +
-                                  "</div>";
+                "</div>" +
+                "<div class=\"exp-price\">" +
+                  "<p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>" +
+                  "<p class=\"price-base\">" + fixed_price + " {% trans 'base' %}</p>" +
+                  "<p class=\"price-pp\">" + price + "{% trans 'pp' %}</p>" +
+                "</div>";
+                new_item +=
+                "<div class=\"exp-price-set\">" +
+                  "<div class=\"container-fluid\">" +
+                    "<span class=\"inline-text\" id=\"" + data.new_product_id + "fixed-price-min\">" + fixed_price_min + "</span><div class=\"slider\" id=\"" + data.new_product_id + "slider-price-base\"></div><span class=\"inline-text\" id=\"" + data.new_product_id + "fixed-price-max\">" + fixed_price_max + "</span>" +
+                    "<p>" +
+                      "<input typy=\"text\" id=\"" + data.new_product_id +  "fixed-price\" readonly>" +
+                      "<label for=\"" + data.new_product_id + "fixed-price\">{% trans 'base' %}</label>" +
+                    "</p>" +
+                  "</div>" +
+                  "<div class=\"container-fluid\">" +
+                    "<span class=\"inline-text\" id=\"" + data.new_product_id + "price-min\">"+ price_min + "</span><div class=\"slider\" id=\""+ data.new_product_id + "slider-price-pp\"></div><span class=\"inline-text\" id=\"" + data.new_product_id + "price-max\">" + price_max + "</span>" +
+                    "<p>" +
+                      "<input type=\"text\" id=\"" + data.new_product_id + "price\" readonly>" +
+                      "<label for=\"" + data.new_product_id + "price\">{% trans 'pp' %}</label>" +
+                    "</p>" +
+                  "</div>" +
+                "</div>";
                 $("#"+type+"_column").append(new_item);
                 $("#"+type+"_column").fadeIn();
                 $("#" + type + "-title").val("");
@@ -829,8 +854,10 @@
                 $("#" + type + "-photo").val("");
                 $(".fileinput").fileinput('clear');
                 $("#add-"+type).hide();
+                $("#add-"+type+"-btn").show();
                 $(".loading").hide();
                 init_drag();
+                init_slider(data.new_product_id);
             },
             failure: function (e) {
                 $(".loading").hide();
@@ -976,11 +1003,16 @@
             {
                 //dropped in the left section
                 $($(ui.item[0]).find(".exp-edit")[0]).show();
+                $($(ui.item[0]).find(".exp-price-set")[0]).hide();
+                $($(ui.item[0]).find(".exp-price")[0]).show();
+
             }
             else
             {
                 //dropped in the right section
-                //$($(ui.item[0]).find(".exp-edit")[0]).hide();
+                $($(ui.item[0]).find(".exp-edit")[0]).hide();
+                $($(ui.item[0]).find(".exp-price")[0]).hide();
+                $($(ui.item[0]).find(".exp-price-set")[0]).show();
             }
         }
 
@@ -997,8 +1029,8 @@
                 var experience = $(day).find(".column")[0].firstElementChild;
                 while(experience && experience.id.indexOf("experience_id_") === 0)
                 {
-                    var fixed = $(experience).find(".exp-price")[0].getElementsByTagName("H2")[0];
-                    var tmp = $(experience).find(".exp-price")[0].getElementsByTagName("H2")[1];
+                    var fixed = $(experience).find(".price-base")[0];
+                    var tmp = $(experience).find(".price-pp")[0]
                     price += parseFloat(tmp.innerText || tmp.textContent);
                     fixed_price += parseFloat(fixed.innerText || fixed.textContent);
                     experience = $(experience).next()[0];
