@@ -35,10 +35,10 @@ function init_drag() {
 function tilt_direction(item) {
   var left_pos = item.position().left,
     move_handler = function(e) {
-      if (e.pageX >= left_pos) {
+      if (e.pageX >= (left_pos + 3)) {
         item.addClass("right");
         item.removeClass("left");
-      } else {
+      } else if (e.pageX < (left_pos - 3)) {
         item.addClass("left");
         item.removeClass("right");
       }
@@ -59,7 +59,7 @@ function init_slider(id) {
     value: (fixedPriceMin + fixedPriceMax)/2,
     slide: function( event, ui ) {
         $("#" + id + "fixed-price").val( ui.value );
-        $("#experience_id_" + id).find(".price-base").text(ui.value + "base");
+        $("#experience_id_" + id).find(".price-base").text(ui.value + " base");
         update_price_title();
       }
   });
@@ -69,7 +69,7 @@ function init_slider(id) {
     value: (priceMin + priceMax)/2,
     slide: function( event, ui ) {
         $("#" + id + "price").val( ui.value );
-        $("#experience_id_" + id).find(".price-pp").text(ui.value + "pp");
+        $("#experience_id_" + id).find(".price-pp").text(ui.value + " pp");
         update_price_title();
       }
   });

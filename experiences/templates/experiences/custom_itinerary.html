@@ -196,14 +196,14 @@
                     </div>
                     <div class="exp-price-set" style="display:block;">
                       <div class="container-fluid">
-                        <span id="{{experience.id}}fixed-price-min">{{experience.fixed_price_min}}</span><div class="slider" id="{{experience.id}}slider-price-base"></div><span id="{{experience.id}}fixed-price-max">{{experience.fixed_price_max}}</span>
+                        <span class="inline-text" id="{{experience.id}}fixed-price-min">{{experience.fixed_price_min}}</span><div class="slider" id="{{experience.id}}slider-price-base"></div><span class="inline-text" id="{{experience.id}}fixed-price-max">{{experience.fixed_price_max}}</span>
                         <p>
                           <input typy="text" id="{{experience.id}}fixed-price" readonly>
                           <label for="{{experience.id}}fixed-price">{% trans "base" %}</label>
                         </p>
                       </div>
                       <div class="container-fluid">
-                        <span id="{{experience.id}}price-min">{{experience.price_min}}</span><div class="slider" id="{{experience.id}}slider-price-pp"></div><span id="{{experience.id}}price-max">{{experience.price_max}}</span>
+                        <span class="inline-text" id="{{experience.id}}price-min">{{experience.price_min}}</span><div class="slider" id="{{experience.id}}slider-price-pp"></div><span class="inline-text" id="{{experience.id}}price-max">{{experience.price_max}}</span>
                         <p>
                           <input type="text" id="{{experience.id}}price" readonly>
                           <label for="{{experience.id}}price">{% trans "pp" %}</label>
@@ -869,8 +869,12 @@
       var experience = $("#experience_id_" + id);
       $("#" + type + "-title").val(experience.find(".exp-info").find("h3").text());
       $("#" + type + "-details").val($(experience.find(".exp-info").find("p")[0]).text());
-      $("#" + type + "-fixed_price").val($(experience.find(".exp-price").find("h2")[0]).text());
-      $("#" + type + "-price").val($(experience.find(".exp-price").find("h2")[1]).text());
+      $("#" + type + "-fixed_price").val(parseFloat($(experience.find(".price-base").text())));
+      $("#" + type + "-price").val(parseFloat($(experience.find(".price-pp").text())));
+      $("#" + type + "-fixed_price-min").val($("#" + id + "fixed-price-min").text());
+      $("#" + type + "-fixed_price-max").val($("#" + id + "fixed-price-max").text())
+      $("#" + type + "-price-min").val($("#" + id + "price-min").text())
+      $("#" + type + "-price-max").val($("#" + id + "price-max").text())
       $("#" + type + "-notes").val(experience.find(".exp-info").find("label").text());
       add_item(type);
     }
@@ -880,8 +884,12 @@
     {
         $("#add-" + type + "-btn").click();
         var experience = $("#experience_id_" + id);
-        var fixed_price = $(experience.find(".exp-price").find("h2")[0]).text();
-        var price = $(experience.find(".exp-price").find("h2")[1]).text();
+        var fixed_price = parseFloat($(experience.find(".price-base").text()))
+        var price = parseFloat($(experience.find(".price-pp").text()));
+        var fixed_price_min = $("#" + id + "fixed-price-min").text();
+        var fixed_price_max = $("#" + id + "fixed-price-max").text();
+        var price_min = $("#" + id + "price-min").text();
+        var price_max = $("#" + id + "price-max").text();
         var title = experience.find(".exp-info").find("h3").text();
         var details = $(experience.find(".exp-info").find("p")[0]).text();
         var notes = experience.find(".exp-info").find("label").text();
@@ -895,6 +903,10 @@
             price = 0;
         }
 
+        $("#" + type + "-fixed_price-min").val(fixed_price_min);
+        $("#" + type + "-fixed_price-max").val(fixed_price_max)
+        $("#" + type + "-price-min").val(price_min)
+        $("#" + type + "-price-max").val(price_max)
         $("#" + type + "-fixed_price").val(fixed_price);
         $("#" + type + "-price").val(price);
         $("#" + type + "-title").val(title);
@@ -908,7 +920,7 @@
             item.append("Edit", "Edit");
             item.append("id", id);
 
-            var ids = ["title", "location", "fixed_price", "price", "details", "notes"];
+            var ids = ["title", "location", "fixed_price-min", "fixed_price-max", "price-min", "price-max", "fixed_price", "price", "details", "notes"];
             var value = "";
 
             for (var i = 0, j = 0; i < ids.length; i++) {
@@ -948,8 +960,8 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                                $(experience.find(".exp-price").find("h2")[0]).text($("#" + type + "-fixed_price").val());
-                                $(experience.find(".exp-price").find("h2")[1]).text($("#" + type + "-price").val());
+                                experience.find(".price-base").text($("#" + id + "fixed-price").val());
+                                experience.find(".price-pp").text($("#" + id + "price").val());
                                 experience.find(".exp-info").find("h3").text($("#" + type + "-title").val());
                                 $(experience.find(".exp-info").find("p")[0]).text($("#" + type + "-details").val());
                                 experience.find(".exp-info").find("label").text($("#" + type + "-notes").val());
@@ -964,8 +976,10 @@
                                 $("#" + type + "-fixed_price").val("");
                                 $("#" + type + "-price").val("");
                                 $("#add-" + type).hide();
+                                $("#add-"+type+"-btn").show();
                                 $(".loading").hide();
                                 init_drag();
+                                init_slider(id);
                 },
                 failure: function (e) {
                     $(".loading").hide();
