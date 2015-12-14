@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-07 13:36+1100\n"
+"POT-Creation-Date: 2015-12-14 14:59+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: experiences/templates/experiences/custom_itinerary.html:175
 #: experiences/templates/experiences/custom_itinerary_left_section.html:30
 #: experiences/templates/experiences/experience_detail.html:391
-#: experiences/templates/experiences/experience_results.html:39
+#: experiences/templates/experiences/experience_results.html:45
 #: experiences/templates/experiences/topic_culture.html:43
 #: experiences/templates/experiences/topic_extreme.html:43
 #: experiences/templates/experiences/topic_family.html:43
@@ -350,7 +350,7 @@ msgstr "【本土客】 注册成功"
 
 #: experiences/templates/experiences/1111.html:26
 #: experiences/templates/experiences/experience_detail.html:369
-#: experiences/templates/experiences/experience_results.html:19
+#: experiences/templates/experiences/experience_results.html:25
 #: experiences/templates/experiences/topic_culture.html:24
 #: experiences/templates/experiences/topic_extreme.html:24
 #: experiences/templates/experiences/topic_family.html:24
@@ -374,7 +374,7 @@ msgstr "%(currency)s/人起"
 #: experiences/templates/experiences/1111.html:44
 #: experiences/templates/experiences/experience_description.html:19
 #: experiences/templates/experiences/experience_detail.html:390
-#: experiences/templates/experiences/experience_results.html:38
+#: experiences/templates/experiences/experience_results.html:44
 #: experiences/templates/experiences/product_description.html:8
 #: experiences/templates/experiences/topic_culture.html:42
 #: experiences/templates/experiences/topic_extreme.html:42
@@ -390,7 +390,7 @@ msgstr "小时"
 #: experiences/templates/experiences/experience_detail.html:87
 #: experiences/templates/experiences/experience_detail.html:89
 #: experiences/templates/experiences/experience_detail.html:390
-#: experiences/templates/experiences/experience_results.html:38
+#: experiences/templates/experiences/experience_results.html:44
 #: experiences/templates/experiences/product_description.html:8
 #: experiences/templates/experiences/topic_culture.html:42
 #: experiences/templates/experiences/topic_extreme.html:42
@@ -485,7 +485,7 @@ msgstr "添加"
 #: experiences/templates/experiences/custom_itinerary_left_section.html:323
 #: experiences/templates/experiences/custom_itinerary_left_section.html:394
 #: experiences/templates/experiences/custom_itinerary_left_section.html:456
-#: experiences/templates/experiences/search_result.html:432
+#: experiences/templates/experiences/search_result.html:440
 msgid "Cancel"
 msgstr "取消"
 
@@ -792,7 +792,7 @@ msgid "Mobile"
 msgstr "移动电话"
 
 #: experiences/templates/experiences/custom_itinerary_request.html:160
-#: experiences/templates/experiences/custom_itinerary_request.html:397
+#: experiences/templates/experiences/custom_itinerary_request.html:400
 #: experiences/templates/experiences/review_experience.html:85
 msgid "Submit"
 msgstr "提交"
@@ -813,7 +813,7 @@ msgstr "请完成所有必填项"
 msgid "Please enter a valid phone number. eg. +61 123456789 or +86 12345678901"
 msgstr "请输入格式正确的手机号，如+61 123456789 或者 +86 12345678901"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:363
+#: experiences/templates/experiences/custom_itinerary_request.html:365
 msgid "Submitting"
 msgstr "提交中"
 
@@ -1439,7 +1439,7 @@ msgid "Local Experiences"
 msgstr "特色体验"
 
 #: experiences/templates/experiences/experience_detail.html:369
-#: experiences/templates/experiences/experience_results.html:19
+#: experiences/templates/experiences/experience_results.html:25
 msgid "/person"
 msgstr "/人起"
 
@@ -1520,11 +1520,19 @@ msgstr "展开"
 msgid "Experiences"
 msgstr "个体验"
 
-#: experiences/templates/experiences/experience_results.html:11
-msgid "Request a trip"
-msgstr "订制行程"
+#: experiences/templates/experiences/experience_results.html:12
+msgid "Australia and New Zealand <br> Custom Itineraries"
+msgstr "澳新路线<br>私人订制 "
 
-#: experiences/templates/experiences/experience_results.html:19
+#: experiences/templates/experiences/experience_results.html:15
+msgid "Save time and effort and let us build your dream trip!"
+msgstr "最本土，最科学的路线"
+
+#: experiences/templates/experiences/experience_results.html:17
+msgid "Request a trip"
+msgstr "我要定制"
+
+#: experiences/templates/experiences/experience_results.html:25
 #, python-format
 msgid "%(currency)s"
 msgstr "%(currency)s"
@@ -1823,7 +1831,7 @@ msgid "edit"
 msgstr "修改"
 
 #: experiences/templates/experiences/search_result.html:113
-#: experiences/templates/experiences/search_result.html:438
+#: experiences/templates/experiences/search_result.html:446
 msgid "More Filters"
 msgstr "更多选项"
 

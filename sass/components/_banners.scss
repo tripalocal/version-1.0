@@ -43,18 +43,18 @@
 .custom-itinerary-searchpage {
   display: none;
   @include media('>tablet') {
-    background-color: white;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    @extend .custom-itinerary;
+    background-image: url(../../img/itinerary_banner_tall.gif);
     display: inline-block;
     position: relative;
     height: 350px;
     width: 300px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: $light-grey;
-    border-radius: 3px;
+    .request-btn {
+      bottom: 80px;
+    }
+    h2 {
+      margin: 50px auto;
+    }
   }
 }
 
