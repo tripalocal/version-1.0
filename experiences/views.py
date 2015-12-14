@@ -3163,7 +3163,10 @@ def custom_itinerary(request, id=None):
                 else:
                     ci = CustomItinerary()
                     while True:
-                        new_id = datetime.now().strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
+                        current = datetime.now()
+                        if current.hour>20:
+                            current = current.replace(hour=20)
+                        new_id = current.strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
                         if len(CustomItinerary.objects.filter(id=new_id)) == 0:
                             break
                     ci.id = new_id
