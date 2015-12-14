@@ -194,6 +194,7 @@
                         <p>{% trans 'per person' %}</p>
                         {% endif %}
                     </div>
+                    {% if experience.type == 'Flight' or experience.type == 'Transfer' or experience.type == 'Accommodation' or experience.type == 'Restaurant' or experience.type == 'Suggestion' or experience.type == 'Pricing'%}
                     <div class="exp-price-set" style="display:block;">
                       <div class="container-fluid">
                         <span class="inline-text" id="{{experience.id}}fixed-price-min">{{experience.fixed_price_min}}</span><div class="slider" id="{{experience.id}}slider-price-base"></div><span class="inline-text" id="{{experience.id}}fixed-price-max">{{experience.fixed_price_max}}</span>
@@ -210,6 +211,7 @@
                         </p>
                       </div>
                     </div>
+                    {% endif %}
                   </div>
                   {% endfor %}
                 </div>
@@ -679,7 +681,7 @@
                 var experience = $(day).find(".column")[0].firstElementChild;
                 var hour = 0;
                 var hour_string = "00";
-                var guest_number = $("#id_adult_number").val() + $("#id_children_number").val();
+                var guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
                 while(experience && experience.id.indexOf("experience_id_") === 0)
                 {
                     var exp_id = experience.id.split("_");
@@ -703,7 +705,7 @@
                               "title":tmp.innerText || tmp.textContent,
                               "date":d.toString('yyyy-M-dd'),
                               "time":hour_string+":00",
-                              "total_price": (parseFloat($("#" + exp_id[exp_id.length-1] + "fixed-price").val()) + parseFloat($("#" + exp_id[exp_id.length-1] + "price").val())*guest_number),
+                              "total_price": (parseFloat($(experience).find(".price-base").text()) + parseFloat($(experience).find(".price-pp").text())*guest_number),
                               "adult_number":$("#id_adult_number").val(),
                               "children_number":$("#id_children_number").val()};
                     itinerary.push(dict);
@@ -876,8 +878,8 @@
       var experience = $("#experience_id_" + id);
       $("#" + type + "-title").val(experience.find(".exp-info").find("h3").text());
       $("#" + type + "-details").val($(experience.find(".exp-info").find("p")[0]).text());
-      $("#" + type + "-fixed_price").val(parseFloat($(experience.find(".price-base").text())));
-      $("#" + type + "-price").val(parseFloat($(experience.find(".price-pp").text())));
+      $("#" + type + "-fixed_price").val(parseFloat(experience.find(".price-base").text()));
+      $("#" + type + "-price").val(parseFloat(experience.find(".price-pp").text()));
       $("#" + type + "-fixed_price-min").val($("#" + id + "fixed-price-min").text());
       $("#" + type + "-fixed_price-max").val($("#" + id + "fixed-price-max").text())
       $("#" + type + "-price-min").val($("#" + id + "price-min").text())
