@@ -29,7 +29,7 @@
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
                     </div>
-                    <div class='exp-price'>
+                    <div class='exp-price' style="display:inline-block;">
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
                         <h2 style="display:none;" class="price-base">0</h2><h2 class="price-pp">{{experience.price|floatformat:"0"}}</h2>
                         <p>{% trans 'per person' %}</p>

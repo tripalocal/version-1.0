@@ -243,7 +243,7 @@ body {
 }
 
 .exp-price {
-  display: inline-block;
+  display: none;
   vertical-align: top;
   text-align: right;
   margin-right: 10px;
@@ -267,8 +267,8 @@ body {
 
 .exp-price-set {
   @extend .exp-price;
-  display: none;
   width: 130px;
+  display: inline-block;
   .container-fluid {
     text-align: center;
     padding: 0;
@@ -280,6 +280,9 @@ body {
   input {
     border:0;
     width: 25px;
+  }
+  label {
+    margin: 0;
   }
 }
 

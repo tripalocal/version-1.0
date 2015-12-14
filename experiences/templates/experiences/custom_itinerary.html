@@ -1037,16 +1037,12 @@
             {
                 //dropped in the left section
                 $($(ui.item[0]).find(".exp-edit")[0]).show();
-                $($(ui.item[0]).find(".exp-price-set")[0]).hide();
-                $($(ui.item[0]).find(".exp-price")[0]).show();
 
             }
             else
             {
                 //dropped in the right section
                 $($(ui.item[0]).find(".exp-edit")[0]).hide();
-                $($(ui.item[0]).find(".exp-price")[0]).hide();
-                $($(ui.item[0]).find(".exp-price-set")[0]).show();
                 var id = $(ui.item[0]).attr("id").split("_");
                 init_slider(id[id.length-1]);
             }
