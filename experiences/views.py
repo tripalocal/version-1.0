@@ -3198,6 +3198,7 @@ def custom_itinerary(request, id=None):
                     experience = AbstractExperience.objects.get(id=str(item['id']))
                     adult_number = int(item['adult_number'])
                     children_number = int(item['children_number'])
+                    total_price = float(item['total_price'])
                     if experience.children_price is not None and experience.children > 0:
                         price = experience_fee_calculator(float(experience.children_price), experience.commission)
                     else:
@@ -3213,7 +3214,7 @@ def custom_itinerary(request, id=None):
                     bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
-                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, children_number = children_number,
+                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, total_price = total_price, children_number = children_number,
                                     datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                     submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                     booking.save()

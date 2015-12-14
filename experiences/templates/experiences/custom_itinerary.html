@@ -679,6 +679,7 @@
                 var experience = $(day).find(".column")[0].firstElementChild;
                 var hour = 0;
                 var hour_string = "00";
+                var guest_number = $("#id_adult_number").val() + $("#id_children_number").val();
                 while(experience && experience.id.indexOf("experience_id_") === 0)
                 {
                     var exp_id = experience.id.split("_");
@@ -702,6 +703,7 @@
                               "title":tmp.innerText || tmp.textContent,
                               "date":d.toString('yyyy-M-dd'),
                               "time":hour_string+":00",
+                              "total_price": (parseFloat($("#" + exp_id[exp_id.length-1] + "fixed-price").val()) + parseFloat($("#" + exp_id[exp_id.length-1] + "price").val())*guest_number),
                               "adult_number":$("#id_adult_number").val(),
                               "children_number":$("#id_children_number").val()};
                     itinerary.push(dict);

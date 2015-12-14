@@ -428,7 +428,10 @@ class CustomItinerary(models.Model):
             guest_number = bking.guest_number
             adult_number = bking.adult_number
             children_number = bking.children_number
-            subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
+            if bking.total_price:
+                subtotal_price = bking.total_price
+            else:
+                subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
             subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
             if experience.currency != currency:
                 subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
@@ -461,6 +464,7 @@ class Booking(models.Model):
     adult_number = models.IntegerField(null=True, blank=True)
     children_number = models.IntegerField(null=True, blank=True)
     experience = models.ForeignKey(AbstractExperience)
+    total_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     datetime = models.DateTimeField()
     status = models.CharField(max_length=50)
     submitted_datetime = models.DateTimeField()
