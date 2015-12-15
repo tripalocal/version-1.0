@@ -114,6 +114,7 @@
       <div class="panel panel-default" id="included">
         <div class="panel-body">
           <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>{% trans "What's Included" %}</h2>
+          {{form.whats_included}}
           <div class="container-fluid">
             <div class="row">
               <div class="col-sm-3">
@@ -418,8 +419,6 @@ $(function() {
       }
 
       // Other questions
-      var isFirstTime;
-      var kidsBed;
       if ($("#id_first_time").is(":checked")) {
         isFirstTime = "Yes";
       } else {
@@ -453,7 +452,7 @@ $(function() {
                       accommodation: $("#accommodation").val(),
                       car_rental: $("#car-rental").val(),
                       car_driver: $("#car-driver").val(),
-                      national_flight: $("national-flight").val(),
+                      national_flight: $("#national-flight").val(),
                       requirements: $("#id_requirements").val(),
                       name: $("#id_name").val(),
                       wechat: $("#id_wechat").val(),
