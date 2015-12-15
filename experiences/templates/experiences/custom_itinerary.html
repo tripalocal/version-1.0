@@ -1012,7 +1012,7 @@
             price=0;
         }
         guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
-        $("#price-pp").text(parseInt(price+fixed_price/guest_number));
+        $("#price-pp").text(Math.round(price+fixed_price/guest_number));
         $("#price-tt").text(parseInt(price*guest_number+fixed_price));
     }
 
