@@ -175,7 +175,7 @@
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
                         {% else %}
                         <p class='exp-edit' style="display:none;">
-                          <a type="button" onclick="edit_item({{experience.id}}, {{experience.type}});">{% trans "Edit" %}</a>
+                          <a type="button" onclick="edit_item({{experience.id}}, '{{experience.type}}');">{% trans "Edit" %}</a>
                           &middot;
                           <a type="button" onclick="duplicate_item({{item.id}}, {{experience.type}});">{% trans "Duplicate" %}</a>
                           &middot;
@@ -400,6 +400,11 @@
 
         $(document).on("click", "#submit-add-kids", function() {
             update_kids();
+        });
+
+        $("#right_section").find(".exp-box-sm").each(function() {
+          var id = $(this).attr("id").split("_");
+          init_slider(id[id.length-1]);
         });
     })
 
@@ -878,6 +883,7 @@
       var experience = $("#experience_id_" + id);
       $("#" + type + "-title").val(experience.find(".exp-info").find("h3").text());
       $("#" + type + "-details").val($(experience.find(".exp-info").find("p")[0]).text());
+      $("#" + type + "-location").val(experience.find(".exp-location").text());
       $("#" + type + "-fixed_price").val(parseFloat(experience.find(".price-base").text()));
       $("#" + type + "-price").val(parseFloat(experience.find(".price-pp").text()));
       $("#" + type + "-fixed_price-min").val($("#" + id + "fixed-price-min").text());
