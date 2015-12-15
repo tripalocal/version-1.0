@@ -102,13 +102,13 @@ def home(request):
                     country = response.country.name
                     reader.close()
                     if country.lower() in ['china']:
-                        return HttpResponseRedirect('/cn/')
+                        return HttpResponseRedirect('https://www.tripalocal.com.cn')
                 except Exception:
                     if reader is not None:
                         reader.close()
 
                 if request.LANGUAGE_CODE.startswith("zh"):
-                    return HttpResponseRedirect('/cn/')
+                    return HttpResponseRedirect('https://www.tripalocal.com.cn')
 
     experienceList = Experience.objects.filter(id__in=[1,2,59])
     idxList = random.sample(range(len(experienceList)), 3)

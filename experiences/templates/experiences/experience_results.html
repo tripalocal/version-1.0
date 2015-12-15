@@ -8,7 +8,13 @@
         {% for experience, formattedTitle, BGImageURL, profileImageURL in cityExperienceList %}
         {% if forloop.counter == 5 %}
         <div class="exp-box custom-itinerary-searchpage scroll-animate fadeInUp" >
-          <button class="btn btn-primary request-btn" onclick="window.location.href = '{{GEO_POSTFIX}}itinerary/request/';">{% trans "Request a trip" %}</button>
+          <h2>
+            {% trans "Australia and New Zealand <br> Custom Itineraries" %}
+          </h2>
+          <h3>
+            {% trans "Save time and effort and let us build your dream trip!" %}
+          </h3>
+          <button class="btn btn-dark request-btn" onclick="window.location.href='{{GEO_POSTFIX}}itinerary/request/';">{% trans 'Request a trip' %}</button>
         </div>
         {% endif %}
 

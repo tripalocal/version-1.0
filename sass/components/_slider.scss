@@ -1,0 +1,27 @@
+/*
+  Sliders
+  Requires slider.js from jQuery UI
+*/
+
+.slider {
+  display: inline-block;
+  width: 80px;
+  height: 1px;
+  vertical-align: middle;
+  margin: 0 10px;
+  background-color: $primary-color;
+  position: relative;
+}
+
+.ui-slider-handle {
+  display: block;
+  position: absolute;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 100px;
+  background-color: white;
+  border: 1px solid white;
+  z-index: 1;
+  @include card(1);
+}

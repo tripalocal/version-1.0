@@ -20,7 +20,7 @@
                 {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
                 <div class='exp-box-sm' id='experience_id_{{experience.id}}'>
                     <div class='exp-img'>
-                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}'/>
+                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt=""/>
                     </div>
                     <div class='exp-info'>
                         <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}" target="_blank" style="color:#333;">{{experience.title}}</a></h3>
