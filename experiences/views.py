@@ -3272,7 +3272,9 @@ def custom_itinerary(request, id=None):
         context["children_number"] = 0
         if id is not None:
             existing_ci = CustomItinerary.objects.get(id=id)
-            itinerary = OrderedDict()
+            #itinerary will be in the format of[{'city':'', 'dates':{'date1':[], 'date2':[], ...}}, ...]
+            itinerary = []
+            last_city = ""
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
             for bking in existing_ci.booking_set.order_by('datetime').all():
@@ -3308,11 +3310,14 @@ def custom_itinerary(request, id=None):
 
                 key = bking.datetime.astimezone(pytz.timezone(bking.experience.get_timezone())).strftime("%Y-%m-%d")
 
-                if bking.experience.city not in itinerary:
-                    itinerary[bking.experience.city] = OrderedDict()
-                if key not in itinerary[bking.experience.city]:
-                    itinerary[bking.experience.city][key] = []
-                itinerary[bking.experience.city][key].append(bking.experience)
+                if bking.experience.city != last_city:
+                    itinerary.append(OrderedDict())
+                    itinerary[-1]['city'] = bking.experience.city
+                    itinerary[-1]['dates'] = OrderedDict()
+                if key not in itinerary[-1]['dates']:
+                    itinerary[-1]['dates'][key] = []
+                itinerary[-1]['dates'][key].append(bking.experience)
+                last_city = bking.experience.city
 
             context['existing_itinerary'] = itinerary
 
