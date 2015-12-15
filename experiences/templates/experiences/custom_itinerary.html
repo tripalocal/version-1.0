@@ -150,14 +150,14 @@
           <h1 class="section-heading">Itinerary</h1>
           <h2 class="price-line">{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-pp">0</label> {% trans "per person (Total of "%}{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-tt">0</label>)</h2>
           <div id="sortable">
-          {% for city in existing_itinerary %}
+          {% for city, dict in existing_itinerary.items %}
           <div class="city-sortable">
-            <div id="city-title-{{forloop.counter0}}" class="section-box-add" onclick="$('.collapse').collapse('hide'); $('#city-collapse-{{forloop.counter0}}').collapse('show');update_left_section('{{city.city}}');" city="{{city.city}}">
+            <div id="city-title-{{forloop.counter0}}" class="section-box-add" onclick="$('.collapse').collapse('hide'); $('#city-collapse-{{forloop.counter0}}').collapse('show');update_left_section('{{city}}');" city="{{city}}">
               <span class="add-sign">+</span>
-              <p id="city-title-p-{{forloop.counter0}}">{{city.city}} <span class="badge">{{city.dates|length}}{% trans ' Day(s)' %}</span></p>
+              <p id="city-title-p-{{forloop.counter0}}">{{city}} <span class="badge">{{dict|length}}{% trans ' Day(s)' %}</span></p>
             </div>
             <div class="collapse" id="city-collapse-{{forloop.counter0}}">
-              {% for date, experiences in city.dates.items %}
+              {% for date, experiences in dict.items %}
               <div id="city-collapse-{{forloop.parentloop.counter0}}-day-{{forloop.counter}}" class="section-box">
                 <p>{% trans 'Day' %} {{forloop.counter}}</p>
                 <div class="column">
@@ -364,11 +364,11 @@
         });
 
         //set initial values if in the editing mode
-        {% for city in existing_itinerary %}
+        {% for city, dict in existing_itinerary.items %}
         // add a new button for the city
-        var city = "{{city.city}}";
-        var city_name = "{{city.city}}";
-        var duration = {{ city.dates|length }};
+        var city = "{{city}}";
+        var city_name = "{{city}}";
+        var duration = {{ dict|length }};
         var i = {{forloop.counter0}};
         var new_city = construct_data_content(i, cities, city, city, duration);
         $(new_city).insertBefore($("#add-city"));
@@ -1012,8 +1012,8 @@
             price=0;
         }
         guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
-        $("#price-pp").text(price+fixed_price/guest_number);
-        $("#price-tt").text(price*guest_number+fixed_price);
+        $("#price-pp").text(parseFloat(price+fixed_price/guest_number));
+        $("#price-tt").text(parseFloat(price*guest_number+fixed_price));
     }
 
     function set_new_item_location(type)
