@@ -13,7 +13,7 @@
 <div id="complete" class="full-height" style="display:none;background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %})">
   <div class="container middle animated fadeIn">
     <h1>{% trans 'Your request has been submitted!' %}</h1>
-    <h2>{% trans 'If we have any further questions we will be in touch on WeChat' %}</h2>
+    <h2>{% trans 'Please keep an eye on our phone call within 4 hours. We will call you between 9am - 9pm Beijing time.' %}</h2>
   </div>
 </div>
 <form id="itinerary-request" action="" method="post">
@@ -38,6 +38,24 @@
           <img src="{% static 'experiences/img/itinerary.svg' %}" class="header-icon"><h2>{% trans 'Destinations' %}</h2>
           <p>{% trans 'List some locations you would like to visit on this trip.' %}</p>
           {{form.destinations}}
+          <div class="checkbox-inline">
+            <label><input class="destination-checkbox" type="checkbox" value="Melbourne">{% trans "Melbourne" %}</label>
+          </div>
+          <div class="checkbox-inline">
+            <label><input class="destination-checkbox" type="checkbox" value="Sydney">{% trans "Sydney" %}</label>
+          </div>
+          <div class="checkbox-inline">
+            <label><input class="destination-checkbox" type="checkbox" value="Brisbane">{% trans "Brisbane" %}</label>
+          </div>
+          <div class="checkbox-inline">
+            <label><input class="destination-checkbox" type="checkbox" value="Goldcoast">{% trans "Gold Coast" %}</label>
+          </div>
+          <div class="checkbox-inline">
+            <label><input class="destination-checkbox" type="checkbox" value="Tasmania">{% trans "Tasmania" %}</label>
+          </div>
+          <div class="checkbox-inline">
+            <label><input class="destination-checkbox" type="checkbox" value="Cairns">{% trans "Cairns" %}</label>
+          </div>
         </div>
       </div>
       <div class="panel panel-default" id="date">
@@ -71,6 +89,9 @@
             </div>
           </div>
           <div class="checkbox">
+            <label><input type="checkbox" id="kids-bed">{% trans "Beds needed for kids (optional)" %}</label>
+          </div>
+          <div class="checkbox">
             <label><input type="checkbox" id="id_first_time">{% trans "This is my first time here" %}</label>
           </div>
         </div>
@@ -93,16 +114,45 @@
       <div class="panel panel-default" id="included">
         <div class="panel-body">
           <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>{% trans "What's Included" %}</h2>
-          <p>{% trans "We don't currently provide car rental." %}</p>
-          <div class="checkbox">
-            {{form.whats_included}}
-            <label><input type="checkbox" id="flights" value="Flights">{% trans 'Domestic flights at destination' %}</label>
-          </div>
-          <div class="checkbox">
-            <label><input type="checkbox" id="accommodation" value="Accommodation">{% trans 'Accommodation' %}</label>
-          </div>
-          <div class="checkbox">
-            <label><input type="checkbox" id="driver" value="Driver">{% trans 'Driver' %}</label>
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="slider" id="car-rental-slider"></div>
+                <p>
+                  <label>{% trans "Car Rental" %}: </label>
+                  <input class="slider-value" type="text" id="car-rental" readonly>
+                </p>
+              </div>
+              <div class="col-sm-3">
+                <div class="slider" id="car-driver-slider"></div>
+                <p>
+                  <label>{% trans "Car + Driver" %}: </label>
+                  <input class="slider-value" type="text" id="car-driver" readonly>
+                </p>
+              </div>
+              <div class="col-sm-3">
+                <div class="slider" id="accommodation-slider"></div>
+                <p>
+                  <label>{% trans "Accommodation" %}: </label>
+                  <input class="slider-value" type="text" id="accommodation" readonly>
+                </p>
+              </div>
+              <div class="col-sm-3">
+                <div class="slider" id="national-flight-slider"></div>
+                <p>
+                  <label>{% trans "National Flight" %}: </label>
+                  <input class="slider-value" type="text" id="national-flight" readonly>
+                </p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="checkbox">
+                <label><input type="checkbox" id="airport-transfer" value="airport_transfer">{% trans 'Airport Transfer' %}</label>
+              </div>
+              <div class="checkbox">
+                <label><input type="checkbox" id="locals" value="locals_to_show_around">{% trans 'Locals to show around city' %}</label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -129,7 +179,7 @@
       <div class="panel panel-default" id="contact">
         <div class="panel-body">
           <img src="{% static 'experiences/img/profile.svg' %}" class="header-icon"><h2>{% trans 'Contact Details' %}</h2>
-          <p>{% trans 'Almost done! Just leave us your contact details so we can get back to you.' %}</p>
+          <p>{% trans 'Almost done! Please leave us your contact details below. A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call.' %}</p>
           <div class="container center-form">
             <div class="row">
               <div class="col-sm-6">
@@ -184,6 +234,7 @@
 {%if LANGUAGE == "zh-CN"%}
 <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
 {%endif%}
+<script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <script>
 $(function() {
   if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
@@ -240,6 +291,8 @@ $(function() {
     $("." + $(this).attr("data-hide")).fadeOut();
   });
 
+  initSliders();
+
   if ($(window).width() > 864) {
     $("#start-btn").click(function() {
         $('html,body').animate({
@@ -263,7 +316,8 @@ $(function() {
       $(".progress-bar").fadeOut();
     });
     $("#next-btn1").click(function() {
-      if ($("#id_destinations").val() && $("#id_start_date").val() && $("#id_end_date").val() && $("#id_guests_adults").val()) {
+
+      if (atLeastOneChecked('destination-checkbox') && $("#id_start_date").val() && $("#id_end_date").val() && $("#id_guests_adults").val()) {
         $('html,body').animate({
             scrollTop: $("#step2").offset().top},
             'slow');
@@ -276,10 +330,10 @@ $(function() {
         $("#next-btn2").delay(1700).fadeIn("slow");
         $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp("slow");
         $(".alert-warning").hide();
-        $("#id_destinations").removeAttr('style');
+        $("#destination").removeAttr('style');
       } else {
         $(".alert-warning").fadeIn();
-        $("#id_destinations").css('border-color','red');
+        $("#destination").css('border','1px solid red');
       }
 
     });
@@ -334,6 +388,8 @@ $(function() {
     var legal_roaming_number = /\+\d{2} \d{11}$/;
     if ($("#id_name").val() && $("#id_wechat").val() && $("#id_email").val() && ($("#id_mobile").val().match(legal_local_number) || $("#id_mobile").val().match(legal_roaming_number))) {
       $(".alert-warning").hide();
+
+      // Interests tags
       $("#id_tags").val("");
       for(i=1;$("#tag_"+i).length>0;i++)
       {
@@ -345,20 +401,36 @@ $(function() {
       tags = $("#id_tags").val();
       tags = tags.substring(0,tags.length-1);
       $("#id_tags").val(tags);
-      if ($("#flights").is(":checked")) {
-        $("#id_whats_included").val($("#id_whats_included").val() + $("#flights").val() + ",")
+
+      // Destinations
+      $(".destination-checkbox").each(function() {
+        if ($(this).is(":checked")) {
+          $("#id_destinations").val($("#id_destinations").val() + $(this).val() + ",")
+        }
+      });
+
+      // Whats included
+      if ($("#airport-transfer").is(":checked")) {
+        $("#id_whats_included").val($("#id_whats_included").val() + $("#airport-transfer").val() + ",")
       }
-      if ($("#accommodation").is(":checked")) {
-        $("#id_whats_included").val($("#id_whats_included").val() + $("#accommodation").val() + ",")
+      if ($("#locals").is(":checked")) {
+        $("#id_whats_included").val($("#id_whats_included").val() + $("#locals").val() + ",")
       }
-      if ($("#driver").is(":checked")) {
-        $("#id_whats_included").val($("#id_whats_included").val() + $("#driver").val() + ",")
-      }
+
+      // Other questions
+      var isFirstTime;
+      var kidsBed;
       if ($("#id_first_time").is(":checked")) {
         isFirstTime = "Yes";
       } else {
         isFirstTime = "No";
       }
+      if ($("#kids-bed").is(":checked")) {
+        kidsBed = "Yes";
+      } else {
+        kidsBed = "No";
+      }
+
       $(this).css({
         'background-color': '#009999',
         'border': '0'
@@ -374,9 +446,14 @@ $(function() {
                       guests_adults: $("#id_guests_adults").val(),
                       guests_children: $("#id_guests_children").val(),
                       first_time: isFirstTime,
+                      kids_bed: kidsBed,
                       interests: tags,
                       budget: $("#id_budget").val(),
                       whats_included: $("#id_whats_included").val(),
+                      accommodation: $("#accommodation").val(),
+                      car_rental: $("#car-rental").val(),
+                      car_driver: $("#car-driver").val(),
+                      national_flight: $("national-flight").val(),
                       requirements: $("#id_requirements").val(),
                       name: $("#id_name").val(),
                       wechat: $("#id_wechat").val(),
@@ -429,5 +506,53 @@ $(function() {
     }
   })
 });
+
+function atLeastOneChecked(className) {
+  var checkedAtLeastOne = false;
+  $("." + className).each(function() {
+    if ($(this).is(":checked")) {
+      checkedAtLeastOne = true;
+    }
+  });
+  return checkedAtLeastOne;
+}
+
+function initSliders() {
+  var frequencies = [
+    "none",
+    "infrequent",
+    "average",
+    "frequent"
+  ];
+  var stars = [
+    "none",
+    "3 Star",
+    "4 Star",
+    "5 Star",
+  ];
+  var classes = [
+    "none",
+    "economy",
+    "business",
+    "first class"
+  ]
+  function setSlider(name, steps) {
+    $("#" + name + "-slider").slider({
+      value: 0,
+      min: 0,
+      max: (steps.length-1),
+      step: 1,
+      slide: function(event, ui) {
+        $("#" + name).val(steps[ui.value]);
+      }
+    });
+    $("#" + name).val(steps[$("#" + name + "-slider").slider("value")]);
+  }
+
+  setSlider("car-rental", frequencies);
+  setSlider("car-driver", frequencies);
+  setSlider("accommodation", stars);
+  setSlider("national-flight", classes);
+}
 </script>
 {% endblock %}
