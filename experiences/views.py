@@ -3131,7 +3131,7 @@ def custom_itinerary(request, id=None):
                     npi18n_r.title = npi18n.title
                     npi18n_r.description = npi18n.description
                     npi18n_r.notice = npi18n.notice
-                    #npi18n_r.save()
+                    npi18n_r.save()
                     if len(request.FILES) > 0:
                         for ph in rp.photo_set.all():
                             ph.delete()
