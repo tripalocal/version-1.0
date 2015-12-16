@@ -37,6 +37,7 @@ import xmltodict
 import collections
 from django.db.models import Q
 from experiences.utils import *
+from copy import deepcopy
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -2925,7 +2926,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
             if experience['type'] != 'ITINERARY' and experience['city'].lower() != city[day_counter]:
                 continue
 
-            if dt_string in experience['dates'] and len(experience['dates'][dt_string]) > 0:
+            if dt_string in experience['dates']: #and len(experience['dates'][dt_string]) > 0:
                 #check instant booking
                 instant_booking = False
                 for timeslot in experience['dates'][dt_string]:
@@ -3057,6 +3058,35 @@ def custom_itinerary(request, id=None):
                 if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                     saveExperienceImage(np, photo, extension, 1)
 
+            #issue 423: when an air ticket item or transfer item is created in a city, please duplicate it in all cities
+            if np.type in ("Flight", "Transfer"):
+                np_list = []
+                np_list.append(np)
+                for city in Location:
+                    if city[0] != np.city:
+                        np_copy = deepcopy(np)
+                        np_copy.id += 10
+                        while len(NewProduct.objects.filter(id = np_copy.id)) > 0:
+                            np_copy.id += 10
+                        np_copy.city = city[0]
+                        np_copy.save()
+                        np_copy.suppliers.add(Provider.objects.get(id=1))
+                        np_list.append(np_copy)
+                        npi18n_copy = deepcopy(npi18n)
+                        npi18n_copy.id += 10
+                        while len(NewProductI18n.objects.filter(id = npi18n_copy.id)) > 0:
+                            npi18n_copy.id += 10
+                        npi18n_copy.product = np_copy
+                        npi18n_copy.location = city[0]
+                        npi18n_copy.save()
+                        if len(request.FILES) > 0:
+                            saveExperienceImage(np_copy, photo, extension, 1)
+
+                for i in range(len(np_list)):
+                    for j in range(len(np_list)):
+                        if i!= j and np_list[j] not in np_list[i].related_products.all():
+                            np_list[i].related_products.add(np_list[j])
+
             return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
 
         if 'Edit' in request.POST:
@@ -3095,6 +3125,23 @@ def custom_itinerary(request, id=None):
                 extension = extension.lower()
                 if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                     saveExperienceImage(np, photo, extension, 1)
+
+            #issue 423:  if one instance of these product is modified, please update all products in all cities
+            if np.type in ("Flight", "Transfer"):
+                for rp in np.related_products.all():
+                    rp.price = np.price
+                    rp.fixed_price = np.fixed_price
+                    rp.save()
+
+                    npi18n_r = rp.newproducti18n_set.all()[0]
+                    npi18n_r.title = npi18n.title
+                    npi18n_r.description = npi18n.description
+                    npi18n_r.notice = npi18n.notice
+                    npi18n_r.save()
+                    if len(request.FILES) > 0:
+                        for ph in rp.photo_set.all():
+                            ph.delete()
+                        saveExperienceImage(rp, photo, extension, 1)
 
             return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
 

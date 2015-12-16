@@ -96,26 +96,6 @@
           {% endwith %}
           {% endif %}
           <div class="item-description">{{item.description|linebreaks}}</div>
-            {% if item.type == 'PrivateProduct' or item.type == 'PublicProduct' %}
-            <div class="item-section">
-              <h3>{% trans "What's Included" %}</h3>
-              <div class="inline-content">
-              {{item.whatsincluded|linebreaks}}
-              </div>
-            </div>
-            {% elif item.type == 'PRIVATE' or item.type == 'NONPRIVATE' %}
-            <div class="item-section">
-              <h3>{% trans "What's Included" %}</h3>
-              <div class="inline-content">
-              {% for w in item.whatsincluded %}
-              {% if w.details %}
-              <p><strong>{% if LANGUAGE != "zh-CN" %}{{w.item}} {%else%} {%if w.item.lower == "food"%}餐饮{%elif w.item.lower == "ticket"%}门票{%elif w.item.lower == "transport"%}交通{%elif w.item.lower == "accommodation"%}住宿{%elif w.item.lower == "private guide"%}旅游达人{%endif%}{%endif%}:</strong> {{w.details}}</p>
-              {% endif %}
-              {% endfor %}
-              </div>
-            </div>
-            {% endif %}
-
           {% endif %}
         {% endfor %}
       </div>

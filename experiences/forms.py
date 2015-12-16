@@ -30,6 +30,7 @@ Location = (('Melbourne', _('Melbourne, VIC')),('GRVIC', _('Greater Victoria')),
             ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
             ('Perth', _('Perth, WA')),('GRWA', _('Greater West Australia')),
+            ('Canberra',_('Canberra, ACT')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
@@ -38,6 +39,7 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
                     (_('Adelaide'), 'Adelaide'), (_('Darwin'), 'Darwin'),
                     (_('Alice Springs'), 'Alicesprings'),
                     (_('Perth'), 'Perth'),
+                    (_('Canberra'),'Canberra'),
                     (_('Christchurch'), 'Christchurch'), (_('Queenstown'), 'Queenstown'),
                     (_('Auckland'), 'Auckland'), (_('Wellington'), 'Wellington'),)
 
@@ -93,6 +95,7 @@ Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Bri
             ('GRVIC', _('Greater Victoria')),('GRNSW', _('Greater New South Wales')),('GRQLD', _('Greater Queensland')),('GRTAS', _('Greater Tasmania')),
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),('GRWA', _('Greater West Australia')),
             ('Perth', _('Perth, WA')),
+            ('Canberra',_('Canberra, ACT')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Currency = (('AUD',_('AUD')),('NZD',_('NZD')),('CNY',_('CNY')),)
