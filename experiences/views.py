@@ -3069,6 +3069,7 @@ def custom_itinerary(request, id=None):
                             np_copy.id += 10
                         np_copy.city = city[0]
                         np_copy.save()
+                        np_copy.suppliers.add(Provider.objects.get(id=1))
                         np_list.append(np_copy)
                         npi18n_copy = deepcopy(npi18n)
                         npi18n_copy.id += 10
