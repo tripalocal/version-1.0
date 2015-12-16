@@ -2925,7 +2925,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
             if experience['type'] != 'ITINERARY' and experience['city'].lower() != city[day_counter]:
                 continue
 
-            if dt_string in experience['dates'] and len(experience['dates'][dt_string]) > 0:
+            if dt_string in experience['dates']: #and len(experience['dates'][dt_string]) > 0:
                 #check instant booking
                 instant_booking = False
                 for timeslot in experience['dates'][dt_string]:
