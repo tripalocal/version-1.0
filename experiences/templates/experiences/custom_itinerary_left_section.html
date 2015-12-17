@@ -18,7 +18,7 @@
             {% endif %}
                 {% for experience in day.experiences %}
                 {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
-                <div class='exp-box-sm' id='experience_id_{{experience.id}}'>
+                <div class='experience_id_{{experience.id}} exp-box-sm'>
                     <div class='exp-img'>
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt=""/>
                     </div>
@@ -46,7 +46,7 @@
         <button type="button" class="btn btn-default btn-right" id="add-flight-btn">+ Add Flight</button>
         <div class="column" id="flight_column">
             {% for item in flight %}
-            <div class="exp-box-sm flight_{{item.location}}" id="experience_id_{{item.id}}">
+            <div class="experience_id_{{item.id}} exp-box-sm flight_{{item.location}}">
                 <div class="exp-img" style="background-image:url({% static "experiences/img/flight.svg" %})">
                     <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
@@ -133,7 +133,7 @@
         <button type="button" id="add-transfer-btn" class="btn btn-default btn-right">+ Add Transfer</button>
         <div class="column" id="transfer_column">
             {% for item in transfer %}
-            <div class="exp-box-sm transfer_{{item.location}}" id="experience_id_{{item.id}}">
+            <div class="experience_id_{{item.id}} exp-box-sm transfer_{{item.location}}">
                 <div class="exp-img" style="background-image:url({% static "experiences/img/transfer.svg" %})">
                     <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
@@ -220,7 +220,7 @@
         <button type="button" id="add-accommodation-btn" class="btn btn-default btn-right">+ Add Accommodation</button>
         <div class="column" id="accommodation_column">
             {% for item in accommodation %}
-            <div class="exp-box-sm accommodation_{{item.location}}" id="experience_id_{{item.id}}">
+            <div class="experience_id_{{item.id}} exp-box-sm accommodation_{{item.location}}">
                 <div class="exp-img" style="background-image:url({% static "experiences/img/accommodation.svg" %})">
                     <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
@@ -307,7 +307,7 @@
         <button type="button" id="add-restaurant-btn" class="btn btn-default btn-right">+ Add Restaurant</button>
         <div class="column" id="restaurant_column">
             {% for item in restaurant %}
-            <div class="exp-box-sm restaurant_{{item.location}}" id="experience_id_{{item.id}}">
+            <div class="experience_id_{{item.id}} exp-box-sm restaurant_{{item.location}}">
                 <div class="exp-img" style="background-image:url({% static "experiences/img/restaurant.svg" %})">
                     <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
@@ -394,7 +394,7 @@
         <button type="button" id="add-suggestion-btn" class="btn btn-default btn-right">+ Add Suggestion</button>
         <div class="column" id="suggestion_column">
             {% for item in suggestion %}
-            <div class="exp-box-sm suggestion_{{item.location}}" id="experience_id_{{item.id}}">
+            <div class="experience_id_{{item.id}} exp-box-sm suggestion_{{item.location}}">
                 <div class="exp-img" style="background-image:url({% static "experiences/img/itinerary.svg" %})">
                     <img src="{{MEDIA_URL}}thumbnails/experiences/experience{{item.id}}_1.jpg" alt=""/>
                 </div>
@@ -481,7 +481,7 @@
         <button type="button" id="add-pricing-btn" class="btn btn-default btn-right">+ Add Pricing</button>
         <div class="column" id="pricing_column">
             {% for item in pricing %}
-            <div class="exp-box-sm" id="experience_id_{{item.id}}">
+            <div class="experience_id_{{item.id}} exp-box-sm">
                 <div class="exp-img"></div>
                 <div class="exp-info">
                     <h3>{{item.title}}</h3>

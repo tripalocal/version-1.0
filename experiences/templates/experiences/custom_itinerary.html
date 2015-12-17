@@ -162,7 +162,7 @@
                 <p>{% trans 'Day' %} {{forloop.counter}}</p>
                 <div class="column">
                   {% for experience in experiences %}
-                  <div class='exp-box-sm' id='experience_id_{{experience.id}}'>
+                  <div class='experience_id_{{experience.id}} exp-box-sm'>
                     <div class='exp-img'>
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
                     </div>
@@ -687,18 +687,19 @@
                 var hour = 0;
                 var hour_string = "00";
                 var guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
-                var fixed_price = $(experience).find(".fixed-price").val();
-                if (isNaN(parseFloat(fixed_price))) {
-                  fixed_price = $(experience).find(".fixed-price").text();
-                }
-                var price = $(experience).find(".price").val();
-                if (isNaN(parseFloat(price))) {
-                  price = $(experience).find(".price").text();
-                }
 
-                while(experience && experience.id.indexOf("experience_id_") === 0)
+                while(experience && $(experience).hasClass("exp-box-sm"))
                 {
-                    var exp_id = experience.id.split("_");
+                    var classes = $(experience).attr("class").split(" ");
+                    var exp_id = classes[0].split("_");
+                    var fixed_price = $(experience).find(".fixed-price").val();
+                    if (isNaN(parseFloat(fixed_price))) {
+                      fixed_price = $(experience).find(".fixed-price").text();
+                    }
+                    var price = $(experience).find(".price").val();
+                    if (isNaN(parseFloat(price))) {
+                      price = $(experience).find(".price").text();
+                    }
                     var d = Date.parseExact($("#id_start_datetime").val().substring(0, 10), "yyyy-M-dd");
                     d.setDate(d.getDate()+number_day-1);
                     var tmp = $(experience).find(".exp-info")[0].firstElementChild;
@@ -823,7 +824,7 @@
                     price = 0;
                 }
 
-                var new_item =  "<div class=\"exp-box-sm\" id=\"experience_id_" + data.new_product_id + "\">" +
+                var new_item =  "<div class=\"experience_id_" + data.new_product_id + " exp-box-sm\">" +
                                   "<div class=\"exp-img\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + data.new_product_id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
                                   "<div class=\"exp-info\">" +
                                     "<h3>" + title + "</h3>" +
@@ -881,7 +882,7 @@
     }
 
     function duplicate_item(id, type) {
-      var experience = $("#experience_id_" + id);
+      var experience = $($(".experience_id_" + id)[0]);
       var fixed_price = parseFloat(experience.find(".fixed-price").text())
       var price = parseFloat(experience.find(".price").text());
       var fixed_price_min = parseFloat(experience.find(".fixed-price-min").text());
@@ -892,7 +893,7 @@
       var details = $(experience.find(".exp-info").find("p")[0]).text();
       var notes = experience.find(".exp-info").find("label").text();
 
-      var new_item =  "<div class=\"exp-box-sm\" id=\"experience_id_" + id + "\">" +
+      var new_item =  "<div class=\"experience_id_" + id + " exp-box-sm\">" +
                         "<div class=\"exp-img\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
                         "<div class=\"exp-info\">" +
                           "<h3>" + title + "</h3>" +
@@ -931,7 +932,7 @@
     function edit_item(id, type)
     {
         $("#add-" + type + "-btn").click();
-        var experience = $("#experience_id_" + id);
+        var experience = $($(".experience_id_" + id)[0]);
         var fixed_price = parseFloat(experience.find(".fixed-price").text())
         var price = parseFloat(experience.find(".price").text());
         var fixed_price_min = parseFloat(experience.find(".fixed-price-min").text());
@@ -1061,7 +1062,7 @@
             processData: false,
             contentType: false,
             success: function (data) {
-                        $("#experience_id_" + id).remove();
+                        $(".experience_id_" + id).remove();
                     },
             failure: function (e) {
                 $(".loading").hide();
@@ -1083,7 +1084,8 @@
             {
                 //dropped in the right section
                 $($(ui.item[0]).find(".exp-edit")[0]).hide();
-                var id = $(ui.item[0]).attr("id").split("_");
+                var classes = $(ui.item[0]).attr("class").split(" ");
+                var id = classes[0].split("_");
                 var type = $(".tab-pane.active").attr("id");
                 duplicate_item(id[id.length-1], type);
                 init_slider($(ui.item[0]));
@@ -1101,7 +1103,7 @@
             while(day && day.id.indexOf("city-collapse-") === 0)
             {
                 var experience = $(day).find(".column")[0].firstElementChild;
-                while(experience && experience.id.indexOf("experience_id_") === 0)
+                while(experience && $(experience).hasClass("exp-box-sm"))
                 {
                     var fixed = $(experience).find(".fixed-price").val();
                     if (isNaN(parseFloat(fixed))) {
