@@ -48,33 +48,37 @@ function tilt_direction(item) {
   item.data("move_handler", move_handler);
 }
 
-function init_slider(id) {
-  var fixedPriceMin = parseFloat($("#" + id + "fixed-price-min").text());
-  var fixedPriceMax = parseFloat($("#" + id + "fixed-price-max").text());
-  var priceMin = parseFloat($("#" + id + "price-min").text());
-  var priceMax = parseFloat($("#" + id + "price-max").text());
-  $("#" + id + "slider-price-base").slider({
+function init_slider(item) {
+  var fixedPriceMin = parseFloat(item.find(".fixed-price-min").text());
+  var fixedPriceMax = parseFloat(item.find(".fixed-price-max").text());
+  var priceMin = parseFloat(item.find(".price-min").text());
+  var priceMax = parseFloat(item.find(".price-max").text());
+
+  var $fixedPrice = item.find(".fixed-price");
+  var $price = item.find(".price");
+  var $sliderPriceBase = item.find(".slider-price-base");
+  var $sliderPricePP = item.find(".slider-price-pp");
+
+  $sliderPriceBase.slider({
     min: fixedPriceMin,
     max: fixedPriceMax,
     value: (fixedPriceMin + fixedPriceMax)/2,
     slide: function( event, ui ) {
-        $("#" + id + "fixed-price").val( ui.value );
-        $("#experience_id_" + id).find(".price-base").text(ui.value + " base");
+        $fixedPrice.val( ui.value );
         update_price_title();
       }
   });
-  $("#" + id + "slider-price-pp").slider({
+  $sliderPricePP.slider({
     min: priceMin,
     max: priceMax,
     value: (priceMin + priceMax)/2,
     slide: function( event, ui ) {
-        $("#" + id + "price").val( ui.value );
-        $("#experience_id_" + id).find(".price-pp").text(ui.value + " pp");
+        $price.val( ui.value );
         update_price_title();
       }
   });
-  $("#" + id + "fixed-price").val( $("#" + id + "slider-price-base").slider( "value" ) );
-  $("#" + id + "price").val( $("#" + id + "slider-price-pp").slider( "value" ) );
+  $fixedPrice.val( $sliderPriceBase.slider( "value" ) );
+  $price.val( $sliderPricePP.slider( "value" ) );
 }
 
 $(document).ready(function() {

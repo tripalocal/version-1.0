@@ -29,9 +29,9 @@
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
                     </div>
-                    <div class='exp-price' style="display:inline-block;">
+                    <div class='exp-price'>
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
-                        <h2 style="display:none;" class="price-base">0</h2><h2 class="price-pp">{{experience.price|floatformat:"0"}}</h2>
+                        <h2 style="display:none;" class="fixed-price">0</h2><h2 class="price">{{experience.price|floatformat:"0"}}</h2>
                         <p>{% trans 'per person' %}</p>
                     </div>
                 </div>
@@ -64,23 +64,18 @@
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price">
-                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
-                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
-                </div>
-                <div class="exp-price-set">
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span class="inline-text" id="{{item.id}}fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
+                    <span class="inline-text fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider slider-price-base"></div><span class="inline-text fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}fixed-price" readonly>
-                      <label for="{{item.id}}fixed-price">{% trans 'base' %}</label>
+                      <input type="text" class="fixed-price" readonly>
+                      <label>{% trans 'base' %}</label>
                     </p>
                   </div>
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span class="inline-text" id="{{item.id}}price-max">{{item.price_max|floatformat:"0"}}</span>
+                    <span class="inline-text price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider slider-price-pp"></div><span class="inline-text price-max">{{item.price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}price" readonly>
-                      <label for="{{item.id}}price">{% trans 'pp' %}</label>
+                      <input type="text" class="price" readonly>
+                      <label>{% trans 'pp' %}</label>
                     </p>
                   </div>
                 </div>
@@ -156,23 +151,18 @@
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price">
-                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
-                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
-                </div>
-                <div class="exp-price-set">
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span class="inline-text" id="{{item.id}}fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
+                    <span class="inline-text fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider slider-price-base"></div><span class="inline-text fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}fixed-price" readonly>
-                      <label for="{{item.id}}fixed-price">{% trans 'base' %}</label>
+                      <input type="text" class="fixed-price" readonly>
+                      <label>{% trans 'base' %}</label>
                     </p>
                   </div>
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span class="inline-text" id="{{item.id}}price-max">{{item.price_max|floatformat:"0"}}</span>
+                    <span class="inline-text price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider slider-price-pp"></div><span class="inline-text price-max">{{item.price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}price" readonly>
-                      <label for="{{item.id}}price">{% trans 'pp' %}</label>
+                      <input type="text" class="price" readonly>
+                      <label>{% trans 'pp' %}</label>
                     </p>
                   </div>
                 </div>
@@ -248,23 +238,18 @@
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price">
-                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
-                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
-                </div>
-                <div class="exp-price-set">
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span class="inline-text" id="{{item.id}}fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
+                    <span class="inline-text fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider slider-price-base"></div><span class="inline-text fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}fixed-price" readonly>
-                      <label for="{{item.id}}fixed-price">{% trans 'base' %}</label>
+                      <input type="text" class="fixed-price" readonly>
+                      <label>{% trans 'base' %}</label>
                     </p>
                   </div>
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span class="inline-text" id="{{item.id}}price-max">{{item.price_max|floatformat:"0"}}</span>
+                    <span class="inline-text price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider slider-price-pp"></div><span class="inline-text price-max">{{item.price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}price" readonly>
-                      <label for="{{item.id}}price">{% trans 'pp' %}</label>
+                      <input type="text" class="price" readonly>
+                      <label>{% trans 'pp' %}</label>
                     </p>
                   </div>
                 </div>
@@ -340,23 +325,18 @@
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price">
-                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
-                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
-                </div>
-                <div class="exp-price-set">
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span class="inline-text" id="{{item.id}}fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
+                    <span class="inline-text fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider slider-price-base"></div><span class="inline-text fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}fixed-price" readonly>
-                      <label for="{{item.id}}fixed-price">{% trans 'base' %}</label>
+                      <input type="text" class="fixed-price" readonly>
+                      <label>{% trans 'base' %}</label>
                     </p>
                   </div>
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span class="inline-text" id="{{item.id}}price-max">{{item.price_max|floatformat:"0"}}</span>
+                    <span class="inline-text price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider slider-price-pp"></div><span class="inline-text price-max">{{item.price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}price" readonly>
-                      <label for="{{item.id}}price">{% trans 'pp' %}</label>
+                      <input type="text" class="price" readonly>
+                      <label>{% trans 'pp' %}</label>
                     </p>
                   </div>
                 </div>
@@ -432,23 +412,18 @@
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price">
-                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
-                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
-                </div>
-                <div class="exp-price-set">
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span class="inline-text" id="{{item.id}}fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
+                    <span class="inline-text fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider slider-price-base"></div><span class="inline-text fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}fixed-price" readonly>
-                      <label for="{{item.id}}fixed-price">{% trans 'base' %}</label>
+                      <input type="text" class="fixed-price" readonly>
+                      <label>{% trans 'base' %}</label>
                     </p>
                   </div>
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span class="inline-text" id="{{item.id}}price-max">{{item.price_max|floatformat:"0"}}</span>
+                    <span class="inline-text price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider slider-price-pp"></div><span class="inline-text price-max">{{item.price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}price" readonly>
-                      <label for="{{item.id}}price">{% trans 'pp' %}</label>
+                      <input type="text" class="price" readonly>
+                      <label>{% trans 'pp' %}</label>
                     </p>
                   </div>
                 </div>
@@ -521,23 +496,18 @@
                     <label style="display:none;">{{item.notes}}</label>
                 </div>
                 <div class="exp-price">
-                    <p>{{request.session.dollar_sign}}{{request.session.custom_currency}}</p>
-                    <p class="price-base">{{item.fixed_price|floatformat:"0"}} {% trans "base" %}</p>
-                    <p class="price-pp">{{item.price|floatformat:"0"}} {% trans "pp" %}</p>
-                </div>
-                <div class="exp-price-set">
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-base"></div><span class="inline-text" id="{{item.id}}fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
+                    <span class="inline-text fixed-price-min">{{item.fixed_price_min|floatformat:"0"}}</span><div class="slider slider-price-base"></div><span class="inline-text fixed-price-max">{{item.fixed_price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}fixed-price" readonly>
-                      <label for="{{item.id}}fixed-price">{% trans 'base' %}</label>
+                      <input type="text" class="fixed-price" readonly>
+                      <label>{% trans 'base' %}</label>
                     </p>
                   </div>
                   <div class="container-fluid">
-                    <span class="inline-text" id="{{item.id}}price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider" id="{{item.id}}slider-price-pp"></div><span class="inline-text" id="{{item.id}}price-max">{{item.price_max|floatformat:"0"}}</span>
+                    <span class="inline-text price-min">{{item.price_min|floatformat:"0"}}</span><div class="slider slider-price-pp"></div><span class="inline-text price-max">{{item.price_max|floatformat:"0"}}</span>
                     <p>
-                      <input type="text" id="{{item.id}}price" readonly>
-                      <label for="{{item.id}}price">{% trans 'pp' %}</label>
+                      <input type="text" class="price" readonly>
+                      <label>{% trans 'pp' %}</label>
                     </p>
                   </div>
                 </div>
