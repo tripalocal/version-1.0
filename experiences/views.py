@@ -3074,7 +3074,7 @@ def custom_itinerary(request, id=None):
 
                 for i in range(len(np_list)):
                     for j in range(len(np_list)):
-                        if i!= j and np_list[j] not in np_list[i].related_products.all():
+                        if i!= j: # and np_list[j] not in np_list[i].related_products.all():
                             np_list[i].related_products.add(np_list[j])
 
             return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
