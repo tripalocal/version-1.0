@@ -146,7 +146,7 @@
       </div>
       <div class="col-sm-6">
         <!-- Right section -->
-        <div id="right_section" class="section" style="overflow:scroll; height:72vh;">
+        <div id="right_section" class="section" style="overflow:scroll; height:78vh;">
           <h1 class="section-heading">Itinerary</h1>
           <h2 class="price-line">{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-pp">0</label> {% trans "per person (Total of "%}{{request.session.dollar_sign}}{{request.session.custom_currency}} <label id="price-tt">0</label>)</h2>
           <div id="sortable">
@@ -162,7 +162,7 @@
                 <p>{% trans 'Day' %} {{forloop.counter}}</p>
                 <div class="column">
                   {% for experience in experiences %}
-                  <div class='experience_id_{{experience.id}} exp-box-sm'>
+                  <div class='experience_id_{{experience.id}} exp-box-sm added'>
                     <div class='exp-img'>
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
                     </div>
@@ -1084,10 +1084,13 @@
             {
                 //dropped in the right section
                 $($(ui.item[0]).find(".exp-edit")[0]).hide();
-                var classes = $(ui.item[0]).attr("class").split(" ");
-                var id = classes[0].split("_");
-                var type = $(".tab-pane.active").attr("id");
-                duplicate_item(id[id.length-1], type);
+                if (!$(ui.item[0]).hasClass("added")) {
+                  var classes = $(ui.item[0]).attr("class").split(" ");
+                  var id = classes[0].split("_");
+                  var type = $(".tab-pane.active").attr("id");
+                  $(ui.item[0]).addClass("added");
+                  duplicate_item(id[id.length-1], type);
+                }
                 init_slider($(ui.item[0]));
             }
         }
