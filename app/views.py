@@ -27,7 +27,7 @@ from Tripalocal_V1 import settings
 from experiences.views import SearchView, set_initial_currency, convert_experience_price
 from allauth.account.signals import email_confirmed, password_changed
 from experiences.models import Booking, Experience, Payment, WechatProduct, WechatBooking
-from experiences.forms import Currency, DollarSign, email_account_generator
+from experiences.forms import Currency, DollarSign
 from django.utils.translation import ugettext_lazy as _
 from post_office import mail
 from django.contrib.auth.models import User

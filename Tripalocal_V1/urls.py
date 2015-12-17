@@ -10,6 +10,7 @@ from experiences.models import Experience
 from experiences.views import *
 from Tripalocal_V1 import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 
 # Uncomment the next lines to enable the admin:
 from django.conf.urls import include
@@ -121,15 +122,15 @@ urlpatterns = patterns('',
     url(r'^service_all_products/$', 'experiences.resource.service_all_products'),
     url(r'^update_files/$', 'experiences.resource.update_files'),
 
-    url(r'^custom_admin/$', NewProductView.as_view(), name='custom_admin_index'),
-    url(r'^custom_admin/booking$', BookingView.as_view(), name='admin_booking'),
+    url(r'^custom_admin/$', staff_member_required(NewProductView.as_view()), name='custom_admin_index'),
+    url(r'^custom_admin/booking$', staff_member_required(BookingView.as_view()), name='admin_booking'),
     #url(r'^custom_admin/change_time/(?P<booking_id>\d+)$', BookingView.as_view()),
-    url(r'^custom_admin/booking-archive/$', BookingArchiveView.as_view(), name='admin_booking_archive'),
-    url(r'^custom_admin/payment/$', PaymentView.as_view(), name='admin_payment'),
-    url(r'^custom_admin/experience/$', ExperienceView.as_view(), name='admin_experience'),
-    url(r'^custom_admin/newproduct/$', NewProductView.as_view(), name='admin_newproduct'),
-    url(r'^custom_admin/partnerproduct/$', PartnerProductView.as_view(), name='admin_partnerproduct'),
-    url(r'^custom_admin/itinerary/$', ItineraryView.as_view(), name='admin_itinerary'),
+    url(r'^custom_admin/booking-archive/$', staff_member_required(BookingArchiveView.as_view()), name='admin_booking_archive'),
+    url(r'^custom_admin/payment/$', staff_member_required(PaymentView.as_view()), name='admin_payment'),
+    url(r'^custom_admin/experience/$', staff_member_required(ExperienceView.as_view()), name='admin_experience'),
+    url(r'^custom_admin/newproduct/$', staff_member_required(NewProductView.as_view()), name='admin_newproduct'),
+    url(r'^custom_admin/partnerproduct/$', staff_member_required(PartnerProductView.as_view()), name='admin_partnerproduct'),
+    url(r'^custom_admin/itinerary/$', staff_member_required(ItineraryView.as_view()), name='admin_itinerary'),
     url(r'^multidaytrip/$','experiences.views.multi_day_trip'),
     url(r'^family/$','experiences.views.topic_family'),
     url(r'^romance/$','experiences.views.topic_romance'),

@@ -35,6 +35,9 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     context_object_name = 'itinerary_list'
     paginate_by = None
 
+    def post(self, request, **kwargs):
+        return self._process_request_with_general_return(request, model_class=CustomItinerary, **kwargs)
+
     def get_queryset(self):
         return self.model.objects.all().order_by('-submitted_datetime')
 
@@ -50,6 +53,21 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
                 else:
                     ci.status = "Discount price"
         return context
+
+    def _manipulate_multi_change_statuses(self, request, itinerary_list, **kwargs):
+        itinerary_list= list(itinerary_list)
+        for itinerary in itinerary_list:
+            #TODO
+            pass
+            #itinerary.change_status(new_status=kwargs['form'].cleaned_data['status'])
+        return {'id':[itinerary.id for itinerary in itinerary_list]}
+
+    def _manipulate_duplicate_itineraries(self, request, itinerary_list, **kwargs):
+        itinerary_list= list(itinerary_list)
+        result_list = []
+        for itinerary in itinerary_list:
+            result_list.append(itinerary.duplicate())
+        return {'id':[itinerary.id for itinerary in result_list]}
 
 class ExperienceView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     model = Experience

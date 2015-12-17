@@ -12,6 +12,7 @@ from polymorphic import PolymorphicModel
 from experiences.utils import *
 import app.models
 from unionpay.util.helper import load_config
+from copy import deepcopy
 
 class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
@@ -440,6 +441,27 @@ class CustomItinerary(models.Model):
         if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + self.submitted_datetime:
             itinerary_price *= 1.15
         return round(itinerary_price,0)
+
+    def duplicate(self):
+        ci = deepcopy(self)
+        while True:
+            current = datetime.now()
+            if current.hour>20:
+                current = current.replace(hour=20)
+            new_id = current.strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
+            if len(CustomItinerary.objects.filter(id=new_id)) == 0:
+                break
+        ci.id = new_id
+        ci.submitted_datetime = pytz.timezone(settings.TIME_ZONE).localize(current)
+        ci.save()
+        for bking in self.booking_set.all():
+            bking_copy = deepcopy(bking)
+            bking_copy.id += 10
+            while len(Booking.objects.filter(id = bking_copy.id)) > 0:
+                bking_copy.id += 10
+            bking_copy.custom_itinerary = ci
+            bking_copy.save()
+        return ci
 
 class CustomItineraryRequest(models.Model):
     is_first_time = models.BooleanField(default=True)

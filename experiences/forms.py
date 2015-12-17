@@ -781,9 +781,6 @@ class CreateExperienceForm(forms.Form):
         self.fields['host_id_photo_4'].widget.attrs['class'] = 'upload'
         self.fields['host_id_photo_5'].widget.attrs['class'] = 'upload'
 
-def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
-
 class ReviewForm(forms.ModelForm):
 
     comment = forms.CharField(min_length=10, max_length=200, required = False, widget=forms.Textarea)

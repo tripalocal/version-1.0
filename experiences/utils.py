@@ -1,4 +1,4 @@
-import os, pytz
+import os, pytz, string, random
 
 from Tripalocal_V1 import settings
 from unionpay.util.helper import load_config
@@ -68,3 +68,6 @@ def get_total_price(experience, guest_number=0, adult_number=0, children_number=
 def get_timezone(city):
     timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
     return timezones.get(city.lower(), settings.TIME_ZONE)
+
+def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
