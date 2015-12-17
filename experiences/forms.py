@@ -1252,8 +1252,8 @@ def send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, 
         send_sms(customer_phone_num, msg)
 
 class SearchForm(forms.Form):
-    start_date = forms.DateTimeField(required=False)
-    end_date = forms.DateTimeField(required=False)
+    start_date = forms.DateTimeField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    end_date = forms.DateTimeField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
     guest_number = forms.ChoiceField(choices=Guest_Number, widget=forms.Select(attrs={'class':'ui dropdown smaller-box'}), required=False)
     city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'class':'ui dropdown'}), required=True)
     language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")

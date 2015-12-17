@@ -3025,6 +3025,7 @@ def custom_itinerary(request, id=None):
             #add a new item
             item = request.POST
             np = NewProduct(price=item.get('price', 0), fixed_price=item.get('fixed_price', 0),
+                            price_min=item.get('price-min'), price_max=item.get('price-max'), fixed_price_min=item.get('fixed_price-min'), fixed_price_max=item.get('fixed_price-max'),
                             commission=0.0, currency=request.session["custom_currency"].lower(), type=item['type'].title(),
                             city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted",
                             start_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)),
@@ -3083,6 +3084,10 @@ def custom_itinerary(request, id=None):
             #edit an item
             item = request.POST
             np = NewProduct.objects.get(id=item.get('id'))
+            np.price_min = item.get('price_min')
+            np.price_max = item.get('price_max')
+            np.fixed_price_min = item.get('fixed_price-min')
+            np.fixed_price_max = item.get('fixed_price-max')
             np.price = item.get('price', 0)
             np.fixed_price = item.get('fixed_price', 0)
             np.city = item.get('location', "")
@@ -3174,6 +3179,10 @@ def custom_itinerary(request, id=None):
                     if 'custom_currency' in request.session and request.session["custom_currency"].lower() != pd.currency.lower():
                         pd.price = convert_currency(pd.price, pd.currency, request.session["custom_currency"])
                         pd.fixed_price = convert_currency(pd.fixed_price, pd.currency, request.session["custom_currency"])
+                        pd.price_min = convert_currency(pd.price_min, pd.currency, request.session["custom_currency"])
+                        pd.price_max = convert_currency(pd.price_max, pd.currency, request.session["custom_currency"])
+                        pd.fixed_price_min = convert_currency(pd.fixed_price_min, pd.currency, request.session["custom_currency"])
+                        pd.fixed_price_max = convert_currency(pd.fixed_price_max, pd.currency, request.session["custom_currency"])
                 context['flight'] = [e for e in pds if e.type == 'Flight' and e.city in str(city).split(",")]
                 context['transfer'] = [e for e in pds if e.type == 'Transfer' and e.city in str(city).split(",")]
                 context['accommodation'] = [e for e in pds if e.type == 'Accommodation' and e.city in str(city).split(",")]
@@ -3216,87 +3225,22 @@ def custom_itinerary(request, id=None):
                     ci.status = "ready"
                 ci.save()
 
-                workbook = xlsxwriter.Workbook(os.path.join(settings.PROJECT_ROOT,'itineraries', str(ci.id)+'.xlsx'))
-                worksheet = workbook.add_worksheet()
-                city = form.cleaned_data['city']
-                city = city.split(',')
-                row = -1
-                last_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2000/01/01", "%Y/%m/%d"))
-                i=-1
-                week_day = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
-                total_price = 0.0
-
                 for item in itinerary:
                     experience = AbstractExperience.objects.get(id=str(item['id']))
                     adult_number = int(item['adult_number'])
                     children_number = int(item['children_number'])
-                    if experience.children_price is not None and experience.children > 0:
-                        price = experience_fee_calculator(float(experience.children_price), experience.commission)
-                    else:
-                        price = experience_fee_calculator(float(experience.price), experience.commission)
-                    total_price += price*children_number
-
-                    price = experience_fee_calculator(float(experience.price), experience.commission)
-                    total_price += price*adult_number
-                    total_price *= 1.15 #*1.15 based on the new requirement
+                    total_price = float(item['total_price'])
 
                     #save the custom itinerary as draft
                     local_timezone = pytz.timezone(experience.get_timezone())
                     bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
-                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, children_number = children_number,
+                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, total_price = total_price, children_number = children_number,
                                     datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                     submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                     booking.save()
-
-                    #save to excel sheet
-                    cell_format = workbook.add_format({'text_wrap': True})
-                    current_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(str(item['date']), "%Y-%m-%d"))
-                    if current_date > last_date:
-                        #a new day
-                        row += 1
-                        i += 1
-                        #date
-                        col = 0
-                        worksheet.write(row, col, str(item['date']))
-                        #day of week
-                        col += 1
-                        worksheet.write(row, col, week_day[current_date.weekday()])
-                        #number of people
-                        col += 1
-                        worksheet.write(row, col, str(adult_number + children_number))
-                        #accommdation
-                        col += 1
-                        worksheet.write(row, col, '')
-                        #city
-                        col += 1
-                        worksheet.write(row, col, city[i])
-                        #title, url
-                        col += 1
-                        worksheet.write(row, col, item['title'] + "\n" + "https://"+settings.ALLOWED_HOSTS[0]+"/experience/"+item['id'], cell_format)
-                        #price pp
-                        col += 1
-                        worksheet.write(row, col, price)
-                        last_date = current_date
-                    else:
-                        row += 1
-                        col = 5
-                        worksheet.write(row, col, item['title'] + "\n" + "https://"+settings.ALLOWED_HOSTS[0]+"/experience/"+item['id'], cell_format)
-                        #price pp
-                        col += 1
-                        worksheet.write(row, col, price)
-
-                row += 1
-                col = 0
-                worksheet.write(row, col, "Total price:")
-                col += 1
-                worksheet.write(row, col, total_price)
-                col += 1
-                worksheet.write(row, col, "Price per person:")
-                col += 1
-                worksheet.write(row, col, total_price/(adult_number + children_number))
-                workbook.close()
+                    
                 if "draft" in request.POST:
                     return HttpResponseRedirect(GEO_POSTFIX+"itinerary/preview/"+str(ci.id)+"/")
                 else:

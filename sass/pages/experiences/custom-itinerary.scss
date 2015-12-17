@@ -71,6 +71,10 @@ body {
   }
 }
 
+.btn-right {
+  float: right;
+}
+
 .right-group {
   float: right;
   margin-right: 0;
@@ -135,12 +139,6 @@ body {
   .input-group {
     width: 100%;
   }
-  .form-control {
-    border-left: 0;
-    border-radius: 0;
-    height: 40px;
-    box-shadow: none;
-  }
   .column {
     clear: both;
     height: 90%;
@@ -148,6 +146,13 @@ body {
     overflow: scroll;
     text-align: right;
   }
+}
+
+#search-keyword {
+  border-left: 0;
+  border-radius: 0;
+  height: 40px;
+  box-shadow: none;
 }
 
 .input-group-addon {
@@ -161,7 +166,6 @@ body {
   color: $dark-grey;
   padding: 15px 0 0 0;
   .form-control {
-    border: 1px solid $light-grey;
     border-radius: 3px;
     height: 30px;
   }
@@ -238,8 +242,13 @@ body {
   }
 }
 
+.exp-location {
+  display: none;
+}
+
 .exp-price {
   display: inline-block;
+  width: 130px;
   vertical-align: top;
   text-align: right;
   margin-right: 10px;
@@ -259,6 +268,44 @@ body {
     font-size: 20px;
     display: inline;
   }
+  .container-fluid {
+    text-align: center;
+    padding: 0;
+    font-size: 10px;
+  }
+  .inline-text {
+    display: inline-block;
+  }
+  input {
+    border:0;
+    width: 25px;
+  }
+  label {
+    margin: 0;
+  }
+}
+
+.slider {
+  display: inline-block;
+  width: 80px;
+  height: 1px;
+  vertical-align: middle;
+  margin: 0 10px;
+  background-color: $primary-color;
+  position: relative;
+}
+
+.ui-slider-handle {
+  display: block;
+  position: absolute;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 100px;
+  background-color: white;
+  border: 1px solid white;
+  z-index: 1;
+  @include card(1);
 }
 
 // Right section
