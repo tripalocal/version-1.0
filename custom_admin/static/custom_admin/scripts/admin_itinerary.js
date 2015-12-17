@@ -134,8 +134,9 @@ var dommCommEventsCallBack = {
                 "<td><p><a href=\"/itinerary/edit/" + itinerary.id + "\" target=\"_blank\">Edit</a></p></td>" +
             "</tr>";
             $(ni).insertAfter(insert_after);
-            insert_after = $(ni);
+            insert_after = $("#itinerary-id-" + itinerary.id);
         }
+        domPresentationEvents.setListner();
     },
 }
 
