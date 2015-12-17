@@ -66,8 +66,19 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
         itinerary_list= list(itinerary_list)
         result_list = []
         for itinerary in itinerary_list:
-            result_list.append(itinerary.duplicate())
-        return {'id':[itinerary.id for itinerary in result_list]}
+            ci = itinerary.duplicate()
+            ci.guest_number = ci.get_guest_number()
+            ci.price_aud = ci.get_price('aud')
+            ci.price_cny = ci.get_price('cny')
+            if ci.status != "paid":
+                if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + ci.submitted_datetime:
+                    ci.status = "Full price"
+                else:
+                    ci.status = "Discount price"
+            result_list.append({"id":ci.id, "guest_number":ci.guest_number,
+                                "price_aud":ci.price_aud, "price_cny":ci.price_cny,
+                                "status":ci.status, "title":ci.title})
+        return {'itineraries':result_list}
 
 class ExperienceView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     model = Experience

@@ -86,7 +86,7 @@ var dommCommEventsProcessor = {
             "operation": "duplicate_itineraries",
             "object_id": helper.collectChosenFields(),
         };
-        commModule.postData(href, datum, helper.genaralSuccessNotification, helper.genaralFailNotification);
+        commModule.postData(href, datum, dommCommEventsCallBack.processMultiDuplicationSuccessCallBack, helper.genaralFailNotification);
         globalVariables.cleanChosenFields();
         eventQueue.addEvent(event);
     }
@@ -102,6 +102,39 @@ var dommCommEventsCallBack = {
         var ids = result.id;
         for(var index in ids) {
             $("#itinerary-id-" + ids[index]).css("display", "none");
+        }
+    },
+
+    processMultiDuplicationSuccessCallBack: function (result) {
+        if (!result.success) {
+            alert("Itineraries not duplicated! Reason: " + result.server_info + ".");
+            return null;
+        }
+        globalVariables.cleanChosenFields();
+        var itineraries = result.itineraries;
+        insert_after = $("#itinerary-attributes");
+        for (var i = 0; i < itineraries.length; i++) {
+            var itinerary = itineraries[i];
+            ni = "<tr id=\"itinerary-id-" + itinerary.id + "\">" +
+                "<td>" +
+                    "<span id=\"sprycheckbox2_" + itinerary.id +"\">" +
+                        "<label>" +
+                            "<input type=\"checkbox\" name=\"admin-panel-itinerary-id-checkbox\" value=\"" + itinerary.id +"\"/>" +
+                        "</label>" +
+                    "</span>" +
+                "</td>" +
+                "<td>" + itinerary.id + "</td>" +
+                "<td><a href=\"/itinerary/" + itinerary.id + "\" target=\"_blank\">" + itinerary.title + "</a></td>" +
+                "<td>" + itinerary.guest_number + "</td>" +
+                "<td>" + itinerary.price_aud + "</td>" +
+                "<td>" + itinerary.price_cny + "</td>" +
+                "<td id=\"td-status-" + itinerary.id + "\">" +
+                    "<p>" + itinerary.status + "</p>" +
+                "</td>" +
+                "<td><p><a href=\"/itinerary/edit/" + itinerary.id + "\" target=\"_blank\">Edit</a></p></td>" +
+            "</tr>";
+            $(ni).insertAfter(insert_after);
+            insert_after = $(ni);
         }
     },
 }
