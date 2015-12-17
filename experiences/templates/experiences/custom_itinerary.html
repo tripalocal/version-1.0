@@ -882,17 +882,49 @@
 
     function duplicate_item(id, type) {
       var experience = $("#experience_id_" + id);
-      $("#" + type + "-title").val(experience.find(".exp-info").find("h3").text());
-      $("#" + type + "-details").val($(experience.find(".exp-info").find("p")[0]).text());
-      $("#" + type + "-location").val(experience.find(".exp-location").text());
-      $("#" + type + "-fixed_price").val(parseFloat(experience.find(".price-base").text()));
-      $("#" + type + "-price").val(parseFloat(experience.find(".price-pp").text()));
-      $("#" + type + "-fixed_price-min").val($("#" + id + "fixed-price-min").text());
-      $("#" + type + "-fixed_price-max").val($("#" + id + "fixed-price-max").text())
-      $("#" + type + "-price-min").val($("#" + id + "price-min").text())
-      $("#" + type + "-price-max").val($("#" + id + "price-max").text())
-      $("#" + type + "-notes").val(experience.find(".exp-info").find("label").text());
-      add_item(type);
+      var fixed_price = parseFloat(experience.find(".fixed-price").text())
+      var price = parseFloat(experience.find(".price").text());
+      var fixed_price_min = parseFloat(experience.find(".fixed-price-min").text());
+      var fixed_price_max = parseFloat(experience.find(".fixed-price-max").text());
+      var price_min = parseFloat(experience.find(".price-min").text());
+      var price_max = parseFloat(experience.find(".price-max").text());
+      var title = experience.find(".exp-info").find("h3").text();
+      var details = $(experience.find(".exp-info").find("p")[0]).text();
+      var notes = experience.find(".exp-info").find("label").text();
+
+      var new_item =  "<div class=\"exp-box-sm\" id=\"experience_id_" + id + "\">" +
+                        "<div class=\"exp-img\"><img src=\"{{MEDIA_URL}}thumbnails/experiences/experience" + id + "_1.jpg\" style=\"width:inherit;height:inherit;\"></div>" +
+                        "<div class=\"exp-info\">" +
+                          "<h3>" + title + "</h3>" +
+                          "<p>" + details + "</p>" +
+                          "<label style=\"display:none;\">" + notes + "</label>";
+
+      new_item +=
+      "<p class=\"exp-edit\">" +
+        "<a type=\"button\" onclick=\"edit_item(" + id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
+        " &middot; " +
+        "<a type=\"button\" onclick=\"duplicate_item(" + id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
+        " &middot; " +
+        "<a type=\"button\" onclick=\"delete_item(" + id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
+      "</p></div>";
+      new_item +=
+      "<div class=\"exp-price\">" +
+        "<div class=\"container-fluid\">" +
+          "<span class=\"inline-text fixed-price-min\">" + fixed_price_min + "</span><div class=\"slider slider-price-base\"></div><span class=\"inline-text fixed-price-max\">" + fixed_price_max + "</span>" +
+          "<p>" +
+            "<input typy=\"text\" class=\"fixed-price\" readonly>" +
+            "<label>{% trans 'base' %}</label>" +
+          "</p>" +
+        "</div>" +
+        "<div class=\"container-fluid\">" +
+          "<span class=\"inline-text price-min\">"+ price_min + "</span><div class=\"slider slider-price-pp\"></div><span class=\"inline-text price-max\">" + price_max + "</span>" +
+          "<p>" +
+            "<input type=\"text\" class=\"price\" readonly>" +
+            "<label>{% trans 'pp' %}</label>" +
+          "</p>" +
+        "</div>" +
+      "</div></div>";
+      $("#"+type+"_column").append(new_item);
     }
 
 
@@ -900,12 +932,12 @@
     {
         $("#add-" + type + "-btn").click();
         var experience = $("#experience_id_" + id);
-        var fixed_price = parseFloat($(experience.find(".price-base").text()))
-        var price = parseFloat($(experience.find(".price-pp").text()));
-        var fixed_price_min = parseFloat($("#" + id + "fixed-price-min").text());
-        var fixed_price_max = parseFloat($("#" + id + "fixed-price-max").text());
-        var price_min = parseFloat($("#" + id + "price-min").text());
-        var price_max = parseFloat($("#" + id + "price-max").text());
+        var fixed_price = parseFloat(experience.find(".fixed-price").text())
+        var price = parseFloat(experience.find(".price").text());
+        var fixed_price_min = parseFloat(experience.find(".fixed-price-min").text());
+        var fixed_price_max = parseFloat(experience.find(".fixed-price-max").text());
+        var price_min = parseFloat(experience.find(".price-min").text());
+        var price_max = parseFloat(experience.find(".price-max").text());
         var title = experience.find(".exp-info").find("h3").text();
         var details = $(experience.find(".exp-info").find("p")[0]).text();
         var notes = experience.find(".exp-info").find("label").text();
@@ -981,14 +1013,12 @@
                                 var price_min = parseFloat($("#" + type + "-price-min").val());
                                 var price_max = parseFloat($("#" + type + "-price-max").val());
                                 var price = (price_min + price_max)/2;
-                                $("#" + id + "fixed-price").text(fixed_price);
-                                $("#" + id +"fixed-price-min").text(fixed_price_min);
-                                $("#" + id +"fixed-price-max").text(fixed_price_max);
-                                $("#" + id +"price-min").text(price_min);
-                                $("#" + id +"price-max").text(price_max);
-                                $("#" + id +"price").text(fixed_price_min);
-                                experience.find(".price-base").text(fixed_price + " base");
-                                experience.find(".price-pp").text(price + " pp");
+                                experience.find(".fixed-price-min").text(fixed_price_min);
+                                experience.find(".fixed-price-max").text(fixed_price_max);
+                                experience.find(".price-min").text(price_min);
+                                experience.find(".price-max").text(price_max);
+                                experience.find(".fixed-price").val(fixed_price);
+                                experience.find(".price").val(price);
                                 experience.find(".exp-info").find("h3").text($("#" + type + "-title").val());
                                 $(experience.find(".exp-info").find("p")[0]).text($("#" + type + "-details").val());
                                 experience.find(".exp-info").find("label").text($("#" + type + "-notes").val());
@@ -1054,6 +1084,8 @@
                 //dropped in the right section
                 $($(ui.item[0]).find(".exp-edit")[0]).hide();
                 var id = $(ui.item[0]).attr("id").split("_");
+                var type = $(".tab-pane.active").attr("id");
+                duplicate_item(id[id.length-1], type);
                 init_slider($(ui.item[0]));
             }
         }
