@@ -17,3 +17,10 @@ REMINDER_NOTIFY_CUSTOMER = "Tripalocal: Your booking for {exp_title} with {host_
 MESSAGE_NOTIFY = "Tripalocal: {sender_name}"
 
 REQUEST_REMIND_HOST = "Tripalocal: It's been 24 hours since {guest_name} reached out. Please confirm or decline the request as soon as possible."
+
+class ItineraryStatus():
+    Deleted = "deleted"
+    Draft = "draft"
+    Ready = "ready"
+    Paid = "paid"
+    Allowed_Status = [Deleted, Draft, Ready, Paid]

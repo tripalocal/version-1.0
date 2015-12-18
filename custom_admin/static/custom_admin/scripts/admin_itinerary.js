@@ -66,7 +66,7 @@ var dommCommEventsProcessor = {
     processMultiChangeStatusEvent: function(event) {
         var status = event.data.status;
         var statusShow = helper.changeItineraryStatusDisplay(status);
-        if(!confirm("Are you sure to change the itinerary status as " + statusShow + "?")) {
+        if(!confirm("Are you sure to change the itinerary status as \"" + statusShow + "\"?")) {
             return null;
         }
         var href = location.href;
@@ -75,9 +75,10 @@ var dommCommEventsProcessor = {
             "status": status,
             "object_id": helper.collectChosenFields(),
         };
-        //commModule.postData(href, datum, dommCommEventsCallBack.processMultiChangeStatusSuccessCallBack, helper.genaralFailNotification);
-        //globalVariables.cleanChosenFields();
-        //eventQueue.addEvent(event);
+        commModule.postData(href, datum, dommCommEventsCallBack.processMultiChangeStatusSuccessCallBack, helper.genaralFailNotification);
+        globalVariables.cleanChosenFields();
+        $('[name="admin-panel-itinerary-id-checkbox"]').prop("checked", false);
+        eventQueue.addEvent(event);
     },
 
     processMultiDuplicationEvent: function(event) {
@@ -88,6 +89,7 @@ var dommCommEventsProcessor = {
         };
         commModule.postData(href, datum, dommCommEventsCallBack.processMultiDuplicationSuccessCallBack, helper.genaralFailNotification);
         globalVariables.cleanChosenFields();
+        $('[name="admin-panel-itinerary-id-checkbox"]').prop("checked", false);
         eventQueue.addEvent(event);
     }
 }
@@ -95,10 +97,11 @@ var dommCommEventsProcessor = {
 var dommCommEventsCallBack = {
     processMultiChangeStatusSuccessCallBack: function(result) {
         if (!result.success) {
-            alert("Status NOT updated! Reason: " + result.server_info + ".");
+            alert("Status NOT updated: " + result.server_info + ".");
             return null;
         }
         globalVariables.cleanChosenFields();
+        $('[name="admin-panel-itinerary-id-checkbox"]').prop("checked", false);
         var ids = result.id;
         for(var index in ids) {
             $("#itinerary-id-" + ids[index]).css("display", "none");
@@ -111,6 +114,7 @@ var dommCommEventsCallBack = {
             return null;
         }
         globalVariables.cleanChosenFields();
+        $('[name="admin-panel-itinerary-id-checkbox"]').prop("checked", false);
         var itineraries = result.itineraries;
         insert_after = $("#itinerary-attributes");
         for (var i = 0; i < itineraries.length; i++) {
@@ -157,14 +161,14 @@ var helper = {
     },
     genaralSuccessNotification: function (result) {
         if (result.success) {
-            alert("Success Updated!");
+            alert("Update succeeded");
         } else {
-            alert("Failed Updated! Because: " + result.server_info);
+            alert("Update failed: " + result.server_info);
         }
         console.log(result);
     },
     genaralFailNotification: function (result) {
-        alert("Failed Updated!");
+        alert("Update failed");
     },
     collectChosenFields: function() {
         var result = [];

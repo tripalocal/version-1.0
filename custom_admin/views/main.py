@@ -13,6 +13,7 @@ from custom_admin.forms import BookingForm, ExperienceUploadForm, CreateExperien
 from custom_admin.views.base import StatusGenerator
 from custom_admin.mail import MailService
 from Tripalocal_V1 import settings
+from experiences.constant import ItineraryStatus
 
 import pytz
 from datetime import *
@@ -40,7 +41,7 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
         return self._process_request_with_general_return(request, model_class=CustomItinerary, **kwargs)
 
     def get_queryset(self):
-        return self.model.objects.all().order_by('-submitted_datetime')
+        return self.model.objects.exclude(status="deleted").order_by('-submitted_datetime')
 
     def get_context_data(self, **kwargs):
         context = super(ItineraryView, self).get_context_data(**kwargs)
@@ -58,9 +59,10 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def _manipulate_multi_change_statuses(self, request, itinerary_list, **kwargs):
         itinerary_list= list(itinerary_list)
         for itinerary in itinerary_list:
-            #TODO
-            pass
-            #itinerary.change_status(new_status=kwargs['form'].cleaned_data['status'])
+            if request.POST['status'] in ItineraryStatus.Allowed_Status:
+                itinerary.change_status(new_status=request.POST['status'])
+            else:
+                raise ValueError("Invalid status")
         return {'id':[itinerary.id for itinerary in itinerary_list]}
 
     def _manipulate_duplicate_itineraries(self, request, itinerary_list, **kwargs):
