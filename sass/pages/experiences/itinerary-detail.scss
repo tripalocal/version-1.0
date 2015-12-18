@@ -15,6 +15,10 @@ body {
   position: relative;
 }
 
+.navbar {
+  position: relative;
+}
+
 .jumbotron {
   color: white;
   h1 {
@@ -149,7 +153,7 @@ body {
   }
   p {
     display: inline-block;
-    line-height: 40px;
+    max-width: 490px;
     margin: 0;
     vertical-align: middle;
   }

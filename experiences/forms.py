@@ -30,6 +30,7 @@ Location = (('Melbourne', _('Melbourne, VIC')),('GRVIC', _('Greater Victoria')),
             ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
             ('Perth', _('Perth, WA')),('GRWA', _('Greater West Australia')),
+            ('Canberra',_('Canberra, ACT')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
@@ -38,6 +39,7 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
                     (_('Adelaide'), 'Adelaide'), (_('Darwin'), 'Darwin'),
                     (_('Alice Springs'), 'Alicesprings'),
                     (_('Perth'), 'Perth'),
+                    (_('Canberra'),'Canberra'),
                     (_('Christchurch'), 'Christchurch'), (_('Queenstown'), 'Queenstown'),
                     (_('Auckland'), 'Auckland'), (_('Wellington'), 'Wellington'),)
 
@@ -93,6 +95,7 @@ Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Bri
             ('GRVIC', _('Greater Victoria')),('GRNSW', _('Greater New South Wales')),('GRQLD', _('Greater Queensland')),('GRTAS', _('Greater Tasmania')),
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),('GRWA', _('Greater West Australia')),
             ('Perth', _('Perth, WA')),
+            ('Canberra',_('Canberra, ACT')),
             ('Christchurch',_('Christchurch, NZ')),('Queenstown',_('Queenstown, NZ')),('Auckland', _('Auckland, NZ')),('Wellington', _('Wellington, NZ')),)
 
 Currency = (('AUD',_('AUD')),('NZD',_('NZD')),('CNY',_('CNY')),)
@@ -778,9 +781,6 @@ class CreateExperienceForm(forms.Form):
         self.fields['host_id_photo_4'].widget.attrs['class'] = 'upload'
         self.fields['host_id_photo_5'].widget.attrs['class'] = 'upload'
 
-def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
-
 class ReviewForm(forms.ModelForm):
 
     comment = forms.CharField(min_length=10, max_length=200, required = False, widget=forms.Textarea)
@@ -799,7 +799,7 @@ SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
 AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children')),(4,_('Famili with elderly&children')))
 
 class CustomItineraryRequestForm(forms.Form):
-    destinations = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':_('Eg. Melbourne, Sydney, Brisbane...')}))
+    destinations = forms.CharField(required=True, widget=forms.TextInput())
     start_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
     end_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
     guests_adults = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
@@ -814,6 +814,7 @@ class CustomItineraryRequestForm(forms.Form):
     mobile = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
     def __init__(self, *args, **kwargs):
         super(CustomItineraryRequestForm, self).__init__(*args, **kwargs)
+        self.fields['destinations'].widget = forms.HiddenInput()
         self.fields['tags'].widget = forms.HiddenInput()
         self.fields['whats_included'].widget = forms.HiddenInput()
 
@@ -1248,8 +1249,8 @@ def send_booking_request_sms(exp_datetime, exp_title, host, customer_phone_num, 
         send_sms(customer_phone_num, msg)
 
 class SearchForm(forms.Form):
-    start_date = forms.DateTimeField(required=False)
-    end_date = forms.DateTimeField(required=False)
+    start_date = forms.DateTimeField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    end_date = forms.DateTimeField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
     guest_number = forms.ChoiceField(choices=Guest_Number, widget=forms.Select(attrs={'class':'ui dropdown smaller-box'}), required=False)
     city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'class':'ui dropdown'}), required=True)
     language = forms.CharField(widget=forms.Textarea,  required=False, initial="English,Mandarin")

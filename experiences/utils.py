@@ -1,4 +1,4 @@
-import os, pytz
+import os, pytz, string, random, decimal
 
 from Tripalocal_V1 import settings
 from unionpay.util.helper import load_config
@@ -21,6 +21,8 @@ def experience_fee_calculator(price, commission_rate):
     return price
 
 def convert_currency(price, current_currency, target_currency):
+    if not (type(price)==int or type(price) == float or type(price) == decimal.Decimal):
+        return price
     file_name = 'experiences/currency_conversion_rate/' + current_currency.upper() + '.yaml'
     conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
     return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
@@ -68,3 +70,6 @@ def get_total_price(experience, guest_number=0, adult_number=0, children_number=
 def get_timezone(city):
     timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
     return timezones.get(city.lower(), settings.TIME_ZONE)
+
+def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))

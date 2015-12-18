@@ -1,5 +1,9 @@
 {% extends "custom_admin/base.html" %}
-{% block head %}<title>Itineraries</title>{% endblock %}
+{% block head %}
+    {% load staticfiles %}
+    <title>Itineraries</title>
+    <script language="javascript" type="text/javascript" src="{% static 'custom_admin/scripts/admin_itinerary.js' %}"></script>
+{% endblock %}
 {% block content %}
     <div class="fullColumn">
         <div class="operation"></div>
@@ -13,11 +17,11 @@
         <table border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td colspan="13" class="tableEdit">&nbsp;&nbsp;↓
-                    <input name="input" type="button" value="Delete"/>&nbsp;&nbsp;
-                    <input name="input" type="button" value="Archive"/>
+                    <input id="delete-itinerary" name="input" type="button" value="Delete"/>&nbsp;&nbsp;
+                    <input id="dulicate-itinerary" name="input" type="button" value="Duplicate"/>
                 </td>
             </tr>
-            <tr>
+            <tr id="itinerary-attributes">
                 <th scope="col">
                     <span id="sprycheckbox1">
                         <label>
@@ -34,11 +38,11 @@
                 <th scope="col">Actions</th>
             </tr>
             {% for itinerary in itinerary_list %}
-            <tr>
+            <tr id="itinerary-id-{{itinerary.id}}">
                 <td>
-                    <span id="sprycheckbox2">
+                    <span id="sprycheckbox2_{{itinerary.id}}">
                         <label>
-                            <input type="checkbox" name="checkbox2" id="checkbox2"/>
+                            <input type="checkbox" name="admin-panel-itinerary-id-checkbox" value="{{itinerary.id}}"/>
                         </label>
                     </span>
                 </td>
@@ -56,7 +60,7 @@
                         <option value="ready">Full Price</option>
                     </select>-->
                 </td>
-                <td><p><a href="/itinerary/edit/{{itinerary.id}}" target="_blank">Edit</a></p></td>
+                <td><p><!--hide edit for now <a href="/itinerary/edit/{{itinerary.id}}" target="_blank">Edit</a> --></p></td>
             </tr>
             {% endfor %}
         </table>

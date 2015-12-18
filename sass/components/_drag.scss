@@ -6,11 +6,15 @@
     transform: rotate(3deg);
     -moz-transform: rotate(3deg);
     -webkit-transform: rotate(3deg);
+    border: 0;
+    @include card(2);
 }
 .tilt.left {
     transform: rotate(-3deg);
     -moz-transform: rotate(-3deg);
     -webkit-transform: rotate(-3deg);
+    border: 0;
+    @include card(2);
 }
 
 .column {

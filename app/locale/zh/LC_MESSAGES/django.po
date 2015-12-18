@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-07 13:36+1100\n"
+"POT-Creation-Date: 2015-12-15 15:37+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -182,10 +182,6 @@ msgstr "为安全起见，请尽快登录修改你的密码"
 #: app/templates/app/email_auto_registration.html:97
 msgid "Login and change password"
 msgstr "登录并修改密码"
-
-#: app/templates/app/email_notification.html:89
-msgid "Send message"
-msgstr "发信息"
 
 #: app/templates/app/email_registration_successful.html:75
 msgid "Your account is ready!"
@@ -743,6 +739,9 @@ msgstr "文件大小超过上限"
 #: app/views.py:752
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
+
+#~ msgid "Send message"
+#~ msgstr "发信息"
 
 #, fuzzy
 #~| msgid "Bring<br>the Kids"

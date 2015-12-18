@@ -335,7 +335,7 @@
       var popupTimer;
         if ($(window).width() > 520) {
            var nClose = parseInt($.cookie("closePopupPromo"), 10);
-           if (!nClose || nClose < 6) {
+           if (!nClose || nClose < 12) {
                if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
                    $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
                  popupTimer = setTimeout(function () {

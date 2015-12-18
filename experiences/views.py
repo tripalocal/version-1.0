@@ -37,6 +37,7 @@ import xmltodict
 import collections
 from django.db.models import Q
 from experiences.utils import *
+from copy import deepcopy
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -2925,7 +2926,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
             if experience['type'] != 'ITINERARY' and experience['city'].lower() != city[day_counter]:
                 continue
 
-            if dt_string in experience['dates'] and len(experience['dates'][dt_string]) > 0:
+            if dt_string in experience['dates']: #and len(experience['dates'][dt_string]) > 0:
                 #check instant booking
                 instant_booking = False
                 for timeslot in experience['dates'][dt_string]:
@@ -2978,15 +2979,6 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
                 if not insert:
                     day_dict['experiences'].append(exp_dict)
 
-        #to avoid showing the same top N items everyday, swap items [0, N-1] with [day_counter*N, (day_counter+1)*N-1]
-        N=3
-        if len(day_dict['experiences']) >= 2*N:
-            for i in range(day_counter*N, (day_counter+1)*N):
-                day_dict['experiences'].insert(i%N, day_dict['experiences'][i])
-                day_dict['experiences'].pop(i+1)
-                day_dict['experiences'].insert(i+1, day_dict['experiences'][i%N+1])
-                day_dict['experiences'].pop(i%N+1)
-
         itinerary.append(day_dict)
         dt += timedelta(days=1)
         day_counter += (1 if len(city) > 1 else 0)
@@ -3033,6 +3025,7 @@ def custom_itinerary(request, id=None):
             #add a new item
             item = request.POST
             np = NewProduct(price=item.get('price', 0), fixed_price=item.get('fixed_price', 0),
+                            price_min=item.get('price-min'), price_max=item.get('price-max'), fixed_price_min=item.get('fixed_price-min'), fixed_price_max=item.get('fixed_price-max'),
                             commission=0.0, currency=request.session["custom_currency"].lower(), type=item['type'].title(),
                             city=item.get('location', ""), duration=1, guest_number_min=1, guest_number_max=10, status="Unlisted",
                             start_datetime = pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)),
@@ -3056,12 +3049,45 @@ def custom_itinerary(request, id=None):
                 if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                     saveExperienceImage(np, photo, extension, 1)
 
+            #issue 423: when an air ticket item or transfer item is created in a city, please duplicate it in all cities
+            if np.type in ("Flight", "Transfer"):
+                np_list = []
+                np_list.append(np)
+                for city in Location:
+                    if city[0] != np.city:
+                        np_copy = deepcopy(np)
+                        np_copy.id += 10
+                        while len(NewProduct.objects.filter(id = np_copy.id)) > 0:
+                            np_copy.id += 10
+                        np_copy.city = city[0]
+                        np_copy.save()
+                        np_copy.suppliers.add(Provider.objects.get(id=1))
+                        np_list.append(np_copy)
+                        npi18n_copy = deepcopy(npi18n)
+                        npi18n_copy.id += 10
+                        while len(NewProductI18n.objects.filter(id = npi18n_copy.id)) > 0:
+                            npi18n_copy.id += 10
+                        npi18n_copy.product = np_copy
+                        npi18n_copy.location = city[0]
+                        npi18n_copy.save()
+                        if len(request.FILES) > 0:
+                            saveExperienceImage(np_copy, photo, extension, 1)
+
+                for i in range(len(np_list)):
+                    for j in range(len(np_list)):
+                        if i!= j: # and np_list[j] not in np_list[i].related_products.all():
+                            np_list[i].related_products.add(np_list[j])
+
             return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
 
         if 'Edit' in request.POST:
             #edit an item
             item = request.POST
             np = NewProduct.objects.get(id=item.get('id'))
+            np.price_min = item.get('price-min')
+            np.price_max = item.get('price-max')
+            np.fixed_price_min = item.get('fixed_price-min')
+            np.fixed_price_max = item.get('fixed_price-max')
             np.price = item.get('price', 0)
             np.fixed_price = item.get('fixed_price', 0)
             np.city = item.get('location', "")
@@ -3090,6 +3116,23 @@ def custom_itinerary(request, id=None):
                 extension = extension.lower()
                 if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
                     saveExperienceImage(np, photo, extension, 1)
+
+            #issue 423:  if one instance of these product is modified, please update all products in all cities
+            if np.type in ("Flight", "Transfer"):
+                for rp in np.related_products.all():
+                    rp.price = np.price
+                    rp.fixed_price = np.fixed_price
+                    rp.save()
+
+                    npi18n_r = rp.newproducti18n_set.all()[0]
+                    npi18n_r.title = npi18n.title
+                    npi18n_r.description = npi18n.description
+                    npi18n_r.notice = npi18n.notice
+                    npi18n_r.save()
+                    if len(request.FILES) > 0:
+                        for ph in rp.photo_set.all():
+                            ph.delete()
+                        saveExperienceImage(rp, photo, extension, 1)
 
             return HttpResponse(json.dumps({'new_product_id':np.id}),content_type="application/json")
 
@@ -3136,6 +3179,10 @@ def custom_itinerary(request, id=None):
                     if 'custom_currency' in request.session and request.session["custom_currency"].lower() != pd.currency.lower():
                         pd.price = convert_currency(pd.price, pd.currency, request.session["custom_currency"])
                         pd.fixed_price = convert_currency(pd.fixed_price, pd.currency, request.session["custom_currency"])
+                        pd.price_min = convert_currency(pd.price_min, pd.currency, request.session["custom_currency"])
+                        pd.price_max = convert_currency(pd.price_max, pd.currency, request.session["custom_currency"])
+                        pd.fixed_price_min = convert_currency(pd.fixed_price_min, pd.currency, request.session["custom_currency"])
+                        pd.fixed_price_max = convert_currency(pd.fixed_price_max, pd.currency, request.session["custom_currency"])
                 context['flight'] = [e for e in pds if e.type == 'Flight' and e.city in str(city).split(",")]
                 context['transfer'] = [e for e in pds if e.type == 'Transfer' and e.city in str(city).split(",")]
                 context['accommodation'] = [e for e in pds if e.type == 'Accommodation' and e.city in str(city).split(",")]
@@ -3163,7 +3210,10 @@ def custom_itinerary(request, id=None):
                 else:
                     ci = CustomItinerary()
                     while True:
-                        new_id = datetime.now().strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
+                        current = datetime.now()
+                        if current.hour>20:
+                            current = current.replace(hour=20)
+                        new_id = current.strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
                         if len(CustomItinerary.objects.filter(id=new_id)) == 0:
                             break
                     ci.id = new_id
@@ -3175,87 +3225,22 @@ def custom_itinerary(request, id=None):
                     ci.status = "ready"
                 ci.save()
 
-                workbook = xlsxwriter.Workbook(os.path.join(settings.PROJECT_ROOT,'itineraries', str(ci.id)+'.xlsx'))
-                worksheet = workbook.add_worksheet()
-                city = form.cleaned_data['city']
-                city = city.split(',')
-                row = -1
-                last_date = pytz.timezone(settings.TIME_ZONE).localize(datetime.strptime("2000/01/01", "%Y/%m/%d"))
-                i=-1
-                week_day = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
-                total_price = 0.0
-
                 for item in itinerary:
                     experience = AbstractExperience.objects.get(id=str(item['id']))
                     adult_number = int(item['adult_number'])
                     children_number = int(item['children_number'])
-                    if experience.children_price is not None and experience.children > 0:
-                        price = experience_fee_calculator(float(experience.children_price), experience.commission)
-                    else:
-                        price = experience_fee_calculator(float(experience.price), experience.commission)
-                    total_price += price*children_number
-
-                    price = experience_fee_calculator(float(experience.price), experience.commission)
-                    total_price += price*adult_number
-                    total_price *= 1.15 #*1.15 based on the new requirement
+                    total_price = item['total_price']
 
                     #save the custom itinerary as draft
                     local_timezone = pytz.timezone(experience.get_timezone())
                     bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
-                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, children_number = children_number,
+                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, total_price = total_price, children_number = children_number,
                                     datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                     submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                     booking.save()
 
-                    #save to excel sheet
-                    cell_format = workbook.add_format({'text_wrap': True})
-                    current_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(str(item['date']), "%Y-%m-%d"))
-                    if current_date > last_date:
-                        #a new day
-                        row += 1
-                        i += 1
-                        #date
-                        col = 0
-                        worksheet.write(row, col, str(item['date']))
-                        #day of week
-                        col += 1
-                        worksheet.write(row, col, week_day[current_date.weekday()])
-                        #number of people
-                        col += 1
-                        worksheet.write(row, col, str(adult_number + children_number))
-                        #accommdation
-                        col += 1
-                        worksheet.write(row, col, '')
-                        #city
-                        col += 1
-                        worksheet.write(row, col, city[i])
-                        #title, url
-                        col += 1
-                        worksheet.write(row, col, item['title'] + "\n" + "https://"+settings.ALLOWED_HOSTS[0]+"/experience/"+item['id'], cell_format)
-                        #price pp
-                        col += 1
-                        worksheet.write(row, col, price)
-                        last_date = current_date
-                    else:
-                        row += 1
-                        col = 5
-                        worksheet.write(row, col, item['title'] + "\n" + "https://"+settings.ALLOWED_HOSTS[0]+"/experience/"+item['id'], cell_format)
-                        #price pp
-                        col += 1
-                        worksheet.write(row, col, price)
-
-                row += 1
-                col = 0
-                worksheet.write(row, col, "Total price:")
-                col += 1
-                worksheet.write(row, col, total_price)
-                col += 1
-                worksheet.write(row, col, "Price per person:")
-                col += 1
-                worksheet.write(row, col, total_price/(adult_number + children_number))
-                workbook.close()
                 if "draft" in request.POST:
                     return HttpResponseRedirect(GEO_POSTFIX+"itinerary/preview/"+str(ci.id)+"/")
                 else:
@@ -3269,7 +3254,9 @@ def custom_itinerary(request, id=None):
         context["children_number"] = 0
         if id is not None:
             existing_ci = CustomItinerary.objects.get(id=id)
-            itinerary = OrderedDict()
+            #itinerary will be in the format of[{'city':'', 'dates':{'date1':[], 'date2':[], ...}}, ...]
+            itinerary = []
+            last_city = ""
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
             for bking in existing_ci.booking_set.order_by('datetime').all():
@@ -3305,11 +3292,14 @@ def custom_itinerary(request, id=None):
 
                 key = bking.datetime.astimezone(pytz.timezone(bking.experience.get_timezone())).strftime("%Y-%m-%d")
 
-                if bking.experience.city not in itinerary:
-                    itinerary[bking.experience.city] = OrderedDict()
-                if key not in itinerary[bking.experience.city]:
-                    itinerary[bking.experience.city][key] = []
-                itinerary[bking.experience.city][key].append(bking.experience)
+                if bking.experience.city != last_city:
+                    itinerary.append(OrderedDict())
+                    itinerary[-1]['city'] = bking.experience.city
+                    itinerary[-1]['dates'] = OrderedDict()
+                if key not in itinerary[-1]['dates']:
+                    itinerary[-1]['dates'][key] = []
+                itinerary[-1]['dates'][key].append(bking.experience)
+                last_city = bking.experience.city
 
             context['existing_itinerary'] = itinerary
 
