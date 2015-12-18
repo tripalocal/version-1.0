@@ -432,7 +432,7 @@ class CustomItinerary(models.Model):
             adult_number = bking.adult_number
             children_number = bking.children_number
             if bking.total_price and experience.type in ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]:
-                subtotal_price = bking.total_price
+                subtotal_price = float(bking.total_price)
             else:
                 subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
             subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
