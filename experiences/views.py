@@ -3005,7 +3005,7 @@ def custom_itinerary_request(request):
         )
     return render_to_response('experiences/custom_itinerary_request.html', {'form':form}, context)
 
-def custom_itinerary(request, id=None):
+def custom_itinerary(request, id=None, operation=None):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
 
@@ -3020,6 +3020,22 @@ def custom_itinerary(request, id=None):
     request.session['custom_currency'] = "AUD"
     request.session['dollar_sign'] = "$"
 
+    if operation == 'new':
+        ci = CustomItinerary()
+        while True:
+            current = datetime.now()
+            if current.hour>20:
+                current = current.replace(hour=20)
+            new_id = current.strftime("%H%M%S") + email_account_generator(size=4,chars=string.digits)
+            if len(CustomItinerary.objects.filter(id=new_id)) == 0:
+                break
+        ci.id = new_id
+        ci.user = request.user
+        ci.title = ""
+        ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        ci.save()
+        return HttpResponseRedirect(GEO_POSTFIX+"itinerary/edit/"+str(ci.id)+"/")
+    
     if request.method == 'POST':
         if 'Add' in request.POST:
             #add a new item
