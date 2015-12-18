@@ -4,10 +4,10 @@
 
 <script type="text/javascript" src="{% static 'experiences/scripts/custom_itinerary.js' %}"></script>
 
-    <div role="tabpanel" class="tab-pane fade in active" id="experience">
+    <div role="tabpanel" class="tab-pane fade in active" id="product">
         <div class="input-group">
             <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
-            <input type="text" class="form-control" id="search-keyword">
+            <input type="text" class="form-control search-keyword">
         </div>
         <div id="experience_column" style='height:100%;'>
             {%for day in itinerary%}
@@ -17,7 +17,45 @@
             <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='display:none;'>
             {% endif %}
                 {% for experience in day.experiences %}
-                {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
+                {% if 'product' in experience.type.lower %}
+                <div class='experience_id_{{experience.id}} exp-box-sm experience'>
+                    <div class='exp-img'>
+                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt=""/>
+                    </div>
+                    <div class='exp-info'>
+                        <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}" target="_blank" style="color:#333;">{{experience.title}}</a></h3>
+                        <p>{{experience.description|escapejs|slice:"0:16"}}</p>
+                        <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
+                            {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
+                            {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+                    </div>
+                    <div class='exp-price'>
+                        <p>{{experience.dollarsign}}{{experience.currency}}</p>
+                        <h2 style="display:none;" class="fixed-price">0</h2><h2 class="price">{{experience.price|floatformat:"0"}}</h2>
+                        <p>{% trans 'per person' %}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div role="tabpanel" class="tab-pane fade" id="experience">
+        <div class="input-group">
+            <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+            <input type="text" class="form-control search-keyword">
+        </div>
+        <div id="experience_column" style='height:100%;'>
+            {%for day in itinerary%}
+            {% if forloop.first %}
+            <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='overflow-x:hidden;overflow-y:scroll;'>
+            {% else %}
+            <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='display:none;'>
+            {% endif %}
+                {% for experience in day.experiences %}
+                {% if 'private' in experience.type.lower %}
                 <div class='experience_id_{{experience.id}} exp-box-sm experience'>
                     <div class='exp-img'>
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt=""/>

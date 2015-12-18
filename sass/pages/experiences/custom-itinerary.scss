@@ -148,7 +148,7 @@ body {
   }
 }
 
-#search-keyword {
+.search-keyword {
   border-left: 0;
   border-radius: 0;
   height: 40px;
@@ -358,6 +358,20 @@ body {
   transform: translateY(-50%);
   color: $dark-grey;
   font-size: 14px;
+}
+
+.whats-included {
+  p {
+    margin-top: 10px;
+  }
+  .btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    min-width: 0;
+    padding: 0;
+    margin: 10px 5px 5px 0;
+  }
 }
 
 // Warning popups

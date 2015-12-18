@@ -131,7 +131,8 @@
         <div class="section">
           <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#experience" aria-controls="experience" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/hot-56.svg' %}"></a></li>
+            <li role="presentation" class="active"><a href="#product" aria-controls="product" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/hot-56.svg' %}"></a></li>
+            <li role="presentation"><a href="#experience" aria-controls="experience" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/profile.svg' %}"></a></li>
             <li role="presentation"><a href="#flight" aria-controls="flight" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/flight.svg' %}"></a></li>
             <li role="presentation"><a href="#transfer" aria-controls="transfer" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/transfer.svg' %}"></a></li>
             <li role="presentation"><a href="#accommodation" aria-controls="accommodation" role="tab" data-toggle="tab"><img src="{% static 'experiences/img/accommodation.svg' %}"></a></li>
@@ -210,6 +211,20 @@
                     {% endif %}
                   </div>
                   {% endfor %}
+                </div>
+                <div class="whats-included">
+                  <p>{% trans "What's Included" %}</p>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/flight.svg' %}"></button>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/airportpickup.svg' %}"></button>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/airportdropoff.svg' %}"></button>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/accommodation.svg' %}"></button>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/cardriver.svg' %}"></button>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/hot-56.svg' %}"></button>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/bus.svg' %}"></button>
+                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/boat.svg' %}"></button>
                 </div>
               </div>
               {% endfor %}
@@ -597,6 +612,20 @@
                                     "<p>{% trans 'Day' %} " + j + "</p>" +
                                     "<div class=\"column\">" +
                                     "</div>" +
+                                    "<div class=\"whats-included\">" +
+                                      "<p>{% trans 'Whats Included' %}</p>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/flight.svg' %}\"></button>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/airportpickup.svg' %}\"></button>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/airportdropoff.svg' %}\"></button>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/accommodation.svg' %}\"></button>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/cardriver.svg' %}\"></button>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/hot-56.svg' %}\"></button>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/lunch.svg' %}\"></button>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/dinner.svg' %}\"></button>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/bus.svg' %}\"></button>" +
+                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/boat.svg' %}\"></button>" +
+                                    "</div>" +
                                 "</div>";
                 $("#city-collapse-" + i).append(new_day);
             }
@@ -739,6 +768,9 @@
                     itinerary.push(dict);
                     experience = $(experience).next()[0];
                 }
+                if ($(experience).hasClass("whats-included")) {
+                  // TODO
+                }
                 day = $(day).next()[0];
             }
             city = $(city).parent().next().children()[1];
@@ -756,7 +788,7 @@
 
     // Filters experiences on search keyword
     function filter_experiences() {
-      $("#search-keyword")
+      $(".search-keyword")
         .change(function() {
           var filter = $(this).val();
           if (filter) {
