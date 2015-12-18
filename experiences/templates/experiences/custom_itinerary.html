@@ -283,10 +283,15 @@
     $(document).ready(function()
     {
         $(".loading").hide();
-        $("#id_title").val("新路线");
-        var d = new Date();
-        d.setDate(d.getDate()+14);
-        $("#id_start_datetime").val(d.toString('yyyy-M-dd'));
+        if ($("#id_title").val() == "") {
+          $("#id_title").val("新路线");
+        }
+        if ($("#id_start_datetime").val() == "") {
+          var d = new Date();
+          d.setDate(d.getDate()+14);
+          $("#id_start_datetime").val(d.toString('yyyy-M-dd'));
+        }
+
         $("#itinerary_search").click(function(e){
             e.preventDefault();
             if(!set_data_before_submit())

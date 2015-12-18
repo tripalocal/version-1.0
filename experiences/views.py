@@ -3084,8 +3084,8 @@ def custom_itinerary(request, id=None):
             #edit an item
             item = request.POST
             np = NewProduct.objects.get(id=item.get('id'))
-            np.price_min = item.get('price_min')
-            np.price_max = item.get('price_max')
+            np.price_min = item.get('price-min')
+            np.price_max = item.get('price-max')
             np.fixed_price_min = item.get('fixed_price-min')
             np.fixed_price_max = item.get('fixed_price-max')
             np.price = item.get('price', 0)
@@ -3240,7 +3240,7 @@ def custom_itinerary(request, id=None):
                                     datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                     submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                     booking.save()
-                    
+
                 if "draft" in request.POST:
                     return HttpResponseRedirect(GEO_POSTFIX+"itinerary/preview/"+str(ci.id)+"/")
                 else:

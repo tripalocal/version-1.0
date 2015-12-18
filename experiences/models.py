@@ -437,7 +437,7 @@ class CustomItinerary(models.Model):
             subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
             if experience.currency != currency:
                 subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
-            itinerary_price += subtotal_price
+            itinerary_price += float(subtotal_price)
         if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + self.submitted_datetime:
             itinerary_price *= 1.15
         return round(itinerary_price,0)
