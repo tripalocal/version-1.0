@@ -7,6 +7,7 @@ from app.decorators import ajax_form_validate
 from app.base import AjaxDisptcherProcessorMixin
 from app.utils import MailSupportMixin
 from experiences.models import Booking, Experience, NewProduct, CustomItinerary
+from experiences.utils import *
 from custom_admin.views.base import BookingInfoMixin
 from custom_admin.forms import BookingForm, ExperienceUploadForm, CreateExperienceForm
 from custom_admin.views.base import StatusGenerator
@@ -148,9 +149,15 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(PartnerProductView, self).get_context_data(**kwargs)
+        context['partnerproduct_list'] = list(context['partnerproduct_list'])
+        new_index=0
         for exp in context['partnerproduct_list']:
             exp.title = exp.get_information(settings.LANGUAGES[0][0]).title
             exp.host = exp.get_host()
+            if not isEnglish(exp.title):
+                old_index = context['partnerproduct_list'].index(exp)
+                context['partnerproduct_list'].insert(new_index, context['partnerproduct_list'].pop(old_index))
+                new_index += 1
         return context
 
     @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
