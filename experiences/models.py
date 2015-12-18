@@ -430,14 +430,14 @@ class CustomItinerary(models.Model):
             guest_number = bking.guest_number
             adult_number = bking.adult_number
             children_number = bking.children_number
-            if bking.total_price:
+            if bking.total_price and experience.type in ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]:
                 subtotal_price = bking.total_price
             else:
                 subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
             subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
             if experience.currency != currency:
                 subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
-            itinerary_price += float(subtotal_price)
+            itinerary_price += subtotal_price
         if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + self.submitted_datetime:
             itinerary_price *= 1.15
         return round(itinerary_price,0)
