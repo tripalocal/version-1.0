@@ -13,6 +13,7 @@ from experiences.utils import *
 import app.models
 from unionpay.util.helper import load_config
 from copy import deepcopy
+from experiences.constant import *
 
 class ExperienceTag(models.Model):
     tag = models.CharField(max_length=100)
@@ -431,7 +432,7 @@ class CustomItinerary(models.Model):
             adult_number = bking.adult_number
             children_number = bking.children_number
             if bking.total_price and experience.type in ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]:
-                subtotal_price = bking.total_price
+                subtotal_price = float(bking.total_price)
             else:
                 subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
             subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
@@ -462,6 +463,14 @@ class CustomItinerary(models.Model):
             bking_copy.custom_itinerary = ci
             bking_copy.save()
         return ci
+
+    def change_status(self, new_status):
+        self.status = new_status
+        self.save()
+        if new_status == ItineraryStatus.Deleted:
+            for bking in self.booking_set.all():
+                bking.status = new_status
+                bking.save()
 
 class CustomItineraryRequest(models.Model):
     is_first_time = models.BooleanField(default=True)

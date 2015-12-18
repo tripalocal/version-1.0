@@ -7,11 +7,13 @@ from app.decorators import ajax_form_validate
 from app.base import AjaxDisptcherProcessorMixin
 from app.utils import MailSupportMixin
 from experiences.models import Booking, Experience, NewProduct, CustomItinerary
+from experiences.utils import *
 from custom_admin.views.base import BookingInfoMixin
 from custom_admin.forms import BookingForm, ExperienceUploadForm, CreateExperienceForm
 from custom_admin.views.base import StatusGenerator
 from custom_admin.mail import MailService
 from Tripalocal_V1 import settings
+from experiences.constant import ItineraryStatus
 
 import pytz
 from datetime import *
@@ -39,7 +41,7 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
         return self._process_request_with_general_return(request, model_class=CustomItinerary, **kwargs)
 
     def get_queryset(self):
-        return self.model.objects.all().order_by('-submitted_datetime')
+        return self.model.objects.exclude(status="deleted").order_by('-submitted_datetime')
 
     def get_context_data(self, **kwargs):
         context = super(ItineraryView, self).get_context_data(**kwargs)
@@ -57,9 +59,10 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def _manipulate_multi_change_statuses(self, request, itinerary_list, **kwargs):
         itinerary_list= list(itinerary_list)
         for itinerary in itinerary_list:
-            #TODO
-            pass
-            #itinerary.change_status(new_status=kwargs['form'].cleaned_data['status'])
+            if request.POST['status'] in ItineraryStatus.Allowed_Status:
+                itinerary.change_status(new_status=request.POST['status'])
+            else:
+                raise ValueError("Invalid status")
         return {'id':[itinerary.id for itinerary in itinerary_list]}
 
     def _manipulate_duplicate_itineraries(self, request, itinerary_list, **kwargs):
@@ -148,9 +151,15 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(PartnerProductView, self).get_context_data(**kwargs)
+        context['partnerproduct_list'] = list(context['partnerproduct_list'])
+        new_index=0
         for exp in context['partnerproduct_list']:
             exp.title = exp.get_information(settings.LANGUAGES[0][0]).title
             exp.host = exp.get_host()
+            if not isEnglish(exp.title):
+                old_index = context['partnerproduct_list'].index(exp)
+                context['partnerproduct_list'].insert(new_index, context['partnerproduct_list'].pop(old_index))
+                new_index += 1
         return context
 
     @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
