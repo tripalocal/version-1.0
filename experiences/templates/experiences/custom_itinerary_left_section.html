@@ -18,7 +18,7 @@
             {% endif %}
                 {% for experience in day.experiences %}
                 {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
-                <div class='experience_id_{{experience.id}} exp-box-sm'>
+                <div class='experience_id_{{experience.id}} exp-box-sm experience'>
                     <div class='exp-img'>
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt=""/>
                     </div>

@@ -162,7 +162,7 @@
                 <p>{% trans 'Day' %} {{forloop.counter}}</p>
                 <div class="column">
                   {% for experience in experiences %}
-                  <div class='experience_id_{{experience.id}} exp-box-sm added'>
+                  <div class="experience_id_{{experience.id}} exp-box-sm added {% if experience.type == 'PrivateProduct' or experience.type == 'PublicProduct' or experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}experience{% endif %}">
                     <div class='exp-img'>
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
                     </div>
@@ -705,6 +705,14 @@
                     if (isNaN(parseFloat(price))) {
                       price = $(experience).find(".price").text();
                     }
+
+                    var total_price;
+                    if (classes.indexOf('experience') > -1) {
+                      total_price = null;
+                    } else {
+                      total_price = (parseFloat(fixed_price) + parseFloat(price)*guest_number);
+                    }
+
                     var d = Date.parseExact($("#id_start_datetime").val().substring(0, 10), "yyyy-M-dd");
                     d.setDate(d.getDate()+number_day-1);
                     var tmp = $(experience).find(".exp-info")[0].firstElementChild;
@@ -725,7 +733,7 @@
                               "title":tmp.innerText || tmp.textContent,
                               "date":d.toString('yyyy-M-dd'),
                               "time":hour_string+":00",
-                              "total_price": (parseFloat(fixed_price) + parseFloat(price)*guest_number),
+                              "total_price": total_price,
                               "adult_number":$("#id_adult_number").val(),
                               "children_number":$("#id_children_number").val()};
                     itinerary.push(dict);

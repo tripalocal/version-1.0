@@ -3229,7 +3229,7 @@ def custom_itinerary(request, id=None):
                     experience = AbstractExperience.objects.get(id=str(item['id']))
                     adult_number = int(item['adult_number'])
                     children_number = int(item['children_number'])
-                    total_price = float(item['total_price'])
+                    total_price = item['total_price']
 
                     #save the custom itinerary as draft
                     local_timezone = pytz.timezone(experience.get_timezone())
