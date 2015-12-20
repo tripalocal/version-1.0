@@ -164,7 +164,7 @@
                   {% for experience in experiences %}
                   <div class="experience_id_{{experience.id}} exp-box-sm added {% if experience.type == 'PrivateProduct' or experience.type == 'PublicProduct' or experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}experience{% endif %}">
                     <div class='exp-img'>
-                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt='{{experience.title}}' style='height:inherit;width:inherit;'/>
+                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt="" style='height:inherit;width:inherit;'/>
                     </div>
                     <div class='exp-info'>
                         <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}">{{experience.title}}</a></h3>
