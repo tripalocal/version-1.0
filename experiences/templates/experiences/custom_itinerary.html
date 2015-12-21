@@ -304,6 +304,8 @@
             $.ajax({
                 url : '{{GEO_POSTFIX}}itinerary/',
                 type: "POST",
+                async: true,
+                timeout: 60000,
                 data : {
                             csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
                             city: $("#id_city").val(),
@@ -317,8 +319,8 @@
                             all_tags: $("#id_all_tags").val(),
                             sort: $("#id_sort").val(),
                             age_limit: $("#id_age_limit").val()
-                        },
-                success: function(data){
+                        }
+            }).done(function(data){
                             $('.tab-content').html(data);
                             $('.nav-tabs').children().removeClass();
                             $($('.nav-tabs').children()[0]).addClass("active");
@@ -327,11 +329,16 @@
                             update_dates();
                             update_price_title();
                             $(".loading").hide();
-                        },
-                failure: function(e) {
+            }).fail(function(jqXHR, textStatus) {
                             $(".loading").hide();
-                            $('.tab-content').text("Sorry but there was an error.");
-                        }
+                            if(textStatus === 'timeout')
+                            {     
+                                alert('Request timeout'); 
+                            }
+                            else
+                            {
+                                $('.tab-content').text("Sorry but there was an error.");
+                            }
             });
         });
 
@@ -824,10 +831,11 @@
         $.ajax({
             url: '{{GEO_POSTFIX}}itinerary/',
             type: "POST",
+            async: true,
             data: item,
             processData: false,
-            contentType: false,
-            success: function (data) {
+            contentType: false
+        }).done(function (data) {
                 if(isNaN(parseFloat(fixed_price)))
                 {
                     fixed_price = 0;
@@ -887,10 +895,12 @@
                 $("#add-"+type+"-btn").show();
                 $(".loading").hide();
                 init_drag();
-            },
-            failure: function (e) {
+        }).fail(function(jqXHR, textStatus) {
                 $(".loading").hide();
-            }
+                if(textStatus === 'timeout')
+                {     
+                    alert('Request timeout'); 
+                }
         });
     }
 
@@ -1017,10 +1027,11 @@
             $.ajax({
                 url: '{{GEO_POSTFIX}}itinerary/',
                 type: "POST",
+                async: true,
                 data: item,
                 processData: false,
-                contentType: false,
-                success: function (data) {
+                contentType: false
+            }).done(function (data) {
                                 var fixed_price_min = parseFloat($("#" + type + "-fixed_price-min").val());
                                 var fixed_price_max = parseFloat($("#" + type + "-fixed_price-max").val());
                                 var fixed_price =  (fixed_price_min + fixed_price_max)/2;
@@ -1054,10 +1065,12 @@
                                 $("#add-"+type+"-btn").show();
                                 $(".loading").hide();
                                 init_drag();
-                },
-                failure: function (e) {
+            }).fail(function(jqXHR, textStatus) {
                     $(".loading").hide();
-                }
+                    if(textStatus === 'timeout')
+                    {     
+                        alert('Request timeout'); 
+                    }
             });
         });
     }
@@ -1071,15 +1084,18 @@
         $.ajax({
             url: '{{GEO_POSTFIX}}itinerary/',
             type: "POST",
+            async: true,
             data: item,
             processData: false,
-            contentType: false,
-            success: function (data) {
-                        $(".experience_id_" + id).remove();
-                    },
-            failure: function (e) {
+            contentType: false
+        }).done(function (data) {
+                $(".experience_id_" + id).remove();
+        }).fail(function(jqXHR, textStatus) {
                 $(".loading").hide();
-            }
+                if(textStatus === 'timeout')
+                {     
+                    alert('Request timeout'); 
+                }
         });
     }
 
