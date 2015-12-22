@@ -38,7 +38,7 @@ urlpatterns = patterns('',
     url(r'^privacypolicy', 'app.views.privacypolicy'),
     url(r'^refundpolicy', 'app.views.refundpolicy'),
     url(r'^email_custom_trip', 'app.views.email_custom_trip'),
-    url(r'^december', 'experiences.views.campaign', name='campaign'),
+    #url(r'^december', 'experiences.views.campaign', name='campaign'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
