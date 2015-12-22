@@ -627,8 +627,9 @@
             city = $("#button_city_" + i).attr("city");
             $(".city_" + city).remove();
             $("#button_city_" + i).remove();
-            $("#city-title-" + i).remove();
-            $("#city-collapse-" + i).remove();
+            $("#city-title-" + i).parent().remove();
+            //$("#city-title-" + i).remove();
+            //$("#city-collapse-" + i).remove();
             $("#warning-delete-location").modal("hide");
         });
     }
