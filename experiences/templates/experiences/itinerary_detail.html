@@ -96,6 +96,12 @@
           {% endwith %}
           {% endif %}
           <div class="item-description">{{item.description|linebreaks}}</div>
+          <div class="item-section">
+             <h3>{% trans "What's Included" %}</h3>
+             <div class="inline-content">
+             {{item.whatsincluded|linebreaks}}
+             </div>
+           </div>
           {% endif %}
         {% endfor %}
       </div>

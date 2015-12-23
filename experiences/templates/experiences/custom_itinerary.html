@@ -184,6 +184,42 @@
                         </p>
                         <label style="display:none;">{{item.notes}}</label>
                         {% endif %}
+                        <div class="whats-included">
+                          {% if experience.type == 'PrivateProduct' or experience.type == 'PublicProduct' or experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Car driver"><img src="{% static 'experiences/img/cardriver.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Activities"><img src="{% static 'experiences/img/hot-56.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Bus"><img src="{% static 'experiences/img/bus.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Ferry"><img src="{% static 'experiences/img/boat.svg' %}"></button>
+                          {% elif experience.type == 'flight' %}
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Flight"><img src="{% static 'experiences/img/flight.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
+                          {% elif experience.type == 'transfer' %}
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Airport pickup"><img src="{% static 'experiences/img/airportpickup.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Airport dropoff"><img src="{% static 'experiences/img/airportdropoff.svg' %}"></button>
+                          {% elif experience.type == 'accommodation' %}
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Accommodation"><img src="{% static 'experiences/img/accommodation.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                          {% elif experience.type == 'restaurant' %}
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
+                          {% elif experience.type == 'suggestion' %}
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Car driver"><img src="{% static 'experiences/img/cardriver.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Accommodation"><img src="{% static 'experiences/img/accommodation.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Bus"><img src="{% static 'experiences/img/bus.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Ferry"><img src="{% static 'experiences/img/boat.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Activities"><img src="{% static 'experiences/img/hot-56.svg' %}"></button>
+                          {% elif experience.type == 'pricing' %}
+                          {% endif %}
+                        </div>
                     </div>
                     {% if experience.type == 'PrivateProduct' or experience.type == 'PublicProduct' or experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
                     <div class='exp-price'>
@@ -211,20 +247,6 @@
                     {% endif %}
                   </div>
                   {% endfor %}
-                </div>
-                <div class="whats-included">
-                  <p>{% trans "What's Included" %}</p>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/flight.svg' %}"></button>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/airportpickup.svg' %}"></button>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/airportdropoff.svg' %}"></button>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/accommodation.svg' %}"></button>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/cardriver.svg' %}"></button>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/hot-56.svg' %}"></button>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/bus.svg' %}"></button>
-                  <button type="button" class="btn btn-default" data-toggle="button" ari-pressed="false" automcomplete="off"><img src="{% static 'experiences/img/boat.svg' %}"></button>
                 </div>
               </div>
               {% endfor %}
@@ -612,20 +634,6 @@
                                     "<p>{% trans 'Day' %} " + j + "</p>" +
                                     "<div class=\"column\">" +
                                     "</div>" +
-                                    "<div class=\"whats-included\">" +
-                                      "<p>{% trans 'Whats Included' %}</p>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/flight.svg' %}\"></button>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/airportpickup.svg' %}\"></button>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/airportdropoff.svg' %}\"></button>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/accommodation.svg' %}\"></button>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/cardriver.svg' %}\"></button>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/hot-56.svg' %}\"></button>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/lunch.svg' %}\"></button>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/dinner.svg' %}\"></button>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/bus.svg' %}\"></button>" +
-                                      "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"button\" ari-pressed=\"false\" automcomplete=\"off\"><img src=\"{% static 'experiences/img/boat.svg' %}\"></button>" +
-                                    "</div>" +
                                 "</div>";
                 $("#city-collapse-" + i).append(new_day);
             }
@@ -742,6 +750,13 @@
                       total_price = (parseFloat(fixed_price) + parseFloat(price)*guest_number);
                     }
 
+                    var whats_included = "";
+                    $(experience).find(".whats-included-btn").each(function() {
+                      if ($(this).attr("aria-pressed") == "true") {
+                        whats_included += $(this).attr("value") + ", ";
+                      }
+                    });
+
                     var d = Date.parseExact($("#id_start_datetime").val().substring(0, 10), "yyyy-M-dd");
                     d.setDate(d.getDate()+number_day-1);
                     var tmp = $(experience).find(".exp-info")[0].firstElementChild;
@@ -763,13 +778,11 @@
                               "date":d.toString('yyyy-M-dd'),
                               "time":hour_string+":00",
                               "total_price": total_price,
+                              "whats_included": whats_included,
                               "adult_number":$("#id_adult_number").val(),
                               "children_number":$("#id_children_number").val()};
                     itinerary.push(dict);
                     experience = $(experience).next()[0];
-                }
-                if ($(experience).hasClass("whats-included")) {
-                  // TODO
                 }
                 day = $(day).next()[0];
             }
@@ -883,8 +896,52 @@
                   "<a type=\"button\" onclick=\"duplicate_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
                   " &middot; " +
                   "<a type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
-                "</p></div>";
+                "</p>" +
+                "<div class=\"whats-included\">";
+
+                if (type == 'PrivateProduct' || type == 'PublicProduct' || type == 'PRIVATE' || type == 'NONPRIVATE') {
+                  new_item +=
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Car driver\"><img src=\"{% static 'experiences/img/cardriver.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Activities\"><img src=\"{% static 'experiences/img/hot-56.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Breakfast\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Lunch\"><img src=\"{% static 'experiences/img/lunch.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Dinner\"><img src=\"{% static 'experiences/img/dinner.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Bus\"><img src=\"{% static 'experiences/img/bus.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Ferry\"><img src=\"{% static 'experiences/img/boat.svg' %}\"></button>";
+                } else if (type == 'flight') {
+                  new_item +=
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Flight\"><img src=\"{% static 'experiences/img/flight.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Breakfast\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Lunch\"><img src=\"{% static 'experiences/img/lunch.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Dinner\"><img src=\"{% static 'experiences/img/dinner.svg' %}\"></button>";
+                } else if (type == 'transfer') {
+                  new_item +=
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Airport pickup\"><img src=\"{% static 'experiences/img/airportpickup.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Airport dropoff\"><img src=\"{% static 'experiences/img/airportdropoff.svg' %}\"></button>";
+                } else if (type == 'accommodation') {
+                  new_item +=
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Accommodation\"><img src=\"{% static 'experiences/img/accommodation.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Breakfast\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>";
+                } else if (type == 'restaurant') {
+                  new_item +=
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Breakfast\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Lunch\"><img src=\"{% static 'experiences/img/lunch.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Dinner\"><img src=\"{% static 'experiences/img/dinner.svg' %}\"></button>";
+                } else if (type == 'suggestion') {
+                  new_item +=
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Car driver\"><img src=\"{% static 'experiences/img/cardriver.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Activities\"><img src=\"{% static 'experiences/img/hot-56.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Breakfast\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Lunch\"><img src=\"{% static 'experiences/img/lunch.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Dinner\"><img src=\"{% static 'experiences/img/dinner.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Accommodation\"><img src=\"{% static 'experiences/img/accommodation.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Bus\"><img src=\"{% static 'experiences/img/bus.svg' %}\"></button>" +
+                  "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Ferry\"><img src=\"{% static 'experiences/img/boat.svg' %}\"></button>";
+                } else if (type == 'pricing') {
+
+                }
                 new_item +=
+                "</div></div>" +
                 "<div class=\"exp-price\">" +
                   "<div class=\"container-fluid\">" +
                     "<span class=\"inline-text fixed-price-min\">" + fixed_price_min + "</span><div class=\"slider slider-price-base\"></div><span class=\"inline-text fixed-price-max\">" + fixed_price_max + "</span>" +
@@ -952,9 +1009,52 @@
         "<a type=\"button\" onclick=\"duplicate_item(" + id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
         " &middot; " +
         "<a type=\"button\" onclick=\"delete_item(" + id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
-      "</p></div>";
+      "</p><div class=\"whats-included\">";
+
+      if (type == 'PrivateProduct' || type == 'PublicProduct' || type == 'PRIVATE' || type == 'NONPRIVATE') {
+        new_item +=
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Car driver\"><img src=\"{% static 'experiences/img/cardriver.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Activities\"><img src=\"{% static 'experiences/img/hot-56.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Breakfast\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Lunch\"><img src=\"{% static 'experiences/img/lunch.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Dinner\"><img src=\"{% static 'experiences/img/dinner.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Bus\"><img src=\"{% static 'experiences/img/bus.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Ferry\"><img src=\"{% static 'experiences/img/boat.svg' %}\"></button>";
+      } else if (type == 'flight') {
+        new_item +=
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Flight\"><img src=\"{% static 'experiences/img/flight.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Breakfast\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Lunch\"><img src=\"{% static 'experiences/img/lunch.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Dinner\"><img src=\"{% static 'experiences/img/dinner.svg' %}\"></button>";
+      } else if (type == 'transfer') {
+        new_item +=
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Airport pickup\"><img src=\"{% static 'experiences/img/airportpickup.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Airport dropoff\"><img src=\"{% static 'experiences/img/airportdropoff.svg' %}\"></button>";
+      } else if (type == 'accommodation') {
+        new_item +=
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Accommodation\"><img src=\"{% static 'experiences/img/accommodation.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Breakfast\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>";
+      } else if (type == 'restaurant') {
+        new_item +=
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Breakfast\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Lunch\"><img src=\"{% static 'experiences/img/lunch.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Dinner\"><img src=\"{% static 'experiences/img/dinner.svg' %}\"></button>";
+      } else if (type == 'suggestion') {
+        new_item +=
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Car driver\"><img src=\"{% static 'experiences/img/cardriver.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Activities\"><img src=\"{% static 'experiences/img/hot-56.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Breakfast\"><img src=\"{% static 'experiences/img/breakfast.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Lunch\"><img src=\"{% static 'experiences/img/lunch.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Dinner\"><img src=\"{% static 'experiences/img/dinner.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Accommodation\"><img src=\"{% static 'experiences/img/accommodation.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Bus\"><img src=\"{% static 'experiences/img/bus.svg' %}\"></button>" +
+        "<button type=\"button\" class=\"btn btn-default whats-included-btn\" data-toggle=\"button\" aria-pressed=\"false\" autocomplete=\"off\" value=\"Ferry\"><img src=\"{% static 'experiences/img/boat.svg' %}\"></button>";
+      } else if (type == 'pricing') {
+
+      }
+
       new_item +=
-      "<div class=\"exp-price\">" +
+      "</div></div><div class=\"exp-price\">" +
         "<div class=\"container-fluid\">" +
           "<span class=\"inline-text fixed-price-min\">" + fixed_price_min + "</span><div class=\"slider slider-price-base\"></div><span class=\"inline-text fixed-price-max\">" + fixed_price_max + "</span>" +
           "<p>" +
@@ -1123,20 +1223,22 @@
             {
                 //dropped in the left section
                 $($(ui.item[0]).find(".exp-edit")[0]).show();
+                $($(ui.item[0]).find(".whats-included")[0]).hide();
 
             }
             else
             {
                 //dropped in the right section
                 $($(ui.item[0]).find(".exp-edit")[0]).hide();
+                $($(ui.item[0]).find(".whats-included")[0]).show();
                 if (!$(ui.item[0]).hasClass("added")) {
                   var classes = $(ui.item[0]).attr("class").split(" ");
                   var id = classes[0].split("_");
                   var type = $(".tab-pane.active").attr("id");
                   $(ui.item[0]).addClass("added");
                   duplicate_item(id[id.length-1], type);
+                  init_slider($(ui.item[0]));
                 }
-                init_slider($(ui.item[0]));
             }
         }
 

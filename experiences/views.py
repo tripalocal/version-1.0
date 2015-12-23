@@ -3035,7 +3035,7 @@ def custom_itinerary(request, id=None, operation=None):
         ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
         ci.save()
         return HttpResponseRedirect(GEO_POSTFIX+"itinerary/edit/"+str(ci.id)+"/")
-    
+
     if request.method == 'POST':
         if 'Add' in request.POST:
             #add a new item
@@ -3246,13 +3246,14 @@ def custom_itinerary(request, id=None, operation=None):
                     adult_number = int(item['adult_number'])
                     children_number = int(item['children_number'])
                     total_price = item['total_price']
+                    whats_included = item['whats_included']
 
                     #save the custom itinerary as draft
                     local_timezone = pytz.timezone(experience.get_timezone())
                     bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
-                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, total_price = total_price, children_number = children_number,
+                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, whats_included=whats_included, total_price = total_price, children_number = children_number,
                                     datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                     submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                     booking.save()
@@ -3378,10 +3379,7 @@ def itinerary_detail(request,id=None,preview=None):
             exp_information = item.experience.get_information(settings.LANGUAGES[0][0])
             item.experience.title = exp_information.title
             item.experience.description = exp_information.description
-            if type(item.experience) == NewProduct:
-                item.experience.whatsincluded = exp_information.whatsincluded
-            else:
-                item.experience.whatsincluded = item.experience.get_whatsincluded(settings.LANGUAGES[0][0])
+            item.experience.whatsincluded = item.whats_included
             key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%Y-%m-%d")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})

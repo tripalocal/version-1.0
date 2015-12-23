@@ -361,16 +361,14 @@ body {
 }
 
 .whats-included {
-  p {
-    margin-top: 10px;
-  }
+  display: none;
   .btn {
     width: 30px;
     height: 30px;
     border-radius: 3px;
     min-width: 0;
     padding: 0;
-    margin: 10px 5px 5px 0;
+    margin: 0 5px 0 0;
   }
 }
 
