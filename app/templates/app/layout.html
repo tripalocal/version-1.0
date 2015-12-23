@@ -105,18 +105,6 @@
         </div>
     </div>
 
-    <!-- Promotional popup -->
-    <div class="modal fade" id="promo-popup" tabindex="-1" role="dialog" aria-labelledby="promo-popup">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content promo-popup" style="background-color:transparent;">
-          <img src="{% static 'app/img/promo_popup.png' %}" width="615" height="424">
-          <a class="btn btn-clear" href="http://www.tripalocal.com.cn/december/?utm=MEpopup"> </a>
-        </div>
-      </div>
-    </div>
-    <!-- End Modal -->
-
-
 <!-- Header navbar -->
     <div id="navbar" class="navbar navbar-fixed-top">
       <div class="container-fluid">
@@ -334,20 +322,12 @@
       var chosenValue = Math.random() < 0.5 ? 0 : 1;
       var popupTimer;
         if ($(window).width() > 520) {
-           var nClose = parseInt($.cookie("closePopupPromo"), 10);
+           var nClose = parseInt($.cookie("closePopup"), 10);
            if (!nClose || nClose < 12) {
                if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
                    $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
                  popupTimer = setTimeout(function () {
-                     {% if LANGUAGE != "zh-CN" %}
                      $('#help-popup').modal('show');
-                     {% else %}
-                     if (chosenValue == 0) {
-                       $('#help-popup').modal('show');
-                     } else {
-                       $('#promo-popup').modal('show');
-                     }
-                     {% endif %}
                      mixpanel.track("saw popup01");
                  }, 15000); // milliseconds
                }
@@ -358,20 +338,19 @@
            $('.close-popup').click(function () {
                clearTimeout(popupTimer);
                if (nClose) {
-                   $.cookie("closePopupPromo", nClose + 1, {path: '/'});
+                   $.cookie("closePopup", nClose + 1, {path: '/'});
                } else {
-                   $.cookie("closePopupPromo", 1, {path: '/'});
+                   $.cookie("closePopup", 1, {path: '/'});
                }
                $('#help-popup').modal('hide');
-               $('#promo-popup').modal('hide');
                mixpanel.track("closed popup01");
            });
            $('#help-no').click(function () {
                clearTimeout(popupTimer);
                if (nClose) {
-                   $.cookie("closePopupPromo", nClose + 1, {path: '/'});
+                   $.cookie("closePopup", nClose + 1, {path: '/'});
                } else {
-                   $.cookie("closePopupPromo", 1, {path: '/'});
+                   $.cookie("closePopup", 1, {path: '/'});
                }
                $('#help-popup').modal('hide');
                mixpanel.track("selected No from popup01");
