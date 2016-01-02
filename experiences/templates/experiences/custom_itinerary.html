@@ -171,7 +171,7 @@
                         <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}">{{experience.title}}</a></h3>
                         <p>{{experience.description|escapejs|slice:"0:16"}}</p>
                         {% if experience.type == 'PrivateProduct' or experience.type == 'PublicProduct' or experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
-                        <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
+                        <p style="display:none;">{{experience.duration}} {% trans 'hr(s)' %} &middot;
                             {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
                             {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
                         {% else %}
@@ -184,7 +184,7 @@
                         </p>
                         <label style="display:none;">{{item.notes}}</label>
                         {% endif %}
-                        <div class="whats-included">
+                        <div class="whats-included" style="display:block;">
                           {% if experience.type == 'PrivateProduct' or experience.type == 'PublicProduct' or experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Car driver"><img src="{% static 'experiences/img/cardriver.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Activities"><img src="{% static 'experiences/img/hot-56.svg' %}"></button>
@@ -369,8 +369,8 @@
             }).fail(function(jqXHR, textStatus) {
                             $(".loading").hide();
                             if(textStatus === 'timeout')
-                            {     
-                                alert('Request timeout'); 
+                            {
+                                alert('Request timeout');
                             }
                             else
                             {
@@ -454,6 +454,7 @@
 
         $("#right_section").find(".exp-box-sm").each(function() {
           init_slider($(this));
+          $(this).find(".whats-included").show();
         });
     })
 
@@ -988,8 +989,8 @@
         }).fail(function(jqXHR, textStatus) {
                 $(".loading").hide();
                 if(textStatus === 'timeout')
-                {     
-                    alert('Request timeout'); 
+                {
+                    alert('Request timeout');
                 }
         });
     }
@@ -1201,8 +1202,8 @@
             }).fail(function(jqXHR, textStatus) {
                     $(".loading").hide();
                     if(textStatus === 'timeout')
-                    {     
-                        alert('Request timeout'); 
+                    {
+                        alert('Request timeout');
                     }
             });
         });
@@ -1226,8 +1227,8 @@
         }).fail(function(jqXHR, textStatus) {
                 $(".loading").hide();
                 if(textStatus === 'timeout')
-                {     
-                    alert('Request timeout'); 
+                {
+                    alert('Request timeout');
                 }
         });
     }
