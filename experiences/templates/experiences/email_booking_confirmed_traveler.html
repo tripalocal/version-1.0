@@ -5,6 +5,9 @@
 
 {% block heading %}{% trans "Booking confirmed" %}{% endblock %}
 {% block subheading %}{% trans "Please meet "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " at the meeting point"%}{% endblock %}
+
+{% block profile %}{% with experience.hosts.all|first as host %}{% if host.registereduser.image_url %}{{ MEDIA_URL }}{{ host.registereduser.image_url }}{% else %}{{ MEDIA_URL }}hosts/profile_default/{{rand|add:"123456789abcdefghijk"|make_list|random}}.svg{% endif %}{% endwith %}{% endblock %}
+
 {% block content %}
 <strong>{{experience.meetup_spot}}</strong><br>
   {% trans "on" %} <strong>{% if LANGUAGE != "zh-CN"%}{{ booking.datetime|date:'d/m/Y' }}{% else %}{{ booking.datetime|date:'Y-m-d' }}{% endif %}</strong>{%trans " at " %}<strong> {{ booking.datetime|date:'H:i' }}</strong><br>

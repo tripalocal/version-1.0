@@ -9,6 +9,8 @@
                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a>
 {% endblock %}
 
+{% block profile %}{% with experience.hosts.all|first as host %}{% if host.registereduser.image_url %}{{ MEDIA_URL }}{{ host.registereduser.image_url }}{% else %}{{ MEDIA_URL }}hosts/profile_default/{{rand|add:"123456789abcdefghijk"|make_list|random}}.svg{% endif %}{% endwith %}{% endblock %}
+
 {% block content %}
   {% trans "Leave a review for your host so they can get more bookings :)"%}
 {% endblock %}
