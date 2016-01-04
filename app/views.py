@@ -21,7 +21,7 @@ from django.dispatch import receiver
 from app.forms import HomepageSearchForm, UserProfileForm, UserCalendarForm
 from app.models import *
 from django.contrib import messages
-import string, random, pytz, subprocess, geoip2.database, requests
+import string, random, pytz, subprocess, geoip2.database, requests, PIL
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, set_initial_currency, convert_experience_price
@@ -761,6 +761,16 @@ def saveProfileImage(user, profile, image_file):
         profile.image_url = dirname + filename
         profile.image = image_file
         profile.save()
+
+        #crop the image
+        dirname = settings.MEDIA_ROOT + '/hosts/' + str(user.id) + '/'
+        im = PIL.Image.open(dirname + filename)
+        w, h = im.size
+        if w > 1200:
+            basewidth = 1200
+            wpercent = (basewidth/float(w))
+            hsize = int((float(h)*float(wpercent)))
+            im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS).save(dirname + filename)
 
 @require_POST
 def email_custom_trip(request):
