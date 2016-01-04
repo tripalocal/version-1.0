@@ -1,0 +1,16 @@
+{% load mathfilters %}
+{% load i18n %}
+{% load staticfiles %}
+
+<div class="booking-box">
+  <input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
+  <form id="experience_booking_form" method="post" action="">
+    {% csrf_token %}
+    {% for field in form.hidden_fields %}
+        {{ field }}
+    {% endfor %}
+    <div>
+      {{form.date}}
+    </div>
+  </form>
+</div>
