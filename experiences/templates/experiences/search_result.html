@@ -315,30 +315,41 @@
         $(".glyphicon-calendar").hide();
 
         if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
-            $(function () {
-                $("#id_start_date").datetimepicker({
-                    format: 'YYYY-MM-DD', locale: 'zh-CN'
-                });
-            });
+          $(function () {
+              $("#id_start_date").datetimepicker({
+                  format: 'YYYY-MM-DD', locale: 'zh-CN'
+              });
+              $("#id_end_date").datetimepicker({
+                  format: 'YYYY-MM-DD', locale: 'zh-CN',
+                  useCurrent: false
+              });
 
-            $(function () {
-                $("#id_end_date").datetimepicker({
-                    format: 'YYYY-MM-DD', locale: 'zh-CN'
-                });
-            });
+              $("#id_start_date").on("dp.change", function (e) {
+                  $('#id_end_date').data("DateTimePicker").minDate(e.date);
+              });
+              $("#id_end_date").on("dp.change", function (e) {
+                  $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+              });
+          });
         }
         else {
-            $(function () {
-                $("#id_start_date").datetimepicker({
-                    format: 'YYYY-MM-DD'
-                });
-            });
+          $(function () {
+              $("#id_start_date").datetimepicker({
+                  format: 'YYYY-MM-DD'
+              });
+              $("#id_end_date").datetimepicker({
+                  format: 'YYYY-MM-DD',
+                  useCurrent: false
+              });
 
-            $(function () {
-                $("#id_end_date").datetimepicker({
-                    format: 'YYYY-MM-DD'
-                });
-            });
+              $("#id_start_date").on("dp.change", function (e) {
+                  $('#id_end_date').data("DateTimePicker").minDate(e.date);
+              });
+              $("#id_end_date").on("dp.change", function (e) {
+                  $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+              });
+
+          });
         }
 
         $("#id_start_date, #id_end_date").focusout(function () {

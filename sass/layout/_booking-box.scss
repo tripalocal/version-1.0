@@ -71,9 +71,6 @@
   input {
     height: 30px;
   }
-  @include media('<tablet') {
-    margin-top: -30px;
-  }
 }
 
 .booking-tip {

@@ -163,9 +163,14 @@ h1 {
       }
     }
 
+    #id_start_date {
+      height: 40px;
+    }
+
     #id_end_date {
       border-top-right-radius: 5px;
       border-bottom-right-radius: 5px;
+      height: 40px;
     }
 
     .home-search-button {

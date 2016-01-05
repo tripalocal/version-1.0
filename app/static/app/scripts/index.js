@@ -2,7 +2,7 @@ $(document).ready(function () {
     mixpanel.track("viewed homepage");
 
 
-    
+
     function getParameterByName(name) {
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
         var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -11,11 +11,6 @@ $(document).ready(function () {
     }
 
     $("#id_city").attr("class", "btn btn-default dropdown-toggle homepage-city");
-    $("#id_start_date").attr("class", "input-sm");
-    $("#id_end_date").attr("class", "input-sm");
-    $("#id_start_date").attr("style", "height:40px;");
-    $("#id_end_date").attr("style", "height:40px;");
-
 
     //hide loginpartial on homepage
     $(".navBox").attr("style", "display:none");
@@ -50,11 +45,16 @@ $(document).ready(function () {
             $("#id_start_date").datetimepicker({
                 format: 'YYYY-MM-DD', locale: 'zh-CN'
             });
-        });
-
-        $(function () {
             $("#id_end_date").datetimepicker({
-                format: 'YYYY-MM-DD', locale: 'zh-CN'
+                format: 'YYYY-MM-DD', locale: 'zh-CN',
+                useCurrent: false
+            });
+
+            $("#id_start_date").on("dp.change", function (e) {
+                $('#id_end_date').data("DateTimePicker").minDate(e.date);
+            });
+            $("#id_end_date").on("dp.change", function (e) {
+                $('#id_start_date').data("DateTimePicker").maxDate(e.date);
             });
         });
     }
@@ -63,12 +63,18 @@ $(document).ready(function () {
             $("#id_start_date").datetimepicker({
                 format: 'YYYY-MM-DD'
             });
-        });
-
-        $(function () {
             $("#id_end_date").datetimepicker({
-                format: 'YYYY-MM-DD'
+                format: 'YYYY-MM-DD',
+                useCurrent: false
             });
+
+            $("#id_start_date").on("dp.change", function (e) {
+                $('#id_end_date').data("DateTimePicker").minDate(e.date);
+            });
+            $("#id_end_date").on("dp.change", function (e) {
+                $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+            });
+
         });
     }
 
