@@ -96,9 +96,9 @@
           {% endwith %}
           {% endif %}
           <div class="item-description">{{item.description|linebreaks}}</div>
-          <div class="item-section">
+          <div class="item-section" style="display:none;">
              <h3>{% trans "What's Included" %}</h3>
-             <div class="inline-content" style="display:none;">
+             <div class="inline-content">
              {{item.whatsincluded|linebreaks}}
              </div>
            </div>
