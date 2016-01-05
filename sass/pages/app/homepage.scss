@@ -118,10 +118,6 @@ h1 {
       margin-top: 80px;
       margin-bottom: 50px;
     }
-    @include media('>tablet') {
-      background-attachment: fixed;
-    }
-
   }
 
   .bootstrap-datetimepicker-widget {
@@ -194,6 +190,7 @@ h1 {
 
   @include media('>tablet') {
     height: 590px;
+    background-attachment: fixed;
   }
 }
 

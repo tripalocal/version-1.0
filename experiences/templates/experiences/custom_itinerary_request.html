@@ -246,8 +246,7 @@ $(function() {
 
           $("#id_end_date").datetimepicker({
               format: 'YYYY-MM-DD', locale: 'zh-CN',
-              useCurrent: false,
-              minDate: $("#id_start_date").val()
+              useCurrent: false
           });
 
           $("#id_start_date").on("dp.change", function (e) {
