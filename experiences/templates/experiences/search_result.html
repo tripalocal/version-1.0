@@ -225,7 +225,6 @@
         }, data)).done(function (response) {
             $('#ajax-experience-result').html($(response).find('#experience-results'));
             $('#ajax-experience-count').html($(response).find('#experience-count'));
-            $('.listing-description').dotdotdot();
         }).fail(function () {
             $('#ajax-experience-result').text("Sorry but there was an error.");
         });
