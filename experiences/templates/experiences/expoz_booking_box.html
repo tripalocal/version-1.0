@@ -9,8 +9,20 @@
     {% for field in form.hidden_fields %}
         {{ field }}
     {% endfor %}
-    <div>
+    <div style="border-bottom: 1px solid #ccc;">
+      <p>
+        {% trans "Date" %}
+      </p>
       {{form.date}}
     </div>
+    <a role="button" data-toggle="collapse" href="#option-{{forloop.counter}}">{{ option }}</a>
+    <div class="collapse" id="option-{{forloop.counter}}">
+
+    </div>
+    {% if user.is_authenticated %}
+        <input style="display:inline-block; width: 60px;" id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" disabled='disabled'/>
+    {% else %}
+        <input style="display:inline-block; width: 60px;" type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
+    {% endif %}
   </form>
 </div>
