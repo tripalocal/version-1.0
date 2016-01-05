@@ -268,6 +268,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         experiences = [e for e in experiences if e.city.lower() in city]
 
     experiences = sort_experiences(experiences, customer, preference)
+    month_in_advance = 1
 
     for experience in experiences:
         #new requirement: if the guest_number is smaller than the min value, increase the price per person instead of excluding the experience
@@ -370,15 +371,15 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
             #calculate all the blockout time periods
             for blk in blockouts:
-                if blk.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+                if blk.start_datetime.astimezone(local_timezone).dst() != timedelta(0):
                     daylightsaving = True
                 else:
                     daylightsaving = False
 
                 if blk.repeat:
                     b_l = blk.end_datetime - blk.start_datetime
-                    if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                        blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+                    if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date():
+                        blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date()
                     while blk.start_datetime.date() <= blk.repeat_end_date:
                         blockout_index += 1
                         blockout_start.append(blk.start_datetime)
@@ -399,15 +400,15 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
             #calculate all the instant booking time periods
             for ib in instantbookings :
-                if ib.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+                if ib.start_datetime.astimezone(local_timezone).dst() != timedelta(0):
                     daylightsaving = True
                 else:
                     daylightsaving = False
 
                 if ib.repeat:
                     ib_l = ib.end_datetime - ib.start_datetime
-                    if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                        ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+                    if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date():
+                        ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date()
                     while ib.start_datetime.date() <= ib.repeat_end_date:
                         instantbooking_index += 1
                         instantbooking_start.append(ib.start_datetime)
@@ -430,7 +431,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         instantbooking_i=0
         while (sdt <= end_datetime):
             sdt_local = sdt.astimezone(local_timezone)
-            if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+            if pytz.utc.localize(datetime.utcnow()).astimezone(local_timezone).dst() != timedelta(0):
                 #daylight saving
                 if not sdt_local.dst() != timedelta(0):
                     # not daylight saving
@@ -567,6 +568,7 @@ class ExperienceListView(ListView):
 def getAvailableOptions(experience, available_options, available_date):
 
     top_instant_bookings = -1
+    month_in_advance = 1
 
     last_sdt = pytz.timezone('UTC').localize(datetime.min)
     local_timezone = pytz.timezone(experience.get_timezone())
@@ -595,15 +597,15 @@ def getAvailableOptions(experience, available_options, available_date):
 
     #calculate all the blockout time periods
     for blk in blockouts :
-        if blk.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+        if blk.start_datetime.astimezone(local_timezone).dst() != timedelta(0):
             daylightsaving = True
         else:
             daylightsaving = False
 
         if blk.repeat:
             b_l =  blk.end_datetime - blk.start_datetime
-            if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+1)).date()
+            if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date():
+                blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date()
             while blk.start_datetime.date() <= blk.repeat_end_date:
                 blockout_index += 1
                 blockout_start.append(blk.start_datetime)
@@ -627,15 +629,15 @@ def getAvailableOptions(experience, available_options, available_date):
 
     #calculate all the instant booking time periods
     for ib in instantbookings :
-        if ib.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+        if ib.start_datetime.astimezone(local_timezone).dst() != timedelta(0):
             daylightsaving = True
         else:
             daylightsaving = False
 
         if ib.repeat:
             ib_l =  ib.end_datetime - ib.start_datetime
-            if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+            if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date():
+                ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date()
             while ib.start_datetime.date() <= ib.repeat_end_date:
                 instantbooking_index += 1
                 instantbooking_start.append(ib.start_datetime)
@@ -656,13 +658,12 @@ def getAvailableOptions(experience, available_options, available_date):
 
     block_i=0
     instantbooking_i=0
-    while (sdt <= experience.end_datetime and sdt <= datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2) ):
+    while (sdt <= experience.end_datetime and sdt <= datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance) ):
         #check if the date is blocked
         blocked = False
-
         #block 10pm-7am if repeated hourly
         sdt_local = sdt.astimezone(local_timezone)
-        if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+        if pytz.utc.localize(datetime.utcnow()).astimezone(local_timezone).dst() != timedelta(0):
             #daylight saving
             if not sdt_local.dst() != timedelta(0):
                 # not daylight saving
@@ -1197,11 +1198,12 @@ def experience_booking_confirmation(request):
         total_price = experience_fee_calculator(subtotal_price, experience.commission)
         subtotal_price = round(subtotal_price*(1.00+COMMISSION_PERCENT),0)
 
+        local_timezone = pytz.timezone(experience.get_timezone())
         if 'Refresh' in request.POST:
             #get coupon information
             wrong_promo_code = False
             code = form.data['promo_code']
-            bk_dt = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['date'].strip()+form.data['time'].strip(),"%Y-%m-%d%H:%M"))
+            bk_dt = local_timezone.localize(datetime.strptime(form.data['date'].strip()+form.data['time'].strip(),"%Y-%m-%d%H:%M"))
             coupons = Coupon.objects.filter(promo_code__iexact = code,
                                             end_datetime__gt = bk_dt,
                                             start_datetime__lt = bk_dt)
@@ -1279,8 +1281,8 @@ def experience_booking_confirmation(request):
             form.data['booking_extra_information'] = order_id
             if form.is_valid():
                 config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
-                bk_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
-                bk_time = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
+                bk_date = local_timezone.localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
+                bk_time = local_timezone.localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
                 total_price = form.cleaned_data['price_paid'] if form.cleaned_data['price_paid'] != -1.0 else total_price
 
                 if total_price > 0.0:
@@ -1327,8 +1329,8 @@ def experience_booking_confirmation(request):
             form.data['booking_extra_information'] = out_trade_no
 
             if form.is_valid():
-                bk_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
-                bk_time = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
+                bk_date = local_timezone.localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
+                bk_time = local_timezone.localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
                 total_price = form.cleaned_data['price_paid'] if form.cleaned_data['price_paid'] != -1.0 else total_price
 
                 if total_price > 0.0:
