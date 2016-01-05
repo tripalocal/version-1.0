@@ -178,11 +178,11 @@
                         <p class='exp-edit' style="display:none;">
                           <a type="button" onclick="edit_item({{experience.id}}, '{{experience.type}}');">{% trans "Edit" %}</a>
                           &middot;
-                          <a type="button" onclick="duplicate_item({{item.id}}, '{{experience.type}}');">{% trans "Duplicate" %}</a>
+                          <a type="button" onclick="duplicate_item({{experience.id}}, '{{experience.type}}');">{% trans "Duplicate" %}</a>
                           &middot;
                           <a type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</a>
                         </p>
-                        <label style="display:none;">{{item.notes}}</label>
+                        <label style="display:none;">{{experience.notes}}</label>
                         {% endif %}
                         <div class="whats-included" style="display:block;">
                           {% if experience.type == 'PrivateProduct' or experience.type == 'PublicProduct' or experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
@@ -193,22 +193,22 @@
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Bus"><img src="{% static 'experiences/img/bus.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Ferry"><img src="{% static 'experiences/img/boat.svg' %}"></button>
-                          {% elif experience.type == 'flight' %}
+                          {% elif experience.type == 'Flight' %}
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Flight"><img src="{% static 'experiences/img/flight.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
-                          {% elif experience.type == 'transfer' %}
+                          {% elif experience.type == 'Transfer' %}
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Airport pickup"><img src="{% static 'experiences/img/airportpickup.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Airport dropoff"><img src="{% static 'experiences/img/airportdropoff.svg' %}"></button>
-                          {% elif experience.type == 'accommodation' %}
+                          {% elif experience.type == 'Accommodation' %}
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Accommodation"><img src="{% static 'experiences/img/accommodation.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
-                          {% elif experience.type == 'restaurant' %}
+                          {% elif experience.type == 'Restaurant' %}
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
-                          {% elif experience.type == 'suggestion' %}
+                          {% elif experience.type == 'Suggestion' %}
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Car driver"><img src="{% static 'experiences/img/cardriver.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
@@ -217,7 +217,6 @@
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Bus"><img src="{% static 'experiences/img/bus.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Ferry"><img src="{% static 'experiences/img/boat.svg' %}"></button>
                           <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Activities"><img src="{% static 'experiences/img/hot-56.svg' %}"></button>
-                          {% elif experience.type == 'pricing' %}
                           {% endif %}
                         </div>
                     </div>
