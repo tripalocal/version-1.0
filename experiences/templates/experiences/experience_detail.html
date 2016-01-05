@@ -6,9 +6,9 @@
     {% load staticfiles %}
     {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
     {% if LANGUAGE != "zh-CN" %}
-    <title>{{ experience.title }} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}</title>
+    <title>{{ experience.title }} {% trans "with" %} {{ host.first_name|title }} {{ host.last_name|title|slice:":1" }}.</title>
     {%else%}
-    <title>{% trans "with" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "Experience" %}{{ experience.title }}</title>
+    <title>{% trans "with" %} {{ host.first_name|title }} {{ host.last_name|title|slice:":1" }}. {% trans "Experience" %}{{ experience.title }}</title>
     {%endif%}
     {% else %}
     <title>{{ experience.title }}</title>
@@ -48,7 +48,7 @@
     {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
     <div class="container-fluid">
         <div class="experience-host bio-box">
-            <h2>{% trans "About the host," %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {% endif %} {% endfor %}</h2>
+            <h2>{% trans "About the host," %} {{ host.first_name|title }}</h2>
             <div id="experience-hostintro" class="experience-hostintro">
                 <div class="experience-hostpic profile-lg" style="background:url({{ MEDIA_URL }}{{ host_image|urlencode }}); no-repeat; background-size:cover; background-position:center;"></div>
                 <div>
@@ -64,9 +64,7 @@
 
             <div class="host-socialmedia">
                 <div class="host-trust">{% trans "Trust" %}</div>
-                {% for h in experience.hosts.all %}
-                {% if forloop.first %}
-                {% if h.socialaccount_set.all%}
+                {% if host.socialaccount_set.all%}
                 <div class="host-facebook">
                     <div class="facebooklogo"></div>
                     <span class="Mobile">Facebook</span>
@@ -80,15 +78,13 @@
                     <span class="review-number" style="color:#333">{{ experience.review_set.count }}</span>
                 </div>
                 {% endif %}
-                {% if h.registereduser.phone_number%}
+                {% if host.registereduser.phone_number%}
                 <div class="host-mobile">
                     <div class="mobilelogo"></div>
                     <span class="Mobile">{% trans "Phone" %}</span>
                     <span class="host-verified">{% trans "Verified" %}</span>
                 </div>
                 {% endif %}
-                {% endif %}
-                {% endfor %}
             </div>
         </div>
     </div>

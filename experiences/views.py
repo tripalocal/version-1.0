@@ -603,7 +603,7 @@ def getAvailableOptions(experience, available_options, available_date):
         if blk.repeat:
             b_l =  blk.end_datetime - blk.start_datetime
             if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+                blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+1)).date()
             while blk.start_datetime.date() <= blk.repeat_end_date:
                 blockout_index += 1
                 blockout_start.append(blk.start_datetime)
@@ -1030,7 +1030,7 @@ class ExperienceDetailView(DetailView):
                 experience.whatsincluded = t.whatsincluded
                 experience.notice = t.notice
 
-        if experience.commission > 0.0:
+        if experience.commission >= 0.0:
             experience.commission = round(experience.commission/(1-experience.commission),3)+1
         else:
             experience.commission = settings.COMMISSION_PERCENT+1
@@ -1065,6 +1065,8 @@ class ExperienceDetailView(DetailView):
                     coordinates.append([co.name if co.name is not None else '', co.longitude, co.latitude])
 
         context['coordinates'] = coordinates
+
+        context['host'] = experience.get_host()
 
         #update page view statistics
         if self.request.user.is_staff:
