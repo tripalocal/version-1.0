@@ -281,8 +281,6 @@ $(window).resize(function(){
 });
 
 $(function(){
-    $(document).ready(function(){
-
         mixpanel.track("viewed an experience");
         if (screen.width > 767) {
           {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
@@ -568,7 +566,6 @@ $(function(){
         }
 
         $("#id_submit_request").prop('disabled', false);
-    })
 })
 
 $(function(){

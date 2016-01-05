@@ -37,7 +37,6 @@
         {% endfor %}
     </table>
     <input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
-    {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' or experience.type == 'ITINERARY'%}
     {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
     <div class="profile-lg">
         <div style="background:url({{ MEDIA_URL }}{{ host_image|urlencode }}); no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
@@ -116,5 +115,4 @@
         {% endif %}
         </div>
     </form>
-    {%endif%}
 </div>
