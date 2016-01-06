@@ -46,7 +46,10 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(ItineraryView, self).get_context_data(**kwargs)
         for ci in context['itinerary_list']:
-            ci.guest_number = ci.get_guest_number()
+            guest_number_tuple = ci.get_guest_number()
+            ci.guest_number = guest_number_tuple[0]
+            ci.adult_number = guest_number_tuple[1]
+            ci.child_number = guest_number_tuple[2]
             ci.price_aud = ci.get_price('aud')
             ci.price_cny = ci.get_price('cny')
             if ci.status != "paid":
