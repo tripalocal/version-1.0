@@ -52,14 +52,21 @@ var domCommEvents = {
     setListener: function() {
         this.deleteItineraryEvent();
         this.duplicateItineraryEvent();
+        this.markAsPaidEvent();
+        this.markAsReadyEvent();
     },
     deleteItineraryEvent: function () {
         $("#delete-itinerary").on("click", { "status": "deleted" }, dommCommEventsProcessor.processMultiChangeStatusEvent);
     },
     duplicateItineraryEvent: function () {
         $("#dulicate-itinerary").on("click", {}, dommCommEventsProcessor.processMultiDuplicationEvent);
+    },
+    markAsPaidEvent: function() {
+        $("#mark-as-paid").on("click", {"status" : "paid"}, dommCommEventsProcessor.processMultiChangeStatusEvent);
+    },
+    markAsReadyEvent: function() {
+        $("#mark-as-ready").on("click", {"status" : "ready"}, dommCommEventsProcessor.processMultiChangeStatusEvent);
     }
-
 }
 
 var dommCommEventsProcessor = {
@@ -103,9 +110,10 @@ var dommCommEventsCallBack = {
         globalVariables.cleanChosenFields();
         $('[name="admin-panel-itinerary-id-checkbox"]').prop("checked", false);
         var ids = result.id;
-        for(var index in ids) {
+        /*for(var index in ids) {
             $("#itinerary-id-" + ids[index]).css("display", "none");
-        }
+        }*/
+        location.reload();
     },
 
     processMultiDuplicationSuccessCallBack: function (result) {
@@ -184,7 +192,7 @@ var helper = {
             case "no_show":
                 return "not show status";
             case "paid":
-                return "previous status";
+                return "paid status";
             case "rejected":
                 return "cancelled status";
             case "accepted":
@@ -197,6 +205,8 @@ var helper = {
                 return "archived status";
             case "unarchived":
                 return "unarchived status";
+            case "ready":
+                return "discount price status";
         }
     },
 }
@@ -208,4 +218,3 @@ var presentationUtil = {
 var constant = {
     CHANGE_TIME_DESCRIPTION: "Change Time",
 }
-

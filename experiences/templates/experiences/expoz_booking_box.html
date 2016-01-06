@@ -10,15 +10,42 @@
         {{ field }}
     {% endfor %}
     <div style="border-bottom: 1px solid #ccc;">
-      <p>
-        {% trans "Date" %}
-      </p>
+      <p>{% trans "Date" %}</p>
       {{form.date}}
     </div>
-    <a role="button" data-toggle="collapse" href="#option-{{forloop.counter}}">{{ option }}</a>
-    <div class="collapse" id="option-{{forloop.counter}}">
 
+    {% for option in available_options %}
+    <a role="button" data-toggle="collapse" href="#option-{{forloop.counter}}">
+      +{{ option.name }}<span class="badge"></span>
+    </a>
+    <div class="collapse" id="option-{{forloop.counter}}">
+      <table>
+        <tr>
+          <td>
+            {% trans "Adults" %}
+          </td>
+          <td>
+            {{ option.price_adult }}
+          </td>
+          <td>
+            
+          </td>
+        </tr>
+        <tr>
+          <td>
+            {% trans "Children (age 3-14)" %}
+          </td>
+          <td>
+            {{ option.price_child }}
+          </td>
+          <td>
+
+          </td>
+        </tr>
+      </table>
     </div>
+    {% endfor %}
+
     {% if user.is_authenticated %}
         <input style="display:inline-block; width: 60px;" id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" disabled='disabled'/>
     {% else %}
@@ -26,3 +53,7 @@
     {% endif %}
   </form>
 </div>
+
+<script>
+
+</script>
