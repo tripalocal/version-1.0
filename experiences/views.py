@@ -2638,12 +2638,12 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         # alongside a list with all the number of reviews
         # experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(type__iexact="itinerary")
 
-            if is_kids_friendly:
-                experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
-            if is_host_with_cars:
-                experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
-            if is_private_tours:
-                experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
+        if is_kids_friendly:
+            experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
+        if is_host_with_cars:
+            experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
+        if is_private_tours:
+            experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
 
         i = 0
         while i < len(experienceList):
