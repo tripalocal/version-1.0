@@ -34,6 +34,7 @@ def get_auth_token():
 
 
 def send_sms(phone_num, msg):
+    phone_num = phone_num.split(',')[0]
     token = get_auth_token()
     headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
     payload = {'to': phone_num, 'body': msg}

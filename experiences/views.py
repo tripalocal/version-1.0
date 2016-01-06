@@ -1883,7 +1883,10 @@ def update_booking(id, accepted, user):
                 booking.coupon.save()
 
             exp_title = experience.get_information(settings.LANGUAGE_CODE).title
-            customer_phone_num = booking.payment.phone_number
+            if booking.payment:
+                customer_phone_num = booking.payment.phone_number
+            else:
+                customer_phone_num = booking.user.registereduser.phone_number
             exp_datetime_local = booking.datetime.astimezone(tzlocal())
             exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y")).format(*'年月日')
 
@@ -2007,7 +2010,10 @@ def update_booking(id, accepted, user):
 
                 #send SMS
                 exp_title = experience.get_information(settings.LANGUAGE_CODE).title
-                customer_phone_num = booking.payment.phone_number
+                if booking.payment:
+                    customer_phone_num = booking.payment.phone_number
+                else:
+                    customer_phone_num = booking.user.registereduser.phone_number
                 exp_datetime_local = booking.datetime.astimezone(tzlocal())
                 exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
                 send_booking_cancelled_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)

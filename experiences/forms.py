@@ -962,6 +962,7 @@ class ItineraryBookingForm(forms.Form):
             else:
                 experience.title = exp_information.title
 
+            payment = Payment()
             if not free:
                 subtotal_price = get_total_price(experience, guest_number)
 
@@ -976,7 +977,6 @@ class ItineraryBookingForm(forms.Form):
                     price = round(subtotal_price*(1.00+COMMISSION_PERCENT), 0)*(1+extra_fee)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
 
                 if price > 0:
-                    payment = Payment()
                     if currency is not None and currency.lower() != experience.currency.lower():
                         price = convert_currency(price, experience.currency, currency)
                         experience.currency = currency
@@ -1022,18 +1022,19 @@ class ItineraryBookingForm(forms.Form):
                 if not free:
                     instance.save()
                     payment.charge_id = instance['id']
-                    payment.booking_id = booking.id
-                    payment.street1 = payment_street1 if payment_street1 is not None else ""
-                    payment.street2 = payment_street2 if payment_street2 is not None else ""
-                    payment.city = payment_city if payment_city is not None else ""
-                    payment.state = payment_state if payment_state is not None else ""
-                    payment.country = payment_country if payment_country is not None else ""
-                    payment.postcode = payment_postcode if payment_postcode is not None else ""
-                    payment.phone_number = payment_phone_number if payment_phone_number is not None else ""
-                    payment.save()
 
-                    booking.payment_id = payment.id
-                    booking.save()
+                payment.booking_id = booking.id
+                payment.street1 = payment_street1 if payment_street1 is not None else ""
+                payment.street2 = payment_street2 if payment_street2 is not None else ""
+                payment.city = payment_city if payment_city is not None else ""
+                payment.state = payment_state if payment_state is not None else ""
+                payment.country = payment_country if payment_country is not None else ""
+                payment.postcode = payment_postcode if payment_postcode is not None else ""
+                payment.phone_number = payment_phone_number if payment_phone_number is not None else ""
+                payment.save()
+
+                booking.payment_id = payment.id
+                booking.save()
 
                 send_booking_email_verification(booking, experience, user, is_instant_booking)
                 sms_notification(booking, experience, user, payment_phone_number)
