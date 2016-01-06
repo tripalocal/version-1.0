@@ -323,6 +323,22 @@ class NewProductI18n(models.Model):
     def __str__(self):
         return self.title
 
+class OptionGroup(models.Model):
+    product = models.ForeignKey(NewProduct)
+    name = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+class OptionItem(models.Model):
+    group = models.ForeignKey(OptionGroup)
+    name = models.TextField()
+    retail_price = models.FloatField(blank=True, null=True)
+    price = models.FloatField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
 class InstantBookingTimePeriod(models.Model):
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
@@ -484,7 +500,7 @@ class CustomItineraryRequest(models.Model):
     budget = models.TextField()
     requirements = models.TextField(blank=True, null=True)
     customer_name = models.CharField(max_length=40)
-    email = models.EmailField()
+    email = models.EmailField(max_length=75)
     wechat = models.CharField(max_length=50)
     mobile = models.CharField(max_length=50)
 
@@ -506,6 +522,7 @@ class Booking(models.Model):
     booking_extra_information = models.TextField(null=True, blank=True)
     custom_itinerary = models.ForeignKey(CustomItinerary, null=True, blank=True)
     host = models.ForeignKey(User, null=True, blank=True, related_name='booking_host')
+    option_item = models.ManyToManyField(OptionItem, related_name='booking_option_item')
 
     def __str__(self):
         return self.user.email + "--" + self.experience.get_information(settings.LANGUAGES[0][0]).title
