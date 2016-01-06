@@ -123,7 +123,7 @@ class NewProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     paginate_by = None
 
     def get_queryset(self):
-        return self.model.objects.filter(Q(partner__isnull=True) | Q(partner__exact=''))
+        return self.model.objects.filter(Q(partner__isnull=True) | Q(partner__exact='')).exclude(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
 
     def get_context_data(self, **kwargs):
         context = super(NewProductView, self).get_context_data(**kwargs)
