@@ -3208,7 +3208,7 @@ def custom_itinerary(request, id=None, operation=None):
                 itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer, currency, skip_availability=True)
 
                 #get flight, transfer, ...
-                pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
+                pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]).order_by('-id')
                 for pd in pds:
                     information = pd.get_information(settings.LANGUAGES[0][0])
                     pd.title = information.title
