@@ -721,85 +721,74 @@
 
     function set_itinerary_string()
     {
+        var numAdults = parseInt($("#id_adult_number").val());
+        var numChildren = parseInt($("#id_children_number").val());
+        var numGuests = numAdults + numChildren;
+
+        var cities = $("#sortable .section-box-add").map(function() {
+          return $(this).attr("city");
+        }).get();
+
         var itinerary = [];
-        var city = $("#sortable > :nth-child(1) > :nth-child(2)")[0];
-        var number_day = 0;
-        var cities = "";
+        $("#sortable .section-box").each(function() {
+          var $items = $(this).find(".exp-box-sm");
+          var date = $(this).children()[0].innerHTML.split(" ")[2];
+          var hour = 0;
+          var hour_string = "00";
+          if ($items) {
+            $items.each(function() {
+              var $item = $(this);
+              var classes = $item.attr("class").split(" ");
+              var id = classes[0].split("_");
 
-        while(city && city.id.indexOf("city-collapse-") === 0)
-        {
-            var c = $(city).prev().attr("city");
-            var day = $(city).children()[0];
-            while(day && day.id.indexOf("city-collapse-") === 0)
-            {
-                number_day += 1;
-                cities += c + ",";
-                var experience = $(day).find(".column")[0].firstElementChild;
-                var hour = 0;
-                var hour_string = "00";
-                var guest_number = parseInt($("#id_adult_number").val()) + parseInt($("#id_children_number").val());
+              var fixedPrice = $item.find(".fixed-price").val();
+              if (isNaN(parseFloat(fixedPrice))) {
+                fixedPrice = $item.find(".fixed-price").text();
+              }
+              var price = $item.find(".price").val();
+              if (isNaN(parseFloat(price))) {
+                price = $item.find(".price").text();
+              }
 
-                while(experience && $(experience).hasClass("exp-box-sm"))
-                {
-                    var classes = $(experience).attr("class").split(" ");
-                    var exp_id = classes[0].split("_");
-                    var fixed_price = $(experience).find(".fixed-price").val();
-                    if (isNaN(parseFloat(fixed_price))) {
-                      fixed_price = $(experience).find(".fixed-price").text();
-                    }
-                    var price = $(experience).find(".price").val();
-                    if (isNaN(parseFloat(price))) {
-                      price = $(experience).find(".price").text();
-                    }
+              var total_price;
+              if (classes.indexOf('experience') > -1) {
+                total_price = null;
+              } else {
+                total_price = (parseFloat(fixedPrice) + parseFloat(price) * numGuests);
+              }
 
-                    var total_price;
-                    if (classes.indexOf('experience') > -1) {
-                      total_price = null;
-                    } else {
-                      total_price = (parseFloat(fixed_price) + parseFloat(price)*guest_number);
-                    }
-
-                    var whats_included = "";
-                    $(experience).find(".whats-included-btn").each(function() {
-                      if ($(this).attr("aria-pressed") == "true") {
-                        whats_included += $(this).attr("value") + ", ";
-                      }
-                    });
-
-                    var d = Date.parseExact($("#id_start_datetime").val().substring(0, 10), "yyyy-M-dd");
-                    d.setDate(d.getDate()+number_day-1);
-                    var tmp = $(experience).find(".exp-info")[0].firstElementChild;
-                    hour += 1;
-                    if(hour<10)
-                    {
-                        hour_string = "0" + hour;
-                    }
-                    else if(hour>23)
-                    {
-                        hour_string = "23";
-                    }
-                    else
-                    {
-                        hour_string = "" + hour;
-                    }
-                    var dict={"id":exp_id[exp_id.length-1],
-                              "title":tmp.innerText || tmp.textContent,
-                              "date":d.toString('yyyy-M-dd'),
-                              "time":hour_string+":00",
-                              "total_price": total_price,
-                              "whats_included": whats_included,
-                              "adult_number":$("#id_adult_number").val(),
-                              "children_number":$("#id_children_number").val()};
-                    itinerary.push(dict);
-                    experience = $(experience).next()[0];
+              var whats_included = "";
+              $item.find(".whats-included-btn").each(function() {
+                if ($(this).attr("aria-pressed") == "true") {
+                  whats_included += $(this).attr("value") + ", ";
                 }
-                day = $(day).next()[0];
-            }
-            city = $(city).parent().next().children()[1];
-        }
+              });
 
-        cities = cities.substring(0,cities.length-1);
-        $("#id_city").val(cities);
+              hour += 1;
+              if (hour < 10) {
+                hour_string = "0" + hour;
+              } else if (hour > 23) {
+                hour_string = "23";
+              } else {
+                hour_string = "" + hour;
+              }
+
+              var tmp = $item.find(".exp-info")[0].firstElementChild
+
+              var dict = {"id": id[id.length-1],
+                          "title": tmp.innerText || tmp.textContent,
+                          "date": date,
+                          "time":hour_string+":00",
+                          "total_price": total_price,
+                          "whats_included": whats_included,
+                          "adult_number": numAdults,
+                          "children_number": numChildren};
+              itinerary.push(dict);
+            });
+          }
+        });
+
+        $("#id_city").val(cities.join());
         $("#id_itinerary_string").val(JSON.stringify(itinerary));
     }
 

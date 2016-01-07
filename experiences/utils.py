@@ -2,6 +2,7 @@ import os, pytz, string, random, decimal
 
 from Tripalocal_V1 import settings
 from unionpay.util.helper import load_config
+from datetime import timedelta, date
 
 def isEnglish(s):
     try:
@@ -42,7 +43,7 @@ def get_total_price(experience, guest_number=0, adult_number=0, children_number=
     if adult_number > 0 or children_number > 0:
         guest_number = adult_number
 
-    subtotal_price = 0.0    
+    subtotal_price = 0.0
     if experience.children_price is not None and experience.children_price > 0:
         subtotal_price += float(experience.children_price) * float(children_number)
     else:
@@ -73,3 +74,7 @@ def get_timezone(city):
 
 def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
+def daterange(start_date, end_date):
+    for n in range(int ((end_date - start_date).days + 1)):
+        yield start_date + timedelta(n)

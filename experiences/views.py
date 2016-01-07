@@ -3245,7 +3245,8 @@ def custom_itinerary(request, id=None, operation=None):
                     ci.id = new_id
                 ci.user = request.user
                 ci.title = form.cleaned_data['title']
-
+                ci.start_datetime = form.cleaned_data['start_datetime']
+                ci.end_datetime = form.cleaned_data['end_datetime']
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
                 if "ready" in request.POST:
                     ci.status = "ready"
@@ -3260,7 +3261,7 @@ def custom_itinerary(request, id=None, operation=None):
 
                     #save the custom itinerary as draft
                     local_timezone = pytz.timezone(experience.get_timezone())
-                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
+                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
                     booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, whats_included=whats_included, total_price = total_price, children_number = children_number,
@@ -3306,9 +3307,9 @@ def custom_itinerary(request, id=None, operation=None):
                 bking.experience.description = exp_information.description
 
                 exp_price = float(bking.experience.price)
-                if bking.experience.dynamic_price != None and \
-                   len(bking.experience.dynamic_price.split(',')) == bking.experience.guest_number_max - bking.experience.guest_number_min + 2 :
-                    exp_price = float(bking.experience.dynamic_price.split(",")[bking.guest_number-bking.experience.guest_number_min])
+                #if bking.experience.dynamic_price != None and \
+                   #len(bking.experience.dynamic_price.split(',')) == bking.experience.guest_number_max - bking.experience.guest_number_min + 2 :
+                    #exp_price = float(bking.experience.dynamic_price.split(",")[bking.guest_number-bking.experience.guest_number_min])
 
                 bking.experience.fixed_price = experience_fee_calculator(bking.experience.fixed_price, bking.experience.commission)
                 bking.experience.price = experience_fee_calculator(exp_price, bking.experience.commission)
@@ -3327,6 +3328,11 @@ def custom_itinerary(request, id=None, operation=None):
                     itinerary[-1]['dates'][key] = []
                 itinerary[-1]['dates'][key].append(bking.experience)
                 last_city = bking.experience.city
+            if (existing_ci.start_datetime and existing_ci.end_datetime):
+                for date in daterange(existing_ci.start_datetime, existing_ci.end_datetime):
+                    date = date.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%d")
+                    if date not in itinerary[-1]['dates']:
+                        itinerary[-1]['dates'][date] = []
 
             context['existing_itinerary'] = itinerary
 
@@ -3381,8 +3387,14 @@ def itinerary_detail(request,id=None,preview=None):
             full_price = False
         discount_deadline = ci.submitted_datetime + timedelta(days=7)
 
-        start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
-        end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        if ci.start_datetime:
+            start_datetime = ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+        else:
+            start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        if ci.end_datetime:
+            end_datetime = ci.end_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+        else:
+            end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
 
         itinerary = {"title":ci.title, "days":{}, "status":ci.status}
         for item in ci.booking_set.order_by('datetime').all():
@@ -3399,6 +3411,11 @@ def itinerary_detail(request,id=None,preview=None):
                 start_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
             if end_datetime < item.datetime:
                 end_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
+
+        for date in daterange(start_datetime, end_datetime):
+            date = date.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%d")
+            if date not in itinerary["days"]:
+                itinerary["days"].update({date:[]})
 
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
         cover_photo = ""

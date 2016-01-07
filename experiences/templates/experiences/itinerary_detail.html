@@ -67,7 +67,7 @@
   </div>
 
   <div class="detail-box">
-      {%for date, list in itinerary.days.items %}
+      {% for date, list in itinerary.days.items %}
       <div class="day-list" id="day{{forloop.counter}}-list">
         <h3 class="day-heading">{% blocktrans with number=forloop.counter %}Day {{number}}{% endblocktrans %} {{date}} {{list.0.city}} </h3>
         {% for item in list %}
