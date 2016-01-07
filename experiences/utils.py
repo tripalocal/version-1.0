@@ -27,26 +27,26 @@ def convert_currency(price, current_currency, target_currency):
     conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
     return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
 
-def get_total_price(experience, guest_number=0, adult_number=0, children_number=0):
+def get_total_price(experience, guest_number=0, adult_number=0, child_number=0):
     '''
     return total price, not including commission or service fee
-    either use guest_number, or adult_number + children_number, the latter has a higher priority
+    either use guest_number, or adult_number + child_number, the latter has a higher priority
     '''
     if type(guest_number) != int or guest_number < 0:
         guest_number = 0
     if type(adult_number) != int or adult_number < 0:
         adult_number = 0
-    if type(children_number) != int or children_number < 0:
-        children_number = 0
+    if type(child_number) != int or child_number < 0:
+        child_number = 0
 
-    if adult_number > 0 or children_number > 0:
+    if adult_number > 0 or child_number > 0:
         guest_number = adult_number
 
     subtotal_price = 0.0    
     if experience.children_price is not None and experience.children_price > 0:
-        subtotal_price += float(experience.children_price) * float(children_number)
+        subtotal_price += float(experience.children_price) * float(child_number)
     else:
-        guest_number += children_number
+        guest_number += child_number
 
     if experience.dynamic_price and type(experience.dynamic_price) == str:
         price = experience.dynamic_price.split(',')

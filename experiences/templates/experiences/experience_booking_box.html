@@ -37,6 +37,7 @@
         {% endfor %}
     </table>
     <input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
+    {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' or experience.type == 'ITINERARY'%}
     {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
     <div class="profile-lg">
         <div style="background:url({{ MEDIA_URL }}{{ host_image|urlencode }}); no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
@@ -70,7 +71,10 @@
             {% for op in available_options %}
                 <p id="seat_left_{{forloop.counter0}}" style="display:none;"> {{op.available_seat}} </p>
             {% endfor %}
-            {{form.guest_number}}
+            {{form.adult_number}}
+            <div style="display:none;">
+            {{form.child_number}}
+            </div>
         </div>
 
         <table style="margin-top:15px;width:100%">
@@ -115,4 +119,5 @@
         {% endif %}
         </div>
     </form>
+    {%endif%}
 </div>

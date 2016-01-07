@@ -875,15 +875,17 @@ class ExperienceDetailView(DetailView):
             if float(experience.duration).is_integer():
                 experience.duration = int(experience.duration)
 
-            guest_number = int(form.data['guest_number'])
-            subtotal_price = get_total_price(experience, guest_number)
+            adult_number = int(form.data['adult_number'])
+            child_number = int(form.data['child_number'])
+            subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number)
 
             COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
             return render(request, 'experiences/experience_booking_confirmation.html',
                           {'form': form, #'eid':self.object.id,
                            'experience': experience,
                            'experience_price': experience_price,
-                           'guest_number':form.data['guest_number'],
+                           'adult_number':form.data['adult_number'],
+                           'child_number':form.data['child_number'],
                            'date':form.data['date'],
                            'time':form.data['time'],
                            'subtotal_price':round(subtotal_price*(1.00+COMMISSION_PERCENT),0),
@@ -944,7 +946,11 @@ class ExperienceDetailView(DetailView):
 
         context['experience_city'] = dict(Location).get(experience.city)
 
-        available_date = getAvailableOptions(experience, available_options, available_date)
+        if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
+            #TODO, (1) get availability from the partner's API; (2) set retail_price, price for OptionItem
+            available_date = getAvailableOptions(experience, available_options, available_date)
+        else:
+            available_date = getAvailableOptions(experience, available_options, available_date)
 
         context['available_options'] = available_options
         uid = self.request.user.id if self.request.user.is_authenticated() else None
@@ -1190,9 +1196,10 @@ def experience_booking_confirmation(request):
         else:
             experience.title = exp_information.title
 
-        guest_number = int(form.data['guest_number'])
+        adult_number = int(form.data['adult_number'])
+        child_number = int(form.data['child_number'])
         experience_price = experience.price
-        subtotal_price = get_total_price(experience, guest_number)
+        subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number)
 
         COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
         total_price = experience_fee_calculator(subtotal_price, experience.commission)
@@ -1211,7 +1218,7 @@ def experience_booking_confirmation(request):
                 coupon = Coupon()
                 wrong_promo_code = True
             else:
-                valid = check_coupon(coupons[0], experience.id, form.data['guest_number'])
+                valid = check_coupon(coupons[0], experience.id, adult_number+child_number)
                 if not valid['valid']:
                     coupon = Coupon()
                     wrong_promo_code = True
@@ -1228,7 +1235,8 @@ def experience_booking_confirmation(request):
                                                                            'wrong_promo_code':wrong_promo_code,
                                                                            'coupon':coupon,
                                                                            'experience': experience,
-                                                                           'guest_number':form.data['guest_number'],
+                                                                           'adult_number':form.data['adult_number'],
+                                                                           'child_number':form.data['child_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':subtotal_price,
@@ -1249,13 +1257,13 @@ def experience_booking_confirmation(request):
                 if form.cleaned_data['status'] == 'accepted':
                     return experience_booking_successful(request,
                                                          experience,
-                                                         int(form.data['guest_number']),
+                                                         int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'], True)
                 else:
                     return experience_booking_successful(request,
                                                          experience,
-                                                         int(form.data['guest_number']),
+                                                         int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'])
 
@@ -1264,7 +1272,8 @@ def experience_booking_confirmation(request):
                                                                            'user_email':request.user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience,
-                                                                           'guest_number':form.data['guest_number'],
+                                                                           'adult_number':form.data['adult_number'],
+                                                                           'child_number':form.data['child_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':subtotal_price,
@@ -1289,7 +1298,7 @@ def experience_booking_confirmation(request):
                     #not free
                     response = client.UnionpayClient(config).pay(int(total_price*100),order_id, channel_type='07',#currency_code=CurrencyCode[experience.currency.upper()],
                                                                  front_url='http://' + settings.ALLOWED_HOSTS[0] + '/experience_booking_successful/?experience_id=' + str(experience.id)
-                                                                 + '&guest_number=' + form.data['guest_number']
+                                                                 + '&guest_number=' + str(adult_number+child_number)
                                                                  + '&booking_datetime=' + form.data['date'].strip()+form.data['time'].strip()
                                                                  + '&price_paid=' + str(total_price)
                                                                  + '&is_instant_booking=' + str(instant_booking(experience,bk_date,bk_time)))
@@ -1298,7 +1307,7 @@ def experience_booking_confirmation(request):
                     #free
                     return experience_booking_successful(request,
                                                          experience,
-                                                         int(form.data['guest_number']),
+                                                         adult_number+child_number,
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'],
                                                          instant_booking(experience,bk_date,bk_time))
@@ -1308,7 +1317,8 @@ def experience_booking_confirmation(request):
                                                                            'user_email':request.user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience,
-                                                                           'guest_number':form.data['guest_number'],
+                                                                           'adult_number':form.data['adult_number'],
+                                                                           'child_number':form.data['child_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':subtotal_price,
@@ -1342,7 +1352,7 @@ def experience_booking_confirmation(request):
                         code_url = pay_info['code_url']
                         success_url = 'http://' + settings.ALLOWED_HOSTS[0] \
                                       + '/experience_booking_successful/?experience_id=' + str(experience.id) \
-                                      + '&guest_number=' + form.data['guest_number'] \
+                                      + '&guest_number=' + str(adult_number+child_number) \
                                       + '&booking_datetime=' + form.data['date'].strip() + form.data['time'].strip() \
                                       + '&price_paid=' + str(total_price) + '&is_instant_booking=' \
                                       + str(instant_booking(experience, bk_date, bk_time))
@@ -1355,7 +1365,7 @@ def experience_booking_confirmation(request):
                     #free
                     return experience_booking_successful(request,
                                                          experience,
-                                                         int(form.data['guest_number']),
+                                                         adult_number+child_number,
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'],
                                                          instant_booking(experience,bk_date,bk_time))
@@ -1365,7 +1375,8 @@ def experience_booking_confirmation(request):
                                                                            'user_email':request.user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience,
-                                                                           'guest_number':form.data['guest_number'],
+                                                                           'adult_number':form.data['adult_number'],
+                                                                           'child_number':form.data['child_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':subtotal_price,
@@ -1975,8 +1986,10 @@ def update_booking(id, accepted, user):
             if not free:
                 payment = Payment.objects.get(booking_id=booking.id)
 
-                guest_number = int(booking.guest_number)
-                subtotal_price = get_total_price(experience, guest_number)
+                if booking.adult_number:
+                    subtotal_price = get_total_price(experience, adult_number=booking.adult_number, child_number=child_number)
+                else:
+                    subtotal_price = get_total_price(experience, booking.guest_number)
 
                 #refund_amount does not include process fee: the transaction can't be undone
                 COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)

@@ -207,7 +207,7 @@
                 <img src="{% static 'experiences/img/itinerary-57.svg' %}" width="35" height="35">
                 <h3>{% trans 'Itineraries' %}</h3>
               </div>
-              <div class="listing-img" style="background-image:linear-gradient(rgba(0, 0, 0, 0.3),rgba(0, 0, 0, 0.3)),url({{ MEDIA_URL }}city/Brisbane.jpg);">
+              <div class="listing-img" style="background-image:linear-gradient(rgba(0, 0, 0, 0.3),rgba(0, 0, 0, 0.3)),url({{ MEDIA_URL }}city/Brisbane.jpg">
                 <div class="listing-img-text">
                   <h1>{% trans "10 Day Trip" %}</h1>
                   <h2>{% trans "Melbourne + Sydney + Gold Coast" %}</h2>
@@ -267,7 +267,7 @@ function resizeImg() {
 
 function is_form_valid()
 {
-    if($("#id_date").val() && $("#id_time").val() && $("#id_guest_number").val())
+    if($("#id_date").val() && $("#id_time").val() && $("#id_adult_number").val() && $("#id_child_number").val())
     {
         return true;
     }
@@ -281,6 +281,8 @@ $(window).resize(function(){
 });
 
 $(function(){
+    $(document).ready(function(){
+
         mixpanel.track("viewed an experience");
         if (screen.width > 767) {
           {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
@@ -355,7 +357,7 @@ $(function(){
 
         seat_left = parseInt($("#seat_left_0").text());
 
-        $("#id_guest_number").html('');
+        $("#id_adult_number").html('');
         var i = parseInt($("#guest_number_min").attr("name"));
         if(typeof i != "number" || i < 1)
         {
@@ -363,8 +365,10 @@ $(function(){
         }
         for(;i<=seat_left;i++)
         {
-            $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
+            $("#id_adult_number").append('<option value=' + i + '>' + i + '</option>');
         }
+        //TODO
+        $("#id_child_number").append('<option value=' + 0 + '>' + 0 + '</option>');
 
         $("#id_submit_request").bind("click", function(e) {
             e.preventDefault();
@@ -419,13 +423,13 @@ $(function(){
         {
             if(max_number >= 4)
             {
-                $("#id_guest_number").val(4);
-                $("#id_guest_number").change();
+                $("#id_adult_number").val(4);
+                $("#id_adult_number").change();
             }
             else
             {
-                $("#id_guest_number").val(max_number);
-                $("#id_guest_number").change();
+                $("#id_adult_number").val(max_number);
+                $("#id_adult_number").change();
             }
         }
 
@@ -566,6 +570,7 @@ $(function(){
         }
 
         $("#id_submit_request").prop('disabled', false);
+    })
 })
 
 $(function(){
@@ -613,11 +618,11 @@ $(function(){
 
         if("{{experience.type}}"=="NONPRIVATE")
         {
-            $("#id_guest_number").html('');
+            $("#id_adult_number").html('');
             var i = parseInt($("#guest_number_min").attr("name"));
             for(;i<=seat_left;i++)
             {
-                $("#id_guest_number").append('<option value=' + i + '>' + i + '</option>');
+                $("#id_adult_number").append('<option value=' + i + '>' + i + '</option>');
             }
         }
 
@@ -630,14 +635,14 @@ $(function(){
 })
 
 $(function(){
-    $("#id_guest_number").change(function(){
+    $("#id_adult_number").change(function(){
         min_number = parseInt($("#guest_number_min").attr("name"));
         max_number = parseInt($("#guest_number_max").attr("name"));
         price = $("#experience_dynamic_price").val().split(',');
         if(price.length == max_number - min_number + 2) // not 1
         {
-            guest_number = parseInt($("#id_guest_number").val());
-            price = Math.round(parseFloat(price[guest_number-min_number])*{{experience.commission}});
+            adult_number = parseInt($("#id_adult_number").val());
+            price = Math.round(parseFloat(price[adult_number-min_number])*{{experience.commission}});
             $("#experience_price").text(price);
         }
 
