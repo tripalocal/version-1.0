@@ -422,14 +422,15 @@ class CustomItinerary(models.Model):
         guest_number = 0
         adult_number = 0
         children_number = 0
-        if self.booking_set.all()[0].adult_number is not None and self.booking_set.all()[0].adult_number > 0:
+        booking_set = self.booking_set.all()
+        if booking_set[0].adult_number is not None and booking_set[0].adult_number > 0:
             guest_number = self.booking_set.all()[0].adult_number
             adult_number = guest_number
-            if self.booking_set.all()[0].children_number is not None and self.booking_set.all()[0].children_number > 0:
-                children_number = self.booking_set.all()[0].children_number
+            if booking_set[0].children_number is not None and booking_set[0].children_number > 0:
+                children_number = booking_set[0].children_number
                 guest_number += children_number
         else:
-            guest_number = self.booking_set.all()[0].guest_number
+            guest_number = booking_set[0].guest_number
             adult_number = guest_number
         return (guest_number, adult_number, children_number)
 
@@ -442,7 +443,10 @@ class CustomItinerary(models.Model):
 
         return len(dates)
 
-    def get_price(self, currency):
+    def get_price(self, currency, **kwargs):
+        '''
+        conversion: dict of conversion rate
+        '''
         itinerary_price = 0.0
         for bking in self.booking_set.all():
             experience = bking.experience
@@ -455,7 +459,13 @@ class CustomItinerary(models.Model):
                 subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
             subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
             if experience.currency != currency:
-                subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
+                if experience.currency.lower() == "aud":
+                    conversion = kwargs.get("currency_aud", None)
+                elif experience.currency.lower() == "cny":
+                    conversion = kwargs.get("currency_cny", None)
+                else:
+                    conversion = None
+                subtotal_price = convert_currency(subtotal_price, experience.currency, currency, conversion)
             itinerary_price += subtotal_price
         if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + self.submitted_datetime:
             itinerary_price *= 1.15

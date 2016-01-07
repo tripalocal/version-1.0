@@ -37,6 +37,7 @@
         {% endfor %}
     </table>
     <input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
+    {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
     <div style="border-bottom:1px solid #ccc;">
         <p>{%if experience.duration < 24 %}{{experience.duration}}{% trans " hour" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}}{% trans " day" %}{%endif%}
            {% if experience.type == "PublicProduct"%}{% trans ' Public Tour' %}{% else %}{% trans ' Private Tour' %}{% endif %}</p>
@@ -66,7 +67,10 @@
           {% for op in available_options %}
               <p id="seat_left_{{forloop.counter0}}" style="display:none;"> {{op.available_seat}} </p>
           {% endfor %}
-          {{form.guest_number}}
+          {{form.adult_number}}
+          <div style="display:none;">
+          {{form.child_number}}
+          </div>
         </div>
         {% if user.is_authenticated %}
             <input style="display:inline-block; width: 60px;" id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" disabled='disabled'/>
@@ -109,4 +113,5 @@
         {% endif %}
         </div>
     </form>
+    {% endif %}
   </div>

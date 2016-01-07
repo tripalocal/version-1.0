@@ -45,13 +45,15 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ItineraryView, self).get_context_data(**kwargs)
+        conversion_cny = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/currency_conversion_rate/CNY.yaml').replace('\\', '/'))
+        conversion_aud = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/currency_conversion_rate/AUD.yaml').replace('\\', '/'))
         for ci in context['itinerary_list']:
             guest_number_tuple = ci.get_guest_number()
             ci.guest_number = guest_number_tuple[0]
             ci.adult_number = guest_number_tuple[1]
             ci.child_number = guest_number_tuple[2]
-            ci.price_aud = ci.get_price('aud')
-            ci.price_cny = ci.get_price('cny')
+            ci.price_aud = ci.get_price('aud', **{"conversion_aud":conversion_aud,"conversion_cny":conversion_cny})
+            ci.price_cny = ci.get_price('cny', **{"conversion_aud":conversion_aud,"conversion_cny":conversion_cny})
             if ci.status != "paid":
                 if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + ci.submitted_datetime:
                     ci.status = "Full price"
