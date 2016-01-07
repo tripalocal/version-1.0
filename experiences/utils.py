@@ -20,11 +20,15 @@ def experience_fee_calculator(price, commission_rate):
 
     return price
 
-def convert_currency(price, current_currency, target_currency):
+def convert_currency(price, current_currency, target_currency, conversion=None):
+    '''
+    add the parameter of "conversion" to avoid reading local files
+    '''
     if not (type(price)==int or type(price) == float or type(price) == decimal.Decimal):
         return price
-    file_name = 'experiences/currency_conversion_rate/' + current_currency.upper() + '.yaml'
-    conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
+    if not conversion:
+        file_name = 'experiences/currency_conversion_rate/' + current_currency.upper() + '.yaml'
+        conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
     return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
 
 def get_total_price(experience, guest_number=0, adult_number=0, child_number=0):
