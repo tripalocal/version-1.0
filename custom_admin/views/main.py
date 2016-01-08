@@ -159,9 +159,10 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
         context['partnerproduct_list'] = list(context['partnerproduct_list'])
         new_index=0
         for exp in context['partnerproduct_list']:
-            exp.title = exp.get_information(settings.LANGUAGES[0][0]).title
+            exp.title_en = exp.get_information("en").title
+            exp.title_cn = exp.get_information("cn").title
             exp.host = exp.get_host()
-            if not isEnglish(exp.title):
+            if not isEnglish(exp.title_cn):
                 old_index = context['partnerproduct_list'].index(exp)
                 context['partnerproduct_list'].insert(new_index, context['partnerproduct_list'].pop(old_index))
                 new_index += 1
