@@ -30,7 +30,7 @@
     {{form.adult_number}}
     {{form.children_number}}
     {{form.end_datetime}}
-    {{form.city_string}}
+    {{form.cities_string}}
   </div>
   <!-- Top search bar -->
   <div class="basic-search">
@@ -695,7 +695,7 @@
               city = $("#button_city_"+i).attr("city");
               duration = $("#button_city_"+i).attr("duration");
               for(j=0;j<duration;j++) {
-                cities_string = city + "," + cities_string
+                cities_string = city + "," + cities_string;
               }
               //comment out the following line if availability is considered in the future
               duration = 1;
