@@ -30,6 +30,7 @@
     {{form.adult_number}}
     {{form.children_number}}
     {{form.end_datetime}}
+    {{form.city_string}}
   </div>
   <!-- Top search bar -->
   <div class="basic-search">
@@ -675,6 +676,7 @@
     function set_data_before_submit()
     {
         var cities="";
+        var cities_string = "";
         //the last city was inserted before $("#add-city"), there must be at least one city
         if(!($("#add-city").prev().attr('id') && $("#add-city").prev().attr('id').indexOf("button_city_") === 0))
         {
@@ -692,6 +694,9 @@
             {
               city = $("#button_city_"+i).attr("city");
               duration = $("#button_city_"+i).attr("duration");
+              for(j=0;j<duration;j++) {
+                cities_string = city + "," + cities_string
+              }
               //comment out the following line if availability is considered in the future
               duration = 1;
               for(j=0;j<duration;j++)
@@ -706,6 +711,7 @@
         }
         cities = cities.substring(0,cities.length-1);
         $("#id_city").val(cities);
+        $("#id_cities_string").val(cities_string);
 
         if(!$("#id_start_datetime").val())
         {

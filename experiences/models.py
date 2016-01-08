@@ -414,6 +414,7 @@ class CustomItinerary(models.Model):
     payment = models.ForeignKey("Payment", null=True, blank=True)
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
+    cities = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.user.username + "--" + self.title
