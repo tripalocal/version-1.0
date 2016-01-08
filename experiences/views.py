@@ -3056,6 +3056,9 @@ def custom_itinerary(request, id=None, operation=None):
         ci.user = request.user
         ci.title = ""
         ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        ci.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
+        ci.end_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
+        ci.cities = "Melbourne"
         ci.save()
         return HttpResponseRedirect(GEO_POSTFIX+"itinerary/edit/"+str(ci.id)+"/")
 
@@ -3302,10 +3305,18 @@ def custom_itinerary(request, id=None, operation=None):
             last_date = existing_ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
-            if existing_ci.cities:
-                city_list = existing_ci.cities.split[',']
-                city_list_index = 0
+            cities_list = existing_ci.cities.split(',')
+            # Construct skeleton of itinerary
+            for day, city in enumerate(cities_list):
+                if city != last_city:
+                    itinerary.append(OrderedDict())
+                    itinerary[-1]['city'] = city
+                    itinerary[-1]['dates'] = OrderedDict()
+                if (last_date + timedelta(days=day)).strftime("%Y-%m-%d") not in itinerary[-1]['dates']:
+                    itinerary[-1]['dates'][(last_date + timedelta(days=day)).strftime("%Y-%m-%d")] = []
+                last_city = city
 
+            city_index = 0
             for bking in existing_ci.booking_set.order_by('datetime').all():
                 if bking.adult_number is not None and bking.adult_number > 0:
                     form.initial["adult_number"] = bking.adult_number
@@ -3338,28 +3349,11 @@ def custom_itinerary(request, id=None, operation=None):
                     bking.experience.duration = int(bking.experience.duration)
 
                 key = bking.datetime.astimezone(pytz.timezone(bking.experience.get_timezone()))
+                city = cities_list[(key-existing_ci.start_datetime).days]
+                if city != bking.experience.city:
+                    city_index += 1
+                itinerary[city_index]['dates'][key.strftime("%Y-%m-%d")].append(bking.experience)
 
-                if bking.experience.city != last_city:
-                    itinerary.append(OrderedDict())
-                    itinerary[-1]['city'] = bking.experience.city
-                    itinerary[-1]['dates'] = OrderedDict()
-                # Insert empty dates between booking date gaps
-                if key > last_date:
-                    for date in daterange(last_date, key):
-                        if date.strftime("%Y-%m-%d") not in itinerary[-1]['dates']:
-                            
-                            itinerary[-1]['dates'][date.strftime("%Y-%m-%d")] = []
-
-                if key.strftime("%Y-%m-%d") not in itinerary[-1]['dates']:
-                    itinerary[-1]['dates'][key.strftime("%Y-%m-%d")] = []
-                itinerary[-1]['dates'][key.strftime("%Y-%m-%d")].append(bking.experience)
-                last_city = bking.experience.city
-                last_date = key
-            # Insert empty dates up to the itinerary end date
-            if last_date < existing_ci.end_datetime:
-                for date in daterange(last_date, existing_ci.end_datetime):
-                    if date.strftime("%Y-%m-%d") not in itinerary[-1]['dates']:
-                        itinerary[-1]['dates'][date.strftime("%Y-%m-%d")] = []
 
             context['existing_itinerary'] = itinerary
 
