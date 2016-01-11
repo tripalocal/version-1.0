@@ -80,5 +80,5 @@ def email_account_generator(size=10, chars=string.ascii_lowercase + string.digit
     return ''.join(random.choice(chars) for _ in range(size))
 
 def daterange(start_date, end_date):
-    for n in range(int ((end_date - start_date).days + 1)):
+    for n in range(int ((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
