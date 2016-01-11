@@ -147,7 +147,11 @@
                 }
 
                 for (i = min; i < max; i++) {
-                    if ($("#dynamic_price_input_" + i).val().length > 0 && $("#dynamic_price_input_" + i).val().match(/^[0-9]+$/)) {
+                    if ($("#dynamic_price_input_" + i).val().length == 0 && $("#id_dynamic_price").val().split(',').length == 2) {
+                        $("#id_dynamic_price").val("");
+                        return true;
+                    }
+                    else if ($("#dynamic_price_input_" + i).val().length > 0 && $("#dynamic_price_input_" + i).val().match(/^[0-9]+$/)) {
                         $("#id_dynamic_price").val($("#id_dynamic_price").val() + $("#dynamic_price_input_" + i).val() + ',');
                     }
                     else {
