@@ -3413,8 +3413,8 @@ def itinerary_detail(request,id=None,preview=None):
             start_datetime = ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
         else:
             start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
-        if ci.end_datetime:
-            end_datetime = ci.end_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+        if ci.cities:
+            end_datetime = start_datetime + timedelta(days=(len(list(filter(None, ci.cities.split(','))))-1))
         else:
             end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
 
