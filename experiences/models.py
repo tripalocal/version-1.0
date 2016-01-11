@@ -324,11 +324,20 @@ class NewProductI18n(models.Model):
         return self.title
 
 class OptionGroup(models.Model):
+    EN = 'en'
+    ZH = 'zh'
+
+    LANG_CHOICES = (
+        (EN, 'English'),
+        (ZH, '中文'),
+    )
+
     product = models.ForeignKey(NewProduct)
     name = models.TextField()
+    language = models.CharField(max_length=3, choices=LANG_CHOICES, default=EN)
 
     def __str__(self):
-        return self.name
+        return self.name if self.name else ""
 
 class OptionItem(models.Model):
     group = models.ForeignKey(OptionGroup)
@@ -337,7 +346,7 @@ class OptionItem(models.Model):
     price = models.FloatField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.name if self.name else ""
 
 class InstantBookingTimePeriod(models.Model):
     start_datetime = models.DateTimeField()
