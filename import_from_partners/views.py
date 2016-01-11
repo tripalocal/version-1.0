@@ -4,7 +4,7 @@ from datetime import *
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponseRedirect
-from experiences.models import NewProduct, NewProductI18n, Provider
+from experiences.models import NewProduct, NewProductI18n, Provider, OptionGroup, OptionItem
 from experiences.views import saveExperienceImage
 from io import BytesIO
 from Tripalocal_V1 import settings
@@ -64,9 +64,9 @@ def import_experienceoz_products(request):
             "primaryRegionId", "primaryRegionUrl", "primaryCategoryId", "primaryCategoryUrl",\
             "timestamp"]
 
-    file_name = os.path.join(settings.PROJECT_ROOT, 'import_from_partners', 'experienceoz_en.json')
+    target_language = request.GET.get('language','en')
+    file_name = os.path.join(settings.PROJECT_ROOT, 'import_from_partners', 'experienceoz_' + target_language + '.json')
     missing_operators = []
-    target_language = "en"
     with open(file_name, "rb") as file:
         products = json.loads(file.read().decode("utf-8"))
         for product in products:
@@ -131,6 +131,21 @@ def import_experienceoz_products(request):
 
                 npi18n.product = np
                 npi18n.save()
+
+                for group in npi18n.combination_options:
+                    try:
+                        og = OptionGroup.objects.get(original_id=group.get("id"))
+                        og.name = group.get("groupName")
+                    except OptionGroup.DoesNotExist:
+                        og = OptionGroup(product = np, name = group.get("groupName"), language = target_language, original_id = group.get("id"))
+                    og.save()
+                    for option in group.get("productOptions"):
+                        try:
+                            oi = OptionItem.objects.get(original_id=option.get("id"))
+                            oi.name = option.get("name")
+                        except OptionItem.DoesNotExist:
+                            oi = OptionItem(group = og, name = option.get("name"), price = 0, retail_price = 0, original_id = option.get("id"))
+                        oi.save()
 
                 #extension = "." + product['image'].split(".")[-1]
                 #response = requests.get(product['image'])
