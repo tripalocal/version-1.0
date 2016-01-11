@@ -3302,18 +3302,19 @@ def custom_itinerary(request, id=None, operation=None):
             #itinerary will be in the format of[{'city':'', 'dates':{'date1':[], 'date2':[], ...}}, ...]
             itinerary = []
             last_city = ""
-            last_date = existing_ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+            start_date = existing_ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
-            cities_list = existing_ci.cities.split(',')
+            cities_list = list(filter(None, existing_ci.cities.split(',')))
+
             # Construct skeleton of itinerary
             for day, city in enumerate(cities_list):
                 if city != last_city:
                     itinerary.append(OrderedDict())
                     itinerary[-1]['city'] = city
                     itinerary[-1]['dates'] = OrderedDict()
-                if (last_date + timedelta(days=day)).strftime("%Y-%m-%d") not in itinerary[-1]['dates']:
-                    itinerary[-1]['dates'][(last_date + timedelta(days=day)).strftime("%Y-%m-%d")] = []
+                if (start_date + timedelta(days=day)).strftime("%Y-%m-%d") not in itinerary[-1]['dates']:
+                    itinerary[-1]['dates'][(start_date + timedelta(days=day)).strftime("%Y-%m-%d")] = []
                 last_city = city
 
             city_index = 0
@@ -3349,11 +3350,11 @@ def custom_itinerary(request, id=None, operation=None):
                     bking.experience.duration = int(bking.experience.duration)
 
                 key = bking.datetime.astimezone(pytz.timezone(bking.experience.get_timezone()))
-                city = cities_list[(key-existing_ci.start_datetime).days]
-                if city != bking.experience.city:
+                # Reduce cities_list to unique cities
+                cities_list = list(OrderedDict.fromkeys(cities_list))
+                while cities_list[city_index] != bking.experience.city:
                     city_index += 1
                 itinerary[city_index]['dates'][key.strftime("%Y-%m-%d")].append(bking.experience)
-
 
             context['existing_itinerary'] = itinerary
 
