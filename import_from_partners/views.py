@@ -110,7 +110,7 @@ def import_experienceoz_products(request):
 
                     if len(np.suppliers.filter(user_id=oid)) == 0:
                         np.suppliers.add(operator)
-                    np.save()
+                        np.save()
 
                 npi18n = np.newproducti18n_set.all()
                 if len(npi18n) > 0 and npi18n[0].language == target_language:
