@@ -3338,9 +3338,9 @@ def custom_itinerary(request, id=None, operation=None):
                 bking.experience.description = exp_information.description
 
                 exp_price = float(bking.experience.price)
-                #if bking.experience.dynamic_price != None and \
-                   #len(bking.experience.dynamic_price.split(',')) == bking.experience.guest_number_max - bking.experience.guest_number_min + 2 :
-                    #exp_price = float(bking.experience.dynamic_price.split(",")[bking.guest_number-bking.experience.guest_number_min])
+                if bking.experience.dynamic_price != None and \
+                   len(bking.experience.dynamic_price.split(',')) == bking.experience.guest_number_max - bking.experience.guest_number_min + 2 :
+                    exp_price = float(bking.experience.dynamic_price.split(",")[bking.guest_number-bking.experience.guest_number_min])
 
                 bking.experience.fixed_price = experience_fee_calculator(bking.experience.fixed_price, bking.experience.commission)
                 bking.experience.price = experience_fee_calculator(exp_price, bking.experience.commission)
