@@ -21,6 +21,10 @@ body {
   position: relative;
 }
 
+.container {
+  width: 1200px;
+}
+
 // Top search bar
 .basic-search {
   background-color: $off-white;
@@ -148,7 +152,7 @@ body {
   }
 }
 
-#search-keyword {
+.search-keyword {
   border-left: 0;
   border-radius: 0;
   height: 40px;
@@ -198,7 +202,7 @@ body {
   position: relative;
   display: inline-block;
   background-color: $light-grey;
-  width: 105px;
+  width: 100px;
   height: 100%;
   background-position: center;
   background-repeat: no-repeat;
@@ -216,7 +220,7 @@ body {
   vertical-align: top;
   margin-left: 10px;
   margin-right: 10px;
-  width: 175px;
+  width: 180px;
   position: relative;
   top: 50%;
   transform: translateY(-50%);
@@ -248,7 +252,7 @@ body {
 
 .exp-price {
   display: inline-block;
-  width: 130px;
+  width: 140px;
   vertical-align: top;
   text-align: right;
   margin-right: 10px;
@@ -358,6 +362,18 @@ body {
   transform: translateY(-50%);
   color: $dark-grey;
   font-size: 14px;
+}
+
+.whats-included {
+  display: none;
+  .btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    min-width: 0;
+    padding: 0;
+    margin: 0 5px 0 0;
+  }
 }
 
 // Warning popups

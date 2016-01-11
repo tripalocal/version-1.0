@@ -9,12 +9,12 @@
     {% load i18n %}
 
     <link rel="icon" href="{% static 'app/img/favicon.ico'%}" />
-    <link href='https://fonts.googleapis.com/css?family=Exo' rel='stylesheet' type='text/css'>
     <link href="{% static 'app/content/main.css' %}" rel="stylesheet">
     {% if LANGUAGE == "zh-CN" or form != None and form.language != None and form.language.value == "zh-CN" %}
     <link href="{% static 'app/content/tripalocal_cn.css' %}" rel="stylesheet">
     {%else%}
     <link href="{% static 'app/content/tripalocal_en.css' %}" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Exo' rel='stylesheet' type='text/css'>
     {%endif%}
 
     {% if form %}
@@ -104,18 +104,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Promotional popup -->
-    <div class="modal fade" id="promo-popup" tabindex="-1" role="dialog" aria-labelledby="promo-popup">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content promo-popup" style="background-color:transparent;">
-          <img src="{% static 'app/img/promo_popup.png' %}" width="615" height="424">
-          <a class="btn btn-clear" href="http://www.tripalocal.com.cn/december/?utm=MEpopup"> </a>
-        </div>
-      </div>
-    </div>
-    <!-- End Modal -->
-
 
 <!-- Header navbar -->
     <div id="navbar" class="navbar navbar-fixed-top">
@@ -253,6 +241,7 @@
             <div class="col-sm-2 col-xs-6">
                 <ul class="footer-col travel">
                     <li><h5>{% trans "Travel" %}</h5></li>
+                    <li><a href="{{GEO_POSTFIX}}blog">{% trans "Blog" %}</a></li>
                     <li><a href="{{ GEO_POSTFIX }}refundpolicy">{% trans "Refund Policy" %}</a></li>
                 </ul>
             </div>
@@ -334,20 +323,12 @@
       var chosenValue = Math.random() < 0.5 ? 0 : 1;
       var popupTimer;
         if ($(window).width() > 520) {
-           var nClose = parseInt($.cookie("closePopupPromo"), 10);
+           var nClose = parseInt($.cookie("closePopup"), 10);
            if (!nClose || nClose < 12) {
                if ($(location).attr('pathname').match('^/$') || $(location).attr('pathname').match('^/cn/$') ||
                    $(location).attr('pathname').match('^/s/') || $(location).attr('pathname').match('^/experience/')) {
                  popupTimer = setTimeout(function () {
-                     {% if LANGUAGE != "zh-CN" %}
                      $('#help-popup').modal('show');
-                     {% else %}
-                     if (chosenValue == 0) {
-                       $('#help-popup').modal('show');
-                     } else {
-                       $('#promo-popup').modal('show');
-                     }
-                     {% endif %}
                      mixpanel.track("saw popup01");
                  }, 15000); // milliseconds
                }
@@ -358,20 +339,19 @@
            $('.close-popup').click(function () {
                clearTimeout(popupTimer);
                if (nClose) {
-                   $.cookie("closePopupPromo", nClose + 1, {path: '/'});
+                   $.cookie("closePopup", nClose + 1, {path: '/'});
                } else {
-                   $.cookie("closePopupPromo", 1, {path: '/'});
+                   $.cookie("closePopup", 1, {path: '/'});
                }
                $('#help-popup').modal('hide');
-               $('#promo-popup').modal('hide');
                mixpanel.track("closed popup01");
            });
            $('#help-no').click(function () {
                clearTimeout(popupTimer);
                if (nClose) {
-                   $.cookie("closePopupPromo", nClose + 1, {path: '/'});
+                   $.cookie("closePopup", nClose + 1, {path: '/'});
                } else {
-                   $.cookie("closePopupPromo", 1, {path: '/'});
+                   $.cookie("closePopup", 1, {path: '/'});
                }
                $('#help-popup').modal('hide');
                mixpanel.track("selected No from popup01");
@@ -516,7 +496,7 @@
 </body>
 
 
-<script>
+<script async>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -526,7 +506,7 @@
   ga('send', 'pageview');
 </script>
 
-    <script type="text/javascript">
+<script type="text/javascript" async>
   (function() {
     window._pa = window._pa || {};
     // _pa.orderId = "myOrderId"; // OPTIONAL: attach unique conversion identifier to conversions
@@ -539,7 +519,7 @@
 </script>
 
 <!-- start Mixpanel -->
-<script type="text/javascript">
+<script type="text/javascript" async>
 (function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
 for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
 
@@ -562,7 +542,7 @@ if ($("#user_email").val()) {
 <!-- end Mixpanel -->
 
 <!-- start baidu statistics -->
-<script type="text/javascript">
+<script type="text/javascript" async>
 var _hmt = _hmt || [];
 (function() {
   var hm = document.createElement("script");
@@ -575,7 +555,7 @@ var _hmt = _hmt || [];
 
 {%if LANGUAGE != "zh-CN"%}
 <!--Start of Zopim Live Chat Script-->
-<script type="text/javascript">
+<script type="text/javascript" async>
 window.$zopim||(function(d,s){var z=$zopim=function(c){
 z._.push(c)},$=z.s=
 d.createElement(s),e=d.getElementsByTagName(s)[0];z.set=function(o){z.set.

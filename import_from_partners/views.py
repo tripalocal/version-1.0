@@ -1,15 +1,38 @@
-import json, os, collections, requests, pytz, base64
+import json, os, collections, requests, pytz, base64, sys, string, http.client
 from allauth.account.signals import user_signed_up
 from datetime import *
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponseRedirect
-from experiences.models import NewProduct, NewProductI18n, Provider
+from experiences.models import NewProduct, NewProductI18n, Provider, OptionGroup, OptionItem
 from experiences.views import saveExperienceImage
 from io import BytesIO
 from Tripalocal_V1 import settings
 
 PARTNER_IDS = {"experienceoz":"001"}
+
+SOAP_REQUEST_AVAILABILITY = \
+'''<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Header>
+        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" 
+        xmlns:wsu="http://docs.oasisopen.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+        soap:mustUnderstand="1">
+            <wsse:UsernameToken wsu:Id="UsernameToken-3">
+                <wsse:Username>tripalocalapi</wsse:Username>
+                <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">JpwBSYJqzpU7UG7K</wsse:Password>
+            </wsse:UsernameToken>
+        </wsse:Security>
+    </soap:Header>
+    <soap:Body>
+        <ns2:getAvailability xmlns:ns2="http://experienceoz.com.au/">
+            <AvailabilityRequest>
+                <ProductId>{product_id}</ProductId>
+                <StartDate>{start_date}</StartDate>
+            </AvailabilityRequest>
+        </ns2:getAvailability>
+    </soap:Body>
+</soap:Envelope>
+'''
 
 def convert_location(city):
     locations = {'cairns':'Cairns','port-douglas':'Cairns','sydney':'Sydney','melbourne':'Melbourne',
@@ -41,7 +64,8 @@ def import_experienceoz_products(request):
             "primaryRegionId", "primaryRegionUrl", "primaryCategoryId", "primaryCategoryUrl",\
             "timestamp"]
 
-    file_name = os.path.join(settings.PROJECT_ROOT, 'import_from_partners', 'experienceoz.json')
+    target_language = request.GET.get('language','en')
+    file_name = os.path.join(settings.PROJECT_ROOT, 'import_from_partners', 'experienceoz_' + target_language + '.json')
     missing_operators = []
     with open(file_name, "rb") as file:
         products = json.loads(file.read().decode("utf-8"))
@@ -62,17 +86,38 @@ def import_experienceoz_products(request):
                 np = NewProduct.objects.filter(abstractexperience_ptr_id = pid)
                 if len(np) > 0:
                     np = np[0]
+                    now = pytz.timezone(np.get_timezone()).localize(datetime.now())
+                    now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
+                    now_string = now_string[:-2] + ":" + now_string[-2:]
+                    #check_experienceoz_availability(product['id'], now_string)
+                    #continue
                 else:
                     np = NewProduct()
                     np.id = pid
+                    np.partner = partner_id
+                    np.city = convert_location(product['primaryRegionUrl'] if product['primaryRegionUrl'] else "")
+                    np.type = product['primaryCategoryUrl'] if product['primaryCategoryUrl'] else ""
+                    np.price = 0
+                    np.fixed_price = 0
+                    np.duration = 1
+                    np.guest_number_min = 1
+                    np.guest_number_max = 10
+                    np.commission = 0
+                    np.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+                    np.end_datetime = np.start_datetime + timedelta(weeks = 520)
 
-                np.partner = partner_id
+                    np.save()
+
+                    if len(np.suppliers.filter(user_id=oid)) == 0:
+                        np.suppliers.add(operator)
+                    np.save()
+
                 npi18n = np.newproducti18n_set.all()
-                if len(npi18n) > 0:
+                if len(npi18n) > 0 and npi18n[0].language == target_language:
                     npi18n = npi18n[0]
                 else:
                     npi18n = NewProductI18n()
-                npi18n.language = "zh"
+                npi18n.language = target_language
                 npi18n.title = product['name'] if product['name'] else ""
                 npi18n.background_info = product['urlSegment'] if product['urlSegment'] else ""
                 np.book_in_advance = product['bookingRequired']
@@ -83,31 +128,32 @@ def import_experienceoz_products(request):
                 npi18n.service = product['moreInfo'] if product['moreInfo'] else ""
                 npi18n.notice = product['hotDealMessage'] if product['hotDealMessage'] else ""
                 npi18n.location = product['primaryRegionUrl'] if product['primaryRegionUrl'] else ""
-                np.city = convert_location(npi18n.location)
-                np.type = product['primaryCategoryUrl'] if product['primaryCategoryUrl'] else ""
-                np.price = 0
-                np.fixed_price = 0
-                np.duration = 1
-                np.guest_number_min = 1
-                np.guest_number_max = 10
-                np.commission = 0
-                np.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
-                np.end_datetime = np.start_datetime + timedelta(weeks = 520)
 
-                np.save()
                 npi18n.product = np
                 npi18n.save()
-                if len(np.suppliers.filter(user_id=oid)) == 0:
-                    np.suppliers.add(operator)
-                    np.save()
 
-                extension = "." + product['image'].split(".")[-1]
-                response = requests.get(product['image'])
-                if response.status_code == 200:
-                    image_io = BytesIO(response.content)
-                    image_io.seek(0, 2)  # Seek to the end of the stream, so we can get its length with `image_io.tell()`
-                    image_file = InMemoryUploadedFile(image_io, None, product['image'].split("/")[-1], "image", image_io.tell(), None, None)
-                    saveExperienceImage(np, image_file, extension, 1)
+                for group in npi18n.combination_options:
+                    try:
+                        og = OptionGroup.objects.get(original_id=group.get("id"))
+                        og.name = group.get("groupName")
+                    except OptionGroup.DoesNotExist:
+                        og = OptionGroup(product = np, name = group.get("groupName"), language = target_language, original_id = group.get("id"))
+                    og.save()
+                    for option in group.get("productOptions"):
+                        try:
+                            oi = OptionItem.objects.get(original_id=option.get("id"))
+                            oi.name = option.get("name")
+                        except OptionItem.DoesNotExist:
+                            oi = OptionItem(group = og, name = option.get("name"), price = 0, retail_price = 0, original_id = option.get("id"))
+                        oi.save()
+
+                #extension = "." + product['image'].split(".")[-1]
+                #response = requests.get(product['image'])
+                #if response.status_code == 200:
+                #    image_io = BytesIO(response.content)
+                #    image_io.seek(0, 2)  # Seek to the end of the stream, so we can get its length with `image_io.tell()`
+                #    image_file = InMemoryUploadedFile(image_io, None, product['image'].split("/")[-1], "image", image_io.tell(), None, None)
+                #    saveExperienceImage(np, image_file, extension, 1)
             elif product['operatorId'] not in missing_operators:
                 missing_operators.append(product['operatorId'])
                 print(product['operatorId'])
@@ -183,3 +229,37 @@ def get_operator(operatorUrl, partner_id, request):
             return None
     else:
         return None
+
+def check_experienceoz_availability(product_id, start_date):
+    server_addr = "www.tmtest.com.au"
+    service_action = "https://www.tmtest.com.au/d/services/API"
+
+    form_kwargs = {
+        'product_id': product_id,
+        'start_date': start_date,
+    }
+    body = SOAP_REQUEST_AVAILABILITY.format(**form_kwargs)
+
+    #body = body.encode('utf-8')
+
+    headers = {"Accept": "application/soap+xml, multipart/related, text/*", 
+               "Content-Type": "text/xml; charset=UTF-8",
+               "Content-Length": str(len(body)),
+              }
+
+    response = requests.post(url=service_action,
+                             headers = headers,
+                             data = body)
+
+    response = response
+    #request = http.client.HTTPConnection(server_addr)
+    #request.putrequest("GET", service_action)
+    #request.putheader("Accept", "application/soap+xml, application/dime, multipart/related, text/*")
+    #request.putheader("Content-Type", "text/xml; charset=utf-8")
+    #request.putheader("Cache-Control", "no-cache")
+    #request.putheader("Pragma", "no-cache")
+    #request.putheader("SOAPAction", service_action)
+    #request.putheader("Content-Length", str(len(body)))
+    #request.endheaders()
+    #request.send(body)
+    #response = request.getresponse().read()

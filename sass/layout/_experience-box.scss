@@ -21,6 +21,7 @@
     font-weight: 500;
     @include media('<tablet') {
       margin-left: 30px;
+      margin-right: 30px;
     }
   }
   p {
@@ -28,6 +29,7 @@
     font-size: 12px;
     @include media('<tablet') {
       margin-left: 30px;
+      margin-right: 30px;
     }
   }
 
@@ -126,4 +128,5 @@
 
 .price-box-sm p {
   font-weight: normal;
+  margin: 0;
 }

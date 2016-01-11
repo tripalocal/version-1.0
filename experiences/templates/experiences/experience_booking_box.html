@@ -1,0 +1,123 @@
+{% load mathfilters %}
+{% load i18n %}
+{% load staticfiles %}
+
+<div class="booking-box">
+    <table style="display:none;">
+        {% for op in available_options %}
+        <p id="date_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.date_string}} </p>
+        {% endfor %}
+
+        {% for op in available_options %}
+        <p id="time_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.time_string}} </p>
+        {% endfor %}
+
+        {% for op in available_options %}
+        {% if forloop.counter0 < 3 and op.instant_booking %}
+        <tr class="booking-list">
+            <td id="instant_booking_date_{{forloop.counter0}}" class="date-list">
+                {{op.date_string}}
+            </td>
+            <td id="instant_booking_time_{{forloop.counter0}}" class="time-list">
+                <div class="timebtn">
+                    <div>
+                        <span>{{op.time_string}}</span><img src="{% static 'icon/instant.png' %}">
+                    </div>
+                </div>
+            </td>
+            <td class="people-list">
+                {% if user.is_authenticated %}
+                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" disabled='disabled' />
+                {% else %}
+                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+    <input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
+    {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' or experience.type == 'ITINERARY'%}
+    {% if experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' %}
+    <div class="profile-lg">
+        <div style="background:url({{ MEDIA_URL }}{{ host_image|urlencode }}); no-repeat; background-size:cover; background-position:center;" class="autosize-profile-img"></div>
+    </div>
+    {% if LANGUAGE != "zh-CN" %}
+    {% trans "Reservation" %} {% trans "with" %} {% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}
+    {%else%}
+    {% trans "with" %}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name|title }} {{ h.last_name|title|slice:":1" }}. {% endif %} {% endfor %}{% trans "Reservation" %}
+    {%endif%}
+    {%endif%}
+
+    <br>
+    <div class="row" style="width:200px;margin-top:10px">
+    {% if LANGUAGE != "zh-CN" %}
+        <label style="vertical-align:top;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%}<br><p>
+    {%else%}
+        <label>{{experience.dollarsign}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label>{{experience.currency}}</label><p style="float:right;line-height:17px;"> {% trans "per person" %}<br>{% trans "for" %} {%if experience.duration < 24 %}{{experience.duration}} {% trans "hours" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}} {% trans "days" %}{%endif%}<br><p>
+    {%endif%}
+    </div>
+
+    <form id="experience_booking_form" method="post" action="">
+        {% csrf_token %}
+
+        {% for field in form.hidden_fields %}
+            {{ field }}
+        {% endfor %}
+
+        <div>{% trans "No. of Guests" %} &nbsp;&nbsp;
+            <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none;"/>
+            <input type="text" id="guest_number_max" name="{{experience.guest_number_max}}" disabled="disabled" style="display:none;"/>
+            {% for op in available_options %}
+                <p id="seat_left_{{forloop.counter0}}" style="display:none;"> {{op.available_seat}} </p>
+            {% endfor %}
+            {{form.adult_number}}
+            <div style="display:none;">
+            {{form.child_number}}
+            </div>
+        </div>
+
+        <table style="margin-top:15px;width:100%">
+            <thead class="booking-exp">
+                <th class="date-exp">{% trans "Date" %}</th>
+                <th class="time-exp">{% trans "Time" %}</th>
+                <th class="people-exp"></th>
+            </thead>
+
+            <tr class="">
+                <td class="">
+                    {{form.date}}
+                </td>
+                <td class="">
+                    {{form.time}}
+                </td>
+                <td class="people-list">
+                {% if user.is_authenticated %}
+                    <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" disabled='disabled'/>
+                {% else %}
+                    <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
+                {% endif %}
+                </td>
+            </tr>
+        </table>
+
+        <div class="save-to-wishlist" style="display:none;">
+        {% if not in_wishlist %}
+            {% if user.is_authenticated %}
+            <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_not_added"></div>
+            {% else %}
+            <div id="save_to_wishlist_icon" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';" class="save_to_wishlist_not_added"></div>
+            {%endif%}
+            <div id="save_to_wishlist_description" class="description">
+                <h3 id="wishlist_head" style="margin-top:10px; font-weight:normal;">{% trans "Save to Wishlist" %}</h3>
+            </div>
+        {% else %}
+            <div id="save_to_wishlist_icon" val={{in_wishlist}} class="save_to_wishlist_added"></div>
+            <div id="save_to_wishlist_description" class="description">
+                <h3 id="wishlist_head" style="margin-top:10px; font-weight:normal;">{% trans "Saved to Wishlist" %}</h3>
+            </div>
+        {% endif %}
+        </div>
+    </form>
+    {%endif%}
+</div>

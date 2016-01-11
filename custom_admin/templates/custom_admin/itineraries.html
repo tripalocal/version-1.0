@@ -18,7 +18,9 @@
             <tr>
                 <td colspan="13" class="tableEdit">&nbsp;&nbsp;↓
                     <input id="delete-itinerary" name="input" type="button" value="Delete"/>&nbsp;&nbsp;
-                    <input id="dulicate-itinerary" name="input" type="button" value="Duplicate"/>
+                    <input id="dulicate-itinerary" name="input" type="button" value="Duplicate"/>&nbsp;&nbsp;
+                    <input id="mark-as-paid" name="input" type="button" value="Mark as paid"/>&nbsp;&nbsp;
+                    <input id="mark-as-ready" name="input" type="button" value="Mark as ready"/>
                 </td>
             </tr>
             <tr id="itinerary-attributes">
@@ -47,8 +49,8 @@
                     </span>
                 </td>
                 <td>{{itinerary.id}}</td>
-                <td><a href="/itinerary/{{itinerary.id}}" target="_blank">{{itinerary.title}}</a></td>
-                <td>{{itinerary.guest_number}}</td>
+                <td><a href="https://www.tripalocal.com.cn/itinerary/preview/{{itinerary.id}}" target="_blank">{{itinerary.title}}</a></td>
+                <td>{{itinerary.guest_number}} ({{itinerary.adult_number}}+{{itinerary.child_number}})</td>
                 <td>{{itinerary.price_aud}}</td>
                 <td>{{itinerary.price_cny}}</td>
                 <td id="td-status-{{itinerary.id}}">
@@ -60,7 +62,7 @@
                         <option value="ready">Full Price</option>
                     </select>-->
                 </td>
-                <td><p><!--hide edit for now <a href="/itinerary/edit/{{itinerary.id}}" target="_blank">Edit</a> --></p></td>
+                <td><p><a href="/itinerary/edit/{{itinerary.id}}" target="_blank">Edit</a></p></td>
             </tr>
             {% endfor %}
         </table>

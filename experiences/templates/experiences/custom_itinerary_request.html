@@ -244,11 +244,17 @@ $(function() {
               format: 'YYYY-MM-DD', locale: 'zh-CN'
           });
 
-
           $("#id_end_date").datetimepicker({
-              format: 'YYYY-MM-DD', locale: 'zh-CN'
+              format: 'YYYY-MM-DD', locale: 'zh-CN',
+              useCurrent: false
           });
 
+          $("#id_start_date").on("dp.change", function (e) {
+              $('#id_end_date').data("DateTimePicker").minDate(e.date);
+          });
+          $("#id_end_date").on("dp.change", function (e) {
+              $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+          });
   }
   else {
 
@@ -258,7 +264,16 @@ $(function() {
 
 
           $("#id_end_date").datetimepicker({
-              format: 'YYYY-MM-DD'
+              format: 'YYYY-MM-DD',
+              useCurrent: false,
+              minDate: $("#id_start_date").val()
+          });
+
+          $("#id_start_date").on("dp.change", function (e) {
+              $('#id_end_date').data("DateTimePicker").minDate(e.date);
+          });
+          $("#id_end_date").on("dp.change", function (e) {
+              $('#id_start_date').data("DateTimePicker").maxDate(e.date);
           });
 
   }

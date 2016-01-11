@@ -4,10 +4,10 @@
 
 <script type="text/javascript" src="{% static 'experiences/scripts/custom_itinerary.js' %}"></script>
 
-    <div role="tabpanel" class="tab-pane fade in active" id="experience">
+    <div role="tabpanel" class="tab-pane fade in active" id="product">
         <div class="input-group">
             <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
-            <input type="text" class="form-control" id="search-keyword">
+            <input type="text" class="form-control search-keyword">
         </div>
         <div id="experience_column" style='height:100%;'>
             {%for day in itinerary%}
@@ -17,7 +17,7 @@
             <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='display:none;'>
             {% endif %}
                 {% for experience in day.experiences %}
-                {% if 'private' in experience.type.lower or 'product' in experience.type.lower %}
+                {% if 'product' in experience.type.lower %}
                 <div class='experience_id_{{experience.id}} exp-box-sm experience'>
                     <div class='exp-img'>
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt=""/>
@@ -25,9 +25,69 @@
                     <div class='exp-info'>
                         <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}" target="_blank" style="color:#333;">{{experience.title}}</a></h3>
                         <p>{{experience.description|escapejs|slice:"0:16"}}</p>
-                        <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
-                            {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
-                            {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+                        <div class="exp-edit">
+                          <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
+                              {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
+                              {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+                        </div>
+                        <div class="whats-included">
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Car driver"><img src="{% static 'experiences/img/cardriver.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Activities"><img src="{% static 'experiences/img/hot-56.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Bus"><img src="{% static 'experiences/img/bus.svg' %}"></button>
+                          <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Ferry"><img src="{% static 'experiences/img/boat.svg' %}"></button>
+                        </div>
+                    </div>
+                    <div class='exp-price'>
+                        <p>{{experience.dollarsign}}{{experience.currency}}</p>
+                        <h2 style="display:none;" class="fixed-price">0</h2><h2 class="price">{{experience.price|floatformat:"0"}}</h2>
+                        <p>{% trans 'per person' %}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div role="tabpanel" class="tab-pane fade" id="experience">
+        <div class="input-group">
+            <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+            <input type="text" class="form-control search-keyword">
+        </div>
+        <div id="experience_column" style='height:100%;'>
+            {%for day in itinerary%}
+            {% if forloop.first %}
+            <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='overflow-x:hidden;overflow-y:scroll;'>
+            {% else %}
+            <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='display:none;'>
+            {% endif %}
+                {% for experience in day.experiences %}
+                {% if 'private' in experience.type.lower %}
+                <div class='experience_id_{{experience.id}} exp-box-sm experience'>
+                    <div class='exp-img'>
+                        <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt=""/>
+                    </div>
+                    <div class='exp-info'>
+                        <h3><a href="{{GEO_POSTFIX}}experience/{{experience.id}}" target="_blank" style="color:#333;">{{experience.title}}</a></h3>
+                        <p>{{experience.description|escapejs|slice:"0:16"}}</p>
+                        <div class="exp-edit">
+                          <p>{{experience.duration}} {% trans 'hr(s)' %} &middot;
+                              {%if experience.language == 'english;mandarin;'%}English / 中文{%else%}English{%endif%} &middot;
+                              {% if experience.type == 'PRIVATE' or experience.type == 'PrivateProduct'%}<strong>{% trans 'Private' %}</strong>{% endif %}</p>
+                        </div>
+                        <div class="whats-included">
+                            <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Car driver"><img src="{% static 'experiences/img/cardriver.svg' %}"></button>
+                            <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Activities"><img src="{% static 'experiences/img/hot-56.svg' %}"></button>
+                            <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                            <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
+                            <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
+                            <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Bus"><img src="{% static 'experiences/img/bus.svg' %}"></button>
+                            <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Ferry"><img src="{% static 'experiences/img/boat.svg' %}"></button>
+                        </div>
                     </div>
                     <div class='exp-price'>
                         <p>{{experience.dollarsign}}{{experience.currency}}</p>
@@ -62,6 +122,12 @@
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
                     <label style="display:none;">{{item.notes}}</label>
+                    <div class="whats-included">
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Flight"><img src="{% static 'experiences/img/flight.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
+                    </div>
                 </div>
                 <div class="exp-price">
                   <div class="container-fluid">
@@ -102,14 +168,14 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="flight-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="flight-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="flight-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="flight-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="flight-fixed_price" type="hidden">
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price PP" %}</label>
-                        <input id="flight-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="flight-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="flight-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="flight-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="flight-price" type="hidden">
                     </div>
                 </div>
@@ -149,6 +215,10 @@
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
                     <label style="display:none;">{{item.notes}}</label>
+                    <div class="whats-included">
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Airport pickup"><img src="{% static 'experiences/img/airportpickup.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Airport dropoff"><img src="{% static 'experiences/img/airportdropoff.svg' %}"></button>
+                    </div>
                 </div>
                 <div class="exp-price">
                   <div class="container-fluid">
@@ -189,14 +259,14 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="transfer-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="transfer-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="transfer-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="transfer-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="transfer-fixed_price" type="hidden">
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price PP" %}</label>
-                        <input id="transfer-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="transfer-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="transfer-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="transfer-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="transfer-price" type="hidden">
                     </div>
                 </div>
@@ -236,6 +306,10 @@
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
                     <label style="display:none;">{{item.notes}}</label>
+                    <div class="whats-included">
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Accommodation"><img src="{% static 'experiences/img/accommodation.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                    </div>
                 </div>
                 <div class="exp-price">
                   <div class="container-fluid">
@@ -276,14 +350,14 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="accommodation-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="accommodation-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="accommodation-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="accommodation-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="accommodation-fixed_price" type="hidden">
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price PP" %}</label>
-                        <input id="accommodation-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="accommodation-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="accommodation-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="accommodation-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="accommodation-price" type="hidden">
                     </div>
                 </div>
@@ -323,6 +397,11 @@
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
                     <label style="display:none;">{{item.notes}}</label>
+                    <div class="whats-included">
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
+                    </div>
                 </div>
                 <div class="exp-price">
                   <div class="container-fluid">
@@ -363,14 +442,14 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="restaurant-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="restaurant-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="restaurant-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="restaurant-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="restaurant-fixed_price" type="hidden">
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price PP" %}</label>
-                        <input id="restaurant-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="restaurant-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="restaurant-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="restaurant-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="restaurant-price" type="hidden">
                     </div>
                 </div>
@@ -410,6 +489,16 @@
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
                     <label style="display:none;">{{item.notes}}</label>
+                    <div class="whats-included">
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Car driver"><img src="{% static 'experiences/img/cardriver.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Breakfast"><img src="{% static 'experiences/img/breakfast.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Lunch"><img src="{% static 'experiences/img/lunch.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Dinner"><img src="{% static 'experiences/img/dinner.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Accommodation"><img src="{% static 'experiences/img/accommodation.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Bus"><img src="{% static 'experiences/img/bus.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Ferry"><img src="{% static 'experiences/img/boat.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Activities"><img src="{% static 'experiences/img/hot-56.svg' %}"></button>
+                    </div>
                 </div>
                 <div class="exp-price">
                   <div class="container-fluid">
@@ -450,14 +539,14 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="suggestion-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="suggestion-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="suggestion-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="suggestion-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="suggestion-fixed_price" type="hidden">
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price PP" %}</label>
-                        <input id="suggestion-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="suggestion-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="suggestion-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="suggestion-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="suggestion-price" type="hidden">
                     </div>
                 </div>
@@ -494,6 +583,10 @@
                       <a type="button" onclick="delete_item({{item.id}});">{% trans "Delete" %}</a>
                     </p>
                     <label style="display:none;">{{item.notes}}</label>
+                    <div class="whats-included">
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Airport pickup"><img src="{% static 'experiences/img/airportpickup.svg' %}"></button>
+                      <button type="button" class="btn btn-default whats-included-btn" data-toggle="button" aria-pressed="false" autocomplete="off" value="Airport dropoff"><img src="{% static 'experiences/img/airportdropoff.svg' %}"></button>
+                    </div>
                 </div>
                 <div class="exp-price">
                   <div class="container-fluid">
@@ -527,14 +620,14 @@
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Fixed Price" %}</label>
-                        <input id="pricing-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="pricing-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="pricing-fixed_price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="pricing-fixed_price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="pricing-fixed_price" type="hidden">
                     </div>
                     <div class="form-group">
                         <label style="display:block;">{% trans "Price PP" %}</label>
-                        <input id="pricing-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min">
-                        <input id="pricing-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max">
+                        <input id="pricing-price-min" class="form-control" style="width:47%; display:inline-block; margin-right:5px;" placeholder="Min" value="0">
+                        <input id="pricing-price-max" class="form-control" style="width:47%; display:inline-block;" placeholder="Max" value="0">
                         <input id="pricing-price" type="hidden">
                     </div>
                 </div>

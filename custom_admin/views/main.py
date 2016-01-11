@@ -45,10 +45,15 @@ class ItineraryView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ItineraryView, self).get_context_data(**kwargs)
+        conversion_cny = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/currency_conversion_rate/CNY.yaml').replace('\\', '/'))
+        conversion_aud = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/currency_conversion_rate/AUD.yaml').replace('\\', '/'))
         for ci in context['itinerary_list']:
-            ci.guest_number = ci.get_guest_number()
-            ci.price_aud = ci.get_price('aud')
-            ci.price_cny = ci.get_price('cny')
+            guest_number_tuple = ci.get_guest_number()
+            ci.guest_number = guest_number_tuple[0]
+            ci.adult_number = guest_number_tuple[1]
+            ci.child_number = guest_number_tuple[2]
+            ci.price_aud = ci.get_price('aud', **{"conversion_aud":conversion_aud,"conversion_cny":conversion_cny})
+            ci.price_cny = ci.get_price('cny', **{"conversion_aud":conversion_aud,"conversion_cny":conversion_cny})
             if ci.status != "paid":
                 if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + ci.submitted_datetime:
                     ci.status = "Full price"
@@ -120,7 +125,7 @@ class NewProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     paginate_by = None
 
     def get_queryset(self):
-        return self.model.objects.filter(Q(partner__isnull=True) | Q(partner__exact=''))
+        return self.model.objects.filter(Q(partner__isnull=True) | Q(partner__exact='')).exclude(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
 
     def get_context_data(self, **kwargs):
         context = super(NewProductView, self).get_context_data(**kwargs)
@@ -154,9 +159,10 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
         context['partnerproduct_list'] = list(context['partnerproduct_list'])
         new_index=0
         for exp in context['partnerproduct_list']:
-            exp.title = exp.get_information(settings.LANGUAGES[0][0]).title
+            exp.title_en = exp.get_information("en").title
+            exp.title_cn = exp.get_information("cn").title
             exp.host = exp.get_host()
-            if not isEnglish(exp.title):
+            if not isEnglish(exp.title_cn):
                 old_index = context['partnerproduct_list'].index(exp)
                 context['partnerproduct_list'].insert(new_index, context['partnerproduct_list'].pop(old_index))
                 new_index += 1

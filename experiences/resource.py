@@ -909,11 +909,11 @@ def service_booking(request, format=None):
                                             start_datetime__lt = bk_dt)
         
         if coupons is not None and len(coupons) > 0:
-            ItineraryBookingForm.booking(ItineraryBookingForm(),booking_data['experience_id'],booking_data['date'],booking_data['time'],booking_data['user'],booking_data['guest_number'],
-                                         booking_data['card_number'],booking_data['exp_month'],booking_data['exp_year'],booking_data['cvv'],coupon=coupons[0])
+            ItineraryBookingForm.booking(ItineraryBookingForm(),booking_data['experience_id'],booking_data['date'],booking_data['time'],booking_data['user'],adult_number=booking_data['guest_number'],
+                                         card_number=booking_data['card_number'],exp_month=booking_data['exp_month'],exp_year=booking_data['exp_year'],cvv=booking_data['cvv'],coupon=coupons[0])
         else:
-            ItineraryBookingForm.booking(ItineraryBookingForm(),booking_data['experience_id'],booking_data['date'],booking_data['time'],booking_data['user'],booking_data['guest_number'],
-                                         booking_data['card_number'],booking_data['exp_month'],booking_data['exp_year'],booking_data['cvv'])
+            ItineraryBookingForm.booking(ItineraryBookingForm(),booking_data['experience_id'],booking_data['date'],booking_data['time'],booking_data['user'],adult_number=booking_data['guest_number'],
+                                         card_number=booking_data['card_number'],exp_month=booking_data['exp_month'],exp_year=booking_data['exp_year'],cvv=booking_data['cvv'])
 
         result = {"success":"true"}
         return Response(result, status=status.HTTP_200_OK)

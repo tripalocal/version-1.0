@@ -268,6 +268,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         experiences = [e for e in experiences if e.city.lower() in city]
 
     experiences = sort_experiences(experiences, customer, preference)
+    month_in_advance = 1
 
     for experience in experiences:
         #new requirement: if the guest_number is smaller than the min value, increase the price per person instead of excluding the experience
@@ -370,15 +371,15 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
             #calculate all the blockout time periods
             for blk in blockouts:
-                if blk.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+                if blk.start_datetime.astimezone(local_timezone).dst() != timedelta(0):
                     daylightsaving = True
                 else:
                     daylightsaving = False
 
                 if blk.repeat:
                     b_l = blk.end_datetime - blk.start_datetime
-                    if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                        blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+                    if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date():
+                        blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date()
                     while blk.start_datetime.date() <= blk.repeat_end_date:
                         blockout_index += 1
                         blockout_start.append(blk.start_datetime)
@@ -399,15 +400,15 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
             #calculate all the instant booking time periods
             for ib in instantbookings :
-                if ib.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+                if ib.start_datetime.astimezone(local_timezone).dst() != timedelta(0):
                     daylightsaving = True
                 else:
                     daylightsaving = False
 
                 if ib.repeat:
                     ib_l = ib.end_datetime - ib.start_datetime
-                    if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                        ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+                    if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date():
+                        ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date()
                     while ib.start_datetime.date() <= ib.repeat_end_date:
                         instantbooking_index += 1
                         instantbooking_start.append(ib.start_datetime)
@@ -430,7 +431,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         instantbooking_i=0
         while (sdt <= end_datetime):
             sdt_local = sdt.astimezone(local_timezone)
-            if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+            if pytz.utc.localize(datetime.utcnow()).astimezone(local_timezone).dst() != timedelta(0):
                 #daylight saving
                 if not sdt_local.dst() != timedelta(0):
                     # not daylight saving
@@ -567,6 +568,7 @@ class ExperienceListView(ListView):
 def getAvailableOptions(experience, available_options, available_date):
 
     top_instant_bookings = -1
+    month_in_advance = 1
 
     last_sdt = pytz.timezone('UTC').localize(datetime.min)
     local_timezone = pytz.timezone(experience.get_timezone())
@@ -595,15 +597,15 @@ def getAvailableOptions(experience, available_options, available_date):
 
     #calculate all the blockout time periods
     for blk in blockouts :
-        if blk.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+        if blk.start_datetime.astimezone(local_timezone).dst() != timedelta(0):
             daylightsaving = True
         else:
             daylightsaving = False
 
         if blk.repeat:
             b_l =  blk.end_datetime - blk.start_datetime
-            if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+            if not blk.repeat_end_date or blk.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date():
+                blk.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date()
             while blk.start_datetime.date() <= blk.repeat_end_date:
                 blockout_index += 1
                 blockout_start.append(blk.start_datetime)
@@ -627,15 +629,15 @@ def getAvailableOptions(experience, available_options, available_date):
 
     #calculate all the instant booking time periods
     for ib in instantbookings :
-        if ib.start_datetime.astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+        if ib.start_datetime.astimezone(local_timezone).dst() != timedelta(0):
             daylightsaving = True
         else:
             daylightsaving = False
 
         if ib.repeat:
             ib_l =  ib.end_datetime - ib.start_datetime
-            if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date():
-                ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2)).date()
+            if not ib.repeat_end_date or ib.repeat_end_date > (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date():
+                ib.repeat_end_date = (datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance)).date()
             while ib.start_datetime.date() <= ib.repeat_end_date:
                 instantbooking_index += 1
                 instantbooking_start.append(ib.start_datetime)
@@ -656,13 +658,12 @@ def getAvailableOptions(experience, available_options, available_date):
 
     block_i=0
     instantbooking_i=0
-    while (sdt <= experience.end_datetime and sdt <= datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=+2) ):
+    while (sdt <= experience.end_datetime and sdt <= datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance) ):
         #check if the date is blocked
         blocked = False
-
         #block 10pm-7am if repeated hourly
         sdt_local = sdt.astimezone(local_timezone)
-        if pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(experience.get_timezone())).dst() != timedelta(0):
+        if pytz.utc.localize(datetime.utcnow()).astimezone(local_timezone).dst() != timedelta(0):
             #daylight saving
             if not sdt_local.dst() != timedelta(0):
                 # not daylight saving
@@ -874,15 +875,17 @@ class ExperienceDetailView(DetailView):
             if float(experience.duration).is_integer():
                 experience.duration = int(experience.duration)
 
-            guest_number = int(form.data['guest_number'])
-            subtotal_price = get_total_price(experience, guest_number)
+            adult_number = int(form.data['adult_number'])
+            child_number = int(form.data['child_number'])
+            subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number)
 
             COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
             return render(request, 'experiences/experience_booking_confirmation.html',
                           {'form': form, #'eid':self.object.id,
                            'experience': experience,
                            'experience_price': experience_price,
-                           'guest_number':form.data['guest_number'],
+                           'adult_number':form.data['adult_number'],
+                           'child_number':form.data['child_number'],
                            'date':form.data['date'],
                            'time':form.data['time'],
                            'subtotal_price':round(subtotal_price*(1.00+COMMISSION_PERCENT),0),
@@ -943,7 +946,11 @@ class ExperienceDetailView(DetailView):
 
         context['experience_city'] = dict(Location).get(experience.city)
 
-        available_date = getAvailableOptions(experience, available_options, available_date)
+        if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
+            #TODO, (1) get availability from the partner's API; (2) set retail_price, price for OptionItem
+            available_date = getAvailableOptions(experience, available_options, available_date)
+        else:
+            available_date = getAvailableOptions(experience, available_options, available_date)
 
         context['available_options'] = available_options
         uid = self.request.user.id if self.request.user.is_authenticated() else None
@@ -1030,7 +1037,7 @@ class ExperienceDetailView(DetailView):
                 experience.whatsincluded = t.whatsincluded
                 experience.notice = t.notice
 
-        if experience.commission > 0.0:
+        if experience.commission >= 0.0:
             experience.commission = round(experience.commission/(1-experience.commission),3)+1
         else:
             experience.commission = settings.COMMISSION_PERCENT+1
@@ -1065,6 +1072,8 @@ class ExperienceDetailView(DetailView):
                     coordinates.append([co.name if co.name is not None else '', co.longitude, co.latitude])
 
         context['coordinates'] = coordinates
+
+        context['host'] = experience.get_host()
 
         #update page view statistics
         if self.request.user.is_staff:
@@ -1187,19 +1196,21 @@ def experience_booking_confirmation(request):
         else:
             experience.title = exp_information.title
 
-        guest_number = int(form.data['guest_number'])
+        adult_number = int(form.data['adult_number'])
+        child_number = int(form.data['child_number'])
         experience_price = experience.price
-        subtotal_price = get_total_price(experience, guest_number)
+        subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number)
 
         COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
         total_price = experience_fee_calculator(subtotal_price, experience.commission)
         subtotal_price = round(subtotal_price*(1.00+COMMISSION_PERCENT),0)
 
+        local_timezone = pytz.timezone(experience.get_timezone())
         if 'Refresh' in request.POST:
             #get coupon information
             wrong_promo_code = False
             code = form.data['promo_code']
-            bk_dt = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['date'].strip()+form.data['time'].strip(),"%Y-%m-%d%H:%M"))
+            bk_dt = local_timezone.localize(datetime.strptime(form.data['date'].strip()+form.data['time'].strip(),"%Y-%m-%d%H:%M"))
             coupons = Coupon.objects.filter(promo_code__iexact = code,
                                             end_datetime__gt = bk_dt,
                                             start_datetime__lt = bk_dt)
@@ -1207,7 +1218,7 @@ def experience_booking_confirmation(request):
                 coupon = Coupon()
                 wrong_promo_code = True
             else:
-                valid = check_coupon(coupons[0], experience.id, form.data['guest_number'])
+                valid = check_coupon(coupons[0], experience.id, adult_number+child_number)
                 if not valid['valid']:
                     coupon = Coupon()
                     wrong_promo_code = True
@@ -1224,7 +1235,8 @@ def experience_booking_confirmation(request):
                                                                            'wrong_promo_code':wrong_promo_code,
                                                                            'coupon':coupon,
                                                                            'experience': experience,
-                                                                           'guest_number':form.data['guest_number'],
+                                                                           'adult_number':form.data['adult_number'],
+                                                                           'child_number':form.data['child_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':subtotal_price,
@@ -1245,13 +1257,13 @@ def experience_booking_confirmation(request):
                 if form.cleaned_data['status'] == 'accepted':
                     return experience_booking_successful(request,
                                                          experience,
-                                                         int(form.data['guest_number']),
+                                                         int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'], True)
                 else:
                     return experience_booking_successful(request,
                                                          experience,
-                                                         int(form.data['guest_number']),
+                                                         int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'])
 
@@ -1260,7 +1272,8 @@ def experience_booking_confirmation(request):
                                                                            'user_email':request.user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience,
-                                                                           'guest_number':form.data['guest_number'],
+                                                                           'adult_number':form.data['adult_number'],
+                                                                           'child_number':form.data['child_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':subtotal_price,
@@ -1277,15 +1290,15 @@ def experience_booking_confirmation(request):
             form.data['booking_extra_information'] = order_id
             if form.is_valid():
                 config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
-                bk_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
-                bk_time = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
+                bk_date = local_timezone.localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
+                bk_time = local_timezone.localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
                 total_price = form.cleaned_data['price_paid'] if form.cleaned_data['price_paid'] != -1.0 else total_price
 
                 if total_price > 0.0:
                     #not free
                     response = client.UnionpayClient(config).pay(int(total_price*100),order_id, channel_type='07',#currency_code=CurrencyCode[experience.currency.upper()],
                                                                  front_url='http://' + settings.ALLOWED_HOSTS[0] + '/experience_booking_successful/?experience_id=' + str(experience.id)
-                                                                 + '&guest_number=' + form.data['guest_number']
+                                                                 + '&guest_number=' + str(adult_number+child_number)
                                                                  + '&booking_datetime=' + form.data['date'].strip()+form.data['time'].strip()
                                                                  + '&price_paid=' + str(total_price)
                                                                  + '&is_instant_booking=' + str(instant_booking(experience,bk_date,bk_time)))
@@ -1294,7 +1307,7 @@ def experience_booking_confirmation(request):
                     #free
                     return experience_booking_successful(request,
                                                          experience,
-                                                         int(form.data['guest_number']),
+                                                         adult_number+child_number,
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'],
                                                          instant_booking(experience,bk_date,bk_time))
@@ -1304,7 +1317,8 @@ def experience_booking_confirmation(request):
                                                                            'user_email':request.user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience,
-                                                                           'guest_number':form.data['guest_number'],
+                                                                           'adult_number':form.data['adult_number'],
+                                                                           'child_number':form.data['child_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':subtotal_price,
@@ -1325,8 +1339,8 @@ def experience_booking_confirmation(request):
             form.data['booking_extra_information'] = out_trade_no
 
             if form.is_valid():
-                bk_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
-                bk_time = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
+                bk_date = local_timezone.localize(datetime.strptime(form.data['date'].strip(), "%Y-%m-%d"))
+                bk_time = local_timezone.localize(datetime.strptime(form.data['time'].split(":")[0].strip(), "%H"))
                 total_price = form.cleaned_data['price_paid'] if form.cleaned_data['price_paid'] != -1.0 else total_price
 
                 if total_price > 0.0:
@@ -1338,7 +1352,7 @@ def experience_booking_confirmation(request):
                         code_url = pay_info['code_url']
                         success_url = 'http://' + settings.ALLOWED_HOSTS[0] \
                                       + '/experience_booking_successful/?experience_id=' + str(experience.id) \
-                                      + '&guest_number=' + form.data['guest_number'] \
+                                      + '&guest_number=' + str(adult_number+child_number) \
                                       + '&booking_datetime=' + form.data['date'].strip() + form.data['time'].strip() \
                                       + '&price_paid=' + str(total_price) + '&is_instant_booking=' \
                                       + str(instant_booking(experience, bk_date, bk_time))
@@ -1351,7 +1365,7 @@ def experience_booking_confirmation(request):
                     #free
                     return experience_booking_successful(request,
                                                          experience,
-                                                         int(form.data['guest_number']),
+                                                         adult_number+child_number,
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'],
                                                          instant_booking(experience,bk_date,bk_time))
@@ -1361,7 +1375,8 @@ def experience_booking_confirmation(request):
                                                                            'user_email':request.user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience,
-                                                                           'guest_number':form.data['guest_number'],
+                                                                           'adult_number':form.data['adult_number'],
+                                                                           'child_number':form.data['child_number'],
                                                                            'date':form.data['date'],
                                                                            'time':form.data['time'],
                                                                            'subtotal_price':subtotal_price,
@@ -1879,7 +1894,10 @@ def update_booking(id, accepted, user):
                 booking.coupon.save()
 
             exp_title = experience.get_information(settings.LANGUAGE_CODE).title
-            customer_phone_num = booking.payment.phone_number
+            if booking.payment:
+                customer_phone_num = booking.payment.phone_number
+            else:
+                customer_phone_num = booking.user.registereduser.phone_number
             exp_datetime_local = booking.datetime.astimezone(tzlocal())
             exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y")).format(*'年月日')
 
@@ -1968,8 +1986,10 @@ def update_booking(id, accepted, user):
             if not free:
                 payment = Payment.objects.get(booking_id=booking.id)
 
-                guest_number = int(booking.guest_number)
-                subtotal_price = get_total_price(experience, guest_number)
+                if booking.adult_number:
+                    subtotal_price = get_total_price(experience, adult_number=booking.adult_number, child_number=child_number)
+                else:
+                    subtotal_price = get_total_price(experience, booking.guest_number)
 
                 #refund_amount does not include process fee: the transaction can't be undone
                 COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
@@ -2003,7 +2023,10 @@ def update_booking(id, accepted, user):
 
                 #send SMS
                 exp_title = experience.get_information(settings.LANGUAGE_CODE).title
-                customer_phone_num = booking.payment.phone_number
+                if booking.payment:
+                    customer_phone_num = booking.payment.phone_number
+                else:
+                    customer_phone_num = booking.user.registereduser.phone_number
                 exp_datetime_local = booking.datetime.astimezone(tzlocal())
                 exp_datetime_local_str = exp_datetime_local.strftime(_("%H:%M %d %b %Y"))
                 send_booking_cancelled_sms(exp_datetime_local_str, exp_title, host, customer_phone_num, guest)
@@ -2628,12 +2651,12 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         # alongside a list with all the number of reviews
         # experienceList = Experience.objects.filter(city__iexact=city, status__iexact="listed").exclude(type__iexact="itinerary")
 
-            if is_kids_friendly:
-                experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
-            if is_host_with_cars:
-                experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
-            if is_private_tours:
-                experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
+        if is_kids_friendly:
+            experienceList = [exp for exp in experienceList if tagsOnly(_("Kids Friendly"), exp)]
+        if is_host_with_cars:
+            experienceList = [exp for exp in experienceList if tagsOnly(_("Host with Car"), exp)]
+        if is_private_tours:
+            experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
 
         i = 0
         while i < len(experienceList):
@@ -3033,9 +3056,12 @@ def custom_itinerary(request, id=None, operation=None):
         ci.user = request.user
         ci.title = ""
         ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        ci.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
+        ci.end_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
+        ci.cities = "Melbourne"
         ci.save()
         return HttpResponseRedirect(GEO_POSTFIX+"itinerary/edit/"+str(ci.id)+"/")
-    
+
     if request.method == 'POST':
         if 'Add' in request.POST:
             #add a new item
@@ -3185,7 +3211,7 @@ def custom_itinerary(request, id=None, operation=None):
                 itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer, currency, skip_availability=True)
 
                 #get flight, transfer, ...
-                pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"])
+                pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]).order_by('-id')
                 for pd in pds:
                     information = pd.get_information(settings.LANGUAGES[0][0])
                     pd.title = information.title
@@ -3235,8 +3261,10 @@ def custom_itinerary(request, id=None, operation=None):
                     ci.id = new_id
                 ci.user = request.user
                 ci.title = form.cleaned_data['title']
-
+                ci.start_datetime = form.cleaned_data['start_datetime']
+                ci.end_datetime = form.cleaned_data['end_datetime']
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+                ci.cities = form.cleaned_data['cities_string']
                 if "ready" in request.POST:
                     ci.status = "ready"
                 ci.save()
@@ -3246,13 +3274,14 @@ def custom_itinerary(request, id=None, operation=None):
                     adult_number = int(item['adult_number'])
                     children_number = int(item['children_number'])
                     total_price = item['total_price']
+                    whats_included = item['whats_included']
 
                     #save the custom itinerary as draft
                     local_timezone = pytz.timezone(experience.get_timezone())
-                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']).strip(), "%Y-%m-%d"))
+                    bk_date = local_timezone.localize(datetime.strptime(str(item['date']), "%Y-%m-%d"))
                     bk_time = local_timezone.localize(datetime.strptime(str(item['time']).split(":")[0].strip(), "%H"))
 
-                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, total_price = total_price, children_number = children_number,
+                    booking = Booking(user = request.user, experience= experience, guest_number = adult_number + children_number, adult_number = adult_number, whats_included=whats_included, total_price = total_price, children_number = children_number,
                                     datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                     submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                     booking.save()
@@ -3273,8 +3302,22 @@ def custom_itinerary(request, id=None, operation=None):
             #itinerary will be in the format of[{'city':'', 'dates':{'date1':[], 'date2':[], ...}}, ...]
             itinerary = []
             last_city = ""
+            start_date = existing_ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
+            cities_list = list(filter(None, existing_ci.cities.split(',')))
+
+            # Construct skeleton of itinerary
+            for day, city in enumerate(cities_list):
+                if city != last_city:
+                    itinerary.append(OrderedDict())
+                    itinerary[-1]['city'] = city
+                    itinerary[-1]['dates'] = OrderedDict()
+                if (start_date + timedelta(days=day)).strftime("%Y-%m-%d") not in itinerary[-1]['dates']:
+                    itinerary[-1]['dates'][(start_date + timedelta(days=day)).strftime("%Y-%m-%d")] = []
+                last_city = city
+
+            city_index = 0
             for bking in existing_ci.booking_set.order_by('datetime').all():
                 if bking.adult_number is not None and bking.adult_number > 0:
                     form.initial["adult_number"] = bking.adult_number
@@ -3306,16 +3349,12 @@ def custom_itinerary(request, id=None, operation=None):
                 if float(bking.experience.duration).is_integer():
                     bking.experience.duration = int(bking.experience.duration)
 
-                key = bking.datetime.astimezone(pytz.timezone(bking.experience.get_timezone())).strftime("%Y-%m-%d")
-
-                if bking.experience.city != last_city:
-                    itinerary.append(OrderedDict())
-                    itinerary[-1]['city'] = bking.experience.city
-                    itinerary[-1]['dates'] = OrderedDict()
-                if key not in itinerary[-1]['dates']:
-                    itinerary[-1]['dates'][key] = []
-                itinerary[-1]['dates'][key].append(bking.experience)
-                last_city = bking.experience.city
+                key = bking.datetime.astimezone(pytz.timezone(bking.experience.get_timezone()))
+                # Reduce cities_list to unique cities
+                cities_list = list(OrderedDict.fromkeys(cities_list))
+                while cities_list[city_index] != bking.experience.city:
+                    city_index += 1
+                itinerary[city_index]['dates'][key.strftime("%Y-%m-%d")].append(bking.experience)
 
             context['existing_itinerary'] = itinerary
 
@@ -3370,18 +3409,21 @@ def itinerary_detail(request,id=None,preview=None):
             full_price = False
         discount_deadline = ci.submitted_datetime + timedelta(days=7)
 
-        start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
-        end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        if ci.start_datetime:
+            start_datetime = ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+        else:
+            start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        if ci.cities:
+            end_datetime = start_datetime + timedelta(days=(len(list(filter(None, ci.cities.split(','))))-1))
+        else:
+            end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
 
         itinerary = {"title":ci.title, "days":{}, "status":ci.status}
         for item in ci.booking_set.order_by('datetime').all():
             exp_information = item.experience.get_information(settings.LANGUAGES[0][0])
             item.experience.title = exp_information.title
             item.experience.description = exp_information.description
-            if type(item.experience) == NewProduct:
-                item.experience.whatsincluded = exp_information.whatsincluded
-            else:
-                item.experience.whatsincluded = item.experience.get_whatsincluded(settings.LANGUAGES[0][0])
+            item.experience.whatsincluded = item.whats_included
             key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%Y-%m-%d")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
@@ -3391,6 +3433,11 @@ def itinerary_detail(request,id=None,preview=None):
                 start_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
             if end_datetime < item.datetime:
                 end_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
+
+        for date in daterange(start_datetime, end_datetime):
+            date = date.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%d")
+            if date not in itinerary["days"]:
+                itinerary["days"].update({date:[]})
 
         itinerary["days"] = OrderedDict(sorted(itinerary["days"].items(), key=lambda t: t[0]))
         cover_photo = ""

@@ -1,0 +1,59 @@
+{% load mathfilters %}
+{% load i18n %}
+{% load staticfiles %}
+
+<div class="booking-box">
+  <input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
+  <form id="experience_booking_form" method="post" action="">
+    {% csrf_token %}
+    {% for field in form.hidden_fields %}
+        {{ field }}
+    {% endfor %}
+    <div style="border-bottom: 1px solid #ccc;">
+      <p>{% trans "Date" %}</p>
+      {{form.date}}
+    </div>
+
+    {% for option in available_options %}
+    <a role="button" data-toggle="collapse" href="#option-{{forloop.counter}}">
+      +{{ option.name }}<span class="badge"></span>
+    </a>
+    <div class="collapse" id="option-{{forloop.counter}}">
+      <table>
+        <tr>
+          <td>
+            {% trans "Adults" %}
+          </td>
+          <td>
+            {{ option.price_adult }}
+          </td>
+          <td>
+            
+          </td>
+        </tr>
+        <tr>
+          <td>
+            {% trans "Children (age 3-14)" %}
+          </td>
+          <td>
+            {{ option.price_child }}
+          </td>
+          <td>
+
+          </td>
+        </tr>
+      </table>
+    </div>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+        <input style="display:inline-block; width: 60px;" id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" disabled='disabled'/>
+    {% else %}
+        <input style="display:inline-block; width: 60px;" type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
+    {% endif %}
+  </form>
+</div>
+
+<script>
+
+</script>

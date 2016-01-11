@@ -33,6 +33,7 @@
     display: inline-block;
     float: none;
     vertical-align: top;
+
     @include media('<tablet') {
       display: none;
     }
@@ -44,6 +45,11 @@
     a:hover, a:focus, .current {
       background-color: white;
       border-color: $primary-color;
+    }
+    @include media('<desktop') {
+      a {
+        margin: 0 10px 12px 10px;
+      }
     }
   }
 

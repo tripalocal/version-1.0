@@ -323,6 +323,33 @@ class NewProductI18n(models.Model):
     def __str__(self):
         return self.title
 
+class OptionGroup(models.Model):
+    EN = 'en'
+    ZH = 'zh'
+
+    LANG_CHOICES = (
+        (EN, 'English'),
+        (ZH, '中文'),
+    )
+
+    product = models.ForeignKey(NewProduct)
+    name = models.TextField()
+    language = models.CharField(max_length=3, choices=LANG_CHOICES, default=EN)
+    original_id = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name if self.name else ""
+
+class OptionItem(models.Model):
+    group = models.ForeignKey(OptionGroup)
+    name = models.TextField()
+    retail_price = models.FloatField(blank=True, null=True)
+    price = models.FloatField(blank=True, null=True)
+    original_id = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name if self.name else ""
+
 class InstantBookingTimePeriod(models.Model):
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
@@ -396,6 +423,9 @@ class CustomItinerary(models.Model):
     note = models.TextField(null=True, blank=True)
     submitted_datetime = models.DateTimeField(null=True)
     payment = models.ForeignKey("Payment", null=True, blank=True)
+    start_datetime = models.DateTimeField(null=True, blank=True)
+    end_datetime = models.DateTimeField(null=True, blank=True)
+    cities = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.user.username + "--" + self.title
@@ -404,14 +434,15 @@ class CustomItinerary(models.Model):
         guest_number = 0
         adult_number = 0
         children_number = 0
-        if self.booking_set.all()[0].adult_number is not None and self.booking_set.all()[0].adult_number > 0:
+        booking_set = self.booking_set.all()
+        if booking_set[0].adult_number is not None and booking_set[0].adult_number > 0:
             guest_number = self.booking_set.all()[0].adult_number
             adult_number = guest_number
-            if self.booking_set.all()[0].children_number is not None and self.booking_set.all()[0].children_number > 0:
-                children_number = self.booking_set.all()[0].children_number
+            if booking_set[0].children_number is not None and booking_set[0].children_number > 0:
+                children_number = booking_set[0].children_number
                 guest_number += children_number
         else:
-            guest_number = self.booking_set.all()[0].guest_number
+            guest_number = booking_set[0].guest_number
             adult_number = guest_number
         return (guest_number, adult_number, children_number)
 
@@ -424,7 +455,10 @@ class CustomItinerary(models.Model):
 
         return len(dates)
 
-    def get_price(self, currency):
+    def get_price(self, currency, **kwargs):
+        '''
+        conversion: dict of conversion rate
+        '''
         itinerary_price = 0.0
         for bking in self.booking_set.all():
             experience = bking.experience
@@ -437,7 +471,13 @@ class CustomItinerary(models.Model):
                 subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
             subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
             if experience.currency != currency:
-                subtotal_price = convert_currency(subtotal_price, experience.currency, currency)
+                if experience.currency.lower() == "aud":
+                    conversion = kwargs.get("currency_aud", None)
+                elif experience.currency.lower() == "cny":
+                    conversion = kwargs.get("currency_cny", None)
+                else:
+                    conversion = None
+                subtotal_price = convert_currency(subtotal_price, experience.currency, currency, conversion)
             itinerary_price += subtotal_price
         if pytz.timezone("UTC").localize(datetime.utcnow()) > timedelta(days=7) + self.submitted_datetime:
             itinerary_price *= 1.15
@@ -484,7 +524,7 @@ class CustomItineraryRequest(models.Model):
     budget = models.TextField()
     requirements = models.TextField(blank=True, null=True)
     customer_name = models.CharField(max_length=40)
-    email = models.EmailField()
+    email = models.EmailField(max_length=75)
     wechat = models.CharField(max_length=50)
     mobile = models.CharField(max_length=50)
 
@@ -496,6 +536,7 @@ class Booking(models.Model):
     adult_number = models.IntegerField(null=True, blank=True)
     children_number = models.IntegerField(null=True, blank=True)
     experience = models.ForeignKey(AbstractExperience)
+    whats_included = models.TextField(null=True, blank=True)
     total_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     datetime = models.DateTimeField()
     status = models.CharField(max_length=50)
@@ -505,6 +546,7 @@ class Booking(models.Model):
     booking_extra_information = models.TextField(null=True, blank=True)
     custom_itinerary = models.ForeignKey(CustomItinerary, null=True, blank=True)
     host = models.ForeignKey(User, null=True, blank=True, related_name='booking_host')
+    option_item = models.ManyToManyField(OptionItem, related_name='booking_option_item')
 
     def __str__(self):
         return self.user.email + "--" + self.experience.get_information(settings.LANGUAGES[0][0]).title
