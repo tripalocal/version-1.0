@@ -3237,15 +3237,15 @@ def custom_itinerary(request, id=None, operation=None):
                     if pd.city in city_list:
                         if pd.type == 'Flight':
                             context['flight'].append(pd)
-                        if pd.type == 'Transfer':
+                        elif pd.type == 'Transfer':
                             context['transfer'].append(pd)
-                        if pd.type == 'Accommodation':
+                        elif pd.type == 'Accommodation':
                             context['accommodation'].append(pd)
-                        if pd.type == 'Restaurant':
+                        elif pd.type == 'Restaurant':
                             context['restaurant'].append(pd)
-                        if pd.type == 'Suggestion':
+                        elif pd.type == 'Suggestion':
                             context['suggestion'].append(pd)
-                        if pd.type == 'Pricing':
+                        elif pd.type == 'Pricing':
                             context['pricing'].append(pd)
                 print(datetime.now())
                 context["adult_number"] = adult_number
