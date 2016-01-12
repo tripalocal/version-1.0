@@ -4,7 +4,6 @@
 
 */
 
-
 .booking-box {
   background-color: #fff;
   border: $light-grey 1px solid;
@@ -70,6 +69,63 @@
 
   input {
     height: 30px;
+  }
+
+  .box-section {
+    border-bottom: 1px solid #ccc;
+    text-align: left;
+    padding: 10px 0;
+  }
+
+  .btn-block {
+    height: 50px;
+    border-radius: 2px;
+    margin: 10px auto;
+  }
+
+  .badge {
+    background-color: white;
+    border: 1px solid $light-grey;
+    color: $dark-grey;
+    font-weight: normal;
+    float: right;
+  }
+
+  .option {
+    width: 100%;
+    height: 30px;
+    padding: 5px 0;
+    vertical-align: middle;
+  }
+
+  .option-name {
+    float: left;
+    line-height: 25px;
+    display: inline-block;
+  }
+
+  .option-price, 
+  .option-amount {
+    float: right;
+    margin-left: 10px;
+    line-height: 25px;
+    display: inline-block;
+  }
+
+  .option-amount {
+    height: 25px;
+  }
+}
+
+.collapse-group-toggle {
+  color: $dark-grey;
+  text-align: left;
+  display: block;
+  &:hover,
+  &:active,
+  &:focus {
+    color: $dark-grey;
+    text-decoration: none;
   }
 }
 

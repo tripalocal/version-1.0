@@ -1,0 +1,52 @@
+{% load mathfilters %}
+{% load i18n %}
+{% load staticfiles %}
+
+<div class="booking-box">
+  <input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
+  <form id="experience_booking_form" method="post" action="">
+    {% csrf_token %}
+    {% for field in form.hidden_fields %}
+        {{ field }}
+    {% endfor %}
+
+    <div class="box-section" style="padding-top:0;">
+      <p style="display:inline; margin-right:10px;">{% trans "Date" %}</p>
+      {{form.date}}
+    </div>
+
+    {% for options in experience.optiongroups_all %}
+    <div class="box-section">
+      <a class="collapse-group-toggle" role="button" data-toggle="collapse" href="#option-group-{{forloop.counter}}" onclick="$('.collapse').collapse('hide'); $('#option-group-{{forloop.counter}}').collapse('show');">
+        + {{options.name}}
+        <span class="badge">0</span>
+      </a>
+      <div class="collapse" id="option-group-{{forloop.counter}}">
+          {{% for option in options %}}
+          <div class="option">
+            <span class="option-name">
+              {{option.name}}
+            </span>
+            <span>
+              <select class="option-amount">
+                {% for i in "0123456789" %}
+                <option value="{{i}}">{{i}}</option>
+                {% endfor %}
+              </select>
+            </span>
+            <span class="option-price">
+              {{option.retail_price}}
+            </span>
+          </div>
+          {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+    
+    {% if user.is_authenticated %}
+        <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" disabled='disabled'/>
+    {% else %}
+        <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
+    {% endif %}
+  </form>
+</div>
