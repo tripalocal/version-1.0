@@ -910,6 +910,7 @@ class ExperienceDetailView(DetailView):
         local_timezone = pytz.timezone(experience.get_timezone())
         available_options = []
         available_date = ()
+        option_groups = experience.optiongroup_set.all()
 
         # Photo with minimum index will be cover photo.
         min_index = 11
