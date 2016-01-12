@@ -41,6 +41,7 @@
             {% include "experiences/experience_description.html" %}
         {% else %}
             {% include "experiences/api_booking_box.html" %}
+            {% include "experiences/experience_description.html" %}
         {%endif%}
     </div>
 
@@ -244,8 +245,6 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 <script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
 <script charset="utf-8" type="text/javascript">
-$("#navbar").removeClass("navbar-static-top");
-$("#navbar").addClass("navbar-fixed-top");
 function resizeImg() {
     var thisImg= $('.item');
     var refH = thisImg.height();
