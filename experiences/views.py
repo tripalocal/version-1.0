@@ -3295,6 +3295,17 @@ def custom_itinerary(request, id=None, operation=None):
                 #          {'form': booking_form,'itinerary':itinerary})
 
     else:
+        all = CustomItinerary.objects.filter(Q(cities__isnull=True) | Q(cities__exact=''))
+        for a in all:
+            a.cities = ''
+            last_d = pytz.timezone("UTC").localize(datetime.utcnow()).replace(hour=14, minute=0, second=0, microsecond=0)
+            for b in a.booking_set.order_by('datetime').all():
+                if b.datetime.replace(hour=14, minute=0, second=0, microsecond=0) != last_d:
+                    a.cities += b.experience.city + ","
+                    last_d = b.datetime.replace(hour=14, minute=0, second=0, microsecond=0)
+            if len(list(filter(None, a.cities.split(',')))) != (a.end_datetime - a.start_datetime).days + 1:
+                a.status= "deleted"
+            a.save()
         context["adult_number"] = 1
         context["children_number"] = 0
         if id is not None:
@@ -3316,6 +3327,15 @@ def custom_itinerary(request, id=None, operation=None):
                 if (start_date + timedelta(days=day)).strftime("%Y-%m-%d") not in itinerary[-1]['dates']:
                     itinerary[-1]['dates'][(start_date + timedelta(days=day)).strftime("%Y-%m-%d")] = []
                 last_city = city
+
+            # remove consecutive duplicate cities from cities_list
+            last_city=""
+            tmp = []
+            for city in cities_list:
+                if last_city != city:
+                    tmp.append(city)
+                last_city = city
+            cities_list = tmp
 
             city_index = 0
             for bking in existing_ci.booking_set.order_by('datetime').all():
@@ -3350,8 +3370,6 @@ def custom_itinerary(request, id=None, operation=None):
                     bking.experience.duration = int(bking.experience.duration)
 
                 key = bking.datetime.astimezone(pytz.timezone(bking.experience.get_timezone()))
-                # Reduce cities_list to unique cities
-                cities_list = list(OrderedDict.fromkeys(cities_list))
                 while cities_list[city_index] != bking.experience.city:
                     city_index += 1
                 itinerary[city_index]['dates'][key.strftime("%Y-%m-%d")].append(bking.experience)
