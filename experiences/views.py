@@ -267,10 +267,11 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
         experiences = [e for e in experiences if e.city.lower() in city]
 
-    experiences = sort_experiences(experiences, customer, preference)
+    #experiences = sort_experiences(experiences, customer, preference)
     month_in_advance = 1
 
     for experience in experiences:
+        experience.popularity=0
         #new requirement: if the guest_number is smaller than the min value, increase the price per person instead of excluding the experience
         if guest_number is not None and (experience.guest_number_max < int(guest_number) or int(guest_number) <= 0):
             continue
@@ -3211,6 +3212,14 @@ def custom_itinerary(request, id=None, operation=None):
                 itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer, currency, skip_availability=True)
 
                 #get flight, transfer, ...
+                city_list = str(city).split(",")
+                context['flight'] = []
+                context['transfer'] = []
+                context['accommodation'] = []
+                context['restaurant'] = []
+                context['suggestion'] = []
+                context['pricing'] = []
+                print(datetime.now())
                 pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]).order_by('-id')
                 for pd in pds:
                     information = pd.get_information(settings.LANGUAGES[0][0])
@@ -3225,12 +3234,20 @@ def custom_itinerary(request, id=None, operation=None):
                         pd.price_max = convert_currency(pd.price_max, pd.currency, request.session["custom_currency"])
                         pd.fixed_price_min = convert_currency(pd.fixed_price_min, pd.currency, request.session["custom_currency"])
                         pd.fixed_price_max = convert_currency(pd.fixed_price_max, pd.currency, request.session["custom_currency"])
-                context['flight'] = [e for e in pds if e.type == 'Flight' and e.city in str(city).split(",")]
-                context['transfer'] = [e for e in pds if e.type == 'Transfer' and e.city in str(city).split(",")]
-                context['accommodation'] = [e for e in pds if e.type == 'Accommodation' and e.city in str(city).split(",")]
-                context['restaurant'] = [e for e in pds if e.type == 'Restaurant' and e.city in str(city).split(",")]
-                context['suggestion'] = [e for e in pds if e.type == 'Suggestion' and e.city in str(city).split(",")]
-                context['pricing'] = [e for e in pds if e.type == 'Pricing' and e.city in str(city).split(",")]
+                    if pd.city in city_list:
+                        if pd.type == 'Flight':
+                            context['flight'].append(pd)
+                        if pd.type == 'Transfer':
+                            context['transfer'].append(pd)
+                        if pd.type == 'Accommodation':
+                            context['accommodation'].append(pd)
+                        if pd.type == 'Restaurant':
+                            context['restaurant'].append(pd)
+                        if pd.type == 'Suggestion':
+                            context['suggestion'].append(pd)
+                        if pd.type == 'Pricing':
+                            context['pricing'].append(pd)
+                print(datetime.now())
                 context["adult_number"] = adult_number
                 context["children_number"] = children_number
                 return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)
