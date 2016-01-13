@@ -644,6 +644,8 @@ $(function(){
 
         mixpanel.track("changed number of people");
     })
+
+    // API BOOKING BOX LOGIC
     {% if experience.type != "PublicProduct" and experience.type != "PrivateProduct" and experience.type != 'ITINERARY' and experience.type != 'PRIVATE' and experience.type != 'PUBLIC' %}
     $('.option-amount').on('change', function() {
       $('.collapse').each(function() {
@@ -655,14 +657,14 @@ $(function(){
           var amount = parseInt($option.find('.option-amount').val());
           total += (price * amount);
         });
-        $optionGroup.prev().find('.badge').text("$" + total);
+        $optionGroup.prev().find('.badge').text("{{experience.dollarsign}}" + total);
       });
       $('#id_submit_request').val(function() {
         var total = 0;
         $('.badge').each(function() {
             total += parseInt($(this).text().replace(/\D/g,''));
         })
-        return ("Request " + "(total price of $" + total + ")");
+        return ("Request " + "(total price of {{experience.dollarsign}}" + total + "{{experience.currency}})");
       })
     });
     {% endif %}

@@ -1037,6 +1037,10 @@ class ExperienceDetailView(DetailView):
                 experience.refund_policy = t.refund_policy
                 experience.whatsincluded = t.whatsincluded
                 experience.notice = t.notice
+                experience.service = t.service
+                experience.location = t.location
+                experience.background_info = t.background_info
+                experience.schedule = t.schedule
 
         if experience.commission >= 0.0:
             experience.commission = round(experience.commission/(1-experience.commission),3)+1
