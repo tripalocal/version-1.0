@@ -38,6 +38,7 @@ import collections
 from django.db.models import Q
 from experiences.utils import *
 from copy import deepcopy
+from import_from_partners.utils import *
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -948,8 +949,12 @@ class ExperienceDetailView(DetailView):
         context['experience_city'] = dict(Location).get(experience.city)
 
         if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
-            #TODO, (1) get availability from the partner's API; (2) set retail_price, price for OptionItem
-            available_date = getAvailableOptions(experience, available_options, available_date)
+            for i in range(4): #7 days per time
+                now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2+i*7)
+                now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
+                now_string = now_string[:-2] + ":" + now_string[-2:]
+                original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
+                available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
         else:
             available_date = getAvailableOptions(experience, available_options, available_date)
 
