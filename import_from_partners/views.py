@@ -8,30 +8,31 @@ from experiences.models import NewProduct, NewProductI18n, Provider, OptionGroup
 from experiences.views import saveExperienceImage
 from io import BytesIO
 from Tripalocal_V1 import settings
+from xml.etree import ElementTree
 
 PARTNER_IDS = {"experienceoz":"001"}
 
 SOAP_REQUEST_AVAILABILITY = \
-'''<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-    <soap:Header>
-        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" 
-        xmlns:wsu="http://docs.oasisopen.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-        soap:mustUnderstand="1">
-            <wsse:UsernameToken wsu:Id="UsernameToken-3">
-                <wsse:Username>tripalocalapi</wsse:Username>
-                <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">JpwBSYJqzpU7UG7K</wsse:Password>
-            </wsse:UsernameToken>
-        </wsse:Security>
-    </soap:Header>
-    <soap:Body>
-        <ns2:getAvailability xmlns:ns2="http://experienceoz.com.au/">
-            <AvailabilityRequest>
+''' <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Header>
+            <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+		    xmlns:wsu="http://docs.oasisopen.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+            soap:mustUnderstand="1">
+                <wsse:UsernameToken wsu:Id="UsernameToken-3">
+                    <wsse:Username>tripalocal</wsse:Username>
+                    <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">okmnji</wsse:Password>
+                </wsse:UsernameToken>
+            </wsse:Security>
+        </soap:Header>
+        <soap:Body>
+          <ns2:GetAvailability xmlns:ns2="https://experienceoz.com.au/">
+             <AvailabilityRequest>
                 <ProductId>{product_id}</ProductId>
                 <StartDate>{start_date}</StartDate>
-            </AvailabilityRequest>
-        </ns2:getAvailability>
-    </soap:Body>
-</soap:Envelope>
+             </AvailabilityRequest>
+          </ns2:GetAvailability>
+        </soap:Body>
+    </soap:Envelope>
 '''
 
 def convert_location(city):
@@ -89,8 +90,8 @@ def import_experienceoz_products(request):
                     now = pytz.timezone(np.get_timezone()).localize(datetime.now())
                     now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
                     now_string = now_string[:-2] + ":" + now_string[-2:]
-                    #check_experienceoz_availability(product['id'], now_string)
-                    #continue
+                    check_experienceoz_availability(product['id'], now_string)
+                    continue
                 else:
                     np = NewProduct()
                     np.id = pid
@@ -112,40 +113,40 @@ def import_experienceoz_products(request):
                         np.suppliers.add(operator)
                         np.save()
 
-                npi18n = np.newproducti18n_set.all()
-                if len(npi18n) > 0 and npi18n[0].language == target_language:
-                    npi18n = npi18n[0]
-                else:
-                    npi18n = NewProductI18n()
-                npi18n.language = target_language
-                npi18n.title = product['name'] if product['name'] else ""
-                npi18n.background_info = product['urlSegment'] if product['urlSegment'] else ""
-                np.book_in_advance = product['bookingRequired']
-                if product['bookingNotesRequired']:
-                    npi18n.ticket_use_instruction = product['bookingNotesPlaceholder'] if product['bookingNotesPlaceholder'] else ""
-                npi18n.description = product['description'] if product['description'] else ""
-                npi18n.combination_options = product['productOptionGroups'] if product['productOptionGroups'] else ""
-                npi18n.service = product['moreInfo'] if product['moreInfo'] else ""
-                npi18n.notice = product['hotDealMessage'] if product['hotDealMessage'] else ""
-                npi18n.location = product['primaryRegionUrl'] if product['primaryRegionUrl'] else ""
+                    npi18n = np.newproducti18n_set.all()
+                    if len(npi18n) > 0 and npi18n[0].language == target_language:
+                        npi18n = npi18n[0]
+                    else:
+                        npi18n = NewProductI18n()
+                    npi18n.language = target_language
+                    npi18n.title = product['name'] if product['name'] else ""
+                    npi18n.background_info = product['urlSegment'] if product['urlSegment'] else ""
+                    np.book_in_advance = product['bookingRequired']
+                    if product['bookingNotesRequired']:
+                        npi18n.ticket_use_instruction = product['bookingNotesPlaceholder'] if product['bookingNotesPlaceholder'] else ""
+                    npi18n.description = product['description'] if product['description'] else ""
+                    npi18n.combination_options = product['productOptionGroups'] if product['productOptionGroups'] else ""
+                    npi18n.service = product['moreInfo'] if product['moreInfo'] else ""
+                    npi18n.notice = product['hotDealMessage'] if product['hotDealMessage'] else ""
+                    npi18n.location = product['primaryRegionUrl'] if product['primaryRegionUrl'] else ""
 
-                npi18n.product = np
-                npi18n.save()
+                    npi18n.product = np
+                    npi18n.save()
 
-                for group in npi18n.combination_options:
-                    try:
-                        og = OptionGroup.objects.get(original_id=group.get("id"))
-                        og.name = group.get("groupName")
-                    except OptionGroup.DoesNotExist:
-                        og = OptionGroup(product = np, name = group.get("groupName"), language = target_language, original_id = group.get("id"))
-                    og.save()
-                    for option in group.get("productOptions"):
+                    for group in npi18n.combination_options:
                         try:
-                            oi = OptionItem.objects.get(original_id=option.get("id"))
-                            oi.name = option.get("name")
-                        except OptionItem.DoesNotExist:
-                            oi = OptionItem(group = og, name = option.get("name"), price = 0, retail_price = 0, original_id = option.get("id"))
-                        oi.save()
+                            og = OptionGroup.objects.get(original_id=group.get("id"))
+                            og.name = group.get("groupName")
+                        except OptionGroup.DoesNotExist:
+                            og = OptionGroup(product = np, name = group.get("groupName"), language = target_language, original_id = group.get("id"))
+                        og.save()
+                        for option in group.get("productOptions"):
+                            try:
+                                oi = OptionItem.objects.get(original_id=option.get("id"))
+                                oi.name = option.get("name")
+                            except OptionItem.DoesNotExist:
+                                oi = OptionItem(group = og, name = option.get("name"), price = 0, retail_price = 0, original_id = option.get("id"))
+                            oi.save()
 
                 #extension = "." + product['image'].split(".")[-1]
                 #response = requests.get(product['image'])
@@ -240,8 +241,6 @@ def check_experienceoz_availability(product_id, start_date):
     }
     body = SOAP_REQUEST_AVAILABILITY.format(**form_kwargs)
 
-    #body = body.encode('utf-8')
-
     headers = {"Accept": "application/soap+xml, multipart/related, text/*", 
                "Content-Type": "text/xml; charset=UTF-8",
                "Content-Length": str(len(body)),
@@ -251,15 +250,25 @@ def check_experienceoz_availability(product_id, start_date):
                              headers = headers,
                              data = body)
 
-    response = response
-    #request = http.client.HTTPConnection(server_addr)
-    #request.putrequest("GET", service_action)
-    #request.putheader("Accept", "application/soap+xml, application/dime, multipart/related, text/*")
-    #request.putheader("Content-Type", "text/xml; charset=utf-8")
-    #request.putheader("Cache-Control", "no-cache")
-    #request.putheader("Pragma", "no-cache")
-    #request.putheader("SOAPAction", service_action)
-    #request.putheader("Content-Length", str(len(body)))
-    #request.endheaders()
-    #request.send(body)
-    #response = request.getresponse().read()
+    if response.status_code == 200:
+        tree = ElementTree.fromstring(response.text)
+        for e in tree.findall('.//Availability'):
+            d = e[0].text
+            s = e[1].text
+            if s == 'Available':
+                option_groups = e[2].findall('.//ProductOptionGroup')
+                for op in option_groups:
+                    op_id = op.get("id")
+                    op_name = op[0].text
+                    option_items = op.findall(".//ProductOption")
+                    for oi in option_items:
+                        oi_id = oi.get("id")
+                        oi_name = oi[0].text
+                        price = float(oi[1].text)
+                        try:
+                            existing_oi = OptionItem.objects.get(original_id=oi.get("id"))
+                            if existing_oi.price != price:
+                                existing_oi.price = price
+                                existing_oi.save()
+                        except OptionItem.DoesNotExist:
+                            pass
