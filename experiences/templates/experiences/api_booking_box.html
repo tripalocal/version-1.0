@@ -46,7 +46,7 @@
     {% if user.is_authenticated %}
         <input id="id_submit_request" type="submit" class="btn-block btn btn-lg btn-primary" value="{% trans "Request" %}" disabled='disabled'/>
     {% else %}
-        <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
+        <input type="button" class="btn-block btn btn-lg btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
     {% endif %}
   </form>
 </div>
