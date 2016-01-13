@@ -47,14 +47,20 @@
     <div class="box-section" style="padding-top:0;">
       <p style="display:inline; margin-right:10px;">{% trans "Date" %}</p>
       {{form.date}}
-      <span class="weather"></span>
+      <span class="weather" id="weather"></span>
+    </div>
+
+    <div style="display:none;">
+      {{form.time}}
+      {{form.adult_number}}
+      {{form.child_number}}
     </div>
 
     {% for options in experience.optiongroup_set.all %}
     <div class="box-section">
       <a class="collapse-group-toggle" role="button" data-toggle="collapse" href="#option-group-{{forloop.counter}}" onclick="$('.collapse').collapse('hide'); $('#option-group-{{forloop.counter}}').collapse('show');">
-        + {{options.name}}
-        <span class="badge">0</span>
+        {{options.name}}
+        <span class="badge">+</span>
       </a>
       <div class="collapse" id="option-group-{{forloop.counter}}">
           {% for option in options.optionitem_set.all %}

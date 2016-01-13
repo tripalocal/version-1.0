@@ -662,11 +662,12 @@ $(function(){
       $('#id_submit_request').val(function() {
         var total = 0;
         $('.badge').each(function() {
-            total += parseInt($(this).text().replace(/\D/g,''));
+            total += parseInt($(this).text().replace(/\D/g,'0'));
         })
         return ("Request " + "(total price of {{experience.dollarsign}}" + total + "{{experience.currency}})");
       })
     });
+    //var time = new Date($(this).val()).getTime() / 1000;
     {% endif %}
 })
 

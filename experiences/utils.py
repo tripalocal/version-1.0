@@ -1,4 +1,4 @@
-import os, pytz, string, random, decimal
+import os, pytz, string, random, decimal, requests
 
 from Tripalocal_V1 import settings
 from unionpay.util.helper import load_config
@@ -82,3 +82,8 @@ def email_account_generator(size=10, chars=string.ascii_lowercase + string.digit
 def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
+
+def get_weather(lat, lon, time):
+    api_address = "https://api.forecast.io/forecast/0a73fa455425979752f12c2afe2441ba/" + str(lat) + "," + str(lon) + "," + str(time)
+    payload = {'units': 'si', 'exclude': 'currently,minutely,hourly,alerts,flags'}
+    r = requests.get(api_address, params=payload)
