@@ -3223,7 +3223,7 @@ def custom_itinerary(request, id=None, operation=None):
                 context['restaurant'] = []
                 context['suggestion'] = []
                 context['pricing'] = []
-                print(datetime.now())
+                
                 pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]).order_by('-id')
                 for pd in pds:
                     information = pd.get_information(settings.LANGUAGES[0][0])
@@ -3251,7 +3251,6 @@ def custom_itinerary(request, id=None, operation=None):
                             context['suggestion'].append(pd)
                         elif pd.type == 'Pricing':
                             context['pricing'].append(pd)
-                print(datetime.now())
                 context["adult_number"] = adult_number
                 context["children_number"] = children_number
                 return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)

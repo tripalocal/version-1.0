@@ -102,12 +102,17 @@ class Experience(AbstractExperience):
         return str(self.id) + '--' + t + '--' + s + '--' + c
 
     def get_information(self, language):
-        if hasattr(self, "experiencei18n_set") and self.experiencei18n_set is not None and len(self.experiencei18n_set.all()) > 0:
-            t = self.experiencei18n_set.filter(language=language)
-            if len(t)>0:
-                return t[0]
+        if self.experiencei18n_set is not None:
+            all = self.experiencei18n_set.all()
+            if len(all) > 0:
+                for i in all:
+                    if i.language == language:
+                        return i
+                return all[0]
             else:
-                return self.experiencei18n_set.all()[0]
+                new = ExperienceI18n(experience = self, language = settings.LANGUAGES[0][0])
+                new.save()
+                return new
         else:
             new = ExperienceI18n(experience = self, language = settings.LANGUAGES[0][0])
             new.save()
@@ -134,7 +139,7 @@ class Experience(AbstractExperience):
     def get_tags(self, language):
         tags = []
 
-        if self.tags is not None and len(self.tags.all()) > 0:
+        if self.tags is not None:
             t = self.tags.filter(language=language)
             for i in range(len(t)):
                 tags.append(t[i].tag)
@@ -235,12 +240,17 @@ class NewProduct(AbstractExperience):
         return str(self.id) + '--' + t
 
     def get_information(self, language):
-        if hasattr(self, "newproducti18n_set") and self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
-            t = self.newproducti18n_set.filter(language=language)
-            if len(t)>0:
-                return t[0]
+        if self.newproducti18n_set is not None:
+            all = self.newproducti18n_set.all()
+            if len(all) > 0:
+                for i in all:
+                    if i.language == language:
+                        return i
+                return all[0]
             else:
-                return self.newproducti18n_set.all()[0]
+                new = NewProductI18n(product = self, language = settings.LANGUAGES[0][0])
+                new.save()
+                return new
         else:
             new = NewProductI18n(product = self, language = settings.LANGUAGES[0][0])
             new.save()
@@ -249,7 +259,7 @@ class NewProduct(AbstractExperience):
     def get_tags(self, language):
         tags = []
 
-        if self.tags is not None and len(self.tags.all()) > 0:
+        if self.tags is not None:
             t = self.tags.filter(language=language)
             for i in range(len(t)):
                 tags.append(t[i].tag)
