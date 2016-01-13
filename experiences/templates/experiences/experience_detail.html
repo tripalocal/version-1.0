@@ -657,7 +657,11 @@ $(function(){
           var amount = parseInt($option.find('.option-amount').val());
           total += (price * amount);
         });
-        $optionGroup.prev().find('.badge').text("{{experience.dollarsign}}" + total);
+        if (total > 0) {
+          $optionGroup.prev().find('.badge').text("{{experience.dollarsign}}" + total);
+        } else {
+          $optionGroup.prev().find('.badge').text("+");
+        }
       });
       $('#id_submit_request').val(function() {
         var total = 0;
