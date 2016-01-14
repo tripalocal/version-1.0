@@ -669,30 +669,36 @@ $(function(){
       })
     });
 
-    $('#start_date').on('change', function() {
+    $('#id_date').on('change', function() {
         var time = new Date($(this).val()).getTime() / 1000;
+        {% if coordinates %}
+        var lat = {{coordinates.0.1}};
+        var lon = {{coordinates.0.2}};
+        {% else %}
+        var lat = -37.814107;
+        var lon = 144.963280
+        {% endif %}
         $.ajax({
             url: '/service_weather',
             type: 'GET',
             dataType: 'json',
             data: {
                 'time': time,
-                'lat' : '{{coordinates.0.0}}',
-                'lon' : '{{coordinates.0.1}}'
+                'lat' : lat,
+                'lon' : lon
             },
         })
-        .done(function(result) {
-            console.log("get weather: success");
-            forecast = JSON.parse(result);
+        .done(function(forecast) {
             var icon = forecast.daily.data[0].icon;
-            var min = forecast.daily.data[0].temperatureMin;
-            var max = forecast.daily.data[0].temperatureMax;
+            var min = parseInt(forecast.daily.data[0].temperatureMin);
+            var max = parseInt(forecast.daily.data[0].temperatureMax);
+            //debug console.log("weather: " + min + "-" + max + " " + icon);
             $('.weather').html(min + '-' + max + '&deg;C <i class="wi wi-forecast-io-' + icon + '"></i>');
         })
         .fail(function() {
             console.log("get weather: error");
         });
-    })
+    });
     {% endif %}
 })
 

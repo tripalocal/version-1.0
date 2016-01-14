@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden, HttpResponseNotAllowed, JsonResponse
 import json, pytz, xlrd, re, os, subprocess, math, logging, ast
 from django.contrib.auth.models import User
 from datetime import *
@@ -1515,8 +1515,10 @@ def service_update_session(request):
 def service_weather(request):
     try:
         data = request.GET
+        #debug print(data)
         response = get_weather(data['lat'], data['lon'], data['time'])
+        #debug print(response)
     except Exception as err:
         response = { 'success': False }
-    return HttpResponse(json.dumps(response), content_type="application/json")
+    return JsonResponse(response)
         
