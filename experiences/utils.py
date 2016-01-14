@@ -87,3 +87,8 @@ def get_weather(lat, lon, time):
     api_address = "https://api.forecast.io/forecast/0a73fa455425979752f12c2afe2441ba/" + str(lat) + "," + str(lon) + "," + str(time)
     payload = {'units': 'si', 'exclude': 'currently,minutely,hourly,alerts,flags'}
     r = requests.get(api_address, params=payload)
+    if r.status_code is requests.codes.ok:
+        return r.json()
+    else:
+        r.raise_for_status()
+

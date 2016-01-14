@@ -1509,4 +1509,14 @@ def service_update_session(request):
     except Exception as err:
         response={'success':False}
     return HttpResponse(json.dumps(response),content_type="application/json")
+
+@api_view(['GET'])
+@csrf_exempt
+def service_weather(request):
+    try:
+        data = request.GET
+        response = get_weather(data['lat'], data['lon'], data['time'])
+    except Exception as err:
+        response = { 'success': False }
+    return HttpResponse(json.dumps(response), content_type="application/json")
         

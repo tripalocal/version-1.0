@@ -122,6 +122,7 @@ urlpatterns = patterns('',
     url(r'^service_update_session/$', 'experiences.resource.service_update_session'),
     url(r'^service_all_products/$', 'experiences.resource.service_all_products'),
     url(r'^update_files/$', 'experiences.resource.update_files'),
+    url(r'^service_weather/$', 'experiences.resource.service_weather', name='service_wishlist'),
 
     url(r'^custom_admin/$', staff_member_required(ItineraryView.as_view()), name='custom_admin_index'),
     url(r'^custom_admin/booking$', staff_member_required(BookingView.as_view()), name='admin_booking'),

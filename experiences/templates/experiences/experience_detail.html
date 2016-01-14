@@ -15,6 +15,7 @@
     {% endif %}
     <!--<link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">-->
     <link href="{% static 'experiences/content/experience-detail.css' %}" rel="stylesheet">
+    <link href="{% static 'experiences/content/weather-icons.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -302,11 +303,13 @@ $(function(){
       {% endif %}
     }
 
+    // UNNECESSARY?
     if($("#div_experience_activity").text().length>0)
     {
        $("#div_experience_activity")[0].innerHTML = $("#div_experience_activity")[0].innerHTML.replace(/&lt;strong&gt;/g,"<strong>").replace(/&lt;\/strong&gt;/g,"</strong>");
     }
 
+    // UNNECESSARY?
     ids=['host_bio','id_experience_activity','id_experience_dress','id_experience_description']
     for(var i=0;i<ids.length;i++)
     {
@@ -368,12 +371,6 @@ $(function(){
 
     $("#id_submit_request").bind("click", function(e) {
         e.preventDefault();
-        {% if LANGUAGE != "zh-CN" %}
-        //mixpanel.track("Clicked on \"Request\"");
-        {% else %}
-        //mixpanel.track("Clicked on \"Request\"_cn");
-        {% endif %}
-
         if(is_form_valid())
         {
             $("#experience_booking_form").submit();
@@ -671,7 +668,31 @@ $(function(){
         return ("Request " + "(total price of {{experience.dollarsign}}" + total + "{{experience.currency}})");
       })
     });
-    //var time = new Date($(this).val()).getTime() / 1000;
+
+    $('#start_date').on('change', function() {
+        var time = new Date($(this).val()).getTime() / 1000;
+        $.ajax({
+            url: '/service_weather',
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                'time': time,
+                'lat' : '{{coordinates.0.0}}',
+                'lon' : '{{coordinates.0.1}}'
+            },
+        })
+        .done(function(result) {
+            console.log("get weather: success");
+            forecast = JSON.parse(result);
+            var icon = forecast.daily.data[0].icon;
+            var min = forecast.daily.data[0].temperatureMin;
+            var max = forecast.daily.data[0].temperatureMax;
+            $('.weather').html(min + '-' + max + '&deg;C <i class="wi wi-forecast-io-' + icon + '"></i>');
+        })
+        .fail(function() {
+            console.log("get weather: error");
+        });
+    })
     {% endif %}
 })
 
