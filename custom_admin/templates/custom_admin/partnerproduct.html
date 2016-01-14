@@ -31,6 +31,9 @@
                 </th>
                 <th scope="col">ID</th>
                 <th scope="col">Product Name</th>
+                <th scope="col">RTP</th>
+                <th scope="col">Sales</th>
+                <th scope="col">Tripalocal</th>
                 <th scope="col">Commission</th>
                 <th scope="col">Status</th>
                 <th scope="col">Type</th>
@@ -52,6 +55,9 @@
                 <td><p><a href="https://www.tripalocal.com/experience/{{experience.id}}" target="_blank">{{experience.title_en}}</a></p>
                     <p><a href="https://www.tripalocal.com.cn/experience/{{experience.id}}" target="_blank">{{experience.title_cn}}</a></p>
                 </td>
+                <td>{{experience.rtp}}</td>
+                <td>{{experience.sale}}</td>
+                <td>{{experience.price}}</td>
                 <td id="td-commission-{{experience.id}}">
                     <p>{% widthratio experience.commission 1 100 %}%</p>
                     <input id="input-commission-{{experience.id}}"/>

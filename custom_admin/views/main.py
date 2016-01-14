@@ -162,6 +162,27 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
             exp.title_en = exp.get_information("en").title
             exp.title_cn = exp.get_information("cn").title
             exp.host = exp.get_host()
+
+            rtp_min = 10000000
+            rtp_max = 0
+            sale_min = 10000000
+            sale_max = 0
+            for og in exp.optiongroup_set.all():
+                for oi in og.optionitem_set.all():
+                    if oi.retail_price < rtp_min:
+                        rtp_min = oi.retail_price
+                    elif oi.retail_price > rtp_max:
+                        rtp_max = oi.retail_price
+                    if oi.price < sale_min:
+                        sale_min = oi.price
+                    elif oi.price > sale_max:
+                        sale_max = oi.price
+            if rtp_min > rtp_max:
+                rtp_min = rtp_max
+            if sale_min > sale_max:
+                sale_min = sale_max
+            exp.rtp = (rtp_min, rtp_max)
+            exp.sale = (sale_min, sale_max)
             if not isEnglish(exp.title_cn):
                 old_index = context['partnerproduct_list'].index(exp)
                 context['partnerproduct_list'].insert(new_index, context['partnerproduct_list'].pop(old_index))
