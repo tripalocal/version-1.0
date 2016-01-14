@@ -689,11 +689,15 @@ $(function(){
             },
         })
         .done(function(forecast) {
-            var icon = forecast.daily.data[0].icon;
-            var min = parseInt(forecast.daily.data[0].temperatureMin);
-            var max = parseInt(forecast.daily.data[0].temperatureMax);
-            //debug console.log("weather: " + min + "-" + max + " " + icon);
-            $('.weather').html(min + '-' + max + '&deg;C <i class="wi wi-forecast-io-' + icon + '"></i>');
+            if (forecast.hasOwnProperty('daily')) {
+                var icon = forecast.daily.data[0].icon;
+                var min = parseInt(forecast.daily.data[0].temperatureMin);
+                var max = parseInt(forecast.daily.data[0].temperatureMax);
+                //debug console.log("weather: " + min + "-" + max + " " + icon);
+                $('.weather').html(min + '-' + max + '&deg;C <i class="wi wi-forecast-io-' + icon + '"></i>');
+            } else {
+                $('.weather').html('-- &deg;C <i class="wi wi-forecast-io-clear-day"></i>');
+            }
         })
         .fail(function() {
             console.log("get weather: error");

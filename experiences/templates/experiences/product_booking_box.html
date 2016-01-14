@@ -42,7 +42,6 @@
         <p>{%if experience.duration < 24 %}{{experience.duration}}{% trans " hour" %}{%else%}{{experience.duration|intdiv:24|floatformat:"0"}}{% trans " day" %}{%endif%}
            {% if experience.type == "PublicProduct"%}{% trans ' Public Tour' %}{% else %}{% trans ' Private Tour' %}{% endif %}</p>
     </div>
-    <div class="weather"></div>
     <div style="padding-top:10px; padding-bottom:10px; border-bottom:1px solid #ccc;">
         <label style="vertical-align:top; margin-right:5px;">{{experience.dollarsign}}{{experience.currency}}</label><span id="experience_price">{{ experience.price|floatformat|mul:experience.commission|floatformat:"0" }}</span><label style="vertical-align:top; margin-left:5px;"> {% trans "per person" %}</label>
     </div>
