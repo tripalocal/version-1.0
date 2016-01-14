@@ -21,6 +21,10 @@
 {% block content %}
 
 {% if expired == None and listed == None %}
+    {% for field in form.hidden_fields %}
+        {{ field }}
+    {% endfor %}
+
     {%if host_only_expired %}
     <p style="postion:relative;top:50px;">{% trans "The experience has expired. Only you can see it now." %}</p>
     {%endif%}
