@@ -649,6 +649,7 @@ $(function(){
     // API BOOKING BOX LOGIC
     {% if experience.type != "PublicProduct" and experience.type != "PrivateProduct" and experience.type != 'ITINERARY' and experience.type != 'PRIVATE' and experience.type != 'PUBLIC' %}
     $('.option-amount').on('change', function() {
+        // Price update
       $('.collapse').each(function() {
         var $optionGroup = $(this);
         var total = 0;
@@ -664,13 +665,14 @@ $(function(){
           $optionGroup.prev().find('.badge').text("+");
         }
       });
+      // Total price update
       $('#id_submit_request').val(function() {
         var total = 0;
         $('.badge').each(function() {
             total += parseInt($(this).text().replace(/\D/g,'0'));
         })
         return ("Request " + "(total price of {{experience.dollarsign}}" + total + "{{experience.currency}})");
-      })
+      });
     });
 
     $('#id_date').on('change', function() {
@@ -680,7 +682,7 @@ $(function(){
         var lon = {{coordinates.0.2}};
         {% else %}
         var lat = -37.814107;
-        var lon = 144.963280
+        var lon = 144.963280;
         {% endif %}
         $.ajax({
             url: '/service_weather',
@@ -707,6 +709,7 @@ $(function(){
             console.log("get weather: error");
         });
     });
+    
     {% endif %}
 })
 
