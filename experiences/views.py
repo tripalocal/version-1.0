@@ -879,7 +879,7 @@ class ExperienceDetailView(DetailView):
 
             adult_number = int(form.data['adult_number'])
             child_number = int(form.data['child_number'])
-            subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number)
+            subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number, extra_information=form.data['booking_extra_information'])
 
             COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
             return render(request, 'experiences/experience_booking_confirmation.html',

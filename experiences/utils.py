@@ -32,10 +32,11 @@ def convert_currency(price, current_currency, target_currency, conversion=None):
         conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
     return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
 
-def get_total_price(experience, guest_number=0, adult_number=0, child_number=0):
+def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, extra_information=None):
     '''
     return total price, not including commission or service fee
     either use guest_number, or adult_number + child_number, the latter has a higher priority
+    extra_information: for experienceoz products, it indicates which optionitem is chosen
     '''
     if type(guest_number) != int or guest_number < 0:
         guest_number = 0
