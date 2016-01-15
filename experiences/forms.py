@@ -529,7 +529,7 @@ class CCExpField(forms.MultiValueField):
             return date(year, month, day)
         return None
 
-def check_coupon(coupon, experience_id, adult_number, child_number=None, target_currency=None):
+def check_coupon(coupon, experience_id, adult_number, child_number=None, target_currency=None, extra_information=None):
 
     rules = json.loads(coupon.rules)
     adult_number = int(adult_number)
@@ -561,7 +561,7 @@ def check_coupon(coupon, experience_id, adult_number, child_number=None, target_
 
     #not free:
     experience = AbstractExperience.objects.get(id = experience_id)
-    subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number)
+    subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number, extra_information = extra_information)
 
     COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
     if extra_fee == 0.00:
@@ -659,7 +659,8 @@ class BookingConfirmationForm(forms.Form):
                                        start_datetime__lt = bk_dt)
 
             if len(cp)>0:
-                valid = check_coupon(cp[0], experience.id, self.cleaned_data['adult_number'] + self.cleaned_data['child_number'])
+                valid = check_coupon(cp[0], experience.id, self.cleaned_data['adult_number'] + self.cleaned_data['child_number'],
+                                     extra_information = self.cleaned_data['booking_extra_information'])
                 if valid['valid']:
                     self.cleaned_data['price_paid'] = valid['new_price']
                     rules = json.loads(cp[0].rules)
@@ -977,7 +978,7 @@ class ItineraryBookingForm(forms.Form):
 
             payment = Payment()
             if not free:
-                subtotal_price = get_total_price(experience, adult_number, child_number)
+                subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number, extra_information=booking_extra_information)
 
                 COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
                 if extra_fee == 0.00:
