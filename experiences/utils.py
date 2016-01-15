@@ -1,4 +1,4 @@
-import os, pytz, string, random, decimal, requests
+import os, pytz, string, random, decimal, requests, json
 
 from Tripalocal_V1 import settings
 from unionpay.util.helper import load_config
@@ -36,8 +36,26 @@ def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, 
     '''
     return total price, not including commission or service fee
     either use guest_number, or adult_number + child_number, the latter has a higher priority
-    extra_information: for experienceoz products, it indicates which optionitem is chosen
+    extra_information: for experienceoz products, it indicates which optionitem is chosen, e.g., {"1243":1, "2344":2}
     '''
+    if extra_information:
+        price = 0
+        i = 0
+        items = json.loads(extra_information)
+        for og in experience.optiongroup_set.all():
+            for oi in og.optionitem_set.all():
+                if str(oi.original_id) in items.keys():
+                    price += oi.price*items.get(str(oi.original_id))
+                    i += 1
+                    if i == len(items.keys()):
+                        break
+            if i == len(items.keys()):
+                break
+        if i == len(items.keys()):
+            return price
+        else:
+            raise ValueError("OptionItem mismatch")
+
     if type(guest_number) != int or guest_number < 0:
         guest_number = 0
     if type(adult_number) != int or adult_number < 0:
