@@ -963,7 +963,7 @@
                     "</p>" +
                   "</div>" +
                 "</div></div>";
-                $("#"+type+"_column").append(new_item);
+                $("#"+type+"_column").prepend(new_item);
                 $("#"+type+"_column").fadeIn();
                 $("#" + type + "-title").val("");
                 $("#" + type + "-details").val("");
@@ -1077,7 +1077,7 @@
           "</p>" +
         "</div>" +
       "</div></div>";
-      $("#"+type+"_column").append(new_item);
+      $("#"+type+"_column").prepend(new_item);
     }
 
 
