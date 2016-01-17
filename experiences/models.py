@@ -547,7 +547,7 @@ class Booking(models.Model):
     children_number = models.IntegerField(null=True, blank=True)
     experience = models.ForeignKey(AbstractExperience)
     whats_included = models.TextField(null=True, blank=True)
-    total_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     datetime = models.DateTimeField()
     status = models.CharField(max_length=50)
     submitted_datetime = models.DateTimeField()
