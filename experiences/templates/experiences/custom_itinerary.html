@@ -318,6 +318,11 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
     <script type="text/javascript">
     cities = {{location_keys|safe}};
+    //the max id of experiences/newproducts, indicating whether or not need to load more
+    MAX = 99999999999;
+    id_min_experience = MAX;
+    id_min_newproduct = MAX;
+    id_min_other = MAX;
 
     $(document).ready(function()
     {
@@ -382,18 +387,55 @@
                                 lastScrollTop[type] = st;
 
                                 if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
-                                    var id = $(this).children().last().attr("class").split(" ")[0].split("_")[2];
+                                    var ids = $(this).children();
+                                    var id_min = MAX;
+                                    for(var i=0;i<ids.length;i++)
+                                    {
+                                        var id=parseInt($(ids[i]).attr("class").split(" ")[0].split("_")[2]);
+                                        if(id < id_min)
+                                        {
+                                            id_min = id;
+                                        }
+                                    }
                                     if(type == "experience")
                                     {
-                                        $("#id_from_id").val(id+"0,0");
+                                        if(id_min_experience != id_min)
+                                        //using "!=" instead of ">" because there are multiuple cities
+                                        {
+                                            $("#id_from_id").val(id_min+"0,0");
+                                            id_min_experience = id_min;
+                                        }
+                                        else
+                                        {
+                                            //reached the end, no need to load more
+                                            return
+                                        }
                                     }
                                     else if (type == "product")
                                     {
-                                        $("#id_from_id").val("0,"+id+",0");
+                                        if(id_min_newproduct != id_min)
+                                        {
+                                            $("#id_from_id").val("0,"+id_min+",0");
+                                            id_min_newproduct = id_min;
+                                        }
+                                        else
+                                        {
+                                            //reached the end, no need to load more
+                                            return
+                                        }
                                     }
                                     else
                                     {
-                                        $("#id_from_id").val("0,0,"+id);
+                                        if(id_min_other != id_min)
+                                        {
+                                            $("#id_from_id").val("0,0,"+id_min);
+                                            id_min_other = id_min;
+                                        }
+                                        else
+                                        {
+                                            //reached the end, no need to load more
+                                            return
+                                        }
                                     }
                                     $("#itinerary_search").click();
                                 }
