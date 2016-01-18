@@ -236,25 +236,24 @@ def search_experience(condition, language="zh", type="experience"):
     result = AbstractExperience.objects.filter(id__in=result)
     return result
 
-def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None, currency=None, skip_availability=False):
+def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None, currency=None, skip_availability=False, from_id=None):
     #city/keywords is a string like A,B,C,
     available_options = []
     start_datetime = start_datetime.replace(hour=2)
     end_datetime = end_datetime.replace(hour=22)
 
-    exp_type = exp_type.lower()
-    if exp_type == 'all':
-        experiences = AbstractExperience.objects.all()
-        experiences = [e for e in experiences if e.status == 'Listed']
-    elif exp_type == 'newproduct':
-        experiences = AbstractExperience.objects.instance_of(NewProduct)
-        experiences = [e for e in experiences if e.status == 'Listed']
+    if not from_id:
+        limit = 9999999999
+        from_id_experience = 9999999999
+        from_id_newprudoct = 9999999999
     else:
-        experiences = AbstractExperience.objects.instance_of(Experience)
-        if exp_type == 'itinerary':
-            experiences = [e for e in experiences if e.status == 'Listed' and e.type == 'ITINERARY']
-        else:
-            experiences = [e for e in experiences if e.status == 'Listed' and e.type != 'ITINERARY']
+        limit=20
+        try:
+            from_id_experience = int(from_id.split(",")[0])
+            from_id_newprudoct = int(from_id.split(",")[1])
+        except Exception as err:
+            from_id_experience = 9999999999
+            from_id_newprudoct = 9999999999
 
     if city is not None and exp_type != 'itinerary':
         city = str(city).lower().split(",")
@@ -266,7 +265,18 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
             for i in range(len(city)):
                 city[i] = dict(Location_reverse).get(city[i]).lower()
 
-        experiences = [e for e in experiences if e.city.lower() in city]
+    exp_type = exp_type.lower()
+    if exp_type == 'all':
+        experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed', city__in=city).order_by('-id'))[:limit] + \
+                      list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed', city__in=city).order_by('-id'))[:limit]
+    elif exp_type == 'newproduct':
+        experiences = list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed').order_by('-id'))[:limit]
+    else:
+        experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed').order_by('-id'))[:limit]
+        if exp_type == 'itinerary':
+            experiences = [e for e in experiences if e.type == 'ITINERARY']
+        else:
+            experiences = [e for e in experiences if e.type != 'ITINERARY']
 
     #experiences = sort_experiences(experiences, customer, preference)
     month_in_advance = 1
@@ -2920,7 +2930,7 @@ def get_experience_score(criteria_dict, experience_tags):
         score += criteria_dict.get(tag, 0)
     return score
 
-def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1, age_limit=1, customer=None, currency=None, skip_availability=False):
+def get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords=None, mobile=False, sort=1, age_limit=1, customer=None, currency=None, skip_availability=False, from_id=None):
     '''
     @sort, 1:most popular, 2:outdoor, 3:urban
     '''
@@ -2940,7 +2950,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
         config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_elderly.yaml').replace('\\', '/')))
         config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_children.yaml').replace('\\', '/')))
 
-    available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords, customer=customer, preference=config, currency=currency, skip_availability=skip_availability)
+    available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords, customer=customer, preference=config, currency=currency, skip_availability=skip_availability, from_id=from_id)
     itinerary = []
     dt = start_datetime
 
@@ -3211,6 +3221,7 @@ def custom_itinerary(request, id=None, operation=None):
                 tags = form.cleaned_data['tags']
                 sort = int(form.cleaned_data['sort'])
                 age_limit = int(form.cleaned_data['age_limit'])
+                from_id = form.cleaned_data['from_id']
 
                 if isinstance(tags, list):
                     tags = ','.join(tags)
@@ -3219,8 +3230,8 @@ def custom_itinerary(request, id=None, operation=None):
 
                 customer = request.user if request.user.is_authenticated() else None
                 currency = request.session['custom_currency'].lower() if hasattr(request, 'session') and 'custom_currency' in request.session else None
-                itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags, False, sort, age_limit, customer, currency, skip_availability=True)
-
+                itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags,
+                                          False, sort, age_limit, customer, currency, skip_availability=True, from_id=from_id)
                 #get flight, transfer, ...
                 city_list = str(city).split(",")
                 context['flight'] = []
@@ -3230,8 +3241,26 @@ def custom_itinerary(request, id=None, operation=None):
                 context['suggestion'] = []
                 context['pricing'] = []
                 
-                pds = NewProduct.objects.filter(type__in=["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]).order_by('-id')
+                try:
+                    from_id = int(from_id.splt(",")[2])
+                except Exception:
+                    from_id = 99999999999
+
+                types = ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]
+                pds = list(NewProduct.objects.filter(id__lt = from_id, type__in=types).order_by('-id'))
+                limit = 10
+                counter = [0, 0, 0, 0, 0, 0]
+                reach_limit = True
                 for pd in pds:
+                    for i in range(len(counter)):
+                        if counter[i] < limit:
+                            reach_limit = False
+                            break
+                    if reach_limit:
+                        break
+                    if counter[types.index(pd.type)]>=limit:
+                        continue
+
                     information = pd.get_information(settings.LANGUAGES[0][0])
                     pd.title = information.title
                     pd.details = information.description
@@ -3247,16 +3276,22 @@ def custom_itinerary(request, id=None, operation=None):
                     if pd.city in city_list:
                         if pd.type == 'Flight':
                             context['flight'].append(pd)
+                            counter[0] += 1
                         elif pd.type == 'Transfer':
                             context['transfer'].append(pd)
+                            counter[1] += 1
                         elif pd.type == 'Accommodation':
                             context['accommodation'].append(pd)
+                            counter[2] += 1
                         elif pd.type == 'Restaurant':
                             context['restaurant'].append(pd)
+                            counter[3] += 1
                         elif pd.type == 'Suggestion':
                             context['suggestion'].append(pd)
+                            counter[4] += 1
                         elif pd.type == 'Pricing':
                             context['pricing'].append(pd)
+                            counter[5] += 1
                 context["adult_number"] = adult_number
                 context["children_number"] = children_number
                 return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)

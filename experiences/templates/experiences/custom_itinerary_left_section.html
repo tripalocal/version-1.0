@@ -9,12 +9,12 @@
             <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
             <input type="text" class="form-control search-keyword">
         </div>
-        <div id="experience_column" style='height:100%;'>
+        <div id="product_column" style='height:100%;'>
             {%for day in itinerary%}
             {% if forloop.first %}
-            <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='overflow-x:hidden;overflow-y:scroll;'>
+            <div id='product_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='overflow-x:hidden;overflow-y:scroll;'>
             {% else %}
-            <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='display:none;'>
+            <div id='product_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='display:none;'>
             {% endif %}
                 {% for experience in day.experiences %}
                 {% if 'product' in experience.type.lower %}

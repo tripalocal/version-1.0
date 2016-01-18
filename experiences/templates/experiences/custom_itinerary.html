@@ -31,6 +31,7 @@
     {{form.children_number}}
     {{form.end_datetime}}
     {{form.cities_string}}
+    {{form.from_id}}
   </div>
   <!-- Top search bar -->
   <div class="basic-search">
@@ -321,6 +322,8 @@
     $(document).ready(function()
     {
         $(".loading").hide();
+        var lastScrollTop = {"experience":0,"product":0,"flight":0,"transfer":0,"accommodation":0,
+                             "suggestion":0,"restaurant":0,"pricing":0};
         if ($("#id_title").val() == "") {
           $("#id_title").val("新路线");
         }
@@ -356,16 +359,45 @@
                             tags: $("#id_tags").val(),
                             all_tags: $("#id_all_tags").val(),
                             sort: $("#id_sort").val(),
-                            age_limit: $("#id_age_limit").val()
+                            age_limit: $("#id_age_limit").val(),
+                            from_id: $("#id_from_id").val(),
                         }
             }).done(function(data){
-                            $('.tab-content').html(data);
+                            append_new_products($('.tab-content'), data);
                             $('.nav-tabs').children().removeClass();
                             $($('.nav-tabs').children()[0]).addClass("active");
                             init_drag(); // Initialize draggable elements
                             filter_experiences(); // Initialize search filter
                             update_dates();
                             update_price_title();
+                            //hook scroll event
+                            $(".column.ui-sortable").scroll(function(e) {
+                                var st = $(this).scrollTop();
+                                var type= $(this).parent().parent()[0].id;
+                                if (st <= lastScrollTop[type]){
+                                    // scroll up
+                                    lastScrollTop[type] = st;
+                                    return
+                                }
+                                lastScrollTop[type] = st;
+
+                                if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                                    var id = $(this).children().last().attr("class").split(" ")[0].split("_")[2];
+                                    if(type == "experience")
+                                    {
+                                        $("#id_from_id").val(id+"0,0");
+                                    }
+                                    else if (type == "product")
+                                    {
+                                        $("#id_from_id").val("0,"+id+",0");
+                                    }
+                                    else
+                                    {
+                                        $("#id_from_id").val("0,0,"+id);
+                                    }
+                                    $("#itinerary_search").click();
+                                }
+                            });
                             $(".loading").hide();
             }).fail(function(jqXHR, textStatus) {
                             $(".loading").hide();
@@ -1301,6 +1333,39 @@
             id = id[id.length-1];
             var city = $($("#city-title-"+id)[0]).attr("city");
             $("#"+type+"-location").val(city);
+        }
+    }
+
+    function append_new_products(existing_result, new_result)
+    {
+        if(existing_result.find(".tab-pane").length == 0)
+        {
+            existing_result.html(new_result);
+            return
+        }
+        new_result = $(new_result);
+        var ids = ["product", "experience", "flight", "transfer", "accommodation", "restaurant", "suggestion", "pricing"];
+
+        for(var i=0;i<ids.length;i++)
+        {
+            var existing_column = $(existing_result.find("#" + ids[i] + "_column")[0]);
+            var new_column = $(new_result.find("#" + ids[i] + "_column")[0]);
+            var existing_days = existing_column.children();
+            var new_days = new_column.children();
+            for(var j=0;j<existing_days.length;j++)
+            {
+                if(existing_days[j].id == new_days[j].id)
+                {
+                    var new_items = $(new_days[j]).children();
+                    for(var k=0;k<new_items.length;k++)
+                    {
+                        if($(existing_days[j]).find("." + new_items[k].className.split(" ")[0]).length == 0)
+                        {
+                            $(existing_days[j]).append($(new_items[k]));
+                        }
+                    }
+                }
+            }
         }
     }
     </script>

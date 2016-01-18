@@ -848,6 +848,7 @@ class CustomItineraryForm(forms.Form):
     cities_string = forms.CharField(required=False)
     sort = forms.ChoiceField(choices=SortBy, required=True)
     age_limit = forms.ChoiceField(choices=AgeLimit, required=True)
+    from_id = forms.CharField(required=True, initial="99999999999,99999999999,99999999999")
 
     def __init__(self, *args, **kwargs):
         super(CustomItineraryForm, self).__init__(*args, **kwargs)
@@ -863,6 +864,8 @@ class CustomItineraryForm(forms.Form):
         self.fields['language'].widget = forms.HiddenInput()
         self.fields['cities_string'].widget.attrs['readonly'] = True
         self.fields['cities_string'].widget = forms.HiddenInput()
+        self.fields['from_id'].widget.attrs['readonly'] = True
+        self.fields['from_id'].widget = forms.HiddenInput()
 
 def schedule_request_reminder_sms(booking_id, host_id, guest_name, schedule_time):
     registered_user = RegisteredUser.objects.get(user_id=host_id)
