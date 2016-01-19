@@ -296,11 +296,10 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
             if v < limit:
                 done_experience = False
                 break
-        if done_experience:
-            for k, v in selected_newproduct.items():
-                if v < limit:
-                    done_newproduct = False
-                    break
+        for k, v in selected_newproduct.items():
+            if v < limit:
+                done_newproduct = False
+                break
 
         if done_experience and done_newproduct:
             return available_options
