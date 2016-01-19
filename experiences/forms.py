@@ -817,8 +817,9 @@ class CustomItineraryRequestForm(forms.Form):
     end_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
     guests_adults = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
     guests_children = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
-    tags = forms.CharField(widget=forms.Textarea, required=False, initial=Tags)
+    guests_infants = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
     budget = forms.ChoiceField(choices=Budget_Range, widget=forms.Select(attrs={'class':'form-control'}), required=True)
+    interests = forms.CharField(required=False)
     whats_included = forms.CharField(widget=forms.TextInput, required=False)
     requirements = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control', 'rows':'5'}), required=False)
     name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
@@ -828,8 +829,11 @@ class CustomItineraryRequestForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(CustomItineraryRequestForm, self).__init__(*args, **kwargs)
         self.fields['destinations'].widget = forms.HiddenInput()
-        self.fields['tags'].widget = forms.HiddenInput()
+        self.fields['start_date'].widget = forms.HiddenInput()
+        self.fields['end_date'].widget = forms.HiddenInput()
+        self.fields['budget'].widget = forms.HiddenInput()
         self.fields['whats_included'].widget = forms.HiddenInput()
+        self.fields['interests'].widget = forms.HiddenInput()
 
 class CustomItineraryForm(forms.Form):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'style':'width:290px;'}), max_length=100, required=False, initial="")

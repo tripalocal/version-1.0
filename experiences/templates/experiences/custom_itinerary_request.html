@@ -10,7 +10,11 @@
 {% endblock %}
 
 {% block content %}
+<div id="skrollr-body">
 <form id="itinerary-request" action="" method="post">
+  {% for field in form.hidden_fields %}
+    {{ field }}
+  {% endfor %}
   <section id="intro">
     <div class="full-height" 
       data-center="background-position: 50% 0px;"
@@ -30,7 +34,7 @@
   </section>
 
   <section id="slide1">
-    <div class="full-height" 
+    <div class="full-height" id="destinations"
       data-0="background-color:rgb(0,0,0);"
       data-500-top="background-color:rgb(252,252,252);"
       data-anchor-target="#slide1">
@@ -43,12 +47,12 @@
           data-anchor-target="#slide1 h2">
           {% trans 'Choose some locations you would like to visit on this trip.' %}
         </h2>
-        <div class="box" style="background-image:url({{MEDIA_URL}}/melbourne/melbourne.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Melbourne' %}</h3></div></div>
-        <div class="box" style="background-image:url({{MEDIA_URL}}/sydney/sydney.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Sydney' %}</h3></div></div>
-        <div class="box" style="background-image:url({{MEDIA_URL}}/goldcoast/goldcoast.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Gold Coast' %}</h3></div></div>
-        <div class="box" style="background-image:url({{MEDIA_URL}}/brisbane/brisbane.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Brisbane' %}</h3></div></div>
-        <div class="box" style="background-image:url({{MEDIA_URL}}/cairns/cairns.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Cairns' %}</h3></div></div>
-        <div class="box" style="background-image:url({{MEDIA_URL}}/tasmania/tasmania.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--100-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Tasmania' %}</h3></div></div>
+        <div class="box" data-city="melbourne" style="background-image:url({{MEDIA_URL}}/melbourne/melbourne.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Melbourne' %}</h3></div></div>
+        <div class="box" data-city="sydney" style="background-image:url({{MEDIA_URL}}/sydney/sydney.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Sydney' %}</h3></div></div>
+        <div class="box" data-city="goldcoast" style="background-image:url({{MEDIA_URL}}/goldcoast/goldcoast.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Gold Coast' %}</h3></div></div>
+        <div class="box" data-city="brisbane" style="background-image:url({{MEDIA_URL}}/brisbane/brisbane.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Brisbane' %}</h3></div></div>
+        <div class="box" data-city="cairns" style="background-image:url({{MEDIA_URL}}/cairns/cairns.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Cairns' %}</h3></div></div>
+        <div class="box" data-city="tasmania" style="background-image:url({{MEDIA_URL}}/tasmania/tasmania.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--100-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Tasmania' %}</h3></div></div>
       </div>
     </div>
   </section>
@@ -59,7 +63,7 @@
       data-center="background-position: 50% 0px;"
       data-top-bottom="background-position: 50% -100px"
       data-anchor-target="#slide2">
-      <div class="container">
+      <div class="container" id="dates">
         <div class="curtain"
           data-bottom-top="opacity: 0"
           data-100-top="height: 1%; top: -10%; opacity: 0;"
@@ -103,7 +107,7 @@
         </div>
         <div class="form-group">
           <label>{% trans 'Infants (< 2)' %}</label>
-          <input class="form-control" type="text" value="0">
+          {{form.guests_infants}}
         </div>
       </div>
     </div>
@@ -160,7 +164,7 @@
         <h2 class="display-dark">{% trans "What's Included" %}</h2>
         <div class="form-group">
           <label>{% trans 'Car + Driver' %}</label>
-          <select class="form-control">
+          <select id="car-driver" class="form-control">
             <option>{% trans 'none' %}</option>
             <option>{% trans 'infrequent' %}</option>
             <option>{% trans 'average' %}</option>
@@ -169,7 +173,7 @@
         </div>
         <div class="form-group">
           <label>{% trans 'Accommodation' %}</label>
-          <select class="form-control">
+          <select id="accommodation" class="form-control">
             <option>{% trans 'none' %}</option>
             <option>{% trans '3 star' %}</option>
             <option>{% trans '4 star' %}</option>
@@ -178,7 +182,7 @@
         </div>
         <div class="form-group">
           <label>{% trans 'National Flight' %}</label>
-          <select class="form-control">
+          <select id="national-flight" class="form-control">
             <option>{% trans 'none' %}</option>
             <option>{% trans 'economy' %}</option>
             <option>{% trans 'business' %}</option>
@@ -194,20 +198,20 @@
       data-bottom-top="background-position: -30px 50%;"
       data-top-bottom="background-position: 10px 50%;"
       data-anchor-target="#slide6">
-      <div class="container"
+      <div class="container" id="contact"
         data-bottom-top="opacity: 0; z-index: -1"
         data--33p-top="opacity: 0; z-index: -1"
         data--66p-top="opacity: 1; z-index: 1"
         data-anchor-target="#slide6">
         <div class="panel panel-default" id="requirements">
           <div class="panel-body">
-            <h3 class="display">{% trans 'Anything else you would like to let us know?' %}</h3>
+            <h3 class="display-dark">{% trans 'Anything else you would like to let us know?' %}</h3>
             {{form.requirements}}
           </div>
         </div>
-        <div class="panel panel-default" id="contact">
+        <div class="panel panel-default">
           <div class="panel-body">
-            <h3 class="display">{% trans 'Almost done! Please leave us your contact details below. A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call.' %}</h3>
+            <h3 class="display-dark">{% trans 'Almost done! Please leave us your contact details below. A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call.' %}</h3>
             <div class="center-form">
               <div class="row">
                 <div class="col-sm-6">
@@ -239,32 +243,12 @@
     </div>
   </section>
 </form>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.js"></script>
 <script type="text/javascript" src="{% static 'app/scripts/skrollr.min.js' %}"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-  var s = skrollr.init();
-  $('#calendar').fullCalendar({
-    aspectRatio: 1.5,
-    selectable: true,
-    header: {
-      left:   'title',
-      center: '',
-      right:  'today prev,next'
-    }
-  });
-  $('.overlay').on('click', function() {
-    $this = $(this);
-    $this.hasClass('selected') ? $this.removeClass('selected') : $this.addClass('selected');
-  });
-  $('.circle').on('click', function() {
-    $this = $(this);
-    $this.hasClass('unselected') ? $this.removeClass('unselected') : $this.addClass('unselected');
-  })
-});
-</script>
+<script type="text/javascript" src="{% static 'experiences/scripts/itinerary-request.js' %}"></script>
 {% endblock %}
