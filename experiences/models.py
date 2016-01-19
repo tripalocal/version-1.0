@@ -234,6 +234,7 @@ class NewProduct(AbstractExperience):
     tags = models.ManyToManyField(ExperienceTag, related_name='newproduct_tags', blank=True)
     partner = models.CharField(max_length=100, blank=True, null=True)
     related_products = models.ManyToManyField("NewProduct", related_name="newproduct_related", blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
 
     def __str__(self):
         t = self.get_information(settings.LANGUAGES[0][0]).title

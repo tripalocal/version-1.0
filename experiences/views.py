@@ -247,7 +247,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         from_id_experience = 9999999999
         from_id_newprudoct = 9999999999
     else:
-        limit=20
+        limit=10
         try:
             from_id_experience = int(from_id.split(",")[0])
             from_id_newprudoct = int(from_id.split(",")[1])
@@ -267,12 +267,12 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
     exp_type = exp_type.lower()
     if exp_type == 'all':
-        experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed', city__in=city).order_by('-id'))[:limit] + \
-                      list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed', city__in=city).order_by('-id'))[:limit]
+        experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed', city__in=city).order_by('-id')) + \
+                      list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed', city__in=city).order_by('-id'))
     elif exp_type == 'newproduct':
-        experiences = list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed').order_by('-id'))[:limit]
+        experiences = list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed').order_by('-id'))
     else:
-        experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed').order_by('-id'))[:limit]
+        experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed').order_by('-id'))
         if exp_type == 'itinerary':
             experiences = [e for e in experiences if e.type == 'ITINERARY']
         else:
@@ -281,7 +281,18 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
     #experiences = sort_experiences(experiences, customer, preference)
     month_in_advance = 1
 
+    selected_experience = 0
+    selected_newproduct = 0
     for experience in experiences:
+        if selected_experience >= limit and selected_newproduct >= limit:
+            return available_options
+
+        if selected_experience >= limit and type(experience) == Experience:
+            continue
+
+        if selected_newproduct >= limit and type(experience) == NewProduct:
+            continue
+
         experience.popularity=0
         #new requirement: if the guest_number is smaller than the min value, increase the price per person instead of excluding the experience
         if guest_number is not None and (experience.guest_number_max < int(guest_number) or int(guest_number) <= 0):
@@ -509,6 +520,11 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
                 sdt += timedelta(days=1)
         experience_avail['dates'] = OrderedDict(sorted(experience_avail['dates'].items(), key=lambda t: t[0]))
         available_options.append(experience_avail)
+        if type(experience) == Experience:
+            selected_experience += 1
+        else:
+            selected_newproduct += 1
+
     return available_options
 
 def experience_availability(request):
