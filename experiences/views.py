@@ -267,7 +267,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
 
     exp_type = exp_type.lower()
     if exp_type == 'all':
-        experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed', city__in=city).order_by('-id')) + \
+        experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed', city__in=city).exclude(type='ITINERARY').order_by('-id')) + \
                       list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed', city__in=city).order_by('-id'))
     elif exp_type == 'newproduct':
         experiences = list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed').order_by('-id'))
@@ -281,16 +281,34 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
     #experiences = sort_experiences(experiences, customer, preference)
     month_in_advance = 1
 
-    selected_experience = 0
-    selected_newproduct = 0
+    #the number of experiences/newproducts selected for each city
+    selected_experience = {}
+    selected_newproduct = {}
+    for i in range(len(city)):
+        if city[i] not in selected_experience:
+            selected_experience[city[i]]=0
+            selected_newproduct[city[i]]=0
+
     for experience in experiences:
-        if selected_experience >= limit and selected_newproduct >= limit:
+        done_experience = True
+        done_newproduct = True
+        for k, v in selected_experience.items():
+            if v < limit:
+                done_experience = False
+                break
+        if done_experience:
+            for k, v in selected_newproduct.items():
+                if v < limit:
+                    done_newproduct = False
+                    break
+
+        if done_experience and done_newproduct:
             return available_options
 
-        if selected_experience >= limit and type(experience) == Experience:
+        if done_experience and type(experience) == Experience:
             continue
 
-        if selected_newproduct >= limit and type(experience) == NewProduct:
+        if done_newproduct and type(experience) == NewProduct:
             continue
 
         experience.popularity=0
@@ -521,9 +539,9 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         experience_avail['dates'] = OrderedDict(sorted(experience_avail['dates'].items(), key=lambda t: t[0]))
         available_options.append(experience_avail)
         if type(experience) == Experience:
-            selected_experience += 1
+            selected_experience[experience.city.lower()] += 1
         else:
-            selected_newproduct += 1
+            selected_newproduct[experience.city.lower()] += 1
 
     return available_options
 
@@ -3263,18 +3281,23 @@ def custom_itinerary(request, id=None, operation=None):
                     from_id = 99999999999
 
                 types = ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]
-                pds = list(NewProduct.objects.filter(id__lt = from_id, type__in=types).order_by('-id'))
+                pds = list(NewProduct.objects.filter(id__lt = from_id, type__in=types, city__in=city_list).order_by('-id'))
                 limit = 10
-                counter = [0, 0, 0, 0, 0, 0]
+                counter = {}
+                for i in range(len(city_list)):
+                    if city_list[i].lower() not in counter:
+                        counter[city_list[i].lower()] = [0, 0, 0, 0, 0, 0]
+
                 reach_limit = True
                 for pd in pds:
-                    for i in range(len(counter)):
-                        if counter[i] < limit:
+                    pd.city=pd.city.strip(" ")
+                    for i in range(len(counter[pd.city.lower()])):
+                        if counter[pd.city.lower()][i] < limit:
                             reach_limit = False
                             break
                     if reach_limit:
                         break
-                    if counter[types.index(pd.type)]>=limit:
+                    if counter[pd.city.lower()][types.index(pd.type)]>=limit:
                         continue
 
                     information = pd.get_information(settings.LANGUAGES[0][0])
@@ -3292,22 +3315,22 @@ def custom_itinerary(request, id=None, operation=None):
                     if pd.city in city_list:
                         if pd.type == 'Flight':
                             context['flight'].append(pd)
-                            counter[0] += 1
+                            counter[pd.city.lower()][0] += 1
                         elif pd.type == 'Transfer':
                             context['transfer'].append(pd)
-                            counter[1] += 1
+                            counter[pd.city.lower()][1] += 1
                         elif pd.type == 'Accommodation':
                             context['accommodation'].append(pd)
-                            counter[2] += 1
+                            counter[pd.city.lower()][2] += 1
                         elif pd.type == 'Restaurant':
                             context['restaurant'].append(pd)
-                            counter[3] += 1
+                            counter[pd.city.lower()][3] += 1
                         elif pd.type == 'Suggestion':
                             context['suggestion'].append(pd)
-                            counter[4] += 1
+                            counter[pd.city.lower()][4] += 1
                         elif pd.type == 'Pricing':
                             context['pricing'].append(pd)
-                            counter[5] += 1
+                            counter[pd.city.lower()][5] += 1
                 context["adult_number"] = adult_number
                 context["children_number"] = children_number
                 return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)

@@ -66,7 +66,7 @@
             <div id='experience_day_{{forloop.counter}}' class='column city_{{day.city|title}}' style='display:none;'>
             {% endif %}
                 {% for experience in day.experiences %}
-                {#{% if 'private' in experience.type.lower %}#}
+                {% if 'private' in experience.type.lower %}
                 <div class='experience_id_{{experience.id}} exp-box-sm experience'>
                     <div class='exp-img'>
                         <img src='{{MEDIA_URL}}thumbnails/experiences/experience{{experience.id}}_1.jpg' alt=""/>
@@ -95,7 +95,7 @@
                         <p>{% trans 'per person' %}</p>
                     </div>
                 </div>
-                {#{% endif %}#}
+                {% endif %}
                 {% endfor %}
             </div>
             {% endfor %}
