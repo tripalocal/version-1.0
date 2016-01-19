@@ -12,6 +12,14 @@
   '../../vendor/animate',
   '../../components/slider';
 
+body {
+  height: auto !important;
+}
+
+.footer {
+  display: none;
+}
+
 // Typography
 h1 {
   font-family: $font-stack-homepage;
@@ -63,6 +71,10 @@ h3 {
   }
 }
 
+.row {
+  text-align: center;
+}
+
 .full-height {
   height: 100vh;
   width: 100%;
@@ -80,6 +92,46 @@ h3 {
   text-align: center;
 }
 
+.form-group {
+  display: inline-block;
+  margin: 20px;
+  min-width: 120px;
+  text-align: left;
+  label {
+    font-weight: 200;
+    font-size: 18px;
+    text-shadow: 0.5px 0.5px 0.5px $light-grey;
+  }
+  select {
+    width: 100%;
+  }
+}
+
+.panel {
+  background-color: rgba(0,0,0,0.75);
+  border: 0;
+  width: 960px;
+  margin: 30px auto;
+  @include card(1);
+  .display {
+    margin: 20px;
+    color: rgba(252,252,252,0.75);
+  }
+  label {
+    color: rgba(252,252,252,0.75);
+    font-weight: 100;
+    text-shadow: none;
+  }
+  input, textarea {
+    background-color: rgba(252,252,252,0.9);
+  }
+}
+
+.center-form {
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+
 #intro .full-height {
   background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('../../img/stars.jpg');
 }
@@ -90,8 +142,50 @@ h3 {
 }
 
 #slide2 .full-height {
-  height: 200vh;
+  height: 150vh;
   background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('../../img/local_culture_lg.jpg');
+}
+
+#slide3 .full-height {
+  height: 300px;
+  background-color: $slate-grey;
+}
+
+#slide4 .full-height {
+  background-color: $off-white;
+}
+
+#slide5 .full-height {
+  height: 300px;
+}
+
+#slide6  .full-height {
+  position: relative;
+  padding-top: 200px;
+  height: 200vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('../../img/homepage/travelling-01.jpg');
+}
+
+#slide6 .container {
+  position:fixed; 
+  bottom:0; 
+  left:0; 
+  opacity: 0;
+  z-index: -1;
+}
+
+#submit-btn {
+  width: 200px;
+  height: 50px;
+  border-radius: 2px;
+  margin: 40px auto;
+  font-weight: 100;
+  font-size: 18px;
+  transition: box-shadow 0.2s;
+  @include card(1);
+  &:hover {
+    @include card(2);
+  }
 }
 
 // Extra components
@@ -144,6 +238,42 @@ h3 {
   }
 }
 
+.circle {
+  display: inline-block;
+  margin: 0 20px;
+  width: 10vw;
+  height: 10vw;
+  border-radius: 100px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 10vw;
+  color: $slate-grey;
+  cursor: pointer;
+  transition: width 0.4s, height 0.4s, line-height 0.4s;
+  @include card(1);
+  @include media('<tablet') {
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+  }
+  @include media('>desktop') {
+    width: 130px;
+    height: 130px;
+    line-height: 130px;
+  }
+  &:hover {
+    width: 12vw;
+    height: 12vw;
+    line-height: 12vw;
+  }
+}
+
+.unselected {
+  background-color: $slate-grey !important;
+  color: $off-white;
+  font-weight: 100;
+}
+
 .curtain {
   width: 300%;
   height: 1px;
@@ -156,8 +286,35 @@ h3 {
 
 .copy {
   position: absolute;
-  bottom: 50%;
-  width: 100%;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  padding: 15px;
+  @include media('>desktop') {
+    width: 60%;
+  }
+}
+
+.full-calendar {
+  padding: 15px;
+  border-radius: 5px;
+  @include card(1);
+  background-color: $off-white;
+  h2 {
+    font-weight: 200;
+    font-size: 24px;
+  }
+  .fc-day-number {
+    padding: 0 10px;
+    color: $slate-grey;
+  }
+  .fc-today {
+    background-color: $pale-grey;
+  }
+  .fc-highlight {
+    background-color: $primary-color;
+  }
 }
 
 .ellipsis i {

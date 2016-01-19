@@ -5,7 +5,7 @@
 
 {% block head %}
   <title>{% trans 'Request a Custom Itinerary' %}</title>
-  <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
+  <link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.css" rel="stylesheet">
   <link href="{% static 'experiences/content/itinerary-request.css' %}" rel="stylesheet"/>
 {% endblock %}
 
@@ -62,29 +62,180 @@
       <div class="container">
         <div class="curtain"
           data-bottom-top="opacity: 0"
-          data-50-top="height: 1%; top: -10%; opacity: 0;"
+          data-100-top="height: 1%; top: -10%; opacity: 0;"
           data-center="height: 100%; top: 0%; opacity: 0.5"
           data-anchor-target="#slide2">
         </div>
         <div class="copy"
           data-bottom-top="opacity: 0"
-          data-center="opacity: 0;"
-          data-280-top="opacity: 1;"
+          data-bottom="opacity: 1;"
           data-50-top="opacity: 1;"
-          data-top-bottom="opacity: 0"
+          data-top-bottom="opacity: 0;"
           data-anchor-target="#slide2 .copy">
           <h2 class="display">
-            {% trans 'Between which dates would you be travelling?' %}
+            {% trans 'Highlight the days in which you will be travelling.' %}
           </h2>
+          <div id="calendar" class="full-calendar"></div>
         </div>
       </div>
-      
     </div>
   </section>
 
   <section id="slide3">
-    <div class="full-height" style="background:#3cc;">
-      
+    <div class="full-height"
+      data-bottom-top="background-color:rgb(0,0,0);"
+      data-bottom="background-color:rgb(252,252,252);"
+      data-anchor-target="#slide3">
+      <div class="container"
+        data--50-bottom="opacity: 0"
+        data-center-top="opacity: 1"
+        data-100-top="opacity: 1"
+        data-top-bottom="opacity: 0"
+        data-anchor-target="#slide3 .container">
+        <h2 class="display-dark">{% trans 'How many adults will be travelling? Any children?' %}</h2>
+        <div class="form-group">
+          <label>{% trans 'Adults' %}</label>
+          {{form.guests_adults}}
+        </div>
+        <div class="form-group">
+          <label>{% trans 'Children (2-12)' %}</label>
+          {{form.guests_children}}
+        </div>
+        <div class="form-group">
+          <label>{% trans 'Infants (< 2)' %}</label>
+          <input class="form-control" type="text" value="0">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="slide4">
+    <div class="full-height">
+      <div class="container"
+        data-bottom-top="opacity: 0"
+        data-center-top="opacity: 1"
+        data--100-top="opacity: 1"
+        data-top-bottom="opacity: 0"
+        data-anchor-target="#slide4 .container">
+        <h2 class="display-dark">{% trans "What kind of things are you interested in? Check the topics that interest you." %}</h2>
+        <div class="row">
+          <div class="circle unselected" style="background-color:#FFABAB">{% trans 'food & wine' %}</div>
+          <div class="circle unselected" style="background-color:#FFDAAB">{% trans 'photography' %}</div>
+        </div>
+        <div class="row">
+          <div class="circle unselected" style="background-color:#DDFFAB">{% trans 'history & culture' %}</div>
+          <div class="circle unselected" style="background-color:#ABE4FF">{% trans 'architecture' %}</div>
+          <div class="circle unselected" style="background-color:#D9ABFF">{% trans 'for couples' %}</div>
+        </div>
+        <div class="row">
+          <div class="circle unselected" style="background-color:#FFABAB">{% trans 'outdoor & nature' %}</div>
+          <div class="circle unselected" style="background-color:#FFDAAB">{% trans 'shopping' %}</div>
+          <div class="circle unselected" style="background-color:#DDFFAB">{% trans 'sports & leisure' %}</div>
+          <div class="circle unselected" style="background-color:#ABE4FF">{% trans 'extreme fun' %}</div>
+        </div>
+        <div class="row">
+          <div class="circle unselected" style="background-color:#D9ABFF">{% trans 'events' %}</div>
+          <div class="circle unselected" style="background-color:#FFABAB">{% trans 'health & beauty' %}</div>
+          <div class="circle unselected" style="background-color:#FFDAAB">{% trans 'livability research' %}</div>
+        </div>
+        <div class="row">
+          <div class="circle unselected" style="background-color:#DDFFAB">{% trans 'education' %}</div>
+          <div class="circle unselected" style="background-color:#ABE4FF">{% trans 'local experiences' %}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="slide5">
+    <div class="full-height"
+      data-bottom-top="background-color:rgb(0,0,0);"
+      data-center-top="background-color:rgb(252,252,252);"
+      data-anchor-target="#slide5">
+      <div class="container"
+        data-bottom-top="opacity: 0"
+        data-center-top="opacity: 1"
+        data-100-top="opacity: 1"
+        data--100-top="opacity: 0"
+        data-anchor-target="#slide5 .container">
+        <h2 class="display-dark">{% trans "What's Included" %}</h2>
+        <div class="form-group">
+          <label>{% trans 'Car + Driver' %}</label>
+          <select class="form-control">
+            <option>{% trans 'none' %}</option>
+            <option>{% trans 'infrequent' %}</option>
+            <option>{% trans 'average' %}</option>
+            <option>{% trans 'frequent' %}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{% trans 'Accommodation' %}</label>
+          <select class="form-control">
+            <option>{% trans 'none' %}</option>
+            <option>{% trans '3 star' %}</option>
+            <option>{% trans '4 star' %}</option>
+            <option>{% trans '5 star' %}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{% trans 'National Flight' %}</label>
+          <select class="form-control">
+            <option>{% trans 'none' %}</option>
+            <option>{% trans 'economy' %}</option>
+            <option>{% trans 'business' %}</option>
+            <option>{% trans 'first class' %}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="slide6">
+    <div class="full-height"
+      data-bottom-top="background-position: -30px 50%;"
+      data-top-bottom="background-position: 10px 50%;"
+      data-anchor-target="#slide6">
+      <div class="container"
+        data-bottom-top="opacity: 0; z-index: -1"
+        data--33p-top="opacity: 0; z-index: -1"
+        data--66p-top="opacity: 1; z-index: 1"
+        data-anchor-target="#slide6">
+        <div class="panel panel-default" id="requirements">
+          <div class="panel-body">
+            <h3 class="display">{% trans 'Anything else you would like to let us know?' %}</h3>
+            {{form.requirements}}
+          </div>
+        </div>
+        <div class="panel panel-default" id="contact">
+          <div class="panel-body">
+            <h3 class="display">{% trans 'Almost done! Please leave us your contact details below. A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call.' %}</h3>
+            <div class="center-form">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>{% trans 'Name' %}</label>
+                    {{form.name}}
+                  </div>
+                  <div class="form-group">
+                    <label>{% trans 'Email' %}</label>
+                    {{form.email}}
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>{% trans 'WeChat' %}</label>
+                    {{form.wechat}}
+                  </div>
+                  <div class="form-group">
+                    <label>{% trans 'Mobile' %}</label>
+                    {{form.mobile}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" id="submit-btn" class="btn btn-primary btn-bottom">{% trans 'Submit' %}</button>
+      </div>
     </div>
   </section>
 </form>
@@ -92,18 +243,27 @@
 
 {% block scripts %}
 <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
-{%if LANGUAGE == "zh-CN"%}
-<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
-{% else %}
-<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
-{%endif%}
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.js"></script>
 <script type="text/javascript" src="{% static 'app/scripts/skrollr.min.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
   var s = skrollr.init();
+  $('#calendar').fullCalendar({
+    aspectRatio: 1.5,
+    selectable: true,
+    header: {
+      left:   'title',
+      center: '',
+      right:  'today prev,next'
+    }
+  });
   $('.overlay').on('click', function() {
     $this = $(this);
     $this.hasClass('selected') ? $this.removeClass('selected') : $this.addClass('selected');
+  });
+  $('.circle').on('click', function() {
+    $this = $(this);
+    $this.hasClass('unselected') ? $this.removeClass('unselected') : $this.addClass('unselected');
   })
 });
 </script>
