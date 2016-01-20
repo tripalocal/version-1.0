@@ -812,6 +812,30 @@ class ExperienceAvailabilityForm(forms.Form):
 SortBy=((1,_('Popularity')),(2,_('Outdoor')),(3,_('Urban')),)
 AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children')),(4,_('Famili with elderly&children')))
 
+class CustomItineraryRequest2Form(forms.Form):
+    destinations = forms.CharField(required=True, widget=forms.TextInput())
+    start_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
+    end_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))
+    guests_adults = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
+    guests_children = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
+    guests_infants = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
+    budget = forms.ChoiceField(choices=Budget_Range, widget=forms.Select(attrs={'class':'form-control'}), required=True)
+    interests = forms.CharField(required=False)
+    whats_included = forms.CharField(widget=forms.TextInput, required=False)
+    requirements = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control', 'rows':'5'}), required=False)
+    name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    wechat = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    email = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    mobile = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}), required=True)
+    def __init__(self, *args, **kwargs):
+        super(CustomItineraryRequest2Form, self).__init__(*args, **kwargs)
+        self.fields['destinations'].widget = forms.HiddenInput()
+        self.fields['start_date'].widget = forms.HiddenInput()
+        self.fields['end_date'].widget = forms.HiddenInput()
+        self.fields['budget'].widget = forms.HiddenInput()
+        self.fields['whats_included'].widget = forms.HiddenInput()
+        self.fields['interests'].widget = forms.HiddenInput()
+
 class CustomItineraryRequestForm(forms.Form):
     destinations = forms.CharField(required=True, widget=forms.TextInput())
     start_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control'}))

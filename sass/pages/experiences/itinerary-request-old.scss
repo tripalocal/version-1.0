@@ -1,0 +1,229 @@
+/*
+
+  Custom Itinerary request form
+
+*/
+@import
+  '../../vendor/include-media',
+  '../../utils/variables',
+  '../../utils/mixins',
+  '../../utils/functions',
+  '../../utils/placeholders',
+  '../../vendor/animate',
+  '../../components/slider';
+
+body {
+  overflow: hidden;
+  padding-top: 50px;
+  @include media('<tablet') {
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+}
+
+h1 {
+  font-family: $font-stack-homepage;
+  font-size: 48px;
+  @include media('<tablet') {
+    font-size: 32px;
+  }
+}
+
+h2 {
+  @include media('<tablet') {
+    font-size: 16px;
+  }
+}
+
+.container {
+  padding: 50px 0;
+  @include media('<tablet') {
+    padding: 0;
+  }
+}
+
+.full-height {
+  height: 100vh;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: relative;
+  @include media('<tablet') {
+    overflow-x: hidden;
+    height: auto;
+    padding: 0;
+  }
+
+  .btn {
+    min-width: 120px;
+    height: 40px;
+    border-radius: 2px;
+    @include card(1);
+  }
+  .btn-bottom {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    @include media('<tablet') {
+      position: relative;
+      margin: 20px auto;
+    }
+  }
+  .btn-top {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .btn-secondary {
+    display: none;
+  }
+}
+.middle {
+  color: white;
+  width: 500px;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  text-shadow: 1px 1px 8px black;
+  -webkit-animation-delay: 1s; /* Chrome, Safari, Opera */
+          animation-delay: 1s;
+  @include media('<tablet') {
+    padding: 15px;
+    transform: none;
+    top: auto;
+  }
+}
+
+.center-form {
+  @include media('>=tablet') {
+    width: 400px;
+    padding: 0;
+  }
+}
+
+.panel {
+  @include card(1);
+  border: 0;
+  display: none;
+  position: relative;
+  h2 {
+    font-size: 24px;
+    font-family: $font-stack-homepage;
+    display: inline;
+    vertical-align: middle;
+  }
+  p {
+    margin-top: 10px;
+  }
+}
+
+.header-icon {
+  margin-right: 10px;
+  width: 32px;
+  height: 32px;
+}
+
+.form-control {
+  width: 100%;
+  height: 40px;
+}
+
+select {
+  min-width: 170px;
+}
+
+.progress-bar {
+  position: fixed;
+  height: 150px;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+}
+
+.indicator {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  margin-bottom: 20px;
+  background: white;
+  color: $medium-grey;
+  border-radius: 100px;
+  @include card(1);
+}
+
+.active {
+  color: white;
+  background: $primary-color;
+}
+
+.alert {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  min-width: 400px;
+  margin: 0 auto;
+  display: none;
+  @include media('<tablet') {
+    min-width: 0;
+    width: 100%;
+    right: 0;
+  }
+}
+
+#intro {
+  @include media('<tablet') {
+    margin-bottom: 20px;
+  }
+}
+
+.ellipsis i {
+    opacity: 0;
+    -webkit-animation: dot 1.3s infinite;
+    -webkit-animation-delay: 0.0s;
+}
+
+.ellipsis i+i {
+    opacity: 0;
+    -webkit-animation: dot 1.3s infinite;
+    -webkit-animation-delay: 0.2s;
+}
+
+.ellipsis i+i+i {
+    opacity: 0;
+    -webkit-animation: dot 1.3s infinite;
+    -webkit-animation-delay: 0.3s;
+}
+
+@-webkit-keyframes dot {
+      0% { opacity: 0; }
+     50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.slider {
+  width: 80%;
+}
+
+.slider-value {
+  border: 0;
+  width: 65px;
+}
+
+.ui-slider-handle {
+  width: 15px;
+  height: 15px;
+  top: -8px;
+}
+
+.col-sm-3 {
+  text-align: center;
+  margin-top: 10px;
+  p {
+    margin: 0;
+  }
+}

@@ -3080,6 +3080,26 @@ def custom_itinerary_request(request):
             html_message=message,
             priority='now',
         )
+    return render_to_response('experiences/custom_itinerary_request_old.html', {'form':form}, context)
+
+def custom_itinerary_request2(request):
+    context = RequestContext(request)
+    context['LANGUAGE'] = settings.LANGUAGE_CODE
+    form = CustomItineraryRequest2Form()
+
+    if request.method == 'POST':
+        data = request.POST
+        email = data.get('email')
+        message = "<h1>Custom itinerary request</h1>";
+        for key, value in data.items():
+            message = message + "<h2>" + key + "</h2>" + "<p>" + value + "</p>"
+        mail.send(
+            sender = 'admin@tripalocal.com',
+            recipients = ['enquiries@tripalocal.com'],
+            subject="Itinerary request from " + email,
+            html_message=message,
+            priority='now',
+        )
     return render_to_response('experiences/custom_itinerary_request.html', {'form':form}, context)
 
 def custom_itinerary(request, id=None, operation=None):
