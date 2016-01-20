@@ -779,9 +779,9 @@ def service_search(request, format=None):
             keywords = None
 
         if int(guest_number) == 0:
-            itinerary = get_itinerary(type, start_datetime, end_datetime, None, city, language, keywords, mobile=True)
+            itinerary = get_itinerary(type, start_datetime, end_datetime, None, city, language, keywords, mobile=True, skip_availability=True)
         else:
-            itinerary = get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords, mobile=True)
+            itinerary = get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords, mobile=True, skip_availability=True)
 
         return Response(itinerary, status=status.HTTP_200_OK)
     except Exception as err:

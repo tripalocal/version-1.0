@@ -270,9 +270,9 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed', city__in=city).exclude(type='ITINERARY').order_by('-id')) + \
                       list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed', city__in=city).order_by('-id'))
     elif exp_type == 'newproduct':
-        experiences = list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed').order_by('-id'))
+        experiences = list(NewProduct.objects.filter(id__lt = from_id_newprudoct, status='Listed', city__in=city).order_by('-id'))
     else:
-        experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed').order_by('-id'))
+        experiences = list(Experience.objects.filter(id__lt = from_id_experience, status='Listed', city__in=city).order_by('-id'))
         if exp_type == 'itinerary':
             experiences = [e for e in experiences if e.type == 'ITINERARY']
         else:
@@ -316,7 +316,7 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         if selected_newproduct.get(experience.city.lower(), 0) >= limit and type(experience) == NewProduct:
             continue
 
-        experience.popularity=0
+        setattr(experience, 'popularity', 0)
         #new requirement: if the guest_number is smaller than the min value, increase the price per person instead of excluding the experience
         if guest_number is not None and (experience.guest_number_max < int(guest_number) or int(guest_number) <= 0):
             continue
