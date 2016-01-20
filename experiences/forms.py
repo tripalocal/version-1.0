@@ -872,7 +872,7 @@ class CustomItineraryForm(forms.Form):
     cities_string = forms.CharField(required=False)
     sort = forms.ChoiceField(choices=SortBy, required=True)
     age_limit = forms.ChoiceField(choices=AgeLimit, required=True)
-    from_id = forms.CharField(required=True, initial="99999999999,99999999999,99999999999")
+    from_id = forms.CharField(required=True, initial="99999999999,99999999999")
 
     def __init__(self, *args, **kwargs):
         super(CustomItineraryForm, self).__init__(*args, **kwargs)

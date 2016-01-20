@@ -3285,71 +3285,44 @@ def custom_itinerary(request, id=None, operation=None):
                 currency = request.session['custom_currency'].lower() if hasattr(request, 'session') and 'custom_currency' in request.session else None
                 itinerary = get_itinerary("ALL", start_datetime, end_datetime, adult_number + children_number, city, language, tags,
                                           False, sort, age_limit, customer, currency, skip_availability=True, from_id=from_id)
-                #get flight, transfer, ...
-                city_list = str(city).split(",")
-                context['flight'] = []
-                context['transfer'] = []
-                context['accommodation'] = []
-                context['restaurant'] = []
-                context['suggestion'] = []
-                context['pricing'] = []
+                if not ('ProductOnly' in request.POST and request.POST['ProductOnly']=='true'):
+                    #get flight, transfer, ...
+                    city_list = str(city).split(",")
+                    context['flight'] = []
+                    context['transfer'] = []
+                    context['accommodation'] = []
+                    context['restaurant'] = []
+                    context['suggestion'] = []
+                    context['pricing'] = []
                 
-                try:
-                    from_id = int(from_id.splt(",")[2])
-                except Exception:
-                    from_id = 99999999999
-
-                types = ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]
-                pds = list(NewProduct.objects.filter(id__lt = from_id, type__in=types, city__in=city_list).order_by('-id'))
-                limit = 10
-                counter = {}
-                for i in range(len(city_list)):
-                    if city_list[i].lower() not in counter:
-                        counter[city_list[i].lower()] = [0, 0, 0, 0, 0, 0]
-
-                reach_limit = True
-                for pd in pds:
-                    pd.city=pd.city.strip(" ")
-                    for i in range(len(counter[pd.city.lower()])):
-                        if counter[pd.city.lower()][i] < limit:
-                            reach_limit = False
-                            break
-                    if reach_limit:
-                        break
-                    if counter[pd.city.lower()][types.index(pd.type)]>=limit:
-                        continue
-
-                    information = pd.get_information(settings.LANGUAGES[0][0])
-                    pd.title = information.title
-                    pd.details = information.description
-                    pd.notes = information.notice
-                    pd.location = pd.city
-                    if 'custom_currency' in request.session and request.session["custom_currency"].lower() != pd.currency.lower():
-                        pd.price = convert_currency(pd.price, pd.currency, request.session["custom_currency"])
-                        pd.fixed_price = convert_currency(pd.fixed_price, pd.currency, request.session["custom_currency"])
-                        pd.price_min = convert_currency(pd.price_min, pd.currency, request.session["custom_currency"])
-                        pd.price_max = convert_currency(pd.price_max, pd.currency, request.session["custom_currency"])
-                        pd.fixed_price_min = convert_currency(pd.fixed_price_min, pd.currency, request.session["custom_currency"])
-                        pd.fixed_price_max = convert_currency(pd.fixed_price_max, pd.currency, request.session["custom_currency"])
-                    if pd.city in city_list:
-                        if pd.type == 'Flight':
-                            context['flight'].append(pd)
-                            counter[pd.city.lower()][0] += 1
-                        elif pd.type == 'Transfer':
-                            context['transfer'].append(pd)
-                            counter[pd.city.lower()][1] += 1
-                        elif pd.type == 'Accommodation':
-                            context['accommodation'].append(pd)
-                            counter[pd.city.lower()][2] += 1
-                        elif pd.type == 'Restaurant':
-                            context['restaurant'].append(pd)
-                            counter[pd.city.lower()][3] += 1
-                        elif pd.type == 'Suggestion':
-                            context['suggestion'].append(pd)
-                            counter[pd.city.lower()][4] += 1
-                        elif pd.type == 'Pricing':
-                            context['pricing'].append(pd)
-                            counter[pd.city.lower()][5] += 1
+                    types = ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]
+                    pds = list(NewProduct.objects.filter(type__in=types, city__in=city_list).order_by('-id'))
+                    for pd in pds:
+                        information = pd.get_information(settings.LANGUAGES[0][0])
+                        pd.title = information.title
+                        pd.details = information.description
+                        pd.notes = information.notice
+                        pd.location = pd.city
+                        if 'custom_currency' in request.session and request.session["custom_currency"].lower() != pd.currency.lower():
+                            pd.price = convert_currency(pd.price, pd.currency, request.session["custom_currency"])
+                            pd.fixed_price = convert_currency(pd.fixed_price, pd.currency, request.session["custom_currency"])
+                            pd.price_min = convert_currency(pd.price_min, pd.currency, request.session["custom_currency"])
+                            pd.price_max = convert_currency(pd.price_max, pd.currency, request.session["custom_currency"])
+                            pd.fixed_price_min = convert_currency(pd.fixed_price_min, pd.currency, request.session["custom_currency"])
+                            pd.fixed_price_max = convert_currency(pd.fixed_price_max, pd.currency, request.session["custom_currency"])
+                        if pd.city in city_list:
+                            if pd.type == 'Flight':
+                                context['flight'].append(pd)
+                            elif pd.type == 'Transfer':
+                                context['transfer'].append(pd)
+                            elif pd.type == 'Accommodation':
+                                context['accommodation'].append(pd)
+                            elif pd.type == 'Restaurant':
+                                context['restaurant'].append(pd)
+                            elif pd.type == 'Suggestion':
+                                context['suggestion'].append(pd)
+                            elif pd.type == 'Pricing':
+                                context['pricing'].append(pd)
                 context["adult_number"] = adult_number
                 context["children_number"] = children_number
                 return render_to_response('experiences/custom_itinerary_left_section.html', {'form':form,'itinerary':itinerary}, context)
