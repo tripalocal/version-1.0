@@ -310,6 +310,12 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
         if done_newproduct and type(experience) == NewProduct:
             continue
 
+        if selected_experience.get(experience.city.lower(), 0) >= limit and type(experience) == Experience:
+            continue
+
+        if selected_newproduct.get(experience.city.lower(), 0) >= limit and type(experience) == NewProduct:
+            continue
+
         experience.popularity=0
         #new requirement: if the guest_number is smaller than the min value, increase the price per person instead of excluding the experience
         if guest_number is not None and (experience.guest_number_max < int(guest_number) or int(guest_number) <= 0):
