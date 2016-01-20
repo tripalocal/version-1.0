@@ -102,3 +102,7 @@ function raiseError(section) {
   }, 'slow');
   return false;
 }
+
+function budgetCalculator() {
+  
+}
