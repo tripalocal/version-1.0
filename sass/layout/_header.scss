@@ -12,7 +12,7 @@
   height: 51px;
   text-align: center;
   border-bottom: 1px solid $light-grey;
-
+  @include card(1);
   a {
     color: $dark-grey;
   }

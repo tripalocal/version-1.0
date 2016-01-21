@@ -4,125 +4,81 @@
 {% load i18n %}
 
 {% block head %}
-  <title>{% trans 'Request a Custom Itinerary' %}</title>
-  <link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.css" rel="stylesheet">
-  <link href="{% static 'experiences/content/itinerary-request2.css' %}" rel="stylesheet"/>
+<title>{% trans 'Request a Custom Itinerary' %}</title>
+<link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.css" rel="stylesheet"/>
+<link href="//cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.7.6/jquery.fullPage.min.css" rel="stylesheet"/>
+<link href="{% static 'experiences/content/itinerary-request3.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
-<div id="skrollr-body">
-<form id="itinerary-request" action="" method="post">
-  {% for field in form.hidden_fields %}
-    {{ field }}
-  {% endfor %}
-  <section id="intro">
-    <div class="full-height" 
-      data-center="background-position: 50% 0px;"
-      data-top-bottom="background-position: 50% -300px"
-      data-anchor-target="#intro">
-      <div class="container"
-        data-center="opacity: 1"
-        data-50-top="opacity: 0"
-        data-anchor-target="#intro h1">
-        <div class="middle">
-          <h1 class="display animated fadeIn">{% trans 'Custom Itinerary' %}</h1>
-          <h2 class="display animated fadeIn">{% trans 'Answer just a few questions and we will <br>build a custom itinerary for your trip' %}</h2>
-        </div>
-        <div class="scroll-down animated fadeIn"><span class="glyphicon glyphicon-chevron-down"></span></div>
-      </div>
-    </div>
-  </section>
+{% for field in form.hidden_fields %}
+  {{ field }}
+{% endfor %}
+<div class="loading"></div>
 
-  <section id="slide1">
-    <div class="full-height" id="destinations"
-      data-0="background-color:rgb(0,0,0);"
-      data-500-top="background-color:rgb(252,252,252);"
-      data-anchor-target="#slide1">
-      <div class="container">
-        <h2 class="display-dark"
-          data--200-bottom="opacity: 0"
-          data-center="opacity: 1"
-          data-150-top="opacity: 1"
-          data--50-top="opacity: 0"
-          data-anchor-target="#slide1 h2">
-          {% trans 'Choose some locations you would like to visit on this trip.' %}
-        </h2>
-        <div class="box" data-city="melbourne" style="background-image:url({{MEDIA_URL}}city/Melbourne.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Melbourne' %}</h3></div></div>
-        <div class="box" data-city="sydney" style="background-image:url({{MEDIA_URL}}city/Sydney.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Sydney' %}</h3></div></div>
-        <div class="box" data-city="goldcoast" style="background-image:url({{MEDIA_URL}}city/Goldcoast.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Gold Coast' %}</h3></div></div>
-        <div class="box" data-city="brisbane" style="background-image:url({{MEDIA_URL}}city/Brisbane.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Brisbane' %}</h3></div></div>
-        <div class="box" data-city="cairns" style="background-image:url({{MEDIA_URL}}city/Cairns.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--200-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Cairns' %}</h3></div></div>
-        <div class="box" data-city="tasmania" style="background-image:url({{MEDIA_URL}}city/Hobart.jpg)" data-bottom-top="opacity: 0"  data-center="opacity: 1" data-150-top="opacity: 1" data--100-top="opacity: 0"><div class="overlay"><h3 class="display">{% trans 'Tasmania' %}</h3></div></div>
-      </div>
-    </div>
-  </section>
+<div class="status-bar" id="status-bar">
+  <div class="container">
+    <h2 class="status-line">{% trans "Estimated cost: Please fill in more fields for a live update." %}</h2>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-primary btn-square" id="nav-up" disabled><span class="glyphicon glyphicon-chevron-up"></span></button>
+    <button class="btn btn-primary btn-square" id="nav-down"><span class="glyphicon glyphicon-chevron-down"></span></button>
+  </div>
+</div>
 
-  <section id="slide2">
-    <div class="full-height"
-      data-bottom-top="background-position: 50% 100px;"
-      data-center="background-position: 50% 0px;"
-      data-top-bottom="background-position: 50% -100px"
-      data-anchor-target="#slide2">
-      <div class="container" id="dates">
-        <div class="curtain"
-          data-bottom-top="opacity: 0"
-          data-100-top="height: 1%; top: -10%; opacity: 0;"
-          data-center="height: 100%; top: 0%; opacity: 0.5"
-          data-anchor-target="#slide2">
-        </div>
-        <div class="copy"
-          data-bottom-top="opacity: 0"
-          data-bottom="opacity: 1;"
-          data-50-top="opacity: 1;"
-          data-top-bottom="opacity: 0;"
-          data-anchor-target="#slide2 .copy">
-          <h2 class="display">
-            {% trans 'Highlight the days in which you will be travelling.' %}
-          </h2>
-          <div id="calendar" class="full-calendar"></div>
-        </div>
-      </div>
+<div id="fullpage">
+  <div class="section" id="intro">
+    <div class="container">
+      <h1>{% trans 'Custom Itinerary' %}</h1>
+      <h2>{% trans 'Answer just a few questions and we will build a custom itinerary for your trip' %}</h2>
+      <button id="start-btn" class="btn btn-primary main-btn">{% trans 'Get started' %}</button>
     </div>
-  </section>
+  </div>
 
-  <section id="slide3">
-    <div class="full-height"
-      data-bottom-top="background-color:rgb(0,0,0);"
-      data-bottom="background-color:rgb(252,252,252);"
-      data-anchor-target="#slide3">
-      <div class="container"
-        data--50-bottom="opacity: 0"
-        data-center-top="opacity: 1"
-        data-100-top="opacity: 1"
-        data-top-bottom="opacity: 0"
-        data-anchor-target="#slide3 .container">
-        <h2 class="display-dark">{% trans 'How many adults will be travelling? Any children?' %}</h2>
-        <div class="form-group">
+  <div class="section">
+    <div class="container">
+      <h1>{% trans 'Choose some locations you would like to visit on this trip.' %} <span class="asterisk">*</span></h1>
+        <div class="box" data-city="melbourne" style="background-image:url({{MEDIA_URL}}city/Melbourne.jpg)"><div class="overlay"><h3 class="display">{% trans 'Melbourne' %}</h3></div></div>
+        <div class="box" data-city="sydney" style="background-image:url({{MEDIA_URL}}city/Sydney.jpg)"><div class="overlay"><h3 class="display">{% trans 'Sydney' %}</h3></div></div>
+        <div class="box" data-city="goldcoast" style="background-image:url({{MEDIA_URL}}city/Goldcoast.jpg)"><div class="overlay"><h3 class="display">{% trans 'Gold Coast' %}</h3></div></div>
+        <div class="box" data-city="brisbane" style="background-image:url({{MEDIA_URL}}city/Brisbane.jpg)"><div class="overlay"><h3 class="display">{% trans 'Brisbane' %}</h3></div></div>
+        <div class="box" data-city="cairns" style="background-image:url({{MEDIA_URL}}city/Cairns.jpg)"><div class="overlay"><h3 class="display">{% trans 'Cairns' %}</h3></div></div>
+        <div class="box" data-city="tasmania" style="background-image:url({{MEDIA_URL}}city/Hobart.jpg)"><div class="overlay"><h3 class="display">{% trans 'Tasmania' %}</h3></div></div>
+        <div class="box" data-city="alicesprings" style="background-image:url({{MEDIA_URL}}city/Alicesprings.jpg)"><div class="overlay"><h3 class="display">{% trans 'Alice Springs' %}</h3></div></div>
+        <div class="box" data-city="darwin" style="background-image:url({{MEDIA_URL}}city/Darwin.jpg)"><div class="overlay"><h3 class="display">{% trans 'Darwin' %}</h3></div></div>
+        <div class="box" data-city="perth" style="background-image:url({{MEDIA_URL}}city/Perth.jpg)"><div class="overlay"><h3 class="display">{% trans 'Perth' %}</h3></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <h1>{% trans 'Highlight the days in which you will be travelling.' %} <span class="asterisk">*</span></h1>
+      <div id="calendar" class="full-calendar"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <h1>{% trans 'How many adults will be travelling?<br>Any children or infants?' %} <span class="asterisk">*</span></h1>
+      <div class="form-group">
           <label>{% trans 'Adults' %}</label>
           {{form.guests_adults}}
-        </div>
-        <div class="form-group">
-          <label>{% trans 'Children (2-12)' %}</label>
-          {{form.guests_children}}
-        </div>
-        <div class="form-group">
-          <label>{% trans 'Infants (< 2)' %}</label>
-          {{form.guests_infants}}
-        </div>
+      </div>
+      <div class="form-group">
+        <label>{% trans 'Children (2-12)' %}</label>
+        {{form.guests_children}}
+      </div>
+      <div class="form-group">
+        <label>{% trans 'Infants (< 2)' %}</label>
+        {{form.guests_infants}}
       </div>
     </div>
-  </section>
+  </div>
 
-  <section id="slide4">
-    <div class="full-height">
-      <div class="container"
-        data-bottom-top="opacity: 0"
-        data-center-top="opacity: 1"
-        data--100-top="opacity: 1"
-        data-top-bottom="opacity: 0"
-        data-anchor-target="#slide4 .container">
-        <h2 class="display-dark">{% trans "What kind of things are you interested in? Check the topics that interest you." %}</h2>
-        <div class="row">
+  <div class="section">
+    <div class="container">
+      <h1 style="margin-bottom: 30px;">{% trans "What kind of things are you interested in?<br>Check the topics that interest you." %}</h1>
+      <div class="row">
           <div class="circle unselected" style="background-color:#FFABAB">{% trans 'food & wine' %}</div>
           <div class="circle unselected" style="background-color:#FFDAAB">{% trans 'photography' %}</div>
         </div>
@@ -146,25 +102,16 @@
           <div class="circle unselected" style="background-color:#DDFFAB">{% trans 'education' %}</div>
           <div class="circle unselected" style="background-color:#ABE4FF">{% trans 'local experiences' %}</div>
         </div>
-      </div>
     </div>
-  </section>
+  </div>
 
-  <section id="slide5">
-    <div class="full-height"
-      data-bottom-top="background-color:rgb(0,0,0);"
-      data-center-top="background-color:rgb(252,252,252);"
-      data-anchor-target="#slide5">
-      <div class="container"
-        data-bottom-top="opacity: 0"
-        data-center-top="opacity: 1"
-        data-100-top="opacity: 1"
-        data--100-top="opacity: 0"
-        data-anchor-target="#slide5 .container">
-        <h2 class="display-dark">{% trans "What's Included" %}</h2>
-        <div class="form-group">
+  <div class="section">
+    <div class="container">
+      <h1>{% trans "What's included" %} <span class="asterisk">*</span></h1>
+      <div class="form-group">
           <label>{% trans 'Car + Driver' %}</label>
           <select id="car-driver" class="form-control">
+            <option>{% trans 'please select' %}</option>
             <option>{% trans 'none' %}</option>
             <option>{% trans 'infrequent' %}</option>
             <option>{% trans 'average' %}</option>
@@ -174,6 +121,7 @@
         <div class="form-group">
           <label>{% trans 'Accommodation' %}</label>
           <select id="accommodation" class="form-control">
+            <option>{% trans 'please select' %}</option>
             <option>{% trans 'none' %}</option>
             <option>{% trans '3 star' %}</option>
             <option>{% trans '4 star' %}</option>
@@ -183,73 +131,42 @@
         <div class="form-group">
           <label>{% trans 'National Flight' %}</label>
           <select id="national-flight" class="form-control">
+            <option>{% trans 'please select' %}</option>
             <option>{% trans 'none' %}</option>
             <option>{% trans 'economy' %}</option>
             <option>{% trans 'business' %}</option>
             <option>{% trans 'first class' %}</option>
           </select>
         </div>
-      </div>
     </div>
-  </section>
+  </div>
 
-  <section id="slide6">
-    <div class="full-height"
-      data-bottom-top="background-position: 50% 100px;"
-      data-center="background-position: 50% 0px;"
-      data-top-bottom="background-position: 50% -100px"
-      data-anchor-target="#slide6">
-      <div class="container" id="contact"
-        data-bottom-top="opacity: 0; z-index: -1"
-        data--33p-top="opacity: 0; z-index: -1"
-        data--66p-top="opacity: 1; z-index: 1"
-        data-anchor-target="#slide6">
-        <div class="panel panel-default" id="requirements">
-          <div class="panel-body">
-            <h3 class="display-dark">{% trans 'Anything else you would like to let us know?' %}</h3>
-            {{form.requirements}}
-          </div>
-        </div>
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <h3 class="display-dark">{% trans 'Almost done! Please leave us your contact details below. A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call.' %}</h3>
-            <div class="center-form">
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label>{% trans 'Name' %}</label>
-                    {{form.name}}
-                  </div>
-                  <div class="form-group">
-                    <label>{% trans 'Email' %}</label>
-                    {{form.email}}
-                  </div>
-                </div>
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label>{% trans 'WeChat' %}</label>
-                    {{form.wechat}}
-                  </div>
-                  <div class="form-group">
-                    <label>{% trans 'Mobile' %}</label>
-                    {{form.mobile}}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button type="button" id="submit-btn" class="btn btn-primary btn-bottom">{% trans 'Submit' %}</button>
-      </div>
+  <div class="section">
+    <div class="container">
+      <h1>{% trans 'Any other details you would like to let us know?' %}</h1>
     </div>
-  </section>
-</form>
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <h1>{% trans "Almost done! Please leave us your contact details below." %} <span class="asterisk">*</span></h1>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <h1>{% trans "Make sure you've filled in all the " %} <span class="asterisk">*sections</span></h1>
+      <h2>{% trans "A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call." %}</h2>
+      <button class="btn btn-primary main-btn">{% trans "Submit" %}</button>
+    </div>
+  </div>
+
 </div>
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.js"></script>
-<script type="text/javascript" src="{% static 'app/scripts/skrollr.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'experiences/scripts/itinerary-request.js' %}"></script>
+<script src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.7.6/jquery.fullPage.min.js"></script>
+<script src="{% static 'experiences/scripts/itinerary-request3.js' %}"></script>
 {% endblock %}
