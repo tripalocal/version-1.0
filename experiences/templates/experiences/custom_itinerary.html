@@ -1170,7 +1170,7 @@
         $("#" + type + "-details").val(details);
         $("#" + type + "-notes").val(notes);
         $("#add-" + type + "-add").text("{% trans "Save" %}");
-        $("#add-" + type + "-add").attr("onclick", "");
+        $("#add-" + type + "-add").attr("onclick", null);
         $("#add-" + type + "-add").click(function(e){
             var item = new FormData();
             item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
