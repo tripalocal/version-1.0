@@ -3140,6 +3140,14 @@ def custom_itinerary(request, id=None, operation=None):
         ci.end_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
         ci.cities = "Melbourne"
         ci.save()
+
+        #add a booking for the new itinerary
+        local_timezone = pytz.timezone("Melbourne")
+
+        booking = Booking(user = request.user, experience=Experience.objects.get(id=1), guest_number = 1, adult_number = 1, children_number = 0,
+                        datetime = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
+        booking.save()
         return HttpResponseRedirect(GEO_POSTFIX+"itinerary/edit/"+str(ci.id)+"/")
 
     if request.method == 'POST':
@@ -3411,7 +3419,8 @@ def custom_itinerary(request, id=None, operation=None):
             #itinerary will be in the format of[{'city':'', 'dates':{'date1':[], 'date2':[], ...}}, ...]
             itinerary = []
             last_city = ""
-            start_date = existing_ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+            all_bookings = list(existing_ci.booking_set.order_by('datetime').all())
+            start_date = existing_ci.start_datetime.astimezone(pytz.timezone(all_bookings[0].experience.get_timezone()))
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
             cities_list = list(filter(None, existing_ci.cities.split(',')))
@@ -3436,7 +3445,7 @@ def custom_itinerary(request, id=None, operation=None):
             cities_list = tmp
 
             city_index = 0
-            for bking in existing_ci.booking_set.order_by('datetime').all():
+            for bking in all_bookings:
                 if bking.adult_number is not None and bking.adult_number > 0:
                     form.initial["adult_number"] = bking.adult_number
                 else:
@@ -3525,8 +3534,11 @@ def itinerary_detail(request,id=None,preview=None):
             full_price = False
         discount_deadline = ci.submitted_datetime + timedelta(days=7)
 
+        all_bookings = list(ci.booking_set.order_by('datetime').all())
+        ci_timezone = all_bookings[0].experience.get_timezone()
+
         if ci.start_datetime:
-            start_datetime = ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+            start_datetime = ci.start_datetime.astimezone(pytz.timezone(ci_timezone))
         else:
             start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
         if ci.cities:
@@ -3535,7 +3547,7 @@ def itinerary_detail(request,id=None,preview=None):
             end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
 
         itinerary = {"title":ci.title, "days":{}, "status":ci.status}
-        for item in ci.booking_set.order_by('datetime').all():
+        for item in all_bookings:
             exp_information = item.experience.get_information(settings.LANGUAGES[0][0])
             item.experience.title = exp_information.title
             item.experience.description = exp_information.description
@@ -3551,7 +3563,7 @@ def itinerary_detail(request,id=None,preview=None):
                 end_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
 
         for date in daterange(start_datetime, end_datetime):
-            date = date.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%d")
+            date = date.astimezone(pytz.timezone(ci_timezone)).strftime("%Y-%m-%d")
             if date not in itinerary["days"]:
                 itinerary["days"].update({date:[]})
 
