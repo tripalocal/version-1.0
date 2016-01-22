@@ -18,7 +18,7 @@
 
 <div class="status-bar" id="status-bar">
   <div class="container">
-    <h2 class="status-line">{% trans "Estimated cost: Please fill in more fields for a live update." %}</h2>
+    <h2 class="status-line" id="budget">{% trans "Estimated cost: Please fill in more fields for a live update." %}</h2>
   </div>
   <div class="nav-btns">
     <button class="btn btn-primary btn-square" id="nav-up" disabled><span class="glyphicon glyphicon-chevron-up"></span></button>
@@ -112,10 +112,9 @@
           <label>{% trans 'Car + Driver' %}</label>
           <select id="car-driver" class="form-control">
             <option>{% trans 'please select' %}</option>
-            <option>{% trans 'none' %}</option>
             <option>{% trans 'infrequent' %}</option>
-            <option>{% trans 'average' %}</option>
             <option>{% trans 'frequent' %}</option>
+            <option>{% trans 'entire trip' %}</option>
           </select>
         </div>
         <div class="form-group">
@@ -134,8 +133,22 @@
             <option>{% trans 'please select' %}</option>
             <option>{% trans 'none' %}</option>
             <option>{% trans 'economy' %}</option>
-            <option>{% trans 'business' %}</option>
-            <option>{% trans 'first class' %}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{% trans 'Service Language' %}</label>
+          <select id="service-language" class="form-control">
+            <option>{% trans 'please select' %}</option>
+            <option>{% trans 'chinese' %}</option>
+            <option>{% trans 'english' %}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{% trans 'Airport Transfer' %}</label>
+          <select id="airport-transfer" class="form-control">
+            <option>{% trans 'please select' %}</option>
+            <option>{% trans 'yes' %}</option>
+            <option>{% trans 'none' %}</option>
           </select>
         </div>
     </div>
@@ -143,13 +156,32 @@
 
   <div class="section">
     <div class="container">
-      <h1>{% trans 'Any other details you would like to let us know?' %}</h1>
+      <h1>{% trans 'Anything else you would like to let us know?' %}</h1>
+      {{form.requirements}}
     </div>
   </div>
 
   <div class="section">
     <div class="container">
-      <h1>{% trans "Almost done! Please leave us your contact details below." %} <span class="asterisk">*</span></h1>
+      <h1>{% trans "Almost done!<br>Please leave us your contact details below." %} <span class="asterisk">*</span></h1>
+      <div class="row" style="margin-top: 20px;">
+        <div class="col-sm-6">
+          <div class="form-group">
+            {{form.name}}
+          </div>
+          <div class="form-group">
+            {{form.email}}
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            {{form.wechat}}
+          </div>
+          <div class="form-group">
+            {{form.mobile}}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -157,7 +189,7 @@
     <div class="container">
       <h1>{% trans "Make sure you've filled in all the " %} <span class="asterisk">*sections</span></h1>
       <h2>{% trans "A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call." %}</h2>
-      <button class="btn btn-primary main-btn">{% trans "Submit" %}</button>
+      <button id="submit-btn" class="btn btn-primary main-btn">{% trans "Submit" %}</button>
     </div>
   </div>
 
