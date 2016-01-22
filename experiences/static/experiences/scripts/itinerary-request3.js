@@ -120,7 +120,7 @@ function updateBudget() {
 	var max = 0;
 
 	// car+driver
-	switch ($('#car-driver').val()) {
+	switch ($('#car-driver').val()[0]) {
 		case 'please select':
 			break;
 		case 'infrequent':
@@ -162,7 +162,7 @@ function updateBudget() {
 	}
 
 	// accommodation
-	switch ($('#accommodation').val()) {
+	switch ($('#accommodation').val()[0]) {
 		case 'please select':
 			break;
 		case 'none':
@@ -182,7 +182,7 @@ function updateBudget() {
 	}
 
 	// service language
-	switch ($('#service-language').val()) {
+	switch ($('#service-language').val()[0]) {
 		case 'please select':
 			break;
 		case 'english':
@@ -198,7 +198,7 @@ function updateBudget() {
 	//// FOR WHOLE TRIP BELOW
 
 	// national flights
-	switch ($('#national-flight').val()) {
+	switch ($('#national-flight').val()[0]) {
 		case 'please select':
 			break;
 		case 'none':
@@ -209,7 +209,7 @@ function updateBudget() {
 	}
 
 	// airport transfer
-	switch ($('#airport-transfer').val()) {
+	switch ($('#airport-transfer').val()[0]) {
 		case 'please select':
 			break;
 		case 'none':

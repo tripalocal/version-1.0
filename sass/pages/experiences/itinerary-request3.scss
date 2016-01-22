@@ -225,14 +225,15 @@ h1 {
 .form-group {
   display: inline-block;
   margin-right: 20px;
-  min-width: 120px;
+  width: 180px;
   text-align: left;
   @include media('<phablet') {
     margin-right: 10px;
+    width: 155px;
   }
   label {
     font-weight: 200;
-    font-size: 18px;
+    font-size: 20px;
   }
   select {
     width: 100%;
@@ -251,6 +252,22 @@ h1 {
   }
 }
 
+.select-expanded {
+  cursor: pointer;
+  font-size: 18px;
+  background-color: inherit;
+  border: 0;
+  color: $medium-grey;
+  &:focus {
+    border: 0;
+    outline: none;
+  }
+  option {
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
 
 .col-sm-6 {
   padding: 0;

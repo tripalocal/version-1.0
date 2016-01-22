@@ -110,8 +110,8 @@
       <h1>{% trans "What's included" %} <span class="asterisk">*</span></h1>
       <div class="form-group">
           <label>{% trans 'Car + Driver' %}</label>
-          <select id="car-driver" class="form-control">
-            <option>{% trans 'please select' %}</option>
+          <select id="car-driver" class="select-expanded" multiple="multiple">
+            <option selected>{% trans 'please select' %}</option>
             <option>{% trans 'infrequent' %}</option>
             <option>{% trans 'frequent' %}</option>
             <option>{% trans 'entire trip' %}</option>
@@ -119,8 +119,8 @@
         </div>
         <div class="form-group">
           <label>{% trans 'Accommodation' %}</label>
-          <select id="accommodation" class="form-control">
-            <option>{% trans 'please select' %}</option>
+          <select id="accommodation" class="select-expanded" multiple="multiple">
+            <option selected>{% trans 'please select' %}</option>
             <option>{% trans 'none' %}</option>
             <option>{% trans '3 star' %}</option>
             <option>{% trans '4 star' %}</option>
@@ -129,26 +129,26 @@
         </div>
         <div class="form-group">
           <label>{% trans 'National Flight' %}</label>
-          <select id="national-flight" class="form-control">
-            <option>{% trans 'please select' %}</option>
+          <select id="national-flight" class="select-expanded" multiple="multiple">
+            <option selected>{% trans 'please select' %}</option>
             <option>{% trans 'none' %}</option>
             <option>{% trans 'economy' %}</option>
           </select>
         </div>
         <div class="form-group">
           <label>{% trans 'Service Language' %}</label>
-          <select id="service-language" class="form-control">
-            <option>{% trans 'please select' %}</option>
+          <select id="service-language" class="select-expanded" multiple="multiple">
+            <option selected>{% trans 'please select' %}</option>
             <option>{% trans 'chinese' %}</option>
             <option>{% trans 'english' %}</option>
           </select>
         </div>
         <div class="form-group">
           <label>{% trans 'Airport Transfer' %}</label>
-          <select id="airport-transfer" class="form-control">
-            <option>{% trans 'please select' %}</option>
-            <option>{% trans 'yes' %}</option>
+          <select id="airport-transfer" class="select-expanded" multiple="multiple">
+            <option selected>{% trans 'please select' %}</option>
             <option>{% trans 'none' %}</option>
+            <option>{% trans 'yes' %}</option>
           </select>
         </div>
     </div>
