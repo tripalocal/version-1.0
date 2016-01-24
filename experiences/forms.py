@@ -627,6 +627,7 @@ class BookingConfirmationForm(forms.Form):
         self.fields['child_number'].widget = forms.HiddenInput()
         self.fields['status'].widget = forms.HiddenInput()
         self.fields['coupon_extra_information'].widget = forms.HiddenInput()
+        self.fields['booking_extra_information'].widget = forms.HiddenInput()
         self.fields['custom_currency'].widget = forms.HiddenInput()
         self.fields['phone_number'].widget = forms.HiddenInput()
 
