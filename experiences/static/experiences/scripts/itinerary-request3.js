@@ -37,7 +37,7 @@ $(document).ready(function() {
 
 	// Initialise calendar
 	$('#calendar').fullCalendar({
-		aspectRatio: 1.5,
+		height: 'auto',
 		selectable: true,
 		unselectAuto: false,
 		header: {
