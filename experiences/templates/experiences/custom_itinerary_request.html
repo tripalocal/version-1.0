@@ -186,7 +186,7 @@
   </div>
 
   <div class="section">
-    <div class="container">
+    <div class="container" id="success-page">
       <h1>{% trans "Make sure you've filled in all the " %} <span class="asterisk">*sections</span></h1>
       <h2>{% trans "A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call." %}</h2>
       <button id="submit-btn" class="btn btn-primary main-btn">{% trans "Submit" %}</button>
@@ -200,5 +200,8 @@
 <script src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.7.6/jquery.fullPage.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="{% static 'app/scripts/jquery.ui.touch.js' %}"></script>
+<script src="{% static 'app/scripts/jquery.ui.touch-punch.min.js' %}"></script>
 <script src="{% static 'experiences/scripts/itinerary-request3.js' %}"></script>
 {% endblock %}

@@ -41,8 +41,23 @@ $(document).ready(function() {
 			right: 'today prev,next'
 		},
 		select: function(start, end, jsEvent, view) {
+			if (moment().diff(start, 'days') > 0) {
+                $('#calendar').fullCalendar('unselect');
+                // or display some sort of alert
+                return false;
+            }
 			$('#id_start_date').val(moment(start).format("YYYY-MM-DD"));
 			$('#id_end_date').val(moment(end).format("YYYY-MM-DD"));
+		},
+		dayRender: function(date, cell) {
+			cell.addTouch();
+		},
+		eventRender: function(event, element, view) {
+			$.support.touch = 'ontouchend' in document;
+
+			if ($.support.touch) {
+				$(element).draggable();
+			}
 		}
 	});
 
@@ -102,10 +117,18 @@ $(document).ready(function() {
 					}
 				})
 				.done(function() {
-
+					$('#success-page').html(
+						'<h1>Your request has been submitted!</h1><h2>Please keep an eye on our phone call within 4 hours. We will call you between 9am - 9pm Beijing time.</h2>'
+					).css({
+						'position': 'fixed',
+						'width': '100%',
+						'height': '100%',
+					});
+					$('#fp-nav').fadeOut();
+					$('#status-bar').slideDown();
 				})
 				.fail(function() {
-					$('.alert-danger').fadeIn();
+					
 				});
 		}
 		$(this).removeAttr('disabled').html('Submit');
