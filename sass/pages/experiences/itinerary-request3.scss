@@ -87,7 +87,7 @@ h1 {
 .asterisk {
   font-size: 32px;
   color: $pink;
-  transition: font-size 0.4s;
+  transition: color 0.4s;
 }
 
 #fp-nav {
@@ -160,12 +160,12 @@ h1 {
   display: inline-block;
   overflow: hidden;
   margin: -5px 15px;
-  width: 10vw;
-  height: 10vw;
+  width: 15vh;
+  height: 15vh;
   border-radius: 100px;
   text-align: center;
   vertical-align: middle;
-  line-height: 10vw;
+  line-height: 15vh;
   color: $slate-grey;
   cursor: pointer;
   transition: width 0.4s, height 0.4s, line-height 0.4s;
@@ -183,13 +183,10 @@ h1 {
     margin: 0 3px;
   }
   @include media('>desktop') {
-    width: 120px;
-    height: 120px;
-    line-height: 120px;
     &:hover {
-      width: 12vw;
-      height: 12vw;
-      line-height: 12vw;
+      width: 17vh;
+      height: 17vh;
+      line-height: 17vh;
     }
   }
 }

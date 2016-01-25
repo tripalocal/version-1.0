@@ -1,6 +1,11 @@
 $(document).ready(function() {
 	// Initialise fullpage 
+	var desktop = true;
+	if (screen.width < 480) {
+		var desktop = false;
+	}
 	$('#fullpage').fullpage({
+		autoScrolling: desktop,
 		paddingTop: '50px',
 		paddingBottom: '50px',
 		navigation: true,
@@ -42,12 +47,26 @@ $(document).ready(function() {
 		},
 		select: function(start, end, jsEvent, view) {
 			if (moment().diff(start, 'days') > 0) {
-                $('#calendar').fullCalendar('unselect');
-                // or display some sort of alert
-                return false;
-            }
-			$('#id_start_date').val(moment(start).format("YYYY-MM-DD"));
-			$('#id_end_date').val(moment(end).format("YYYY-MM-DD"));
+				$('#calendar').fullCalendar('unselect');
+				// or display some sort of alert
+				return false;
+			}
+			$("#calendar").fullCalendar('addEventSource', [{
+				start: start,
+				end: end,
+				rendering: 'background',
+				block: true,
+			}, ]);
+			$("#calendar").fullCalendar("unselect");
+			if (moment(start) < moment($('#id_start_date').val())) {
+				$('#id_start_date').val(moment(start).format("YYYY-MM-DD"));
+			}
+			if (moment(end) > moment($('#id_end_date').val())) {
+				$('#id_end_date').val(moment(end).format("YYYY-MM-DD"));
+			}
+		},
+		selectOverlap: function(event) {
+			return !event.block;
 		},
 		dayRender: function(date, cell) {
 			cell.addTouch();
@@ -243,7 +262,10 @@ function updateBudget() {
 	}
 
 	if (min != 0 && max != 0) {
-		$('#budget').text('Estimated cost: $' + min + ' to $' + max + ' total for this itinerary.');
+		$('#budget').text('Estimated cost: $' + min + ' to $' + max + ' total for this itinerary.').addClass('animated fadeInUp');
+		var wait = window.setTimeout( function(){
+            $('#budget').removeClass('animated fadeInUp')}, 1000
+        );
 	}
 }
 
@@ -265,7 +287,10 @@ function validateForm() {
 	if ($('#id_destinations').val() && $('#id_start_date').val() && $('#id_guests_adults').val() && $('#id_name').val() && $('#id_mobile').val() && $('#id_email').val()) {
 		return true;
 	} else {
-		$('.asterisk').css({'font-size':'48px', 'color': 'red'});
+		$('.asterisk').addClass('animated shake').css({'color': 'red'});
+		var wait = window.setTimeout( function(){
+            $('.asterisk').removeClass('animated shake')}, 1000
+        );
 		return false;
 	}
 }
