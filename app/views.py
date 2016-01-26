@@ -699,9 +699,9 @@ def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
 
 def track_user_login(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP":ip})
 
     try:
+        mp.people_set(user.email, {"IP":ip})
         reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
         country = response.country.name
@@ -741,7 +741,6 @@ def track_user_login(ip, sociallogin, user):
         mp = Mixpanel(settings.MIXPANEL_TOKEN)
         mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
         mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-
 
 def saveProfileImage(user, profile, image_file):
     content_type = image_file.content_type.split('/')[0]
@@ -786,14 +785,12 @@ def email_custom_trip(request):
 
     return HttpResponse(json.dumps({}))
 
-
 def create_wx_trade_no(mch_id):
     system_time = strftime("%Y%m%d%H%M%S", gmtime())
     trade_no = 'wx' + mch_id + system_time
     N = 32 - len(trade_no)
     trade_no += ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
     return trade_no
-
 
 def wechat_product(request):
     pay = JsAPIOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY, settings.WECHAT_APPSECRET)
@@ -811,7 +808,6 @@ def wechat_product(request):
         print('no code redirect')
         # 重定向到oauth_url后，获得code值
         return redirect(oauth_url)
-
 
 @csrf_exempt
 def generate_order(request):
@@ -837,7 +833,6 @@ def generate_order(request):
     print('json_pay_info', json_pay_info)
     return HttpResponse(json.dumps(json_pay_info), content_type='application/json')
 
-
 @csrf_exempt
 def wechat_payment_notify(request):
     if (request.body):
@@ -854,7 +849,6 @@ def wechat_payment_notify(request):
         return HttpResponse('')
     else:
         return HttpResponse('')
-
 
 # @csrf_exempt
 # def wechat_qr_payment(request):
