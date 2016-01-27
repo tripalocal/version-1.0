@@ -1523,8 +1523,8 @@ def service_weather(request):
     return JsonResponse(response)
 
 @api_view(['POST'])
-@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))#))#,
-@permission_classes((IsAuthenticated,))
+#@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))#))#,
+#@permission_classes((IsAuthenticated,))
 @csrf_exempt
 def service_search_text(request, format=None):
     '''
@@ -1578,7 +1578,10 @@ def service_search_text(request, format=None):
             if counter >= 3:
                 return Response(recent[title], status=status.HTTP_200_OK)
 
-        return Response(recent[title], status=status.HTTP_200_OK)
+        if counter > 0:
+            return Response(recent[title], status=status.HTTP_200_OK)
+        else:
+            return Response({"max_id":0,"experiences":[]}, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)       

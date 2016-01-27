@@ -3734,6 +3734,10 @@ def itinerary_booking_successful(request, itinerary_id):
 
     return HttpResponseRedirect(GEO_POSTFIX + "itinerary/" + itinerary_id)
 
+def itinerary_tool(request):
+    context = RequestContext(request)
+    return render_to_response('experiences/itinerary_tool.html', {}, context)
+
 def campaign(request):
     set_initial_currency(request)
     # NOTE: in the future, we should define these topics globally
@@ -4176,7 +4180,6 @@ def unionpay_refund_callback(request):
         except Exception as err:
             logger.debug(err)
 
-
 def wechat_qr_payment(request):
     code_url = request.GET.get('code_url')
     out_trade_no = request.GET.get('out_trade_no')
@@ -4186,7 +4189,6 @@ def wechat_qr_payment(request):
                                'out_trade_no': out_trade_no,
                                'success_url': success_url},
                               RequestContext(request))
-
 
 def wechat_qr_payment_query(request, out_trade_no):
     order_query = OrderQuery(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
@@ -4205,7 +4207,6 @@ def wechat_qr_payment_query(request, out_trade_no):
     #                            'out_trade_no': out_trade_no},
     #                           RequestContext(request))
     pass
-
 
 @csrf_exempt
 def wechat_qr_payment_notify(request):

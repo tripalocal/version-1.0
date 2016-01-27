@@ -1,0 +1,61 @@
+{% extends "app/layout.html" %}
+{% load staticfiles %}
+{% load mathfilters %}
+{% load i18n %}
+
+{% block head %}
+    <title>{% trans 'Itinerary tool' %}</title>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div>
+        <input id="itinerary_day_1" type="text" class="itinerary_item" city="Melbourne" style="width:300px;height:100px;">
+        <textarea id="hint" type="text" style="width:600px;height:300px;"></textarea>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+    var timer;
+    function searchExperience(e){ 
+        var title = $("#"+e.target.id).val();
+        var city = $("#"+e.target.id).attr("city");
+        if(title == null || city == null || title.length == 0 || city.length == 0)
+        {
+            return;
+        }
+        $.ajax({
+                url: '/search_text/',
+                type: "POST",
+                async: true,
+                data : {
+                            csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
+                            city: city,
+                            title: title,
+                        }
+            }).done(function(data){
+                var suggestions = "";
+                for(var i=0; i < data["experiences"].length; i++)
+                {
+                    suggestions += data["experiences"][i]["title"] + "\n";
+                }
+                $("#hint").text(suggestions);
+
+            }).fail(function(jqXHR, textStatus) {
+                $("#hint").val("error");
+            });
+    }
+
+    $(document).ready(function()
+    {
+        $(".itinerary_item").on('keyup', function(e){
+            if(timer) {
+                clearTimeout(timer);
+                timer=null;
+            }
+            timer = setTimeout(function() {searchExperience(e)}, 1000); 
+        });
+    });
+    </script>
+{% endblock %}
