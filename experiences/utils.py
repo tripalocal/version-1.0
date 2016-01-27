@@ -3,6 +3,7 @@ import os, pytz, string, random, decimal, requests, json
 from Tripalocal_V1 import settings
 from unionpay.util.helper import load_config
 from datetime import timedelta, date
+from copy import deepcopy
 
 def isEnglish(s):
     try:
@@ -111,3 +112,30 @@ def get_weather(lat, lon, time):
     else:
         r.raise_for_status()
 
+def static_vars(**kwargs):
+    def decorate(func):
+        for k in kwargs:
+            setattr(func, k, kwargs[k])
+        return func
+    return decorate
+
+@static_vars(dict={})
+def recent_search(action, new_search=None):
+    '''
+    action: get, update, clear
+    new_search: add the new item to the dict/update an existing item
+    '''
+    if action is not None:
+        if action.lower()=="get":
+            return recent_search.dict
+        elif action.lower()=="update" and new_search is not None:
+            for k, v in new_search.items():
+                if k not in recent_search.dict:
+                    recent_search.dict[k] = deepcopy(v)
+                else:
+                    for experience in v['experiences']:
+                        if recent_search.dict[k]['max_id'] < experience['id']:
+                            recent_search.dict[k]['experiences'].append(experience)
+                    recent_search.dict[k]['max_id'] = v['max_id']
+        elif action.lower()=="clear":
+            recent_search.dict.clear()

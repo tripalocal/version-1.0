@@ -1521,4 +1521,64 @@ def service_weather(request):
     except Exception as err:
         response = { 'success': False }
     return JsonResponse(response)
+
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))#))#,
+@permission_classes((IsAuthenticated,))
+@csrf_exempt
+def service_search_text(request, format=None):
+    '''
+    recent_result.dict is in the format of 
+    {
+        "key":
+            {
+                "max_id":123,
+                "experiences":
+                    [
+                        {'id":123, "title":"asdf"}
+                    ]
+            }
+    }
+    each time the service is called, update the dict by adding 3 more experiences whose title matches the input
+    '''
+
+    try:
+        data = request.data
+        action = data.get('action',None)
+        title = data.get('title',None)
+        city = data.get('city',None)
+
+        if action and action == "clear":
+            recent_search("clear")
+            return Response(status=status.HTTP_200_OK)
+
+        if title is None or city is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        max_id = 1
+        recent = recent_search("get")
+        if title in recent:
+            max_id = recent[title]["max_id"]
         
+        experiences = list(Experience.objects.filter(id__gt=max_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
+                      list(NewProduct.objects.filter(id__gt=max_id, status='Listed', city=city).order_by('id'))
+        counter = 0
+        language = 'en' if isEnglish(title) else 'zh'
+        for experience in experiences:
+            exp_title = experience.get_information(language).title
+            if exp_title.lower().find(title) >= 0:
+                if title not in recent:
+                    recent[title] = {}
+                    recent[title]["experiences"] = []
+
+                recent[title]["max_id"] = experience.id
+                recent[title]["experiences"].append({"id":experience.id,"title":exp_title})
+                recent_search("update",recent)
+                counter += 1
+            if counter >= 3:
+                return Response(recent[title], status=status.HTTP_200_OK)
+
+        return Response(recent[title], status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)       
