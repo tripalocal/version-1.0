@@ -10,12 +10,11 @@
 
 {% block content %}
     {% csrf_token %}
-    <div style="display:none;">
-        <input id="itinerary_day_1" type="text" class="itinerary_item" city="Melbourne" style="width:300px;height:100px;">
-        <textarea id="hint" type="text" style="width:600px;height:300px;"></textarea>
+    <div>
+        <input id="itinerary_day_1" type="text" class="itinerary_item" city="Melbourne" style="width:300px;height:30px;">
+        <textarea id="hint" type="text" style="width:600px;height:300px;margin-top:60px;"></textarea>
     </div>
     <div id="container" class="container">
-    </div>
 {% endblock %}
 
 {% block scripts %}
@@ -39,12 +38,21 @@
                             title: title,
                         }
             }).done(function(data){
-                var suggestions = "";
+                var suggestions_exp = "Experiences:\n";
                 for(var i=0; i < data["experiences"].length; i++)
                 {
-                    suggestions += data["experiences"][i]["title"] + "\n";
+                    suggestions_exp += data["experiences"][i]["title"] + "\n";
                 }
-                $("#hint").text(suggestions);
+                var suggestions_iti = "\nDaily itineraries:\n";
+                for(i=0; i < data["daily_itineraries"].length; i++)
+                {
+                    for(var j=0; j < data["daily_itineraries"][i]["experiences"].length; j++)
+                    {
+                        suggestions_iti += data["daily_itineraries"][i]["experiences"][j]["title"] + " ";
+                    }
+                    suggestions_iti += "\n";
+                }
+                $("#hint").text(suggestions_exp + suggestions_iti);
 
             }).fail(function(jqXHR, textStatus) {
                 $("#hint").val("error");
