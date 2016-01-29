@@ -23,6 +23,17 @@ gulp.task('styles', function() {
     .pipe(gulp.dest('./experiences/static/experiences/content/'));
 });
 
+// Compile jsx into js task
+gulp.task('scripts', function() {
+  browserify('experiences/static/experiences/scripts/itinerary-tool.jsx')
+    .bundle()
+    .pipe(source('experience/static/experiences/itinerary-tool-bundle.jsx'))
+    .pipe(babel({
+      presets: ['react']
+    }))
+    .pipe(gulp.dest('experiences/static/experiences/scripts/itinerary-tool.js'));
+});
+
 // Watch task
 gulp.task('default', function() {
   gulp.watch('sass/**/*.scss', ['styles']);
