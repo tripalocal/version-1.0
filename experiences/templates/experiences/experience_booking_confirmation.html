@@ -158,7 +158,7 @@
                     <hr style="margin-bottom:10px;">
                     <form action="{{GEO_POSTFIX}}experience/{{experience.id}}/" method="get">
                         <p>{% trans "Reservation for" %} <strong>{{ adult_number|add:child_number }}{% trans " person(s)" %}</strong><br>
-                           {% trans "on" %} <strong>{{date}}</strong>{% trans " at" %} <strong>{{time}}</strong>
+                           {% trans "on" %} <strong>{{date}}</strong>{%if experience.type == "PRIVATE" or experience.type == "NONPRIVATE"%}{% trans " at" %} <strong>{{time}}</strong>{% endif %}
                             (<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)
                         </p>
                         <hr style="margin:10px 0">
