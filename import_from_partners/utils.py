@@ -10,8 +10,8 @@ SOAP_REQUEST_AVAILABILITY = \
 		    xmlns:wsu="http://docs.oasisopen.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
             soap:mustUnderstand="1">
                 <wsse:UsernameToken wsu:Id="UsernameToken-3">
-                    <wsse:Username>tripalocal</wsse:Username>
-                    <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">okmnji</wsse:Password>
+                    <wsse:Username>tripalocalapi</wsse:Username>
+                    <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">c8EAZbRULywU4PnW</wsse:Password>
                 </wsse:UsernameToken>
             </wsse:Security>
         </soap:Header>
@@ -43,7 +43,7 @@ def convert_location(city):
 
 def get_experienceoz_availability(product_id, start_date, experience, available_options, available_date):
     server_addr = "www.tmtest.com.au"
-    service_action = "https://www.tmtest.com.au/d/services/API"
+    service_action = "https://tripalocal.experienceoz.com.au/d/services/API"
 
     form_kwargs = {
         'product_id': product_id,

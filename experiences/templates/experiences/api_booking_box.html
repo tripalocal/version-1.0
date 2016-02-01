@@ -69,7 +69,7 @@
               {{option.name}}
             </span>
             <span>
-              <select class="option-amount">
+              <select class="option-amount" option_id="{{option.original_id}}">
                 {% for i in "0123456789" %}
                 <option value="{{i}}">{{i}}</option>
                 {% endfor %}

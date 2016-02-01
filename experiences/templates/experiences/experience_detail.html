@@ -21,10 +21,6 @@
 {% block content %}
 
 {% if expired == None and listed == None %}
-    {% for field in form.hidden_fields %}
-        {{ field }}
-    {% endfor %}
-
     {%if host_only_expired %}
     <p style="postion:relative;top:50px;">{% trans "The experience has expired. Only you can see it now." %}</p>
     {%endif%}
@@ -270,6 +266,30 @@ function resizeImg() {
 
 function is_form_valid()
 {
+    var option_items = $(".option-amount");
+    if(option_items.length > 0)
+    {
+        //partner product
+        $("#id_booking_extra_information").val("{");
+        for(var i=0;i<option_items.length;i++)
+        {
+            var n = $(option_items[i]).val();
+            if(n>0)
+            {
+                $("#id_booking_extra_information").val($("#id_booking_extra_information").val()
+                                                    + "\"" + $(option_items[i]).attr("option_id") + "\":"
+                                                    + n + ",");
+            }
+        }
+        
+        $("#id_booking_extra_information").val($("#id_booking_extra_information").val().substring(0,$("#id_booking_extra_information").val().length-1) + "}");
+        if($("#id_booking_extra_information").val().length > 2)
+        {
+            return true;
+        }
+        return false;
+    }
+
     if($("#id_date").val() && $("#id_time").val() && $("#id_adult_number").val() && $("#id_child_number").val())
     {
         return true;
@@ -371,6 +391,10 @@ $(function(){
         $("#id_adult_number").append('<option value=' + i + '>' + i + '</option>');
     }
     //TODO
+    if($("#id_adult_number").children().length==0)
+    {
+        $("#id_adult_number").append('<option value=1>1</option>');
+    }
     $("#id_child_number").append('<option value=' + 0 + '>' + 0 + '</option>');
 
     $("#id_submit_request").bind("click", function(e) {
