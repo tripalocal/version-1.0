@@ -6,7 +6,7 @@ var SettingBar = React.createClass({
   displayName: 'SettingBar',
 
   render: function () {
-    return React.createElement('div', { className: 'row' });
+    return React.createElement('div', { className: 'bar' });
   }
 });
 
@@ -26,6 +26,21 @@ var DayRow = React.createClass({
         'td',
         null,
         this.props.day.items
+      ),
+      React.createElement(
+        'td',
+        null,
+        this.props.day.transport
+      ),
+      React.createElement(
+        'td',
+        null,
+        this.props.day.accommodation
+      ),
+      React.createElement(
+        'td',
+        null,
+        this.props.day.restaurant
       )
     );
   }
@@ -41,7 +56,7 @@ var DayTable = React.createClass({
     });
     return React.createElement(
       'table',
-      { className: 'table' },
+      { className: 'table table-striped' },
       React.createElement(
         'thead',
         null,
@@ -57,6 +72,21 @@ var DayTable = React.createClass({
             'th',
             null,
             'Activities'
+          ),
+          React.createElement(
+            'th',
+            null,
+            'Transport'
+          ),
+          React.createElement(
+            'th',
+            null,
+            'Accommodation'
+          ),
+          React.createElement(
+            'th',
+            null,
+            'Restaurant'
           )
         )
       ),
@@ -82,7 +112,8 @@ var ItineraryTool = React.createClass({
   }
 });
 
-var DAYS = [{ date: '2016-02-01', items: 'Lunching, Breathing, Rafting' }, { date: '2016-02-02', items: 'Eating, Breaking, Laughing' }, { date: '2016-02-03', items: 'Running, Jumping, Painting' }];
+// TEST DATA
+var DAYS = [{ date: '2016-02-01', items: 'Lunching, Breathing, Rafting', transport: 'CX992', accommodation: 'Melbourne 4Star', restaurant: 'Continental breakfast' }, { date: '2016-02-02', items: 'Eating, Breaking, Laughing', transport: 'Bus Ride', accommodation: 'Hilton 5star', restaurant: 'Great breakfast, lunch, dinner' }, { date: '2016-02-03', items: 'Running, Jumping, Painting', transport: 'Airport transfer', accommodation: 'Cool Cottage', restaurant: '' }];
 
 ReactDOM.render(React.createElement(ItineraryTool, { days: DAYS }), document.getElementById('container'));
 
