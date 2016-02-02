@@ -680,7 +680,7 @@ class BookingConfirmationForm(forms.Form):
                 and hasattr(experience, "partner") and experience.partner == "001":
                 bk_dt_string = bk_dt.strftime("%Y-%m-%d%z")
                 bk_dt_string = bk_dt_string[:-2]+":"+bk_dt_string[-2:]
-                purchase = experienceoz_makepurchase(user.first_name, user.last_name, payment_phone_number.split(",")[0], user.email, payment_country, payment_postcode,
+                purchase = experienceoz_makepurchase(user.first_name, user.last_name, payment_phone_number.split(",")[0], "billing@tripalocal.com", payment_country, payment_postcode,
                                           experience, bk_dt_string, self.cleaned_data['booking_extra_information'])
                 if purchase.get("success", False):
                     purchase_id = purchase["purchase_id"]
