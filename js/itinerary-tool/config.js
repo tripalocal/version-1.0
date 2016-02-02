@@ -18,9 +18,11 @@ System.config({
     "babel": "npm:babel-core@5.8.35",
     "babel-runtime": "npm:babel-runtime@5.8.35",
     "core-js": "npm:core-js@1.2.6",
+    "css": "github:systemjs/plugin-css@0.1.20",
     "jsx": "github:floatdrop/plugin-jsx@1.1.0",
     "react": "npm:react@0.14.7",
     "react-dom": "npm:react-dom@0.14.7",
+    "react-select": "npm:react-select@1.0.0-beta8",
     "github:floatdrop/plugin-jsx@1.1.0": {
       "react-tools": "npm:react-tools@0.13.3"
     },
@@ -383,6 +385,15 @@ System.config({
     },
     "npm:react-dom@0.14.7": {
       "react": "npm:react@0.14.7"
+    },
+    "npm:react-input-autosize@0.6.8": {
+      "react": "npm:react@0.14.7"
+    },
+    "npm:react-select@1.0.0-beta8": {
+      "classnames": "npm:classnames@2.2.3",
+      "react": "npm:react@0.14.7",
+      "react-dom": "npm:react-dom@0.14.7",
+      "react-input-autosize": "npm:react-input-autosize@0.6.8"
     },
     "npm:react-tools@0.13.3": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
