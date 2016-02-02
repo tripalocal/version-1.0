@@ -1,17 +1,13 @@
 import React from 'react';
 import Row from './Row.jsx!';
 
-export let __hotReload = true
 
 export default class Table extends React.Component {
   constructor(props) {
     super(props);
   }
   render() {
-    const rows = [];
-    this.props.days.forEach(day => {
-      rows.push(<Row day={day} key={day.date}/>);
-    })
+    const days = this.props.days.map(day => <Row day={day} key={day.date} />);
     return (
       <table className="table table-striped">
         <thead>
@@ -24,9 +20,11 @@ export default class Table extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {rows}
+          {days}
         </tbody>
       </table>
     );
   }
 }
+
+export let __hotReload = true;

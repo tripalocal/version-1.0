@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^1.10.3",
+    "eslint-plugin-react": "^3.16.1",
     "jspm": "^0.16.25",
     "jspm-server": "^1.0.1"
   },
