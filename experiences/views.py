@@ -76,6 +76,18 @@ def convert_experience_price(request, experience):
 
         experience.currency = request.session['custom_currency']
 
+    if hasattr(request, 'session') and 'custom_currency' in request.session and request.session['custom_currency'].lower() != "aud" \
+        and hasattr(experience, "optiongroup_set") and len(experience.optiongroup_set.all()) > 0:
+        optiongroup_set = []
+        for option in experience.optiongroup_set.all():
+            og = {"name":option.name, "optionitem_set":[]}
+            for item in option.optionitem_set.all():
+                og["optionitem_set"].append({"name":item.name, "original_id":item.original_id, "price":convert_currency(item.price, "aud", request.session['custom_currency'])})
+            optiongroup_set.append(og)
+        return optiongroup_set
+    else:
+        return None
+
 def next_time_slot(experience, repeat_cycle, repeat_frequency, repeat_extra_information, current_datetime, daylightsaving):
     #TODO:always return the next time slot in the future, even if "current_datetime" is earlier than now
     #daylightsaving: whether it was in daylightsaving when this blockout/instant booking record was created
@@ -1066,7 +1078,9 @@ class ExperienceDetailView(DetailView):
 
         context['related_experiences'] = zip(related_experiences, related_experiences_added_to_wishlist)
 
-        convert_experience_price(self.request, experience)
+        optiongroup_set = convert_experience_price(self.request, experience)
+        if optiongroup_set:
+            context["optiongroup_set"] = optiongroup_set
         experience.dollarsign = DollarSign[experience.currency.upper()]
         experience.currency = str(dict(Currency)[experience.currency.upper()])
 

@@ -56,14 +56,14 @@
       {{form.child_number}}
     </div>
 
-    {% for options in experience.optiongroup_set.all %}
+    {% for options in optiongroup_set %}
     <div class="box-section">
       <a class="collapse-group-toggle" role="button" data-toggle="collapse" href="#option-group-{{forloop.counter}}" onclick="$('.collapse').collapse('hide'); $('#option-group-{{forloop.counter}}').collapse('show');">
         {{options.name}}
         <span class="badge">+</span>
       </a>
       <div class="collapse" id="option-group-{{forloop.counter}}">
-          {% for option in options.optionitem_set.all %}
+          {% for option in options.optionitem_set %}
           <div class="option">
             <span class="option-name">
               {{option.name}}

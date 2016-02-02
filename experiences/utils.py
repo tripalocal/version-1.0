@@ -53,6 +53,8 @@ def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, 
             if i == len(items.keys()):
                 break
         if i == len(items.keys()):
+            if experience.currency.lower() != "aud":
+                price = convert_currency(price, "aud", experience.currency)
             return price
         else:
             raise ValueError("OptionItem mismatch")
