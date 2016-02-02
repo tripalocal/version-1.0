@@ -20,6 +20,7 @@ from django.db import connections
 from app.models import RegisteredUser
 from post_office import mail
 from unionpay.util.helper import load_config
+from import_from_partners.utils import *
 
 Type = (('PRIVATE', _('Private')),('NONPRIVATE', _('NonPrivate')),('RECOMMENDED', _('Recommended')),)
 
@@ -609,6 +610,8 @@ class BookingConfirmationForm(forms.Form):
     price_paid = forms.DecimalField(max_digits=6, decimal_places=2, required=False)
     custom_currency = forms.CharField(max_length=3, required=True)
 
+    booking_id = forms.CharField(max_length=50, required=False)
+
     def __init__(self, *args, **kwargs):
         super(BookingConfirmationForm, self).__init__(*args, **kwargs)
         self.fields['experience_id'].widget.attrs['readonly'] = True
@@ -652,9 +655,40 @@ class BookingConfirmationForm(forms.Form):
             free = False
             self.cleaned_data['price_paid'] = -1.0
 
+            user = User.objects.get(id=self.cleaned_data['user_id'])
+            adult_number = int(self.cleaned_data["adult_number"])
+            child_number = int(self.cleaned_data["child_number"])
+            coupon_extra_information=self.cleaned_data['coupon_extra_information'],
+
+            payment_street1 = self.cleaned_data['street1']
+            payment_street2 = self.cleaned_data['street2']
+            payment_city = self.cleaned_data['city_town']
+            payment_state = self.cleaned_data['state']
+            payment_country = self.cleaned_data['country']
+            payment_postcode = self.cleaned_data['postcode']
+            payment_phone_number = self.cleaned_data['phone_number']
+            currency = self.cleaned_data['custom_currency']
+
             dt = self.cleaned_data['date']
             tm = self.cleaned_data['time']
-            bk_dt = local_timezone.localize(datetime(dt.year, dt.month, dt.day, tm.hour, tm.minute)).astimezone(pytz.timezone("UTC"))
+            bk_dt = local_timezone.localize(datetime(dt.year, dt.month, dt.day, tm.hour, tm.minute))
+
+            #call makePurchase API if the product is from experienceOz
+            purchase_id = None
+            bk_total_price = None
+            if 'booking_extra_information' in self.cleaned_data and len(self.cleaned_data['booking_extra_information'])>0 \
+                and hasattr(experience, "partner") and experience.partner == "001":
+                bk_dt_string = bk_dt.strftime("%Y-%m-%d%z")
+                bk_dt_string = bk_dt_string[:-2]+":"+bk_dt_string[-2:]
+                purchase = experienceoz_makepurchase(user.first_name, user.last_name, payment_phone_number.split(",")[0], user.email, payment_country, payment_postcode,
+                                          experience, bk_dt_string, self.cleaned_data['booking_extra_information'])
+                if purchase.get("success", False):
+                    purchase_id = purchase["purchase_id"]
+                    bk_total_price = purchase["price"]
+                else:
+                    raise forms.ValidationError("Errors in calling makePurchase API")
+
+            bk_dt = bk_dt.astimezone(pytz.timezone("UTC"))
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
                                        end_datetime__gt = bk_dt,
                                        start_datetime__lt = bk_dt)
@@ -672,20 +706,7 @@ class BookingConfirmationForm(forms.Form):
                 else:
                     raise forms.ValidationError(valid['error'])
 
-            user = User.objects.get(id=self.cleaned_data['user_id'])
-            adult_number = int(self.cleaned_data["adult_number"])
-            child_number = int(self.cleaned_data["child_number"])
-            coupon_extra_information=self.cleaned_data['coupon_extra_information'],
             coupon=cp[0] if len(cp)>0 else None
-            payment_street1 = self.cleaned_data['street1']
-            payment_street2 = self.cleaned_data['street2']
-            payment_city = self.cleaned_data['city_town']
-            payment_state = self.cleaned_data['state']
-            payment_country = self.cleaned_data['country']
-            payment_postcode = self.cleaned_data['postcode']
-            payment_phone_number = self.cleaned_data['phone_number']
-            currency = self.cleaned_data['custom_currency']
-
             ids = []
             dates = []
             times = []
@@ -695,9 +716,10 @@ class BookingConfirmationForm(forms.Form):
 
             if 'Stripe' in self.data or 'stripeToken' in self.data:
                 booking_extra_information=self.cleaned_data['booking_extra_information'] if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information'] else ""
-                ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,adult_number,child_number = child_number,
-                             coupon_extra_information = coupon_extra_information, coupon = coupon,
-                             payment_phone_number = payment_phone_number, stripe_token = stripeToken, currency = currency)
+                booking = ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,adult_number,child_number = child_number,
+                             booking_extra_information=booking_extra_information, coupon_extra_information = coupon_extra_information, coupon = coupon,
+                             payment_phone_number = payment_phone_number, stripe_token = stripeToken, currency = currency,
+                             purchase_id = purchase_id)
             elif 'UnionPay' in self.data or 'WeChat' in self.data:
                 booking_extra_information=self.cleaned_data['booking_extra_information']
                 if coupon:
@@ -707,7 +729,8 @@ class BookingConfirmationForm(forms.Form):
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status=st,
                                         coupon_extra_information=coupon_extra_information,
                                         coupon=coupon,
-                                        booking_extra_information=booking_extra_information)
+                                        booking_extra_information=booking_extra_information,
+                                        whats_included = purchase_id)
                     if valid['valid'] and valid['new_price']==0.0:
                         send_booking_email_verification(booking, experience, user, instant_booking(experience,dt,tm))
                         sms_notification(booking, experience, user, self.cleaned_data['phone_number'])
@@ -716,7 +739,8 @@ class BookingConfirmationForm(forms.Form):
                     booking = Booking(user = user, experience= experience, guest_number = adult_number+child_number, adult_number = adult_number, children_number = child_number,
                                         datetime = bk_dt,
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="requested",
-                                        booking_extra_information=booking_extra_information)
+                                        booking_extra_information=booking_extra_information,
+                                        whats_included = purchase_id)
                 booking.save()
 
                 if not coupon or not valid['valid'] or valid['new_price'] > 0.0:
@@ -733,6 +757,8 @@ class BookingConfirmationForm(forms.Form):
                 #experience.guests.add(user)
                     cursor = connections['default'].cursor()
                     cursor.execute("Insert into experiences_experience_guests (experience_id,user_id) values (%s, %s)", [experience.id, user.id])
+
+            self.cleaned_data['booking_id'] = booking.id
 
         return cleaned
 
@@ -978,7 +1004,7 @@ class ItineraryBookingForm(forms.Form):
                 booking_extra_information=None,coupon_extra_information=None,coupon=None,
                 payment_street1=None,payment_street2=None,payment_city=None,
                 payment_state=None,payment_country=None,payment_postcode=None,
-                payment_phone_number=None,stripe_token=None,currency=None):
+                payment_phone_number=None,stripe_token=None,currency=None,purchase_id=None):
 
         for i in range(len(ids)):
             extra_fee = 0.00
@@ -1049,11 +1075,13 @@ class ItineraryBookingForm(forms.Form):
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid",
                                         coupon_extra_information=coupon_extra_information,
                                         coupon=coupon,
-                                        booking_extra_information=booking_extra_information)
+                                        booking_extra_information=booking_extra_information,
+                                        whats_included = purchase_id)
                 else:
                     booking = Booking(user = user, experience= experience, guest_number = adult_number+child_number, adult_number = adult_number, children_number = child_number,
                                         datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
-                                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information)
+                                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information,
+                                        whats_included = purchase_id)
                 booking.save()
                 #add the user to the guest list
                 if type(experience) == Experience and user not in experience.guests.all():
@@ -1080,6 +1108,8 @@ class ItineraryBookingForm(forms.Form):
 
                 send_booking_email_verification(booking, experience, user, is_instant_booking)
                 sms_notification(booking, experience, user, payment_phone_number)
+
+                return booking
 
     def clean(self):
         """

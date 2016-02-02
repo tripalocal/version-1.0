@@ -1,5 +1,5 @@
 ﻿from io import BytesIO
-from urllib.parse import urlencode
+from urllib.parse import urlencode, unquote
 from app.wechat_payment.api import UnifiedOrderPay, OrderQuery
 from app.wechat_payment.utils import dict_to_xml
 from django.core.files.storage import default_storage as storage
@@ -1007,6 +1007,9 @@ class ExperienceDetailView(DetailView):
         else:
             available_date = getAvailableOptions(experience, available_options, available_date)
 
+        if len(available_date) == 0:
+            raise ValueError("experience detail page: no available date")
+
         context['available_options'] = available_options
         uid = self.request.user.id if self.request.user.is_authenticated() else None
         context['form'] = BookingForm(available_date, experience.id, uid)
@@ -1193,20 +1196,31 @@ def update_pageview_statistics(user_id, experience_id, length = None):
 EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 
 @csrf_exempt
-def experience_booking_successful(request, experience=None, guest_number=None, booking_datetime=None, price_paid=None, is_instant_booking=False, *args, **kwargs):
+def experience_booking_successful(request, booking_id=None, guest_number=None, booking_datetime=None, price_paid=None, is_instant_booking=False, *args, **kwargs):
     if not request.user.is_authenticated():
         return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
 
-    if (request.GET is None or len(request.GET) == 0) and experience is None:
+    if (request.GET is None or len(request.GET) == 0) and booking_id is None:
         return HttpResponseRedirect(GEO_POSTFIX)
 
     data = request.GET
-    if experience is None and data is not None:
-        experience = AbstractExperience.objects.get(id=data['experience_id'])
+    if booking_id is not None:
+        booking = Booking.objects.get(id=booking_id)
+        experience = booking.experience
+    elif data is not None:
+        booking = Booking.objects.get(id=data['booking_id'])
+        experience = booking.experience
         guest_number = int(data['guest_number'])
         booking_datetime = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(data['booking_datetime'], "%Y-%m-%d%H:%M"))
         price_paid = float(data['price_paid'])
         is_instant_booking = True if data['is_instant_booking'] == "True" else False
+
+    #call Receipt API if the product is from experienceOz
+    link = None
+    if booking.whats_included and hasattr(experience, "partner") and experience.partner == "001":
+        receipt = experienceoz_receipt(booking)
+        if receipt.get("success", False):
+            link = unquote(receipt["link"])
 
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
     mp.track(request.user.email, 'Sent request to '+ experience.get_host().first_name)
@@ -1227,6 +1241,7 @@ def experience_booking_successful(request, experience=None, guest_number=None, b
                                     'booking_datetime':booking_datetime,
                                     'user':request.user,
                                     'experience_url':'http://' + settings.DOMAIN_NAME + '/experience/' + str(experience.id),
+                                    'link':link,
                                     'GEO_POSTFIX':settings.GEO_POSTFIX,
                                     'LANGUAGE':settings.LANGUAGE_CODE})
 
@@ -1316,13 +1331,13 @@ def experience_booking_confirmation(request):
 
                 if form.cleaned_data['status'] == 'accepted':
                     return experience_booking_successful(request,
-                                                         experience,
+                                                         form.cleaned_data['booking_id'],
                                                          int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'], True)
                 else:
                     return experience_booking_successful(request,
-                                                         experience,
+                                                         form.cleaned_data['booking_id'],
                                                          int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'])
@@ -1357,7 +1372,7 @@ def experience_booking_confirmation(request):
                 if total_price > 0.0:
                     #not free
                     response = client.UnionpayClient(config).pay(int(total_price*100),order_id, channel_type='07',#currency_code=CurrencyCode[experience.currency.upper()],
-                                                                 front_url='http://' + settings.ALLOWED_HOSTS[0] + '/experience_booking_successful/?experience_id=' + str(experience.id)
+                                                                 front_url='http://' + settings.ALLOWED_HOSTS[0] + '/experience_booking_successful/?booking_id=' + str(form.cleaned_data['booking_id'])
                                                                  + '&guest_number=' + str(adult_number+child_number)
                                                                  + '&booking_datetime=' + form.data['date'].strip()+form.data['time'].strip()
                                                                  + '&price_paid=' + str(total_price)
@@ -1366,7 +1381,7 @@ def experience_booking_confirmation(request):
                 else:
                     #free
                     return experience_booking_successful(request,
-                                                         experience,
+                                                         form.cleaned_data['booking_id'],
                                                          adult_number+child_number,
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'],
@@ -1411,7 +1426,7 @@ def experience_booking_confirmation(request):
                     if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
                         code_url = pay_info['code_url']
                         success_url = 'http://' + settings.ALLOWED_HOSTS[0] \
-                                      + '/experience_booking_successful/?experience_id=' + str(experience.id) \
+                                      + '/experience_booking_successful/?booking_id=' + str(form.cleaned_data['booking_id']) \
                                       + '&guest_number=' + str(adult_number+child_number) \
                                       + '&booking_datetime=' + form.data['date'].strip() + form.data['time'].strip() \
                                       + '&price_paid=' + str(total_price) + '&is_instant_booking=' \
@@ -1424,7 +1439,7 @@ def experience_booking_confirmation(request):
                 else:
                     #free
                     return experience_booking_successful(request,
-                                                         experience,
+                                                         form.cleaned_data['booking_id'],
                                                          adult_number+child_number,
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'],
