@@ -150,10 +150,11 @@ def get_experienceoz_availability(product_id, start_date, experience, available_
                         oi_name = oi[0].text
                         price = float(oi[1].text)
                         try:
-                            existing_oi = OptionItem.objects.get(original_id=oi.get("id"))
-                            if existing_oi.price != price:
-                                existing_oi.price = price
-                                existing_oi.save()
+                            existing_ois = OptionItem.objects.filter(original_id=oi.get("id"))
+                            for existing_oi in existing_ois:
+                                if existing_oi.price != price:
+                                    existing_oi.price = price
+                                    existing_oi.save()
                         except OptionItem.DoesNotExist:
                             pass
     return available_date

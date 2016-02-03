@@ -78,7 +78,7 @@ def convert_experience_price(request, experience):
 
     if hasattr(experience, "optiongroup_set") and len(experience.optiongroup_set.all()) > 0:
         optiongroup_set = []
-        for option in experience.optiongroup_set.all():
+        for option in experience.optiongroup_set.filter(language=settings.LANGUAGES[0][0]):
             og = {"name":option.name, "optionitem_set":[]}
             for item in option.optionitem_set.all():
                 if hasattr(request, 'session') and 'custom_currency' in request.session and request.session['custom_currency'].lower() != "aud":
