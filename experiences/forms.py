@@ -583,7 +583,7 @@ def check_coupon(coupon, experience_id, adult_number, child_number=None, target_
 class BookingConfirmationForm(forms.Form):
     user_id = forms.CharField()
     experience_id = forms.CharField()
-    date = forms.DateField()
+    date = forms.DateField(required=True, widget=forms.TextInput(attrs={'class':'form-control'}))
     time = forms.TimeField(initial=time(9,00,00))
     adult_number = forms.IntegerField(label="People")
     child_number = forms.IntegerField(label="Child",initial=0)

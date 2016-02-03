@@ -245,6 +245,11 @@
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 <script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+{%if LANGUAGE == "zh-CN"%}
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+{%endif%} 
 <script charset="utf-8" type="text/javascript">
 function resizeImg() {
     var thisImg= $('.item');
@@ -672,6 +677,22 @@ $(function(){
 
     // API BOOKING BOX LOGIC
     {% if experience.type != "PublicProduct" and experience.type != "PrivateProduct" and experience.type != 'ITINERARY' and experience.type != 'PRIVATE' and experience.type != 'PUBLIC' %}
+    if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
+            $("#id_date").datetimepicker({
+                format: 'YYYY-MM-DD', locale: 'zh-CN'
+            });
+
+            $("#id_date").on("dp.change", function (e) {
+                $('#id_date').data("DateTimePicker").minDate(e.date);
+            });
+    }  else {
+          $("#id_start_date").datetimepicker({
+                format: 'YYYY-MM-DD'
+            });
+            $("#id_date").on("dp.change", function (e) {
+                $('#id_date').data("DateTimePicker").minDate(e.date);
+            });
+    }
     $('.option-amount').on('change', function() {
         // Price update
       $('.collapse').each(function() {
