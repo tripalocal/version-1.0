@@ -1,3 +1,10 @@
 .Select-arrow-zone {
   display: none!important;
 }
+.Select-control:hover {
+  box-shadow: none!important;
+  cursor: text;
+}
+.table>tbody>tr>td {
+  vertical-align: middle;
+}

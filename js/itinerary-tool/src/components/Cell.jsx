@@ -1,64 +1,54 @@
 import React from 'react';
 import Select from 'react-select';
+import {ModalContainer, ModalDialog} from 'react-modal-dialog';
 
 export default class Cell extends React.Component {
   constructor(props) {
     super(props);
     // Initial state
     this.state = {
-      editing: false,
-      val: this.props.val
+      value: [{value: this.props.value, label: this.props.value}]
     };
     // Bind methods to component
-    this.edit = this.edit.bind(this);
-    this.finishEdit = this.finishEdit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.getOptions = this.getOptions.bind(this);
   }
 
   render() {
-    console.log(this.state.val);
     return(
       <td>
         <Select.Async
-          name={this.props.key}
           loadOptions={this.getOptions}
-          onFocus={this.edit}
           placeholder={this.props.type}
-          onChange={this.finishEdit}
-          value={this.state.val}
+          onChange={this.handleChange}
+          value={this.state.value}
+          multi={true}
+          clearable={false}
+          valueKey="value"
+          labelKey="label"
         />
       </td>
     );
   }
 
-  edit() {
-    // Enter edit mode.
-    this.setState({
-      editing: true
-    });
+  handleChange(value) {
+    console.log('You\'ve selected: ', value);
+    this.setState({ value });
   }
 
-  finishEdit(e) {
-    // Exit edit mode and update state.
-    e == null ?
-    this.setState({editing: false, val: ''}) :
-    this.setState({editing: false, val: e.value});
+  renderNewItemLink() {
+    return <a style={{ marginLeft: 5  }} onClick=></a>;
   }
 
   getOptions(input, callback) {
-    // Will be an ajax call.
-    setTimeout(() => {
-      callback(null, {
-        options: TEST_DATA[this.props.type]
-      });
-    }, 1000);
     // Test data.
     const TEST_DATA = {
       'items' : [
         { value: '1123', label: 'Skiing'},
         { value: '8282', label: 'Explore the jungle'},
         { value: '6624', label: 'Fight club'},
-        { value: '43224', label: 'Fishing'}
+        { value: '43224', label: 'Fishing'},
+        { value: '1245, 145, 12', label: 'Exploring, Jumping, Dancing' }
       ],
 
       'transport' : [
@@ -81,6 +71,19 @@ export default class Cell extends React.Component {
         { value: '1343', label: 'Asian delight'}
       ]
     };
+    // Will be an ajax call.
+    setTimeout(() => {
+      const options = TEST_DATA[this.props.type].push({
+        label: 'Add new item',
+        value: 'new',
+        disabled: true,
+        link: this.renderNewItemLink
+      });
+      callback(null, {
+        options: options 
+      });
+    }, 1000);
+
   }
 }
 

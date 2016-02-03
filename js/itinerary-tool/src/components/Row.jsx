@@ -14,7 +14,7 @@ export default class Row extends React.Component {
       } else {
         return(
           <Cell key={this.props.day.date + field}
-            val={this.props.day[field]}
+            value={this.props.day[field]}
             type={field}
           />
         );

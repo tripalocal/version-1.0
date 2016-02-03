@@ -9,7 +9,7 @@ export default class Table extends React.Component {
   render() {
     const days = this.props.days.map(day => <Row day={day} key={day.date} />);
     return (
-      <table className="table table-striped">
+      <table className="table">
         <thead>
           <tr>
             <th>Date</th>

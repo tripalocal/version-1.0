@@ -22,6 +22,7 @@ System.config({
     "jsx": "github:floatdrop/plugin-jsx@1.1.0",
     "react": "npm:react@0.14.7",
     "react-dom": "npm:react-dom@0.14.7",
+    "react-modal-dialog": "npm:react-modal-dialog@2.0.0",
     "react-select": "npm:react-select@1.0.0-beta8",
     "github:floatdrop/plugin-jsx@1.1.0": {
       "react-tools": "npm:react-tools@0.13.3"
@@ -67,6 +68,10 @@ System.config({
       "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2",
       "stream": "github:jspm/nodelibs-stream@0.1.0"
+    },
+    "npm:active-event-stack@1.0.0": {
+      "immutable": "npm:immutable@3.7.6",
+      "lodash": "npm:lodash@3.10.1"
     },
     "npm:amdefine@1.0.0": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -228,6 +233,9 @@ System.config({
       "public-encrypt": "npm:public-encrypt@4.0.0",
       "randombytes": "npm:randombytes@2.0.2"
     },
+    "npm:css-vendor@0.3.1": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
     "npm:des.js@1.0.0": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "inherits": "npm:inherits@2.0.1",
@@ -311,6 +319,27 @@ System.config({
     "npm:inherits@2.0.1": {
       "util": "github:jspm/nodelibs-util@0.1.0"
     },
+    "npm:jss-camel-case@1.0.1": {
+      "jss": "npm:jss@3.3.0",
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:jss-nested@1.0.2": {
+      "jss": "npm:jss@3.3.0",
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:jss-px@1.0.0": {
+      "jss": "npm:jss@3.3.0",
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:jss-vendor-prefixer@1.0.1": {
+      "css-vendor": "npm:css-vendor@0.3.1",
+      "jss": "npm:jss@3.3.0",
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:jss@3.3.0": {
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
+    },
     "npm:jstransform@10.1.0": {
       "base62": "npm:base62@0.1.1",
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
@@ -318,6 +347,9 @@ System.config({
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "process": "github:jspm/nodelibs-process@0.1.2",
       "source-map": "npm:source-map@0.1.31"
+    },
+    "npm:lodash@3.10.1": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:miller-rabin@4.0.0": {
       "bn.js": "npm:bn.js@4.9.0",
@@ -383,11 +415,39 @@ System.config({
       "crypto": "github:jspm/nodelibs-crypto@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
+    "npm:react-center-component@2.0.1": {
+      "lodash": "npm:lodash@3.10.1",
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "react": "npm:react@0.14.7",
+      "react-dom": "npm:react-dom@0.14.7"
+    },
     "npm:react-dom@0.14.7": {
       "react": "npm:react@0.14.7"
     },
     "npm:react-input-autosize@0.6.8": {
       "react": "npm:react@0.14.7"
+    },
+    "npm:react-jss@2.0.1": {
+      "jss": "npm:jss@3.3.0",
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "react": "npm:react@0.14.7"
+    },
+    "npm:react-modal-dialog@2.0.0": {
+      "active-event-stack": "npm:active-event-stack@1.0.0",
+      "classnames": "npm:classnames@2.2.3",
+      "dynamics.js": "npm:dynamics.js@0.0.7",
+      "immutable": "npm:immutable@3.7.6",
+      "jss": "npm:jss@3.3.0",
+      "jss-camel-case": "npm:jss-camel-case@1.0.1",
+      "jss-nested": "npm:jss-nested@1.0.2",
+      "jss-px": "npm:jss-px@1.0.0",
+      "jss-vendor-prefixer": "npm:jss-vendor-prefixer@1.0.1",
+      "keycode": "npm:keycode@2.1.0",
+      "lodash": "npm:lodash@3.10.1",
+      "react": "npm:react@0.14.7",
+      "react-center-component": "npm:react-center-component@2.0.1",
+      "react-dom": "npm:react-dom@0.14.7",
+      "react-jss": "npm:react-jss@2.0.1"
     },
     "npm:react-select@1.0.0-beta8": {
       "classnames": "npm:classnames@2.2.3",
