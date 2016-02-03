@@ -57,6 +57,7 @@
   }
 
   td {
+    position: relative;
     text-align: left;
     padding-top: 8px;
   }
@@ -120,6 +121,10 @@
   .weather {
     display: inline-block;
   }
+}
+
+.date-box {
+  position: relative;
 }
 
 .collapse-group-toggle {

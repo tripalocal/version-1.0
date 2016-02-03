@@ -444,7 +444,7 @@ class ExperienceSummaryForm(forms.Form):
 class BookingForm(forms.Form):
     user_id = forms.CharField()
     experience_id = forms.CharField()
-    date = forms.ChoiceField(label="")
+    date = forms.DateField(required=True, widget=forms.TextInput(attrs={'class':'form-control'})) 
     time = forms.ChoiceField(label="")
     adult_number = forms.ChoiceField(label="")
     child_number = forms.ChoiceField(label="", initial=0)
@@ -454,7 +454,6 @@ class BookingForm(forms.Form):
 
     def __init__(self, available_date, experience_id, user_id, *args, **kwargs):
         super(BookingForm, self).__init__(*args, **kwargs)
-        self.fields['date'] = forms.ChoiceField(choices = available_date)
         self.fields['experience_id'] = forms.CharField(initial=experience_id)
         self.fields['experience_id'].widget.attrs['readonly'] = True
         self.fields['experience_id'].widget = forms.HiddenInput()
@@ -583,7 +582,7 @@ def check_coupon(coupon, experience_id, adult_number, child_number=None, target_
 class BookingConfirmationForm(forms.Form):
     user_id = forms.CharField()
     experience_id = forms.CharField()
-    date = forms.DateField(required=True, widget=forms.TextInput(attrs={'class':'form-control'}))
+    date = forms.DateField()
     time = forms.TimeField(initial=time(9,00,00))
     adult_number = forms.IntegerField(label="People")
     child_number = forms.IntegerField(label="Child",initial=0)

@@ -16,6 +16,7 @@
     <!--<link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">-->
     <link href="{% static 'experiences/content/experience-detail.css' %}" rel="stylesheet">
     <link href="{% static 'experiences/content/weather-icons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -660,6 +661,19 @@ $(function(){
 })
 
 $(function(){
+
+    if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
+            $("#id_date").datetimepicker({
+                format: 'dd/MM/YYYY', locale: 'zh-CN',
+                enabledDates: {{available_dates|safe}} 
+            });
+    }  else {
+          $("#id_date").datetimepicker({
+                format: 'DD/MM/YYYY',
+                enabledDates: {{available_dates|safe}} 
+            });
+    }
+
     $("#id_adult_number").change(function(){
         min_number = parseInt($("#guest_number_min").attr("name"));
         max_number = parseInt($("#guest_number_max").attr("name"));
@@ -677,23 +691,7 @@ $(function(){
 
     // API BOOKING BOX LOGIC
     {% if experience.type != "PublicProduct" and experience.type != "PrivateProduct" and experience.type != 'ITINERARY' and experience.type != 'PRIVATE' and experience.type != 'PUBLIC' %}
-    if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
-            $("#id_date").datetimepicker({
-                format: 'YYYY-MM-DD', locale: 'zh-CN'
-            });
-
-            $("#id_date").on("dp.change", function (e) {
-                $('#id_date').data("DateTimePicker").minDate(e.date);
-            });
-    }  else {
-          $("#id_start_date").datetimepicker({
-                format: 'YYYY-MM-DD'
-            });
-            $("#id_date").on("dp.change", function (e) {
-                $('#id_date').data("DateTimePicker").minDate(e.date);
-            });
-    }
-    $('.option-amount').on('change', function() {
+      $('.option-amount').on('change', function() {
         // Price update
       $('.collapse').each(function() {
         var $optionGroup = $(this);
