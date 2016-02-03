@@ -183,25 +183,30 @@ def create_operator(operator, partner_id, request):
                     first_name = operator['name'][:30] if operator['name'] else "",
                     last_name = partner_id,
                     date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC))
-    user.save()
-    user.set_password(user.username)
-    user.save()
 
-    image_url = operator.get('image', None)
-    bio = operator.get('summary', operator.get('description', None))
-    user_signed_up.send(sender=user.__class__, request=request, user=user,
-                        partner_operator = True,
-                        image_url = image_url,
-                        bio = bio)
-    if hasattr(user, "provider"):
+        user.save()
+        user.set_password(user.username)
+        user.save()
+
+        image_url = operator.get('image', None)
+        bio = operator.get('summary', operator.get('description', None))
+        user_signed_up.send(sender=user.__class__, request=request, user=user,
+                            partner_operator = True,
+                            image_url = image_url,
+                            bio = bio)
+
+    if hasattr(user, "provider") and user.provider is not None:
         provider = user.provider
     else:
         provider = Provider()
         provider.user = user
-    provider.partner = partner_id
-    provider.company = operator['name'] if operator['name'] else ""
-    provider.website = operator['urlSegment'] if operator['urlSegment'] else ""
-    provider.email = user.email
+
+        provider.partner = partner_id
+        provider.company = operator.get('name', "")
+        provider.website = operator.get('urlSegment', "")
+        provider.email = user.email
+
+    provider.location = operator.get('geolocation', None)
     provider.save()
     return provider
 
