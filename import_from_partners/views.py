@@ -4,7 +4,7 @@ from datetime import *
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpResponseRedirect
-from experiences.models import NewProduct, NewProductI18n, Provider, OptionGroup, OptionItem
+from experiences.models import NewProduct, NewProductI18n, Provider, OptionGroup, OptionItem, Coordinate
 from experiences.views import saveExperienceImage
 from experiences.utils import isEnglish
 from io import BytesIO
@@ -208,6 +208,16 @@ def create_operator(operator, partner_id, request):
 
     provider.location = operator.get('geolocation', None)
     provider.save()
+
+    if provider.location and provider.product_suppliers:
+        for product in provider.product_suppliers.all():
+            if len(product.coordinate_set.all()) == 0:
+                coordinates = provider.location
+                longitude = coordinates['longitude']
+                latitude = coordinates['latitude']
+                c = Coordinate(experience=product, order=1, longitude=longitude, latitude=latitude)
+                c.save()
+
     return provider
 
 def get_operator(operatorUrl, partner_id, request):
