@@ -703,9 +703,9 @@ $(function(){
             total += parseInt($(this).text().replace(/\D/g,'0'));
         })
         if (total > 0 && $('#id_date').val()) {
-          $("#id_submit_request").removeAttr("disabled");
+          $("#id_submit_request").prop('disabled', false);
         } else {
-          $("#id_submit_request").attr("disabled");
+          $("#id_submit_request").prop('disabled', true);
           return ("Please select date and ticket type");
         }
         return ("Request " + "(total price of {{experience.dollarsign}}" + total + "{{experience.currency}})");
