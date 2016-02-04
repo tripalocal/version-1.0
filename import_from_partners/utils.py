@@ -1,6 +1,6 @@
 import json, os, collections, requests, pytz, base64, sys, string, http.client
 from datetime import *
-from experiences.models import OptionGroup, OptionItem
+from experiences.models import OptionGroup, OptionItem, NewProduct
 from xml.etree import ElementTree
 
 USERNAME = "tripalocalapi"
@@ -208,6 +208,17 @@ def experienceoz_makepurchase(first_name, last_name, number, email, country, pos
         for v in purchase.findall('.//Voucher'):
             vouchers.append(v.attrib['id'])
             profits += float(v[3].text)
+        #update commission
+        try:
+            p = NewProduct.objects.get(id=v[0].attrib['id'])
+            new_c = round(float(v[3].text)/(float(v[1].text)-float(v[3].text)),3)
+            if p.commission == 0:
+                p.commission = new_c
+            elif new_c < p.commission:
+                p.commission = new_c
+                p.save()
+        except Exception:
+            pass
 
         return {"success":True, "purchase_id":purchase.attrib['id'], "price":price, "vouchers":vouchers, "profits":profits}
     else:
