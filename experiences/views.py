@@ -1028,6 +1028,7 @@ class ExperienceDetailView(DetailView):
         uid = self.request.user.id if self.request.user.is_authenticated() else None
         context['form'] = BookingForm(available_date, experience.id, uid)
         context['available_dates'] = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))
+        context['first_available_date'] = context['available_dates'][0]
         
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
