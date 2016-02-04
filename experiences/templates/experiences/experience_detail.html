@@ -302,13 +302,13 @@ function is_form_valid()
     return false;
 }
 
-$(document).ready(resizeImg())
 
 $(window).resize(function(){
     resizeImg();
 });
 
 $(function(){
+    resizeImg();
     mixpanel.track("viewed an experience");
     if (screen.width > 767) {
       {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
@@ -348,16 +348,6 @@ $(function(){
             text = text.replace(/(?:\r\n|\r|\n)/g, '<br />');
             $("#"+ids[i]).html(text);
         }
-    }
-
-    var i=0;
-    for(; $("#id_date option").eq(i).length; i++)
-    {
-        var parts = $("#id_date option").eq(i).text().trim().split("/");
-        var date = new Date(parseInt(parts[2], 10),
-                          parseInt(parts[1], 10) - 1,
-                          parseInt(parts[0], 10));
-        $("#id_date option").eq(i).val(date.getFullYear() + '-' + (date.getMonth()+1) + '-' +  date.getDate());
     }
 
     if($("#time_string_0").attr("instant") == "True")
@@ -595,15 +585,12 @@ $(function(){
         $("#experience_map").hide();
     }
 
-    $("#id_submit_request").prop('disabled', false);
-})
 
-$(function(){
-    $("#id_date").change(function(){
-        selected_date = $("#id_date option:selected").text().trim();
-
+    $("#id_date").change(function() {
+        var selected_date = $("#id_date").val();
+        $("#id_submit_request").removeAttr('disabled');
         $("#id_time").html('');
-
+        
         var i=0;
         for(; $("#date_string_"+i).text().trim() != selected_date; i++)
         {
@@ -623,12 +610,14 @@ $(function(){
 
         $("#id_time").change();
     })
-})
 
-$(function(){
+   $("#id_date").blur(function() {
+        $(this).change();
+   });
+
     $("#id_time").change(function(){
-        selected_date = $("#id_date option:selected").text().trim();
-        selected_time = $("#id_time option:selected").text().trim();
+        var selected_date = $("#id_date").val();
+        var selected_time = $("#id_time option:selected").text().trim();
 
         var i=0;
         for(; $("#date_string_"+i).text().trim() != selected_date; i++)
@@ -657,9 +646,7 @@ $(function(){
         //mixpanel.track("Changed time_cn");
         {% endif %}
     })
-})
 
-$(function(){
 
     if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
             $("#id_date").datetimepicker({

@@ -141,6 +141,11 @@
     color: $dark-grey;
     text-decoration: none;
   }
+  p {
+    max-width: 225px;
+    margin: 0;
+    display: inline-block;
+  }
 }
 
 .booking-tip {

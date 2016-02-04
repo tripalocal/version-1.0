@@ -59,7 +59,7 @@
     {% for options in optiongroup_set %}
     <div class="box-section">
       <a class="collapse-group-toggle" role="button" data-toggle="collapse" href="#option-group-{{forloop.counter}}" onclick="$('.collapse').collapse('hide'); $('#option-group-{{forloop.counter}}').collapse('show');">
-        <p style="max-width:225px;display:inline-block;">{{options.name}}</p>
+        <p>{{options.name}}</p>
         <span class="badge">+</span>
       </a>
       <div class="collapse" id="option-group-{{forloop.counter}}">
