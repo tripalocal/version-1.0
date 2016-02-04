@@ -578,6 +578,10 @@ $(function(){
             })(marker, i));
 
             map.fitBounds(bounds);
+            var listener = google.maps.event.addListener(map, "idle", function() { 
+                              if (map.getZoom() > 14) map.setZoom(14); 
+                              google.maps.event.removeListener(listener); 
+                           });
         }
     }
     else
