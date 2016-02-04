@@ -46,17 +46,17 @@
     margin: auto;
   }
 
-  th {
+  .box-heading {
     font-weight: normal;
     border-bottom: 1px solid $light-grey;
     padding-left: 0;
   }
 
-  tr {
+  .box-row {
     height: 40px;
   }
 
-  td {
+  .box-cell {
     position: relative;
     text-align: left;
     padding-top: 8px;
@@ -125,7 +125,10 @@
 
 .date-box {
   position: relative;
+  width: 100px;
 }
+
+
 
 .collapse-group-toggle {
   color: $dark-grey;

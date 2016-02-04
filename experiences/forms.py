@@ -464,7 +464,7 @@ class BookingForm(forms.Form):
         self.fields['status'].widget = forms.HiddenInput()
         self.fields['adult_number'].widget.attrs.update({'class' : 'booking_form_people'})
         self.fields['child_number'].widget.attrs.update({'class' : 'booking_form_people'})
-        self.fields['date'].widget.attrs.update({'class' : 'booking_form_date'})
+        self.fields['date'].widget.attrs.update({'class' : 'form-control'})
         self.fields['time'].widget.attrs.update({'class' : 'booking_form_time'})
         self.fields['booking_extra_information'].widget.attrs['readonly'] = True
         self.fields['booking_extra_information'].widget = forms.HiddenInput()
