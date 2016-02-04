@@ -1146,9 +1146,9 @@ class ExperienceDetailView(DetailView):
         if experience.coordinate_set is not None:
             for co in experience.coordinate_set.all():
                 if co.order is not None and co.order >= 1:
-                    coordinates.insert(co.order-1, [co.name if co.name is not None else '', co.longitude, co.latitude])
+                    coordinates.insert(co.order-1, [co.name if co.name is not None else '', co.latitude, co.longitude])
                 else:
-                    coordinates.append([co.name if co.name is not None else '', co.longitude, co.latitude])
+                    coordinates.append([co.name if co.name is not None else '', co.latitude, co.longitude])
 
         context['coordinates'] = coordinates
 
