@@ -30,6 +30,17 @@
     </div>
     {% endif %}
 
+    {% if experience.notice %}
+     <div class="row" style="border-bottom:1px solid #CCCCCC;">
+      <div class="col-sm-3">
+        <h3>{% trans "Notice" %}</h3>
+      </div>
+      <div class="col-sm-9">
+        {{ experience.notice|linebreaks }}
+      </div>
+    </div>
+    {% endif %}
+
     {% if experience.service %}
     <div class="row" style="border-bottom:1px solid #CCCCCC;">
       <div class="col-sm-3">

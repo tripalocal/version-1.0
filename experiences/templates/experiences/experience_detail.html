@@ -42,7 +42,7 @@
             {% include "experiences/experience_description.html" %}
         {% else %}
             {% include "experiences/api_booking_box.html" %}
-            {% include "experiences/experience_description.html" %}
+            {% include "experiences/api_description.html" %}
         {%endif%}
     </div>
 
@@ -148,7 +148,6 @@
                 {% endfor%}
             </div>
             {% endif %}
-            <div id="experience_map" class="map"></div>
         </div>
     </div>
 
@@ -588,7 +587,10 @@ $(function(){
 
     $("#id_date").change(function() {
         var selected_date = $("#id_date").val();
+
+        {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' or experience.type == 'PRIVATE' or experience.type == 'PUBLIC' %}
         $("#id_submit_request").removeAttr('disabled');
+        {% endif %}
         $("#id_time").html('');
         
         var i=0;
@@ -700,12 +702,25 @@ $(function(){
         $('.badge').each(function() {
             total += parseInt($(this).text().replace(/\D/g,'0'));
         })
+        if (total > 0 && $('#id_date').val()) {
+          $("#id_submit_request").removeAttr("disabled");
+        } else {
+          $("#id_submit_request").attr("disabled");
+        }
         return ("Request " + "(total price of {{experience.dollarsign}}" + total + "{{experience.currency}})");
       });
     });
 
     $('#id_date').blur(function() {
         var time = new Date($(this).val().replace( /(\d{2})[-/](\d{2})[-/](\d+)/, "$2/$1/$3")).getTime() / 1000;
+        var timeNow = new Date().getTime() / 1000;
+        if ((time - timeNow) <= 172800) {
+          $("#id_submit_request").hide();
+          $(".booking-enquiry").show();
+        } else {
+          $(".booking-enquiry").hide();
+          $("#id_submit_request").show();
+        }
         {% if coordinates %}
         var lat = {{coordinates.0.1}};
         var lon = {{coordinates.0.2}};
