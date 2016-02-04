@@ -704,7 +704,7 @@ $(function(){
       });
     });
 
-    $('#id_date').on('change', function() {
+    $('#id_date').blur(function() {
         var time = new Date($(this).val()).getTime() / 1000;
         {% if coordinates %}
         var lat = {{coordinates.0.1}};
