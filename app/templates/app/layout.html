@@ -167,8 +167,8 @@
           {% endif %}
 
         <ul class="nav navbar-nav main-menu">
-          <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
-          <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
+          <li><a id="top_search_product" href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
+          <li><a id="top_search_experience" href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
           <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
         </ul>
 
@@ -484,6 +484,36 @@
     $(".dimmer").click(function() {
       $(".dimmer").fadeOut(250);
     })
+
+    $("#top_search_product").click(function() {
+        if($("#id_city").length>0 && $("#id_city").val().length>0)
+        {
+            var link = $("#top_search_product").attr("href");
+            link = link.split("/");
+            link[link.length-2] = $("#id_city").val();
+            var new_l = link[0]  + "/";
+            for(var i=1;i<link.length-1;i++)
+            {
+                new_l += link[i] + "/";
+            }
+            $("#top_search_product").attr("href", new_l);
+        }
+    });
+
+    $("#top_search_experience").click(function() {
+        if($("#id_city").length>0 && $("#id_city").val().length>0)
+        {
+            var link = $("#top_search_experience").attr("href");
+            link = link.split("/");
+            link[link.length-2] = $("#id_city").val();
+            var new_l = link[0]  + "/";
+            for(var i=1;i<link.length-1;i++)
+            {
+                new_l += link[i] + "/";
+            }
+            $("#top_search_experience").attr("href", new_l);
+        }
+    });
 
     {#http://stackoverflow.com/questions/11381673/detecting-a-mobile-browser#}
     window.mobilecheck = function() {
