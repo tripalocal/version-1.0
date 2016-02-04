@@ -650,7 +650,7 @@ $(function(){
 
     if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
             $("#id_date").datetimepicker({
-                format: 'dd/MM/YYYY', locale: 'zh-CN',
+                format: 'DD/MM/YYYY', locale: 'zh-CN',
                 enabledDates: {{available_dates|safe}} 
             });
     }  else {
@@ -705,7 +705,7 @@ $(function(){
     });
 
     $('#id_date').blur(function() {
-        var time = new Date($(this).val()).getTime() / 1000;
+        var time = new Date($(this).val().replace( /(\d{2})[-/](\d{2})[-/](\d+)/, "$2/$1/$3")).getTime() / 1000;
         {% if coordinates %}
         var lat = {{coordinates.0.1}};
         var lon = {{coordinates.0.2}};
