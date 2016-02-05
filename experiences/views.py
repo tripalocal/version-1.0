@@ -945,6 +945,21 @@ class ExperienceDetailView(DetailView):
             subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number, extra_information=form.data['booking_extra_information'])
 
             COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
+
+            item_options = None
+            if 'booking_extra_information' in form.data and len(form.data['booking_extra_information'])>0 \
+                and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
+                options = json.loads(form.data['booking_extra_information'])
+                item_options = {}
+                for k, v in options.items():
+                    ois = OptionItem.objects.filter(original_id=k)
+                    for oi in ois:
+                        if oi.group.language == settings.LANGUAGES[0][0]:
+                            if oi.group.name not in item_options:
+                                item_options[oi.group.name] = {}
+                            item_options[oi.group.name][oi.name] = v
+                            break
+
             return render(request, 'experiences/experience_booking_confirmation.html',
                           {'form': form, #'eid':self.object.id,
                            'experience': experience,
@@ -960,6 +975,7 @@ class ExperienceDetailView(DetailView):
                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                            'LANGUAGE':settings.LANGUAGE_CODE,
                            'commission':COMMISSION_PERCENT + 1,
+                           'item_options':item_options,
                            })
 
     def get_context_data(self, **kwargs):
@@ -1028,7 +1044,7 @@ class ExperienceDetailView(DetailView):
         uid = self.request.user.id if self.request.user.is_authenticated() else None
         context['form'] = BookingForm(available_date, experience.id, uid)
         context['available_dates'] = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))
-
+        
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
 

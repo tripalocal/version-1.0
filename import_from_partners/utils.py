@@ -3,6 +3,7 @@ from datetime import *
 from experiences.models import OptionGroup, OptionItem, NewProduct
 from xml.etree import ElementTree
 
+PARTNER_IDS = {"experienceoz":"001"}
 USERNAME = "tripalocalapi"
 PASSWORD = "c8EAZbRULywU4PnW"
 service_action = "https://tripalocal.experienceoz.com.au/d/services/API"

@@ -676,7 +676,7 @@ class BookingConfirmationForm(forms.Form):
             purchase_id = None
             bk_total_price = None
             if 'booking_extra_information' in self.cleaned_data and len(self.cleaned_data['booking_extra_information'])>0 \
-                and hasattr(experience, "partner") and experience.partner == "001":
+                and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
                 bk_dt_string = bk_dt.strftime("%Y-%m-%d%z")
                 bk_dt_string = bk_dt_string[:-2]+":"+bk_dt_string[-2:]
                 purchase = experienceoz_makepurchase(user.first_name, user.last_name, payment_phone_number.split(",")[0], "billing@tripalocal.com", payment_country, payment_postcode,

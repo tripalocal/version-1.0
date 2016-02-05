@@ -12,8 +12,6 @@ from Tripalocal_V1 import settings
 from xml.etree import ElementTree
 from import_from_partners.utils import *
 
-PARTNER_IDS = {"experienceoz":"001"}
-
 def import_experienceoz_products(request):
     if not request.user.is_authenticated() or not request.user.is_staff:
         return HttpResponseRedirect("/")
