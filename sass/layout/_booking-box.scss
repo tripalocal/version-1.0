@@ -83,6 +83,10 @@
     height: 50px;
     border-radius: 2px;
     margin: 10px auto;
+    &:disabled {
+      background-color: $medium-grey;
+      color: white;
+    }
   }
 
   .badge {
@@ -119,8 +123,9 @@
   }
 
   .weather {
-    margin-left: 15px;
+    float: right;
     display: inline-block;
+    line-height: 30px;
   }
 }
 

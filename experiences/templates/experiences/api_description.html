@@ -1,4 +1,4 @@
-{% load mathfilters %} {% load i18n %}
+{% load mathfilters %} {% load i18n %}{% load markdown_filter %}
 
 <div class="description-box">
   <div class="container-fluid" style="text-align:left;">
@@ -47,7 +47,7 @@
         <h3>{% trans "Description" %}</h3>
       </div>
       <div class="col-sm-9">
-        {{ experience.service|linebreaks }}
+        {{ experience.service|markdown_filter|safe }}
       </div>
     </div>
     {% endif %}
