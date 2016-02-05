@@ -158,7 +158,7 @@
                     <hr style="margin-bottom:10px;">
                     <form action="{{GEO_POSTFIX}}experience/{{experience.id}}/" method="get">
                     {% if item_options %}
-                        {% trans "on" %} <strong>{{date}}</strong>(<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)<br>
+                        {% trans "on" %} <strong>{{date}}</strong>(<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)<br><br>
                         {% for op_name, v in item_options.items %}
                             <strong>{{op_name}}</strong><br>
                             {%for oi_name, number in v.items%}
