@@ -3184,14 +3184,12 @@ def custom_itinerary(request, id=None, operation=None):
         ci.user = request.user
         ci.title = ""
         ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
-        ci.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
-        ci.end_datetime = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
+        ci.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        ci.end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
         ci.cities = "Melbourne"
         ci.save()
 
         #add a booking for the new itinerary
-        local_timezone = pytz.timezone("Melbourne")
-
         booking = Booking(user = request.user, experience=Experience.objects.get(id=1), guest_number = 1, adult_number = 1, children_number = 0,
                         datetime = datetime.utcnow().replace(tzinfo=pytz.UTC),
                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
