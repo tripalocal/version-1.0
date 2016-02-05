@@ -157,12 +157,26 @@
                     <p>{{ experience.city }}</p>
                     <hr style="margin-bottom:10px;">
                     <form action="{{GEO_POSTFIX}}experience/{{experience.id}}/" method="get">
+                    {% if item_options %}
+                        {% trans "on" %} <strong>{{date}}</strong>(<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)<br>
+                        {% for op_name, v in item_options.items %}
+                            <strong>{{op_name}}</strong><br>
+                            {%for oi_name, number in v.items%}
+                            {% if forloop.last %}
+                            {{oi_name}} &#215; {{number}}<br>
+                            {% else %}
+                            {{oi_name}} &#215; {{number}},
+                            {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% else %}
                         <p>{% trans "Reservation for" %} <strong>{{ adult_number|add:child_number }}{% trans " person(s)" %}</strong><br>
                            {% trans "on" %} <strong>{{date}}</strong>{%if experience.type == "PRIVATE" or experience.type == "NONPRIVATE"%}{% trans " at" %} <strong>{{time}}</strong>{% endif %}
                             (<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)
                         </p>
                         <hr style="margin:10px 0">
                         <p>{% trans "Rate:" %} {{experience.currency|upper}}{{experience.dollarsign}}{{experience_price|floatformat|mul:commission|floatformat:"0"}}{% trans " per person for " %}{{experience.duration}}{% trans " hours" %}</p>
+                    {% endif %}
                         <hr style="margin-bottom:10px;">
                         {% trans "Subtotal:" %} {{experience.currency|upper}}{{experience.dollarsign}}<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
                         <br>
