@@ -61,10 +61,14 @@
     margin-top: 15px;
   }
 
-  h3 {
+  h3, h4 {
     color: $dark-grey;
     margin-top: 0;
     font-weight: normal;
+  }
+
+  li {
+    list-style: disc;  
   }
 
   p {
@@ -74,6 +78,14 @@
     @include media('<tablet') {
       padding-left: 30px;
       padding-right: 30px;
+    }
+  }
+}
+
+.markdown-text {
+  @include media('>tablet') {
+    ul, p {
+      margin-top: -20px;
     }
   }
 }
