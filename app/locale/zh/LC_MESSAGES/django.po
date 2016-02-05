@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-11 12:16+1100\n"
+"POT-Creation-Date: 2016-02-05 11:41+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -329,7 +329,7 @@ msgid "Send"
 msgstr "发送"
 
 #: app/templates/app/layout.html:148 app/templates/app/loginpartial.html:38
-#: app/templates/app/mylisting.html:6 app/templates/app/mylisting.html:15
+#: app/templates/app/mylisting.html:6 app/templates/app/mylisting.html.py:15
 #: app/templates/app/myprofile.html:15 app/templates/app/myreservation.html:15
 #: app/templates/app/mytrip.html:15
 msgid "My Listing"
@@ -424,31 +424,31 @@ msgstr ""
 msgid "Twitter"
 msgstr ""
 
-#: app/templates/app/layout.html:266
+#: app/templates/app/layout.html:265
 msgid "Scan for wechat"
 msgstr "扫一扫微信客服"
 
-#: app/templates/app/layout.html:292
+#: app/templates/app/layout.html:291
 msgid "Sent!"
 msgstr "发送成功"
 
-#: app/templates/app/layout.html:297
+#: app/templates/app/layout.html:296
 msgid "Error sending, please"
 msgstr "发送失败，请重试"
 
-#: app/templates/app/layout.html:297 app/templates/app/layout.html.py:380
+#: app/templates/app/layout.html:296 app/templates/app/layout.html.py:379
 msgid "try again"
 msgstr "请重试"
 
-#: app/templates/app/layout.html:372
+#: app/templates/app/layout.html:371
 msgid "Please fill in all fields."
 msgstr "请填写全部必填项"
 
-#: app/templates/app/layout.html:380
+#: app/templates/app/layout.html:379
 msgid "Invalid email, please"
 msgstr "无效电子邮箱"
 
-#: app/templates/app/layout.html:459
+#: app/templates/app/layout.html:458
 msgid "Please try again later"
 msgstr ""
 
@@ -477,7 +477,7 @@ msgid "Invalid input"
 msgstr ""
 
 #: app/templates/app/mylisting.html:17 app/templates/app/myprofile.html:6
-#: app/templates/app/myprofile.html:17 app/templates/app/myprofile.html:26
+#: app/templates/app/myprofile.html.py:17 app/templates/app/myprofile.html:26
 #: app/templates/app/myreservation.html:17 app/templates/app/mytrip.html:17
 msgid "My Profile"
 msgstr "个人信息"
@@ -736,11 +736,11 @@ msgstr "惠灵顿"
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 您的帐户已经成功激活"
 
-#: app/views.py:750
+#: app/views.py:749
 msgid "Image size exceeds the limit"
 msgstr "文件大小超过上限"
 
-#: app/views.py:752
+#: app/views.py:751
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
 
