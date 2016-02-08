@@ -948,9 +948,9 @@ class ExperienceDetailView(DetailView):
             COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
 
             item_options = None
-            if 'booking_extra_information' in form.data and len(form.data['booking_extra_information'])>0 \
+            if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0 \
                 and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
-                options = json.loads(form.data['booking_extra_information'])
+                options = json.loads(form.data['partner_product_information'])
                 item_options = {}
                 for k, v in options.items():
                     ois = OptionItem.objects.filter(original_id=k)
