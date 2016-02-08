@@ -444,7 +444,7 @@ class ExperienceSummaryForm(forms.Form):
 class BookingForm(forms.Form):
     user_id = forms.CharField()
     experience_id = forms.CharField()
-    date = forms.DateField(required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Please select'})) 
+    date = forms.DateField(required=True, widget=forms.TextInput(attrs={'placeholder':_('Please select')})) 
     time = forms.ChoiceField(label="")
     adult_number = forms.ChoiceField(label="")
     child_number = forms.ChoiceField(label="", initial=0)
