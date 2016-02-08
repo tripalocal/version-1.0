@@ -86,7 +86,7 @@ $(document).ready(function() {
 	// Bind click events
 	$('#start-btn').on('click', function() {
 		$.fn.fullpage.moveSectionDown();
-	})
+	});
 	$('.overlay').on('click', function() {
 		$this = $(this);
 		$this.hasClass('selected') ? $this.removeClass('selected') : $this.addClass('selected');
@@ -261,11 +261,14 @@ function updateBudget() {
 			max += (cities * 200);
 	}
 
-	if (min != 0 && max != 0) {
-		$('#budget').text('Estimated cost: $' + min + ' to $' + max + ' total for this itinerary.').addClass('animated fadeInUp');
-		var wait = window.setTimeout( function(){
-            $('#budget').removeClass('animated fadeInUp')}, 1000
-        );
+  if (min < 1000) {
+    $('#budget').text('Our custom itinerary service starts from $1000');
+  }
+	else {
+		$('#budget').text('Estimated cost: $' + Math.round(min/guests) + '+ per person ($' + min + '+ in total)').addClass('animated fadeInUp');
+		var wait = window.setTimeout(function(){
+      $('#budget').removeClass('animated fadeInUp')}, 1000
+    );
 	}
 }
 
