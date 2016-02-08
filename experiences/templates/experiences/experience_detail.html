@@ -393,6 +393,10 @@ $(function(){
     $("#id_child_number").append('<option value=' + 0 + '>' + 0 + '</option>');
 
     $("#id_submit_request").bind("click", function(e) {
+        if($("#" + e.target.id).attr("type") == "button")
+        {
+            return;
+        }
         e.preventDefault();
         if(is_form_valid())
         {
