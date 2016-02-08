@@ -274,20 +274,20 @@ function is_form_valid()
     if(option_items.length > 0)
     {
         //partner product
-        $("#id_booking_extra_information").val("{");
+        $("#id_partner_product_information").val("{");
         for(var i=0;i<option_items.length;i++)
         {
             var n = $(option_items[i]).val();
             if(n>0)
             {
-                $("#id_booking_extra_information").val($("#id_booking_extra_information").val()
+                $("#id_partner_product_information").val($("#id_partner_product_information").val()
                                                     + "\"" + $(option_items[i]).attr("option_id") + "\":"
                                                     + n + ",");
             }
         }
         
-        $("#id_booking_extra_information").val($("#id_booking_extra_information").val().substring(0,$("#id_booking_extra_information").val().length-1) + "}");
-        if($("#id_booking_extra_information").val().length > 2)
+        $("#id_partner_product_information").val($("#id_partner_product_information").val().substring(0,$("#id_partner_product_information").val().length-1) + "}");
+        if($("#id_partner_product_information").val().length > 2)
         {
             return true;
         }

@@ -942,7 +942,8 @@ class ExperienceDetailView(DetailView):
 
             adult_number = int(form.data['adult_number'])
             child_number = int(form.data['child_number'])
-            subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number, extra_information=form.data['booking_extra_information'])
+            subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number,
+                                             extra_information=form.data['partner_product_information'])
 
             COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
 
@@ -1306,7 +1307,8 @@ def experience_booking_confirmation(request):
         adult_number = int(form.data['adult_number'])
         child_number = int(form.data['child_number'])
         experience_price = experience.price
-        subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number, extra_information=form.data['booking_extra_information'])
+        subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number,
+                                         extra_information=form.data['partner_product_information'])
 
         COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
         total_price = experience_fee_calculator(subtotal_price, experience.commission)
@@ -1326,7 +1328,7 @@ def experience_booking_confirmation(request):
                 wrong_promo_code = True
             else:
                 valid = check_coupon(coupons[0], experience.id, adult_number+child_number,
-                                     extra_information=form.data['booking_extra_information'])
+                                     extra_information=form.data['partner_product_information'])
                 if not valid['valid']:
                     coupon = Coupon()
                     wrong_promo_code = True
@@ -2095,9 +2097,10 @@ def update_booking(id, accepted, user):
                 payment = Payment.objects.get(booking_id=booking.id)
 
                 if booking.adult_number:
-                    subtotal_price = get_total_price(experience, adult_number=booking.adult_number, child_number=child_number, extra_information=booking.booking_extra_information)
+                    subtotal_price = get_total_price(experience, adult_number=booking.adult_number, child_number=child_number, 
+                                                     extra_information=booking.partner_product_information)
                 else:
-                    subtotal_price = get_total_price(experience, booking.guest_number, extra_information=booking.booking_extra_information)
+                    subtotal_price = get_total_price(experience, booking.guest_number, extra_information=booking.partner_product_information)
 
                 #refund_amount does not include process fee: the transaction can't be undone
                 COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)

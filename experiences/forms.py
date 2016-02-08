@@ -450,7 +450,7 @@ class BookingForm(forms.Form):
     child_number = forms.ChoiceField(label="", initial=0)
     status = forms.CharField(initial="Requested")
     #for booking partner products
-    booking_extra_information = forms.CharField(required = False)
+    partner_product_information = forms.CharField(required = False)
 
     def __init__(self, available_date, experience_id, user_id, *args, **kwargs):
         super(BookingForm, self).__init__(*args, **kwargs)
@@ -466,8 +466,8 @@ class BookingForm(forms.Form):
         self.fields['child_number'].widget.attrs.update({'class' : 'booking_form_people'})
         self.fields['date'].widget.attrs.update({'class' : 'form-control'})
         self.fields['time'].widget.attrs.update({'class' : 'booking_form_time'})
-        self.fields['booking_extra_information'].widget.attrs['readonly'] = True
-        self.fields['booking_extra_information'].widget = forms.HiddenInput()
+        self.fields['partner_product_information'].widget.attrs['readonly'] = True
+        self.fields['partner_product_information'].widget = forms.HiddenInput()
 
 class CreditCardField(forms.IntegerField):
     def clean(self, value):
@@ -606,6 +606,7 @@ class BookingConfirmationForm(forms.Form):
 
     coupon_extra_information = forms.CharField(max_length=500, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
+    partner_product_information = forms.CharField(required = False)
     price_paid = forms.DecimalField(max_digits=6, decimal_places=2, required=False)
     custom_currency = forms.CharField(max_length=3, required=True)
 
@@ -630,6 +631,7 @@ class BookingConfirmationForm(forms.Form):
         self.fields['status'].widget = forms.HiddenInput()
         self.fields['coupon_extra_information'].widget = forms.HiddenInput()
         self.fields['booking_extra_information'].widget = forms.HiddenInput()
+        self.fields['partner_product_information'].widget = forms.HiddenInput()
         self.fields['custom_currency'].widget = forms.HiddenInput()
         self.fields['phone_number'].widget = forms.HiddenInput()
 
@@ -657,7 +659,9 @@ class BookingConfirmationForm(forms.Form):
             user = User.objects.get(id=self.cleaned_data['user_id'])
             adult_number = int(self.cleaned_data["adult_number"])
             child_number = int(self.cleaned_data["child_number"])
-            coupon_extra_information=self.cleaned_data['coupon_extra_information'],
+            coupon_extra_information = self.cleaned_data['coupon_extra_information']
+            booking_extra_information = self.cleaned_data['booking_extra_information']
+            partner_product_information = self.cleaned_data['partner_product_information']
 
             payment_street1 = self.cleaned_data['street1']
             payment_street2 = self.cleaned_data['street2']
@@ -675,12 +679,11 @@ class BookingConfirmationForm(forms.Form):
             #call makePurchase API if the product is from experienceOz
             purchase_id = None
             bk_total_price = None
-            if 'booking_extra_information' in self.cleaned_data and len(self.cleaned_data['booking_extra_information'])>0 \
-                and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
+            if hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
                 bk_dt_string = bk_dt.strftime("%Y-%m-%d%z")
                 bk_dt_string = bk_dt_string[:-2]+":"+bk_dt_string[-2:]
                 purchase = experienceoz_makepurchase(user.first_name, user.last_name, payment_phone_number.split(",")[0], "billing@tripalocal.com", payment_country, payment_postcode,
-                                          experience, bk_dt_string, self.cleaned_data['booking_extra_information'])
+                                          experience, bk_dt_string, partner_product_information)
                 if purchase.get("success", False):
                     purchase_id = purchase["purchase_id"]
                     bk_total_price = purchase["price"]
@@ -693,8 +696,8 @@ class BookingConfirmationForm(forms.Form):
                                        start_datetime__lt = bk_dt)
 
             if len(cp)>0:
-                valid = check_coupon(cp[0], experience.id, self.cleaned_data['adult_number'] + self.cleaned_data['child_number'],
-                                     extra_information = self.cleaned_data['booking_extra_information'])
+                valid = check_coupon(cp[0], experience.id, adult_number + child_number,
+                                     extra_information = partner_product_information)
                 if valid['valid']:
                     self.cleaned_data['price_paid'] = valid['new_price']
                     rules = json.loads(cp[0].rules)
@@ -714,13 +717,13 @@ class BookingConfirmationForm(forms.Form):
             times.append(tm.strftime("%H"))
 
             if 'Stripe' in self.data or 'stripeToken' in self.data:
-                booking_extra_information=self.cleaned_data['booking_extra_information'] if 'booking_extra_information' in self.cleaned_data and self.cleaned_data['booking_extra_information'] else ""
                 booking = ItineraryBookingForm.booking(ItineraryBookingForm(),ids,dates,times,user,adult_number,child_number = child_number,
-                             booking_extra_information=booking_extra_information, coupon_extra_information = coupon_extra_information, coupon = coupon,
+                             partner_product_information = partner_product_information,
+                             booking_extra_information=booking_extra_information, 
+                             coupon_extra_information = coupon_extra_information, coupon = coupon,
                              payment_phone_number = payment_phone_number, stripe_token = stripeToken, currency = currency,
                              purchase_id = purchase_id)
             elif 'UnionPay' in self.data or 'WeChat' in self.data:
-                booking_extra_information=self.cleaned_data['booking_extra_information']
                 if coupon:
                     st = "paid" if valid['valid'] and valid['new_price']==0.0 else 'requested'
                     booking = Booking(user = user, experience= experience, guest_number = adult_number+child_number, adult_number = adult_number, children_number = child_number,
@@ -729,6 +732,7 @@ class BookingConfirmationForm(forms.Form):
                                         coupon_extra_information=coupon_extra_information,
                                         coupon=coupon,
                                         booking_extra_information=booking_extra_information,
+                                        partner_product = partner_product_information,
                                         whats_included = purchase_id)
                     if valid['valid'] and valid['new_price']==0.0:
                         send_booking_email_verification(booking, experience, user, instant_booking(experience,dt,tm))
@@ -739,6 +743,7 @@ class BookingConfirmationForm(forms.Form):
                                         datetime = bk_dt,
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="requested",
                                         booking_extra_information=booking_extra_information,
+                                        partner_product = partner_product_information,
                                         whats_included = purchase_id)
                 booking.save()
 
@@ -984,6 +989,7 @@ class ItineraryBookingForm(forms.Form):
     postcode = forms.CharField(max_length=4, required = False)
     phone_number = forms.CharField(max_length=50, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
+    partner_product_information = forms.CharField(widget=forms.Textarea, required=False)
     custom_currency = forms.CharField(max_length=3, required=True)
     price_paid = forms.FloatField(required=False)
 
@@ -994,12 +1000,14 @@ class ItineraryBookingForm(forms.Form):
         self.fields['itinerary_id'].widget.attrs['readonly'] = True
         self.fields['itinerary_id'].widget = forms.HiddenInput()
         self.fields['booking_extra_information'].widget = forms.HiddenInput()
+        self.fields['partner_product_information'].widget = forms.HiddenInput()
         self.fields['custom_currency'].widget.attrs['readonly'] = True
         self.fields['custom_currency'].widget = forms.HiddenInput()
         self.fields['phone_number'].widget = forms.HiddenInput()
 
     def booking(self,ids,dates,times,user,adult_number,child_number=None,
                 card_number=None,exp_month=None,exp_year=None,cvv=None,
+                partner_product_information = None,
                 booking_extra_information=None,coupon_extra_information=None,coupon=None,
                 payment_street1=None,payment_street2=None,payment_city=None,
                 payment_state=None,payment_country=None,payment_postcode=None,
@@ -1031,7 +1039,8 @@ class ItineraryBookingForm(forms.Form):
 
             payment = Payment()
             if not free:
-                subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number, extra_information=booking_extra_information)
+                subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number,
+                                                 extra_information=partner_product_information)
 
                 COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
                 if extra_fee == 0.00:
@@ -1075,12 +1084,13 @@ class ItineraryBookingForm(forms.Form):
                                         coupon_extra_information=coupon_extra_information,
                                         coupon=coupon,
                                         booking_extra_information=booking_extra_information,
+                                        partner_product = partner_product_information,
                                         whats_included = purchase_id)
                 else:
                     booking = Booking(user = user, experience= experience, guest_number = adult_number+child_number, adult_number = adult_number, children_number = child_number,
                                         datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information,
-                                        whats_included = purchase_id)
+                                        partner_product = partner_product_information, whats_included = purchase_id)
                 booking.save()
                 #add the user to the guest list
                 if type(experience) == Experience and user not in experience.guests.all():
