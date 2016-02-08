@@ -480,7 +480,7 @@ class CustomItinerary(models.Model):
             if bking.total_price and experience.type in ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]:
                 subtotal_price = float(bking.total_price)
             else:
-                subtotal_price = get_total_price(experience, guest_number, adult_number, children_number, extra_information=bking.booking_extra_information)
+                subtotal_price = get_total_price(experience, guest_number, adult_number, children_number, extra_information=bking.partner_product_information)
             subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
             if experience.currency != currency:
                 if experience.currency.lower() == "aud":
@@ -558,7 +558,7 @@ class Booking(models.Model):
     booking_extra_information = models.TextField(null=True, blank=True)
     custom_itinerary = models.ForeignKey(CustomItinerary, null=True, blank=True)
     host = models.ForeignKey(User, null=True, blank=True, related_name='booking_host')
-    option_item = models.ManyToManyField(OptionItem, related_name='booking_option_item')
+    partner_product = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.user.email + "--" + self.experience.get_information(settings.LANGUAGES[0][0]).title
