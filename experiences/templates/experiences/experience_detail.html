@@ -653,14 +653,14 @@ $(function(){
     if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
             var available_dates = {{available_dates|safe}};
             $("#id_date").datetimepicker({
-                format: 'DD/MM/YYYY', locale: 'zh-CN',
+                format: 'YYYY-MM-DD', locale: 'zh-CN',
                 enabledDates: available_dates,
                 minDate: available_dates[0] 
             });
     }  else {
           var available_dates = {{available_dates|safe}};
           $("#id_date").datetimepicker({
-                format: 'DD/MM/YYYY',
+                format: 'YYYY-MM-DD',
                 enabledDates: available_dates,
                 minDate: available_dates[0]
           });
