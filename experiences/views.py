@@ -2098,9 +2098,9 @@ def update_booking(id, accepted, user):
 
                 if booking.adult_number:
                     subtotal_price = get_total_price(experience, adult_number=booking.adult_number, child_number=child_number, 
-                                                     extra_information=booking.partner_product_information)
+                                                     extra_information=booking.partner_product)
                 else:
-                    subtotal_price = get_total_price(experience, booking.guest_number, extra_information=booking.partner_product_information)
+                    subtotal_price = get_total_price(experience, booking.guest_number, extra_information=booking.partner_product)
 
                 #refund_amount does not include process fee: the transaction can't be undone
                 COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
