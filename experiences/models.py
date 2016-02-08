@@ -480,7 +480,7 @@ class CustomItinerary(models.Model):
             if bking.total_price and experience.type in ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]:
                 subtotal_price = float(bking.total_price)
             else:
-                subtotal_price = get_total_price(experience, guest_number, adult_number, children_number, extra_information=bking.partner_product_information)
+                subtotal_price = get_total_price(experience, guest_number, adult_number, children_number, extra_information=bking.partner_product)
             subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
             if experience.currency != currency:
                 if experience.currency.lower() == "aud":
