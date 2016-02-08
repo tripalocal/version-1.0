@@ -701,8 +701,8 @@ def track_user_login(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
     try:
-        mp.people_set(user.email, {"IP":ip})
         reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+        mp.people_set(user.email, {"IP":ip})
         response = reader.city(ip)
         country = response.country.name
         region = response.subdivisions.most_specific.name

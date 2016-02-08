@@ -157,8 +157,11 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(PartnerProductView, self).get_context_data(**kwargs)
         context['partnerproduct_list'] = list(context['partnerproduct_list'])
+        price_updated = [e for e in context['partnerproduct_list'] if e.price > 0.0]
+        price_not_updated = [e for e in context['partnerproduct_list'] if e.price == 0.0]
+
         new_index=0
-        for exp in context['partnerproduct_list']:
+        for exp in price_updated:
             exp.title_en = exp.get_information("en").title
             exp.title_cn = exp.get_information("cn").title
             exp.host = exp.get_host()
@@ -184,9 +187,10 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
             #exp.rtp = (rtp_min, rtp_max)
             exp.sale = (round(sale_min,2), round(sale_max,2))
             if not isEnglish(exp.title_cn):
-                old_index = context['partnerproduct_list'].index(exp)
-                context['partnerproduct_list'].insert(new_index, context['partnerproduct_list'].pop(old_index))
+                old_index = price_updated.index(exp)
+                price_updated.insert(new_index, price_updated.pop(old_index))
                 new_index += 1
+        context['partnerproduct_list'] = price_updated + price_not_updated
         return context
 
     @method_decorator(ajax_form_validate(form_class=ExperienceUploadForm))
