@@ -35,50 +35,42 @@ $(document).ready(function() {
 		}
 	});
 
-	// Initialise calendar
-	$('#calendar').fullCalendar({
-		height: 'auto',
-		selectable: true,
-		unselectAuto: false,
-		header: {
-			left: 'title',
-			center: '',
-			right: 'today prev,next'
-		},
-		select: function(start, end, jsEvent, view) {
-			if (moment().diff(start, 'days') > 0) {
-				$('#calendar').fullCalendar('unselect');
-				// or display some sort of alert
-				return false;
-			}
-			$("#calendar").fullCalendar('addEventSource', [{
-				start: start,
-				end: end,
-				rendering: 'background',
-				block: true,
-			}, ]);
-			$("#calendar").fullCalendar("unselect");
-			if (moment(start) < moment($('#id_start_date').val())) {
-				$('#id_start_date').val(moment(start).format("YYYY-MM-DD"));
-			}
-			if (moment(end) > moment($('#id_end_date').val())) {
-				$('#id_end_date').val(moment(end).format("YYYY-MM-DD"));
-			}
-		},
-		selectOverlap: function(event) {
-			return !event.block;
-		},
-		dayRender: function(date, cell) {
-			cell.addTouch();
-		},
-		eventRender: function(event, element, view) {
-			$.support.touch = 'ontouchend' in document;
+  if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
+  $("#id_start_date").datetimepicker({
+      format: 'YYYY-MM-DD', locale: 'zh-CN'
+    });
+    $("#id_end_date").datetimepicker({
+        format: 'YYYY-MM-DD', locale: 'zh-CN',
+        useCurrent: false
+    });
 
-			if ($.support.touch) {
-				$(element).draggable();
-			}
-		}
-	});
+    $("#id_start_date").on("dp.change", function (e) {
+        $('#id_end_date').data("DateTimePicker").minDate(e.date);
+    });
+    $("#id_end_date").on("dp.change", function (e) {
+        $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+    });
+  }
+  else {
+    $("#id_start_date").datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+    $("#id_end_date").datetimepicker({
+        format: 'YYYY-MM-DD',
+        useCurrent: false
+    });
+
+    $("#id_start_date").on("dp.change", function (e) {
+        $('#id_end_date').data("DateTimePicker").minDate(e.date);
+    });
+    $("#id_end_date").on("dp.change", function (e) {
+        $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+    });
+  }
+  
+  // Clear the date fields
+  $('#id_start_date').val('');
+  $('#id_end_date').val('');
 
 	// Show page when init is done
 	$('.loading').fadeOut('slow');
@@ -160,9 +152,14 @@ function updateBudget() {
 	var cities = $('#id_destinations').val().split(',').length;
 	var min = 0;
 	var max = 0;
+  
+  // Check if date fields entered:
+  if (isNaN(days)) {
+    return;
+  }
 
 	// car+driver
-	switch ($('#car-driver').val()[0]) {
+	switch ($('#car-driver option:selected').text()) {
 		case 'please select':
 			break;
 		case 'infrequent':
@@ -204,27 +201,27 @@ function updateBudget() {
 	}
 
 	// accommodation
-	switch ($('#accommodation').val()[0]) {
+	switch ($('#accommodation option:selected').text()) {
 		case 'please select':
 			break;
 		case 'none':
 			break;
 		case '3 star':
-			min += ((guests / 2) * 150);
-			max += ((guests / 2) * 300);
+			min += (Math.round(guests / 2) * 150);
+			max += (Math.round(guests / 2) * 300);
 			break;
 		case '4 star':
-			min += ((guests / 2) * 200);
-			max += ((guests / 2) * 400);
+			min += (Math.round(guests / 2) * 200);
+			max += (Math.round(guests / 2) * 400);
 			break;
 		case '5 star':
-			min += ((guests / 2) * 300);
-			max += ((guests / 2) * 600);
+			min += (Math.round(guests / 2) * 300);
+			max += (Math.round(guests / 2) * 600);
 			break;
 	}
 
 	// service language
-	switch ($('#service-language').val()[0]) {
+	switch ($('#service-language option:selected').text()) {
 		case 'please select':
 			break;
 		case 'english':
@@ -240,7 +237,7 @@ function updateBudget() {
 	//// FOR WHOLE TRIP BELOW
 
 	// national flights
-	switch ($('#national-flight').val()[0]) {
+	switch ($('#national-flight option:selected').text()) {
 		case 'please select':
 			break;
 		case 'none':
@@ -251,7 +248,7 @@ function updateBudget() {
 	}
 
 	// airport transfer
-	switch ($('#airport-transfer').val()[0]) {
+	switch ($('#airport-transfer option:selected').text()) {
 		case 'please select':
 			break;
 		case 'none':

@@ -5,8 +5,8 @@
 
 {% block head %}
 <title>{% trans 'Request a Custom Itinerary' %}</title>
-<link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.css" rel="stylesheet"/>
 <link href="//cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.7.6/jquery.fullPage.min.css" rel="stylesheet"/>
+<link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
 <link href="{% static 'experiences/content/itinerary-request2.css' %}" rel="stylesheet"/>
 {% endblock %}
 
@@ -52,8 +52,9 @@
 
   <div class="section">
     <div class="container">
-      <h1>{% trans 'Highlight the days in which you will be travelling.' %} <span class="asterisk">*</span></h1>
-      <div id="calendar" class="full-calendar"></div>
+      <h1>{% trans "Select the start and end dates of your trip" %} <span class="asterisk">*</span></h1>
+      <div class="form-group"><label>{% trans "Start Date" %}</label>{{form.start_date}}</div>
+      <div class="form-group"><label>{% trans "End Date" %}</label>{{form.end_date}}</div>
     </div>
   </div>
 
@@ -198,10 +199,10 @@
 
 {% block scripts %}
 <script src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.js"></script>
+<script src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.7.6/jquery.fullPage.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-<script src="{% static 'app/scripts/jquery.ui.touch.js' %}"></script>
-<script src="{% static 'app/scripts/jquery.ui.touch-punch.min.js' %}"></script>
+{%if LANGUAGE == "zh-CN"%}
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+{%endif%}
 <script src="{% static 'experiences/scripts/itinerary-request.js' %}"></script>
 {% endblock %}
