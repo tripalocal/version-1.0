@@ -693,8 +693,8 @@ $(function(){
 
     // API BOOKING BOX LOGIC
     {% if experience.type != "PublicProduct" and experience.type != "PrivateProduct" and experience.type != 'ITINERARY' and experience.type != 'PRIVATE' and experience.type != 'PUBLIC' %}
-      $('.option-amount').on('change', function() {
-        // Price update
+    $('.option-amount').on('change', function() {
+      // Price update
       $('.collapse').each(function() {
         var $optionGroup = $(this);
         var total = 0;
@@ -727,6 +727,7 @@ $(function(){
     });
 
     $('#id_date').blur(function() {
+        $('.option-amount').change();
         var time = new Date($(this).val().replace( /(\d{2})[-/](\d{2})[-/](\d+)/, "$2/$1/$3")).getTime() / 1000;
         var timeNow = new Date().getTime() / 1000;
         if ((time - timeNow) <= 172800) {
