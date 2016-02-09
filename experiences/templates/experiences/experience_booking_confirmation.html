@@ -11,6 +11,13 @@
 
 {% block content %}
           <div class="container">
+            {% if "partner_product_information" in form.errors and display_error%}
+            <div style="text-align:center;margin:20px;color:red;">
+                {% trans "Payment not successful. We apologize for the inconvenience." %}<br>
+                {% trans "If you chose to pay by Credit card/Alipay, please do not pay again, and we will refund you ASAP." %}<br>
+                {% trans "If you chose to pay by Wechat or Unionpay, you have not been charged." %}
+            </div>
+            {% endif %}
             <div class="checkoutBox">
               <form id="category_form" method="post" action="{{GEO_POSTFIX}}experience_booking_confirmation/">
                 {% csrf_token %}
