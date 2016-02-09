@@ -1014,6 +1014,22 @@ class ExperienceDetailView(DetailView):
                 context['host_only_expired'] = True
                 return context
 
+        if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
+            for i in range(4): #7 days per time
+                now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2+i*7)
+                now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
+                now_string = now_string[:-2] + ":" + now_string[-2:]
+                original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
+                available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+        else:
+            available_date = getAvailableOptions(experience, available_options, available_date)
+
+        if len(available_date) == 0:
+            experience.status="Unlisted"
+            experience.save()
+
+        context['available_options'] = available_options
+
         if not experience.status.lower() == "listed":
             owner_id = experience.get_host().id
 
@@ -1028,20 +1044,6 @@ class ExperienceDetailView(DetailView):
 
         context['experience_city'] = dict(Location).get(experience.city)
 
-        if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
-            for i in range(4): #7 days per time
-                now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2+i*7)
-                now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
-                now_string = now_string[:-2] + ":" + now_string[-2:]
-                original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
-                available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
-        else:
-            available_date = getAvailableOptions(experience, available_options, available_date)
-
-        if len(available_date) == 0:
-            raise ValueError("experience detail page: no available date")
-
-        context['available_options'] = available_options
         uid = self.request.user.id if self.request.user.is_authenticated() else None
         context['form'] = BookingForm(available_date, experience.id, uid)
         context['available_dates'] = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))
