@@ -913,6 +913,19 @@ def get_experience_popularity(experience):
 
     return 100 - 100*i/int(cursor.rowcount) if int(cursor.rowcount)>0 else 0
 
+def set_option_items(partner_product_information, experience):
+    options = json.loads(partner_product_information)
+    item_options = {}
+    for k, v in options.items():
+        ois = OptionItem.objects.filter(original_id=k)
+        for oi in ois:
+            if oi.group.language == settings.LANGUAGES[0][0]:
+                if oi.group.name not in item_options:
+                    item_options[oi.group.name] = {}
+                item_options[oi.group.name][oi.name] = v
+                break
+    return item_options
+
 class ExperienceDetailView(DetailView):
     model = AbstractExperience
     template_name = 'experiences/experience_detail.html'
@@ -950,16 +963,7 @@ class ExperienceDetailView(DetailView):
             item_options = None
             if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0 \
                 and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
-                options = json.loads(form.data['partner_product_information'])
-                item_options = {}
-                for k, v in options.items():
-                    ois = OptionItem.objects.filter(original_id=k)
-                    for oi in ois:
-                        if oi.group.language == settings.LANGUAGES[0][0]:
-                            if oi.group.name not in item_options:
-                                item_options[oi.group.name] = {}
-                            item_options[oi.group.name][oi.name] = v
-                            break
+                item_options = set_option_items(form.data['partner_product_information'], experience)
 
             return render(request, 'experiences/experience_booking_confirmation.html',
                           {'form': form, #'eid':self.object.id,
@@ -1316,6 +1320,11 @@ def experience_booking_confirmation(request):
         total_price = experience_fee_calculator(subtotal_price, experience.commission)
         subtotal_price = round(subtotal_price*(1.00+COMMISSION_PERCENT),0)
 
+        item_options = None
+        if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0 \
+            and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
+            item_options = set_option_items(form.data['partner_product_information'], experience)
+
         local_timezone = pytz.timezone(experience.get_timezone())
         if 'Refresh' in request.POST:
             #get coupon information
@@ -1357,7 +1366,8 @@ def experience_booking_confirmation(request):
                                                                            'total_price': total_price,
                                                                            'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
-                                                                           'LANGUAGE':settings.LANGUAGE_CODE}, context)
+                                                                           'LANGUAGE':settings.LANGUAGE_CODE,
+                                                                           'item_options':item_options,}, context)
 
         elif 'Stripe' in request.POST or 'stripeToken' in request.POST:
             #submit the form
@@ -1394,7 +1404,8 @@ def experience_booking_confirmation(request):
                                                                            'total_price': total_price,
                                                                            'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
-                                                                           'LANGUAGE':settings.LANGUAGE_CODE}, context)
+                                                                           'LANGUAGE':settings.LANGUAGE_CODE,
+                                                                           'item_options':item_options,}, context)
         elif 'UnionPay' in request.POST:
             display_error = True
             order_id = make_order_id('Tripalocal')
@@ -1439,7 +1450,8 @@ def experience_booking_confirmation(request):
                                                                            'total_price': total_price,
                                                                            'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
-                                                                           'LANGUAGE':settings.LANGUAGE_CODE}, context)
+                                                                           'LANGUAGE':settings.LANGUAGE_CODE,
+                                                                           'item_options':item_options,}, context)
 
         elif 'WeChat' in request.POST:
             display_error = True
@@ -1497,7 +1509,8 @@ def experience_booking_confirmation(request):
                                                                            'total_price': total_price,
                                                                            'commission':1 + COMMISSION_PERCENT,
                                                                            'GEO_POSTFIX':settings.GEO_POSTFIX,
-                                                                           'LANGUAGE':settings.LANGUAGE_CODE}, context)
+                                                                           'LANGUAGE':settings.LANGUAGE_CODE,
+                                                                           'item_options':item_options,}, context)
 
         else:
             #TODO
