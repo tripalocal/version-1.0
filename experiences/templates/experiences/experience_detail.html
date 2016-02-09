@@ -21,17 +21,17 @@
 {% block content %}
 
 {% if expired == None and listed == None %}
-    {%if host_only_expired %}
-    <p style="postion:relative;top:50px;">{% trans "The experience has expired. Only you can see it now." %}</p>
-    {%endif%}
-
-    {%if host_only_unlisted %}
-    <p style="postion:relative;top:50px;">{% trans "The experience has not be approved. Only you can see it now." %}</p>
-    {%endif%}
-
     <div class="jumbotron experienceImg" style="background-image:url(
 		{{ MEDIA_URL }}{{cover_photo.directory}}{{cover_photo.name}})">
 	</div>
+
+    {%if host_only_expired %}
+    <p style="text-align:center; color:red;">{% trans "The experience has expired. Only you can see it now." %}</p>
+    {%endif%}
+
+    {%if host_only_unlisted %}
+    <p style="text-align:center; color:red;">{% trans "The experience has not been approved. Only you can see it now." %}</p>
+    {%endif%}
 
     <div class="container">
         {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
