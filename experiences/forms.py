@@ -689,7 +689,7 @@ class BookingConfirmationForm(forms.Form):
                     purchase_id = purchase["purchase_id"]
                     bk_total_price = purchase["price"]
                 else:
-                    raise BaseException("Errors in calling makePurchase API")
+                    raise forms.ValidationError({"partner_product_information":"Errors in calling makePurchase API"})
 
             bk_dt = bk_dt.astimezone(pytz.timezone("UTC"))
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
