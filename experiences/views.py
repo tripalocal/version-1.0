@@ -1262,12 +1262,12 @@ def experience_booking_successful(request, booking_id=None, guest_number=None, b
         if receipt.get("success", False):
             link = unquote(receipt["link"])
 
-    mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.track(request.user.email, 'Sent request to '+ experience.get_host().first_name)
-
     if not settings.DEVELOPMENT:
-        mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(request.user.email, 'Sent request to '+ experience.get_host().first_name)
+        try:
+            mp = Mixpanel(settings.MIXPANEL_TOKEN)
+            mp.track(request.user.email, 'Sent request to '+ experience.get_host().first_name)
+        except Exception as err:
+            pass
 
     template = 'experiences/experience_booking_successful_requested.html'
     if is_instant_booking:
@@ -1348,8 +1348,11 @@ def experience_booking_confirmation(request):
                     total_price = valid['new_price']
 
             if not settings.DEVELOPMENT:
-                mp = Mixpanel(settings.MIXPANEL_TOKEN)
-                mp.track(request.user.email, 'Clicked on "Refresh"')
+                try:
+                    mp = Mixpanel(settings.MIXPANEL_TOKEN)
+                    mp.track(request.user.email, 'Clicked on "Refresh"')
+                except Exception as err:
+                    pass
 
             return render_to_response('experiences/experience_booking_confirmation.html', {'form': form,
                                                                            'user_email':request.user.email,
@@ -2937,12 +2940,15 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             i += 1
 
         if not settings.DEVELOPMENT:
-            mp = Mixpanel(settings.MIXPANEL_TOKEN)
+            try:
+                mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
-            if request.user.is_authenticated():
-                mp.track(request.user.email,"Viewed " + city.title() + " search page")
-            #else:
-            #    mp.track("","Viewed " + city.title() + " search page")
+                if request.user.is_authenticated():
+                    mp.track(request.user.email,"Viewed " + city.title() + " search page")
+                #else:
+                #    mp.track("","Viewed " + city.title() + " search page")
+            except Exception as err:
+                pass
 
         template = 'experiences/experience_results.html'
     else:
