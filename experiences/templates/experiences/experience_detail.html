@@ -310,7 +310,7 @@ $(function(){
     var available_dates = {{available_dates|safe}};
     resizeImg();
     mixpanel.track("viewed an experience");
-    if (screen.width > 767) {
+    if ($(window).width > 767) {
       {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
       $('.booking-box').affix({
         offset: {
