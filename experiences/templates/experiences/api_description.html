@@ -17,7 +17,7 @@
         <h3>{% trans "Overview" %}</h3>
       </div>
       <div class="col-sm-9">
-        {% autoescape off %}{{ experience.description|markdown_filter}}{% endautoescape %}
+        {{ experience.description|markdown_filter|safe}}
       </div>
     </div>
 
