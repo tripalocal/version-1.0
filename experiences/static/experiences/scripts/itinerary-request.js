@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	// Initialise fullpage 
 	var desktop = true;
-	if (screen.width < 480) {
+	if ($(window).width < 480) {
 		var desktop = false;
 	}
 	$('#fullpage').fullpage({
