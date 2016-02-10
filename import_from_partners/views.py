@@ -281,6 +281,8 @@ def create_operator(operator, partner_id, request):
 
     provider.location = operator.get('geolocation', None)
     if 'address' in operator:
+        if provider.location is None:
+            provider.location = {}
         provider.location['address'] = operator.get('address')
     provider.save()
 
