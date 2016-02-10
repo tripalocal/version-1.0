@@ -44,7 +44,7 @@ def import_experienceoz_products(request):
                                 auth=requests.auth.HTTPBasicAuth(
                                 username,
                                 password))
-        if response.status_code == 200:
+        if response.status_code == 200 and response.reason == "OK":
             updates = json.loads(response.text)
             current_page += 1
             total_page = int(updates["totalPages"])
@@ -156,7 +156,7 @@ def import_experienceoz_products(request):
                     missing_operators.append(product['operatorId'])
                     print(product['operatorId'])
         else:
-            break
+            raise Exception("Error in updating products")
 
     #products = NewProduct.objects.filter(partner = PARTNER_IDS["experienceoz"])
     #for np in products:
@@ -232,7 +232,7 @@ def import_experienceoz_operators(request):
                                 auth=requests.auth.HTTPBasicAuth(
                                 username,
                                 password))
-        if response.status_code == 200:
+        if response.status_code == 200 and response.reason=="OK":
             updates = json.loads(response.text)
             current_page += 1
             total_page = int(updates["totalPages"])
@@ -241,7 +241,7 @@ def import_experienceoz_operators(request):
             for operator in operators:
                 create_operator(operator, partner_id, request)
         else:
-            break
+            raise Exception("Error in updating operators")
 
     return HttpResponseRedirect("/")
 
