@@ -26,7 +26,7 @@ Type = (('PRIVATE', _('Private')),('NONPRIVATE', _('NonPrivate')),('RECOMMENDED'
 
 Location = (('Melbourne', _('Melbourne, VIC')),('GRVIC', _('Greater Victoria')),
             ('Sydney', _('Sydney, NSW')),('GRNSW', _('Greater New South Wales')),
-            ('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),('Goldcoast',_('Gold coast, QLD')),('Whitesundaysisland',_('Whitesundays Island, QLD')),('GRQLD', _('Greater Queensland')),
+            ('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),('Goldcoast',_('Gold coast, QLD')),('Whitsundaysisland',_('Whitsundays Island, QLD')),('GRQLD', _('Greater Queensland')),
             ('Hobart',_('Hobart, TAS')),('GRTAS', _('Greater Tasmania')),
             ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),
@@ -43,13 +43,13 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
                     (_('Canberra'),'Canberra'),
                     (_('Christchurch'), 'Christchurch'), (_('Queenstown'), 'Queenstown'),
                     (_('Auckland'), 'Auckland'), (_('Wellington'), 'Wellington'),
-                    (_('Whitesundays Island, QLD'), 'Whitesundaysisland'))
+                    (_('Whitsundays Island, QLD'), 'Whitsundaysisland'))
 
 #                    (_('Greater South Australia'), 'GRSA'),(_('Greater Victoria'), 'GRVIC'),
 #                    (_('Greater New South Wales'), 'GRNSW'),(_('Greater Queensland'), 'GRQLD'),
 #                    (_('Greater Northern Territory'), 'GRNT'),
 
-Location_relation = {'GRQLD':['Brisbane','Cairns','Goldcoast','Whitesundaysisland'], 'GRNT':['Darwin','Alicesprings'],
+Location_relation = {'GRQLD':['Brisbane','Cairns','Goldcoast','Whitsundaysisland'], 'GRNT':['Darwin','Alicesprings'],
                      'GRVIC':['Melbourne'], 'GRSA':['Adelaide'], 'GRNSW':['Sydney'],
                      'GRTAS':['Hobart'], 'GRWA':['Perth']} #for issue 208
 
@@ -93,7 +93,7 @@ Duration = (('1.0', '1 hour'),('1.5', '1.5 hours'),('2.0', '2 hours'),('2.5', '2
 Included = (('Yes', ''),('No', ''),)
 
 Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),
-            ('Goldcoast',_('Gold coast, QLD')),('Whitesundaysisland',_('Whitesundays Island, QLD')),
+            ('Goldcoast',_('Gold coast, QLD')),('Whitsundaysisland',_('Whitsundays Island, QLD')),
             ('Hobart',_('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
             ('GRVIC', _('Greater Victoria')),('GRNSW', _('Greater New South Wales')),('GRQLD', _('Greater Queensland')),('GRTAS', _('Greater Tasmania')),
             ('Darwin',_('Darwin, NT')),('Alicesprings',_('Alice Springs, NT')),('GRNT', _('Greater Northern Territory')),('GRWA', _('Greater West Australia')),
