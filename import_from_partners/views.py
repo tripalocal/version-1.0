@@ -30,9 +30,9 @@ def import_experienceoz_products(request):
     end_date = datetime.now().strftime("%d/%m/%Y")
     offset = 0
     current_page = 0
-    total_page = 0
+    total_page = 1
 
-    while current_page <= total_page:
+    while current_page < total_page:
         kwargs = {
             'start_date': start_date,
             'end_date': end_date,
@@ -218,9 +218,9 @@ def import_experienceoz_operators(request):
     end_date = datetime.now().strftime("%d/%m/%Y")
     offset = 0
     current_page = 0
-    total_page = 0
+    total_page = 1
 
-    while current_page <= total_page:
+    while current_page < total_page:
         kwargs = {
             'start_date': start_date,
             'end_date': end_date,
