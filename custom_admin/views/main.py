@@ -152,7 +152,7 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     paginate_by = None
 
     def get_queryset(self):
-        return self.model.objects.exclude(partner__isnull=True).exclude(partner__exact='')
+        return self.model.objects.exclude(partner__isnull=True).exclude(partner__exact='').order_by('status','id')
 
     def get_context_data(self, **kwargs):
         context = super(PartnerProductView, self).get_context_data(**kwargs)

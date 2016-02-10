@@ -718,7 +718,7 @@ class Coordinate(models.Model):
     experience = models.ForeignKey(AbstractExperience)
 
     def __str__(self):
-        return self.name
+        return self.name if self.name else "" + "--" + str(self.experience.id)
 
 #TODO: move to the models of experience, newproduct
 # add new or update experience title
