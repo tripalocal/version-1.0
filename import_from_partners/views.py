@@ -36,7 +36,7 @@ def import_experienceoz_products(request):
         kwargs = {
             'start_date': start_date,
             'end_date': end_date,
-            'offset': offset,
+            'offset': current_page,
         }
         url = url_template.format(**kwargs)
     
@@ -48,7 +48,6 @@ def import_experienceoz_products(request):
             updates = json.loads(response.text)
             current_page += 1
             total_page = int(updates["totalPages"])
-            offset = int(updates["maxSize"]) * current_page
             products = updates["productList"]
             partner_id = PARTNER_IDS['experienceoz']
             #the ids of products imported from partners will be in the format:
@@ -225,7 +224,7 @@ def import_experienceoz_operators(request):
         kwargs = {
             'start_date': start_date,
             'end_date': end_date,
-            'offset': offset,
+            'offset': current_page,
         }
         url = url_template.format(**kwargs)
     
@@ -237,7 +236,6 @@ def import_experienceoz_operators(request):
             updates = json.loads(response.text)
             current_page += 1
             total_page = int(updates["totalPages"])
-            offset = int(updates["maxSize"]) * current_page
             operators = updates["operators"]
             partner_id = PARTNER_IDS['experienceoz']
             for operator in operators:
