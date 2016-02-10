@@ -242,6 +242,8 @@ def import_experienceoz_operators(request):
             partner_id = PARTNER_IDS['experienceoz']
             for operator in operators:
                 create_operator(operator, partner_id, request)
+        else:
+            break
 
     return HttpResponseRedirect("/")
 
@@ -280,13 +282,14 @@ def create_operator(operator, partner_id, request):
         provider.email = user.email
 
     provider.location = operator.get('geolocation', None)
-    if 'address' in operator:
+    if 'address' in operator and operator['address'] is not None:
         if provider.location is None:
             provider.location = {}
         provider.location['address'] = operator.get('address')
     provider.save()
 
-    if provider.location and provider.product_suppliers:
+    if provider.location and 'longitude' in provider.location\
+        and 'latitude' in provider.location and provider.product_suppliers:
         for product in provider.product_suppliers.all():
             if len(product.coordinate_set.all()) == 0:
                 coordinates = provider.location
