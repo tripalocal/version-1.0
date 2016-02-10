@@ -145,13 +145,13 @@ def import_experienceoz_products(request):
                                                 original_id = option.get("id"))
                             oi.save()
 
-                    #extension = "." + product['image'].split(".")[-1]
-                    #response = requests.get(product['image'])
-                    #if response.status_code == 200:
-                    #    image_io = BytesIO(response.content)
-                    #    image_io.seek(0, 2)  # Seek to the end of the stream, so we can get its length with `image_io.tell()`
-                    #    image_file = InMemoryUploadedFile(image_io, None, product['image'].split("/")[-1], "image", image_io.tell(), None, None)
-                    #    saveExperienceImage(np, image_file, extension, 1)
+                    extension = "." + product['image'].split(".")[-1]
+                    response = requests.get(product['image'])
+                    if response.status_code == 200:
+                        image_io = BytesIO(response.content)
+                        image_io.seek(0, 2)  # Seek to the end of the stream, so we can get its length with `image_io.tell()`
+                        image_file = InMemoryUploadedFile(image_io, None, product['image'].split("/")[-1], "image", image_io.tell(), None, None)
+                        saveExperienceImage(np, image_file, extension, 1)
                 elif product['operatorId'] not in missing_operators:
                     missing_operators.append(product['operatorId'])
                     print(product['operatorId'])
