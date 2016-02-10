@@ -69,7 +69,7 @@ msgid "Gold coast, QLD"
 msgstr "黄金海岸, 昆士兰"
 
 #: experiences/forms.py:29 experiences/forms.py:46 experiences/forms.py:96
-msgid "Whitesundays Island, QLD"
+msgid "Whitsundays Island, QLD"
 msgstr ""
 
 #: experiences/forms.py:29 experiences/forms.py:98
