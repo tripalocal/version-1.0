@@ -799,7 +799,7 @@ msgstr "婴儿（小于2周岁）"
 msgid ""
 "What kind of things are you interested in?<br>Check the topics that interest "
 "you."
-msgstr "您对什么感兴趣呢？请去掉感兴趣的主题。"
+msgstr "您对什么感兴趣呢？请选择感兴趣的主题。"
 
 #: templates/experiences/custom_itinerary_request.html:83
 msgid "food & wine"
@@ -891,7 +891,7 @@ msgstr "住宿"
 #: templates/experiences/custom_itinerary_request.html:135
 #: templates/experiences/custom_itinerary_request.html:151
 msgid "none"
-msgstr "任意"
+msgstr "不需要"
 
 #: templates/experiences/custom_itinerary_request.html:126
 msgid "3 star"
