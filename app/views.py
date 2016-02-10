@@ -39,6 +39,7 @@ import xmltodict
 from experiences.utils import *
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.storage import default_storage as storage
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
@@ -771,14 +772,24 @@ def saveProfileImage(user, profile, image_file):
         profile.save()
 
         #crop the image
-        dirname = settings.MEDIA_ROOT + '/hosts/' + str(user.id) + '/'
-        im = PIL.Image.open(dirname + filename)
+        f = storage.open(dirname + filename, 'rb')
+        im = PIL.Image.open(f)
         w, h = im.size
         if w > 1200:
             basewidth = 1200
             wpercent = (basewidth/float(w))
             hsize = int((float(h)*float(wpercent)))
-            im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS).save(dirname + filename)
+            im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+            im_out = BytesIO()
+            if extension == '.jpg':
+                extension = '.jpeg'
+            im.save(im_out, format = extension[1:].upper())
+            f.close()
+            f = storage.open(dirname + filename, 'wb')
+            f.write(im_out.getvalue())
+            f.close()
+        else:
+            f.close()
 
 @require_POST
 def email_custom_trip(request):
