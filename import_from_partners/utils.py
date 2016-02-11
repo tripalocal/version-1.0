@@ -6,7 +6,7 @@ from xml.etree import ElementTree
 PARTNER_IDS = {"experienceoz":"001"}
 USERNAME = "tripalocalapi"
 PASSWORD = "c8EAZbRULywU4PnW"
-service_action = "https://tripalocal.experienceoz.com.au/d/services/API"
+service_action = "https://tripalocal.experienceoz.com.au/d/services/API"#"https://www.tmtest.com.au/d/services/API"#
 
 SOAP_REQUEST_AVAILABILITY = \
 ''' <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -125,7 +125,7 @@ def get_experienceoz_availability(product_id, start_date, experience, available_
                              headers = headers,
                              data = body)
 
-    if response.status_code == 200:
+    if response.status_code == 200 and response.ok:
         tree = ElementTree.fromstring(response.text)
         for e in tree.findall('.//Availability'):
             date_string = e[0].text
@@ -200,7 +200,7 @@ def experienceoz_makepurchase(first_name, last_name, number, email, country, pos
                              headers = headers,
                              data = body)
 
-    if response.status_code == 200:
+    if response.status_code == 200 and response.ok:
         tree = ElementTree.fromstring(response.text)
         purchase = tree.find('.//Purchase')
         price = float(purchase[1].text)
@@ -244,7 +244,7 @@ def experienceoz_receipt(booking):
                              headers = headers,
                              data = body)
 
-    if response.status_code == 200:
+    if response.status_code == 200 and response.ok:
         tree = ElementTree.fromstring(response.text)
         link = tree.find('.//TicketPDFLink')
         return {"success":True, "link":link.text}
