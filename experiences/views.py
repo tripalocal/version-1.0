@@ -941,6 +941,12 @@ def checkout_as_guest(request):
         u = User.objects.filter(email=email)
         if len(u) > 0:
             u = u[0]
+            u.first_name = first_name
+            u.last_name = last_name
+            u.phone_number = phone_number
+            u.save()
+            username = u.username
+            password = u.username
         else:
             u = User.objects.filter(first_name__iexact = username)
             counter = len(u) if u is not None else 0
@@ -954,8 +960,7 @@ def checkout_as_guest(request):
             u.set_password(username)
             u.save()
 
-            u = authenticate(username=username, password=password)
-
+        u = authenticate(username=username, password=password)
         login(request, u)
     except Exception as err:
         return HttpResponse(json.dumps({'success':False}),content_type="application/json")
@@ -3526,7 +3531,7 @@ def custom_itinerary(request, id=None, operation=None):
             itinerary = []
             last_city = ""
             all_bookings = list(existing_ci.booking_set.order_by('datetime').all())
-            start_date = existing_ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
+            start_date = all_bookings[0].datetime.astimezone(pytz.timezone(all_bookings[0].experience.get_timezone()))
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
             cities_list = list(filter(None, existing_ci.cities.split(',')))
@@ -3644,7 +3649,7 @@ def itinerary_detail(request,id=None,preview=None):
         ci_timezone = all_bookings[0].experience.get_timezone()
 
         if ci.start_datetime:
-            start_datetime = ci.start_datetime.astimezone(pytz.timezone(ci_timezone))
+            start_datetime = all_bookings[0].datetime.astimezone(pytz.timezone(ci_timezone))
         else:
             start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
         if ci.cities:
