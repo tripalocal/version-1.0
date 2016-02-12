@@ -979,6 +979,33 @@ class ExperienceDetailView(DetailView):
         self.object = self.get_object()
 
         if request.method == 'POST':
+            if 'guest' in request.POST:
+                checkout_as_guest(request)
+            elif 'login' in request.POST:
+                try:
+                    data = request.POST #request.query_params['data']
+
+                    if "email" not in data or "password" not in data:
+                        result = {"error":"Wrong username/password"} 
+                        return HttpResponse(json.dumps(result), content_type="application/json")
+
+                    email = data['email']
+                    password = data['password']
+                    username = User.objects.get(email=email).username
+
+                    user = authenticate(username=username, password=password)
+                    if user is not None: # and user.is_active:
+                        login(request, user)
+                        result = {'success':True, 'user_id':user.id}
+                        return HttpResponse(json.dumps(result), content_type="application/json")
+                    else:
+                        result = {'success':False, "error":"Wrong username/password"}
+                        return HttpResponse(json.dumps(result), content_type="application/json")
+
+                except Exception as err:
+                    #TODO
+                    return HttpResponse(json.dumps({'success':False}), content_type="application/json")
+
             form = BookingConfirmationForm(request.POST)
             form.data = form.data.copy()
             form.data['user_id'] = request.user.id

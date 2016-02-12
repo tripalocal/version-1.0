@@ -33,6 +33,31 @@
     <p style="text-align:center; color:red;">{% trans "The experience has not been approved. Only you can see it now." %}</p>
     {%endif%}
 
+    <div id="booking_option" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="help-popup">
+        <p>{%trans 'You have not logged in yet. You can:' %}</p>
+        <div id="booking_login_title" onclick="$('.collapse').collapse('hide'); $('#booking_login').collapse('show'); $('#booking_option').attr('option','login');"> 
+            <p>{%trans 'Login in' %}<p>
+        </div>
+        <div id="booking_login" class="collapse">
+            <p><input id="login_email" name="login" placeholder="{%trans 'Email' %}" type="email"></p>
+            <p><input id="login_password" name="password" placeholder="{%trans 'Password' %}" type="password"></p>
+        </div>
+        <div id="booking_guest_title" onclick="$('.collapse').collapse('hide'); $('#booking_guest').collapse('show'); $('#booking_option').attr('option','guest');"> 
+            <p>{%trans 'Continue as guest' %}<p>
+        </div>
+        <div id="booking_guest" class="collapse">
+            <p>{%trans 'You have to provide correct information, or you will not receive booking confirmation.'%}</p>
+            <p><input id="guest_email" name="email" placeholder="{%trans 'Email' %}" type="email"></p>
+            <p><input id="guest_first_name" maxlength="30" name="first_name" placeholder="{%trans 'First Name' %}" type="text"></p>
+            <p><input id="guest_last_name" maxlength="30" name="last_name" placeholder="{%trans 'Last Name' %}" type="text"></p>
+            <p><input id="guest_phone_number" maxlength="30" name="phone_number" placeholder="{%trans 'Phone number' %}" type="text"></p>
+        </div>
+        <div>
+            <input id="booking_cancel" type="button" value="{%trans 'Cancel' %}">
+            <input id="booking_continue" type="button" value="{%trans 'Continue' %}">
+        </div>
+    </div>
+
     <div class="container">
         {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
             {% include "experiences/product_booking_box.html" %}
@@ -398,6 +423,7 @@ $(function(){
             return;
         }
         e.preventDefault();
+        {% if user.is_authenticated %}
         if(is_form_valid())
         {
             var unformattedDate = $("#id_date").val();
@@ -408,6 +434,9 @@ $(function(){
         {
             alert("{%trans 'Please select coordinate, time and guest number' %}");
         }
+        {% else %}
+        $("#booking_option").modal('show');
+        {% endif %}
     });
 
     for(i=0;i<3;i++)
@@ -438,6 +467,83 @@ $(function(){
             }
         });
     }
+
+    $("#booking_cancel").bind("click", function(e) {
+        $("#booking_option").modal('hide');
+    });
+
+    $("#booking_continue").bind("click", function(e) {
+        if($("#booking_option").attr("option") == "login")
+        {
+            var email = $("#login_email").val();
+            var password = $("#login_password").val();
+            $.ajax({
+                    type: 'POST',
+                    url: "/experience/{{experience.id}}/",
+                    dataType: 'json',
+                    data: {
+                        "csrfmiddlewaretoken": "{{ csrf_token }}",
+                        "email": email,
+                        "password": password,
+                        "login": "login",
+                    },
+                    success: function (data) {
+                        result = data; //$.parseJSON(data)
+                        if('user_id' in data)
+                        {
+                            $('#id_user_id').val(data.user_id);
+                            var unformattedDate = $("#id_date").val();
+                            $("#id_date").val(String(moment(unformattedDate, "DD/MM/YYYY").format("YYYY-MM-DD")));
+                            $("#experience_booking_form").submit();
+                        }
+                        else
+                        {
+                            alert(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        alert('{%trans "Please try again later"%}');
+                    }
+                  })
+        }
+        else
+        {
+            var first_name = $("#guest_first_name").val();
+            var last_name = $("#guest_last_name").val();
+            var email = $("#guest_email").val();
+            var phone_number = $("#guest_phone_number").val();
+            $.ajax({
+                    type: 'POST',
+                    url: "/experience/{{experience.id}}/",
+                    dataType: 'json',
+                    data: {
+                        "csrfmiddlewaretoken": "{{ csrf_token }}",
+                        "email": email,
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "phone_number": phone_number,
+                        "guest": "guest"
+                    },
+                    success: function (data) {
+                        result = data; //$.parseJSON(data)
+                        if(data.success)
+                        {
+                            $('#id_user_id').val(data.user_id);
+                            var unformattedDate = $("#id_date").val();
+                            $("#id_date").val(String(moment(unformattedDate, "DD/MM/YYYY").format("YYYY-MM-DD")));
+                            $("#experience_booking_form").submit();
+                        }
+                        else
+                        {
+                            alert('{%trans "Please try a different email address."%}');
+                        }
+                    },
+                    error: function (e) {
+                        alert('{%trans "Please try again later"%}');
+                    }
+                  })
+        }
+    });
 
     min_number = parseInt($("#guest_number_min").attr("name"));
     max_number = parseInt($("#guest_number_max").attr("name"));

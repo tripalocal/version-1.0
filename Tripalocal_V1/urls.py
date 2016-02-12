@@ -156,4 +156,5 @@ urlpatterns = patterns('',
     url(r'^wechatmsg/$', 'wechat.message.receive_message', name='wechatmsg'),
     url(r'^search_text/$', 'experiences.resource.service_search_text', name='search_text'),
     url(r'^itinerary_tool/$', 'experiences.views.itinerary_tool', name='itinerary_tool'),
+    url(r'^checkout_as_guest/$', 'experiences.views.checkout_as_guest', name='checkout_as_guest'),
 )
