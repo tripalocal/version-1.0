@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from io import BytesIO
 from Tripalocal_V1 import settings
 
-APPID = "wx6e6dfd80262310ec"
+APPID = "wx57aaa750d440d0d8"
 APPSECRET = ""
 
 def get_token(APPID, APPSECRET):
@@ -15,13 +15,13 @@ def get_token(APPID, APPSECRET):
     url_token = url_token.format(**args)
     response = requests.get(url_token)
     token = None
-    if response.status_code == 200:
+    if response.status_code == 200 and response.ok:
         token = json.loads(response.text).get("access_token", None)
     return token
 
 def generate_ticket(TOKEN, scene_id, scene_str, permanent=True):
     url_ticket = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={TOKEN}"
-    url_ticket = url_ticket.format({"TOKEN":TOKEN})
+    url_ticket = url_ticket.format(**{"TOKEN":TOKEN})
     args_temp = {"expire_seconds": 604800, "action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id, "scene_str": scene_str}}}
     args_permanent = {"action_name": "QR_LIMIT_SCENE", "action_info": {"scene": {"scene_id": scene_id, "scene_str": scene_str}}}
     if permanent:
@@ -32,7 +32,7 @@ def generate_ticket(TOKEN, scene_id, scene_str, permanent=True):
     response = requests.post(url = url_ticket, data = args)
     ticket = None
     url = None
-    if response.status_code == 200:
+    if response.status_code == 200 and response.ok:
         ticket = json.loads(response.text).get("ticket", None)
         url = json.loads(response.text).get("url", None)
     return ticket
@@ -57,7 +57,7 @@ def qrcode(request):
 
     scene_id = request.GET.get("scene_id",None)
     scene_str = request.GET.get("scene_str", None)
-    permanent = reqeust.GET.get("permanent", None)
+    permanent = request.GET.get("permanent", None)
     token = get_token(APPID, APPSECRET)
     if token and scene_id and scene_str and permanent:
         ticket = generate_ticket(token, scene_id, scene_str, permanent)
