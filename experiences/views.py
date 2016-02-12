@@ -39,6 +39,7 @@ from django.db.models import Q
 from experiences.utils import *
 from copy import deepcopy
 from import_from_partners.utils import *
+from django.contrib.auth import authenticate, login
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -925,6 +926,41 @@ def set_option_items(partner_product_information, experience):
                 item_options[oi.group.name][oi.name] = v
                 break
     return item_options
+
+def checkout_as_guest(request):
+    '''
+    return an auto-created new user (just id) if the email is new, otherwise return the user associated with the email
+    '''
+
+    data = request.POST
+    try:
+        first_name = data['first_name']
+        last_name = data['last_name']
+        email = data['email']
+        phone_number = data['phone_number']
+        u = User.objects.filter(email=email)
+        if len(u) > 0:
+            u = u[0]
+        else:
+            u = User.objects.filter(first_name__iexact = username)
+            counter = len(u) if u is not None else 0
+            counter += 1
+            username = username + str(counter) if counter > 1 else username
+            u = User(first_name = first_name, last_name = last_name, email = email,username = username,
+                        date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
+                        last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
+            u.save()
+
+            u.set_password(username)
+            u.save()
+
+            u = authenticate(username=username, password=password)
+
+        login(request, u)
+    except Exception as err:
+        return HttpResponse(json.dumps({'success':False}),content_type="application/json")
+
+    return HttpResponse(json.dumps({'success':True, 'user_id':u.id}),content_type="application/json")
 
 class ExperienceDetailView(DetailView):
     model = AbstractExperience
@@ -3490,7 +3526,7 @@ def custom_itinerary(request, id=None, operation=None):
             itinerary = []
             last_city = ""
             all_bookings = list(existing_ci.booking_set.order_by('datetime').all())
-            start_date = existing_ci.start_datetime.astimezone(pytz.timezone(all_bookings[0].experience.get_timezone()))
+            start_date = existing_ci.start_datetime.astimezone(pytz.timezone(settings.TIME_ZONE))
             form.initial["title"] = existing_ci.title
             form.initial["start_datetime"] = pytz.timezone("UTC").localize(datetime.utcnow()) + timedelta(weeks=520)
             cities_list = list(filter(None, existing_ci.cities.split(',')))
