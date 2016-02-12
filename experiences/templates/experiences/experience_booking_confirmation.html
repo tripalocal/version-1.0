@@ -107,13 +107,20 @@
 
                   <div class="form-group" style="display: inline-block; margin-right: 15px;">
                     <h3>{% trans 'Destination mobile number' %}</h3>
-                    <input id="id_local_number" maxlength="17" type="text" class="form-control" placeholder="+61 XXX XXX XXX"> 
+                    <input id="id_local_number" maxlength="15" type="search" list="local-area-options" class="form-control" placeholder="+XX XXX XXX XXX">
+                    <datalist id="local-area-options">
+                      <option label="{% trans 'Australia' %} 🇦🇺" value="+61">
+                      <option label="{% trans 'New Zealand' %} 🇳🇿" value="+64">
+                    </datalist>
                   </div>
 
                   <div class="form-group" style="display: inline-block;">
                     <h3>{% trans 'Roaming mobile number' %}</h3>
-                    <input id="id_roaming_number" maxlength="19" type="text" class="form-control" placeholder="+86 XXX XXXX XXXX">
-                    </div>
+                    <input id="id_roaming_number" maxlength="17" type="text" list="roaming-area-options" class="form-control" placeholder="+XX XXX XXXX XXXX">
+                    <datalist id="roaming-area-options">
+                      <option label="{% trans 'China' %} 🇨🇳" value="+86">
+                    </datalist>
+                  </div>
 
                     <div class="warning-sign" id="local_phone_warning" style="display:none;">
                         <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
@@ -198,10 +205,9 @@
   {% endblock %}
 
   {% block scripts %}
-
   <script charset="utf-8" type="text/javascript">
-      legal_local_number = /\(\+\d{2}\) \d{3} \d{3} \d{3}/;
-      legal_roaming_number = /\(\+\d{2}\) \d{3} \d{4} \d{4}/;
+      legal_local_number = /\+\d{2} \d{3} \d{3} \d{3}/;
+      legal_roaming_number = /\+\d{2} \d{3} \d{4} \d{4}/;
      
       /**
        * formatPhone is an auto-formatting callback function for phone numbers.
@@ -213,46 +219,33 @@
         var num = $phone.val().replace(/-/g, ''); 
         if (locale === "local") {
           // Format area code
-          if (num.length == 3) {
-            if (num.slice(0,2) === '61') {
-              $phone.val('(+61) ' + num.charAt(2));
-            } else if (num === '(+6') {
-              $phone.val('(+61) ');  
-            } else if (num !== '+61') {
-              $phone.val('(+61) ' + num); 
-            } else {
-              $phone.val('(' + num + ') ');
-            }
+          if (num.length > 0 && num.charAt(0) !== '+') {
+            $phone.val('+' + num);
           // Add spacing after area code
-          } else if (num.length > 5 && num.charAt(5) !== ' ') {
-            $phone.val(spliceSlice(num, 5, 0, ' '));
+          } else if (num.length > 3 && num.charAt(3) !== ' ') {
+            $phone.val(spliceSlice(num, 3, 0, ' '));
           // Strip away leading 0
-          } else if (num.length > 6 && num.charAt(6) === '0') {
-            $phone.val(spliceSlice(num, 6, 1));
+          } else if (num.length > 4 && num.charAt(4) === '0') {
+            $phone.val(spliceSlice(num, 4, 1));
           // Add spacing in groups of three numbers 
-          } else if (num.length > 9 && num.charAt(9) !== ' ') {
-            $phone.val(spliceSlice(num, 9, 0, ' '));
-          } else if (num.length > 13 && num.charAt(13) !== ' ' ) {
-            $phone.val(spliceSlice(num, 13, 0, ' '));
+          } else if (num.length > 7 && num.charAt(7) !== ' ') {
+            $phone.val(spliceSlice(num, 7, 0, ' '));
+          } else if (num.length > 11 && num.charAt(11) !== ' ' ) {
+            $phone.val(spliceSlice(num, 11, 0, ' '));
           }
         } else if (locale === "roaming") {
           // Format area code
-          if (num.length == 3) {
-            if (num.charAt(0) !== '+') {
-              $phone.val('(+' + num.charAt(0) + num.charAt(1) + ') ' + num.charAt(2)); 
-            } else {
-              $phone.val('(' + num + ') ');
-            }
-          }
+          if (num.length > 0 && num.charAt(0) !== '+') {
+            $phone.val('+' + num);
           // Add spacing after area code
-          else if (num.length > 5 && num.charAt(5) !== ' ') {
-            $phone.val(spliceSlice(num, 5, 0, ' '));
+          } else if (num.length > 3 && num.charAt(3) !== ' ') {
+            $phone.val(spliceSlice(num, 3, 0, ' '));
           // Add spacing after first group of three
-          } else if (num.length > 9 && num.charAt(9) !== ' ') {
-            $phone.val(spliceSlice(num, 9, 0, ' '));
+          } else if (num.length > 7 && num.charAt(7) !== ' ') {
+            $phone.val(spliceSlice(num, 7, 0, ' '));
           // Add spacing after next group of four
-          } else if (num.length > 14 && num.charAt(14) !== ' ') {
-            $phone.val(spliceSlice(num, 14, 0, ' '));
+          } else if (num.length > 12 && num.charAt(12) !== ' ') {
+            $phone.val(spliceSlice(num, 12, 0, ' '));
           }
         }
       }
@@ -340,7 +333,6 @@
 
     $(document).ready(function(){
         mixpanel.track("checkout");
-
         $("#id_promo_code").attr("class", "form-control");
         $("#id_card_number").attr("class", "form-control");
         $("#id_expiration_0").attr("class", "btn btn-default dropdown-toggle");
