@@ -107,119 +107,172 @@
 
                   <div class="form-group" style="display: inline-block; margin-right: 15px;">
                     <h3>{% trans 'Destination mobile number' %}</h3>
-                    <input id="id_local_number" maxlength="15" type="text" class="form-control" value="+61 123456789" style="color:lightgrey;" onfocus="if (this.value=='+61 123456789') this.value = ''; $(this).css('color', '#666');">
+                    <input id="id_local_number" maxlength="17" type="text" class="form-control" placeholder="+61 XXX XXX XXX"> 
                   </div>
 
                   <div class="form-group" style="display: inline-block;">
                     <h3>{% trans 'Roaming mobile number' %}</h3>
-                    <input id="id_roaming_number" maxlength="15" type="text" class="form-control" value="+86 12345678901" style="color:lightgrey;" onfocus="if (this.value=='+86 12345678901') this.value = ''; $(this).css('color', '#666');">
-                  </div>
-
-                  <div class="warning-sign" id="local_phone_warning" style="display:none;">
-                      <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                      <p>{% trans 'Invalid local number' %}</p>
-                  </div>
-
-                  <div class="warning-sign" id="roaming_phone_warning" style="display:none;">
-                      <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                      <p>{% trans 'Invalid roaming number' %}</p>
-                  </div>
-
-                  <p>{% trans 'Your host will contact you via this number on the day.' %}</p>
-                  <div class="warning-sign" id="phone_warning" style="display:none;">
-                      <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                      <p>{% trans 'Please enter at least one number' %}</p>
-                  </div>
-                </div>
-
-                <div class="container-fluid">
-                  <input id="isAgreementSelected" type="checkbox" style="vertical-align: top;margin-top:20px;"/><p class="help-message">{% trans "By booking this listing, you agree to " %}<a href="{{GEO_POSTFIX}}termsofservice" target="_blank">{% trans "Terms of Service" %}</a>, <a href="{{GEO_POSTFIX}}privacypolicy" target="_blank">{% trans "Privacy Policy" %}</a> {% trans "and" %} <a href="{{GEO_POSTFIX}}refundpolicy"  target="_blank">{% trans "Traveller Refund Policy" %}</a>.</p>
-                  <div id="id_term_condition" class="warning-sign" style="display:none;">
-                    <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
-                    <p>{% trans "Please accept terms and conditions" %}</p>
-                  </div>
-                </div>
-                <input type="submit" id="submit_booking" name="Stripe" value="{% trans "Credit card / Alipay" %}" class="btn btn-primary btn-lg"/>
-                {#<button disabled="disabled" type="submit" id="submit_booking_unionpay" name="UnionPay" class="btn btn-default btn-lg" style="padding-top:6px; padding-bottom:6px;"><img src="{% static 'icon/union.svg' %}">{% trans "Union Pay" %}</button>#}
-                <button type="submit" id="wechat_booking" name="WeChat" class="btn btn-default btn-lg" style="padding-top:6px; padding-bottom:6px;"><img src="{% static 'icon/qr.svg' %}">{% trans "WeChat Pay" %}</button>
-              </form>
-            </div>
-
-
-            <div class="exp-box">
-                <div class="listing-img" style="background-image:url(
-		        {% for photo in experience.photo_set.all %}
-                    {% if forloop.first %}
-				        {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}
-                    {% endif %}
-                {% endfor %}); position: relative;">
-                {% if experience.hosts %}
-                    <div class="profile-frame">
-                        <div class="checkout-profile" style="background-image:url({{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %})"></div>
+                    <input id="id_roaming_number" maxlength="19" type="text" class="form-control" placeholder="+86 XXX XXXX XXXX">
                     </div>
-                {% endif %}
-                </div>
-                <div class="checkoutInfo">
-                    <h3 style="font-weight:bold;">{{ experience.title }}</h3>
-                    <p>{{ experience.city }}</p>
-                    <hr style="margin-bottom:10px;">
-                    <form action="{{GEO_POSTFIX}}experience/{{experience.id}}/" method="get">
-                    {% if item_options %}
-                        {% trans "on" %} <strong>{{date}}</strong>(<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)<br><br>
-                        {% for op_name, v in item_options.items %}
-                            <strong>{{op_name}}</strong><br>
-                            {%for oi_name, number in v.items%}
-                            {% if forloop.last %}
-                            {{oi_name}} &#215; {{number}}<br>
-                            {% else %}
-                            {{oi_name}} &#215; {{number}},
-                            {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    {% else %}
-                        <p>{% trans "Reservation for" %} <strong>{{ adult_number|add:child_number }}{% trans " person(s)" %}</strong><br>
-                           {% trans "on" %} <strong>{{date}}</strong>{%if experience.type == "PRIVATE" or experience.type == "NONPRIVATE"%}{% trans " at" %} <strong>{{time}}</strong>{% endif %}
-                            (<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)
-                        </p>
-                        <hr style="margin:10px 0">
-                        <p>{% trans "Rate:" %} {{experience.currency|upper}}{{experience.dollarsign}}{{experience_price|floatformat|mul:commission|floatformat:"0"}}{% trans " per person for " %}{{experience.duration}}{% trans " hours" %}</p>
-                    {% endif %}
-                        <hr style="margin-bottom:10px;">
-                        {% trans "Subtotal:" %} {{experience.currency|upper}}{{experience.dollarsign}}<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
-                        <br>
-                        <p id="id_coupon_extra_fee" style="font-size:14px;"></p>
-                        <div id="id_service_fee" style="display:none;">{% trans "Processing Fee:" %} {{experience.currency|upper}}{{experience.dollarsign}}{{ service_fee|stringformat:".2f" }}<br></div>
-                        <strong style="font-size:18px;">{% trans "Total:" %} {{experience.currency|upper}}{{experience.dollarsign}}<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
-                    </form>
-                </div>
+
+                    <div class="warning-sign" id="local_phone_warning" style="display:none;">
+                        <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                        <p>{% trans 'Invalid local number' %}</p>
+                    </div>
+
+                    <div class="warning-sign" id="roaming_phone_warning" style="display:none;">
+                        <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                        <p>{% trans 'Invalid roaming number' %}</p>
+                    </div>
+
+                    <p>{% trans 'Your host will contact you via this number on the day.' %}</p>
+                    <div class="warning-sign" id="phone_warning" style="display:none;">
+                        <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                        <p>{% trans 'Please enter at least one number' %}</p>
+                    </div>
+                  </div>
+
+                  <div class="container-fluid">
+                    <input id="isAgreementSelected" type="checkbox" style="vertical-align: top;margin-top:20px;"/><p class="help-message">{% trans "By booking this listing, you agree to " %}<a href="{{GEO_POSTFIX}}termsofservice" target="_blank">{% trans "Terms of Service" %}</a>, <a href="{{GEO_POSTFIX}}privacypolicy" target="_blank">{% trans "Privacy Policy" %}</a> {% trans "and" %} <a href="{{GEO_POSTFIX}}refundpolicy"  target="_blank">{% trans "Traveller Refund Policy" %}</a>.</p>
+                    <div id="id_term_condition" class="warning-sign" style="display:none;">
+                      <img src="{{MEDIA_URL}}icon/error_icon.png" style="position: relative; top:4px; left:5px;">
+                      <p>{% trans "Please accept terms and conditions" %}</p>
+                    </div>
+                  </div>
+                  <input type="submit" id="submit_booking" name="Stripe" value="{% trans "Credit card / Alipay" %}" class="btn btn-primary btn-lg"/>
+                  {#<button disabled="disabled" type="submit" id="submit_booking_unionpay" name="UnionPay" class="btn btn-default btn-lg" style="padding-top:6px; padding-bottom:6px;"><img src="{% static 'icon/union.svg' %}">{% trans "Union Pay" %}</button>#}
+                  <button type="submit" id="wechat_booking" name="WeChat" class="btn btn-default btn-lg" style="padding-top:6px; padding-bottom:6px;"><img src="{% static 'icon/qr.svg' %}">{% trans "WeChat Pay" %}</button>
+                </form>
+              </div>
+
+
+              <div class="exp-box">
+                  <div class="listing-img" style="background-image:url(
+              {% for photo in experience.photo_set.all %}
+                      {% if forloop.first %}
+                  {{ MEDIA_URL }}{{photo.directory}}{{photo.name}}
+                      {% endif %}
+                  {% endfor %}); position: relative;">
+                  {% if experience.hosts %}
+                      <div class="profile-frame">
+                          <div class="checkout-profile" style="background-image:url({{ MEDIA_URL }}{% for h in experience.hosts.all %}{% if forloop.first %}{{ h.registereduser.image_url }}{% endif %}{% endfor %})"></div>
+                      </div>
+                  {% endif %}
+                  </div>
+                  <div class="checkoutInfo">
+                      <h3 style="font-weight:bold;">{{ experience.title }}</h3>
+                      <p>{{ experience.city }}</p>
+                      <hr style="margin-bottom:10px;">
+                      <form action="{{GEO_POSTFIX}}experience/{{experience.id}}/" method="get">
+                      {% if item_options %}
+                          {% trans "on" %} <strong>{{date}}</strong>(<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)<br><br>
+                          {% for op_name, v in item_options.items %}
+                              <strong>{{op_name}}</strong><br>
+                              {%for oi_name, number in v.items%}
+                              {% if forloop.last %}
+                              {{oi_name}} &#215; {{number}}<br>
+                              {% else %}
+                              {{oi_name}} &#215; {{number}},
+                              {% endif %}
+                              {% endfor %}
+                          {% endfor %}
+                      {% else %}
+                          <p>{% trans "Reservation for" %} <strong>{{ adult_number|add:child_number }}{% trans " person(s)" %}</strong><br>
+                             {% trans "on" %} <strong>{{date}}</strong>{%if experience.type == "PRIVATE" or experience.type == "NONPRIVATE"%}{% trans " at" %} <strong>{{time}}</strong>{% endif %}
+                              (<input type="submit" value="{% trans "Change" %}" name="Change" style="border:none;background:none;color:#3cc;padding:0px;"/>)
+                          </p>
+                          <hr style="margin:10px 0">
+                          <p>{% trans "Rate:" %} {{experience.currency|upper}}{{experience.dollarsign}}{{experience_price|floatformat|mul:commission|floatformat:"0"}}{% trans " per person for " %}{{experience.duration}}{% trans " hours" %}</p>
+                      {% endif %}
+                          <hr style="margin-bottom:10px;">
+                          {% trans "Subtotal:" %} {{experience.currency|upper}}{{experience.dollarsign}}<div id="id_sub_total" style="display:inline"> {{ subtotal_price|stringformat:".2f"}} </div>
+                          <br>
+                          <p id="id_coupon_extra_fee" style="font-size:14px;"></p>
+                          <div id="id_service_fee" style="display:none;">{% trans "Processing Fee:" %} {{experience.currency|upper}}{{experience.dollarsign}}{{ service_fee|stringformat:".2f" }}<br></div>
+                          <strong style="font-size:18px;">{% trans "Total:" %} {{experience.currency|upper}}{{experience.dollarsign}}<div id="id_total" style="display:inline">{{ total_price|stringformat:".2f" }}</div></strong>
+                      </form>
+                  </div>
+              </div>
             </div>
-          </div>
 
-{% endblock %}
+  {% endblock %}
 
-{% block scripts %}
+  {% block scripts %}
 
-<script charset="utf-8" type="text/javascript">
-    legal_local_number = /\+\d{2} \d{9}/;
-    legal_roaming_number = /\+\d{2} \d{11}/;
+  <script charset="utf-8" type="text/javascript">
+      legal_local_number = /\(\+\d{2}\) \d{3} \d{3} \d{3}/;
+      legal_roaming_number = /\(\+\d{2}\) \d{3} \d{4} \d{4}/;
+     
+      /**
+       * formatPhone is an auto-formatting callback function for phone numbers.
+       * Takes a jquery object of the phone input field and whether it is a
+       * 'local' or 'roaming' type number.
+       */
+      function formatPhone($phone, locale) {
+        // First strip away certain characters.
+        var num = $phone.val().replace(/-/g, ''); 
+        if (locale === "local") {
+          // Format area code
+          if (num.length == 3) {
+            if (num.slice(0,2) === '61') {
+              $phone.val('(+61) ' + num.charAt(2));
+            } else if (num === '(+6') {
+              $phone.val('(+61) ');  
+            } else if (num !== '+61') {
+              $phone.val('(+61) ' + num); 
+            } else {
+              $phone.val('(' + num + ') ');
+            }
+          // Add spacing after area code
+          } else if (num.length > 5 && num.charAt(5) !== ' ') {
+            $phone.val(spliceSlice(num, 5, 0, ' '));
+          // Strip away leading 0
+          } else if (num.length > 6 && num.charAt(6) === '0') {
+            $phone.val(spliceSlice(num, 6, 1));
+          // Add spacing in groups of three numbers 
+          } else if (num.length > 9 && num.charAt(9) !== ' ') {
+            $phone.val(spliceSlice(num, 9, 0, ' '));
+          } else if (num.length > 13 && num.charAt(13) !== ' ' ) {
+            $phone.val(spliceSlice(num, 13, 0, ' '));
+          }
+        } else if (locale === "roaming") {
+          // Format area code
+          if (num.length == 3) {
+            if (num.charAt(0) !== '+') {
+              $phone.val('(+' + num.charAt(0) + num.charAt(1) + ') ' + num.charAt(2)); 
+            } else {
+              $phone.val('(' + num + ') ');
+            }
+          }
+          // Add spacing after area code
+          else if (num.length > 5 && num.charAt(5) !== ' ') {
+            $phone.val(spliceSlice(num, 5, 0, ' '));
+          // Add spacing after first group of three
+          } else if (num.length > 9 && num.charAt(9) !== ' ') {
+            $phone.val(spliceSlice(num, 9, 0, ' '));
+          // Add spacing after next group of four
+          } else if (num.length > 14 && num.charAt(14) !== ' ') {
+            $phone.val(spliceSlice(num, 14, 0, ' '));
+          }
+        }
+      }
 
-    function checkPaymentForm(preparePayment, e) {
-        if ($("#isAgreementSelected").is(':checked'))
-            {
-                var phone1=$("#id_local_number").val();
-                var phone2=$("#id_roaming_number").val();
+      /**
+       * spliceSlice is a utility function that takes a string, an index in that string,
+       * the amount (count) of characters starting from that index you want to remove,
+       * and the character (add) you want to be inserted into the string.
+       */
+      function spliceSlice(str, index, count, add) {
+        return str.slice(0, index) + (add || "") + str.slice(index + count);
+      }
 
-                if(phone1 == "+61 123456789")
-                {
-                    phone1 = "";
-                }
+      function checkPaymentForm(preparePayment, e) {
+          if ($("#isAgreementSelected").is(':checked'))
+              {
+                  var phone1=$("#id_local_number").val();
+                  var phone2=$("#id_roaming_number").val();
 
-                if(phone2 == "+86 12345678901")
-                {
-                    phone2 = "";
-                }
-
-                if(phone1.length >0 && phone1.match(legal_local_number) == null)
+                if(phone1.length > 0 && phone1.match(legal_local_number) == null)
                 {
                     $("#phone_warning").hide();
                     $("#roaming_phone_warning").hide();
@@ -233,7 +286,7 @@
                     $("#local_phone_warning").hide();
                 }
 
-                if(phone2.length >0 && phone2.match(legal_roaming_number) == null)
+                if(phone2.length > 0 && phone2.match(legal_roaming_number) == null)
                 {
                     $("#phone_warning").hide();
                     e.preventDefault();
@@ -307,7 +360,9 @@
         $("#id_country").attr("class", "btn btn-default dropdown-toggle");
 
         $("#id_expiration_1 :nth-child(2)").prop('selected', true);
-
+        
+        $('#id_local_number').keyup(function() { formatPhone($(this), 'local') });
+        $('#id_roaming_number').keyup(function() { formatPhone($(this), 'roaming') });
         var phone = $("#id_phone_number").val();
         if(phone)
         {

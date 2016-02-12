@@ -100,16 +100,14 @@
 
   .option {
     width: 100%;
-    min-height: 50px;
     padding: 10px 0;
     vertical-align: middle;
   }
 
   .option-name {
-    float: left;
-    line-height: 25px;
     display: inline-block;
-    max-width: 150px; 
+    max-width: 150px;
+    overflow-wrap: break-word;
   }
 
   .option-price, 
