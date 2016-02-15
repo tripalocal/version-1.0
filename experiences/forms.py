@@ -865,7 +865,7 @@ class CustomItineraryRequestForm(forms.Form):
     email = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder': 'email'}), required=True)
     mobile = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder': 'mobile'}), required=True)
     def __init__(self, *args, **kwargs):
-        super(CustomItineraryRequest2Form, self).__init__(*args, **kwargs)
+        super(CustomItineraryRequestForm, self).__init__(*args, **kwargs)
         self.fields['destinations'].widget = forms.HiddenInput()
         self.fields['budget'].widget = forms.HiddenInput()
         self.fields['whats_included'].widget = forms.HiddenInput()
