@@ -86,3 +86,22 @@ label {
     margin-bottom: 2px;
   }
 }
+
+// Phone number boxes
+.phone-box {
+  position: relative;
+
+  .dropdown {
+    border: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .dropdown-toggle {
+    border-color: transparent;
+    background-color: transparent;
+  }
+  input {
+    padding-left: 30px;
+  }
+}

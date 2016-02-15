@@ -107,19 +107,35 @@
 
                   <div class="form-group" style="display: inline-block; margin-right: 15px;">
                     <h3>{% trans 'Destination mobile number' %}</h3>
-                    <input id="id_local_number" maxlength="15" type="search" list="local-area-options" class="form-control" placeholder="+XX XXX XXX XXX">
-                    <datalist id="local-area-options">
-                      <option label="{% trans 'Australia' %} 🇦🇺" value="+61">
-                      <option label="{% trans 'New Zealand' %} 🇳🇿" value="+64">
-                    </datalist>
+                    <div class="phone-box">
+                      <div class="flag-box"></div>
+                      <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="toggle" id="local-area-toggle" data-toggle="dropdown">
+                          <span class="caret"></span>
+                        </button>
+                        <ul id="local-area-options" class="dropdown-menu">
+                          <li>🇦🇺 {% trans "Australia" %} (+61)</li>
+                          <li>🇳🇿 {% trans "New Zealand" %} (+64)</li>
+                        </ul>
+                      </div>
+                      <input id="id_local_number" maxlength="15" type="text" class="form-control" placeholder="+XX XXX XXX XXX">
+                    </div>
                   </div>
 
                   <div class="form-group" style="display: inline-block;">
                     <h3>{% trans 'Roaming mobile number' %}</h3>
-                    <input id="id_roaming_number" maxlength="17" type="text" list="roaming-area-options" class="form-control" placeholder="+XX XXX XXXX XXXX">
-                    <datalist id="roaming-area-options">
-                      <option label="{% trans 'China' %} 🇨🇳" value="+86">
-                    </datalist>
+                    <div class="phone-box">
+                      <div class="flag-box"></div>
+                      <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="toggle" id="roaming-area-toggle" dat-toggle="dropdown">
+                          <span class="caret"></span>
+                        </button>
+                        <ul cl id="roaming-area-options" class="dropdown-menu">
+                          <li>{% trans 'China' %} +68</li>
+                        </ul>
+                      </div>
+                      <input id="id_roaming_number" maxlength="17" type="text" class="form-control" placeholder="+XX XXX XXXX XXXX">
+                    </div>
                   </div>
 
                     <div class="warning-sign" id="local_phone_warning" style="display:none;">
