@@ -941,17 +941,20 @@ def checkout_as_guest(request):
         u = User.objects.filter(email=email)
         if len(u) > 0:
             u = u[0]
-            u.first_name = first_name
-            u.last_name = last_name
-            u.phone_number = phone_number
-            u.save()
+            if authenticate(username=u.username, password=u.username) is not None:
+                u.first_name = first_name
+                u.last_name = last_name
+                u.registereduser.phone_number = phone_number
+                u.save()
             username = u.username
             password = u.username
         else:
+            username = first_name.lower()
             u = User.objects.filter(first_name__iexact = username)
             counter = len(u) if u is not None else 0
             counter += 1
             username = username + str(counter) if counter > 1 else username
+            password = username
             u = User(first_name = first_name, last_name = last_name, email = email,username = username,
                         date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC),
                         last_login = datetime.utcnow().replace(tzinfo=pytz.UTC))
@@ -960,12 +963,15 @@ def checkout_as_guest(request):
             u.set_password(username)
             u.save()
 
+            r = RegisteredUser(user = u, phone_number = phone_number)
+            r.save()
+
         u = authenticate(username=username, password=password)
         login(request, u)
     except Exception as err:
-        return HttpResponse(json.dumps({'success':False}),content_type="application/json")
+        return {'success':False}
 
-    return HttpResponse(json.dumps({'success':True, 'user_id':u.id}),content_type="application/json")
+    return {'success':True, 'user_id':u.id}
 
 class ExperienceDetailView(DetailView):
     model = AbstractExperience
@@ -980,7 +986,8 @@ class ExperienceDetailView(DetailView):
 
         if request.method == 'POST':
             if 'guest' in request.POST:
-                checkout_as_guest(request)
+                result = checkout_as_guest(request)
+                return HttpResponse(json.dumps(result),content_type="application/json")
             elif 'login' in request.POST:
                 try:
                     data = request.POST #request.query_params['data']
