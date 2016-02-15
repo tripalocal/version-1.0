@@ -112,44 +112,44 @@
       <div class="form-group">
           <label>{% trans 'Car + Driver' %}</label>
           <select id="car-driver" class="select-expanded" size="4"> 
-            <option selected>{% trans 'please select' %}</option>
-            <option>{% trans 'infrequent' %}</option>
-            <option>{% trans 'frequent' %}</option>
-            <option>{% trans 'entire trip' %}</option>
+            <option value="please select" selected>{% trans 'please select' %}</option>
+            <option value="infrequent">{% trans 'infrequent' %}</option>
+            <option value="frequent">{% trans 'frequent' %}</option>
+            <option value="entire trip">{% trans 'entire trip' %}</option>
           </select>
         </div>
         <div class="form-group">
           <label>{% trans 'Accommodation' %}</label>
           <select id="accommodation" class="select-expanded" size="5">
-            <option selected>{% trans 'please select' %}</option>
-            <option>{% trans 'none' %}</option>
-            <option>{% trans '3 star' %}</option>
-            <option>{% trans '4 star' %}</option>
-            <option>{% trans '5 star' %}</option>
+            <option value="please select" selected>{% trans 'please select' %}</option>
+            <option value="please select">{% trans 'none' %}</option>
+            <option value="3 star">{% trans '3 star' %}</option>
+            <option value="4 star">{% trans '4 star' %}</option>
+            <option value="5 star">{% trans '5 star' %}</option>
           </select>
         </div>
         <div class="form-group">
           <label>{% trans 'National Flight' %}</label>
           <select id="national-flight" class="select-expanded" size="3">
-            <option selected>{% trans 'please select' %}</option>
-            <option>{% trans 'none' %}</option>
-            <option>{% trans 'economy' %}</option>
+            <option value="please select" selected>{% trans 'please select' %}</option>
+            <option value="none">{% trans 'none' %}</option>
+            <option value="economy">{% trans 'economy' %}</option>
           </select>
         </div>
         <div class="form-group">
           <label>{% trans 'Service Language' %}</label>
           <select id="service-language" class="select-expanded" size="3">
-            <option selected>{% trans 'please select' %}</option>
-            <option>{% trans 'chinese' %}</option>
-            <option>{% trans 'english' %}</option>
+            <option value="please select" selected>{% trans 'please select' %}</option>
+            <option value="chinese">{% trans 'chinese' %}</option>
+            <option value="english">{% trans 'english' %}</option>
           </select>
         </div>
         <div class="form-group">
           <label>{% trans 'Airport Transfer' %}</label>
           <select id="airport-transfer" class="select-expanded" size="3">
-            <option selected>{% trans 'please select' %}</option>
-            <option>{% trans 'none' %}</option>
-            <option>{% trans 'yes' %}</option>
+            <option value="please select" selected>{% trans 'please select' %}</option>
+            <option value="none">{% trans 'none' %}</option>
+            <option value="yes">{% trans 'yes' %}</option>
           </select>
         </div>
     </div>
@@ -188,7 +188,7 @@
 
   <div class="section">
     <div class="container" id="success-page">
-      <h1>{% trans "Make sure you've filled in all the " %} <span class="asterisk">*sections</span></h1>
+      <h1>{% trans "Make sure you've filled in all the " %} <span class="asterisk">*{% trans "sections" %}</span></h1>
       <h2>{% trans "A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call." %}</h2>
       <button id="submit-btn" class="btn btn-primary main-btn">{% trans "Submit" %}</button>
     </div>
@@ -242,8 +242,9 @@ $(document).ready(function() {
 		}
 	});
 
+
   if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
-  $("#id_start_date").datetimepicker({
+    $("#id_start_date").datetimepicker({
       format: 'YYYY-MM-DD', locale: 'zh-CN'
     });
     $("#id_end_date").datetimepicker({
@@ -354,6 +355,10 @@ $(document).ready(function() {
 })
 
 function updateBudget() {
+  var currencyConversion = 1;
+  if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
+    currencyConversion = 4.67;
+  }
 	var guests = parseInt($('#id_guests_adults').val()) + parseInt($("#id_guests_children").val()) + parseInt($("#id_guests_infants").val());
 	var days = moment($('#id_end_date').val()).diff(moment($('#id_start_date').val()), 'days');
 	var cities = $('#id_destinations').val().split(',').length;
@@ -469,7 +474,7 @@ function updateBudget() {
     $('#budget').text('{% trans "Our custom itinerary service starts from $1000"%}');
   }
 	else {
-    $('#budget').text('{% trans "Estimated cost: $" %}' + Math.round(min/guests) + '+ {% trans "per person ($" %}' + min + '+ {% trans "in total" %})').addClass('animated fadeInUp');
+    $('#budget').text('{% trans "Estimated cost: $" %}' + Math.round((min/guests)*currencyConversion) + '+ {% trans "per person ($" %}' + min*currencyConversion + '+ {% trans "in total" %})').addClass('animated fadeInUp');
 		var wait = window.setTimeout(function(){
       $('#budget').removeClass('animated fadeInUp')}, 1000
     );
