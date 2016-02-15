@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-15 12:52+1100\n"
+"POT-Creation-Date: 2016-02-15 16:01+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -289,7 +289,7 @@ msgstr "预定次数"
 
 #: experiences/forms.py:849
 #: experiences/templates/experiences/topic_outdoor.html:13
-#: experiences/views.py:3895
+#: experiences/views.py:3890
 msgid "Outdoor"
 msgstr "户外运动"
 
@@ -313,7 +313,7 @@ msgstr "有小孩"
 msgid "Famili with elderly&children"
 msgstr "有老人和小孩"
 
-#: experiences/forms.py:934 experiences/forms.py:1332 experiences/forms.py:1336
+#: experiences/forms.py:914 experiences/forms.py:1312 experiences/forms.py:1316
 #: experiences/resource.py:1386 experiences/views.py:2013
 #: experiences/views.py:2021 experiences/views.py:2025
 #: experiences/views.py:2249 experiences/views.py:2254
@@ -322,21 +322,21 @@ msgstr "有老人和小孩"
 msgid "%s"
 msgstr ""
 
-#: experiences/forms.py:1202 experiences/views.py:4248
+#: experiences/forms.py:1182 experiences/views.py:4243
 msgid "[Tripalocal] Your booking request has been sent"
 msgstr "【本土客】 您的预约已经发送"
 
-#: experiences/forms.py:1218
+#: experiences/forms.py:1198
 msgid "[Tripalocal] "
 msgstr "【本土客】 "
 
-#: experiences/forms.py:1218
+#: experiences/forms.py:1198
 msgid " has requested your experience"
 msgstr " 预约了您的体验"
 
-#: experiences/forms.py:1219 experiences/forms.py:1233
-#: experiences/forms.py:1253 experiences/forms.py:1265
-#: experiences/forms.py:1277 experiences/forms.py:1301
+#: experiences/forms.py:1199 experiences/forms.py:1213
+#: experiences/forms.py:1233 experiences/forms.py:1245
+#: experiences/forms.py:1257 experiences/forms.py:1281
 #: experiences/resource.py:261 experiences/resource.py:285
 #: experiences/resource.py:297 experiences/resource.py:309
 #: experiences/views.py:2077 experiences/views.py:2093
@@ -345,28 +345,28 @@ msgstr " 预约了您的体验"
 msgid "Tripalocal <"
 msgstr "本土客 <"
 
-#: experiences/forms.py:1232
+#: experiences/forms.py:1212
 msgid "[Tripalocal] Your booking request is sent to the host"
 msgstr "【本土客】 您的预约已经发送"
 
-#: experiences/forms.py:1252 experiences/forms.py:1300
+#: experiences/forms.py:1232 experiences/forms.py:1280
 #: experiences/resource.py:260 experiences/resource.py:284
 #: experiences/views.py:2076 experiences/views.py:2131
 msgid "[Tripalocal] Booking confirmed"
 msgstr "【本土客】 预订确认"
 
-#: experiences/forms.py:1264 experiences/forms.py:1276
+#: experiences/forms.py:1244 experiences/forms.py:1256
 #: experiences/resource.py:296 experiences/resource.py:308
 #: experiences/views.py:2092 experiences/views.py:2104
 msgid "[Tripalocal] Booking reminder"
 msgstr "【本土客】 预订提醒"
 
-#: experiences/forms.py:1288 experiences/resource.py:272
+#: experiences/forms.py:1268 experiences/resource.py:272
 #: experiences/views.py:2119
 msgid "[Tripalocal] How was your experience?"
 msgstr "【本土客】 您对我们的体验还满意吗？"
 
-#: experiences/forms.py:1322 experiences/views.py:2071
+#: experiences/forms.py:1302 experiences/views.py:2071
 #: experiences/views.py:2201
 msgid "%H:%M %d %b %Y"
 msgstr "%Y{0}%m{1}%d{2}%H:%M"
@@ -446,6 +446,7 @@ msgstr "日期"
 
 #: experiences/templates/experiences/api_booking_box.html:86
 #: experiences/templates/experiences/api_booking_box.html:88
+#: experiences/templates/experiences/experience_detail.html:723
 msgid "Please select date and ticket type"
 msgstr "请选择日期和门票"
 
@@ -1025,12 +1026,12 @@ msgstr "联系"
 msgid "Done!"
 msgstr "完成"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:342
+#: experiences/templates/experiences/custom_itinerary_request.html:340
 #: experiences/templates/experiences/custom_itinerary_request_old.html:15
 msgid "Your request has been submitted!"
 msgstr "谢谢咨询！"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:342
+#: experiences/templates/experiences/custom_itinerary_request.html:340
 #: experiences/templates/experiences/custom_itinerary_request_old.html:16
 msgid ""
 "Please keep an eye on our phone call within 4 hours. We will call you "
@@ -1039,19 +1040,19 @@ msgstr ""
 "请在4小时内注意你的手机。我们在墨尔本总部的电话联系时间为北京时间早9点至晚9"
 "点。"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:472
+#: experiences/templates/experiences/custom_itinerary_request.html:474
 msgid "Our custom itinerary service starts from $1000"
 msgstr "低于私人定制服务最低消费－私人定制服务从¥5000元走起"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:475
+#: experiences/templates/experiences/custom_itinerary_request.html:477
 msgid "Estimated cost: $"
 msgstr "平均每人¥"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:475
+#: experiences/templates/experiences/custom_itinerary_request.html:477
 msgid "per person ($"
 msgstr "起 (总数¥"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:475
+#: experiences/templates/experiences/custom_itinerary_request.html:477
 msgid "in total"
 msgstr "起"
 
@@ -1481,6 +1482,7 @@ msgstr "时间"
 
 #: experiences/templates/experiences/experience_booking_box.html:96
 #: experiences/templates/experiences/experience_booking_box.html:98
+#: experiences/templates/experiences/experience_detail.html:725
 #: experiences/templates/experiences/product_booking_box.html:76
 #: experiences/templates/experiences/product_booking_box.html:78
 msgid "Request"
@@ -1848,6 +1850,10 @@ msgstr "该体验已成功从您的兴趣列表中移除"
 msgid "Please try again later"
 msgstr "请稍后再试"
 
+#: experiences/templates/experiences/experience_detail.html:725
+msgid "total price of "
+msgstr "总价格为"
+
 #: experiences/templates/experiences/experience_detail.html:812
 msgid "Save now, plan later"
 msgstr ""
@@ -2188,7 +2194,7 @@ msgid "Tripalocal | Local Culture"
 msgstr "本土客 风土人情"
 
 #: experiences/templates/experiences/topic_culture.html:13
-#: experiences/views.py:3895
+#: experiences/views.py:3890
 msgid "Local Culture"
 msgstr "风土人情"
 
@@ -2197,7 +2203,7 @@ msgid "Tripalocal | Extreme Experiences"
 msgstr "【本土客】 刺激体验"
 
 #: experiences/templates/experiences/topic_extreme.html:13
-#: experiences/views.py:3895
+#: experiences/views.py:3890
 msgid "Extreme Experiences"
 msgstr "刺激体验"
 
@@ -2206,7 +2212,7 @@ msgid "Tripalocal | Bring the Kids"
 msgstr "【本土客】 亲子游"
 
 #: experiences/templates/experiences/topic_family.html:13
-#: experiences/views.py:3895
+#: experiences/views.py:3890
 msgid "Bring the Kids"
 msgstr "亲子游"
 
@@ -2219,7 +2225,7 @@ msgid "Tripalocal | Photography Worthy"
 msgstr "本土客 | 风光摄影"
 
 #: experiences/templates/experiences/topic_photography.html:13
-#: experiences/views.py:3895
+#: experiences/views.py:3890
 msgid "Photography Worthy"
 msgstr "风光摄影"
 
@@ -2228,7 +2234,7 @@ msgid "Tripalocal | Honeymoon"
 msgstr "本土客 蜜月游"
 
 #: experiences/templates/experiences/topic_romance.html:13
-#: experiences/views.py:3895
+#: experiences/views.py:3890
 msgid "Honeymoon"
 msgstr "蜜月游"
 
@@ -2283,13 +2289,13 @@ msgstr "如果你不在微信浏览器，请储存以上二维图片在微信中
 
 #: experiences/views.py:1575 experiences/views.py:1900
 #: experiences/views.py:1922 experiences/views.py:2577
-#: experiences/views.py:3284 experiences/views.py:3352
+#: experiences/views.py:3279 experiences/views.py:3347
 msgid "Image size exceeds the limit"
 msgstr "图片大小超过上限"
 
 #: experiences/views.py:1577 experiences/views.py:1902
-#: experiences/views.py:1924 experiences/views.py:3286
-#: experiences/views.py:3354
+#: experiences/views.py:1924 experiences/views.py:3281
+#: experiences/views.py:3349
 msgid "File type is not supported"
 msgstr "不支持的文件类型"
 

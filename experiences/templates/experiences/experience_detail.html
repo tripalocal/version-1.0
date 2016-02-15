@@ -720,9 +720,9 @@ $(function(){
           $("#id_submit_request").prop('disabled', false);
         } else {
           $("#id_submit_request").prop('disabled', true);
-          return ("Please select date and ticket type");
+          return ("{% trans 'Please select date and ticket type' %}");
         }
-        return ("Request " + "(total price of {{experience.dollarsign}}" + total + "{{experience.currency}})");
+        return ("{% trans 'Request' %} " + "({% trans 'total price of ' %}{{experience.dollarsign}}" + total + "{{experience.currency}})");
       });
     });
 
