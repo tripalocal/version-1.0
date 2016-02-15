@@ -331,6 +331,22 @@ $(window).resize(function(){
     resizeImg();
 });
 
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 $(function(){
     var available_dates = {{available_dates|safe}};
     resizeImg();
@@ -468,6 +484,15 @@ $(function(){
         });
     }
 
+    $.ajaxSetup({ 
+        beforeSend: function(xhr, settings) {
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        }
+    });
+
     $("#booking_cancel").bind("click", function(e) {
         $("#booking_option").modal('hide');
     });
@@ -482,18 +507,19 @@ $(function(){
                     url: "/experience/{{experience.id}}/",
                     dataType: 'json',
                     data: {
-                        "csrfmiddlewaretoken": "{{ csrf_token }}",
+                        "csrfmiddlewaretoken": getCookie('csrftoken'),
                         "email": email,
                         "password": password,
                         "login": "login",
                     },
-                    success: function (data) {
-                        result = data; //$.parseJSON(data)
+                    success: function (data,status,xhr) {
+                        var result = data; //$.parseJSON(data)
                         if('user_id' in data)
                         {
                             $('#id_user_id').val(data.user_id);
                             var unformattedDate = $("#id_date").val();
                             $("#id_date").val(String(moment(unformattedDate, "DD/MM/YYYY").format("YYYY-MM-DD")));
+                            $('[name="csrfmiddlewaretoken"]').val(getCookie('csrftoken'));
                             $("#experience_booking_form").submit();
                         }
                         else
@@ -517,20 +543,21 @@ $(function(){
                     url: "/experience/{{experience.id}}/",
                     dataType: 'json',
                     data: {
-                        "csrfmiddlewaretoken": "{{ csrf_token }}",
+                        "csrfmiddlewaretoken": getCookie('csrftoken'),
                         "email": email,
                         "first_name": first_name,
                         "last_name": last_name,
                         "phone_number": phone_number,
                         "guest": "guest"
                     },
-                    success: function (data) {
+                    success: function (data,status,xhr) {
                         result = data; //$.parseJSON(data)
                         if(data.success)
                         {
                             $('#id_user_id').val(data.user_id);
                             var unformattedDate = $("#id_date").val();
                             $("#id_date").val(String(moment(unformattedDate, "DD/MM/YYYY").format("YYYY-MM-DD")));
+                            $('[name="csrfmiddlewaretoken"]').val(getCookie('csrftoken'));
                             $("#experience_booking_form").submit();
                         }
                         else
@@ -576,7 +603,7 @@ $(function(){
                         url: "{{wishlist_webservice}}",
                         dataType: 'json',
                         data: {
-                            "csrfmiddlewaretoken": "{{ csrf_token }}",
+                            "csrfmiddlewaretoken": getCookie('csrftoken'),
                             "user_id": user_id,
                             "experience_id": experience_id,
                             "added": $('#save_to_wishlist_related_'+i).attr("val")
@@ -890,7 +917,7 @@ $(function(){
                     url: "{{wishlist_webservice}}",
                     dataType: 'json',
                     data: {
-                        "csrfmiddlewaretoken": "{{ csrf_token }}",
+                        "csrfmiddlewaretoken": getCookie('csrftoken'),
                         "user_id": user_id,
                         "experience_id": experience_id,
                         "added": $('#save_to_wishlist_icon').attr("val")
@@ -970,7 +997,7 @@ $(function(){
                 url: "/service_pageview/",
                 dataType: 'json',
                 data: {
-                    "csrfmiddlewaretoken": "{{ csrf_token }}",
+                    "csrfmiddlewaretoken": getCookie('csrftoken'),
                     "user_id": user_id,
                     "experience_id": {{experience.id}},
                     "length": length
