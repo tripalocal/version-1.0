@@ -3193,7 +3193,7 @@ def custom_itinerary_request(request):
         message = "<h1>Custom itinerary request</h1>" + \
                 "<p>" + fields['name'] + " has requested an itinerary for " + \
                 fields['guests_adults'] + " adults, " + fields['guests_children'] + " children and " + fields['guests_infants'] + " infants;" + \
-                " from " +  fields['start_date'] + " to " fields['end_date'] + " with the \
+                " from " +  fields['start_date'] + " to " + fields['end_date'] + " with the \
                 following destinations: " + fields['destinations'] + ".</p>" + \
                 "<p>Interests include: " + fields['interests'] + ".</p>" + \
                 "<h3>What's included</h3>" + \
