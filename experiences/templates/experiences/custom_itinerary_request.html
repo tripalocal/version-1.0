@@ -35,7 +35,7 @@
     </div>
   </div>
 
-  <div class="section">
+  <div id="city-section" class="section">
     <div class="container">
       <h1>{% trans 'Choose some locations you would like to visit on this trip.' %} <span class="asterisk">*</span></h1>
         <div class="box" data-city="melbourne" style="background-image:url({{MEDIA_URL}}city/Melbourne.jpg)"><div class="overlay"><h3 class="display">{% trans 'Melbourne' %}</h3></div></div>
@@ -50,7 +50,7 @@
     </div>
   </div>
 
-  <div class="section">
+  <div id="date-section" class="section">
     <div class="container">
       <h1>{% trans "Select the start and end dates of your trip" %} <span class="asterisk">*</span></h1>
       <div class="form-group"><label>{% trans "Start Date" %}</label>{{form.start_date}}</div>
@@ -76,7 +76,7 @@
     </div>
   </div>
 
-  <div class="section">
+  <div id="interests-section" class="section">
     <div class="container">
       <h1 style="margin-bottom: 30px;">{% trans "What kind of things are you interested in?<br>Check the topics that interest you." %}</h1>
       <div class="row">
@@ -207,12 +207,8 @@
 <script>
 $(document).ready(function() {
 	// Initialise fullpage 
-	var desktop = true;
-	if ($(window).width < 480) {
-		var desktop = false;
-	}
 	$('#fullpage').fullpage({
-		autoScrolling: desktop,
+		responsiveWidth: 500,
 		paddingTop: '50px',
 		paddingBottom: '50px',
 		navigation: true,
