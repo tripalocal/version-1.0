@@ -535,7 +535,7 @@ $(function(){
         {
             var email = $("#login_email").val();
             var password = $("#login_password").val();
-            if(!isValidEmailAddress(email))
+            if(!is_form_valid() || !isValidEmailAddress(email))
             {
                 return;
             }
@@ -577,7 +577,7 @@ $(function(){
             var email = $("#guest_email").val();
             var phone_number = $("#guest_phone_number").val();
 
-            if(!isValidEmailAddress(email) || !isValidName(first_name) ||
+            if(!is_form_valid() || !isValidEmailAddress(email) || !isValidName(first_name) ||
                !isValidName(last_name) || !isValidPhoneNumber(phone_number))
             {
                 return;
