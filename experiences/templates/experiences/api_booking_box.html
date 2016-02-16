@@ -82,11 +82,7 @@
     </div>
     {% endfor %}
     
-    {% if user.is_authenticated %}
-        <input id="id_submit_request" type="submit" class="btn-block btn btn-lg btn-primary" value="{% trans "Please select date and ticket type" %}" disabled='disabled'/>
-    {% else %}
-        <input id="id_submit_request" type="button" class="btn-block btn btn-lg btn-primary" value="{% trans "Please select date and ticket type" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';" disabled='disabled'/>
-    {% endif %}
+    <input id="id_submit_request" type="submit" class="btn-block btn btn-lg btn-primary" value="{% trans "Please select date and ticket type" %}" disabled='disabled'/>
     <div class="booking-enquiry">
       <p>{% trans "Please contact customer support via wechat QR code and quote ID " %}{{experience.id}}</p>
       <img src="{% static 'img/wechat_qr.jpg' %}"/>
