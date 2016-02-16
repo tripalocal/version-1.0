@@ -6,6 +6,7 @@
   {% load staticfiles %}
     <title>{% trans "Booking Confirmation" %}</title>
     <link rel="stylesheet" href="{% static 'experiences/content/checkout.css' %}">
+    <link rel="stylesheet" href="{% static 'app/content/intlTelInput.css' %}">
     <script src="https://checkout.stripe.com/checkout.js"></script>
 {% endblock %}
 
@@ -107,34 +108,37 @@
 
                   <div class="form-group" style="display: inline-block; margin-right: 15px;">
                     <h3>{% trans 'Destination mobile number' %}</h3>
-                    <div class="phone-box">
-                      <div class="flag-box"></div>
+                    <div class="phone-box" style="display:none;">
                       <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="toggle" id="local-area-toggle" data-toggle="dropdown">
+                        <button class="btn dropdown-toggle" type="toggle" id="local-area-toggle" data-toggle="dropdown">
                           <span class="caret"></span>
+                          <span class="flag">🇦🇺 </span>
                         </button>
                         <ul id="local-area-options" class="dropdown-menu">
-                          <li>🇦🇺 {% trans "Australia" %} (+61)</li>
-                          <li>🇳🇿 {% trans "New Zealand" %} (+64)</li>
+                          <li><a class="local-country-code" href="#">🇦🇺 &nbsp; {% trans "Australia" %} (+61)</a></li>
+                          <li><a class="local-country-code" href="#">🇳🇿 &nbsp; {% trans "New Zealand" %} (+64)</a></li>
                         </ul>
                       </div>
-                      <input id="id_local_number" maxlength="15" type="text" class="form-control" placeholder="+XX XXX XXX XXX">
+                      <input value="+61 " id="id_local_number" maxlength="15" type="text" class="form-control" placeholder="+XX XXX XXX XXX">
                     </div>
+                    <input id="local-number" type="tel" class="form-control">
                   </div>
 
                   <div class="form-group" style="display: inline-block;">
                     <h3>{% trans 'Roaming mobile number' %}</h3>
                     <div class="phone-box">
-                      <div class="flag-box"></div>
                       <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="toggle" id="roaming-area-toggle" dat-toggle="dropdown">
+                        <button class="btn dropdown-toggle" type="toggle" id="roaming-area-toggle" data-toggle="dropdown">
                           <span class="caret"></span>
+                          <span class="flag">🇨🇳 </span>
                         </button>
-                        <ul cl id="roaming-area-options" class="dropdown-menu">
-                          <li>{% trans 'China' %} +68</li>
+                        <ul id="roaming-area-options" class="dropdown-menu">
+                          <li><a class="roaming-country-code" href="#">🇨🇳 &nbsp; {% trans 'China' %} (+86)</a></li>
+                          <li><a class="roaming-country-code" href="#">🇯🇵 &nbsp; {% trans 'Japan' %} (+61)</a></li>
+                          <li><a class="roaming-country-code" href="#">🇰🇷 &nbsp; {% trans 'South Korea' %} (+62)</a></li>
                         </ul>
                       </div>
-                      <input id="id_roaming_number" maxlength="17" type="text" class="form-control" placeholder="+XX XXX XXXX XXXX">
+                      <input value="+86 " id="id_roaming_number" maxlength="17" type="text" class="form-control" placeholder="+XX XXX XXXX XXXX">
                     </div>
                   </div>
 
@@ -221,6 +225,7 @@
   {% endblock %}
 
   {% block scripts %}
+  <script src="{% static 'app/scripts/intlTelInput.min.js' %}">
   <script charset="utf-8" type="text/javascript">
       legal_local_number = /\+\d{2} \d{3} \d{3} \d{3}/;
       legal_roaming_number = /\+\d{2} \d{3} \d{4} \d{4}/;
@@ -273,6 +278,22 @@
        */
       function spliceSlice(str, index, count, add) {
         return str.slice(0, index) + (add || "") + str.slice(index + count);
+      }
+      
+      /**
+       * setCountryCode is a callback function that takes jquery object of the country code 
+       * that the user clicked on and whether if it is local or roaming.
+       */
+      function setCountryCode($code, locale) {
+        if (locale === 'local') {
+          $('#id_local_number').val($code.text().match(/\+\d{2}/));
+          $('#local-area-toggle').children('.flag').remove();
+          $('#local-area-toggle').append('<span class=\"flag\">' + $code.text().match(/[^\+\(\d{2}\)\w+[a-zA-Z]+/g) + '</span>');
+        } else if (locale === 'roaming') {
+          $('#id_roaming_number').val($code.text().match(/\+\d{2}/));
+          $('#roaming-area-toggle').children('.flag').remove();
+          $('#roaming-area-toggle').append('<span class=\"flag\">' + $code.text().match(/[^\+\(\d{2}\)\w+[a-zA-Z]+/g) + '</span>');
+        }
       }
 
       function checkPaymentForm(preparePayment, e) {
@@ -369,8 +390,18 @@
 
         $("#id_expiration_1 :nth-child(2)").prop('selected', true);
         
+        // Insert area code on click
+        $('.local-country-code').click(function() { setCountryCode($(this), 'local') });
+        $('.roaming-country-code').click(function() { setCountryCode($(this), 'roaming') });
+        
+        // Format phone number on keyup
         $('#id_local_number').keyup(function() { formatPhone($(this), 'local') });
         $('#id_roaming_number').keyup(function() { formatPhone($(this), 'roaming') });
+        $('#local-number').intlTelInput({
+          onlyCountries: ['au', 'nz'],
+          utilsScript: {% static 'app/scripts/intlTelInputUtils.js' %}
+        });
+
         var phone = $("#id_phone_number").val();
         if(phone)
         {
