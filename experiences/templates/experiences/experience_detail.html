@@ -48,15 +48,23 @@
             </button>
             <div id="booking_guest" class="collapse">
               <div class="well">
-                <p>{%trans 'You have to provide correct information, or you will not receive booking confirmation.'%}
+                <p>{%trans 'Please provide correct information, or you will not receive booking confirmation.'%}
                 <div class="form-group">
                   <input class="form-control" id="guest_email" name="email" placeholder="{%trans 'Email' %}" type="email">
                 </div>
                 <div class="form-group">
+                  {% if LANGUAGE != "zh-CN" %}
                   <input class="form-control" id="guest_first_name" maxlength="30" name="first_name" placeholder="{%trans 'First Name' %}" type="text">
+                  {% else %}
+                  <input class="form-control" id="guest_last_name" maxlength="30" name="last_name" placeholder="{%trans 'Last Name' %}" type="text">
+                  {% endif %}
                 </div>
                 <div class="form-group">
+                  {% if LANGUAGE != "zh-CN" %}
                   <input class="form-control" id="guest_last_name" maxlength="30" name="last_name" placeholder="{%trans 'Last Name' %}" type="text">
+                  {% else %}
+                  <input class="form-control" id="guest_first_name" maxlength="30" name="first_name" placeholder="{%trans 'First Name' %}" type="text">
+                  {% endif %}
                 </div>
                 <div class="form-group">
                   <input class="form-control" id="guest_phone_number" maxlength="30" name="phone_number" placeholder="{%trans 'Phone number' %}" type="text">
@@ -297,7 +305,8 @@
 <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
 {%if LANGUAGE == "zh-CN"%}
 <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
-{%endif%} 
+{%endif%}
+<script type="text/javascript" src="{% static 'experiences/scripts/utils.js' %}"></script>
 <script charset="utf-8" type="text/javascript">
 function resizeImg() {
     var thisImg= $('.item');
@@ -526,6 +535,11 @@ $(function(){
         {
             var email = $("#login_email").val();
             var password = $("#login_password").val();
+            if(!isValidEmailAddress(email))
+            {
+                return;
+            }
+
             $.ajax({
                     type: 'POST',
                     url: "/experience/{{experience.id}}/",
@@ -562,6 +576,13 @@ $(function(){
             var last_name = $("#guest_last_name").val();
             var email = $("#guest_email").val();
             var phone_number = $("#guest_phone_number").val();
+
+            if(!isValidEmailAddress(email) || !isValidName(first_name) ||
+               !isValidName(last_name) || !isValidPhoneNumber(phone_number))
+            {
+                return;
+            }
+
             $.ajax({
                     type: 'POST',
                     url: "/experience/{{experience.id}}/",
