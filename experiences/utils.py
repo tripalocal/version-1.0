@@ -1,8 +1,9 @@
-import os, pytz, string, random, decimal
+import os, pytz, string, random, decimal, requests, json
 
 from Tripalocal_V1 import settings
 from unionpay.util.helper import load_config
 from datetime import timedelta, date
+from copy import deepcopy
 
 def isEnglish(s):
     try:
@@ -32,11 +33,32 @@ def convert_currency(price, current_currency, target_currency, conversion=None):
         conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
     return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
 
-def get_total_price(experience, guest_number=0, adult_number=0, child_number=0):
+def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, extra_information=None):
     '''
     return total price, not including commission or service fee
     either use guest_number, or adult_number + child_number, the latter has a higher priority
+    extra_information: for experienceoz products, it indicates which optionitem is chosen, e.g., {"1243":1, "2344":2}
     '''
+    if extra_information:
+        price = 0
+        i = 0
+        items = json.loads(extra_information)
+        for og in experience.optiongroup_set.all():
+            for oi in og.optionitem_set.all():
+                if str(oi.original_id) in items.keys():
+                    price += oi.price*items.get(str(oi.original_id))
+                    i += 1
+                    if i == len(items.keys()):
+                        break
+            if i == len(items.keys()):
+                break
+        if i == len(items.keys()):
+            if experience.currency.lower() != "aud":
+                price = convert_currency(price, "aud", experience.currency)
+            return price
+        else:
+            raise ValueError("OptionItem mismatch")
+
     if type(guest_number) != int or guest_number < 0:
         guest_number = 0
     if type(adult_number) != int or adult_number < 0:
@@ -82,3 +104,40 @@ def email_account_generator(size=10, chars=string.ascii_lowercase + string.digit
 def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
+
+def get_weather(lat, lon, time):
+    api_address = "https://api.forecast.io/forecast/0a73fa455425979752f12c2afe2441ba/" + str(lat) + "," + str(lon) + "," + str(time)
+    payload = {'units': 'si', 'exclude': 'currently,minutely,hourly,alerts,flags'}
+    r = requests.get(api_address, params=payload)
+    if r.status_code is requests.codes.ok:
+        return r.json()
+    else:
+        r.raise_for_status()
+
+def static_vars(**kwargs):
+    def decorate(func):
+        for k in kwargs:
+            setattr(func, k, kwargs[k])
+        return func
+    return decorate
+
+@static_vars(dict={"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]})
+def recent_search(action, new_search=None):
+    '''
+    action: get, update, clear
+    new_search: add the new item to the dict/update an existing item
+    '''
+    if action is not None:
+        if action.lower()=="get":
+            return recent_search.dict
+        elif action.lower()=="update" and new_search is not None:
+            for k, v in new_search.items():
+                if k not in recent_search.dict:
+                    recent_search.dict[k] = deepcopy(v)
+                else:
+                    for experience in v['experiences']:
+                        if recent_search.dict[k]['max_id'] < experience['id']:
+                            recent_search.dict[k]['experiences'].append(experience)
+                    recent_search.dict[k]['max_id'] = v['max_id']
+        elif action.lower()=="clear":
+            recent_search.dict.clear()

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     {% load staticfiles %}
@@ -167,8 +167,8 @@
           {% endif %}
 
         <ul class="nav navbar-nav main-menu">
-          <li><a href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
-          <li><a href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
+          <li><a id="top_search_product" href="{{ GEO_POSTFIX }}product/Melbourne/">{% trans 'Local Experiences' %}</a></li>
+          <li><a id="top_search_experience" href="{{ GEO_POSTFIX }}s/Melbourne/">{% trans 'Travel with Locals' %}</a></li>
           <li><a href="{{ GEO_POSTFIX }}multidaytrip/">{% trans 'Itineraries' %}</a></li>
         </ul>
 
@@ -241,7 +241,7 @@
             <div class="col-sm-2 col-xs-6">
                 <ul class="footer-col travel">
                     <li><h5>{% trans "Travel" %}</h5></li>
-                    <li><a href="{{GEO_POSTFIX}}blog">{% trans "Blog" %}</a></li>
+                    <li><a href="https://www.tripalocal.com/blog/">{% trans "Blog" %}</a></li>
                     <li><a href="{{ GEO_POSTFIX }}refundpolicy">{% trans "Refund Policy" %}</a></li>
                 </ul>
             </div>
@@ -257,8 +257,7 @@
       </div>
 
         <div class="footer-line">
-            <p id="copyright"> &#169; Tripalocal Pty. Ltd. ABN 45 600 546 549</p>
-            <p id="copyright">京ICP备15055137号</p>
+            <p id="copyright"> &#169; Tripalocal Pty. Ltd. | ABN 45 600 546 549 | 京ICP备15055137号</p>
         </div>
     </div>
 
@@ -319,7 +318,7 @@
       setTimeout(function() {
         $("#wechat-qr").animate({'margin-right': 0}, 500, 'linear');
       }, 2000);
-
+      /*
       var chosenValue = Math.random() < 0.5 ? 0 : 1;
       var popupTimer;
         if ($(window).width() > 520) {
@@ -387,7 +386,7 @@
                }
            });
        }
-
+*/
         var des_url = window.location.pathname;
         if (des_url.indexOf("/cn") > -1) {
             $('#id_language_select').val('cn');
@@ -485,6 +484,36 @@
     $(".dimmer").click(function() {
       $(".dimmer").fadeOut(250);
     })
+
+    $("#top_search_product").click(function() {
+        if($("#id_city").length>0 && $("#id_city").val().length>0)
+        {
+            var link = $("#top_search_product").attr("href");
+            link = link.split("/");
+            link[link.length-2] = $("#id_city").val();
+            var new_l = link[0]  + "/";
+            for(var i=1;i<link.length-1;i++)
+            {
+                new_l += link[i] + "/";
+            }
+            $("#top_search_product").attr("href", new_l);
+        }
+    });
+
+    $("#top_search_experience").click(function() {
+        if($("#id_city").length>0 && $("#id_city").val().length>0)
+        {
+            var link = $("#top_search_experience").attr("href");
+            link = link.split("/");
+            link[link.length-2] = $("#id_city").val();
+            var new_l = link[0]  + "/";
+            for(var i=1;i<link.length-1;i++)
+            {
+                new_l += link[i] + "/";
+            }
+            $("#top_search_experience").attr("href", new_l);
+        }
+    });
 
     {#http://stackoverflow.com/questions/11381673/detecting-a-mobile-browser#}
     window.mobilecheck = function() {

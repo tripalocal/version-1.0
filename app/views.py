@@ -39,6 +39,7 @@ import xmltodict
 from experiences.utils import *
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.storage import default_storage as storage
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
@@ -631,12 +632,15 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
 
 def track_user_signup(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP":ip,
-                               "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
-                               })
 
     reader = None
     try:
+        mp.people_set(user.email, 
+                      {"IP":ip,
+                       "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
+                       })
+        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+
         reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
         country = response.country.name
@@ -646,11 +650,10 @@ def track_user_signup(ip, sociallogin, user):
         longitude = response.location.longitude
         latitude = response.location.latitude
 
-        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
         mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "$first_name":user.first_name, "$last_name":user.last_name, "Postcode":postcode, "Latitude":latitude, "Longitude":longitude})
         reader.close()
     except Exception:
-        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+        pass
     finally:
         if reader is not None:
             reader.close()
@@ -672,9 +675,12 @@ def track_user_signup(ip, sociallogin, user):
         if 'gender' in data:
             gender = data['gender']
 
-        mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed up via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        try:
+            mp = Mixpanel(settings.MIXPANEL_TOKEN)
+            mp.track(email, 'has signed up via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+            mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        except Exception as err:
+            pass
 
 @receiver(user_logged_in)
 def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
@@ -699,10 +705,12 @@ def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
 
 def track_user_login(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP":ip})
+    reader = None
 
     try:
         reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+        mp.people_set(user.email, {"IP":ip})
+        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
         response = reader.city(ip)
         country = response.country.name
         region = response.subdivisions.most_specific.name
@@ -711,12 +719,11 @@ def track_user_login(ip, sociallogin, user):
         longitude = response.location.longitude
         latitude = response.location.latitude
 
-        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
         mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "Postcode":postcode,
                                    "Latitude":latitude, "Longitude":longitude, "Language":settings.LANGUAGES[0][1]}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
         reader.close()
     except Exception:
-        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
+        pass
     finally:
         if reader is not None:
             reader.close()
@@ -738,10 +745,12 @@ def track_user_login(ip, sociallogin, user):
         if 'gender' in data:
             gender = data['gender']
 
-        mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-
+        try:
+            mp = Mixpanel(settings.MIXPANEL_TOKEN)
+            mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+            mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        except Exception:
+            pass
 
 def saveProfileImage(user, profile, image_file):
     content_type = image_file.content_type.split('/')[0]
@@ -763,14 +772,24 @@ def saveProfileImage(user, profile, image_file):
         profile.save()
 
         #crop the image
-        dirname = settings.MEDIA_ROOT + '/hosts/' + str(user.id) + '/'
-        im = PIL.Image.open(dirname + filename)
+        f = storage.open(dirname + filename, 'rb')
+        im = PIL.Image.open(f)
         w, h = im.size
         if w > 1200:
             basewidth = 1200
             wpercent = (basewidth/float(w))
             hsize = int((float(h)*float(wpercent)))
-            im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS).save(dirname + filename)
+            im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+            im_out = BytesIO()
+            if extension == '.jpg':
+                extension = '.jpeg'
+            im.save(im_out, format = extension[1:].upper())
+            f.close()
+            f = storage.open(dirname + filename, 'wb')
+            f.write(im_out.getvalue())
+            f.close()
+        else:
+            f.close()
 
 @require_POST
 def email_custom_trip(request):
@@ -786,14 +805,12 @@ def email_custom_trip(request):
 
     return HttpResponse(json.dumps({}))
 
-
 def create_wx_trade_no(mch_id):
     system_time = strftime("%Y%m%d%H%M%S", gmtime())
     trade_no = 'wx' + mch_id + system_time
     N = 32 - len(trade_no)
     trade_no += ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
     return trade_no
-
 
 def wechat_product(request):
     pay = JsAPIOrderPay(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY, settings.WECHAT_APPSECRET)
@@ -811,7 +828,6 @@ def wechat_product(request):
         print('no code redirect')
         # 重定向到oauth_url后，获得code值
         return redirect(oauth_url)
-
 
 @csrf_exempt
 def generate_order(request):
@@ -837,7 +853,6 @@ def generate_order(request):
     print('json_pay_info', json_pay_info)
     return HttpResponse(json.dumps(json_pay_info), content_type='application/json')
 
-
 @csrf_exempt
 def wechat_payment_notify(request):
     if (request.body):
@@ -854,7 +869,6 @@ def wechat_payment_notify(request):
         return HttpResponse('')
     else:
         return HttpResponse('')
-
 
 # @csrf_exempt
 # def wechat_qr_payment(request):

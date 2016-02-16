@@ -134,10 +134,10 @@ var helper = {
         return name.split("-").pop();
     },
     genaralSuccessNotification: function(result) {
-        alert(result.success);
+        console.log(result.success);
     },
     genaralFailNotification: function() {
-        alert(result.success);
+        console.log(result.success);
     },
     mapStatusToColor: function(status) {
         switch (status) {

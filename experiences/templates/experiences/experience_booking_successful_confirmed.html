@@ -112,7 +112,7 @@
 													                        <h1 style="text-align: center;"><font size="5">{% trans "Booking confirmed" %}</font></h1>
 														                    <p style="text-align: center;">{% trans "Please meet "%}{% for h in experience.hosts.all %}{% if forloop.first %} {{ h.first_name }}{% endif %}{% endfor %}{% trans " at the meeting point"%}<br>
                                                                                 <strong>{{experience.meetup_spot}}</strong><br>
-                                                                                {% trans "on" %} <strong>{% if LANGUAGE != "zh-CN"%}{{ booking_datetime|date:'d/m/Y' }}{% else %}{{ booking_datetime|date:'Y-m-d' }}{% endif %}</strong>{%trans " at " %}<strong> {{ booking_datetime|date:'H:i' }}</strong><br>
+                                                                                {% trans "on" %} <strong>{% if LANGUAGE != "zh-CN"%}{{ booking_datetime|date:'d/m/Y' }}{% else %}{{ booking_datetime|date:'Y-m-d' }}{% endif %}</strong>{%if experience.type == "PRIVATE" or experience.type == "NONPRIVATE"%}{%trans " at " %}<strong> {{ booking_datetime|date:'H:i' }}</strong>{% endif %}<br>
                                                                                 {% trans "to experience" %}<br>
                                                                                 <a href="{{experience_url}}" target="_blank">{{experience.title}}</a><br>
                                                                                 <br>

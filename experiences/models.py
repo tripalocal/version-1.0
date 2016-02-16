@@ -48,6 +48,7 @@ class Provider(models.Model):
     email = models.CharField(max_length=100, blank=True)
     phone_number = models.CharField(max_length=15, blank=True)
     partner = models.CharField(max_length=100, blank=True, null=True)
+    location = models.CharField(max_length=500, blank=True, null=True)
 
     def __str__(self):
         return self.company
@@ -102,12 +103,17 @@ class Experience(AbstractExperience):
         return str(self.id) + '--' + t + '--' + s + '--' + c
 
     def get_information(self, language):
-        if hasattr(self, "experiencei18n_set") and self.experiencei18n_set is not None and len(self.experiencei18n_set.all()) > 0:
-            t = self.experiencei18n_set.filter(language=language)
-            if len(t)>0:
-                return t[0]
+        if self.experiencei18n_set is not None:
+            all = self.experiencei18n_set.all()
+            if len(all) > 0:
+                for i in all:
+                    if i.language == language:
+                        return i
+                return all[0]
             else:
-                return self.experiencei18n_set.all()[0]
+                new = ExperienceI18n(experience = self, language = settings.LANGUAGES[0][0])
+                new.save()
+                return new
         else:
             new = ExperienceI18n(experience = self, language = settings.LANGUAGES[0][0])
             new.save()
@@ -134,7 +140,7 @@ class Experience(AbstractExperience):
     def get_tags(self, language):
         tags = []
 
-        if self.tags is not None and len(self.tags.all()) > 0:
+        if self.tags is not None:
             t = self.tags.filter(language=language)
             for i in range(len(t)):
                 tags.append(t[i].tag)
@@ -191,10 +197,12 @@ class NewProduct(AbstractExperience):
 
     LISTED = 'Listed'
     UNLISTED = 'Unlisted'
+    INCORRECT = 'API incorrect'
 
     STATUS_CHOICES = (
         (LISTED, 'Listed'),
         (UNLISTED, 'Unlisted'),
+        (INCORRECT, 'API incorrect')
     )
 
     type = models.CharField(max_length=50, default="PublicProduct")
@@ -229,18 +237,24 @@ class NewProduct(AbstractExperience):
     tags = models.ManyToManyField(ExperienceTag, related_name='newproduct_tags', blank=True)
     partner = models.CharField(max_length=100, blank=True, null=True)
     related_products = models.ManyToManyField("NewProduct", related_name="newproduct_related", blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
 
     def __str__(self):
         t = self.get_information(settings.LANGUAGES[0][0]).title
         return str(self.id) + '--' + t
 
     def get_information(self, language):
-        if hasattr(self, "newproducti18n_set") and self.newproducti18n_set is not None and len(self.newproducti18n_set.all()) > 0:
-            t = self.newproducti18n_set.filter(language=language)
-            if len(t)>0:
-                return t[0]
+        if self.newproducti18n_set is not None:
+            all = self.newproducti18n_set.all()
+            if len(all) > 0:
+                for i in all:
+                    if i.language == language:
+                        return i
+                return all[0]
             else:
-                return self.newproducti18n_set.all()[0]
+                new = NewProductI18n(product = self, language = settings.LANGUAGES[0][0])
+                new.save()
+                return new
         else:
             new = NewProductI18n(product = self, language = settings.LANGUAGES[0][0])
             new.save()
@@ -249,7 +263,7 @@ class NewProduct(AbstractExperience):
     def get_tags(self, language):
         tags = []
 
-        if self.tags is not None and len(self.tags.all()) > 0:
+        if self.tags is not None:
             t = self.tags.filter(language=language)
             for i in range(len(t)):
                 tags.append(t[i].tag)
@@ -468,7 +482,7 @@ class CustomItinerary(models.Model):
             if bking.total_price and experience.type in ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]:
                 subtotal_price = float(bking.total_price)
             else:
-                subtotal_price = get_total_price(experience, guest_number, adult_number, children_number)
+                subtotal_price = get_total_price(experience, guest_number, adult_number, children_number, extra_information=bking.partner_product)
             subtotal_price = experience_fee_calculator(subtotal_price, experience.commission)
             if experience.currency != currency:
                 if experience.currency.lower() == "aud":
@@ -537,7 +551,7 @@ class Booking(models.Model):
     children_number = models.IntegerField(null=True, blank=True)
     experience = models.ForeignKey(AbstractExperience)
     whats_included = models.TextField(null=True, blank=True)
-    total_price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     datetime = models.DateTimeField()
     status = models.CharField(max_length=50)
     submitted_datetime = models.DateTimeField()
@@ -546,7 +560,7 @@ class Booking(models.Model):
     booking_extra_information = models.TextField(null=True, blank=True)
     custom_itinerary = models.ForeignKey(CustomItinerary, null=True, blank=True)
     host = models.ForeignKey(User, null=True, blank=True, related_name='booking_host')
-    option_item = models.ManyToManyField(OptionItem, related_name='booking_option_item')
+    partner_product = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.user.email + "--" + self.experience.get_information(settings.LANGUAGES[0][0]).title
@@ -704,7 +718,7 @@ class Coordinate(models.Model):
     experience = models.ForeignKey(AbstractExperience)
 
     def __str__(self):
-        return self.name
+        return self.name if self.name else "" + "--" + str(self.experience.id)
 
 #TODO: move to the models of experience, newproduct
 # add new or update experience title

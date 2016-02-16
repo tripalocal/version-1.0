@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-11 12:16+1100\n"
+"POT-Creation-Date: 2016-02-15 16:00+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,19 +99,19 @@ msgstr "我们欢迎您加入到我们的行列，与我们一起寻找最原汁
 msgid "Most popular destinations"
 msgstr "最热门目的地"
 
-#: app/templates/app/campaign.html:20 app/views.py:49
+#: app/templates/app/campaign.html:20 app/views.py:50
 msgid "Melbourne"
 msgstr "墨尔本"
 
-#: app/templates/app/campaign.html:20 app/views.py:49
+#: app/templates/app/campaign.html:20 app/views.py:50
 msgid "Sydney"
 msgstr "悉尼"
 
-#: app/templates/app/campaign.html:20 app/views.py:49
+#: app/templates/app/campaign.html:20 app/views.py:50
 msgid "Brisbane"
 msgstr "布里斯班"
 
-#: app/templates/app/campaign.html:20 app/views.py:51
+#: app/templates/app/campaign.html:20 app/views.py:52
 msgid "Gold Coast"
 msgstr "黄金海岸"
 
@@ -329,7 +329,7 @@ msgid "Send"
 msgstr "发送"
 
 #: app/templates/app/layout.html:148 app/templates/app/loginpartial.html:38
-#: app/templates/app/mylisting.html:6 app/templates/app/mylisting.html:15
+#: app/templates/app/mylisting.html:6 app/templates/app/mylisting.html.py:15
 #: app/templates/app/myprofile.html:15 app/templates/app/myreservation.html:15
 #: app/templates/app/mytrip.html:15
 msgid "My Listing"
@@ -424,31 +424,31 @@ msgstr ""
 msgid "Twitter"
 msgstr ""
 
-#: app/templates/app/layout.html:266
+#: app/templates/app/layout.html:265
 msgid "Scan for wechat"
 msgstr "扫一扫微信客服"
 
-#: app/templates/app/layout.html:292
+#: app/templates/app/layout.html:291
 msgid "Sent!"
 msgstr "发送成功"
 
-#: app/templates/app/layout.html:297
+#: app/templates/app/layout.html:296
 msgid "Error sending, please"
 msgstr "发送失败，请重试"
 
-#: app/templates/app/layout.html:297 app/templates/app/layout.html.py:380
+#: app/templates/app/layout.html:296 app/templates/app/layout.html.py:379
 msgid "try again"
 msgstr "请重试"
 
-#: app/templates/app/layout.html:372
+#: app/templates/app/layout.html:371
 msgid "Please fill in all fields."
 msgstr "请填写全部必填项"
 
-#: app/templates/app/layout.html:380
+#: app/templates/app/layout.html:379
 msgid "Invalid email, please"
 msgstr "无效电子邮箱"
 
-#: app/templates/app/layout.html:459
+#: app/templates/app/layout.html:458
 msgid "Please try again later"
 msgstr ""
 
@@ -477,7 +477,7 @@ msgid "Invalid input"
 msgstr ""
 
 #: app/templates/app/mylisting.html:17 app/templates/app/myprofile.html:6
-#: app/templates/app/myprofile.html:17 app/templates/app/myprofile.html:26
+#: app/templates/app/myprofile.html.py:17 app/templates/app/myprofile.html:26
 #: app/templates/app/myreservation.html:17 app/templates/app/mytrip.html:17
 msgid "My Profile"
 msgstr "个人信息"
@@ -692,55 +692,55 @@ msgstr "您用 %(user_email)注册的账户已经激活。"
 msgid "Show me around"
 msgstr "去主页逛逛"
 
-#: app/views.py:50
+#: app/views.py:51
 msgid "Cairns"
 msgstr "凯恩斯"
 
-#: app/views.py:51
+#: app/views.py:52
 msgid "Hobart"
 msgstr "霍巴特"
 
-#: app/views.py:51
+#: app/views.py:52
 msgid "Adelaide"
 msgstr "阿德莱德"
 
-#: app/views.py:52
+#: app/views.py:53
 msgid "Darwin"
 msgstr "达尔文"
 
-#: app/views.py:52
+#: app/views.py:53
 msgid "Alice Springs"
 msgstr "艾利斯斯普林斯"
 
-#: app/views.py:53
+#: app/views.py:54
 msgid "Perth"
 msgstr ""
 
-#: app/views.py:54
+#: app/views.py:55
 msgid "Christchurch"
 msgstr "基督城"
 
-#: app/views.py:54
+#: app/views.py:55
 msgid "Queenstown"
 msgstr "皇后镇"
 
-#: app/views.py:55
+#: app/views.py:56
 msgid "Auckland"
 msgstr "奥克兰"
 
-#: app/views.py:55
+#: app/views.py:56
 msgid "Wellington"
 msgstr "惠灵顿"
 
-#: app/views.py:231
+#: app/views.py:232
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 您的帐户已经成功激活"
 
-#: app/views.py:750
+#: app/views.py:759
 msgid "Image size exceeds the limit"
 msgstr "文件大小超过上限"
 
-#: app/views.py:752
+#: app/views.py:761
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
 

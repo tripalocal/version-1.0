@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden, HttpResponseNotAllowed, JsonResponse
 import json, pytz, xlrd, re, os, subprocess, math, logging, ast
 from django.contrib.auth.models import User
 from datetime import *
@@ -779,9 +779,9 @@ def service_search(request, format=None):
             keywords = None
 
         if int(guest_number) == 0:
-            itinerary = get_itinerary(type, start_datetime, end_datetime, None, city, language, keywords, mobile=True)
+            itinerary = get_itinerary(type, start_datetime, end_datetime, None, city, language, keywords, mobile=True, skip_availability=True)
         else:
-            itinerary = get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords, mobile=True)
+            itinerary = get_itinerary(type, start_datetime, end_datetime, guest_number, city, language, keywords, mobile=True, skip_availability=True)
 
         return Response(itinerary, status=status.HTTP_200_OK)
     except Exception as err:
@@ -1509,4 +1509,118 @@ def service_update_session(request):
     except Exception as err:
         response={'success':False}
     return HttpResponse(json.dumps(response),content_type="application/json")
+
+@api_view(['GET'])
+@csrf_exempt
+def service_weather(request):
+    try:
+        data = request.GET
+        #debug print(data)
+        response = get_weather(data['lat'], data['lon'], data['time'])
+        #debug print(response)
+    except Exception as err:
+        response = { 'success': False }
+    return JsonResponse(response)
+
+@api_view(['POST'])
+#@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))#))#,
+#@permission_classes((IsAuthenticated,))
+@csrf_exempt
+def service_search_text(request, format=None):
+    '''
+    recent_result.dict is in the format of 
+    {
+        "key":
+            {
+                "max_experience_id":123,
+                "experiences":
+                    [
+                        {'id":123, "title":"asdf"}
+                    ],
+                "itineraries_last_updated":"2016-01-29 12:00:00",
+                "daily_itineraries":
+                    [
+                        {"id":2222,"
+                         "experiences":
+                            [
+                                {'id":809, "title":"yioyi"}
+                            ]
+                        }
+                    ]
+            }
+    }
+    each time the service is called, update the dict by adding 3 more experiences whose title matches the input
+    daily_itinerary is only updated once every hour
+    '''
+
+    try:
+        data = request.data
+        action = data.get('action',None)
+        title = data.get('title',None)
+        city = data.get('city',None)
+
+        if action and action == "clear":
+            recent_search("clear")
+            return Response(status=status.HTTP_200_OK)
+
+        if title is None or city is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        recent = recent_search("get")
+        language = 'en' if isEnglish(title) else 'zh'
+
+        #initialisation
+        if title not in recent:
+            recent[title] = {}
+            recent[title]["max_experience_id"] = 0
+            recent[title]["experiences"] = []
+            recent[title]["itineraries_last_updated"] = datetime(2000,1,1,0,0,0,0).strftime("%Y-%m-%d %H:%M:%S")
+            recent[title]["daily_itineraries"] = []
+
+        #update daily itinerary
+        last_updated = datetime.strptime(recent[title]["itineraries_last_updated"],"%Y-%m-%d %H:%M:%S")
+
+        if (datetime.utcnow() - last_updated).seconds > 3600:
+            itineraries = CustomItinerary.objects.filter(cities=city).exclude(status="deleted")\
+                                                                     .exclude(start_datetime__isnull=True)\
+                                                                     .exclude(end_datetime__isnull=True)
+
+            recent[title]["daily_itineraries"].clear()
+            recent[title]["itineraries_last_updated"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
+            for itinerary in itineraries:
+                match = False
+                new_item = {"id":itinerary.id, "experiences":[]}
+
+                for booking in itinerary.booking_set.all():
+                    exp_title = booking.experience.get_information(language).title
+                    new_item["experiences"].append({"id":booking.experience.id,"title":exp_title})
+                    if exp_title.lower().find(title) >= 0:
+                        match = True
+                if match:
+                    recent[title]["daily_itineraries"].append(new_item)  
+
+        #update experiences
+        max_experience_id = 0
+        max_experience_id = recent[title]["max_experience_id"]
         
+        experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
+                      list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id'))
+        counter = 0
+        for experience in experiences:
+            exp_title = experience.get_information(language).title
+            if exp_title.lower().find(title) >= 0:
+                recent[title]["max_experience_id"] = experience.id
+                recent[title]["experiences"].append({"id":experience.id,"title":exp_title})
+                #recent_search("update",recent)
+                counter += 1
+            if counter >= 3:
+                return Response(recent[title], status=status.HTTP_200_OK)
+
+        if counter > 0 or len(recent[title]['daily_itineraries']) > 0:
+            return Response(recent[title], status=status.HTTP_200_OK)
+        else:
+            return Response({"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}, status=status.HTTP_200_OK)
+    except Exception as err:
+        #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)       

@@ -31,6 +31,7 @@
     {{form.children_number}}
     {{form.end_datetime}}
     {{form.cities_string}}
+    {{form.from_id}}
   </div>
   <!-- Top search bar -->
   <div class="basic-search">
@@ -317,10 +318,16 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
     <script type="text/javascript">
     cities = {{location_keys|safe}};
+    //the max id of experiences/newproducts, indicating whether or not need to load more
+    MAX = 99999999999;
+    //there is no paging for Flight, Transfer, ..., so no need to reload them
+    ProductOnly = false;
 
     $(document).ready(function()
     {
         $(".loading").hide();
+        var lastScrollTop = {"experience":0,"product":0,"flight":0,"transfer":0,"accommodation":0,
+                             "suggestion":0,"restaurant":0,"pricing":0};
         if ($("#id_title").val() == "") {
           $("#id_title").val("新路线");
         }
@@ -353,19 +360,59 @@
                             children_number: $("#id_children_number").val(),
                             language: $("#id_language").val(),
                             Search: "Search",
+                            ProductOnly: ProductOnly,
                             tags: $("#id_tags").val(),
                             all_tags: $("#id_all_tags").val(),
                             sort: $("#id_sort").val(),
-                            age_limit: $("#id_age_limit").val()
+                            age_limit: $("#id_age_limit").val(),
+                            from_id: $("#id_from_id").val(),
                         }
             }).done(function(data){
-                            $('.tab-content').html(data);
+                            append_new_products($('.tab-content'), data);
                             $('.nav-tabs').children().removeClass();
                             $($('.nav-tabs').children()[0]).addClass("active");
                             init_drag(); // Initialize draggable elements
                             filter_experiences(); // Initialize search filter
                             update_dates();
                             update_price_title();
+                            //hook scroll event
+                            $(".column.ui-sortable").scroll(function(e) {
+                                var st = $(this).scrollTop();
+                                var type= $(this).parent().parent()[0].id;
+                                if (st <= lastScrollTop[type]){
+                                    // scroll up
+                                    lastScrollTop[type] = st;
+                                    return
+                                }
+                                lastScrollTop[type] = st;
+
+                                if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                                    var ids = $(this).children();
+                                    var id_min = MAX;
+                                    for(var i=0;i<ids.length;i++)
+                                    {
+                                        var id=parseInt($(ids[i]).attr("class").split(" ")[0].split("_")[2]);
+                                        if(id < id_min)
+                                        {
+                                            id_min = id;
+                                        }
+                                    }
+                                    if(type == "experience")
+                                    {
+                                        $("#id_from_id").val(id_min+",0");
+                                    }
+                                    else if (type == "product")
+                                    {
+                                        $("#id_from_id").val("0,"+id_min);
+                                    }
+                                    else
+                                    {
+                                        return
+                                    }
+                                    ProductOnly = true;
+                                    $("#itinerary_search").click();
+                                }
+                            });
                             $(".loading").hide();
             }).fail(function(jqXHR, textStatus) {
                             $(".loading").hide();
@@ -536,6 +583,8 @@
         {
             $("#"+type[i]+"-location").val(city);
         }
+        //reset values
+        $("#id_from_id").val(MAX+","+MAX);
     }
 
     function add_new_city()
@@ -592,6 +641,10 @@
         new_item += "</div></div>";
         $("#sortable").append(new_item);
 
+        //reset values
+        $("#id_from_id").val(MAX+","+MAX);
+
+        ProductOnly = false;
         //reload data
         $("#itinerary_search").click();
     }
@@ -652,7 +705,11 @@
                 $("#city-collapse-" + i + "-day-" + j).remove();
             }
         }
-
+        //clear current data
+        $("#product_day_"+(i+1)).remove();
+        $("#experience_day_"+(i+1)).remove();
+        $("#id_from_id").val(MAX+","+MAX);
+        ProductOnly = false;
         //reload data
         $("#itinerary_search").click();
     }
@@ -963,17 +1020,17 @@
                     "</p>" +
                   "</div>" +
                 "</div></div>";
-                $("#"+type+"_column").append(new_item);
+                $("#"+type+"_column").prepend(new_item);
                 $("#"+type+"_column").fadeIn();
                 $("#" + type + "-title").val("");
                 $("#" + type + "-details").val("");
                 $("#" + type + "-location").val("");
                 $("#" + type + "-fixed_price").val("");
                 $("#" + type + "-price").val("");
-                $("#" + type + "-fixed_price-min").val("");
-                $("#" + type + "-fixed_price-max").val("");
-                $("#" + type + "-price-min").val("");
-                $("#" + type + "-price-max").val("");
+                $("#" + type + "-fixed_price-min").val(0);
+                $("#" + type + "-fixed_price-max").val(0);
+                $("#" + type + "-price-min").val(0);
+                $("#" + type + "-price-max").val(0);
                 $("#" + type + "-notes").val("");
                 $("#" + type + "-photo").val("");
                 $(".fileinput").fileinput('clear');
@@ -1077,7 +1134,7 @@
           "</p>" +
         "</div>" +
       "</div></div>";
-      $("#"+type+"_column").append(new_item);
+      $("#"+type+"_column").prepend(new_item);
     }
 
 
@@ -1113,7 +1170,7 @@
         $("#" + type + "-details").val(details);
         $("#" + type + "-notes").val(notes);
         $("#add-" + type + "-add").text("{% trans "Save" %}");
-        $("#add-" + type + "-add").attr("onclick", "");
+        $("#add-" + type + "-add").attr("onclick", null);
         $("#add-" + type + "-add").click(function(e){
             var item = new FormData();
             item.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']")[0].value);
@@ -1186,10 +1243,10 @@
                                 $("#" + type + "-location").val("");
                                 $("#" + type + "-fixed_price").val("");
                                 $("#" + type + "-price").val("");
-                                $("#" + type + "-fixed_price-min").val("");
-                                $("#" + type + "-fixed_price-max").val("");
-                                $("#" + type + "-price-min").val("");
-                                $("#" + type + "-price-max").val("");
+                                $("#" + type + "-fixed_price-min").val(0);
+                                $("#" + type + "-fixed_price-max").val(0);
+                                $("#" + type + "-price-min").val(0);
+                                $("#" + type + "-price-max").val(0);
                                 $("#add-" + type).hide();
                                 $("#add-"+type+"-btn").show();
                                 $(".loading").hide();
@@ -1301,6 +1358,69 @@
             id = id[id.length-1];
             var city = $($("#city-title-"+id)[0]).attr("city");
             $("#"+type+"-location").val(city);
+        }
+    }
+
+    function append_new_products(existing_result, new_result)
+    {
+        if(existing_result.find(".tab-pane").length == 0)
+        {
+            existing_result.html(new_result);
+            return
+        }
+        new_result = $(new_result);
+        var ids = ["product", "experience", "flight", "transfer", "accommodation", "restaurant", "suggestion", "pricing"];
+
+        for(var i=0;i<ids.length;i++)
+        {
+            var existing_column = $(existing_result.find("#" + ids[i] + "_column")[0]);
+            var new_column = $(new_result.find("#" + ids[i] + "_column")[0]);
+
+            if(i<2)
+            {
+                var existing_days = existing_column.children();
+                var new_days = new_column.children();
+                for(var j=0;j<new_days.length;j++)
+                {
+                    //whether or not the city is updated/a new city is added
+                    if(existing_column.find("#"+new_days[j].id).length>0)
+                    {
+                        //not updated/added
+                        var existing_day = existing_column.find("#"+new_days[j].id);
+                        var new_items = $(new_days[j]).children();
+                        for(var k=0;k<new_items.length;k++)
+                        {
+                            if($(existing_day).find("." + new_items[k].className.split(" ")[0]).length == 0)
+                            {
+                                $(existing_day).append($(new_items[k]));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //updated/added
+                        if(j>0)
+                        {
+                            $(new_days[j]).insertAfter($(existing_column.find("#"+new_days[j-1].id)));
+                        }
+                        else
+                        {
+                            $(existing_column).prepend(new_days[j]);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                var new_items = $(new_column).children();
+                for(var k=0;k<new_items.length;k++)
+                {
+                    if(existing_column.find("." + new_items[k].className.split(" ")[0]).length == 0)
+                    {
+                        existing_column.append($(new_items[k]));
+                    }
+                }
+            }
         }
     }
     </script>

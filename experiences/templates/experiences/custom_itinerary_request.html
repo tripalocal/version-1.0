@@ -4,569 +4,507 @@
 {% load i18n %}
 
 {% block head %}
-  <title>{% trans 'Request a Custom Itinerary' %}</title>
-  <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
-  <link href="{% static 'experiences/content/itinerary-request.css' %}" rel="stylesheet"/>
+<title>{% trans 'Request a Custom Itinerary' %}</title>
+<link href="//cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.7.6/jquery.fullPage.min.css" rel="stylesheet"/>
+<link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
+<link href="{% static 'experiences/content/itinerary-request2.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
-<div id="complete" class="full-height" style="display:none;background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %})">
-  <div class="container middle animated fadeIn">
-    <h1>{% trans 'Your request has been submitted!' %}</h1>
-    <h2>{% trans 'Please keep an eye on our phone call within 4 hours. We will call you between 9am - 9pm Beijing time.' %}</h2>
+{% for field in form.hidden_fields %}
+  {{ field }}
+{% endfor %}
+<div class="loading"></div>
+
+<div class="status-bar" id="status-bar">
+  <div class="container">
+    <h2 class="status-line" id="budget">{% trans "Estimated cost: Please fill in more fields for a live update." %}</h2>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-primary btn-square" id="nav-up" disabled><span class="glyphicon glyphicon-chevron-up"></span></button>
+    <button class="btn btn-primary btn-square" id="nav-down"><span class="glyphicon glyphicon-chevron-down"></span></button>
   </div>
 </div>
-<form id="itinerary-request" action="" method="post">
-  {% csrf_token %}
-  <div id="intro" class="full-height" style="background-image:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ),url({% static 'img/stars.jpg' %})">
-    <div class="container middle animated fadeIn">
+
+<div id="fullpage">
+  <div class="section" id="intro">
+    <div class="container">
       <h1>{% trans 'Custom Itinerary' %}</h1>
-      <h2>{% trans 'Please answer a few questions and we will <br>build a custom itinerary for your trip' %}</h2>
-      <button type="button" id="start-btn" class="btn btn-primary">{% trans 'Get Started' %}</button>
+      <h2>{% trans 'Answer just a few questions and we will build a custom itinerary for your trip' %}</h2>
+      <button id="start-btn" class="btn btn-primary main-btn">{% trans 'Get started' %}</button>
     </div>
   </div>
-  <div class="progress-bar">
-    <div class="indicator" id="indicator1">1</div>
-    <div class="indicator" id="indicator2">2</div>
-    <div class="indicator" id="indicator3">3</div>
-  </div>
-  <div id="step1" class="full-height">
-    <button type="button" id="prev-btn1" class="btn btn-secondary btn-top">{% trans 'Back' %}</button>
-    <div class="container">
-      <div class="panel panel-default" id="destination">
-        <div class="panel-body">
-          <img src="{% static 'experiences/img/itinerary.svg' %}" class="header-icon"><h2>{% trans 'Destinations' %}</h2>
-          <p>{% trans 'List some locations you would like to visit on this trip.' %}</p>
-          {{form.destinations}}
-          <div class="checkbox-inline">
-            <label><input class="destination-checkbox" type="checkbox" value="Melbourne">{% trans "Melbourne" %}</label>
-          </div>
-          <div class="checkbox-inline">
-            <label><input class="destination-checkbox" type="checkbox" value="Sydney">{% trans "Sydney" %}</label>
-          </div>
-          <div class="checkbox-inline">
-            <label><input class="destination-checkbox" type="checkbox" value="Brisbane">{% trans "Brisbane" %}</label>
-          </div>
-          <div class="checkbox-inline">
-            <label><input class="destination-checkbox" type="checkbox" value="Goldcoast">{% trans "Gold Coast" %}</label>
-          </div>
-          <div class="checkbox-inline">
-            <label><input class="destination-checkbox" type="checkbox" value="Tasmania">{% trans "Tasmania" %}</label>
-          </div>
-          <div class="checkbox-inline">
-            <label><input class="destination-checkbox" type="checkbox" value="Cairns">{% trans "Cairns" %}</label>
-          </div>
-        </div>
-      </div>
-      <div class="panel panel-default" id="date">
-        <div class="panel-body">
-          <img src="{% static 'experiences/img/calendar.svg' %}" class="header-icon"><h2>{% trans 'Dates' %}</h2>
-          <p>{% trans 'Between which dates would you be travelling?' %}</p>
-          <div class="container center-form">
-            <div class="form-group" style="display:inline-block; margin-right:20px; margin-bottom:0;">
-              <label>{% trans 'Start date' %}</label>
-              {{form.start_date}}
-            </div>
-            <div class="form-group" style="display:inline-block; margin-bottom:0;">
-              <label>{% trans 'End date' %}</label>
-              {{form.end_date}}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="panel panel-default" id="group">
-        <div class="panel-body">
-          <img src="{% static 'experiences/img/group.svg' %}" class="header-icon"><h2>{% trans 'Group Size' %}</h2>
-          <p>{% trans 'How many adults will be travelling? Any children?' %}</p>
-          <div class="container center-form">
-            <div class="form-group" style="display:inline-block; margin-right:20px; margin-bottom:0;">
-              <label>{% trans 'Adults' %}</label>
-              {{form.guests_adults}}
-            </div>
-            <div class="form-group" style="display:inline-block; margin-bottom:0;">
-              <label>{% trans 'Children (2-12 years old)' %}</label>
-              {{form.guests_children}}
-            </div>
-          </div>
-          <div class="checkbox">
-            <label><input type="checkbox" id="kids-bed">{% trans "Beds needed for kids (optional)" %}</label>
-          </div>
-          <div class="checkbox">
-            <label><input type="checkbox" id="id_first_time">{% trans "This is my first time here" %}</label>
-          </div>
-        </div>
-      </div>
-    </div>
-    <button type="button" id="next-btn1" class="btn btn-secondary btn-bottom">{% trans 'Next' %}</button>
-  </div>
-  <div id="step2" class="full-height">
-    <button type="button" id="prev-btn2" class="btn btn-secondary btn-top">{% trans 'Back' %}</button>
-    <div class="container">
-      <div class="panel panel-default" id="interests">
-        <div class="panel-body">
-          <img src="{% static 'experiences/img/heart_large_grey.svg' %}" class="header-icon"><h2>{% trans 'Interests' %}</h2>
-          <p>{% trans "What kind of things are you interested in? Check the topics that interest you." %}</p>
-          <div class="form-box" id="tags_div">
-              {{form.tags}}
-          </div>
-        </div>
-      </div>
-      <div class="panel panel-default" id="included">
-        <div class="panel-body">
-          <img src="{% static 'experiences/img/flight.svg' %}" class="header-icon"><h2>{% trans "What's Included" %}</h2>
-          {{form.whats_included}}
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-sm-3">
-                <div class="slider" id="car-rental-slider"></div>
-                <p>
-                  <label>{% trans "Car Rental" %}: </label>
-                  <input class="slider-value" type="text" id="car-rental" readonly>
-                </p>
-              </div>
-              <div class="col-sm-3">
-                <div class="slider" id="car-driver-slider"></div>
-                <p>
-                  <label>{% trans "Car + Driver" %}: </label>
-                  <input class="slider-value" type="text" id="car-driver" readonly>
-                </p>
-              </div>
-              <div class="col-sm-3">
-                <div class="slider" id="accommodation-slider"></div>
-                <p>
-                  <label>{% trans "Accommodation" %}: </label>
-                  <input class="slider-value" type="text" id="accommodation" readonly>
-                </p>
-              </div>
-              <div class="col-sm-3">
-                <div class="slider" id="national-flight-slider"></div>
-                <p>
-                  <label>{% trans "National Flight" %}: </label>
-                  <input class="slider-value" type="text" id="national-flight" readonly>
-                </p>
-              </div>
-            </div>
-            <div class="row">
-              <div class="checkbox">
-                <label><input type="checkbox" id="airport-transfer" value="airport_transfer">{% trans 'Airport Transfer' %}</label>
-              </div>
-              <div class="checkbox">
-                <label><input type="checkbox" id="locals" value="locals_to_show_around">{% trans 'Locals to show around city' %}</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="panel panel-default" id="budget">
-        <div class="panel-body">
-          <img src="{% static 'experiences/img/price.svg' %}" class="header-icon"><h2>{% trans 'Budget' %}</h2>
-          <p>{% trans 'What is your budget for this trip?' %}</p>
-          {{form.budget}}
-        </div>
-      </div>
-    </div>
-    <button type="button" id="next-btn2" class="btn btn-secondary btn-bottom">{% trans 'Next' %}</button>
-  </div>
-  <div id="step3" class="full-height">
-    <button type="button" id="prev-btn3" class="btn btn-secondary btn-top">{% trans 'Back' %}</button>
-    <div class="container">
-      <div class="panel panel-default" id="requirements">
-        <div class="panel-body">
-          <img src="{% static 'experiences/img/discuss.svg' %}" class="header-icon"><h2>{% trans 'Other Requirements' %}</h2>
-          <p>{% trans 'Anything else you would like to let us know?' %}</p>
-          {{form.requirements}}
-        </div>
-      </div>
-      <div class="panel panel-default" id="contact">
-        <div class="panel-body">
-          <img src="{% static 'experiences/img/profile.svg' %}" class="header-icon"><h2>{% trans 'Contact Details' %}</h2>
-          <p>{% trans 'Almost done! Please leave us your contact details below. A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call.' %}</p>
-          <div class="container center-form">
-            <div class="row">
-              <div class="col-sm-6">
-                <div class="form-group">
-                  <label>{% trans 'Name' %}</label>
-                  {{form.name}}
-                </div>
-                <div class="form-group">
-                  <label>{% trans 'Email' %}</label>
-                  {{form.email}}
-                </div>
-              </div>
-              <div class="col-sm-6">
-                <div class="form-group">
-                  <label>{% trans 'WeChat' %}</label>
-                  {{form.wechat}}
-                </div>
-                <div class="form-group">
-                  <label>{% trans 'Mobile' %}</label>
-                  {{form.mobile}}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <button type="button" id="submit-btn" class="btn btn-primary btn-bottom">{% trans 'Submit' %}</button>
-  </div>
-</form>
-<!-- Alerts -->
-<div class="alert alert-danger alert-dismissible" role="alert">
-  <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  <strong>{% trans 'Oops!' %}</strong> {% trans 'There was a problem submitting your request. Please try again shortly.' %}
-</div>
 
-<div class="alert alert-warning data-dismissible" role="alert">
-  <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  {% trans 'Please fill in all required fields before continuing.' %}
-</div>
+  <div class="section">
+    <div class="container">
+      <h1>{% trans 'Choose some locations you would like to visit on this trip.' %} <span class="asterisk">*</span></h1>
+        <div class="box" data-city="melbourne" style="background-image:url({{MEDIA_URL}}city/Melbourne.jpg)"><div class="overlay"><h3 class="display">{% trans 'Melbourne' %}</h3></div></div>
+        <div class="box" data-city="sydney" style="background-image:url({{MEDIA_URL}}city/Sydney.jpg)"><div class="overlay"><h3 class="display">{% trans 'Sydney' %}</h3></div></div>
+        <div class="box" data-city="goldcoast" style="background-image:url({{MEDIA_URL}}city/Goldcoast.jpg)"><div class="overlay"><h3 class="display">{% trans 'Gold Coast' %}</h3></div></div>
+        <div class="box" data-city="brisbane" style="background-image:url({{MEDIA_URL}}city/Brisbane.jpg)"><div class="overlay"><h3 class="display">{% trans 'Brisbane' %}</h3></div></div>
+        <div class="box" data-city="cairns" style="background-image:url({{MEDIA_URL}}city/Cairns.jpg)"><div class="overlay"><h3 class="display">{% trans 'Cairns' %}</h3></div></div>
+        <div class="box" data-city="tasmania" style="background-image:url({{MEDIA_URL}}city/Hobart.jpg)"><div class="overlay"><h3 class="display">{% trans 'Tasmania' %}</h3></div></div>
+        <div class="box" data-city="alicesprings" style="background-image:url({{MEDIA_URL}}city/Alicesprings.jpg)"><div class="overlay"><h3 class="display">{% trans 'Alice Springs' %}</h3></div></div>
+        <div class="box" data-city="darwin" style="background-image:url({{MEDIA_URL}}city/Darwin.jpg)"><div class="overlay"><h3 class="display">{% trans 'Darwin' %}</h3></div></div>
+        <div class="box" data-city="perth" style="background-image:url({{MEDIA_URL}}city/Perth.jpg)"><div class="overlay"><h3 class="display">{% trans 'Perth' %}</h3></div></div>
+    </div>
+  </div>
 
-<div class="alert alert-info data-dismissible" id="mobile-format-warning" role="alert">
-  <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  {% trans 'Please enter a valid phone number. eg. +61 123456789 or +86 12345678901' %}
-</div>
+  <div class="section">
+    <div class="container">
+      <h1>{% trans "Select the start and end dates of your trip" %} <span class="asterisk">*</span></h1>
+      <div class="form-group"><label>{% trans "Start Date" %}</label>{{form.start_date}}</div>
+      <div class="form-group"><label>{% trans "End Date" %}</label>{{form.end_date}}</div>
+    </div>
+  </div>
 
+  <div class="section">
+    <div class="container">
+      <h1>{% trans 'How many adults will be travelling?<br>Any children or infants?' %} <span class="asterisk">*</span></h1>
+      <div class="form-group">
+          <label>{% trans 'Adults' %}</label>
+          {{form.guests_adults}}
+      </div>
+      <div class="form-group">
+        <label>{% trans 'Children (2-12)' %}</label>
+        {{form.guests_children}}
+      </div>
+      <div class="form-group">
+        <label>{% trans 'Infants (< 2)' %}</label>
+        {{form.guests_infants}}
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <h1 style="margin-bottom: 30px;">{% trans "What kind of things are you interested in?<br>Check the topics that interest you." %}</h1>
+      <div class="row">
+          <div class="circle unselected" style="background-color:#FFABAB">{% trans 'food & wine' %}</div>
+          <div class="circle unselected" style="background-color:#FFDAAB">{% trans 'photography' %}</div>
+        </div>
+        <div class="row">
+          <div class="circle unselected" style="background-color:#DDFFAB">{% trans 'history & culture' %}</div>
+          <div class="circle unselected" style="background-color:#ABE4FF">{% trans 'architecture' %}</div>
+          <div class="circle unselected" style="background-color:#D9ABFF">{% trans 'for couples' %}</div>
+        </div>
+        <div class="row">
+          <div class="circle unselected" style="background-color:#FFABAB">{% trans 'outdoor & nature' %}</div>
+          <div class="circle unselected" style="background-color:#FFDAAB">{% trans 'shopping' %}</div>
+          <div class="circle unselected" style="background-color:#DDFFAB">{% trans 'sports & leisure' %}</div>
+          <div class="circle unselected" style="background-color:#ABE4FF">{% trans 'extreme fun' %}</div>
+        </div>
+        <div class="row">
+          <div class="circle unselected" style="background-color:#D9ABFF">{% trans 'events' %}</div>
+          <div class="circle unselected" style="background-color:#FFABAB">{% trans 'health & beauty' %}</div>
+          <div class="circle unselected" style="background-color:#FFDAAB">{% trans 'livability research' %}</div>
+        </div>
+        <div class="row">
+          <div class="circle unselected" style="background-color:#DDFFAB">{% trans 'education' %}</div>
+          <div class="circle unselected" style="background-color:#ABE4FF">{% trans 'local experiences' %}</div>
+        </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <h1>{% trans "What's included" %} <span class="asterisk">*</span></h1>
+      <div class="form-group">
+          <label>{% trans 'Car + Driver' %}</label>
+          <select id="car-driver" class="select-expanded" size="4"> 
+            <option value="please select" selected>{% trans 'please select' %}</option>
+            <option value="infrequent">{% trans 'infrequent' %}</option>
+            <option value="frequent">{% trans 'frequent' %}</option>
+            <option value="entire trip">{% trans 'entire trip' %}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{% trans 'Accommodation' %}</label>
+          <select id="accommodation" class="select-expanded" size="5">
+            <option value="please select" selected>{% trans 'please select' %}</option>
+            <option value="please select">{% trans 'none' %}</option>
+            <option value="3 star">{% trans '3 star' %}</option>
+            <option value="4 star">{% trans '4 star' %}</option>
+            <option value="5 star">{% trans '5 star' %}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{% trans 'National Flight' %}</label>
+          <select id="national-flight" class="select-expanded" size="3">
+            <option value="please select" selected>{% trans 'please select' %}</option>
+            <option value="none">{% trans 'none' %}</option>
+            <option value="economy">{% trans 'economy' %}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{% trans 'Service Language' %}</label>
+          <select id="service-language" class="select-expanded" size="3">
+            <option value="please select" selected>{% trans 'please select' %}</option>
+            <option value="chinese">{% trans 'chinese' %}</option>
+            <option value="english">{% trans 'english' %}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{% trans 'Airport Transfer' %}</label>
+          <select id="airport-transfer" class="select-expanded" size="3">
+            <option value="please select" selected>{% trans 'please select' %}</option>
+            <option value="none">{% trans 'none' %}</option>
+            <option value="yes">{% trans 'yes' %}</option>
+          </select>
+        </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <h1>{% trans 'Anything else you would like to let us know?' %}</h1>
+      {{form.requirements}}
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <h1>{% trans "Almost done!<br>Please leave us your contact details below." %} <span class="asterisk">*</span></h1>
+      <div class="row" style="margin-top: 20px;">
+        <div class="col-sm-6">
+          <div class="form-group">
+            {{form.name}}
+          </div>
+          <div class="form-group">
+            {{form.email}}
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            {{form.wechat}}
+          </div>
+          <div class="form-group">
+            {{form.mobile}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="container" id="success-page">
+      <h1>{% trans "Make sure you've filled in all the " %} <span class="asterisk">*{% trans "sections" %}</span></h1>
+      <h2>{% trans "A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call." %}</h2>
+      <button id="submit-btn" class="btn btn-primary main-btn">{% trans "Submit" %}</button>
+    </div>
+  </div>
+
+</div>
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+<script src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+<script src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.7.6/jquery.fullPage.min.js"></script>
 {%if LANGUAGE == "zh-CN"%}
 <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
 {%endif%}
-<script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <script>
-$(function() {
+$(document).ready(function() {
+	// Initialise fullpage 
+	var desktop = true;
+	if ($(window).width < 480) {
+		var desktop = false;
+	}
+	$('#fullpage').fullpage({
+		autoScrolling: desktop,
+		paddingTop: '50px',
+		paddingBottom: '50px',
+		navigation: true,
+		navigationPosition: 'left',
+		showActiveTooltip: true,
+		anchors: ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8', 'section9'],
+		navigationTooltips: ['{% trans "Start" %}', '{% trans "Destinations" %}', '{% trans "Dates" %}', '{% trans "Guests" %}', '{% trans "Interests" %}', '{% trans "Whats Included" %}', '{% trans "Extras" %}', '{% trans "Contact" %}', '{% trans "Done!" %}'],
+		sectionsColor: ['#f7f7f7', '#f3f3f3', '#7BAABE', 'whitesmoke', '#f7f7f7'],
+		onLeave: function(index, nextIndex, direction) {
+			if (nextIndex == 2 && direction == 'up') {
+				$('#nav-up').attr('disabled', 'disabled');
+			} else {
+				$('#nav-up').removeAttr('disabled');
+			}
+			if (nextIndex == 9 && direction == 'down') {
+				$('#nav-down').attr('disabled', 'disabled');
+			} else {
+				$('#nav-down').removeAttr('disabled');
+			}
+			if (index == 1 && direction == 'down') {
+				$('#status-bar').slideDown();
+				$('#nav-up').attr('disabled', 'disabled');
+			}
+			if (nextIndex == 1 && direction == 'up') {
+				$('#status-bar').slideUp();
+			}
+		}
+	});
+
+
   if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
+    $("#id_start_date").datetimepicker({
+      format: 'YYYY-MM-DD', locale: 'zh-CN'
+    });
+    $("#id_end_date").datetimepicker({
+        format: 'YYYY-MM-DD', locale: 'zh-CN',
+        useCurrent: false
+    });
 
-          $("#id_start_date").datetimepicker({
-              format: 'YYYY-MM-DD', locale: 'zh-CN'
-          });
-
-          $("#id_end_date").datetimepicker({
-              format: 'YYYY-MM-DD', locale: 'zh-CN',
-              useCurrent: false
-          });
-
-          $("#id_start_date").on("dp.change", function (e) {
-              $('#id_end_date').data("DateTimePicker").minDate(e.date);
-          });
-          $("#id_end_date").on("dp.change", function (e) {
-              $('#id_start_date').data("DateTimePicker").maxDate(e.date);
-          });
+    $("#id_start_date").on("dp.change", function (e) {
+        $('#id_end_date').data("DateTimePicker").minDate(e.date);
+    });
+    $("#id_end_date").on("dp.change", function (e) {
+        $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+    });
   }
   else {
+    $("#id_start_date").datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+    $("#id_end_date").datetimepicker({
+        format: 'YYYY-MM-DD',
+        useCurrent: false
+    });
 
-          $("#id_start_date").datetimepicker({
-              format: 'YYYY-MM-DD'
-          });
-
-
-          $("#id_end_date").datetimepicker({
-              format: 'YYYY-MM-DD',
-              useCurrent: false,
-              minDate: $("#id_start_date").val()
-          });
-
-          $("#id_start_date").on("dp.change", function (e) {
-              $('#id_end_date').data("DateTimePicker").minDate(e.date);
-          });
-          $("#id_end_date").on("dp.change", function (e) {
-              $('#id_start_date').data("DateTimePicker").maxDate(e.date);
-          });
-
+    $("#id_start_date").on("dp.change", function (e) {
+        $('#id_end_date').data("DateTimePicker").minDate(e.date);
+    });
+    $("#id_end_date").on("dp.change", function (e) {
+        $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+    });
   }
-  var tags = $("#id_tags").val().split(",");
-  for(i=0;i<tags.length;i++)
-  {
+  
+  // Clear the date fields
+  $('#id_start_date').val('');
+  $('#id_end_date').val('');
 
-      new_tag = "<div id= \"tag_box_" + (i+1) + "\" class=\"tag-box tag-box-unselected\"><label id=\"tag_" + (i+1) +"\" class=\"tag-non-selected\">" + tags[i] + "</label><button type=\"button\" id=\"tag_button_" + (i+1) +"\" class=\"tag-button\" style=\"background-image:url({% static 'icon/plus_grey.svg' %}\"></button></div>";
+	// Show page when init is done
+	$('.loading').fadeOut('slow');
 
-      $("#tags_div").append(new_tag);
+	// Bind click events
+	$('#start-btn').on('click', function() {
+		$.fn.fullpage.moveSectionDown();
+	});
+	$('.overlay').on('click', function() {
+		$this = $(this);
+		$this.hasClass('selected') ? $this.removeClass('selected') : $this.addClass('selected');
+		updateCities();
+	});
+	$('.circle').on('click', function() {
+		$this = $(this);
+		$this.hasClass('unselected') ? $this.removeClass('unselected') : $this.addClass('unselected');
+		updateInterests();
+	});
+	$('#nav-up').on('click', function() {
+		$.fn.fullpage.moveSectionUp();
+	});
+	$('#nav-down').on('click', function() {
+		$.fn.fullpage.moveSectionDown();
+	});
+	
+	$('select').on('change',function() {
+		updateBudget();
+	});
 
-      $("#tag_button_"+(i+1)).click(function(e){
-          id = e.target.id.split("_")[2];
-          if($("#tag_"+id).attr("class") == "tag-selected")
-          {
-              $("#tag_button_"+id).css("background-image","url({% static 'icon/plus_grey.svg' %})");
-              $("#tag_"+id).attr("class", "tag-non-selected");
-              $("#tag_box_"+id).removeClass("tag-box-selected");
-              $("#tag_box_"+id).addClass("tag-box-unselected");
-          }
-          else
-          {
-              $("#tag_button_"+id).css("background-image","url({% static 'icon/cross_grey.svg' %})");
-              $("#tag_"+id).attr("class", "tag-selected");
-              $("#tag_box_"+id).removeClass("tag-box-unselected");
-              $("#tag_box_"+id).addClass("tag-box-selected");
-          }
-      });
+	$('#submit-btn').on('click', function() {
+		$(this).html('Submitting<i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>').attr('disabled', 'disabled');
+		if (validateForm()) {
+			$.ajax({
+					url: '/itinerary/request/',
+					type: 'POST',
+					data: {
+						csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
+						destinations: $("#id_destinations").val(),
+						start_date: $("#id_start_date").val(),
+						end_date: $("#id_end_date").val(),
+						guests_adults: $("#id_guests_adults").val(),
+						guests_children: $("#id_guests_children").val(),
+						guests_infants: $("#id_guests_infants").val(),
+						interests: $("#id_interests").val(),
+						accommodation: $("#accommodation").val(),
+						car_driver: $("#car-driver").val(),
+						national_flight: $("#national-flight").val(),
+						service_language: $("#service-language").val(),
+						requirements: $("#id_requirements").val(),
+						name: $("#id_name").val(),
+						wechat: $("#id_wechat").val(),
+						email: $("#id_email").val(),
+						mobile: $("#id_mobile").val(),
+						budget : $('#budget').text()
+					}
+				})
+				.done(function() {
+					$('#success-page').html(
+              '<h1>{% trans "Your request has been submitted!" %}</h1><h2>{% trans "Please keep an eye on our phone call within 4 hours. We will call you between 9am - 9pm Beijing time." %}</h2>'
+					).css({
+						'position': 'fixed',
+						'width': '100%',
+						'height': '100%',
+					});
+					$('#fp-nav').fadeOut();
+					$('#status-bar').slideDown();
+				})
+				.fail(function() {
+					
+				});
+		}
+		$(this).removeAttr('disabled').html('Submit');
+	})
+})
+
+function updateBudget() {
+  var currencyConversion = 1;
+  if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
+    currencyConversion = 4.67;
   }
-  $("[data-hide]").on("click", function(){
-    $("." + $(this).attr("data-hide")).fadeOut();
-  });
-
-  initSliders();
-
-  if ($(window).width() > 864) {
-    $("#start-btn").click(function() {
-        $('html,body').animate({
-            scrollTop: $("#step1").offset().top},
-            'slow');
-        $("#navbar").fadeOut();
-        $(".progress-bar").delay(500).fadeIn();
-        $("#indicator1").delay(1000).addClass("active animated pulse infinite");
-        $("#prev-btn1").delay(500).fadeIn("slow");
-        $("#destination").delay(800).fadeIn("slow");
-        $("#date").delay(1100).fadeIn("slow");
-        $("#group").delay(1400).fadeIn("slow");
-        $("#next-btn1").delay(1700).fadeIn("slow");
-    });
-    $("#prev-btn1").click(function() {
-      $('html,body').animate({
-          scrollTop: $("body").offset().top},
-          'slow');
-          $("#navbar").fadeIn();
-      $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp();
-      $(".progress-bar").fadeOut();
-    });
-    $("#next-btn1").click(function() {
-
-      if (atLeastOneChecked('destination-checkbox') && $("#id_start_date").val() && $("#id_end_date").val() && $("#id_guests_adults").val()) {
-        $('html,body').animate({
-            scrollTop: $("#step2").offset().top},
-            'slow');
-        $("#indicator1").removeClass("active animated pulse infinite");
-        $("#indicator2").addClass("active animated pulse infinite");
-        $("#prev-btn2").delay(500).fadeIn("slow");
-        $("#interests").delay(800).fadeIn("slow");
-        $("#included").delay(1100).fadeIn("slow");
-        $("#budget").delay(1400).fadeIn("slow");
-        $("#next-btn2").delay(1700).fadeIn("slow");
-        $("#prev-btn1, #destination, #date, #group, #next-btn1").slideUp("slow");
-        $(".alert-warning").hide();
-        $("#destination").removeAttr('style');
-      } else {
-        $(".alert-warning").fadeIn();
-        $("#destination").css('border','1px solid red');
-      }
-
-    });
-    $("#prev-btn2").click(function() {
-      $('html,body').animate({
-          scrollTop: $("#step1").offset().top},
-          'slow');
-      $("#indicator2").removeClass("active animated pulse infinite");
-      $("#indicator1").addClass("active animated pulse infinite");
-      $("#prev-btn1").delay(500).fadeIn("slow");
-      $("#destination").delay(800).fadeIn("slow");
-      $("#date").delay(1100).fadeIn("slow");
-      $("#group").delay(1400).fadeIn("slow");
-      $("#next-btn1").delay(1700).fadeIn("slow");
-      $("#prev-btn2, #interests, #included, #budget, #next-btn2").slideUp("slow");
-    });
-    $("#next-btn2").click(function() {
-      $('html,body').animate({
-          scrollTop: $("#step3").offset().top},
-          'slow');
-      $("#indicator2").removeClass("active animated pulse infinite");
-      $("#indicator3").addClass("active animated pulse infinite");
-      $("#prev-btn3").delay(500).fadeIn("slow");
-      $("#requirements").delay(800).fadeIn("slow");
-      $("#contact").delay(1100).fadeIn("slow");
-      $("#submit-btn").delay(1400).fadeIn("slow");
-      $("#prev-btn2, #interests, #included, #budget, #next-btn2").slideUp("slow");
-    });
-    $("#prev-btn3").click(function() {
-      $('html,body').animate({
-          scrollTop: $("#step2").offset().top},
-          'slow');
-      $("#indicator3").removeClass("active animated pulse infinite");
-      $("#indicator2").addClass("active animated pulse infinite");
-      $("#prev-btn2").delay(500).fadeIn("slow");
-      $("#interests").delay(800).fadeIn("slow");
-      $("#included").delay(1100).fadeIn("slow");
-      $("#budget").delay(1400).fadeIn("slow");
-      $("#next-btn2").delay(1700).fadeIn("slow");
-      $("#prev-btn3, #requirements, #contact, #submit-btn").slideUp("slow");
-    })
-  } else {
-    $("body").css("overflow-y","scroll");
-    $(".btn-secondary").hide();
-    $(".progress-bar").hide();
-    $("#start-btn").hide();
-    $(".panel").show();
+	var guests = parseInt($('#id_guests_adults').val()) + parseInt($("#id_guests_children").val()) + parseInt($("#id_guests_infants").val());
+	var days = moment($('#id_end_date').val()).diff(moment($('#id_start_date').val()), 'days');
+	var cities = $('#id_destinations').val().split(',').length;
+	var min = 0;
+	var max = 0;
+  
+  // Check if date fields entered:
+  if (isNaN(days)) {
+    return;
   }
 
-  $("#submit-btn").click(function() {
-    var legal_local_number = /\+\d{2} \d{9}$/;
-    var legal_roaming_number = /\+\d{2} \d{11}$/;
-    if ($("#id_name").val() && $("#id_wechat").val() && $("#id_email").val() && ($("#id_mobile").val().match(legal_local_number) || $("#id_mobile").val().match(legal_roaming_number))) {
-      $(".alert-warning").hide();
+	// car+driver
+	switch ($('#car-driver option:selected').text()) {
+		case 'please select':
+			break;
+		case 'infrequent':
+			if (guests < 5) {
+				min += 167;
+				max += 400;
+			} else if (guests < 8) {
+				min += 267;
+				max += 500;
+			} else {
+				min += 333;
+				max += 667;
+			}
+			break;
+		case 'frequent':
+			if (guests < 5) {
+				min += 250;
+				max += 600;
+			} else if (guests < 8) {
+				min += 400;
+				max += 750;
+			} else {
+				min += 500;
+				max += 1000;
+			}
+			break;
+		case 'entire trip':
+			if (guests < 5) {
+				min += 500;
+				max += 1200;
+			} else if (guests < 8) {
+				min += 800;
+				max += 1500;
+			} else {
+				min += 1000;
+				max += 2000;
+			}
+			break;
+	}
 
-      // Interests tags
-      $("#id_tags").val("");
-      for(i=1;$("#tag_"+i).length>0;i++)
-      {
-          if($("#tag_"+i).attr("class") == "tag-selected")
-          {
-              $("#id_tags").val($("#id_tags").val() + $("#tag_"+i).text() + ",");
-          }
-      }
-      tags = $("#id_tags").val();
-      tags = tags.substring(0,tags.length-1);
-      $("#id_tags").val(tags);
+	// accommodation
+	switch ($('#accommodation option:selected').text()) {
+		case 'please select':
+			break;
+		case 'none':
+			break;
+		case '3 star':
+			min += (Math.round(guests / 2) * 150);
+			max += (Math.round(guests / 2) * 300);
+			break;
+		case '4 star':
+			min += (Math.round(guests / 2) * 200);
+			max += (Math.round(guests / 2) * 400);
+			break;
+		case '5 star':
+			min += (Math.round(guests / 2) * 300);
+			max += (Math.round(guests / 2) * 600);
+			break;
+	}
 
-      // Destinations
-      $(".destination-checkbox").each(function() {
-        if ($(this).is(":checked")) {
-          $("#id_destinations").val($("#id_destinations").val() + $(this).val() + ",")
-        }
-      });
+	// service language
+	switch ($('#service-language option:selected').text()) {
+		case 'please select':
+			break;
+		case 'english':
+			break;
+		case 'chinese':
+			min += 50;
+			max += 50;
+	}
 
-      // Whats included
-      if ($("#airport-transfer").is(":checked")) {
-        $("#id_whats_included").val($("#id_whats_included").val() + $("#airport-transfer").val() + ",")
-      }
-      if ($("#locals").is(":checked")) {
-        $("#id_whats_included").val($("#id_whats_included").val() + $("#locals").val() + ",")
-      }
+	//// PER DAY ABOVE
+	min *= days;
+	max *= days;
+	//// FOR WHOLE TRIP BELOW
 
-      // Other questions
-      if ($("#id_first_time").is(":checked")) {
-        isFirstTime = "Yes";
-      } else {
-        isFirstTime = "No";
-      }
-      if ($("#kids-bed").is(":checked")) {
-        kidsBed = "Yes";
-      } else {
-        kidsBed = "No";
-      }
+	// national flights
+	switch ($('#national-flight option:selected').text()) {
+		case 'please select':
+			break;
+		case 'none':
+			break;
+		case 'economy':
+			min += ((cities - 1) * guests * 200);
+			max += ((cities - 1) * guests * 400);
+	}
 
-      $(this).css({
-        'background-color': '#009999',
-        'border': '0'
-      }).html('{% trans "Submitting" %}<i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>').attr('disabled', 'disabled');
-      $.ajax({
-          url : '{{GEO_POSTFIX}}itinerary/request/',
-          type: "POST",
-          data : {
-                      csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
-                      destinations: $("#id_destinations").val(),
-                      start_date: $("#id_start_date").val(),
-                      end_date: $("#id_end_date").val(),
-                      guests_adults: $("#id_guests_adults").val(),
-                      guests_children: $("#id_guests_children").val(),
-                      first_time: isFirstTime,
-                      kids_bed: kidsBed,
-                      interests: tags,
-                      budget: $("#id_budget").val(),
-                      whats_included: $("#id_whats_included").val(),
-                      accommodation: $("#accommodation").val(),
-                      car_rental: $("#car-rental").val(),
-                      car_driver: $("#car-driver").val(),
-                      national_flight: $("#national-flight").val(),
-                      requirements: $("#id_requirements").val(),
-                      name: $("#id_name").val(),
-                      wechat: $("#id_wechat").val(),
-                      email: $("#id_email").val(),
-                      mobile: $("#id_mobile").val()
-                  },
-          success: function(data){
-                      $(".alert").hide();
-                      $("#complete").show();
-                      $("#intro").hide();
-                      $(".progress-bar").hide();
-                      $('html,body').animate({
-                          scrollTop: $("body").offset().top},
-                          'slow');
-                      $("#submit-btn").slideUp("slow");
-                      $("#navbar").fadeIn();
-                  },
-          error: function(e) {
-                      $(".alert-danger").delay(2000).fadeIn();
-                      setTimeout(function() {
-                        $("#submit-btn").removeAttr("disabled").removeAttr("style").text("{% trans 'Submit' %}");
-                      }, 2000);
-                  }
-      });
-    } else {
-      $(".alert-warning").fadeIn();
-      if (!$("#id_name").val()) {
-        $("#id_name").css('border-color', 'red');
-      } else {
-        $("#id_name").removeAttr('style');
-      }
-      if (!$("#id_wechat").val()) {
-        $("#id_wechat").css('border-color', 'red');
-      } else {
-        $("#id_wechat").removeAttr('style');
-      }
-      if (!$("#id_email").val()) {
-        $("#id_email").css('border-color', 'red');
-      } else {
-        $("#id_email").removeAttr('style');
-      }
-      if (!$("#id_mobile").val()) {
-        $("#id_mobile").css('border-color', 'red');
-      } else if (!$("#id_mobile").val().match(legal_local_number) || $("#id_mobile").val().match(legal_roaming_number)) {
-        $("#id_mobile").css('border-color', 'red');
-        $("#mobile-format-warning").fadeIn();
-      } else {
-        $("#id_mobile").removeAttr('style');
-      }
-    }
-  })
-});
+	// airport transfer
+	switch ($('#airport-transfer option:selected').text()) {
+		case 'please select':
+			break;
+		case 'none':
+			break;
+		case 'yes':
+			min += (cities * 200);
+			max += (cities * 200);
+	}
 
-function atLeastOneChecked(className) {
-  var checkedAtLeastOne = false;
-  $("." + className).each(function() {
-    if ($(this).is(":checked")) {
-      checkedAtLeastOne = true;
-    }
-  });
-  return checkedAtLeastOne;
+  if (min < 1000) {
+    $('#budget').text('{% trans "Our custom itinerary service starts from $1000"%}');
+  }
+	else {
+    $('#budget').text('{% trans "Estimated cost: $" %}' + Math.round((min/guests)*currencyConversion) + '+ {% trans "per person ($" %}' + min*currencyConversion + '+ {% trans "in total" %})').addClass('animated fadeInUp');
+		var wait = window.setTimeout(function(){
+      $('#budget').removeClass('animated fadeInUp')}, 1000
+    );
+	}
 }
 
-function initSliders() {
-  var frequencies = [
-    "none",
-    "infrequent",
-    "average",
-    "frequent"
-  ];
-  var stars = [
-    "none",
-    "3 Star",
-    "4 Star",
-    "5 Star",
-  ];
-  var classes = [
-    "none",
-    "economy",
-    "business",
-    "first class"
-  ]
-  function setSlider(name, steps) {
-    $("#" + name + "-slider").slider({
-      value: 0,
-      min: 0,
-      max: (steps.length-1),
-      step: 1,
-      slide: function(event, ui) {
-        $("#" + name).val(steps[ui.value]);
-      }
-    });
-    $("#" + name).val(steps[$("#" + name + "-slider").slider("value")]);
-  }
+function updateCities() {
+	var selectedCities = $('.overlay.selected').map(function() {
+		return $(this).parent().attr('data-city');
+	}).get();
+	$('#id_destinations').val(selectedCities.join());
+}
 
-  setSlider("car-rental", frequencies);
-  setSlider("car-driver", frequencies);
-  setSlider("accommodation", stars);
-  setSlider("national-flight", classes);
+function updateInterests() {
+	var selectedInterests = $('.circle').filter(':not(.unselected)').map(function() {
+		return $(this).text();
+	}).get();
+	$('#id_interests').val(selectedInterests.join());
+}
+
+function validateForm() {
+	if ($('#id_destinations').val() && $('#id_start_date').val() && $('#id_guests_adults').val() && $('#id_name').val() && $('#id_mobile').val() && $('#id_email').val()) {
+		return true;
+	} else {
+		$('.asterisk').addClass('animated shake').css({'color': 'red'});
+		var wait = window.setTimeout( function(){
+            $('.asterisk').removeClass('animated shake')}, 1000
+        );
+		return false;
+	}
 }
 </script>
 {% endblock %}

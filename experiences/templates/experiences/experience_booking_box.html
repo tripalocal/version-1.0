@@ -29,7 +29,7 @@
                 {% if user.is_authenticated %}
                 <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" disabled='disabled' />
                 {% else %}
-                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
+                <input id="booking_guest_{{forloop.counter0}}" type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" />
                 {% endif %}
             </td>
         </tr>
@@ -79,24 +79,20 @@
 
         <table style="margin-top:15px;width:100%">
             <thead class="booking-exp">
-                <th class="date-exp">{% trans "Date" %}</th>
-                <th class="time-exp">{% trans "Time" %}</th>
-                <th class="people-exp"></th>
+                <th class="date-exp box-heading">{% trans "Date" %}</th>
+                <th class="time-exp box-heading">{% trans "Time" %}</th>
+                <th class="people-exp box-heading"></th>
             </thead>
 
-            <tr class="">
-                <td class="">
+            <tr class="box-row">
+                <td class="box-cell" style="padding: 5px;">
                     {{form.date}}
                 </td>
-                <td class="">
+                <td style="padding: 5px;">
                     {{form.time}}
                 </td>
-                <td class="people-list">
-                {% if user.is_authenticated %}
+                <td style="padding: 5px;">
                     <input id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" disabled='disabled'/>
-                {% else %}
-                    <input type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
-                {% endif %}
                 </td>
             </tr>
         </table>

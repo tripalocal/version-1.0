@@ -31,11 +31,11 @@
                 </th>
                 <th scope="col">ID</th>
                 <th scope="col">Product Name</th>
+                <th scope="col">Sales</th>
                 <th scope="col">Commission</th>
                 <th scope="col">Status</th>
                 <th scope="col">Type</th>
                 <th scope="col">Provider</th>
-                <th scope="col">Partner</th>
                 <th scope="col">Destination</th>
                 <th scope="col">Actions</th>
             </tr>
@@ -52,8 +52,9 @@
                 <td><p><a href="https://www.tripalocal.com/experience/{{experience.id}}" target="_blank">{{experience.title_en}}</a></p>
                     <p><a href="https://www.tripalocal.com.cn/experience/{{experience.id}}" target="_blank">{{experience.title_cn}}</a></p>
                 </td>
+                <td>{{experience.sale}}</td>
                 <td id="td-commission-{{experience.id}}">
-                    <p>{% widthratio experience.commission 1 100 %}%</p>
+                    <p>From {% widthratio experience.commission 1 100 %}%</p>
                     <input id="input-commission-{{experience.id}}"/>
                 </td>
                 <td id="td-status-{{experience.id}}">
@@ -72,8 +73,6 @@
                 <td>{{experience.type}}</td>
                 <td><p><a href="/myprofile?user_id={{experience.host.id}}" target="_blank">{{experience.host}}</a></p>
                     <p style="display:none;">(<a href="#">Change</a>)</p>
-                </td>
-                <td><p>{% if experience.partner %}{{experience.partner}}{% else %} {% endif %}</p>
                 </td>
                 <td>{{experience.city}}</td>
                 <td><p><a href="https://www.tripalocal.com/admin/experiences/newproduct/{{experience.id}}" target="_blank">Edit</a></p>
