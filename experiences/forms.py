@@ -851,8 +851,8 @@ AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children'
 
 class CustomItineraryRequestForm(forms.Form):
     destinations = forms.CharField(required=True, widget=forms.TextInput())
-    start_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':_('Please select')}))
-    end_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':_('Please select')}))
+    start_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'readonly': 'true', 'class': 'form-control', 'placeholder':_('Please select')}))
+    end_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'readonly': 'true', 'class': 'form-control', 'placeholder':_('Please select')}))
     guests_adults = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
     guests_children = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
     guests_infants = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)

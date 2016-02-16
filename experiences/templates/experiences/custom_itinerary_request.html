@@ -245,11 +245,14 @@ $(document).ready(function() {
 
   if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
     $("#id_start_date").datetimepicker({
-      format: 'YYYY-MM-DD', locale: 'zh-CN'
+      format: 'YYYY-MM-DD', locale: 'zh-CN',
+      minDate: moment(),
+      ignoreReadonly: true
     });
     $("#id_end_date").datetimepicker({
         format: 'YYYY-MM-DD', locale: 'zh-CN',
-        useCurrent: false
+        useCurrent: false,
+        ignoreReadonly: true
     });
 
     $("#id_start_date").on("dp.change", function (e) {
@@ -261,11 +264,14 @@ $(document).ready(function() {
   }
   else {
     $("#id_start_date").datetimepicker({
-        format: 'YYYY-MM-DD'
+        format: 'YYYY-MM-DD',
+        minDate: moment(),
+        ignoreReadonly: true
     });
     $("#id_end_date").datetimepicker({
         format: 'YYYY-MM-DD',
-        useCurrent: false
+        useCurrent: false,
+        ignoreReadonly: true
     });
 
     $("#id_start_date").on("dp.change", function (e) {
@@ -371,7 +377,7 @@ function updateBudget() {
   }
 
 	// car+driver
-	switch ($('#car-driver option:selected').text()) {
+	switch ($('#car-driver option:selected').val()) {
 		case 'please select':
 			break;
 		case 'infrequent':
@@ -413,7 +419,7 @@ function updateBudget() {
 	}
 
 	// accommodation
-	switch ($('#accommodation option:selected').text()) {
+	switch ($('#accommodation option:selected').val()) {
 		case 'please select':
 			break;
 		case 'none':
@@ -433,7 +439,7 @@ function updateBudget() {
 	}
 
 	// service language
-	switch ($('#service-language option:selected').text()) {
+	switch ($('#service-language option:selected').val()) {
 		case 'please select':
 			break;
 		case 'english':
@@ -449,7 +455,7 @@ function updateBudget() {
 	//// FOR WHOLE TRIP BELOW
 
 	// national flights
-	switch ($('#national-flight option:selected').text()) {
+	switch ($('#national-flight option:selected').val()) {
 		case 'please select':
 			break;
 		case 'none':
@@ -460,7 +466,7 @@ function updateBudget() {
 	}
 
 	// airport transfer
-	switch ($('#airport-transfer option:selected').text()) {
+	switch ($('#airport-transfer option:selected').val()) {
 		case 'please select':
 			break;
 		case 'none':
