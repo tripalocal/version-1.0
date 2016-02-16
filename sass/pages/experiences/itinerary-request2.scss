@@ -285,6 +285,13 @@ h1 {
   }
 }
 
+#date-section > .fp-tableCell {
+  @include media('>=phablet') {
+    position: relative;
+    top: -50px;
+  }
+}
+
 .zopim {
   display: none;
 }
