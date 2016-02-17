@@ -359,7 +359,6 @@ function is_form_valid()
     return false;
 }
 
-
 $(window).resize(function(){
     resizeImg();
 });
@@ -378,6 +377,72 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+function setup_time_seat()
+{
+    if($("#time_string_0").attr("instant") == "True")
+    {
+        first_date = $("#date_string_3").text().trim();
+        i=3;
+    }
+    else
+    {
+        first_date = $("#date_string_0").text().trim();
+        i=0;
+    }
+
+    $("#id_time").html('');
+    for(; first_date && $("#date_string_"+i).text().trim() == first_date; i++)
+    {
+        if($("#time_string_"+i).attr("instant") == "True")
+        {
+            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' style="color:green;">' + $("#time_string_"+i).text().trim() + '</option>');
+        }
+        else
+        {
+            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+        }
+    }
+
+    seat_left = parseInt($("#seat_left_0").text());
+
+    $("#id_adult_number").html('');
+    var i = parseInt($("#guest_number_min").attr("name"));
+    if(typeof i != "number" || i < 1)
+    {
+        i=1;
+    }
+    for(;i<=seat_left;i++)
+    {
+        $("#id_adult_number").append('<option value=' + i + '>' + i + '</option>');
+    }
+    //TODO
+    if($("#id_adult_number").children().length==0)
+    {
+        $("#id_adult_number").append('<option value=1>1</option>');
+    }
+    $("#id_child_number").append('<option value=' + 0 + '>' + 0 + '</option>');
+}
+
+function setup_datetimepicker(available_dates)
+{
+    if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1)
+    {
+        $("#id_date").datetimepicker({
+            format: 'DD/MM/YYYY', locale: 'zh-CN',
+            enabledDates: available_dates,
+            minDate: available_dates[0],
+        });
+    }
+    else 
+    {
+        $("#id_date").datetimepicker({
+            format: 'DD/MM/YYYY',
+            enabledDates: available_dates,
+            minDate: available_dates[0],
+        });
+    }
 }
 
 $(function(){
@@ -424,47 +489,7 @@ $(function(){
         }
     }
 
-    if($("#time_string_0").attr("instant") == "True")
-    {
-        first_date = $("#date_string_3").text().trim();
-        i=3;
-    }
-    else
-    {
-        first_date = $("#date_string_0").text().trim();
-        i=0;
-    }
-
-    for(; first_date && $("#date_string_"+i).text().trim() == first_date; i++)
-    {
-        if($("#time_string_"+i).attr("instant") == "True")
-        {
-            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' style="color:green;">' + $("#time_string_"+i).text().trim() + '</option>');
-        }
-        else
-        {
-            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
-        }
-    }
-
-    seat_left = parseInt($("#seat_left_0").text());
-
-    $("#id_adult_number").html('');
-    var i = parseInt($("#guest_number_min").attr("name"));
-    if(typeof i != "number" || i < 1)
-    {
-        i=1;
-    }
-    for(;i<=seat_left;i++)
-    {
-        $("#id_adult_number").append('<option value=' + i + '>' + i + '</option>');
-    }
-    //TODO
-    if($("#id_adult_number").children().length==0)
-    {
-        $("#id_adult_number").append('<option value=1>1</option>');
-    }
-    $("#id_child_number").append('<option value=' + 0 + '>' + 0 + '</option>');
+    setup_time_seat();
 
     $("#id_submit_request").bind("click", function(e) {
         if($("#" + e.target.id).attr("type") == "button")
@@ -487,35 +512,6 @@ $(function(){
         $("#booking_option").modal('show');
         {% endif %}
     });
-
-    for(i=0;i<3;i++)
-    {
-        $("#id_submit_request_"+i).bind("click", function(e) {
-            e.preventDefault();
-            i = e.target.id.substr(-1,1);
-            var parts = $("#instant_booking_date_"+i).text().trim().split("/");
-            var date = new Date(parseInt(parts[2], 10),
-                              parseInt(parts[1], 10) - 1,
-                              parseInt(parts[0], 10));
-            $("#id_date").val(date.getFullYear() + '-' + (date.getMonth()+1) + '-' +  date.getDate());
-            $("#id_date").change();
-            $("#id_time").val($("#instant_booking_time_"+i).text().trim());
-            {% if LANGUAGE != "zh-CN" %}
-            mixpanel.track("Clicked on \"Book\"");
-            {% else %}
-            mixpanel.track("Clicked on \"Book_cn\"");
-            {% endif %}
-
-            if(is_form_valid())
-            {
-                $("#experience_booking_form").submit();
-            }
-            else
-            {
-                alert("{%trans 'Please select coordinate, time and guest number' %}");
-            }
-        });
-    }
 
     $.ajaxSetup({ 
         beforeSend: function(xhr, settings) {
@@ -769,7 +765,6 @@ $(function(){
         $("#experience_map").hide();
     }
 
-
     $("#id_date").change(function() {
         var selected_date = $("#id_date").val();
 
@@ -839,20 +834,60 @@ $(function(){
         {% endif %}
     })
 
+    setup_datetimepicker(available_dates);
 
-    if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
-            $("#id_date").datetimepicker({
-                format: 'DD/MM/YYYY', locale: 'zh-CN',
-                enabledDates: available_dates,
-                minDate: available_dates[0],
-            });
-    }  else {
-          $("#id_date").datetimepicker({
-                format: 'DD/MM/YYYY',
-                enabledDates: available_dates,
-                minDate: available_dates[0],
-          });
-    }
+    $("#id_date").datetimepicker().on('dp.update', function(e) {
+        var vd = e.viewDate._d;
+        var enabled_dates = $('#id_date').data("DateTimePicker").enabledDates();
+        enabled_dates = Object.keys(enabled_dates);
+        var max_date = Date.parseExact(enabled_dates[enabled_dates.length-1], "yyyy-MM-dd");
+        if(max_date < vd)
+        {
+            $.ajax({
+                    type: 'POST',
+                    url: "/experience/{{experience.id}}/",
+                    dataType: 'json',
+                    data: {
+                        "csrfmiddlewaretoken": getCookie('csrftoken'),
+                        "experience_id": {{experience.id}},
+                        "max_date": max_date.toString("yyyy-MM-dd"),
+                        "load_more": "load_more",
+                    },
+                    success: function (data,status,xhr) {
+                        var result = data; //$.parseJSON(data)
+                        if(data.success)
+                        {
+                            len = $('p[id^="date_string_"]').length;
+                            available_dates = available_dates.concat(data.available_dates);
+                            for(var i=0;i<data.available_options.length;i++)
+                            {
+                                $("#table_date").append("<p id=\"date_string_" + (len+i) + "\" style=\"display:none;\" instant=\"" + data.available_options[i].instant_booking + "\">" + data.available_options[i].date_string +"</p>");
+                                $("#table_time").append("<p id=\"time_string_" + (len+i) + "\" style=\"display:none;\" instant=\"" + data.available_options[i].instant_booking + "\">" + data.available_options[i].time_string +"</p>");
+                                if($("#table_seat").length > 0)
+                                {
+                                    $("#table_seat").append("<p id=\"seat_left_" + (len+i) + "\">" + data.available_options[i].available_seat + " </p>");
+                                }
+                            }
+                            setup_time_seat();
+                            var enabled_dates = []
+                            for(var i=0;i<available_dates.length;i++)
+                            {
+                                enabled_dates.push(Date.parseExact(available_dates[i], "yyyy-MM-dd"));
+                            }
+                            $('#id_date').data("DateTimePicker").enabledDates(enabled_dates);
+                        }
+                        else
+                        {
+                            alert(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        alert('{%trans "Please try again later"%}');
+                    }
+                  })
+        }
+    })
+
     $("#id_date").val("");
     $("#id_adult_number").change(function(){
         min_number = parseInt($("#guest_number_min").attr("name"));
