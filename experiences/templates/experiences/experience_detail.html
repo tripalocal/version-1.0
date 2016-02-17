@@ -282,6 +282,7 @@
               </div>
         </div>
     </div>
+    <div class="loading"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
     {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
     <style>
       .affix {
@@ -446,6 +447,7 @@ function setup_datetimepicker(available_dates)
 }
 
 $(function(){
+    $(".loading").hide();
     var available_dates = {{available_dates|safe}};
     resizeImg();
     mixpanel.track("viewed an experience");
@@ -843,10 +845,12 @@ $(function(){
         var max_date = Date.parseExact(enabled_dates[enabled_dates.length-1], "yyyy-MM-dd");
         if(max_date < vd)
         {
+            $(".loading").show();
             $.ajax({
                     type: 'POST',
                     url: "/experience/{{experience.id}}/",
                     dataType: 'json',
+                    timeout: 10000,
                     data: {
                         "csrfmiddlewaretoken": getCookie('csrftoken'),
                         "experience_id": {{experience.id}},
@@ -855,6 +859,7 @@ $(function(){
                     },
                     success: function (data,status,xhr) {
                         var result = data; //$.parseJSON(data)
+                        $(".loading").hide();
                         if(data.success)
                         {
                             len = $('p[id^="date_string_"]').length;
@@ -882,6 +887,7 @@ $(function(){
                         }
                     },
                     error: function (e) {
+                        $(".loading").hide();
                         alert('{%trans "Please try again later"%}');
                     }
                   })
