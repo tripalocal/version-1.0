@@ -87,30 +87,3 @@ label {
   }
 }
 
-// Phone number boxes
-.phone-box {
-  position: relative;
-
-  .dropdown {
-    border: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-  .dropdown-toggle {
-    border-color: transparent;
-    background-color: transparent;
-    &:hover,
-    &:active {
-     border-color: transparent;
-     background-color: transparent;
-     color: $medium-grey;
-    }
-  }
-  input {
-    padding-left: 50px;
-  }
-  .flag {
-    color: white;
-  }
-}
