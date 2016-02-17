@@ -3719,6 +3719,7 @@ def itinerary_detail(request,id=None,preview=None):
             item.experience.title = exp_information.title
             item.experience.description = exp_information.description
             item.experience.whatsincluded = item.whats_included
+            item.experience.city = _(item.experience.city)
             key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%Y-%m-%d")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
