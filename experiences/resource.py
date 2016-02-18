@@ -1605,7 +1605,8 @@ def service_search_text(request, format=None):
         max_experience_id = recent[title]["max_experience_id"]
         
         experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
-                      list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id'))
+                      list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id')) + \
+                      list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Flight','Transfer','Accommodation','Suggestion','Pricing','Restaurnat'], city=city).order_by('id'))
         counter = 0
         for experience in experiences:
             exp_title = experience.get_information(language).title
