@@ -631,13 +631,14 @@ class ExperienceListView(ListView):
         else:
             return HttpResponseRedirect(GEO_POSTFIX + "admin/login/?next=" + GEO_POSTFIX + "experiencelist")
 
-def getAvailableOptions(experience, available_options, available_date):
+def getAvailableOptions(experience, available_options, available_date, from_datetime=None):
 
     top_instant_bookings = -1
     month_in_advance = 1
 
     last_sdt = pytz.timezone('UTC').localize(datetime.min)
     local_timezone = pytz.timezone(experience.get_timezone())
+
 
     #requirement change: all timeslots are considered available unless being explicitly blocked
     #while (sdt < datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(hours=+6)):
@@ -649,12 +650,13 @@ def getAvailableOptions(experience, available_options, available_date):
         #    sdt += timedelta(weeks=experience.repeat_frequency)
         #else :
             #TODO
-    #set the start time according to book_in_advance or 23 hours later
-    if hasattr(experience, 'book_in_advance') and experience.book_in_advance is not None and experience.book_in_advance>0:
+    #set the start time according to from_datetime, book_in_advance or 23 hours later
+    if from_datetime is not None:
+        sdt = from_datetime
+    elif hasattr(experience, 'book_in_advance') and experience.book_in_advance is not None and experience.book_in_advance>0:
         sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(hour=22, minute=0, second=0, microsecond=0) + relativedelta(days=experience.book_in_advance-1)
     else:
         sdt = datetime.utcnow().replace(tzinfo=pytz.UTC).replace(minute=0, second=0, microsecond=0) + relativedelta(hours=+23)
-
 
     blockouts = experience.blockouttimeperiod_set.filter(experience_id=experience.id)
     blockout_start = []
@@ -724,7 +726,9 @@ def getAvailableOptions(experience, available_options, available_date):
 
     block_i=0
     instantbooking_i=0
-    while (sdt <= experience.end_datetime and sdt <= datetime.utcnow().replace(tzinfo=pytz.UTC) + relativedelta(months=month_in_advance) ):
+    if from_datetime is None:
+        from_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC)
+    while (sdt <= experience.end_datetime and sdt <= from_datetime + relativedelta(months=month_in_advance) ):
         #check if the date is blocked
         blocked = False
         #block 10pm-7am if repeated hourly
@@ -778,7 +782,7 @@ def getAvailableOptions(experience, available_options, available_date):
                     dict = {'available_seat': experience.guest_number_max - i,
                             'date_string': sdt_local.strftime("%d/%m/%Y"),
                             'time_string': sdt_local.strftime("%H:%M"),
-                            'datetime': sdt_local,
+                            #'datetime': sdt_local,
                             'instant_booking': instant_booking}
 
                     if instant_booking:
@@ -1009,6 +1013,29 @@ class ExperienceDetailView(DetailView):
                         result = {'success':False, "error":"Wrong username/password"}
                         return HttpResponse(json.dumps(result), content_type="application/json")
 
+                except Exception as err:
+                    #TODO
+                    return HttpResponse(json.dumps({'success':False}), content_type="application/json")
+            elif 'load_more' in request.POST:
+                try:
+                    data = request.POST
+                    experience = AbstractExperience.objects.get(id=data["experience_id"])
+                    max_date = data["max_date"]
+                    max_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(max_date, "%Y-%m-%d"))
+                    available_options = []
+                    available_date = ()
+                    if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
+                        for i in range(4): #7 days per time
+                            now = max_date + timedelta(days=1+i*7)
+                            now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
+                            now_string = now_string[:-2] + ":" + now_string[-2:]
+                            original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
+                            available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+                    else:
+                        available_date = getAvailableOptions(experience, available_options, available_date, from_datetime = (max_date+timedelta(days=1)).astimezone(pytz.timezone('UTC')))
+                    available_date = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))
+                    result = {'success':True, 'available_dates':available_date, 'available_options':available_options}
+                    return HttpResponse(json.dumps(result), content_type="application/json")
                 except Exception as err:
                     #TODO
                     return HttpResponse(json.dumps({'success':False}), content_type="application/json")
@@ -3691,6 +3718,7 @@ def itinerary_detail(request,id=None,preview=None):
             item.experience.title = exp_information.title
             item.experience.description = exp_information.description
             item.experience.whatsincluded = item.whats_included
+            item.experience.city = _(item.experience.city)
             key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%Y-%m-%d")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})

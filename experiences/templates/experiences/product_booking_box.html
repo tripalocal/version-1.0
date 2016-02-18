@@ -3,39 +3,17 @@
 {% load staticfiles %}
 
 <div class="booking-box">
-    <table style="display:none;">
+    <div id="table_date" style="display:none;">
         {% for op in available_options %}
-        <p id="date_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.date_string}} </p>
+        <p id="date_string_{{forloop.counter0}}" instant="{{op.instant_booking}}"> {{op.date_string}} </p>
         {% endfor %}
+    </div>
+    <div id="table_time" style="display:none;">
+        {% for op in available_options %}
+        <p id="time_string_{{forloop.counter0}}" instant="{{op.instant_booking}}"> {{op.time_string}} </p>
+        {% endfor %}
+    </div>
 
-        {% for op in available_options %}
-        <p id="time_string_{{forloop.counter0}}" style="display:none;" instant="{{op.instant_booking}}"> {{op.time_string}} </p>
-        {% endfor %}
-
-        {% for op in available_options %}
-        {% if forloop.counter0 < 3 and op.instant_booking %}
-        <tr class="booking-list">
-            <td id="instant_booking_date_{{forloop.counter0}}" class="date-list">
-                {{op.date_string}}
-            </td>
-            <td id="instant_booking_time_{{forloop.counter0}}" class="time-list">
-                <div class="timebtn">
-                    <div>
-                        <span>{{op.time_string}}</span><img src="{% static 'icon/instant.png' %}">
-                    </div>
-                </div>
-            </td>
-            <td class="people-list">
-                {% if user.is_authenticated %}
-                <input id="id_submit_request_{{forloop.counter0}}" type="submit" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" disabled='disabled' />
-                {% else %}
-                <input type="button" class="btn-block btn btn-xs btn-primary" value="{%trans "Book"%}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
-                {% endif %}
-            </td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-    </table>
     <input id="experience_dynamic_price" type="text" value="{{experience.dynamic_price}}" style="display:none;" disabled="disabled"/>
     {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
     <div style="border-bottom:1px solid #ccc;">
@@ -64,19 +42,17 @@
           <p>{% trans 'Guests' %}</p>
           <input type="text" id="guest_number_min" name="{{experience.guest_number_min}}" disabled="disabled" style="display:none;"/>
           <input type="text" id="guest_number_max" name="{{experience.guest_number_max}}" disabled="disabled" style="display:none;"/>
+          <div id="table_seat" style="display:none;">
           {% for op in available_options %}
-              <p id="seat_left_{{forloop.counter0}}" style="display:none;"> {{op.available_seat}} </p>
+              <p id="seat_left_{{forloop.counter0}}"> {{op.available_seat}} </p>
           {% endfor %}
+          </div>
           {{form.adult_number}}
           <div style="display:none;">
           {{form.child_number}}
           </div>
         </div>
-        {% if user.is_authenticated %}
-            <input style="display:inline-block; width: 60px;" id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" disabled='disabled'/>
-        {% else %}
-            <input style="display:inline-block; width: 60px;" type="button" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" onclick="location.href = '{{GEO_POSTFIX}}accounts/login/?next={{GEO_POSTFIX}}experience/{{experience.id}}';"/>
-        {% endif %}
+        <input style="display:inline-block; width: 60px;" id="id_submit_request" type="submit" class="btn-block btn btn-xs btn-primary" value="{% trans "Request" %}" disabled='disabled'/>
 
         <!--- PAGE VIEW STATISTICS HERE -->
         {% if not top_20 and top_50 %}
