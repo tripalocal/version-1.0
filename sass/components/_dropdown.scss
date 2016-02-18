@@ -89,3 +89,10 @@
   background-color: white;
   color: $primary-color;
 }
+
+// Add this class to make them fixed height with scroll
+.scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+  }

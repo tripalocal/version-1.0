@@ -1,7 +1,12 @@
 import json, os, collections, requests, pytz, base64, sys, string, http.client
 from datetime import *
-from experiences.models import OptionGroup, OptionItem
+from experiences.models import OptionGroup, OptionItem, NewProduct
 from xml.etree import ElementTree
+
+PARTNER_IDS = {"experienceoz":"001"}
+USERNAME = "tripalocalapi"
+PASSWORD = "c8EAZbRULywU4PnW"
+service_action = "https://tripalocal.experienceoz.com.au/d/services/API"#"https://www.tmtest.com.au/d/services/API"#
 
 SOAP_REQUEST_AVAILABILITY = \
 ''' <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -10,8 +15,8 @@ SOAP_REQUEST_AVAILABILITY = \
 		    xmlns:wsu="http://docs.oasisopen.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
             soap:mustUnderstand="1">
                 <wsse:UsernameToken wsu:Id="UsernameToken-3">
-                    <wsse:Username>tripalocal</wsse:Username>
-                    <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">okmnji</wsse:Password>
+                    <wsse:Username>{username}</wsse:Username>
+                    <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">{password}</wsse:Password>
                 </wsse:UsernameToken>
             </wsse:Security>
         </soap:Header>
@@ -24,6 +29,66 @@ SOAP_REQUEST_AVAILABILITY = \
           </ns2:GetAvailability>
         </soap:Body>
     </soap:Envelope>
+'''
+
+SOAP_REQUEST_MAKEPURCHASE = \
+'''
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Header>
+		<wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+        soap:mustUnderstand="1">
+			<wsse:UsernameToken wsu:Id="UsernameToken-1">
+				<wsse:Username>{username}</wsse:Username>
+				<wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">{password}</wsse:Password>
+			</wsse:UsernameToken>
+	</wsse:Security>
+	</soap:Header>
+	<soap:Body>
+		<ns3:MakePurchase xmlns:ns3="https://experienceoz.com.au/">
+			<PurchaseRequest>
+				<Customer>
+					<FirstName>{first_name}</FirstName>
+					<LastName>{last_name}</LastName>
+					<ContactNumber>{number}</ContactNumber>
+					<Email>{email}</Email>
+					<Country>{country}</Country>
+					<Postcode>{postcode}</Postcode>
+				</Customer>
+				<Items>
+					<Item>
+						<ProductId>{product_id}</ProductId>
+						<BookingDate>{booking_date}</BookingDate>
+						<ItemOptions>{item_options}</ItemOptions>
+					</Item>
+				</Items>
+			</PurchaseRequest>
+		</ns3:MakePurchase>
+	</soap:Body>
+</soap:Envelope>
+'''
+
+SOAP_REQUEST_RECEIPT = \
+'''
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Header>
+		<wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+		soap:mustUnderstand="1">
+			<wsse:UsernameToken wsu:Id="UsernameToken-2">
+				<wsse:Username>{username}</wsse:Username>
+				<wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">{password}</wsse:Password>
+			</wsse:UsernameToken>
+		</wsse:Security>
+	</soap:Header>
+	<soap:Body>
+		<ns3:Receipt xmlns:ns3="https://experienceoz.com.au/">
+			<ReceiptPurchaseRequest id="{purchase_id}">
+				<ReferenceNumber>{reference_number}</ReferenceNumber>
+			</ReceiptPurchaseRequest>
+		</ns3:Receipt>
+	</soap:Body>
+</soap:Envelope>
 '''
 
 def convert_location(city):
@@ -42,10 +107,10 @@ def convert_location(city):
     return locations.get(city, city)
 
 def get_experienceoz_availability(product_id, start_date, experience, available_options, available_date):
-    server_addr = "www.tmtest.com.au"
-    service_action = "https://www.tmtest.com.au/d/services/API"
 
     form_kwargs = {
+        'username': USERNAME,
+        'password': PASSWORD,
         'product_id': product_id,
         'start_date': start_date,
     }
@@ -60,7 +125,7 @@ def get_experienceoz_availability(product_id, start_date, experience, available_
                              headers = headers,
                              data = body)
 
-    if response.status_code == 200:
+    if response.status_code == 200 and response.ok:
         tree = ElementTree.fromstring(response.text)
         for e in tree.findall('.//Availability'):
             date_string = e[0].text
@@ -70,7 +135,7 @@ def get_experienceoz_availability(product_id, start_date, experience, available_
                 dict = {'available_seat': experience.guest_number_max,
                             'date_string': d.strftime("%d/%m/%Y"),
                             'time_string': "00:00",
-                            'datetime': d,
+                            #'datetime': d,
                             'instant_booking': False}
                 available_options.append(dict)
                 new_date = ((d.strftime("%d/%m/%Y"), d.strftime("%d/%m/%Y")),)
@@ -86,10 +151,102 @@ def get_experienceoz_availability(product_id, start_date, experience, available_
                         oi_name = oi[0].text
                         price = float(oi[1].text)
                         try:
-                            existing_oi = OptionItem.objects.get(original_id=oi.get("id"))
-                            if existing_oi.price != price:
-                                existing_oi.price = price
-                                existing_oi.save()
+                            existing_ois = OptionItem.objects.filter(original_id=oi.get("id"))
+                            for existing_oi in existing_ois:
+                                if existing_oi.price != price:
+                                    existing_oi.price = price
+                                    existing_oi.save()
                         except OptionItem.DoesNotExist:
                             pass
     return available_date
+
+def experienceoz_makepurchase(first_name, last_name, number, email, country, postcode, product, booking_date, booking_extra_information):
+    #convert booking_extra_information into 
+    #<ItemOption>
+	#	<ProductOptionId></ProductOptionId>
+	#	<Quantity></Quantity>
+	#</ItemOption>
+    #<ItemOption>
+	#	<ProductOptionId></ProductOptionId>
+	#	<Quantity></Quantity>
+	#</ItemOption>
+    options = json.loads(booking_extra_information)
+    item_options = ""
+    for k, v in options.items():
+        item_options += "<ItemOption><ProductOptionId>"+str(k)+"</ProductOptionId><Quantity>"+str(v)+"</Quantity></ItemOption>"
+
+    number = number.strip() #not working???
+    form_kwargs = {
+        'username': USERNAME,
+        'password': PASSWORD,
+        'first_name':first_name,
+        'last_name':last_name,
+        'email':email,
+        'number':number,
+        'country':country.upper(),
+        'postcode':postcode,
+        'product_id': str(product.id)[:-(len(str(product.partner))+1)],
+        'booking_date': booking_date,
+        'item_options':item_options
+    }
+    body = SOAP_REQUEST_MAKEPURCHASE.format(**form_kwargs)
+
+    headers = {"Accept": "application/soap+xml, multipart/related, text/*", 
+               "Content-Type": "text/xml; charset=UTF-8",
+               "Content-Length": str(len(body)),
+              }
+
+    response = requests.post(url=service_action,
+                             headers = headers,
+                             data = body)
+
+    if response.status_code == 200 and response.ok:
+        tree = ElementTree.fromstring(response.text)
+        purchase = tree.find('.//Purchase')
+        price = float(purchase[1].text)
+        vouchers = []
+        profits = 0.0
+        for v in purchase.findall('.//Voucher'):
+            vouchers.append(v.attrib['id'])
+            profits += float(v[3].text)
+        #update commission
+        try:
+            p = NewProduct.objects.get(id=v[0].attrib['id'])
+            new_c = round(float(v[3].text)/(float(v[1].text)-float(v[3].text)),3)
+            if p.commission == 0:
+                p.commission = new_c
+            elif new_c < p.commission:
+                p.commission = new_c
+                p.save()
+        except Exception:
+            pass
+
+        return {"success":True, "purchase_id":purchase.attrib['id'], "price":price, "vouchers":vouchers, "profits":profits}
+    else:
+        return {"success":False}
+
+def experienceoz_receipt(booking):
+    form_kwargs = {
+        'username': USERNAME,
+        'password': PASSWORD,
+        'purchase_id':booking.whats_included,
+        'reference_number':booking.id,
+    }
+
+    body = SOAP_REQUEST_RECEIPT.format(**form_kwargs)
+
+    headers = {"Accept": "application/soap+xml, multipart/related, text/*", 
+               "Content-Type": "text/xml; charset=UTF-8",
+               "Content-Length": str(len(body)),
+              }
+
+    response = requests.post(url=service_action,
+                             headers = headers,
+                             data = body)
+
+    if response.status_code == 200 and response.ok:
+        tree = ElementTree.fromstring(response.text)
+        link = tree.find('.//TicketPDFLink')
+        return {"success":True, "link":link.text}
+    else:
+        return {"success":False}

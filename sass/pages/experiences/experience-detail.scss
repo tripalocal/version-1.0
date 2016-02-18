@@ -19,6 +19,13 @@
   position: absolute;
 }
 
+
+.btn-lg {
+  min-width: 180px;
+  margin-right: 15px;
+  margin-bottom: 15px;
+}
+
 .jumbotron {
   height: 220px;
   background-position: center;
@@ -51,10 +58,14 @@
     margin-top: 15px;
   }
 
-  h3 {
+  h3, h4 {
     color: $dark-grey;
     margin-top: 0;
     font-weight: normal;
+  }
+
+  li {
+    list-style: disc;  
   }
 
   p {
@@ -64,6 +75,31 @@
     @include media('<tablet') {
       padding-left: 30px;
       padding-right: 30px;
+    }
+  }
+}
+
+.markdown-text {
+  padding: 0;
+  @include media('>tablet') {
+    h4 {
+      border-top: 1px solid $light-grey;
+      padding-top: 15px;
+      padding-right: 440px;
+    }
+    h5 {
+      padding-top: 15px;
+      padding-right: 440px;
+    }
+    ul {
+      margin-bottom: 15px;
+      margin-top: -45px;
+      padding: 15px 0 15px 150px;
+    }
+   > p {
+      margin-bottom: 15px;
+      margin-top: -45px; 
+      padding: 15px 0 15px 135px;
     }
   }
 }
@@ -310,7 +346,7 @@
 .map {
   width: 560px;
   height: 365px;
-  margin: 30px auto;
+  margin: 60px auto 30px auto;
   @include media('<tablet') {
     width: 100%;
   }

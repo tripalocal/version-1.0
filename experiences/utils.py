@@ -53,6 +53,8 @@ def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, 
             if i == len(items.keys()):
                 break
         if i == len(items.keys()):
+            if experience.currency.lower() != "aud":
+                price = convert_currency(price, "aud", experience.currency)
             return price
         else:
             raise ValueError("OptionItem mismatch")
@@ -119,7 +121,7 @@ def static_vars(**kwargs):
         return func
     return decorate
 
-@static_vars(dict={})
+@static_vars(dict={"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]})
 def recent_search(action, new_search=None):
     '''
     action: get, update, clear

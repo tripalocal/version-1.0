@@ -6,3 +6,8 @@
 .bootstrap-datetimepicker-widget td.active:hover {
   background-color: $primary-color !important;
 }
+
+.bootstrap-datetimepicker-widget td.disabled {
+  background-color: $off-white !important;
+  color: $pale-grey !important;
+}

@@ -120,16 +120,6 @@ h1 {
     }
   }
 
-  .bootstrap-datetimepicker-widget {
-    top: 0;
-    left: 0;
-    width: 250px;
-    padding: 4px;
-    margin-top: 1px;
-    z-index: 99999;
-    border-radius: 4px;
-  }
-
   .search-bar {
     width: 225px;
     height: 95px;
@@ -190,7 +180,6 @@ h1 {
 
   @include media('>tablet') {
     height: 590px;
-    background-attachment: fixed;
   }
 }
 
@@ -298,7 +287,6 @@ h1 {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    background-attachment: fixed;
     position: relative;
     display: table;
   }

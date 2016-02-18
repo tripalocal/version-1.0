@@ -13,7 +13,7 @@
     {% else %}
     <title>{{ experience.title }}</title>
     {% endif %}
-    <!--<link href="{% static 'experiences/content/experience_detail.css' %}" rel="stylesheet">-->
+    <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
     <link href="{% static 'experiences/content/experience-detail.css' %}" rel="stylesheet">
     <link href="{% static 'experiences/content/weather-icons.min.css' %}" rel="stylesheet">
 {% endblock %}
@@ -21,21 +21,74 @@
 {% block content %}
 
 {% if expired == None and listed == None %}
-    {% for field in form.hidden_fields %}
-        {{ field }}
-    {% endfor %}
-
-    {%if host_only_expired %}
-    <p style="postion:relative;top:50px;">{% trans "The experience has expired. Only you can see it now." %}</p>
-    {%endif%}
-
-    {%if host_only_unlisted %}
-    <p style="postion:relative;top:50px;">{% trans "The experience has not be approved. Only you can see it now." %}</p>
-    {%endif%}
-
     <div class="jumbotron experienceImg" style="background-image:url(
 		{{ MEDIA_URL }}{{cover_photo.directory}}{{cover_photo.name}})">
 	</div>
+
+    {%if host_only_expired %}
+    <p style="text-align:center; color:red;">{% trans "The experience has expired. Only you can see it now." %}</p>
+    {%endif%}
+
+    {%if host_only_unlisted %}
+    <p style="text-align:center; color:red;">{% trans "The experience has not been approved. Only you can see it now." %}</p>
+    {%endif%}
+
+    <div id="booking_option" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="guest-popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{%trans 'You have not logged in yet. You can:' %}</h4>
+          </div>
+          <div class="modal-body" style="text-align: center;">
+            <button class="btn btn-default btn-lg" role="button" id="booking_login_title" onclick="$('.collapse').collapse('hide'); $('#booking_login').collapse('show'); $('#booking_option').attr('option','login');"> 
+              {%trans 'Login' %}
+            </button>
+            <button class="btn btn-default btn-lg" role="button" id="booking_guest_title" onclick="$('.collapse').collapse('hide'); $('#booking_guest').collapse('show'); $('#booking_option').attr('option','guest');"> 
+                {%trans 'Continue as guest' %}
+            </button>
+            <div id="booking_guest" class="collapse">
+              <div class="well">
+                <p>{%trans 'Please provide correct information, or you will not receive booking confirmation.'%}
+                <div class="form-group">
+                  <input class="form-control" id="guest_email" name="email" placeholder="{%trans 'Email' %}" type="email">
+                </div>
+                <div class="form-group">
+                  {% if LANGUAGE != "zh-CN" %}
+                  <input class="form-control" id="guest_first_name" maxlength="30" name="first_name" placeholder="{%trans 'First Name' %}" type="text">
+                  {% else %}
+                  <input class="form-control" id="guest_last_name" maxlength="30" name="last_name" placeholder="{%trans 'Last Name' %}" type="text">
+                  {% endif %}
+                </div>
+                <div class="form-group">
+                  {% if LANGUAGE != "zh-CN" %}
+                  <input class="form-control" id="guest_last_name" maxlength="30" name="last_name" placeholder="{%trans 'Last Name' %}" type="text">
+                  {% else %}
+                  <input class="form-control" id="guest_first_name" maxlength="30" name="first_name" placeholder="{%trans 'First Name' %}" type="text">
+                  {% endif %}
+                </div>
+                <div class="form-group">
+                  <input class="form-control" id="guest_phone_number" maxlength="30" name="phone_number" placeholder="{%trans 'Phone number' %}" type="text">
+                </div>
+              </div>
+            </div>
+            <div id="booking_login" class="collapse">
+              <div class="well">
+                <div class="form-group">
+                  <input class="form-control" id="login_email" name="login" placeholder="{%trans 'Email' %}" type="email">
+                </div>
+                <div class="form-group">
+                  <input class="form-control" id="login_password" name="password" placeholder="{%trans 'Password' %}" type="password">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <input class="btn btn-secondary" id="booking_cancel" type="button" value="{%trans 'Cancel' %}">
+            <input class="btn btn-primary" id="booking_continue" type="button" value="{%trans 'Continue' %}">
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="container">
         {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
@@ -46,7 +99,7 @@
             {% include "experiences/experience_description.html" %}
         {% else %}
             {% include "experiences/api_booking_box.html" %}
-            {% include "experiences/experience_description.html" %}
+            {% include "experiences/api_description.html" %}
         {%endif%}
     </div>
 
@@ -152,7 +205,6 @@
                 {% endfor%}
             </div>
             {% endif %}
-            <div id="experience_map" class="map"></div>
         </div>
     </div>
 
@@ -230,6 +282,7 @@
               </div>
         </div>
     </div>
+    <div class="loading"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
     {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
     <style>
       .affix {
@@ -249,6 +302,12 @@
 <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 <script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+{%if LANGUAGE == "zh-CN"%}
+<script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+{%endif%}
+<script type="text/javascript" src="{% static 'experiences/scripts/utils.js' %}"></script>
 <script charset="utf-8" type="text/javascript">
 function resizeImg() {
     var thisImg= $('.item');
@@ -270,6 +329,30 @@ function resizeImg() {
 
 function is_form_valid()
 {
+    var option_items = $(".option-amount");
+    if(option_items.length > 0)
+    {
+        //partner product
+        $("#id_partner_product_information").val("{");
+        for(var i=0;i<option_items.length;i++)
+        {
+            var n = $(option_items[i]).val();
+            if(n>0)
+            {
+                $("#id_partner_product_information").val($("#id_partner_product_information").val()
+                                                    + "\"" + $(option_items[i]).attr("option_id") + "\":"
+                                                    + n + ",");
+            }
+        }
+        
+        $("#id_partner_product_information").val($("#id_partner_product_information").val().substring(0,$("#id_partner_product_information").val().length-1) + "}");
+        if($("#id_partner_product_information").val().length > 2)
+        {
+            return true;
+        }
+        return false;
+    }
+
     if($("#id_date").val() && $("#id_time").val() && $("#id_adult_number").val() && $("#id_child_number").val())
     {
         return true;
@@ -277,15 +360,98 @@ function is_form_valid()
     return false;
 }
 
-$(document).ready(resizeImg())
-
 $(window).resize(function(){
     resizeImg();
 });
 
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function setup_time_seat()
+{
+    if($("#time_string_0").attr("instant") == "True")
+    {
+        first_date = $("#date_string_3").text().trim();
+        i=3;
+    }
+    else
+    {
+        first_date = $("#date_string_0").text().trim();
+        i=0;
+    }
+
+    $("#id_time").html('');
+    for(; first_date && $("#date_string_"+i).text().trim() == first_date; i++)
+    {
+        if($("#time_string_"+i).attr("instant") == "True")
+        {
+            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' style="color:green;">' + $("#time_string_"+i).text().trim() + '</option>');
+        }
+        else
+        {
+            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+        }
+    }
+
+    seat_left = parseInt($("#seat_left_0").text());
+
+    $("#id_adult_number").html('');
+    var i = parseInt($("#guest_number_min").attr("name"));
+    if(typeof i != "number" || i < 1)
+    {
+        i=1;
+    }
+    for(;i<=seat_left;i++)
+    {
+        $("#id_adult_number").append('<option value=' + i + '>' + i + '</option>');
+    }
+    //TODO
+    if($("#id_adult_number").children().length==0)
+    {
+        $("#id_adult_number").append('<option value=1>1</option>');
+    }
+    $("#id_child_number").append('<option value=' + 0 + '>' + 0 + '</option>');
+}
+
+function setup_datetimepicker(available_dates)
+{
+    if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1)
+    {
+        $("#id_date").datetimepicker({
+            format: 'DD/MM/YYYY', locale: 'zh-CN',
+            enabledDates: available_dates,
+            minDate: available_dates[0],
+        });
+    }
+    else 
+    {
+        $("#id_date").datetimepicker({
+            format: 'DD/MM/YYYY',
+            enabledDates: available_dates,
+            minDate: available_dates[0],
+        });
+    }
+}
+
 $(function(){
+    $(".loading").hide();
+    var available_dates = {{available_dates|safe}};
+    resizeImg();
     mixpanel.track("viewed an experience");
-    if (screen.width > 767) {
+    if ($(window).width > 767) {
       {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
       $('.booking-box').affix({
         offset: {
@@ -325,94 +491,129 @@ $(function(){
         }
     }
 
-    var i=0;
-    for(; $("#id_date option").eq(i).length; i++)
-    {
-        var parts = $("#id_date option").eq(i).text().trim().split("/");
-        var date = new Date(parseInt(parts[2], 10),
-                          parseInt(parts[1], 10) - 1,
-                          parseInt(parts[0], 10));
-        $("#id_date option").eq(i).val(date.getFullYear() + '-' + (date.getMonth()+1) + '-' +  date.getDate());
-    }
-
-    if($("#time_string_0").attr("instant") == "True")
-    {
-        first_date = $("#date_string_3").text().trim();
-        i=3;
-    }
-    else
-    {
-        first_date = $("#date_string_0").text().trim();
-        i=0;
-    }
-
-    for(; first_date && $("#date_string_"+i).text().trim() == first_date; i++)
-    {
-        if($("#time_string_"+i).attr("instant") == "True")
-        {
-            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' style="color:green;">' + $("#time_string_"+i).text().trim() + '</option>');
-        }
-        else
-        {
-            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
-        }
-    }
-
-    seat_left = parseInt($("#seat_left_0").text());
-
-    $("#id_adult_number").html('');
-    var i = parseInt($("#guest_number_min").attr("name"));
-    if(typeof i != "number" || i < 1)
-    {
-        i=1;
-    }
-    for(;i<=seat_left;i++)
-    {
-        $("#id_adult_number").append('<option value=' + i + '>' + i + '</option>');
-    }
-    //TODO
-    $("#id_child_number").append('<option value=' + 0 + '>' + 0 + '</option>');
+    setup_time_seat();
 
     $("#id_submit_request").bind("click", function(e) {
+        if($("#" + e.target.id).attr("type") == "button")
+        {
+            return;
+        }
         e.preventDefault();
+        {% if user.is_authenticated %}
         if(is_form_valid())
         {
+            var unformattedDate = $("#id_date").val();
+            $("#id_date").val(String(moment(unformattedDate, "DD/MM/YYYY").format("YYYY-MM-DD")));
             $("#experience_booking_form").submit();
         }
         else
         {
             alert("{%trans 'Please select coordinate, time and guest number' %}");
         }
+        {% else %}
+        $("#booking_option").modal('show');
+        {% endif %}
     });
 
-    for(i=0;i<3;i++)
-    {
-        $("#id_submit_request_"+i).bind("click", function(e) {
-            e.preventDefault();
-            i = e.target.id.substr(-1,1);
-            var parts = $("#instant_booking_date_"+i).text().trim().split("/");
-            var date = new Date(parseInt(parts[2], 10),
-                              parseInt(parts[1], 10) - 1,
-                              parseInt(parts[0], 10));
-            $("#id_date").val(date.getFullYear() + '-' + (date.getMonth()+1) + '-' +  date.getDate());
-            $("#id_date").change();
-            $("#id_time").val($("#instant_booking_time_"+i).text().trim());
-            {% if LANGUAGE != "zh-CN" %}
-            mixpanel.track("Clicked on \"Book\"");
-            {% else %}
-            mixpanel.track("Clicked on \"Book_cn\"");
-            {% endif %}
+    $.ajaxSetup({ 
+        beforeSend: function(xhr, settings) {
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        }
+    });
 
-            if(is_form_valid())
+    $("#booking_cancel").bind("click", function(e) {
+        $("#booking_option").modal('hide');
+    });
+
+    $("#booking_continue").bind("click", function(e) {
+        if($("#booking_option").attr("option") == "login")
+        {
+            var email = $("#login_email").val();
+            var password = $("#login_password").val();
+            if(!is_form_valid() || !isValidEmailAddress(email))
             {
-                $("#experience_booking_form").submit();
+                return;
             }
-            else
+
+            $.ajax({
+                    type: 'POST',
+                    url: "/experience/{{experience.id}}/",
+                    dataType: 'json',
+                    data: {
+                        "csrfmiddlewaretoken": getCookie('csrftoken'),
+                        "email": email,
+                        "password": password,
+                        "login": "login",
+                    },
+                    success: function (data,status,xhr) {
+                        var result = data; //$.parseJSON(data)
+                        if('user_id' in data)
+                        {
+                            $('#id_user_id').val(data.user_id);
+                            var unformattedDate = $("#id_date").val();
+                            $("#id_date").val(String(moment(unformattedDate, "DD/MM/YYYY").format("YYYY-MM-DD")));
+                            $('[name="csrfmiddlewaretoken"]').val(getCookie('csrftoken'));
+                            $("#experience_booking_form").submit();
+                        }
+                        else
+                        {
+                            alert(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        alert('{%trans "Please try again later"%}');
+                    }
+                  })
+        }
+        else
+        {
+            var first_name = $("#guest_first_name").val();
+            var last_name = $("#guest_last_name").val();
+            var email = $("#guest_email").val();
+            var phone_number = $("#guest_phone_number").val();
+
+            if(!is_form_valid() || !isValidEmailAddress(email) || !isValidName(first_name) ||
+               !isValidName(last_name) || !isValidPhoneNumber(phone_number))
             {
-                alert("{%trans 'Please select coordinate, time and guest number' %}");
+                return;
             }
-        });
-    }
+
+            $.ajax({
+                    type: 'POST',
+                    url: "/experience/{{experience.id}}/",
+                    dataType: 'json',
+                    data: {
+                        "csrfmiddlewaretoken": getCookie('csrftoken'),
+                        "email": email,
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "phone_number": phone_number,
+                        "guest": "guest"
+                    },
+                    success: function (data,status,xhr) {
+                        result = data; //$.parseJSON(data)
+                        if(data.success)
+                        {
+                            $('#id_user_id').val(data.user_id);
+                            var unformattedDate = $("#id_date").val();
+                            $("#id_date").val(String(moment(unformattedDate, "DD/MM/YYYY").format("YYYY-MM-DD")));
+                            $('[name="csrfmiddlewaretoken"]').val(getCookie('csrftoken'));
+                            $("#experience_booking_form").submit();
+                        }
+                        else
+                        {
+                            alert('{%trans "Please try a different email address."%}');
+                        }
+                    },
+                    error: function (e) {
+                        alert('{%trans "Please try again later"%}');
+                    }
+                  })
+        }
+    });
 
     min_number = parseInt($("#guest_number_min").attr("name"));
     max_number = parseInt($("#guest_number_max").attr("name"));
@@ -445,7 +646,7 @@ $(function(){
                         url: "{{wishlist_webservice}}",
                         dataType: 'json',
                         data: {
-                            "csrfmiddlewaretoken": "{{ csrf_token }}",
+                            "csrfmiddlewaretoken": getCookie('csrftoken'),
                             "user_id": user_id,
                             "experience_id": experience_id,
                             "added": $('#save_to_wishlist_related_'+i).attr("val")
@@ -566,40 +767,46 @@ $(function(){
         $("#experience_map").hide();
     }
 
-    $("#id_submit_request").prop('disabled', false);
-})
+    $("#id_date").change(function() {
+        var selected_date = $("#id_date").val();
 
-$(function(){
-    $("#id_date").change(function(){
-        selected_date = $("#id_date option:selected").text().trim();
-
+        {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' or experience.type == 'PRIVATE' or experience.type == 'PUBLIC' %}
+        $("#id_submit_request").removeAttr('disabled');
+        {% endif %}
         $("#id_time").html('');
 
-        var i=0;
-        for(; $("#date_string_"+i).text().trim() != selected_date; i++)
-        {
+        // Skip loop if date is not available, otherwise loop will go ifinite.
+        if (available_dates.indexOf(String(moment(selected_date, "DD/MM/YYYY").format("YYYY-MM-DD"))) > -1 ) {
+   
+          var i=0;
+          for(; $("#date_string_"+i).text().trim() != selected_date; i++)
+          {
+          }
+
+          for(; $("#date_string_"+i).text().trim() == selected_date; i++)
+          {
+              if($("#time_string_"+i).attr("instant") == "True")
+              {
+                  $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' style="color:green;">' + $("#time_string_"+i).text().trim() + '</option>');
+              }
+              else
+              {
+                  $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+              }
+          }
+
+          $("#id_time").change();
+              
         }
+   })
 
-        for(; $("#date_string_"+i).text().trim() == selected_date; i++)
-        {
-            if($("#time_string_"+i).attr("instant") == "True")
-            {
-                $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' style="color:green;">' + $("#time_string_"+i).text().trim() + '</option>');
-            }
-            else
-            {
-                $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
-            }
-        }
+   $("#id_date").blur(function() {
+        $(this).change();
+   });
 
-        $("#id_time").change();
-    })
-})
-
-$(function(){
     $("#id_time").change(function(){
-        selected_date = $("#id_date option:selected").text().trim();
-        selected_time = $("#id_time option:selected").text().trim();
+        var selected_date = $("#id_date").val();
+        var selected_time = $("#id_time option:selected").text().trim();
 
         var i=0;
         for(; $("#date_string_"+i).text().trim() != selected_date; i++)
@@ -628,9 +835,66 @@ $(function(){
         //mixpanel.track("Changed time_cn");
         {% endif %}
     })
-})
 
-$(function(){
+    setup_datetimepicker(available_dates);
+
+    $("#id_date").datetimepicker().on('dp.update', function(e) {
+        var vd = e.viewDate._d;
+        var enabled_dates = $('#id_date').data("DateTimePicker").enabledDates();
+        enabled_dates = Object.keys(enabled_dates);
+        var max_date = Date.parseExact(enabled_dates[enabled_dates.length-1], "yyyy-MM-dd");
+        if(max_date < vd)
+        {
+            $(".loading").show();
+            $.ajax({
+                    type: 'POST',
+                    url: "/experience/{{experience.id}}/",
+                    dataType: 'json',
+                    timeout: 10000,
+                    data: {
+                        "csrfmiddlewaretoken": getCookie('csrftoken'),
+                        "experience_id": {{experience.id}},
+                        "max_date": max_date.toString("yyyy-MM-dd"),
+                        "load_more": "load_more",
+                    },
+                    success: function (data,status,xhr) {
+                        var result = data; //$.parseJSON(data)
+                        $(".loading").hide();
+                        if(data.success)
+                        {
+                            len = $('p[id^="date_string_"]').length;
+                            available_dates = available_dates.concat(data.available_dates);
+                            for(var i=0;i<data.available_options.length;i++)
+                            {
+                                $("#table_date").append("<p id=\"date_string_" + (len+i) + "\" style=\"display:none;\" instant=\"" + data.available_options[i].instant_booking + "\">" + data.available_options[i].date_string +"</p>");
+                                $("#table_time").append("<p id=\"time_string_" + (len+i) + "\" style=\"display:none;\" instant=\"" + data.available_options[i].instant_booking + "\">" + data.available_options[i].time_string +"</p>");
+                                if($("#table_seat").length > 0)
+                                {
+                                    $("#table_seat").append("<p id=\"seat_left_" + (len+i) + "\">" + data.available_options[i].available_seat + " </p>");
+                                }
+                            }
+                            setup_time_seat();
+                            var enabled_dates = []
+                            for(var i=0;i<available_dates.length;i++)
+                            {
+                                enabled_dates.push(Date.parseExact(available_dates[i], "yyyy-MM-dd"));
+                            }
+                            $('#id_date').data("DateTimePicker").enabledDates(enabled_dates);
+                        }
+                        else
+                        {
+                            alert(data.error);
+                        }
+                    },
+                    error: function (e) {
+                        $(".loading").hide();
+                        alert('{%trans "Please try again later"%}');
+                    }
+                  })
+        }
+    })
+
+    $("#id_date").val("");
     $("#id_adult_number").change(function(){
         min_number = parseInt($("#guest_number_min").attr("name"));
         max_number = parseInt($("#guest_number_max").attr("name"));
@@ -649,7 +913,7 @@ $(function(){
     // API BOOKING BOX LOGIC
     {% if experience.type != "PublicProduct" and experience.type != "PrivateProduct" and experience.type != 'ITINERARY' and experience.type != 'PRIVATE' and experience.type != 'PUBLIC' %}
     $('.option-amount').on('change', function() {
-        // Price update
+      // Price update
       $('.collapse').each(function() {
         var $optionGroup = $(this);
         var total = 0;
@@ -671,12 +935,27 @@ $(function(){
         $('.badge').each(function() {
             total += parseInt($(this).text().replace(/\D/g,'0'));
         })
-        return ("Request " + "(total price of {{experience.dollarsign}}" + total + "{{experience.currency}})");
+        if (total > 0 && $('#id_date').val()) {
+          $("#id_submit_request").prop('disabled', false);
+        } else {
+          $("#id_submit_request").prop('disabled', true);
+          return ("{% trans 'Please select date and ticket type' %}");
+        }
+        return ("{% trans 'Request' %} " + "({% trans 'total price of ' %}{{experience.dollarsign}}" + total + "{{experience.currency}})");
       });
     });
 
-    $('#id_date').on('change', function() {
-        var time = new Date($(this).val()).getTime() / 1000;
+    $('#id_date').blur(function() {
+        $('.option-amount').change();
+        var time = new Date($(this).val().replace( /(\d{2})[-/](\d{2})[-/](\d+)/, "$2/$1/$3")).getTime() / 1000;
+        var timeNow = new Date().getTime() / 1000;
+        if ((time - timeNow) <= 172800) {
+          $("#id_submit_request").hide();
+          $(".booking-enquiry").show();
+        } else {
+          $(".booking-enquiry").hide();
+          $("#id_submit_request").show();
+        }
         {% if coordinates %}
         var lat = {{coordinates.0.1}};
         var lon = {{coordinates.0.2}};
@@ -724,7 +1003,7 @@ $(function(){
                     url: "{{wishlist_webservice}}",
                     dataType: 'json',
                     data: {
-                        "csrfmiddlewaretoken": "{{ csrf_token }}",
+                        "csrfmiddlewaretoken": getCookie('csrftoken'),
                         "user_id": user_id,
                         "experience_id": experience_id,
                         "added": $('#save_to_wishlist_icon').attr("val")
@@ -804,7 +1083,7 @@ $(function(){
                 url: "/service_pageview/",
                 dataType: 'json',
                 data: {
-                    "csrfmiddlewaretoken": "{{ csrf_token }}",
+                    "csrfmiddlewaretoken": getCookie('csrftoken'),
                     "user_id": user_id,
                     "experience_id": {{experience.id}},
                     "length": length

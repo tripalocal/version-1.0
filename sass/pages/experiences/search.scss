@@ -149,6 +149,7 @@ body {
 }
 .search-result {
   padding-bottom: 50px;
+  min-height: 100vh;
   .container {
     @include media('>=desktop') {
       width: 960px;

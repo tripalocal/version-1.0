@@ -39,6 +39,7 @@ import xmltodict
 from experiences.utils import *
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.storage import default_storage as storage
 
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
 
@@ -631,12 +632,15 @@ def handle_user_signed_up(request, user, sociallogin=None, **kwargs):
 
 def track_user_signup(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-    mp.people_set(user.email, {"IP":ip,
-                               "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
-                               })
 
     reader = None
     try:
+        mp.people_set(user.email, 
+                      {"IP":ip,
+                       "$created":pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
+                       })
+        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+
         reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
         response = reader.city(ip)
         country = response.country.name
@@ -646,11 +650,10 @@ def track_user_signup(ip, sociallogin, user):
         longitude = response.location.longitude
         latitude = response.location.latitude
 
-        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
         mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "$first_name":user.first_name, "$last_name":user.last_name, "Postcode":postcode, "Latitude":latitude, "Longitude":longitude})
         reader.close()
     except Exception:
-        mp.track(user.email, "has signed up via email_"+settings.LANGUAGES[0][0])
+        pass
     finally:
         if reader is not None:
             reader.close()
@@ -672,9 +675,12 @@ def track_user_signup(ip, sociallogin, user):
         if 'gender' in data:
             gender = data['gender']
 
-        mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed up via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        try:
+            mp = Mixpanel(settings.MIXPANEL_TOKEN)
+            mp.track(email, 'has signed up via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+            mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        except Exception as err:
+            pass
 
 @receiver(user_logged_in)
 def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
@@ -699,10 +705,12 @@ def handle_user_logged_in(request, user, sociallogin=None, **kwargs):
 
 def track_user_login(ip, sociallogin, user):
     mp = Mixpanel(settings.MIXPANEL_TOKEN)
+    reader = None
 
     try:
-        mp.people_set(user.email, {"IP":ip})
         reader = geoip2.database.Reader(os.path.join(settings.PROJECT_ROOT, 'GeoLite2-City.mmdb'))
+        mp.people_set(user.email, {"IP":ip})
+        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
         response = reader.city(ip)
         country = response.country.name
         region = response.subdivisions.most_specific.name
@@ -711,12 +719,11 @@ def track_user_login(ip, sociallogin, user):
         longitude = response.location.longitude
         latitude = response.location.latitude
 
-        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
         mp.people_set(user.email, {'$email':user.email, "$country":country, "$city":city, "$region":region, "Postcode":postcode,
                                    "Latitude":latitude, "Longitude":longitude, "Language":settings.LANGUAGES[0][1]}) #"$last_seen": datetime.utcnow().replace(tzinfo=pytz.UTC).astimezone(pytz.timezone(settings.TIME_ZONE))
         reader.close()
     except Exception:
-        mp.track(user.email, "has signed in via email_"+settings.LANGUAGES[0][0])
+        pass
     finally:
         if reader is not None:
             reader.close()
@@ -738,9 +745,12 @@ def track_user_login(ip, sociallogin, user):
         if 'gender' in data:
             gender = data['gender']
 
-        mp = Mixpanel(settings.MIXPANEL_TOKEN)
-        mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
-        mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        try:
+            mp = Mixpanel(settings.MIXPANEL_TOKEN)
+            mp.track(email, 'has signed in via Facebook',{'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+            mp.people_set(email, {'$email':email,'$name':first_name + " " + last_name, 'age':age, 'gender':gender})
+        except Exception:
+            pass
 
 def saveProfileImage(user, profile, image_file):
     content_type = image_file.content_type.split('/')[0]
@@ -762,14 +772,24 @@ def saveProfileImage(user, profile, image_file):
         profile.save()
 
         #crop the image
-        dirname = settings.MEDIA_ROOT + '/hosts/' + str(user.id) + '/'
-        im = PIL.Image.open(dirname + filename)
+        f = storage.open(dirname + filename, 'rb')
+        im = PIL.Image.open(f)
         w, h = im.size
         if w > 1200:
             basewidth = 1200
             wpercent = (basewidth/float(w))
             hsize = int((float(h)*float(wpercent)))
-            im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS).save(dirname + filename)
+            im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+            im_out = BytesIO()
+            if extension == '.jpg':
+                extension = '.jpeg'
+            im.save(im_out, format = extension[1:].upper())
+            f.close()
+            f = storage.open(dirname + filename, 'wb')
+            f.write(im_out.getvalue())
+            f.close()
+        else:
+            f.close()
 
 @require_POST
 def email_custom_trip(request):
