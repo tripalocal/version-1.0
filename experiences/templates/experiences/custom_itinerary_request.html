@@ -38,15 +38,15 @@
   <div id="city-section" class="section">
     <div class="container">
       <h1>{% trans 'Choose some locations you would like to visit on this trip.' %} <span class="asterisk">*</span></h1>
-        <div class="box" data-city="melbourne" style="background-image:url({{MEDIA_URL}}city/Melbourne.jpg)"><div class="overlay"><h3 class="display">{% trans 'Melbourne' %}</h3></div></div>
-        <div class="box" data-city="sydney" style="background-image:url({{MEDIA_URL}}city/Sydney.jpg)"><div class="overlay"><h3 class="display">{% trans 'Sydney' %}</h3></div></div>
-        <div class="box" data-city="goldcoast" style="background-image:url({{MEDIA_URL}}city/Goldcoast.jpg)"><div class="overlay"><h3 class="display">{% trans 'Gold Coast' %}</h3></div></div>
-        <div class="box" data-city="brisbane" style="background-image:url({{MEDIA_URL}}city/Brisbane.jpg)"><div class="overlay"><h3 class="display">{% trans 'Brisbane' %}</h3></div></div>
-        <div class="box" data-city="cairns" style="background-image:url({{MEDIA_URL}}city/Cairns.jpg)"><div class="overlay"><h3 class="display">{% trans 'Cairns' %}</h3></div></div>
-        <div class="box" data-city="tasmania" style="background-image:url({{MEDIA_URL}}city/Hobart.jpg)"><div class="overlay"><h3 class="display">{% trans 'Tasmania' %}</h3></div></div>
-        <div class="box" data-city="alicesprings" style="background-image:url({{MEDIA_URL}}city/Alicesprings.jpg)"><div class="overlay"><h3 class="display">{% trans 'Alice Springs' %}</h3></div></div>
-        <div class="box" data-city="darwin" style="background-image:url({{MEDIA_URL}}city/Darwin.jpg)"><div class="overlay"><h3 class="display">{% trans 'Darwin' %}</h3></div></div>
-        <div class="box" data-city="perth" style="background-image:url({{MEDIA_URL}}city/Perth.jpg)"><div class="overlay"><h3 class="display">{% trans 'Perth' %}</h3></div></div>
+        <div class="btn btn-clear city">{% trans 'Melbourne' %}</div>
+        <div class="btn btn-clear city">{% trans 'Sydney' %}</div>
+        <div class="btn btn-clear city">{% trans 'Gold Coast' %}</div>
+        <div class="btn btn-clear city">{% trans 'Brisbane' %}</div>
+        <div class="btn btn-clear city">{% trans 'Cairns' %}</div>
+        <div class="btn btn-clear city">{% trans 'Tasmania' %}</div>
+        <div class="btn btn-clear city">{% trans 'Alice Springs' %}</div>
+        <div class="btn btn-clear city">{% trans 'Darwin' %}</div>
+        <div class="btn btn-clear city">{% trans 'Perth' %}</div>
     </div>
   </div>
 
@@ -78,31 +78,21 @@
 
   <div id="interests-section" class="section">
     <div class="container">
-      <h1 style="margin-bottom: 30px;">{% trans "What kind of things are you interested in?<br>Check the topics that interest you." %}</h1>
-      <div class="row">
-          <div class="circle unselected" style="background-color:#FFABAB">{% trans 'food & wine' %}</div>
-          <div class="circle unselected" style="background-color:#FFDAAB">{% trans 'photography' %}</div>
-        </div>
-        <div class="row">
-          <div class="circle unselected" style="background-color:#DDFFAB">{% trans 'history & culture' %}</div>
-          <div class="circle unselected" style="background-color:#ABE4FF">{% trans 'architecture' %}</div>
-          <div class="circle unselected" style="background-color:#D9ABFF">{% trans 'for couples' %}</div>
-        </div>
-        <div class="row">
-          <div class="circle unselected" style="background-color:#FFABAB">{% trans 'outdoor & nature' %}</div>
-          <div class="circle unselected" style="background-color:#FFDAAB">{% trans 'shopping' %}</div>
-          <div class="circle unselected" style="background-color:#DDFFAB">{% trans 'sports & leisure' %}</div>
-          <div class="circle unselected" style="background-color:#ABE4FF">{% trans 'extreme fun' %}</div>
-        </div>
-        <div class="row">
-          <div class="circle unselected" style="background-color:#D9ABFF">{% trans 'events' %}</div>
-          <div class="circle unselected" style="background-color:#FFABAB">{% trans 'health & beauty' %}</div>
-          <div class="circle unselected" style="background-color:#FFDAAB">{% trans 'livability research' %}</div>
-        </div>
-        <div class="row">
-          <div class="circle unselected" style="background-color:#DDFFAB">{% trans 'education' %}</div>
-          <div class="circle unselected" style="background-color:#ABE4FF">{% trans 'local experiences' %}</div>
-        </div>
+      <h1>{% trans "What kind of things are you interested in?<br>Check the topics that interest you." %}</h1>
+      <div class="btn btn-clear interest">{% trans 'food & wine' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'photography' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'history & culture' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'architecture' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'for couples' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'outdoor & nature' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'shopping' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'sports & leisure' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'extreme fun' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'events' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'health & beauty' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'livability research' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'education' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear interest">{% trans 'local experiences' %}<span class="glyphicon glyphicon-plus"></span></div>
     </div>
   </div>
 
@@ -206,6 +196,62 @@
 {%endif%}
 <script>
 $(document).ready(function() {
+  // Init calendars
+  if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
+    $("#id_start_date").datetimepicker({
+      format: 'YYYY-MM-DD', locale: 'zh-CN',
+      minDate: moment(),
+      ignoreReadonly: true,
+      inline: true,
+      keepOpen: true,
+      debug: true
+    });
+    $("#id_end_date").datetimepicker({
+      format: 'YYYY-MM-DD', locale: 'zh-CN',
+      useCurrent: false,
+      ignoreReadonly: true,
+      inline: true,
+      keepOpen: true,
+      debug: true
+    });
+
+    $("#id_start_date").on("dp.change", function (e) {
+      $('#id_end_date').data("DateTimePicker").minDate(e.date);
+    });
+    $("#id_end_date").on("dp.change", function (e) {
+      $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+    });
+  }
+  else {
+    $("#id_start_date").datetimepicker({
+      format: 'YYYY-MM-DD',
+      minDate: moment(),
+      ignoreReadonly: true,
+      inline: true,
+      keepOpen: true,
+      debug: true
+    });
+    $("#id_end_date").datetimepicker({
+      format: 'YYYY-MM-DD',
+      useCurrent: false,
+      ignoreReadonly: true,
+      inline: true,
+      keepOpen: true,
+      debug: true
+    });
+
+    $("#id_start_date").on("dp.change", function (e) {
+      $('#id_end_date').data("DateTimePicker").minDate(e.date);
+    });
+    $("#id_end_date").on("dp.change", function (e) {
+      $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+    });
+  }
+  
+  // Clear the date fields
+  $('#id_start_date').val('').datetimepicker('show');
+  $('#id_end_date').val('').datetimepicker('show');
+
 	// Initialise fullpage 
 	$('#fullpage').fullpage({
 		responsiveWidth: 500,
@@ -213,7 +259,7 @@ $(document).ready(function() {
 		paddingBottom: '50px',
 		navigation: true,
 		navigationPosition: 'left',
-		showActiveTooltip: true,
+		showActiveTooltip: false,
 		anchors: ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8', 'section9'],
 		navigationTooltips: ['{% trans "Start" %}', '{% trans "Destinations" %}', '{% trans "Dates" %}', '{% trans "Guests" %}', '{% trans "Interests" %}', '{% trans "Whats Included" %}', '{% trans "Extras" %}', '{% trans "Contact" %}', '{% trans "Done!" %}'],
 		sectionsColor: '#f7f7f7',
@@ -239,48 +285,6 @@ $(document).ready(function() {
 	});
 
 
-  if (window.location.pathname.indexOf("/cn") > -1 || window.location.href.indexOf(".cn") > -1) {
-    $("#id_start_date").datetimepicker({
-      format: 'YYYY-MM-DD', locale: 'zh-CN',
-      minDate: moment(),
-      ignoreReadonly: true
-    });
-    $("#id_end_date").datetimepicker({
-        format: 'YYYY-MM-DD', locale: 'zh-CN',
-        useCurrent: false,
-        ignoreReadonly: true
-    });
-
-    $("#id_start_date").on("dp.change", function (e) {
-        $('#id_end_date').data("DateTimePicker").minDate(e.date);
-    });
-    $("#id_end_date").on("dp.change", function (e) {
-        $('#id_start_date').data("DateTimePicker").maxDate(e.date);
-    });
-  }
-  else {
-    $("#id_start_date").datetimepicker({
-        format: 'YYYY-MM-DD',
-        minDate: moment(),
-        ignoreReadonly: true
-    });
-    $("#id_end_date").datetimepicker({
-        format: 'YYYY-MM-DD',
-        useCurrent: false,
-        ignoreReadonly: true
-    });
-
-    $("#id_start_date").on("dp.change", function (e) {
-        $('#id_end_date').data("DateTimePicker").minDate(e.date);
-    });
-    $("#id_end_date").on("dp.change", function (e) {
-        $('#id_start_date').data("DateTimePicker").maxDate(e.date);
-    });
-  }
-  
-  // Clear the date fields
-  $('#id_start_date').val('');
-  $('#id_end_date').val('');
 
 	// Show page when init is done
 	$('.loading').fadeOut('slow');
@@ -289,14 +293,16 @@ $(document).ready(function() {
 	$('#start-btn').on('click', function() {
 		$.fn.fullpage.moveSectionDown();
 	});
-	$('.overlay').on('click', function() {
-		$this = $(this);
+	$('.city').on('click', function() {
+		var $this = $(this);
 		$this.hasClass('selected') ? $this.removeClass('selected') : $this.addClass('selected');
 		updateCities();
 	});
-	$('.circle').on('click', function() {
+	$('.interest').on('click', function() {
 		$this = $(this);
-		$this.hasClass('unselected') ? $this.removeClass('unselected') : $this.addClass('unselected');
+    var $icon = $this.children('.glyphicon');
+		$this.hasClass('selected') ? $this.removeClass('selected') : $this.addClass('selected');
+    $icon.hasClass('glyphicon-plus') ? $icon.addClass('glyphicon-ok').removeClass('glyphicon-plus') : $icon.addClass('glyphicon-plus').removeClass('glyphicon-ok');
 		updateInterests();
 	});
 	$('#nav-up').on('click', function() {
@@ -479,17 +485,17 @@ function updateBudget() {
 }
 
 function updateCities() {
-	var selectedCities = $('.overlay.selected').map(function() {
-		return $(this).parent().attr('data-city');
+	var selectedCities = $('.city.selected').map(function() {
+		return $(this).text();
 	}).get();
-	$('#id_destinations').val(selectedCities.join());
+	$('#id_destinations').val(selectedCities.join(', '));
 }
 
 function updateInterests() {
-	var selectedInterests = $('.circle').filter(':not(.unselected)').map(function() {
+	var selectedInterests = $('.interest.selected').map(function() {
 		return $(this).text();
 	}).get();
-	$('#id_interests').val(selectedInterests.join());
+	$('#id_interests').val(selectedInterests.join(', '));
 }
 
 function validateForm() {
