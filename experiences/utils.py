@@ -121,7 +121,7 @@ def static_vars(**kwargs):
         return func
     return decorate
 
-@static_vars(dict={"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]})
+@static_vars(dict={"Melbourne":{"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}})
 def recent_search(action, new_search=None):
     '''
     action: get, update, clear

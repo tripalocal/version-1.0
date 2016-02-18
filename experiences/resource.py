@@ -1618,7 +1618,7 @@ def service_search_text(request, format=None):
             if counter >= 3:
                 return Response(recent[title], status=status.HTTP_200_OK)
 
-        if counter > 0 or len(recent[title]['daily_itineraries']) > 0:
+        if len(recent[title]['experiences']) > 0 or len(recent[title]['daily_itineraries']) > 0:
             return Response(recent[title], status=status.HTTP_200_OK)
         else:
             return Response({"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}, status=status.HTTP_200_OK)
