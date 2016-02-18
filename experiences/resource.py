@@ -1558,6 +1558,7 @@ def service_search_text(request, format=None):
         action = data.get('action',None)
         title = data.get('title',None)
         city = data.get('city',None)
+        category = data.get('category','all')
 
         if action and action == "clear":
             recent_search("clear")
@@ -1603,10 +1604,18 @@ def service_search_text(request, format=None):
         #update experiences
         max_experience_id = 0
         max_experience_id = recent[title]["max_experience_id"]
-        
-        experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
-                      list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id')) + \
-                      list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Flight','Transfer','Accommodation','Suggestion','Pricing','Restaurnat'], city=city).order_by('id'))
+
+        if category.lower() == "all":
+            experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id')) + \
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Flight','Transfer','Accommodation','Suggestion','Pricing','Restaurnat'], city=city).order_by('id'))
+        elif category.lower() == "products":
+            experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id'))
+        else:
+            category = category.split(",")
+            experiences = list(Experience.objects.filter(id__gt=max_experience_id, type__in=category, city=city).order_by('id')) + \
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=category, city=city).order_by('id'))
         counter = 0
         for experience in experiences:
             exp_title = experience.get_information(language).title

@@ -11,7 +11,7 @@
 {% block content %}
     {% csrf_token %}
     <div>
-        <input id="itinerary_day_1" type="text" class="itinerary_item" city="Melbourne" style="width:300px;height:30px;">
+        <input id="itinerary_day_1" type="text" class="itinerary_item" city="Melbourne" category="products" style="width:300px;height:30px;">
         <textarea id="hint" type="text" style="width:600px;height:300px;margin-top:60px;"></textarea>
     </div>
     <div id="container" class="container">
@@ -24,6 +24,7 @@
     function searchExperience(e){ 
         var title = $("#"+e.target.id).val();
         var city = $("#"+e.target.id).attr("city");
+        var category = $("#"+e.target.id).attr("category");
         if(title == null || city == null || title.length == 0 || city.length == 0)
         {
             return;
@@ -36,6 +37,7 @@
                             csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
                             city: city,
                             title: title,
+                            category: category,
                         }
             }).done(function(data){
                 var suggestions_exp = "Experiences:\n";
