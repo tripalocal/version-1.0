@@ -135,7 +135,7 @@ def get_experienceoz_availability(product_id, start_date, experience, available_
                 dict = {'available_seat': experience.guest_number_max,
                             'date_string': d.strftime("%d/%m/%Y"),
                             'time_string': "00:00",
-                            'datetime': d,
+                            #'datetime': d,
                             'instant_booking': False}
                 available_options.append(dict)
                 new_date = ((d.strftime("%d/%m/%Y"), d.strftime("%d/%m/%Y")),)

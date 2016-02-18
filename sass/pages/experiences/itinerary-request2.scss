@@ -233,7 +233,9 @@ h1 {
   background-color: inherit;
   border: 0;
   color: $medium-grey;
-  height: 120px;
+  @include media('>phablet') {
+    height: 120px !important;
+  }
   &:focus {
     border: 0;
     outline: none;
@@ -275,4 +277,21 @@ h1 {
     100% { opacity: 1; }
 }
 
+#date-section > .fp-tableCell,
+#city-section > .fp-tableCell,
+#interests-section > .fp-tableCell {
+  @include media('<phablet') {
+    vertical-align: top;
+  }
+}
 
+#date-section > .fp-tableCell {
+  @include media('>=phablet') {
+    position: relative;
+    top: -50px;
+  }
+}
+
+.zopim {
+  display: none;
+}

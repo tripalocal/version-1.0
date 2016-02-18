@@ -6,6 +6,7 @@
   {% load staticfiles %}
     <title>{% trans "Booking Confirmation" %}</title>
     <link rel="stylesheet" href="{% static 'experiences/content/checkout.css' %}">
+    <link rel="stylesheet" href="{% static 'app/content/intlTelInput.css' %}">
     <script src="https://checkout.stripe.com/checkout.js"></script>
 {% endblock %}
 
@@ -107,19 +108,12 @@
 
                   <div class="form-group" style="display: inline-block; margin-right: 15px;">
                     <h3>{% trans 'Destination mobile number' %}</h3>
-                    <input id="id_local_number" maxlength="15" type="search" list="local-area-options" class="form-control" placeholder="+XX XXX XXX XXX">
-                    <datalist id="local-area-options">
-                      <option label="{% trans 'Australia' %} 🇦🇺" value="+61">
-                      <option label="{% trans 'New Zealand' %} 🇳🇿" value="+64">
-                    </datalist>
+                    <input id="id_local_number" type="tel" class="form-control" maxlength="12">
                   </div>
 
                   <div class="form-group" style="display: inline-block;">
                     <h3>{% trans 'Roaming mobile number' %}</h3>
-                    <input id="id_roaming_number" maxlength="17" type="text" list="roaming-area-options" class="form-control" placeholder="+XX XXX XXXX XXXX">
-                    <datalist id="roaming-area-options">
-                      <option label="{% trans 'China' %} 🇨🇳" value="+86">
-                    </datalist>
+                    <input id="id_roaming_number" type="tel" class="form-control" maxlength="13">
                   </div>
 
                     <div class="warning-sign" id="local_phone_warning" style="display:none;">
@@ -205,73 +199,23 @@
   {% endblock %}
 
   {% block scripts %}
+  <script src="{% static 'app/scripts/intlTelInput.min.js' %}"></script>
   <script charset="utf-8" type="text/javascript">
-      legal_local_number = /\+\d{2} \d{3} \d{3} \d{3}/;
-      legal_roaming_number = /\+\d{2} \d{3} \d{4} \d{4}/;
-     
-      /**
-       * formatPhone is an auto-formatting callback function for phone numbers.
-       * Takes a jquery object of the phone input field and whether it is a
-       * 'local' or 'roaming' type number.
-       */
-      function formatPhone($phone, locale) {
-        // First strip away certain characters.
-        var num = $phone.val().replace(/-/g, ''); 
-        if (locale === "local") {
-          // Format area code
-          if (num.length > 0 && num.charAt(0) !== '+') {
-            $phone.val('+' + num);
-          // Add spacing after area code
-          } else if (num.length > 3 && num.charAt(3) !== ' ') {
-            $phone.val(spliceSlice(num, 3, 0, ' '));
-          // Strip away leading 0
-          } else if (num.length > 4 && num.charAt(4) === '0') {
-            $phone.val(spliceSlice(num, 4, 1));
-          // Add spacing in groups of three numbers 
-          } else if (num.length > 7 && num.charAt(7) !== ' ') {
-            $phone.val(spliceSlice(num, 7, 0, ' '));
-          } else if (num.length > 11 && num.charAt(11) !== ' ' ) {
-            $phone.val(spliceSlice(num, 11, 0, ' '));
-          }
-        } else if (locale === "roaming") {
-          // Format area code
-          if (num.length > 0 && num.charAt(0) !== '+') {
-            $phone.val('+' + num);
-          // Add spacing after area code
-          } else if (num.length > 3 && num.charAt(3) !== ' ') {
-            $phone.val(spliceSlice(num, 3, 0, ' '));
-          // Add spacing after first group of three
-          } else if (num.length > 7 && num.charAt(7) !== ' ') {
-            $phone.val(spliceSlice(num, 7, 0, ' '));
-          // Add spacing after next group of four
-          } else if (num.length > 12 && num.charAt(12) !== ' ') {
-            $phone.val(spliceSlice(num, 12, 0, ' '));
-          }
-        }
-      }
-
-      /**
-       * spliceSlice is a utility function that takes a string, an index in that string,
-       * the amount (count) of characters starting from that index you want to remove,
-       * and the character (add) you want to be inserted into the string.
-       */
-      function spliceSlice(str, index, count, add) {
-        return str.slice(0, index) + (add || "") + str.slice(index + count);
-      }
 
       function checkPaymentForm(preparePayment, e) {
           if ($("#isAgreementSelected").is(':checked'))
-              {
-                  var phone1=$("#id_local_number").val();
-                  var phone2=$("#id_roaming_number").val();
-
-                if(phone1.length > 0 && phone1.match(legal_local_number) == null)
+              {   
+                var $phone1 = $("#id_local_number");
+                var $phone2 = $("#id_roaming_number");
+                
+                // If phone inputs are filled, check if they are actually valid
+                if($phone1.val() && !$phone1.intlTelInput("isValidNumber"))
                 {
                     $("#phone_warning").hide();
                     $("#roaming_phone_warning").hide();
                     e.preventDefault();
                     $("#id_local_number").css("border-color","red");
-                    $("#local_phone_warning").attr("style","width:180px; display:inline-block;");
+                    $("#local_phone_warning").attr("style","width:180px; display:block;");
                     return;
                 }
                 else
@@ -279,12 +223,12 @@
                     $("#local_phone_warning").hide();
                 }
 
-                if(phone2.length > 0 && phone2.match(legal_roaming_number) == null)
+                if($phone2.val() && !$phone2.intlTelInput("isValidNumber"))
                 {
                     $("#phone_warning").hide();
                     e.preventDefault();
                     $("#id_roaming_number").css("border-color","red");
-                    $("#roaming_phone_warning").attr("style","width:200px; margin-left:200px; display:inline-block;");
+                    $("#roaming_phone_warning").attr("style","width:200px; margin-left:200px; display:block;");
                     return;
                 }
                 else
@@ -292,18 +236,18 @@
                     $("#roaming_phone_warning").hide();
                 }
 
-                if(phone1)
+                if($phone1.val())
                 {
-                    $("#id_phone_number").val(phone1+',');
-                    if(phone2)
+                  $("#id_phone_number").val($phone1.intlTelInput("getNumber") + ',');
+                    if($phone2.val())
                     {
-                        $("#id_phone_number").val(phone1+','+phone2);
+                        $("#id_phone_number").val($phone1.intlTelInput("getNumber") + ',' + $phone2.intlTelInput("getNumber"));
                     }
                     $("#phone_warning").hide();
                 }
-                else if(phone2)
+                else if($phone2.val())
                 {
-                    $("#id_phone_number").val(','+phone2);
+                    $("#id_phone_number").val(',' + $phone2.intlTelInput("getNumber"));
                     $("#phone_warning").hide();
                 }
                 else
@@ -329,32 +273,25 @@
                 e.preventDefault();
                 $("#id_term_condition").attr("style","display:inline-block;");
             }
-    }
+      }
+   
 
     $(document).ready(function(){
         mixpanel.track("checkout");
-        $("#id_promo_code").attr("class", "form-control");
-        $("#id_card_number").attr("class", "form-control");
-        $("#id_expiration_0").attr("class", "btn btn-default dropdown-toggle");
-        $("#id_expiration_1").attr("class", "btn btn-default dropdown-toggle");
-        $("#id_cvv").attr("class", "form-control");
-        $("#id_first_name").attr("class", "form-control");
-        $("#id_last_name").attr("class", "form-control");
-        $("#id_first_name").attr("style", "width:auto;");
-        $("#id_last_name").attr("style", "width:auto;");
-        $("#id_street1").attr("class", "form-control");
-        $("#id_street2").attr("class", "form-control");
-        $("#id_city_town").attr("class", "form-control");
-        $("#id_state").attr("class", "form-control");
-        $("#id_state").attr("size", "4");
-        $("#id_postcode").attr("class", "form-control");
-        $("#id_postcode").attr("size", "4");
-        $("#id_country").attr("class", "btn btn-default dropdown-toggle");
 
         $("#id_expiration_1 :nth-child(2)").prop('selected', true);
         
-        $('#id_local_number').keyup(function() { formatPhone($(this), 'local') });
-        $('#id_roaming_number').keyup(function() { formatPhone($(this), 'roaming') });
+        $('#id_local_number').intlTelInput({
+          onlyCountries: ['au', 'nz'],
+          utilsScript: '{% static "app/scripts/intlTelInputUtils.js" %}'
+        });
+
+        $('#id_roaming_number').intlTelInput({
+          excludeCountries: ['au', 'nz'],
+          initialCountry: 'cn',
+          utilsScript: '{% static "app/scripts/intlTelInputUtils.js" %}'
+        })
+        
         var phone = $("#id_phone_number").val();
         if(phone)
         {

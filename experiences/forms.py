@@ -587,21 +587,21 @@ class BookingConfirmationForm(forms.Form):
     adult_number = forms.IntegerField(label="People")
     child_number = forms.IntegerField(label="Child",initial=0)
     status = forms.CharField(initial="Requested")
-    promo_code = forms.CharField(required=False)
+    promo_code = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
 
     #card_number = CreditCardField(required=False, label="Card Number")
     #expiration = CCExpField(required=False, label="Expiration")
     #cvv = forms.IntegerField(required=False, label="CVV Number",
     #    max_value=9999, widget=forms.TextInput(attrs={'size': '4'}))
 
-    first_name = forms.CharField(max_length=50)
-    last_name = forms.CharField(max_length=50)
-    street1 = forms.CharField(max_length=50, required = False)
-    street2 = forms.CharField(max_length=50, required = False)
-    city_town = forms.CharField(max_length=20, required = False)
-    state = forms.CharField(max_length=10, required = False)
-    country = forms.ChoiceField(choices=Country, required = False)
-    postcode = forms.CharField(max_length=4, required = False)
+    first_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'form-control', 'style':'width:auto;'}))
+    last_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'form-control', 'style':'width:auto;'}))
+    street1 = forms.CharField(max_length=50, required = False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    street2 = forms.CharField(max_length=50, required = False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    city_town = forms.CharField(max_length=20, required = False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    state = forms.CharField(max_length=10, required = False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    country = forms.ChoiceField(choices=Country, required = False, widget=forms.Select(attrs={'class':'form-control'}))
+    postcode = forms.CharField(max_length=4, required = False, widget=forms.TextInput(attrs={'class':'form-control'}))
     phone_number = forms.CharField(max_length=50, required=True)
 
     coupon_extra_information = forms.CharField(max_length=500, required=False)
@@ -851,8 +851,8 @@ AgeLimit=((1,_('None')),(2,_('Famili with elderly')),(3,_('Famili with children'
 
 class CustomItineraryRequestForm(forms.Form):
     destinations = forms.CharField(required=True, widget=forms.TextInput())
-    start_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':_('Please select')}))
-    end_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder':_('Please select')}))
+    start_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'readonly': 'true', 'class': 'form-control', 'placeholder':_('Please select')}))
+    end_date = forms.DateTimeField(required=True, initial=pytz.timezone(settings.TIME_ZONE).localize(datetime.now()), widget=forms.TextInput(attrs={'readonly': 'true', 'class': 'form-control', 'placeholder':_('Please select')}))
     guests_adults = forms.ChoiceField(choices=Guest_Number_Min, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=1)
     guests_children = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
     guests_infants = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
