@@ -7,7 +7,7 @@
 <title>{% trans 'Request a Custom Itinerary' %}</title>
 <link href="//cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.7.6/jquery.fullPage.min.css" rel="stylesheet"/>
 <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
-<link href="{% static 'experiences/content/itinerary-request2.css' %}" rel="stylesheet"/>
+<link href="{% static 'experiences/content/itinerary-request.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
@@ -216,7 +216,7 @@ $(document).ready(function() {
 		showActiveTooltip: true,
 		anchors: ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8', 'section9'],
 		navigationTooltips: ['{% trans "Start" %}', '{% trans "Destinations" %}', '{% trans "Dates" %}', '{% trans "Guests" %}', '{% trans "Interests" %}', '{% trans "Whats Included" %}', '{% trans "Extras" %}', '{% trans "Contact" %}', '{% trans "Done!" %}'],
-		sectionsColor: ['#f7f7f7', '#f3f3f3', '#7BAABE', 'whitesmoke', '#f7f7f7'],
+		sectionsColor: '#f7f7f7',
 		onLeave: function(index, nextIndex, direction) {
 			if (nextIndex == 2 && direction == 'up') {
 				$('#nav-up').attr('disabled', 'disabled');
@@ -311,7 +311,6 @@ $(document).ready(function() {
 	});
 
 	$('#submit-btn').on('click', function() {
-		$(this).html('Submitting<i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>').attr('disabled', 'disabled');
 		if (validateForm()) {
 			$.ajax({
 					url: '/itinerary/request/',
@@ -340,11 +339,7 @@ $(document).ready(function() {
 				.done(function() {
 					$('#success-page').html(
               '<h1>{% trans "Your request has been submitted!" %}</h1><h2>{% trans "Please keep an eye on our phone call within 4 hours. We will call you between 9am - 9pm Beijing time." %}</h2>'
-					).css({
-						'position': 'fixed',
-						'width': '100%',
-						'height': '100%',
-					});
+					);
 					$('#fp-nav').fadeOut();
 					$('#status-bar').slideDown();
 				})

@@ -13,173 +13,274 @@
   '../../components/slider';
 
 body {
-  overflow: hidden;
-  padding-top: 50px;
-  @include media('<tablet') {
-    overflow-x: hidden;
-    overflow-y: scroll;
-  }
+  color: $dark-grey;
+}
+
+.side-banner {
+  display: none;
+}
+
+.footer {
+  display: none;
 }
 
 h1 {
-  font-family: $font-stack-homepage;
-  font-size: 48px;
   @include media('<tablet') {
-    font-size: 32px;
+    font-size: 28px;
   }
 }
 
-h2 {
-  @include media('<tablet') {
-    font-size: 16px;
-  }
+.display {
+  color: white;
+  text-shadow: 1px 1px 8px black;
 }
 
-.container {
-  padding: 50px 0;
-  @include media('<tablet') {
-    padding: 0;
-  }
+.loading {
+  position: absolute;
+  top: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(51,51,51,1);
 }
 
-.full-height {
-  height: 100vh;
-  padding-top: 30px;
-  padding-bottom: 30px;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+.status-bar {
   position: relative;
-  @include media('<tablet') {
-    overflow-x: hidden;
-    height: auto;
-    padding: 0;
-  }
+  display: none;
+  width: 100%;
+  height: 50px;
+  background-color: white;
+  position: fixed;
+  bottom: 0;
+  margin: 0;
+  z-index: 100000000;
+  border-top: 1px solid $light-grey;
+  @include card(4);
+}
 
-  .btn {
-    min-width: 120px;
-    height: 40px;
-    border-radius: 2px;
-    @include card(1);
+.status-line {
+  margin-top: 15px;
+  @include media('<phablet') {
+    font-size: 14px;
+    margin-top: 10px;
+    max-width: 250px;
   }
-  .btn-bottom {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    @include media('<tablet') {
-      position: relative;
-      margin: 20px auto;
-    }
-  }
-  .btn-top {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .btn-secondary {
+}
+
+.nav-btns {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.main-btn {
+  margin-top: 100px;
+  font-size: 18px;
+  font-weight: 300;
+  border-radius: 3px;
+  height: 50px;
+  width: 120px;
+}
+
+.asterisk {
+  font-size: 32px;
+  color: $pink;
+  transition: color 0.4s;
+}
+
+#fp-nav {
+  @include media('<desktop') {
     display: none;
   }
 }
-.middle {
-  color: white;
-  width: 500px;
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  text-shadow: 1px 1px 8px black;
-  -webkit-animation-delay: 1s; /* Chrome, Safari, Opera */
-          animation-delay: 1s;
-  @include media('<tablet') {
-    padding: 15px;
-    transform: none;
-    top: auto;
-  }
+
+.fp-tooltip {
+  color: $dark-grey !important;
+  top: -3px !important;
+  font-weight: bold;
 }
 
-.center-form {
-  @include media('>=tablet') {
-    width: 400px;
-    padding: 0;
-  }
-}
-
-.panel {
-  @include card(1);
-  border: 0;
+#fp-nav.fp-show-active a.active+.fp-tooltip {
   display: none;
-  position: relative;
-  h2 {
-    font-size: 24px;
-    font-family: $font-stack-homepage;
-    display: inline;
-    vertical-align: middle;
-  }
-  p {
-    margin-top: 10px;
+}
+#fp-nav.fp-show-active a.active+span:hover {
+  .fp-tooltip {
+    display: block;
   }
 }
 
-.header-icon {
-  margin-right: 10px;
-  width: 32px;
-  height: 32px;
+#fp-nav ul li {
+  margin: 15px 7px 15px 7px;
 }
 
-.form-control {
-  width: 100%;
+#fp-nav ul li a span {
+  background-color: $light-grey;
+  margin: -5px 0 0 -5px;
+  width: 10px;
+  height: 10px;
+  &:hover {
+    background-color: $primary-color;
+  }
+}
+
+#fp-nav ul li a.active span {
+  background-color: $primary-color !important;
+  margin: -8px 0 0 -8px !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.btn-square {
+  width: 40px;
   height: 40px;
 }
 
-select {
-  min-width: 170px;
+.container {
+  @include media('>desktop') {
+    width: 780px;
+  }
 }
 
-.progress-bar {
-  position: fixed;
-  height: 150px;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: none;
+.row {
+  text-align: center;
+  margin: 0;
 }
 
-.indicator {
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  margin-bottom: 20px;
-  background: white;
-  color: $medium-grey;
-  border-radius: 100px;
+.box {
+  position: relative;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 150px;
+  height: 100px;
+  float: left;
+  margin: 15px 15px 15px 0;
   @include card(1);
-}
-
-.active {
-  color: white;
-  background: $primary-color;
-}
-
-.alert {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  min-width: 400px;
-  margin: 0 auto;
-  display: none;
-  @include media('<tablet') {
-    min-width: 0;
+  @include media('<phone') {
+    width: 100px;
+    height: 100px;
+    margin: 10px 10px 0 0;
+  }
+  .overlay {
+    position: relative;
     width: 100%;
-    right: 0;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    transition: background-color 0.4s;
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(0,0,0,0.2);
+    }
+    .display {
+      position: absolute;
+      margin: 0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+  .selected {
+    border: 3px solid $primary-color;
   }
 }
 
-#intro {
+.circle {
+  display: inline-block;
+  overflow: hidden;
+  margin: -5px 15px;
+  width: 15vh;
+  height: 15vh;
+  border-radius: 100px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 15vh;
+  color: $slate-grey;
+  cursor: pointer;
+  transition: width 0.4s, height 0.4s, line-height 0.4s;
+  @include card(1);
   @include media('<tablet') {
-    margin-bottom: 20px;
+    width: 100px;
+    height: 100px;
+    line-height: 80px;
+    margin: -5px 5px;
+  }
+  @include media('<phone') {
+    width: 70px;
+    height: 70px;
+    line-height: 70px;
+    margin: 0 3px;
+  }
+  @include media('>desktop') {
+    &:hover {
+      width: 17vh;
+      height: 17vh;
+      line-height: 17vh;
+    }
   }
 }
+
+.unselected {
+  background-color: $slate-grey !important;
+  color: $off-white;
+  font-weight: 100;
+}
+
+.form-group {
+  display: inline-block;
+  margin-right: 20px;
+  width: 180px;
+  text-align: left;
+  @include media('<phablet') {
+    margin-right: 10px;
+    width: 155px;
+  }
+  label {
+    font-weight: 300;
+    font-size: 20px;
+  }
+  select {
+    width: 100%;
+  }
+}
+
+.text-input {
+  font-size: 24px;
+  background-color: inherit;
+  border: 0;
+  width: 100%;
+  color: #7BAABE;
+  &:focus {
+    border: 0;
+    outline: none;
+  }
+}
+
+.select-expanded {
+  cursor: pointer;
+  font-size: 18px;
+  background-color: inherit;
+  border: 0;
+  color: $medium-grey;
+  @include media('>phablet') {
+    height: 120px !important;
+  }
+  &:focus {
+    border: 0;
+    outline: none;
+  }
+  option {
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+.col-sm-6 {
+  padding: 0;
+  text-align: left;
+}
+
 
 .ellipsis i {
     opacity: 0;
@@ -205,25 +306,21 @@ select {
     100% { opacity: 1; }
 }
 
-.slider {
-  width: 80%;
-}
-
-.slider-value {
-  border: 0;
-  width: 65px;
-}
-
-.ui-slider-handle {
-  width: 15px;
-  height: 15px;
-  top: -8px;
-}
-
-.col-sm-3 {
-  text-align: center;
-  margin-top: 10px;
-  p {
-    margin: 0;
+#date-section > .fp-tableCell,
+#city-section > .fp-tableCell,
+#interests-section > .fp-tableCell {
+  @include media('<phablet') {
+    vertical-align: top;
   }
+}
+
+#date-section > .fp-tableCell {
+  @include media('>=phablet') {
+    position: relative;
+    top: -50px;
+  }
+}
+
+.zopim {
+  display: none;
 }
