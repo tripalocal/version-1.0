@@ -61,3 +61,16 @@
   color: $pink;
 }
 
+.btn-selectable {
+  color: $light-grey;
+  border: 1px solid $light-grey;
+  height: 40px;
+  line-height: 40px;
+  margin: 0 15px 15px 0;
+  padding: 0 12px;
+  &.selected {
+    border: 1px solid $primary-color;
+    background-color: white;
+    color: $primary-color;
+  }
+}
