@@ -58,13 +58,13 @@ Locations = [(_('Australia'), [('Melbourne', _('Melbourne'), _('Victoria')), ('S
                            ('Goldcoast', _('Gold Coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
                            ('Adelaide', _('Adelaide'), _('South Australia')),
                            ('Perth', _('Perth'), _('West Australia')),
-                           #('Darwin', _('Darwin'), _('Northern Territory')),
-                           #('Alicesprings', _('Alice Springs'), _('Northern Territory'))
+                           ('Darwin', _('Darwin'), _('Northern Territory')),
+                           ('Alicesprings', _('Alice Springs'), _('Northern Territory'))
                            ]),
-             (_('New Zealand'), [#('Christchurch', _('Christchurch'), _('Canterbury')),
+             (_('New Zealand'), [('Christchurch', _('Christchurch'), _('Canterbury')),
                              ('Queenstown', _('Queenstown'), _('Otago')),
-                             #('Auckland', _('Auckland'), _('Auckland')),
-                             #('Wellington', _('Wellington'), _('Wellington'))
+                             ('Auckland', _('Auckland'), _('Auckland')),
+                             ('Wellington', _('Wellington'), _('Wellington'))
                              ])]
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),)#('english;translation','English+Chinese translation'),
