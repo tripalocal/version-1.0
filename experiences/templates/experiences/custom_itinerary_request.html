@@ -35,11 +35,11 @@
       <div class="btn btn-clear btn-selectable city">{% trans 'Brisbane' %}</div>
       <div class="btn btn-clear btn-selectable city">{% trans 'Cairns' %}</div>
       <div class="btn btn-clear btn-selectable city">{% trans 'Adelaide' %}</div>
-      <div class="btn btn-clear btn-selectable city">{% trans 'Tasmania' %}</div>
-      <div class="btn btn-clear btn-selectable city">{% trans 'Alice Springs' %}</div>
+      <div class="btn btn-clear btn-selectable city">{% trans 'Hobart' %}</div>
       <div class="btn btn-clear btn-selectable city">{% trans 'Darwin' %}</div>
       <div class="btn btn-clear btn-selectable city">{% trans 'Perth' %}</div>
-      <div class="btn btn-clear btn-selectable city">{% trans 'New Zealand' %}</div>
+      <div class="btn btn-clear btn-selectable city">{% trans 'Queenstown' %}</div>
+      <div class="btn btn-clear btn-selectable city">{% trans 'Auckland' %}</div>
       <button class="btn btn-primary main-btn next-btn animated infinite pulse">{% trans "Next" %}</button>
     </div>
   </div>
@@ -109,7 +109,7 @@
         <input id="accommodation" type="hidden">
         <div class="btn btn-clear btn-selectable option">{% trans "none" %}</div>
         <div class="btn btn-clear btn-selectable option">{% trans "3 star" %}</div>
-        <div class="btn btn-clear btn-selectable option">{% trans "4 star" %} </div>
+        <div class="btn btn-clear btn-selectable option">{% trans "4 star" %}</div>
         <div class="btn btn-clear btn-selectable option">{% trans "5 star" %}</div>
       </div>
       <div class="form-inline" id="form-flight">
@@ -199,7 +199,7 @@ $(document).ready(function() {
     });
     $("#id_end_date").datetimepicker({
       format: 'YYYY-MM-DD', locale: 'zh-CN',
-      useCurrent: false,
+      minDate: moment(),
       ignoreReadonly: true,
       inline: true,
       keepOpen: true,
@@ -211,12 +211,14 @@ $(document).ready(function() {
       if ($('#id_end_date').val()) {
         $('#date-section').find('.next-btn').attr('style', 'display:block');
       }
+      updateBudget();
     });
     $("#id_end_date").on("dp.change", function (e) {
       $('#id_start_date').data("DateTimePicker").maxDate(e.date);
       if ($('#id_start_date').val()) {
         $('#date-section').find('.next-btn').attr('style', 'display:block');
       }
+      updateBudget();
     });
   }
   else {
@@ -230,7 +232,7 @@ $(document).ready(function() {
     });
     $("#id_end_date").datetimepicker({
       format: 'YYYY-MM-DD',
-      useCurrent: false,
+      minDate: moment(),
       ignoreReadonly: true,
       inline: true,
       keepOpen: true,
@@ -242,12 +244,14 @@ $(document).ready(function() {
       if ($('#id_end_date').val()) {
         $('#date-section').find('.next-btn').attr('style', 'display:block');
       }
+      updateBudget();
     });
     $("#id_end_date").on("dp.change", function (e) {
       $('#id_start_date').data("DateTimePicker").maxDate(e.date);
       if ($('#id_start_date').val()) {
         $('#date-section').find('.next-btn').attr('style', 'display:block');
       }
+      updateBudget();
     });
   }
   
@@ -271,9 +275,12 @@ $(document).ready(function() {
 	});
   
   // Init budget tooltip
-  var tooltipPlacement = $(window).width > 864 ? 'right' : 'top';
+  var tooltipPlacement = 'right';
+  if ($(window).width() < 800) {
+    tooltipPlacement = 'top';
+  }
   $('#budget-mount').tooltip({
-    placement: 'right',
+    placement: tooltipPlacement,
     trigger: 'manual',
     template: '\
       <div class="tooltip" role="tooltip"> \
@@ -371,6 +378,7 @@ $(document).ready(function() {
   // Bind change events
   $('#id_destinations').change(function() {
     $('#city-section').find('.next-btn').attr('style', 'display:block');
+    updateBudget();
   });
   $('#id_interests').change(function() {
     $('#interests-section').find('.next-btn').attr('style', 'display:block');
@@ -551,21 +559,23 @@ function updateBudget() {
     $('#budget-mount').attr('data-original-title', '{% trans "Our custom itinerary service starts from $1000"%}');
     $('#budget').attr('style', 'background-color:#FF8F93;');
     $('.tooltip-arrow').attr('style', 'border-right-color:#FF8F93');
+    $('#budget-tip').removeAttr('style');
   }
 	else {
-    $('#budget-mount').attr('data-original-title', '{% trans "Estimated cost: $" %}' + Math.round((min/guests)*currencyConversion) + '+ {% trans "per person ($" %}' + min*currencyConversion + '+ {% trans "in total" %})');
+    $('#budget-mount').attr('data-original-title', '{% trans "Starts from $" %}' + Math.round((min/guests)*currencyConversion) + '{% trans "/person" %}');
     $('#budget').removeAttr('style');
     $('.tooltip-arrow').removeAttr('style');
-	}
-  if (guests < 6) {
-    var savings = Math.round((min/guests)*currencyConversion) - Math.round(((min/(guests+2))+(accomPrice/2)+(flightPrice))*currencyConversion);
-    if (savings > 0) {
-      $('#budget-tip').attr('style', 'display:inline-block;').text("{% trans 'Save $' %}" + (savings*2) + " {% trans 'by adding 2 extra people!' %}");
+	
+    if (guests < 6) {
+      var savings = Math.round((min/guests)*currencyConversion) - Math.round(((min/(guests+2))+(accomPrice/2)+(flightPrice))*currencyConversion);
+      if (savings > 0) {
+        $('#budget-tip').attr('style', 'display:inline-block;').text("{% trans 'Save $' %}" + savings + "{% trans '/person for a group of' %} " + (guests+2));
+      } else {
+        $('#budget-tip').attr('style', 'display:inline-block;').text("{% trans 'Add 2 extra people for only $' %}" + Math.abs(savings) + " each!");
+      }
     } else {
-      $('#budget-tip').attr('style', 'display:inline-block;').text("{% trans 'Add 2 extra people for only $' %}" + Math.abs(savings*2) + "!");
+      $('#budget-tip').removeAttr('style');
     }
-  } else {
-    $('#budget-tip').removeAttr('style');
   }
   $('#budget-mount').tooltip('show');
 }
