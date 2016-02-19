@@ -163,14 +163,6 @@ h1 {
     100% { opacity: 1; }
 }
 
-#date-section > .fp-tableCell,
-#city-section > .fp-tableCell,
-#interests-section > .fp-tableCell {
-  @include media('<phablet') {
-    vertical-align: top;
-  }
-}
-
 #date-section { 
   .form-group {
     position: relative;

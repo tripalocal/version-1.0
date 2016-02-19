@@ -361,7 +361,8 @@ $(document).ready(function() {
 					$('#status-bar').slideDown();
 				})
 				.fail(function() {
-					
+          $('#succes-page').find('h1').text('{% trans "There was an error with sending your request" %}');
+          $('#success-page').find('h2').text('{% trans "Please try again later" %}');
 				});
 		}
 		$(this).removeAttr('disabled').html('Submit');
@@ -470,7 +471,7 @@ function updateBudget() {
 				max += 1000;
 			}
 			break;
-		case 'entire trip':
+		case 'whole trip':
 			if (guests < 5) {
 				min += 500;
 				max += 1200;
