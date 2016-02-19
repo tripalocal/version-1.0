@@ -3261,6 +3261,7 @@ def custom_itinerary_request(request):
                 "<p>Accommodation: " + data.get('accommodation') + "</p>" + \
                 "<p>Car driver: " + data.get('car_driver') + "</p>" + \
                 "<p>National flight: " + data.get('national_flight') + "</p>" + \
+                "<p>Airport transfer: " + data.get('airport_transfer') + "</p>" + \
                 "<p>Service language: " + data.get('service_language') + "</p>" + \
                 "<h3>Requirements</h3><p>" + data.get('requirements') + "</p>" + \
                 "<h3>Contact details</h3>" + \
