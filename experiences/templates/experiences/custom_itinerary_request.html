@@ -16,16 +16,6 @@
 {% endfor %}
 <div class="loading"></div>
 
-<div class="status-bar" id="status-bar">
-  <div class="container">
-    <h2 class="status-line" id="budget">{% trans "Estimated cost: Please fill in more fields for a live update." %}</h2>
-  </div>
-  <div class="nav-btns">
-    <button class="btn btn-primary btn-square" id="nav-up" disabled><span class="glyphicon glyphicon-chevron-up"></span></button>
-    <button class="btn btn-primary btn-square" id="nav-down"><span class="glyphicon glyphicon-chevron-down"></span></button>
-  </div>
-</div>
-
 <div id="fullpage">
   <div class="section" id="intro">
     <div class="container">
@@ -38,15 +28,17 @@
   <div id="city-section" class="section">
     <div class="container">
       <h1>{% trans 'Choose some locations you would like to visit on this trip.' %} <span class="asterisk">*</span></h1>
-        <div class="btn btn-clear city">{% trans 'Melbourne' %}</div>
-        <div class="btn btn-clear city">{% trans 'Sydney' %}</div>
-        <div class="btn btn-clear city">{% trans 'Gold Coast' %}</div>
-        <div class="btn btn-clear city">{% trans 'Brisbane' %}</div>
-        <div class="btn btn-clear city">{% trans 'Cairns' %}</div>
-        <div class="btn btn-clear city">{% trans 'Tasmania' %}</div>
-        <div class="btn btn-clear city">{% trans 'Alice Springs' %}</div>
-        <div class="btn btn-clear city">{% trans 'Darwin' %}</div>
-        <div class="btn btn-clear city">{% trans 'Perth' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'Melbourne' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'Sydney' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'Gold Coast' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'Brisbane' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'Cairns' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'Adelaide' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'Tasmania' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'Alice Springs' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'Darwin' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'Perth' %}</div>
+        <div class="btn btn-clear btn-selectable city">{% trans 'New Zealand' %}</div>
     </div>
   </div>
 
@@ -79,68 +71,59 @@
   <div id="interests-section" class="section">
     <div class="container">
       <h1>{% trans "What kind of things are you interested in?<br>Check the topics that interest you." %}</h1>
-      <div class="btn btn-clear interest">{% trans 'food & wine' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'photography' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'history & culture' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'architecture' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'for couples' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'outdoor & nature' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'shopping' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'sports & leisure' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'extreme fun' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'events' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'health & beauty' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'livability research' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'education' %}<span class="glyphicon glyphicon-plus"></span></div>
-      <div class="btn btn-clear interest">{% trans 'local experiences' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'food & wine' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'photography' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'history & culture' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'architecture' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'for couples' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'outdoor & nature' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'shopping' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'sports & leisure' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'extreme fun' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'events' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'health & beauty' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'livability research' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'education' %}<span class="glyphicon glyphicon-plus"></span></div>
+      <div class="btn btn-clear btn-selectable interest">{% trans 'local experiences' %}<span class="glyphicon glyphicon-plus"></span></div>
     </div>
   </div>
 
   <div class="section">
-    <div class="container">
-      <h1>{% trans "What's included" %} <span class="asterisk">*</span></h1>
-      <div class="form-group">
+    <div class="container" id="whats-included">
+      <h1 id="budget-mount" data-toggle="tooltip" title="{% trans 'Please fill in more fields for a live update.' %}">{% trans "What's included" %} <span class="asterisk">*</span></h1>
+      <div class="form-inline">
           <label>{% trans 'Car + Driver' %}</label>
-          <select id="car-driver" class="select-expanded" size="4"> 
-            <option value="please select" selected>{% trans 'please select' %}</option>
-            <option value="infrequent">{% trans 'infrequent' %}</option>
-            <option value="frequent">{% trans 'frequent' %}</option>
-            <option value="entire trip">{% trans 'entire trip' %}</option>
-          </select>
+          <input id="car-driver" type="hidden">
+          <div class="btn btn-clear btn-selectable option">{% trans "none" %}</div>
+          <div class="btn btn-clear btn-selectable option">{% trans "infrequent" %}</div>
+          <div class="btn btn-clear btn-selectable option">{% trans "frequent" %}</div>
+          <div class="btn btn-clear btn-selectable option">{% trans "whole trip" %}</div>
         </div>
-        <div class="form-group">
+        <div class="form-inline" id="form-accommodation">
           <label>{% trans 'Accommodation' %}</label>
-          <select id="accommodation" class="select-expanded" size="5">
-            <option value="please select" selected>{% trans 'please select' %}</option>
-            <option value="please select">{% trans 'none' %}</option>
-            <option value="3 star">{% trans '3 star' %}</option>
-            <option value="4 star">{% trans '4 star' %}</option>
-            <option value="5 star">{% trans '5 star' %}</option>
-          </select>
+          <input id="accommodation" type="hidden">
+          <div class="btn btn-clear btn-selectable option">{% trans "none" %}</div>
+          <div class="btn btn-clear btn-selectable option">{% trans "3 star" %}</div>
+          <div class="btn btn-clear btn-selectable option">{% trans "4 star" %} </div>
+          <div class="btn btn-clear btn-selectable option">{% trans "5 star" %}</div>
         </div>
-        <div class="form-group">
+        <div class="form-inline" id="form-flight">
           <label>{% trans 'National Flight' %}</label>
-          <select id="national-flight" class="select-expanded" size="3">
-            <option value="please select" selected>{% trans 'please select' %}</option>
-            <option value="none">{% trans 'none' %}</option>
-            <option value="economy">{% trans 'economy' %}</option>
-          </select>
+          <input id="national-flight" type="hidden"> 
+          <div class="btn btn-clear btn-selectable option">{% trans "none" %}</div>
+          <div class="btn btn-clear btn-selectable option">{% trans "economy" %}</div>
         </div>
-        <div class="form-group">
+        <div class="form-inline" id="form-language">
           <label>{% trans 'Service Language' %}</label>
-          <select id="service-language" class="select-expanded" size="3">
-            <option value="please select" selected>{% trans 'please select' %}</option>
-            <option value="chinese">{% trans 'chinese' %}</option>
-            <option value="english">{% trans 'english' %}</option>
-          </select>
+          <input id="service-language" type="hidden">
+          <div class="btn btn-clear btn-selectable option">{% trans 'chinese' %}</div>
+          <div class="btn btn-clear btn-selectable option">{% trans 'english' %}</div>
         </div>
-        <div class="form-group">
+        <div class="form-inline" id="form-transfer">
           <label>{% trans 'Airport Transfer' %}</label>
-          <select id="airport-transfer" class="select-expanded" size="3">
-            <option value="please select" selected>{% trans 'please select' %}</option>
-            <option value="none">{% trans 'none' %}</option>
-            <option value="yes">{% trans 'yes' %}</option>
-          </select>
+          <input id="airport-transfer" type="hidden">
+          <div class="btn btn-clear btn-selectable option">{% trans 'none' %}</div>
+          <div class="btn btn-clear btn-selectable option">{% trans 'yes' %}</div>
         </div>
     </div>
   </div>
@@ -264,27 +247,22 @@ $(document).ready(function() {
 		navigationTooltips: ['{% trans "Start" %}', '{% trans "Destinations" %}', '{% trans "Dates" %}', '{% trans "Guests" %}', '{% trans "Interests" %}', '{% trans "Whats Included" %}', '{% trans "Extras" %}', '{% trans "Contact" %}', '{% trans "Done!" %}'],
 		sectionsColor: '#f7f7f7',
 		onLeave: function(index, nextIndex, direction) {
-			if (nextIndex == 2 && direction == 'up') {
-				$('#nav-up').attr('disabled', 'disabled');
-			} else {
-				$('#nav-up').removeAttr('disabled');
-			}
-			if (nextIndex == 9 && direction == 'down') {
-				$('#nav-down').attr('disabled', 'disabled');
-			} else {
-				$('#nav-down').removeAttr('disabled');
-			}
-			if (index == 1 && direction == 'down') {
-				$('#status-bar').slideDown();
-				$('#nav-up').attr('disabled', 'disabled');
-			}
-			if (nextIndex == 1 && direction == 'up') {
-				$('#status-bar').slideUp();
-			}
 		}
 	});
-
-
+  
+  // Init budget tooltip
+  var tooltipPlacement = $(window).width > 864 ? 'right' : 'top';
+  $('#budget-mount').tooltip({
+    placement: 'right',
+    trigger: 'manual',
+    template: '\
+      <div class="tooltip" role="tooltip"> \
+        <div class="tooltip-arrow"></div> \
+        <div class="tooltip-inner" id="budget"></div> \
+        <div class="tooltip-extra" id="budget-tip"></div> \
+      </div> \
+    '
+  });
 
 	// Show page when init is done
 	$('.loading').fadeOut('slow');
@@ -293,11 +271,13 @@ $(document).ready(function() {
 	$('#start-btn').on('click', function() {
 		$.fn.fullpage.moveSectionDown();
 	});
+
 	$('.city').on('click', function() {
 		var $this = $(this);
 		$this.hasClass('selected') ? $this.removeClass('selected') : $this.addClass('selected');
 		updateCities();
 	});
+
 	$('.interest').on('click', function() {
 		$this = $(this);
     var $icon = $this.children('.glyphicon');
@@ -305,16 +285,23 @@ $(document).ready(function() {
     $icon.hasClass('glyphicon-plus') ? $icon.addClass('glyphicon-ok').removeClass('glyphicon-plus') : $icon.addClass('glyphicon-plus').removeClass('glyphicon-ok');
 		updateInterests();
 	});
-	$('#nav-up').on('click', function() {
-		$.fn.fullpage.moveSectionUp();
-	});
-	$('#nav-down').on('click', function() {
-		$.fn.fullpage.moveSectionDown();
-	});
-	
-	$('select').on('change',function() {
-		updateBudget();
-	});
+  
+  $('#whats-included').children('.form-inline').each(function() {
+    var $field = $(this);
+    var $input = $field.children('input');
+    var options = $field.children('.option');
+    options.each(function() {
+      var $option = $(this);
+      $option.click(function() {
+        options.each(function() {
+          $(this).removeClass('selected');
+        });
+        $option.addClass('selected');
+        $input.val($option.text());
+        updateBudget();
+      });
+    });
+  });
 
 	$('#submit-btn').on('click', function() {
 		if (validateForm()) {
@@ -367,15 +354,20 @@ function updateBudget() {
 	var cities = $('#id_destinations').val().split(',').length;
 	var min = 0;
 	var max = 0;
-  
+  var accomPrice = 0;
+  var flightPrice = 0;
+
   // Check if date fields entered:
   if (isNaN(days)) {
+    $('#budget-mount').tooltip('show');
     return;
   }
 
 	// car+driver
-	switch ($('#car-driver option:selected').val()) {
-		case 'please select':
+	switch ($('#car-driver').val()) {
+		case '':
+			break;
+		case 'none':
 			break;
 		case 'infrequent':
 			if (guests < 5) {
@@ -416,28 +408,31 @@ function updateBudget() {
 	}
 
 	// accommodation
-	switch ($('#accommodation option:selected').val()) {
-		case 'please select':
+	switch ($('#accommodation').val()) {
+		case '':
 			break;
 		case 'none':
 			break;
 		case '3 star':
 			min += (Math.round(guests / 2) * 150);
 			max += (Math.round(guests / 2) * 300);
+      accomPrice = 150;
 			break;
 		case '4 star':
 			min += (Math.round(guests / 2) * 200);
 			max += (Math.round(guests / 2) * 400);
+      accomPrice = 200;
 			break;
 		case '5 star':
 			min += (Math.round(guests / 2) * 300);
 			max += (Math.round(guests / 2) * 600);
+      accomPrice = 300;
 			break;
 	}
 
 	// service language
-	switch ($('#service-language option:selected').val()) {
-		case 'please select':
+	switch ($('#service-language').val()) {
+		case '':
 			break;
 		case 'english':
 			break;
@@ -452,19 +447,20 @@ function updateBudget() {
 	//// FOR WHOLE TRIP BELOW
 
 	// national flights
-	switch ($('#national-flight option:selected').val()) {
-		case 'please select':
+	switch ($('#national-flight').val()) {
+		case '':
 			break;
 		case 'none':
 			break;
 		case 'economy':
 			min += ((cities - 1) * guests * 200);
 			max += ((cities - 1) * guests * 400);
+      flightPrice = 200;
 	}
 
 	// airport transfer
-	switch ($('#airport-transfer option:selected').val()) {
-		case 'please select':
+	switch ($('#airport-transfer').val()) {
+		case '':
 			break;
 		case 'none':
 			break;
@@ -474,14 +470,26 @@ function updateBudget() {
 	}
 
   if (min < 1000) {
-    $('#budget').text('{% trans "Our custom itinerary service starts from $1000"%}');
+    $('#budget-mount').attr('data-original-title', '{% trans "Our custom itinerary service starts from $1000"%}');
+    $('#budget').attr('style', 'background-color:#FF8F93;');
+    $('.tooltip-arrow').attr('style', 'border-right-color:#FF8F93');
   }
 	else {
-    $('#budget').text('{% trans "Estimated cost: $" %}' + Math.round((min/guests)*currencyConversion) + '+ {% trans "per person ($" %}' + min*currencyConversion + '+ {% trans "in total" %})').addClass('animated fadeInUp');
-		var wait = window.setTimeout(function(){
-      $('#budget').removeClass('animated fadeInUp')}, 1000
-    );
+    $('#budget-mount').attr('data-original-title', '{% trans "Estimated cost: $" %}' + Math.round((min/guests)*currencyConversion) + '+ {% trans "per person ($" %}' + min*currencyConversion + '+ {% trans "in total" %})');
+    $('#budget').removeAttr('style');
+    $('.tooltip-arrow').removeAttr('style');
 	}
+  if (guests < 6) {
+    var savings = Math.round((min/guests)*currencyConversion) - Math.round(((min/(guests+2))+accomPrice+(flightPrice*2))*currencyConversion);
+    if (savings > 0) {
+      $('#budget-tip').attr('style', 'display:inline-block;').text("{% trans 'Save $' %}" + savings + "{% trans ' by adding 2 extra people!' %}");
+    } else {
+      $('#budget-tip').attr('style', 'display:inline-block;').text("{% trans 'Add 2 extra people for only $' %}" + Math.abs(savings) + "!");
+    }
+  } else {
+    $('#budget-tip').removeAttr('style');
+  }
+  $('#budget-mount').tooltip('show');
 }
 
 function updateCities() {
