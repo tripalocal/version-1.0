@@ -211,14 +211,12 @@ $(document).ready(function() {
       if ($('#id_end_date').val()) {
         $('#date-section').find('.next-btn').attr('style', 'display:block');
       }
-      updateBudget();
     });
     $("#id_end_date").on("dp.change", function (e) {
       $('#id_start_date').data("DateTimePicker").maxDate(e.date);
       if ($('#id_start_date').val()) {
         $('#date-section').find('.next-btn').attr('style', 'display:block');
       }
-      updateBudget();
     });
   }
   else {
@@ -244,14 +242,12 @@ $(document).ready(function() {
       if ($('#id_end_date').val()) {
         $('#date-section').find('.next-btn').attr('style', 'display:block');
       }
-      updateBudget();
     });
     $("#id_end_date").on("dp.change", function (e) {
       $('#id_start_date').data("DateTimePicker").maxDate(e.date);
       if ($('#id_start_date').val()) {
         $('#date-section').find('.next-btn').attr('style', 'display:block');
       }
-      updateBudget();
     });
   }
   
@@ -378,7 +374,6 @@ $(document).ready(function() {
   // Bind change events
   $('#id_destinations').change(function() {
     $('#city-section').find('.next-btn').attr('style', 'display:block');
-    updateBudget();
   });
   $('#id_interests').change(function() {
     $('#interests-section').find('.next-btn').attr('style', 'display:block');
