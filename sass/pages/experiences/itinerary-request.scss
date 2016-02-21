@@ -190,6 +190,9 @@ h1 {
 #budget-mount {
   width: 280px;
   margin-top: -10px;
+  @include media('<tablet') {
+    margin-bottom: 90px;
+  }
 }
 
 .tooltip-inner {
@@ -206,8 +209,8 @@ h1 {
   border-right-color: $primary-color;
 }
 
-.tooltip.top .tooltip-arrow {
-  border-top-color: $primary-color;
+.tooltip.bottom .tooltip-arrow {
+  border-bottom-color: $primary-color;
 }
 
 .tooltip-extra {
