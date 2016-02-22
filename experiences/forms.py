@@ -675,27 +675,7 @@ class BookingConfirmationForm(forms.Form):
             dt = self.cleaned_data['date']
             tm = self.cleaned_data['time']
             bk_dt = local_timezone.localize(datetime(dt.year, dt.month, dt.day, tm.hour, tm.minute))
-
-            #call makePurchase API if the product is from experienceOz
             purchase_id = None
-            bk_total_price = None
-            if partner_product_information and len(partner_product_information) > 0 and \
-                hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
-                bk_dt_string = bk_dt.strftime("%Y-%m-%d%z")
-                bk_dt_string = bk_dt_string[:-2]+":"+bk_dt_string[-2:]
-                phone_number = "123456789"
-                if len(payment_phone_number.split(",")[0]) > 0:
-                    phone_number = payment_phone_number.split(",")[0]
-                elif len(payment_phone_number.split(",")) > 1:
-                    phone_number = payment_phone_number.split(",")[1]
-                purchase = experienceoz_makepurchase(user.first_name, user.last_name, phone_number, "billing@tripalocal.com", payment_country, payment_postcode,
-                                          experience, bk_dt_string, partner_product_information)
-                if purchase.get("success", False):
-                    purchase_id = purchase["purchase_id"]
-                    bk_total_price = purchase["price"]
-                else:
-                    raise forms.ValidationError({"partner_product_information":"Errors in calling makePurchase API"})
-
             bk_dt = bk_dt.astimezone(pytz.timezone("UTC"))
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
                                        end_datetime__gt = bk_dt,

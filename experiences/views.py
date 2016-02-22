@@ -1066,6 +1066,7 @@ class ExperienceDetailView(DetailView):
             if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0 \
                 and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
                 item_options = set_option_items(form.data['partner_product_information'], experience)
+                form.data['time'] = "09:00"
 
             return render(request, 'experiences/experience_booking_confirmation.html',
                           {'form': form, #'eid':self.object.id,
@@ -1357,9 +1358,29 @@ def experience_booking_successful(request, booking_id=None, guest_number=None, b
         price_paid = float(data['price_paid'])
         is_instant_booking = True if data['is_instant_booking'] == "True" else False
 
-    #call Receipt API if the product is from experienceOz
+    #if the product is from experienceOz
+    #call makePurchase API, and then Receipt API
+    purchase_id = None
+    bk_total_price = None
     link = None
-    if booking.whats_included and hasattr(experience, "partner") and experience.partner == "001":
+    if hasattr(experience, "partner") and experience.partner == "001":
+        bk_dt_string = booking.datetime.strftime("%Y-%m-%d%z")
+        bk_dt_string = bk_dt_string[:-2]+":"+bk_dt_string[-2:]
+        phone_number = "123456789"
+        if len(booking.payment.phone_number.split(",")[0]) > 0:
+            phone_number = booking.payment.phone_number.split(",")[0]
+        elif len(booking.payment.phone_number.split(",")) > 1:
+            phone_number = booking.payment.phone_number.split(",")[1]
+        purchase = experienceoz_makepurchase(request.user.first_name, request.user.last_name, phone_number, "billing@tripalocal.com", "Australia", "3066",
+                                    experience, bk_dt_string, booking.whatsincluded)
+        if purchase.get("success", False):
+            purchase_id = purchase["purchase_id"]
+            bk_total_price = purchase["price"]
+            booking.whatsincluded = purchase_id
+            booking.save()
+        else:
+            raise Exception("Errors in calling makePurchase API")
+
         receipt = experienceoz_receipt(booking)
         if receipt.get("success", False):
             link = unquote(receipt["link"])
@@ -1416,7 +1437,7 @@ def experience_booking_confirmation(request):
         child_number = int(form.data['child_number'])
         experience_price = experience.price
         subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number,
-                                         extra_information=form.data['partner_product_information'])
+                                         extra_information=form.data['partner_product_information'], language=request.LANGUAGE_CODE)
 
         COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
         total_price = experience_fee_calculator(subtotal_price, experience.commission)
@@ -3250,24 +3271,24 @@ def custom_itinerary_request(request):
     if request.method == 'POST':
         data = request.POST
         email = data.get('email')
+        fields = data.items()
         message = "<h1>Custom itinerary request</h1>" + \
-                "<p>" + data.get('name') + " has requested an itinerary for " + \
-                data.get('guests_adults') + " adults, " + data.get('guests_children') + " children and " + data.get('guests_infants') + " infants;" + \
-                " from " +  data.get('start_date') + " to " + data.get('end_date') + " with the \
-                following destinations: " + data.get('destinations') + ".</p>" + \
-                "<p>Interests include: " + data.get('interests') + ".</p>" + \
+                "<p>" + fields['name'] + " has requested an itinerary for " + \
+                fields['guests_adults'] + " adults, " + fields['guests_children'] + " children and " + fields['guests_infants'] + " infants;" + \
+                " from " +  fields['start_date'] + " to " + fields['end_date'] + " with the \
+                following destinations: " + fields['destinations'] + ".</p>" + \
+                "<p>Interests include: " + fields['interests'] + ".</p>" + \
                 "<h3>What's included</h3>" + \
-                "<p>" + data.get('budget') + "</p>" + \
-                "<p>Accommodation: " + data.get('accommodation') + "</p>" + \
-                "<p>Car driver: " + data.get('car_driver') + "</p>" + \
-                "<p>National flight: " + data.get('national_flight') + "</p>" + \
-                "<p>Airport transfer: " + data.get('airport_transfer') + "</p>" + \
-                "<p>Service language: " + data.get('service_language') + "</p>" + \
-                "<h3>Requirements</h3><p>" + data.get('requirements') + "</p>" + \
+                "<p>Budget: $" + fields['budget'] + "</p>" + \
+                "<p>Accommodation: " + fields['accommodation'] + "</p>" + \
+                "<p>Car driver: " + fields['car_driver'] + "</p>" + \
+                "<p>National flight: " + fields['national_flight'] + "</p>" + \
+                "<p>Service language: " + fields['service_language'] + "</p>" + \
+                "<h3>Requirements</h3><p>" + fields['requirements'] + "</p>" + \
                 "<h3>Contact details</h3>" + \
-                "<p>Wechat: " + data.get('wechat') + "</p>" + \
-                "<p>Email: " + data.get('email') + "</p>" + \
-                "<p>Mobile: " + data.get('mobile') + "</p>"
+                "<p>Wechat: " + fields['wechat'] + "</p>" + \
+                "<p>Email: " + fields['email'] + "</p>" + \
+                "<p>Mobile: " + fields['mobile'] + "</p>"
         mail.send(
             sender = 'admin@tripalocal.com',
             recipients = ['enquiries@tripalocal.com'],

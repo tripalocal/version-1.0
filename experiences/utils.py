@@ -33,7 +33,7 @@ def convert_currency(price, current_currency, target_currency, conversion=None):
         conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
     return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
 
-def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, extra_information=None):
+def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, extra_information=None, language=None):
     '''
     return total price, not including commission or service fee
     either use guest_number, or adult_number + child_number, the latter has a higher priority
@@ -43,7 +43,8 @@ def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, 
         price = 0
         i = 0
         items = json.loads(extra_information)
-        for og in experience.optiongroup_set.all():
+        language = settings.LANGUAGES[0][0] if language is None else language
+        for og in experience.optiongroup_set.filter(language=language):
             for oi in og.optionitem_set.all():
                 if str(oi.original_id) in items.keys():
                     price += oi.price*items.get(str(oi.original_id))
@@ -121,7 +122,7 @@ def static_vars(**kwargs):
         return func
     return decorate
 
-@static_vars(dict={"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]})
+@static_vars(dict={"Melbourne":{"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}})
 def recent_search(action, new_search=None):
     '''
     action: get, update, clear
