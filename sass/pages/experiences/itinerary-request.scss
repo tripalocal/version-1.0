@@ -44,6 +44,12 @@ h1 {
   background-color: rgba(51,51,51,1);
 }
 
+.container {
+  @include media('>=desktop') {
+    width: 960px;
+  }
+}
+
 .main-btn {
   font-size: 18px;
   font-weight: 300;
@@ -71,7 +77,7 @@ h1 {
 .fp-tooltip {
   color: $dark-grey !important;
   top: -3px !important;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 #fp-nav ul li {
@@ -98,6 +104,9 @@ h1 {
 .form-inline {
   label {
     min-width: 140px;
+    @include media('<tablet') {
+      display: block;
+    }
   }
 }
 
@@ -181,6 +190,9 @@ h1 {
 #budget-mount {
   width: 280px;
   margin-top: -10px;
+  @include media('<tablet') {
+    margin-bottom: 90px;
+  }
 }
 
 .tooltip-inner {
@@ -197,8 +209,8 @@ h1 {
   border-right-color: $primary-color;
 }
 
-.tooltip.top .tooltip-arrow {
-  border-top-color: $primary-color;
+.tooltip.bottom .tooltip-arrow {
+  border-bottom-color: $primary-color;
 }
 
 .tooltip-extra {
