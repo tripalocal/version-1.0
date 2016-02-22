@@ -99,36 +99,36 @@
       <div class="form-inline">
         <label>{% trans 'Car + Driver' %}</label>
         <input id="car-driver" type="hidden">
-        <div class="btn btn-clear btn-selectable option">{% trans "none" %}</div>
-        <div class="btn btn-clear btn-selectable option">{% trans "infrequent" %}</div>
-        <div class="btn btn-clear btn-selectable option">{% trans "frequent" %}</div>
-        <div class="btn btn-clear btn-selectable option">{% trans "whole trip" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="none">{% trans "none" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="infrequent">{% trans "infrequent" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="frequent">{% trans "frequent" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="entire trip">{% trans "entire trip" %}</div>
       </div>
       <div class="form-inline" id="form-accommodation">
         <label>{% trans 'Accommodation' %}</label>
         <input id="accommodation" type="hidden">
-        <div class="btn btn-clear btn-selectable option">{% trans "none" %}</div>
-        <div class="btn btn-clear btn-selectable option">{% trans "3 star" %}</div>
-        <div class="btn btn-clear btn-selectable option">{% trans "4 star" %}</div>
-        <div class="btn btn-clear btn-selectable option">{% trans "5 star" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="none">{% trans "none" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="3 star">{% trans "3 star" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="4 star">{% trans "4 star" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="5 star">{% trans "5 star" %}</div>
       </div>
       <div class="form-inline" id="form-flight">
         <label>{% trans 'National Flight' %}</label>
         <input id="national-flight" type="hidden"> 
-        <div class="btn btn-clear btn-selectable option">{% trans "none" %}</div>
-        <div class="btn btn-clear btn-selectable option">{% trans "economy" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="none">{% trans "none" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="economy">{% trans "economy" %}</div>
       </div>
       <div class="form-inline" id="form-language">
         <label>{% trans 'Service Language' %}</label>
         <input id="service-language" type="hidden">
-        <div class="btn btn-clear btn-selectable option">{% trans 'chinese' %}</div>
-        <div class="btn btn-clear btn-selectable option">{% trans 'english' %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="chinese">{% trans "chinese" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="english">{% trans "english" %}</div>
       </div>
       <div class="form-inline" id="form-transfer">
         <label>{% trans 'Airport Transfer' %}</label>
         <input id="airport-transfer" type="hidden">
-        <div class="btn btn-clear btn-selectable option">{% trans 'none' %}</div>
-        <div class="btn btn-clear btn-selectable option">{% trans 'yes' %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="none">{% trans "none" %}</div>
+        <div class="btn btn-clear btn-selectable option" data-option="yes">{% trans "yes" %}</div>
       </div>
       <button class="btn btn-primary main-btn next-btn animated infinite pulse">{% trans "Next" %}</button>
     </div>
@@ -323,7 +323,7 @@ $(document).ready(function() {
           $(this).removeClass('selected');
         });
         $option.addClass('selected');
-        $input.val($option.text()).trigger('change');
+        $input.val($option.attr('data-option')).trigger('change');
         updateBudget();
       });
     });
@@ -474,7 +474,7 @@ function updateBudget() {
 				max += 1000;
 			}
 			break;
-		case 'whole trip':
+		case 'entire trip':
 			if (guests < 5) {
 				min += 500;
 				max += 1200;
