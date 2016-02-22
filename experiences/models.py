@@ -197,12 +197,12 @@ class NewProduct(AbstractExperience):
 
     LISTED = 'Listed'
     UNLISTED = 'Unlisted'
-    INCORRECT = 'API incorrect'
+    UNAVAILABLE = 'Unavailable'
 
     STATUS_CHOICES = (
         (LISTED, 'Listed'),
         (UNLISTED, 'Unlisted'),
-        (INCORRECT, 'API incorrect')
+        (UNAVAILABLE, 'Unavailable')
     )
 
     type = models.CharField(max_length=50, default="PublicProduct")
