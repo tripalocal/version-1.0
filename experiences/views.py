@@ -1376,7 +1376,7 @@ def experience_booking_successful(request, booking_id=None, guest_number=None, b
         if purchase.get("success", False):
             purchase_id = purchase["purchase_id"]
             bk_total_price = purchase["price"]
-            booking.whatsincluded = purchase_id
+            booking.whats_included = purchase_id
             booking.save()
         else:
             raise Exception("Errors in calling makePurchase API")
