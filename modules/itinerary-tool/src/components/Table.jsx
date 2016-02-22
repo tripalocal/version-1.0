@@ -6,6 +6,7 @@ export default class Table extends React.Component {
   constructor(props) {
     super(props);
   }
+
   render() {
     const days = this.props.days.map(day => <Row day={day} key={day.date} />);
     return (

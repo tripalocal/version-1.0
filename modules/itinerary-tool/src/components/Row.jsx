@@ -5,6 +5,7 @@ export default class Row extends React.Component {
   constructor(props) {
     super(props);
   }
+
   render() {
     const fields = Object.keys(this.props.day).map(field => {
       if (field === 'date') {

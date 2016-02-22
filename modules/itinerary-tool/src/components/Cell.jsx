@@ -5,13 +5,18 @@ import {ModalContainer, ModalDialog} from 'react-modal-dialog';
 export default class Cell extends React.Component {
   constructor(props) {
     super(props);
-    // Initial state
+    // Initialize state
     this.state = {
-      value: [{value: this.props.value, label: this.props.value}]
+      value: [{value: this.props.value, label: this.props.value}],
+      showModal: false
     };
-    // Bind methods to component
-    this.handleChange = this.handleChange.bind(this);
+    // Bind methods to object context
+    this.renderOption = this.renderOption.bind(this);
+    this.renderNewItemLink = this.renderNewItemLink.bind(this);
     this.getOptions = this.getOptions.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleModalOpen = this.handleModalOpen.bind(this);
+    this.handleModalClose = this.handleModalClose.bind(this)
   }
 
   render() {
@@ -19,6 +24,7 @@ export default class Cell extends React.Component {
       <td>
         <Select.Async
           loadOptions={this.getOptions}
+          optionRenderer={this.renderOption}
           placeholder={this.props.type}
           onChange={this.handleChange}
           value={this.state.value}
@@ -27,17 +33,33 @@ export default class Cell extends React.Component {
           valueKey="value"
           labelKey="label"
         />
+        {
+          this.state.showModal ? 
+          <NewItemModal onClose={this.handleModalClose}/> :
+          null
+        }
       </td>
     );
   }
 
   handleChange(value) {
-    console.log('You\'ve selected: ', value);
     this.setState({ value });
   }
 
+  handleModalOpen() {
+    this.setState({showModal: true});
+  }
+
+  handleModalClose(){
+    this.setState({showModal: false});
+  }
+ 
+  renderOption(option) {
+    return <span>{option.label} {option.link}</span>;
+  }
+
   renderNewItemLink() {
-    return <a style={{ marginLeft: 5  }} onClick=></a>;
+    return <a style={{ marginLeft: 5  }} href="#" onClick={this.handleModalOpen}>+ Add</a>;
   }
 
   getOptions(input, callback) {
@@ -73,17 +95,35 @@ export default class Cell extends React.Component {
     };
     // Will be an ajax call.
     setTimeout(() => {
-      const options = TEST_DATA[this.props.type].push({
-        label: 'Add new item',
+      const options = TEST_DATA[this.props.type];
+      options.push({
         value: 'new',
-        disabled: true,
-        link: this.renderNewItemLink
-      });
+        label: 'New item',
+        link: this.renderNewItemLink(),
+        disabled: true
+      })
       callback(null, {
         options: options 
       });
     }, 1000);
 
+  }
+}
+
+class NewItemModal extends React.Component {
+  constructor(props) {
+    super(props);
+
+  }
+  
+  render() {
+    return (
+      <ModalContainer onClose={this.props.onClose}>
+        <ModalDialog onClose={this.props.onClose}>
+          <h1>New Item</h1>
+        </ModalDialog>
+      </ModalContainer>
+    );
   }
 }
 
