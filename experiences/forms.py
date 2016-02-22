@@ -41,8 +41,8 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
                     (_('Alice Springs'), 'Alicesprings'),
                     (_('Perth'), 'Perth'),
                     (_('Canberra'),'Canberra'),
-                    (_('Christchurch'), 'Christchurch'), (_('Queenstown'), 'Queenstown'),
-                    (_('Auckland'), 'Auckland'), (_('Wellington'), 'Wellington'),
+                    (_('Queenstown'), 'Queenstown'), #(_('Christchurch'), 'Christchurch'),
+                    (_('Auckland'), 'Auckland'), #(_('Wellington'), 'Wellington'),
                     (_('Whitsundays Island, QLD'), 'Whitsundaysisland'))
 
 #                    (_('Greater South Australia'), 'GRSA'),(_('Greater Victoria'), 'GRVIC'),
@@ -858,6 +858,7 @@ class CustomItineraryRequestForm(forms.Form):
     guests_infants = forms.ChoiceField(choices=Guest_Number_Child, widget=forms.Select(attrs={'class':'form-control'}), required=True, initial=0)
     budget = forms.ChoiceField(choices=Budget_Range, widget=forms.Select(attrs={'class':'form-control'}), required=True)
     interests = forms.CharField(required=False)
+    whats_included = forms.CharField(widget=forms.TextInput, required=False)
     requirements = forms.CharField(widget=forms.Textarea(attrs={'class':'text-input', 'rows':'5', 'placeholder':'Click here to list any other requirements you have.'}), required=False)
     name = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder':'name'}), required=True)
     wechat = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder': 'wechat'}), required=True)
@@ -867,6 +868,7 @@ class CustomItineraryRequestForm(forms.Form):
         super(CustomItineraryRequestForm, self).__init__(*args, **kwargs)
         self.fields['destinations'].widget = forms.HiddenInput()
         self.fields['budget'].widget = forms.HiddenInput()
+        self.fields['whats_included'].widget = forms.HiddenInput()
         self.fields['interests'].widget = forms.HiddenInput()
 
 class CustomItineraryForm(forms.Form):
