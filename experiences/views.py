@@ -1372,7 +1372,7 @@ def experience_booking_successful(request, booking_id=None, guest_number=None, b
         elif len(booking.payment.phone_number.split(",")) > 1:
             phone_number = booking.payment.phone_number.split(",")[1]
         purchase = experienceoz_makepurchase(request.user.first_name, request.user.last_name, phone_number, "billing@tripalocal.com", "Australia", "3066",
-                                    experience, bk_dt_string, booking.whats_included)
+                                    experience, bk_dt_string, booking.whatsincluded)
         if purchase.get("success", False):
             purchase_id = purchase["purchase_id"]
             bk_total_price = purchase["price"]
