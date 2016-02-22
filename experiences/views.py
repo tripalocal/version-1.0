@@ -1372,7 +1372,7 @@ def experience_booking_successful(request, booking_id=None, guest_number=None, b
         elif len(booking.payment.phone_number.split(",")) > 1:
             phone_number = booking.payment.phone_number.split(",")[1]
         purchase = experienceoz_makepurchase(request.user.first_name, request.user.last_name, phone_number, "billing@tripalocal.com", "Australia", "3066",
-                                    experience, bk_dt_string, booking.whatsincluded)
+                                    experience, bk_dt_string, booking.partner_product)
         if purchase.get("success", False):
             purchase_id = purchase["purchase_id"]
             bk_total_price = purchase["price"]
@@ -4382,7 +4382,7 @@ def wechat_qr_payment(request):
 def wechat_qr_payment_query(request, out_trade_no):
     order_query = OrderQuery(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
     pay_info = order_query.post(out_trade_no)
-    if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
+    if pay_info.get("return_code","") == 'SUCCESS' and pay_info.get("result_code","") == 'SUCCESS':
         trade_state = pay_info['trade_state']
         if trade_state == 'SUCCESS':
             return HttpResponse(json.dumps({'order_paid': True}))
