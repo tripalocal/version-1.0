@@ -59,7 +59,8 @@ SOAP_REQUEST_MAKEPURCHASE = \
 					<Item>
 						<ProductId>{product_id}</ProductId>
 						<BookingDate>{booking_date}</BookingDate>
-						<ItemOptions>{item_options}</ItemOptions>
+                        <BookingNotes>{booking_notes}</BookingNotes>
+                        <ItemOptions>{item_options}</ItemOptions>
 					</Item>
 				</Items>
 			</PurchaseRequest>
@@ -160,7 +161,7 @@ def get_experienceoz_availability(product_id, start_date, experience, available_
                             pass
     return available_date
 
-def experienceoz_makepurchase(first_name, last_name, number, email, country, postcode, product, booking_date, booking_extra_information):
+def experienceoz_makepurchase(first_name, last_name, number, email, country, postcode, product, booking_date, booking_extra_information, note=None):
     #convert booking_extra_information into 
     #<ItemOption>
 	#	<ProductOptionId></ProductOptionId>
@@ -187,6 +188,7 @@ def experienceoz_makepurchase(first_name, last_name, number, email, country, pos
         'postcode':postcode,
         'product_id': str(product.id)[:-(len(str(product.partner))+1)],
         'booking_date': booking_date,
+        'booking_notes': note if note else "",
         'item_options':item_options
     }
     body = SOAP_REQUEST_MAKEPURCHASE.format(**form_kwargs)
