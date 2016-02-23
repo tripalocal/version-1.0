@@ -451,6 +451,7 @@ class BookingForm(forms.Form):
     status = forms.CharField(initial="Requested")
     #for booking partner products
     partner_product_information = forms.CharField(required = False)
+    phone_number = forms.CharField(max_length=50, required = False)
 
     def __init__(self, available_date, experience_id, user_id, *args, **kwargs):
         super(BookingForm, self).__init__(*args, **kwargs)
@@ -468,6 +469,8 @@ class BookingForm(forms.Form):
         self.fields['time'].widget.attrs.update({'class' : 'booking_form_time'})
         self.fields['partner_product_information'].widget.attrs['readonly'] = True
         self.fields['partner_product_information'].widget = forms.HiddenInput()
+        self.fields['phone_number'].widget.attrs['readonly'] = True
+        self.fields['phone_number'].widget = forms.HiddenInput()
 
 class CreditCardField(forms.IntegerField):
     def clean(self, value):

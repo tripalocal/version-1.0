@@ -598,6 +598,7 @@ $(function(){
                         if(data.success)
                         {
                             $('#id_user_id').val(data.user_id);
+                            $('#id_phone_number').val(phone_number+",");
                             var unformattedDate = $("#id_date").val();
                             $("#id_date").val(String(moment(unformattedDate, "DD/MM/YYYY").format("YYYY-MM-DD")));
                             $('[name="csrfmiddlewaretoken"]').val(getCookie('csrftoken'));
