@@ -17,6 +17,7 @@ export default class Row extends React.Component {
           <Cell key={this.props.day.date + field}
             value={this.props.day[field]}
             type={field}
+            handleModalOpen={this.props.handleModalOpen}
           />
         );
       }

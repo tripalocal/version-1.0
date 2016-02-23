@@ -1,6 +1,5 @@
 import React from 'react';
 import Select from 'react-select';
-import {ModalContainer, ModalDialog} from 'react-modal-dialog';
 
 export default class Cell extends React.Component {
   constructor(props) {
@@ -8,15 +7,12 @@ export default class Cell extends React.Component {
     // Initialize state
     this.state = {
       value: [{value: this.props.value, label: this.props.value}],
-      showModal: false
     };
     // Bind methods to object context
     this.renderOption = this.renderOption.bind(this);
     this.renderNewItemLink = this.renderNewItemLink.bind(this);
     this.getOptions = this.getOptions.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.handleModalOpen = this.handleModalOpen.bind(this);
-    this.handleModalClose = this.handleModalClose.bind(this)
   }
 
   render() {
@@ -33,11 +29,6 @@ export default class Cell extends React.Component {
           valueKey="value"
           labelKey="label"
         />
-        {
-          this.state.showModal ? 
-          <NewItemModal onClose={this.handleModalClose}/> :
-          null
-        }
       </td>
     );
   }
@@ -46,20 +37,12 @@ export default class Cell extends React.Component {
     this.setState({ value });
   }
 
-  handleModalOpen() {
-    this.setState({showModal: true});
-  }
-
-  handleModalClose(){
-    this.setState({showModal: false});
-  }
- 
   renderOption(option) {
     return <span>{option.label} {option.link}</span>;
   }
 
   renderNewItemLink() {
-    return <a style={{ marginLeft: 5  }} href="#" onClick={this.handleModalOpen}>+ Add</a>;
+    return <a style={{ marginLeft: 5  }} href="#" onClick={this.props.handleModalOpen}>+ Add</a>;
   }
 
   getOptions(input, callback) {
@@ -107,23 +90,6 @@ export default class Cell extends React.Component {
       });
     }, 1000);
 
-  }
-}
-
-class NewItemModal extends React.Component {
-  constructor(props) {
-    super(props);
-
-  }
-  
-  render() {
-    return (
-      <ModalContainer onClose={this.props.onClose}>
-        <ModalDialog onClose={this.props.onClose}>
-          <h1>New Item</h1>
-        </ModalDialog>
-      </ModalContainer>
-    );
   }
 }
 

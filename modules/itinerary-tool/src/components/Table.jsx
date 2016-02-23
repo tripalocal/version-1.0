@@ -8,7 +8,12 @@ export default class Table extends React.Component {
   }
 
   render() {
-    const days = this.props.days.map(day => <Row day={day} key={day.date} />);
+    const days = this.props.days.map(day => 
+      <Row day={day} 
+        key={day.date} 
+        handleModalOpen={this.props.handleModalOpen} 
+      />
+    );
     return (
       <table className="table">
         <thead>
