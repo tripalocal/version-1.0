@@ -1135,7 +1135,7 @@ class ExperienceDetailView(DetailView):
             available_date = getAvailableOptions(experience, available_options, available_date)
 
         if len(available_date) == 0:
-            experience.status="Unlisted"
+            experience.status="Unavailable"
             experience.save()
 
         context['available_options'] = available_options
