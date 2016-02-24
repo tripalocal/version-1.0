@@ -3286,24 +3286,23 @@ def custom_itinerary_request(request):
     if request.method == 'POST':
         data = request.POST
         email = data.get('email')
-        fields = data.items()
         message = "<h1>Custom itinerary request</h1>" + \
-                "<p>" + fields['name'] + " has requested an itinerary for " + \
-                fields['guests_adults'] + " adults, " + fields['guests_children'] + " children and " + fields['guests_infants'] + " infants;" + \
-                " from " +  fields['start_date'] + " to " + fields['end_date'] + " with the \
-                following destinations: " + fields['destinations'] + ".</p>" + \
-                "<p>Interests include: " + fields['interests'] + ".</p>" + \
+                "<p>" + data.get('name') + " has requested an itinerary for " + \
+                data.get('guests_adults') + " adults, " + data.get('guests_children') + " children and " + data.get('guests_infants') + " infants;" + \
+                " from " +  data.get('start_date') + " to " + data.get('end_date') + " with the \
+                following destinations: " + data.get('destinations') + ".</p>" + \
+                "<p>Interests include: " + data.get('interests') + ".</p>" + \
                 "<h3>What's included</h3>" + \
-                "<p>Budget: $" + fields['budget'] + "</p>" + \
-                "<p>Accommodation: " + fields['accommodation'] + "</p>" + \
-                "<p>Car driver: " + fields['car_driver'] + "</p>" + \
-                "<p>National flight: " + fields['national_flight'] + "</p>" + \
-                "<p>Service language: " + fields['service_language'] + "</p>" + \
-                "<h3>Requirements</h3><p>" + fields['requirements'] + "</p>" + \
+                "<p>Budget: $" + data.get('budget') + "</p>" + \
+                "<p>Accommodation: " + data.get('accommodation') + "</p>" + \
+                "<p>Car driver: " + data.get('car_driver') + "</p>" + \
+                "<p>National flight: " + data.get('national_flight') + "</p>" + \
+                "<p>Service language: " + data.get('service_language') + "</p>" + \
+                "<h3>Requirements</h3><p>" + data.get('requirements') + "</p>" + \
                 "<h3>Contact details</h3>" + \
-                "<p>Wechat: " + fields['wechat'] + "</p>" + \
-                "<p>Email: " + fields['email'] + "</p>" + \
-                "<p>Mobile: " + fields['mobile'] + "</p>"
+                "<p>Wechat: " + data.get('wechat') + "</p>" + \
+                "<p>Email: " + data.get('email') + "</p>" + \
+                "<p>Mobile: " + data.get('mobile') + "</p>"
         mail.send(
             sender = 'admin@tripalocal.com',
             recipients = ['enquiries@tripalocal.com'],
