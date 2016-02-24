@@ -3755,7 +3755,10 @@ def itinerary_detail(request,id=None,preview=None):
             item.experience.description = exp_information.description
             item.experience.whatsincluded = item.whats_included
             item.experience.city = _(item.experience.city)
-            key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%Y-%m-%d")
+            if settings.LANGUAGE_CODE == "zh-CN":
+                key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime(_("%d %b %Y")).format(*'年月日')
+            else:
+                key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%d-%m-%Y")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
@@ -3766,7 +3769,10 @@ def itinerary_detail(request,id=None,preview=None):
                 end_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
 
         for date in daterange(start_datetime, end_datetime):
-            date = date.astimezone(pytz.timezone(ci_timezone)).strftime("%Y-%m-%d")
+            if settings.LANGUAGE_CODE == "zh-CN":
+                date = date.astimezone(pytz.timezone(ci_timezone)).strftime(_("%d %b %Y")).format(*'年月日')
+            else:
+                date = date.astimezone(pytz.timezone(ci_timezone)).strftime("%d-%m-%Y")
             if date not in itinerary["days"]:
                 itinerary["days"].update({date:[]})
 
@@ -3781,14 +3787,23 @@ def itinerary_detail(request,id=None,preview=None):
                 continue
             break
         guest_number = ci.get_guest_number()
+        if settings.LANGUAGE_CODE == "zh-CN":
+            start_date = start_datetime.strftime(_("%d %b %Y")).format(*'年月日')
+            end_date = end_datetime.strftime(_("%d %b %Y")).format(*'年月日')
+            discount_deadline = discount_deadline.strftime(_("%d %b %Y")).format(*'年月日')
+        else:
+            start_date = start_datetime.strftime("%d/%m/%Y")
+            end_date = end_datetime.strftime("%d/%m/%Y")
+            discount_deadline = discount_deadline.strftime("%d/%m/%Y")
+
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
                                    "guest_number":guest_number[0],
                                    "adult_number":guest_number[1],
                                    "children_number":guest_number[2],
-                                   "start_date": start_datetime.strftime("%Y-%m-%d"),
-                                   "end_date":end_datetime.strftime("%Y-%m-%d"),
-                                   "discount_deadline":discount_deadline.strftime("%Y-%m-%d"),
+                                   "start_date":start_date,
+                                   "end_date":end_date,
+                                   "discount_deadline":discount_deadline,
                                    "price":price,
                                    "full_price":full_price,
                                    "cover_photo":cover_photo,

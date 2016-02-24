@@ -2230,6 +2230,9 @@ msgstr "领路人自驾"
 msgid "Private group"
 msgstr "私人团"
 
+msgid "%d %b %Y"
+msgstr "%Y{0}%m{1}%d{2}"
+
 #~ msgid "Book"
 #~ msgstr "预订"
 
