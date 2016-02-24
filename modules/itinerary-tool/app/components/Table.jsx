@@ -1,6 +1,5 @@
 import React from 'react';
-import Row from './Row.jsx!';
-
+import Row from './Row.jsx';
 
 export default class Table extends React.Component {
   constructor(props) {
@@ -33,4 +32,3 @@ export default class Table extends React.Component {
   }
 }
 
-export let __hotReload = true;

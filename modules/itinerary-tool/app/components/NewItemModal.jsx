@@ -17,5 +17,3 @@ export default class NewItemModal extends React.Component {
   }
 }
 
-
-export let __hotReload = true;

@@ -1,8 +1,9 @@
-import './main.css!'
-import 'react-select/dist/react-select.css!';
+import './main.css';
+
+import 'react-select/dist/react-select.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/App.jsx!';
+import App from './components/App.jsx';
 
 // TEST DATA
 const DAYS = [

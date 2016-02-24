@@ -93,5 +93,3 @@ export default class Cell extends React.Component {
   }
 }
 
-
-export let __hotReload = true;

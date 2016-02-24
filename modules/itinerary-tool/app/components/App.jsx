@@ -1,7 +1,7 @@
 import React from 'react';
-import Bar from './Bar.jsx!';
-import Table from './Table.jsx!';
-import NewItemModal from './NewItemModal.jsx!';
+import Bar from './Bar.jsx';
+import Table from './Table.jsx';
+import NewItemModal from './NewItemModal.jsx';
 
 export default class App extends React.Component {
   constructor(props) {

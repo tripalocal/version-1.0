@@ -1,5 +1,5 @@
 import React from 'react';
-import Cell from './Cell.jsx!';
+import Cell from './Cell.jsx';
 
 export default class Row extends React.Component {
   constructor(props) {
@@ -28,4 +28,3 @@ export default class Row extends React.Component {
   }
 }
 
-export let __hotReload = true;
