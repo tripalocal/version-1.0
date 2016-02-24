@@ -610,7 +610,7 @@ class BookingConfirmationForm(forms.Form):
     coupon_extra_information = forms.CharField(max_length=500, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
     partner_product_information = forms.CharField(required = False)
-    note = forms.CharField(widget=forms.Textarea, required=False)
+    note = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}), required=False)
     price_paid = forms.DecimalField(max_digits=6, decimal_places=2, required=False)
     custom_currency = forms.CharField(max_length=3, required=True)
 
