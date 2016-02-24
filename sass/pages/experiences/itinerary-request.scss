@@ -188,8 +188,9 @@ h1 {
 }
 
 #budget-mount {
-  width: 280px;
+  width: auto;
   margin-top: -10px;
+  display: inline-block;
   @include media('<tablet') {
     margin-bottom: 90px;
   }
@@ -203,6 +204,10 @@ h1 {
   line-height: 30px;
   padding: 3px 15px;
   display: inline-block;
+}
+
+.tooltip.right {
+  margin-left: 15px;
 }
 
 .tooltip.right .tooltip-arrow {

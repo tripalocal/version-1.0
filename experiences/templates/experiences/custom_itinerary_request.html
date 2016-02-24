@@ -564,7 +564,11 @@ function updateBudget() {
     if (guests < 6) {
       var savings = Math.round((min/guests)*currencyConversion) - Math.round(((min/(guests+2))+(accomPrice/2)+(flightPrice))*currencyConversion);
       if (savings > 0) {
-        $('#budget-tip').attr('style', 'display:inline-block;').text("{% trans 'Save $' %}" + savings + "{% trans '/person for a group of' %} " + (guests+2));
+        {% if LANGUAGE == "zh-CN" %}
+        $('#budget-tip').attr('style', 'display:inline-block;').text( (guests+2) + "人团可优惠¥" + savings + "/人");
+        {% else %}
+        $('#budget-tip').attr('style', 'display:inline-block;').text("Save $" + savings + "/person for a group of " + (guests+2));
+        {% endif %}
       } else {
         $('#budget-tip').attr('style', 'display:inline-block;').text("{% trans 'Add 2 extra people for only $' %}" + Math.abs(savings) + " each!");
       }

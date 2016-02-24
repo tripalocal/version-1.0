@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-24 12:07+1100\n"
+"POT-Creation-Date: 2016-02-24 12:41+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -314,6 +314,26 @@ msgstr "有小孩"
 #: experiences/forms.py:835
 msgid "Famili with elderly&children"
 msgstr "有老人和小孩"
+
+#: experiences/forms.py:847
+msgid "Click here to list any other requirements you have."
+msgstr "点击这里，列出你的其他要求"
+
+#: experiences/forms.py:848
+msgid "name"
+msgstr "姓"
+
+#: experiences/forms.py:849
+msgid "wechat"
+msgstr ""
+
+#: experiences/forms.py:850
+msgid "email"
+msgstr "邮箱"
+
+#: experiences/forms.py:851
+msgid "mobile"
+msgstr "移动电话"
 
 #: experiences/forms.py:899 experiences/forms.py:1297 experiences/forms.py:1301
 #: experiences/resource.py:1386 experiences/views.py:2110
@@ -1022,7 +1042,7 @@ msgstr ""
 
 #: experiences/templates/experiences/custom_itinerary_request.html:367
 msgid "There was an error with sending your request"
-msgstr ""
+msgstr "发送你的要求时出现一个错误"
 
 #: experiences/templates/experiences/custom_itinerary_request.html:368
 #: experiences/templates/experiences/experience_detail.html:567
@@ -2317,9 +2337,6 @@ msgstr "私人团"
 
 #~ msgid "WeChat"
 #~ msgstr "微信"
-
-#~ msgid "Mobile"
-#~ msgstr "移动电话"
 
 #~ msgid "Oops!"
 #~ msgstr "不好意思，"
