@@ -2270,7 +2270,7 @@ def update_booking(id, accepted, user):
                 if payment.charge_id.startswith('ch_'):
                     #stripe
                     success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
-                else:
+                elif booking.booking_extra_information and booing.booking_extra_information.startswith("Tripalocal"):
                     #union pay
                     config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
                     response = client.UnionpayClient(config).refund(int(refund_amount*100),
@@ -2281,6 +2281,11 @@ def update_booking(id, accepted, user):
                     if success:
                         booking.refund_id=response['queryId']
                         booking.save()
+                elif booking.booking_extra_information and booing.booking_extra_information.startswith("wx"):
+                    #TODO, wechat
+                    success = False
+                else:
+                    success = False
             else:
                 success = True
 
@@ -3758,7 +3763,7 @@ def itinerary_detail(request,id=None,preview=None):
             if settings.LANGUAGE_CODE == "zh-CN":
                 key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime(_("%d %b %Y")).format(*'年月日')
             else:
-                key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%d-%m-%Y")
+                key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%Y-%m-%d")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
@@ -3772,7 +3777,7 @@ def itinerary_detail(request,id=None,preview=None):
             if settings.LANGUAGE_CODE == "zh-CN":
                 date = date.astimezone(pytz.timezone(ci_timezone)).strftime(_("%d %b %Y")).format(*'年月日')
             else:
-                date = date.astimezone(pytz.timezone(ci_timezone)).strftime("%d-%m-%Y")
+                date = date.astimezone(pytz.timezone(ci_timezone)).strftime("%Y-%m-%d")
             if date not in itinerary["days"]:
                 itinerary["days"].update({date:[]})
 

@@ -1,4 +1,4 @@
-import time
+﻿import time
 import requests
 
 from app.wechat_payment.utils import (smart_str, dict_to_xml, calculate_sign, random_str,
