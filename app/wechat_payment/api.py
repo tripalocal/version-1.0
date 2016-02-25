@@ -159,4 +159,21 @@ class JsAPIOrderPay(UnifiedOrderPay):
                         return self._get_json_js_api_params(prepay_id)
         return None
 
+class Refund(WeiXinPay):
+    """退款"""
+    def __init__(self, appid, mch_id, api_key):
+        super(Refund, self).__init__(appid, mch_id, api_key)
+        self.url = "https://api.mch.weixin.qq.com/secapi/pay/refund"
 
+    def post(self, out_trade_no, out_refund_no, total_fee, refund_fee, refund_fee_type, op_user_id, **kwargs):
+        tmp_kwargs = {
+            "out_trade_no": out_trade_no,
+            "out_refund_no": out_refund_no,
+            "total_fee": total_fee,
+            "refund_fee": refund_fee,
+            "refund_fee_type": refund_fee_type,
+            "op_user_id": op_user_id,
+        }
+        tmp_kwargs.update(**kwargs)
+        self.set_params(**tmp_kwargs)
+        return self.post_xml()[1]

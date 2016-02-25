@@ -1,6 +1,6 @@
 ﻿from io import BytesIO
 from urllib.parse import urlencode, unquote
-from app.wechat_payment.api import UnifiedOrderPay, OrderQuery
+from app.wechat_payment.api import UnifiedOrderPay, OrderQuery, Refund
 from app.wechat_payment.utils import dict_to_xml
 from django.core.files.storage import default_storage as storage
 from django.shortcuts import render, render_to_response, redirect
@@ -2142,8 +2142,11 @@ def update_booking(id, accepted, user):
         experience = AbstractExperience.objects.get(id=booking.experience_id)
         exp_information = experience.get_information(settings.LANGUAGES[0][0])
         experience.title = exp_information.title
-        experience.meetup_spot = exp_information.meetup_spot
-        if not experience.get_host().id == user.id:
+        if type(experience) == Experience:
+            experience.meetup_spot = exp_information.meetup_spot
+        else:
+            experience.meetup_spot = exp_information.location
+        if not experience.get_host().id == user.id and not user.is_superuser:
             booking_success = False
             result={'booking_success':booking_success, 'error':'only the host can accept/reject the booking'}
             return result
@@ -2251,27 +2254,32 @@ def update_booking(id, accepted, user):
 
             if not free:
                 payment = Payment.objects.get(booking_id=booking.id)
-
-                if booking.adult_number:
-                    subtotal_price = get_total_price(experience, adult_number=booking.adult_number, child_number=child_number, 
-                                                     extra_information=booking.partner_product)
+                if booking.total_price:
+                    refund_amount = booking.total_price
                 else:
-                    subtotal_price = get_total_price(experience, booking.guest_number, extra_information=booking.partner_product)
+                    if booking.adult_number:
+                        subtotal_price = get_total_price(experience, adult_number=booking.adult_number,
+                                                         child_number=booking.children_number, 
+                                                         extra_information=booking.partner_product)
+                    else:
+                        subtotal_price = get_total_price(experience, booking.guest_number, extra_information=booking.partner_product)
 
-                #refund_amount does not include process fee: the transaction can't be undone
-                COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
-                refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT),0)
+                    #refund_amount does not include process fee: the transaction can't be undone
+                    COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
+                    refund_amount = subtotal_price*(1+COMMISSION_PERCENT)
 
-                if extra_fee <= -1:
-                    refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT), 0) + extra_fee
-                if extra_fee < 0 and extra_fee > -1:
-                    refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT), 0) * (1+extra_fee)
+                    if extra_fee <= -1:
+                        refund_amount = subtotal_price*(1+COMMISSION_PERCENT) + extra_fee
+                    if extra_fee < 0 and extra_fee > -1:
+                        refund_amount = subtotal_price*(1+COMMISSION_PERCENT) * (1+extra_fee)
 
                 if payment.charge_id.startswith('ch_'):
                     #stripe
+                    refund_amount = round(refund_amount, 0)
                     success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
-                elif booking.booking_extra_information and booing.booking_extra_information.startswith("Tripalocal"):
+                elif booking.booking_extra_information and booking.booking_extra_information.startswith("Tripalocal"):
                     #union pay
+                    refund_amount = round(convert_currency(refund_amount, experience.currency, "CNY"), 0)
                     config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
                     response = client.UnionpayClient(config).refund(int(refund_amount*100),
                                                          payment.booking.booking_extra_information.replace("Tripalocal","UPRefund"),
@@ -2281,9 +2289,16 @@ def update_booking(id, accepted, user):
                     if success:
                         booking.refund_id=response['queryId']
                         booking.save()
-                elif booking.booking_extra_information and booing.booking_extra_information.startswith("wx"):
-                    #TODO, wechat
-                    success = False
+                elif booking.booking_extra_information and booking.booking_extra_information.startswith("wx"):
+                    #wechat
+                    refund_amount = round(convert_currency(refund_amount, experience.currency, "CNY"), 0)
+                    rf = Refund(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
+                    response = rf.post(booking.booking_extra_information, booking.booking_extra_information,
+                                       str(int(refund_amount*100)), str(int(refund_amount*100)), "CNY", settings.WECHAT_MCH_ID)
+                    success = True if response['return_code'] == 'SUCCESS' and response['result_code'] == 'SUCCESS' else False
+                    if success:
+                        booking.refund_id=response['refund_id']
+                        booking.save()
                 else:
                     success = False
             else:
