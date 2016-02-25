@@ -14,11 +14,11 @@
         <input id="itinerary_day_1" type="text" class="itinerary_item" city="Melbourne" category="products" style="width:300px;height:30px;">
         <textarea id="hint" type="text" style="width:600px;height:300px;margin-top:60px;"></textarea>
     </div>
-    <div id="container" class="container">
+    <div id="root" class="container"></div>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'experiences/scripts/itinerary-tool.js' %}"></script>
+    <script src="{% static 'experiences/scripts/itinerary-tool.min.js' %}"></script>
     <script type="text/javascript">
     var timer;
     function searchExperience(e){ 
