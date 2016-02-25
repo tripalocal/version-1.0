@@ -91,5 +91,8 @@ def random_str(randomlength=8):
     return "".join([chars[random.randint(0, len(chars) - 1)] for i in range(randomlength)])
 
 
-def post_xml(url, xml):
-    return requests.post(url, data=xml)
+def post_xml(url, xml, verify=None):
+    if verify:
+        return requests.post(url, data=xml, verify=verify)
+    else:
+        return requests.post(url, data=xml)

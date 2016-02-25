@@ -2294,7 +2294,8 @@ def update_booking(id, accepted, user):
                     refund_amount = round(convert_currency(refund_amount, experience.currency, "CNY"), 0)
                     rf = Refund(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
                     response = rf.post(booking.booking_extra_information, booking.booking_extra_information,
-                                       str(int(refund_amount*100)), str(int(refund_amount*100)), "CNY", settings.WECHAT_MCH_ID)
+                                       str(int(refund_amount*100)), str(int(refund_amount*100)), "CNY", settings.WECHAT_MCH_ID,
+                                       os.path.join(os.path.join(settings.PROJECT_ROOT, 'wechat_cert'), 'apiclient_cert.p12').replace('\\', '/'))
                     success = True if response['return_code'] == 'SUCCESS' and response['result_code'] == 'SUCCESS' else False
                     if success:
                         booking.refund_id=response['refund_id']
