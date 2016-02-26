@@ -1,24 +1,34 @@
 import React, { PropTypes } from 'react'
 import Select from 'react-select'
+import EditMenu from '../containers/EditMenu'
 
-const Cell = ({ type, items, searchItems, handleChange }) => (
+const Cell = ({ type, items, searchItems, handleChange, showSelect }) => (
   <td>
-    <Select.Async
-      loadOptions={searchItems}
-      placeholder={type}
-      onChange={handleChange}
-      value={items}
-      clearable={false}
-      multi
-    /> 
+    {items.map(item => <span data-id="item.id">{item.title}</span>)}
+    {showSelect ? 
+      <Select.Async
+        loadOptions={searchItems}
+        placeholder={type}
+        onChange={handleChange}
+        clearable={false}
+        multi
+      />
+      : null
+    }
+    <div className="dropdown">
+      <button type="button" data-toggle="dropdown">
+        <span className="caret"></span>
+      </button>
+      <EditMenu />
+    </div>
   </td>
 )
 
 Cell.propTypes = {
   type: PropTypes.string,
   items: PropTypes.arrayOf(PropTypes.shape({
-    label: PropTypes.string,
-    value: PropTypes.number
+    title: PropTypes.string,
+    id: PropTypes.number
   })),
   searchItems: PropTypes.func,
   handleChange: PropTypes.func
