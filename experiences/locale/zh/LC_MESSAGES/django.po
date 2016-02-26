@@ -1270,7 +1270,7 @@ msgstr "您预订了"
 #: experiences/templates/experiences/email_booking_requested_traveler.html:6
 #: experiences/templates/experiences/experience_booking_successful.html:80
 msgid "'s experience"
-msgstr "的体验之行感觉如何？"
+msgstr "的体验之行？"
 
 #: experiences/templates/experiences/email_booking_requested_traveler.html:8
 #: experiences/templates/experiences/email_product_requested.html:11
