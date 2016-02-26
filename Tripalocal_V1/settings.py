@@ -354,7 +354,7 @@ WECHAT_APPSECRET = '84ecdc9ed6d5ad17b9c029d27b51a65a'
 WECHAT_MCH_ID = '1266572301'
 WECHAT_API_KEY = '34Ds769dYJ458Pd6J387g298RvD78674'
 
-WECHAT_PAYMENT_CERT = '~/wechat_cert/apiclient_cert.pem'
+WECHAT_PAYMENT_CERT = ('/home/ubuntu/wechat_cert/apiclient_cert.pem','/home/ubuntu/wechat_cert/apiclient_key.pem')
 
 # Customized settings should always be put at the bottom
 if os.environ.get('ENV_MODE') == 'DEVELOPMENT':

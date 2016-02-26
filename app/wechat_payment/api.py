@@ -31,10 +31,10 @@ class WeiXinPay(object):
             self.params["trade_type"] = self.trade_type
         self.params.update(self.common_params)
 
-    def post_xml(self, verify=None):
+    def post_xml(self, cert=None):
         sign = calculate_sign(self.params, self.api_key)
         xml = dict_to_xml(self.params, sign)
-        response = post_xml(self.url, xml.encode('utf-8'), verify=verify)
+        response = post_xml(self.url, xml.encode('utf-8'), cert=cert)
         return xml_to_dict(response.text)
 
     def valiate_xml(self, xml):
@@ -165,7 +165,7 @@ class Refund(WeiXinPay):
         super(Refund, self).__init__(appid, mch_id, api_key)
         self.url = "https://api.mch.weixin.qq.com/secapi/pay/refund"
 
-    def post(self, out_trade_no, out_refund_no, total_fee, refund_fee, refund_fee_type, op_user_id, verify, **kwargs):
+    def post(self, out_trade_no, out_refund_no, total_fee, refund_fee, refund_fee_type, op_user_id, cert, **kwargs):
         tmp_kwargs = {
             "out_trade_no": out_trade_no,
             "out_refund_no": out_refund_no,
@@ -176,4 +176,4 @@ class Refund(WeiXinPay):
         }
         tmp_kwargs.update(**kwargs)
         self.set_params(**tmp_kwargs)
-        return self.post_xml(verify=verify)[1]
+        return self.post_xml(cert=cert)[1]
