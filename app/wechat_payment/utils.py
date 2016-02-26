@@ -92,7 +92,7 @@ def random_str(randomlength=8):
 
 
 def post_xml(url, xml, cert=None):
-    if verify:
+    if cert:
         return requests.post(url, data=xml, cert=cert, verify=False)
     else:
         return requests.post(url, data=xml)
