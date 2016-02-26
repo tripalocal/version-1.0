@@ -33,7 +33,7 @@ class BookingForm(forms.Form):
         return data
 
 class ExperienceUploadForm(forms.Form):
-    status = forms.CharField(max_length=10, required=False)
+    status = forms.CharField(max_length=20, required=False)
     commission = forms.FloatField(required=False)
 
     def clean_status(self):
