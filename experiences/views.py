@@ -2960,7 +2960,6 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
             if type == 'product':
                 setProductDisplayPrice(experience)
-
             else:
                 setExperienceDisplayPrice(experience)
                 experience_tags = experience.get_tags(settings.LANGUAGES[0][0])
@@ -2988,7 +2987,6 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 i += 1
                 continue
 
-
             if language is not None and len(language) > 0 and experience.language is not None and len(experience.language) > 0:
                 experience_language = experience.language.split(";")
                 experience_language = [x.lower() for x in experience_language]
@@ -3001,6 +2999,12 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 if not match:
                     i += 1
                     continue
+
+            #hide the duration if the product is from partners, as it might be set incorrectly
+            if hasattr(experience, "partner") and experience.partner is not None and len(experience.partner)>0:
+                experience.show_duration = False
+            else:
+                experience.show_duration = True
 
             if not experience.currency:
                 experience.currency = 'aud'
