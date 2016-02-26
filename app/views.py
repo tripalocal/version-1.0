@@ -780,6 +780,10 @@ def saveProfileImage(user, profile, image_file):
             wpercent = (basewidth/float(w))
             hsize = int((float(h)*float(wpercent)))
             im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
+            #add watermark
+            mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_logo_stripe.jpg').replace('\\', '/'))
+            im = watermark(im, mark, 'scale', 0.5)
+
             im_out = BytesIO()
             if extension == '.jpg':
                 extension = '.jpeg'
@@ -789,6 +793,17 @@ def saveProfileImage(user, profile, image_file):
             f.write(im_out.getvalue())
             f.close()
         else:
+            #add watermark
+            mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_logo_stripe.jpg').replace('\\', '/'))
+            im = watermark(im, mark, 'scale', 0.25)
+
+            im_out = BytesIO()
+            if extension == '.jpg':
+                extension = '.jpeg'
+            im.save(im_out, format = extension[1:].upper())
+            f.close()
+            f = storage.open(dirname + filename, 'wb')
+            f.write(im_out.getvalue())
             f.close()
 
 @require_POST
