@@ -735,7 +735,8 @@ $(function(){
     if(locations.length > 0)
     {
         var map = new google.maps.Map(document.getElementById('experience_map'), {
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            maxZoom: 16,
         });
 
         var infowindow = new google.maps.InfoWindow();
