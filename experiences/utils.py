@@ -195,7 +195,7 @@ def add_watermark(f, im, extension, dirname, filename):
     im = watermark(im, mark, 'scale', 0.5)
 
     im_out = BytesIO()
-    if extension == '.jpg':
+    if extension.lower() == '.jpg':
         extension = '.jpeg'
     im.save(im_out, format = extension[1:].upper())
     f.close()
