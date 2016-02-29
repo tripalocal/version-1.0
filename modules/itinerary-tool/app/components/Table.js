@@ -1,11 +1,12 @@
 import React, { PropTypes } from 'react'
 import Row from './Row'
 
-const Table = ({ days }) => (
+const Table = ({ dates }) => (
   <table className="table">
     <thead>
       <tr>
         <th>Date</th>
+        <th>City</th>
         <th>Activities</th>
         <th>Transport</th>
         <th>Accommodation</th>
@@ -13,7 +14,7 @@ const Table = ({ days }) => (
       </tr>
     </thead>
     <tbody>
-      {days.map(day => <Row fields={day} key={day.date} />)}
+      {dates.map(date => <Row key={date} date={date} />)}
     </tbody>
   </table>
 )

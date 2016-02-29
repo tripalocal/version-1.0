@@ -1,12 +1,12 @@
 import React from 'react'
 import Bar from './Bar'
-import Table from './Table'
+import DateList from '../containers/DateList'
 import NewItemModal from './NewItemModal'
 
 const App = () => (
   <div>
     <Bar />
-    <Table />
+    <DateList />
     <NewItemModal />
   </div>
 )

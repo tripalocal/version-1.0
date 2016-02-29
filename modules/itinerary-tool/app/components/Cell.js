@@ -5,16 +5,15 @@ import EditMenu from '../containers/EditMenu'
 const Cell = ({ type, items, searchItems, handleChange, showSelect }) => (
   <td>
     {items.map(item => <span data-id="item.id">{item.title}</span>)}
-    {showSelect ? 
-      <Select.Async
-        loadOptions={searchItems}
-        placeholder={type}
-        onChange={handleChange}
-        clearable={false}
-        multi
-      />
-      : null
-    }
+    {showSelect  
+      ? <Select.Async
+          loadOptions={searchItems}
+          placeholder={type}
+          onChange={handleChange}
+          clearable={false}
+          multi
+        />
+      : null}
     <div className="dropdown">
       <button type="button" data-toggle="dropdown">
         <span className="caret"></span>

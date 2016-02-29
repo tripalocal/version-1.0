@@ -6,7 +6,7 @@ const NewItemModal = ({ type, handleClose, handleSubmit }) => (
     <ModalDialog onClose={handleClose}>
       <h3>New {type}</h3>
       <label forName="title">Title</label>
-      <input name="title">
+      <input name="title" />
     </ModalDialog>
   </ModalContainer>
 )
