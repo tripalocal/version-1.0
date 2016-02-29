@@ -1711,17 +1711,32 @@ def saveProfileImage(user, profile, image_file):
 
 def saveExperienceImage(experience, photo, extension, index):
     filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-    dir_name = 'experiences/' + str(experience.id) + '/'
+    dirname = 'experiences/' + str(experience.id) + '/'
 
     photos = Photo.objects.filter(name=filename)
     if len(photos) != 0:
         ph = photos[0]
         photos[0].image.delete()
     else:
-        ph = Photo(name=filename, directory=dir_name, experience=experience)
+        ph = Photo(name=filename, directory=dirname, experience=experience)
 
     ph.image = photo
     ph.save()
+
+    #add watermark
+    f = storage.open(dirname + filename, 'rb')
+    im = PIL.Image.open(f)
+    mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_logo_stripe.jpg').replace('\\', '/'))
+    im = watermark(im, mark, 'scale', 0.5)
+
+    im_out = BytesIO()
+    if extension == '.jpg':
+        extension = '.jpeg'
+    im.save(im_out, format = extension[1:].upper())
+    f.close()
+    f = storage.open(dirname + filename, 'wb')
+    f.write(im_out.getvalue())
+    f.close()
 
     #create the corresponding thumbnail (force .jpg)
     basewidth = 400
@@ -1730,7 +1745,7 @@ def saveExperienceImage(experience, photo, extension, index):
     if storage.exists(thumb_file_name):
         storage.delete(thumb_file_name)
     try:
-        f = storage.open(dir_name + filename, 'rb')
+        f = storage.open(dirname + filename, 'rb')
         img = Image.open(f)
         f_thumb = storage.open(thumb_file_name, "wb")
         wpercent = (basewidth / float(img.size[0]))
@@ -2700,40 +2715,10 @@ def manage_listing_photo(request, experience, context):
                     if file._size > EXPERIENCE_IMAGE_SIZE_LIMIT:
                             raise forms.ValidationError(_('Image size exceeds the limit'))
                     extension = '.jpg'
-                    filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-                    dir_name = 'experiences/' + str(experience.id) + '/'
-
-                    photos = Photo.objects.filter(name=filename)
-                    if len(photos) != 0:
-                        photo = photos[0]
-                        photos[0].image.delete()
-                    else:
-                        photo = Photo(name=filename, directory=dir_name, experience=experience)
-
-
-                    photo.image = file
-                    photo.save()
-
-                    #create the corresponding thumbnail (force .jpg)
-                    basewidth = 400
-                    thumb_file_name = 'thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg'
-
-                    if storage.exists(thumb_file_name):
-                        storage.delete(thumb_file_name)
                     try:
-                        f = storage.open(dir_name + filename, 'rb')
-                        img = Image.open(f)
-                        f_thumb = storage.open(thumb_file_name, "wb")
-                        wpercent = (basewidth / float(img.size[0]))
-                        hsize = int((float(img.size[1]) * float(wpercent)))
-                        img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
-                        img_out = BytesIO()
-                        img.save(img_out, format='JPEG')
-                        f_thumb.write(img_out.getvalue())
-                        f_thumb.close()
+                        saveExperienceImage(experience, file, extension, index)
                     except:
                         return HttpResponse(json.dumps({'success': False}), content_type='application/json')
-
 
             experience.save()
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
