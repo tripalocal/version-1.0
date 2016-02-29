@@ -5,6 +5,8 @@ from Tripalocal_V1 import settings
 from unionpay.util.helper import load_config
 from datetime import timedelta, date
 from copy import deepcopy
+from io import BytesIO
+from django.core.files.storage import default_storage as storage
 
 def isEnglish(s):
     try:
@@ -187,3 +189,16 @@ def watermark(im, mark, position, opacity=1):
 #watermark(im, mark, 'tile', 0.5).show()
 #watermark(im, mark, 'scale', 1.0).show()
 #watermark(im, mark, (100, 100), 0.5).show()
+
+def add_watermark(f, im, extension, dirname, filename):
+    mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_logo_stripe.jpg').replace('\\', '/'))
+    im = watermark(im, mark, 'scale', 0.5)
+
+    im_out = BytesIO()
+    if extension == '.jpg':
+        extension = '.jpeg'
+    im.save(im_out, format = extension[1:].upper())
+    f.close()
+    f = storage.open(dirname + filename, 'wb')
+    f.write(im_out.getvalue())
+    f.close()

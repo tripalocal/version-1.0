@@ -781,30 +781,10 @@ def saveProfileImage(user, profile, image_file):
             hsize = int((float(h)*float(wpercent)))
             im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
             #add watermark
-            mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_logo_stripe.jpg').replace('\\', '/'))
-            im = watermark(im, mark, 'scale', 0.5)
-
-            im_out = BytesIO()
-            if extension == '.jpg':
-                extension = '.jpeg'
-            im.save(im_out, format = extension[1:].upper())
-            f.close()
-            f = storage.open(dirname + filename, 'wb')
-            f.write(im_out.getvalue())
-            f.close()
+            add_watermark(f, im, extension, dirname, filename)
         else:
             #add watermark
-            mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_logo_stripe.jpg').replace('\\', '/'))
-            im = watermark(im, mark, 'scale', 0.25)
-
-            im_out = BytesIO()
-            if extension == '.jpg':
-                extension = '.jpeg'
-            im.save(im_out, format = extension[1:].upper())
-            f.close()
-            f = storage.open(dirname + filename, 'wb')
-            f.write(im_out.getvalue())
-            f.close()
+            add_watermark(f, im, extension, dirname, filename)
 
 @require_POST
 def email_custom_trip(request):

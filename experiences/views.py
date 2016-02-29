@@ -1726,17 +1726,7 @@ def saveExperienceImage(experience, photo, extension, index):
     #add watermark
     f = storage.open(dirname + filename, 'rb')
     im = PIL.Image.open(f)
-    mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_logo_stripe.jpg').replace('\\', '/'))
-    im = watermark(im, mark, 'scale', 0.5)
-
-    im_out = BytesIO()
-    if extension == '.jpg':
-        extension = '.jpeg'
-    im.save(im_out, format = extension[1:].upper())
-    f.close()
-    f = storage.open(dirname + filename, 'wb')
-    f.write(im_out.getvalue())
-    f.close()
+    add_watermark(f, im, extension, dirname, filename)
 
     #create the corresponding thumbnail (force .jpg)
     basewidth = 400
@@ -2717,7 +2707,7 @@ def manage_listing_photo(request, experience, context):
                     extension = '.jpg'
                     try:
                         saveExperienceImage(experience, file, extension, index)
-                    except:
+                    except Exception as err:
                         return HttpResponse(json.dumps({'success': False}), content_type='application/json')
 
             experience.save()
