@@ -174,11 +174,14 @@ def watermark(im, mark, position, opacity=1):
                 layer.paste(mark, (x, y))
     elif position == 'scale':
         # scale, but preserve the aspect ratio
-        ratio = min(float(70) / mark.size[0], float(70) / mark.size[1])
-        w = int(mark.size[0] * ratio)
-        h = int(mark.size[1] * ratio)
+        # width of logo / width of image = 1/6
+        # right margin of logo / width of image = 1/30
+        # top margin = right margin
+        ratio = float(mark.size[0]) / float(mark.size[1]) #min(float(im.size[0]) / mark.size[0], float(im.size[1]) / mark.size[1])
+        w = int(im.size[0]/6)
+        h = int(w/ratio)
         mark = mark.resize((w, h))
-        layer.paste(mark, ((im.size[0] - w), (im.size[1] - h)))
+        layer.paste(mark, (int(im.size[0]*29/30 - w), int(im.size[0]/30)))
     else:
         layer.paste(mark, position)
     # composite the watermark with the layer
@@ -191,7 +194,7 @@ def watermark(im, mark, position, opacity=1):
 #watermark(im, mark, (100, 100), 0.5).show()
 
 def add_watermark(f, im, extension, dirname, filename):
-    mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_logo_stripe.jpg').replace('\\', '/'))
+    mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_watermark.png').replace('\\', '/'))
     im = watermark(im, mark, 'scale', 0.5)
 
     im_out = BytesIO()
