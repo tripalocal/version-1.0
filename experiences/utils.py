@@ -194,12 +194,22 @@ def watermark(im, mark, position, opacity=1):
 #watermark(im, mark, (100, 100), 0.5).show()
 
 def add_watermark(f, im, extension, dirname, filename):
+    #save a copy of the original image
+    filename_org = filename.split(".")[0]+"_original."+filename.split(".")[1]
+    if storage.exists(dirname + filename_org):
+        storage.delete(dirname + filename_org)
+    f_org = storage.open(dirname + filename_org, 'wb')
+    im_out = BytesIO()
+    if extension.lower() == '.jpg':
+        extension = '.jpeg'
+    im.save(im_out, format = extension[1:].upper(), quality=100)
+    f_org.write(im_out.getvalue())
+    f_org.close()
+
     mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_watermark.png').replace('\\', '/'))
     im = watermark(im, mark, 'scale', 0.5)
 
     im_out = BytesIO()
-    if extension.lower() == '.jpg':
-        extension = '.jpeg'
     im.save(im_out, format = extension[1:].upper())
     f.close()
     f = storage.open(dirname + filename, 'wb')
