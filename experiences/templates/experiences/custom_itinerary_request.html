@@ -594,14 +594,23 @@ function updateInterests() {
 }
 
 function validateForm() {
-	if ($('#id_destinations').val() && $('#id_start_date').val() && $('#id_guests_adults').val() && $('#id_name').val() && $('#id_mobile').val() && $('#id_email').val()) {
+  if (!$('#id_destinations').val()) {
+    $.fn.fullpage.moveTo(2);
+    return false;
+  } else if (!$('#id_start_date').val()) {
+    $.fn.fullpage.moveTo(3);
+    return false
+  } else if (!$('#id_guests_adults').val()) {
+    $.fn.fullpage.moveTo(4);
+    return false;
+  } else if (!$('#id_name').val()) {
+    $.fn.fullpage.moveTo(8);
+    return false;
+  } else if (!$('#id_wechat').val()) {
+    $.fn.fullpage.moveTo(8);
+    return false;
+  } else {
 		return true;
-	} else {
-		$('.asterisk').addClass('animated shake').css({'color': 'red'});
-		var wait = window.setTimeout( function(){
-            $('.asterisk').removeClass('animated shake')}, 1000
-        );
-		return false;
 	}
 }
 </script>
