@@ -14,7 +14,7 @@ const Table = ({ dates }) => (
       </tr>
     </thead>
     <tbody>
-      {dates.map(date => <Row key={date} date={date} />)}
+      {Object.keys(dates).map(date => <Row key={date} date={date} />)}
     </tbody>
   </table>
 )

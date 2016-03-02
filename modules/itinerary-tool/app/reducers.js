@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux'
+import { reducer as formReducer } from 'redux-form'
 import Immutable from 'immutable'
 
 function modal(state = 'NONE', action) {
@@ -21,7 +22,8 @@ function dates(state = Immutable.Map(), action) {
 
 const rootReducer = combineReducers({
   modal,
-  dates
+  dates,
+  form: formReducer
 })
 
 export default rootReducer

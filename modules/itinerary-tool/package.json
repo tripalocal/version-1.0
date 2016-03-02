@@ -1,7 +1,7 @@
 {
   "name": "itinerary-tool",
   "version": "1.0.0",
-  "description": "",
+  "description": "A great tool for itineraries",
   "main": "index.js",
   "scripts": {
     "test": "mocha --compilers js:babel-core/register --recursive ./test/",
@@ -9,7 +9,7 @@
     "start": "webpack-dev-server"
   },
   "keywords": [],
-  "author": "",
+  "author": "Kemble Song",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.5.2",
@@ -21,19 +21,20 @@
     "mocha": "^2.4.5",
     "npm-install-webpack-plugin": "^2.0.2",
     "react-addons-test-utils": "^0.14.7",
-    "skin-deep": "^0.14.0",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1",
     "webpack-merge": "^0.7.3"
   },
   "dependencies": {
+    "fetch": "^1.0.1",
     "immutable": "^3.7.6",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
     "react-modal-dialog": "^2.0.0",
     "react-redux": "^4.4.0",
     "react-select": "^1.0.0-beta10",
-    "redux": "^3.3.1"
+    "redux": "^3.3.1",
+    "redux-form": "^4.2.0"
   }
 }

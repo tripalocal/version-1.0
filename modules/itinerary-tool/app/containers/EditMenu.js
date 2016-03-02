@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { showSelect, showModal } from '../actions'
 
-const EditMenu = ({ dispatch, date, field }) => (
+let EditMenu = ({ dispatch, date, field }) => (
   <ul className="dropdown-menu">
     <li>
       <a href="#" onClick={ e => {

@@ -7,7 +7,7 @@ const mapStateToProps = (state) => {
   }
 }
 
-const DateList = connect(mapStateToProps)(Table)
+const TableContainer = connect(mapStateToProps)(Table)
 
-export default DateList
+export default TableContainer
 

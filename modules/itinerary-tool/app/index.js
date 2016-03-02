@@ -6,7 +6,7 @@ import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import rootReducer from './reducers'
-import App from './components/App'
+import App from './containers/App'
 
 /*
   ===============
@@ -59,7 +59,58 @@ import App from './components/App'
 
 */
 
-let initialState = window.STATE_FROM_SERVER
+let initialState = {
+  modal: 'NONE', 
+  dates: {
+    '2016-03-01': {
+      city: 'melbourne',
+      experiences: {
+        items: ['cool activity', 'another one'],
+        host: '',
+        display: 'NORMAL'
+      },
+      transport: {
+        items: [],
+        host: 'Guy',
+        display: 'NORMAL'
+      },
+      accommodation: {
+        items: ['Hilton'],
+        host: 'Guy',
+        display: 'NORMAL'
+      },
+      restaurants: {
+        items: ['Food Inc.'],
+        host: 'Person',
+        display: 'EDIT'
+      }
+    },
+    '2016-03-02': {
+      city: 'melbourne',
+      experiences: {
+        items: ['cool activity', 'another one'],
+        host: '',
+        display: 'NORMAL'
+      },
+      transport: {
+        items: [],
+        host: 'Guy',
+        display: 'NORMAL'
+      },
+      accommodation: {
+        items: ['Hilton'],
+        host: 'Guy',
+        display: 'NORMAL'
+      },
+      restaurants: {
+        items: ['Food Inc.'],
+        host: 'Person',
+        display: 'EDIT'
+      }
+    }
+  }
+}
+
 let store = createStore(rootReducer, initialState)
 
 render(
