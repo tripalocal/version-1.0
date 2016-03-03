@@ -20,41 +20,43 @@
     <div class="jumbotron">
       <div class="container">
         <div class="homepage-logo"></div>
-          <form id="search_form" action="" method="post">
-            {% csrf_token %}
-
-              <div class="search-bar">
-                <div class="container-fluid">
-                  <div class="row">
-                    <div class="search-location col-sm-6">
-                      <div id="id-city" class="ui selection dropdown">
-                        <input type="hidden" name="city" value="city">
-                          <i class="dropdown icon"></i>
-                          <div class="text">{% trans "City" %}</div>
-                          <div id="city-menu" class="menu"></div>
+        <div class="homepage-menu">
+          <div class="homepage-toggle">
+            <h3 style="margin-left:40px;" class="toggle-label">{% trans "Request a trip" %}</h3>
+            <div class="toggle"><div class="switch"></div></div>
+            <h3 class="toggle-label">{% trans "Local experiences" %}</h3>
+          </div>
+          <div id="custom-itinerary" class="homepage-option">
+            <h3>{% trans "Instant price estimate, custom itinerary" %}</h3>
+            <a class="btn btn-primary">{% trans "Start Here" %}</a>
+          </div>
+          <div id="local-experiences" class="homepage-option">
+            <form id="search_form" action="" method="post">
+              {% csrf_token %}
+                <div class="search-bar">
+                  <div class="container-fluid">
+                    <div class="row">
+                      <div class="search-location col-sm-10">
+                        <div id="id-city" class="ui selection dropdown">
+                          <input type="hidden" name="city" value="city">
+                            <i class="dropdown icon"></i>
+                            <div class="text">{% trans "City" %}</div>
+                            <div id="city-menu" class="menu"></div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="search-from col-sm-2">
-                      {{form.start_date}}
-                    </div>
-                    <div class="search-to col-sm-2">
-                      {{form.end_date}}
-                    </div>
-                    <div class="home-search-button col-sm-2">
-                      <input id="search-submit" type="submit" value="{% trans "Search" %}" name="search" class="btn btn-primary btn-search">
+                      <div style="display:none;">
+                        {{form.start_date}}
+                        {{form.end_date}}
+                      </div>
+                      <div class="home-search-button col-sm-2">
+                        <input id="search-submit" type="submit" value="{% trans "Search" %}" name="search" class="btn btn-primary btn-search">
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-            </form>
-            <div>
-            {%if LANGUAGE == "zh-CN"%}
-                <p>{% trans " to get notified when we launch in more countries."%}<a href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></p>
-            {%else%}
-                <p><a href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a>{% trans " to get notified when we launch in more countries."%}</p>
-            {%endif%}
-            </div>
+              </form>
+          </div>
+        </div>
         </div>
     </div>
     <div class="banner-logos">

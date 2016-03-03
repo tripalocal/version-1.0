@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "babel-preset-react": "^6.3.13",
+    "browser-sync": "^2.11.1",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.1",
     "gulp-minify-css": "^1.2.1",

@@ -107,68 +107,50 @@ h1 {
 .jumbotron {
 
   .homepage-logo {
-    height: 200px;
+    height: 80px;
     margin: 0 auto;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    margin-top: 20px;
+    margin-top: 80px;
     @include media('>tablet') {
-      height: 240px;
-      margin-top: 80px;
+      height: 100px;
+      margin-top: 140px;
       margin-bottom: 50px;
     }
   }
 
   .search-bar {
     width: 225px;
-    height: 95px;
     margin: auto;
     background-color: rgba(black, 0.5);
-    @include border-radius(6px);
     @include media('>tablet') {
-      width: 620px;
-      height: 47px;
+      width: 500px;
     }
 
     .search-location {
       padding: 3px;
+      height: 50px;
       @include media('>tablet') {
         padding-right: 0;
       }
     }
-
-    .search-from, .search-to {
-      display: none;
-      padding: 3px;
-      @include media('>tablet') {
-        display: block;
-        margin: 0;
-        padding-left: 0;
-        padding-right: 0;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-      }
-    }
-
-    #id_start_date {
-      height: 40px;
-    }
-
-    #id_end_date {
-      border-top-right-radius: 5px;
-      border-bottom-right-radius: 5px;
-      height: 40px;
-    }
-
-    .home-search-button {
-      padding: 3px;
-      border-radius: 2px;
+    
+    .ui.dropdown > .text {
+      font-size: 18px;
     }
 
     .btn-search {
       width: 100%;
-      height: 40px;
+      height: 50px;
+      border-radius: 2px;
+      @include media('<tablet') {
+        margin-top: 3px;
+      }
+    }
+
+    .home-search-button {
+      padding: 3px;
     }
 
   }
@@ -179,8 +161,50 @@ h1 {
   }
 
   @include media('>tablet') {
-    height: 590px;
+    height: 80vh;
   }
+}
+
+// Toggle switch menu
+.homepage-option {
+  display: none;
+  background-color: rgba(black, 0.5);
+  border-radius: 3px;
+}
+
+.homepage-toggle {
+  color: white;
+  height: 35px;
+  position: relative;
+}
+
+.toggle {
+  width: 80px;
+  height: 35px;
+  border: 1px solid white;
+  border-radius: 20px;
+  position: relative;
+  display: inline-block;
+  margin: 0 15px;
+}
+
+.toggle-label {
+  margin: 0;
+  display: inline-block;
+  font-size: 18px;
+  position: relative;
+  top: -50%;
+  transform: translateY(30%);
+}
+
+.switch {
+  width: 25px;
+  height: 25px;
+  border-radius: 100px;
+  background-color: white;
+  position: absolute;
+  left: 5px;
+  top: 4px;
 }
 
 // Tease box

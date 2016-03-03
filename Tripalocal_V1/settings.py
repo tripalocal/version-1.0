@@ -62,11 +62,11 @@ TIME_ZONE = 'Australia/Melbourne'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'zh-CN'
+LANGUAGE_CODE = 'au-EN'
 
 LANGUAGES = (
-    ('zh', _('Chinese')),
     ('en', _('English')),
+    ('zh', _('Chinese')),
 )
 
 SITE_ID = 1

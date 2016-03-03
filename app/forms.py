@@ -45,8 +45,8 @@ class SubscriptionForm(forms.ModelForm):
 
 class HomepageSearchForm(forms.Form):
     city = forms.ChoiceField(choices=Location, widget=forms.Select(attrs={'id':'id-city','class':'ui dropdown'}))
-    start_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'class':'form-control input-sm'}))
-    end_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'class':'form-control input-sm'}))
+    start_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'class':'form-control input-sm', 'type': 'hidden'}))
+    end_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'class':'form-control input-sm', 'type': 'hidden'}))
 
 class UserProfileForm(forms.Form):
     image = forms.ImageField(required = False)
