@@ -1,21 +1,21 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Bar from '../components/Bar'
-import TableContainer from './TableContainer'
-import ModalContainer from './ModalContainer'
+import TableState from './TableState'
+import ModalState from './ModalState'
 
 export const App = ({ showModal }) => (
   <div>
     <Bar />
-    <TableContainer />
+    <TableState />
     { showModal !== 'NONE'
-      ? <ModalContainer />
+      ? <ModalState />
       : null }
   </div>
 )
 
 const mapStateToProps = (state) => {
-    return { showModal: state.modal }
+  return { showModal: state.modal }
 }
 
 export default connect(mapStateToProps)(App)

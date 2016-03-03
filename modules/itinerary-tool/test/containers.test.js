@@ -19,14 +19,18 @@ function setupApp(modalSetting) {
 }
 
 describe('Containers', () => {
-  describe('App', () => {
+  describe('app', () => {
     it('should render correctly', () => {
       const { output } = setupApp('NONE')
       expect(output.type).to.equal('div')
     })
     it('should not show modal if modal state is NONE', () => {
       const { output } = setupApp('NONE')
-      expect(output.children).to.be.null
+      expect(output.props.children[2]).to.be.null
+    })
+    it('should show modal if modal state is not NONE', () => {
+      const { output } = setupApp('NEW_ITEM')
+      expect(output.props.children[2]).to.not.be.null
     })
   })
 })

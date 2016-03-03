@@ -11,10 +11,12 @@ const submitForm = (dispatch) => {
     response.ok ? console.log("fetch success") : console.log("fetch fail")
     dispatch(showModal('NONE'))
     dispatch(initialize('newItem', {}))
+    dispatch(initialize('assignHost', {}))
   }, (error) => {
     console.log('fetch error')
     dispatch(showModal('NONE'))
     dispatch(initialize('newItem', {}))
+    dispatch(initialize('assignHost', {}))
   })
 }
 
@@ -31,9 +33,9 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-const ModalContainer = connect(
+const ModalState = connect(
   mapStateToProps,
   mapDispatchToProps
 )(Modal)
 
-export default ModalContainer
+export default ModalState

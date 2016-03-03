@@ -21,6 +21,7 @@
     "mocha": "^2.4.5",
     "npm-install-webpack-plugin": "^2.0.2",
     "react-addons-test-utils": "^0.14.7",
+    "react-shallow-testutils": "^1.0.0",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1",

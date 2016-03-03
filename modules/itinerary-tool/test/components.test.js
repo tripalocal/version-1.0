@@ -1,8 +1,12 @@
 import { expect } from 'chai'
 import TestUtils from 'react-addons-test-utils'
+import { isComponentOfType, findAllWithType } from 'react-shallow-testutils'
 import React from 'react'
 import Table from '../app/components/Table'
 import Modal from '../app/components/Modal'
+import AssignHostForm from '../app/components/AssignHostForm'
+import NewItemForm from '../app/components/NewItemForm'
+import { ModalContainer, ModalDialog } from 'react-modal-dialog'
 
 function setupTable() {
   let props = {
@@ -97,15 +101,25 @@ describe('Components', () => {
 
   })
 
+  describe('row', () => {
+    it('should render correctly', () => {
+      const { output } = setupRow()
+      expect(output.type).to.equal('tr')
+      expect(output.props.children[])
+      
+    })
+  })
+
   describe('modal', () => {
     it('should render NewItemForm if setting is NEW_ITEM', () => {
       const { output } = setupModal('NEW_ITEM')
-      expect(output.type).to.eql('ModalContainer')
+      expect(findAllWithType(output, NewItemForm)).to.have.lengthOf(1)
     })
 
     it('should render AssignHostForm if setting is ASSIGN_HOST', () => {
       const { output } = setupModal('ASSIGN_HOST')
-      expect(output.type).to.eql('ModalContainer')
+      expect(isComponentOfType(output, ModalContainer)).to.be.true
+      expect(findAllWithType(output, AssignHostForm)).to.have.lengthOf(1)
     })
   })
 })

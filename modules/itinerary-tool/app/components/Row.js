@@ -1,15 +1,16 @@
 import React, { PropTypes } from 'react'
-import ItemList from '../containers/ItemList'
+import CellState from '../containers/CellState'
 
-const Row = ({ date }) => (
-  <tr> 
+const Row = ({ date, fields }) => (
+  <tr>
+    <td>{date}</td>
     {
-      Object.keys(date).map(field => {
-        if (field === 'city' || field === 'date') {
-          return <td>{fields}</td>
+      Object.keys(fields).map(field => {
+        if (field === 'city') {
+          return <td>{date.field}</td>
         }
         return(
-          <ItemList field={field} />
+          <CellState field={date.field} />
         )
       })
     }
@@ -17,6 +18,7 @@ const Row = ({ date }) => (
 )
 
 Row.propTypes = {
+  date: PropTypes.string
   fields: PropTypes.arrayOf(PropTypes.shape({
     city: PropTypes.string,
     experiences: PropTypes.object,

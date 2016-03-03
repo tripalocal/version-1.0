@@ -10,10 +10,10 @@ const mapDispatchToProps = (dispatch) => {
 
 }
 
-const ItemList = connect(
+const CellState = connect(
   mapStateToProps,
   mapDispatchToProps
 )(Cell)
 
-export default ItemList
+export default CellState
 
