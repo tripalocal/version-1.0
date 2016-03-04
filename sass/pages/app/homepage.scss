@@ -168,43 +168,69 @@ h1 {
 // Toggle switch menu
 .homepage-option {
   display: none;
+}
+
+#custom-itinerary {
+  color: white;
   background-color: rgba(black, 0.5);
   border-radius: 3px;
+  width: 500px;
+  padding: 15px;
+  margin: 0 auto;
+  h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: normal;
+  }
+  .btn {
+    border-radius: 2px;
+    height: 40px;
+    line-height: 27px;
+  }
+  @include media('<tablet') {
+    width: 90%;
+  }
+}
+#label-custom-itinerary {
+  @include media('>=phablet') {
+    margin-left: 30px;
+  }
 }
 
 .homepage-toggle {
   color: white;
-  height: 35px;
+  height: 70px;
   position: relative;
+  @include media('<phablet') {
+    margin: 0 -15px;
+  }
 }
-
-.toggle {
-  width: 80px;
-  height: 35px;
-  border: 1px solid white;
-  border-radius: 20px;
-  position: relative;
-  display: inline-block;
+.switch {
+  width: 100px;
   margin: 0 15px;
+  display: inline-block;
 }
-
 .toggle-label {
   margin: 0;
+  color: rgba(white, 0.5);
+  font-weight: normal;
+  width: 152px;
   display: inline-block;
   font-size: 18px;
   position: relative;
-  top: -50%;
-  transform: translateY(30%);
+  cursor: pointer;
+  top: -40%;
+  transform: translateY(50%);
+  transition: color 0.4s;
+  @include media('<phablet') {
+    font-size: 14px;
+    width: auto;
+  }
 }
-
-.switch {
-  width: 25px;
-  height: 25px;
-  border-radius: 100px;
-  background-color: white;
-  position: absolute;
-  left: 5px;
-  top: 4px;
+.toggle-label.active {
+  font-weight: 500;
+  color: rgba(white, 1);
 }
 
 // Tease box

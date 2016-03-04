@@ -13,6 +13,7 @@
     <meta name="description" content="Established in Australia, Tripalocal is an online travel platform dedicated to providing travelers with various unique local experiences. Tripalocal has an international team capable of meeting travelers demands for authentic local insights, themed activities and tailored trips to suit a range of needs.">
     <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/homepage.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/transition.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -22,13 +23,16 @@
         <div class="homepage-logo"></div>
         <div class="homepage-menu">
           <div class="homepage-toggle">
-            <h3 style="margin-left:40px;" class="toggle-label">{% trans "Request a trip" %}</h3>
-            <div class="toggle"><div class="switch"></div></div>
-            <h3 class="toggle-label">{% trans "Local experiences" %}</h3>
+            <h3 id="label-custom-itinerary" class="toggle-label">{% trans "Request a trip" %}</h3>
+            <div class="switch">
+              <input id="toggle-main" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+              <label for="toggle-main"></label>
+            </div>
+            <h3 id="label-local-experiences" class="toggle-label">{% trans "Local experiences" %}</h3>
           </div>
           <div id="custom-itinerary" class="homepage-option">
             <h3>{% trans "Instant price estimate, custom itinerary" %}</h3>
-            <a class="btn btn-primary">{% trans "Start Here" %}</a>
+            <a class="btn btn-primary" href="{{GEO_POSTFIX}}itinerary/request">{% trans "Start Here" %}</a>
           </div>
           <div id="local-experiences" class="homepage-option">
             <form id="search_form" action="" method="post">
@@ -223,8 +227,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/dropdown.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/transition.min.js"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
     {%if LANGUAGE == "zh-CN"%}
