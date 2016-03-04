@@ -107,8 +107,8 @@ h1 {
 .jumbotron {
 
   .homepage-logo {
-    height: 100px;
-    margin: 80px auto 20px auto;
+    height: 80px;
+    margin: 80px auto 30px auto;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -191,11 +191,6 @@ h1 {
     width: 90%;
   }
 }
-#label-custom-itinerary {
-  @include media('>=phablet') {
-    margin-left: 30px;
-  }
-}
 
 .homepage-toggle {
   color: white;
@@ -224,7 +219,8 @@ h1 {
   transition: color 0.4s;
   @include media('<phablet') {
     font-size: 14px;
-    width: auto;
+    width: 50px;
+    text-align: left;
   }
 }
 .toggle-label.active {
