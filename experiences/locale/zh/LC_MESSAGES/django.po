@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 11:10+1100\n"
+"POT-Creation-Date: 2016-03-04 15:05+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -453,7 +453,7 @@ msgstr "天"
 #: experiences/templates/experiences/api_booking_box.html:26
 #: experiences/templates/experiences/experience_booking_box.html:62
 #: experiences/templates/experiences/product_booking_box.html:35
-#: experiences/templates/experiences/search_result.html:44
+#: experiences/templates/experiences/search_result.html:45
 msgid "Date"
 msgstr "日期"
 
@@ -560,7 +560,7 @@ msgstr "人数"
 #: experiences/templates/experiences/custom_itinerary_left_section.html:440
 #: experiences/templates/experiences/custom_itinerary_left_section.html:537
 #: experiences/templates/experiences/custom_itinerary_left_section.html:618
-#: experiences/templates/experiences/search_result.html:21
+#: experiences/templates/experiences/search_result.html:22
 #: experiences/templates/experiences/supplier_search.html:24
 msgid "Location"
 msgstr "目的地"
@@ -597,7 +597,7 @@ msgstr "添加"
 #: experiences/templates/experiences/custom_itinerary_left_section.html:563
 #: experiences/templates/experiences/custom_itinerary_left_section.html:644
 #: experiences/templates/experiences/experience_detail.html:86
-#: experiences/templates/experiences/search_result.html:448
+#: experiences/templates/experiences/search_result.html:449
 msgid "Cancel"
 msgstr "取消"
 
@@ -606,7 +606,7 @@ msgid "Add City"
 msgstr "添加城市"
 
 #: experiences/templates/experiences/custom_itinerary.html:122
-#: experiences/templates/experiences/search_result.html:88
+#: experiences/templates/experiences/search_result.html:89
 msgid "Search"
 msgstr "搜索"
 
@@ -708,7 +708,7 @@ msgid "Empty itinerary"
 msgstr "无效行程"
 
 #: experiences/templates/experiences/custom_itinerary.html:549
-#: experiences/templates/experiences/search_result.html:88
+#: experiences/templates/experiences/search_result.html:89
 msgid "Update"
 msgstr "刷新"
 
@@ -1008,7 +1008,7 @@ msgid "Guests"
 msgstr "人数"
 
 #: experiences/templates/experiences/custom_itinerary_request.html:267
-#: experiences/templates/experiences/search_result.html:96
+#: experiences/templates/experiences/search_result.html:97
 msgid "Interests"
 msgstr "兴趣"
 
@@ -2068,43 +2068,43 @@ msgstr "准备好了尝试更多体验？"
 msgid "Check out more experiences"
 msgstr "查看其他体验"
 
-#: experiences/templates/experiences/search_result.html:9
+#: experiences/templates/experiences/search_result.html:10
 #: experiences/templates/experiences/supplier_search.html:16
 msgid "Discover"
 msgstr "探索"
 
-#: experiences/templates/experiences/search_result.html:25
+#: experiences/templates/experiences/search_result.html:26
 #: experiences/templates/experiences/supplier_search.html:28
 msgid "City"
 msgstr "市"
 
-#: experiences/templates/experiences/search_result.html:61
+#: experiences/templates/experiences/search_result.html:62
 msgid "Kids friendly only"
 msgstr "仅亲子夏令营"
 
-#: experiences/templates/experiences/search_result.html:69
+#: experiences/templates/experiences/search_result.html:70
 msgid "Drivers only"
 msgstr "领路人自驾"
 
-#: experiences/templates/experiences/search_result.html:77
+#: experiences/templates/experiences/search_result.html:78
 msgid "Private tours only"
 msgstr "仅私人团"
 
-#: experiences/templates/experiences/search_result.html:83
+#: experiences/templates/experiences/search_result.html:84
 msgid ""
 "Interests: food &amp; wine, education, history &amp; culture, architecture"
 msgstr "兴趣：美食美酒，名校游学, 历史人文, 经典建筑"
 
-#: experiences/templates/experiences/search_result.html:83
+#: experiences/templates/experiences/search_result.html:84
 msgid "edit"
 msgstr "修改"
 
-#: experiences/templates/experiences/search_result.html:113
-#: experiences/templates/experiences/search_result.html:454
+#: experiences/templates/experiences/search_result.html:114
+#: experiences/templates/experiences/search_result.html:455
 msgid "More Filters"
 msgstr "更多选项"
 
-#: experiences/templates/experiences/search_result.html:114
+#: experiences/templates/experiences/search_result.html:115
 msgid "Apply Filters"
 msgstr "更新"
 

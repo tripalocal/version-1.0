@@ -2,7 +2,6 @@
 .searchbar{background-image:url(/images/searchbar.jpg);}
 
 @media all and (min-width: 768px) {
-.jumbotron {background-image:url(/images/melbourne.jpg);}
 .tease-box{background-image:url(../img/exps_l.jpg);}
 .support {background-image: url(../img/support_logos_l.jpg);}
 .homepage-logo{background-image:url(../img/top_logo-cn.svg);}
@@ -13,7 +12,6 @@
 .rev03{background-image:url(../img/rev03.jpg)}
 }
 @media all and (max-width: 767px) {
-.jumbotron {background-image:url(/images/melbourne_s.jpg);}
 .tease-box{background-image:url(../img/exps_s.jpg);}
 .support {background-image: url(../img/support_logos_s.jpg);}
 .homepage-logo{background-image:url(../img/top_logo-cn.svg);}
