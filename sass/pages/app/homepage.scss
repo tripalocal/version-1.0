@@ -219,7 +219,7 @@ h1 {
   transition: color 0.4s;
   @include media('<phablet') {
     font-size: 14px;
-    width: 50px;
+    width: 60px;
     text-align: left;
   }
 }
