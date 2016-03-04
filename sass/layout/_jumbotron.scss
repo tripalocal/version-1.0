@@ -4,13 +4,20 @@
 
 
 .jumbotron {
-  height: 425px;
+  height: 500px;
   text-align: center;
   margin-bottom: 0;
+  background: linear-gradient(rgba(0,0,0,0.2),rgba(0,0,0,0.2)), url(/images/img/melbourne.jpg);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   p {
       font-size: 14px;
+  }
+  @include media('<tablet') {
+    background:linear-gradient(rgba(0,0,0,0.2),rgba(0,0,0,0.2)), url(/images/img/melbourne_s.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
   }
 }

@@ -1,7 +1,25 @@
 $(document).ready(function () {
     mixpanel.track("viewed homepage");
-
-
+        
+    $('#label-custom-itinerary').addClass('active');
+    $('#custom-itinerary').fadeIn();
+    $('#toggle-main').change(function() {
+      $('.toggle-label').each(function() {
+        var $this = $(this);
+        $this.hasClass('active') ? $this.removeClass('active') : $this.addClass('active')
+      });
+      $('.homepage-option').each(function() {
+        var $this = $(this);
+        $this.is(':visible') ? $this.hide() : $this.fadeIn()
+      })
+    });
+    $('.toggle-label').click(function() {
+      if ($(this).hasClass('active')) {
+        return false;
+      } else {
+        $('#toggle-main').click();
+      }
+    })
 
     function getParameterByName(name) {
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
