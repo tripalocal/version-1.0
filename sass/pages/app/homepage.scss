@@ -113,7 +113,7 @@ h1 {
     background-repeat: no-repeat;
     background-position: center;
     @include media('>tablet') {
-      height: 120px;
+      height: 100px;
       margin-top: 120px;
       margin-bottom: 50px;
     }
