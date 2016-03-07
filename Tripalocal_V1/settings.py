@@ -241,7 +241,8 @@ LOGGING = {
 }
 
 # Specify the default test runner.
-TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+#TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+TEST_RUNNER = 'Tripalocal_V1.testrunner.TripalocalTestRunner'
 
 AUTH_PROFILE_MODULE = "experience.RegisteredUser"
 
