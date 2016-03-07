@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-04 15:05+1100\n"
+"POT-Creation-Date: 2016-03-07 11:12+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -597,7 +597,7 @@ msgstr "添加"
 #: experiences/templates/experiences/custom_itinerary_left_section.html:563
 #: experiences/templates/experiences/custom_itinerary_left_section.html:644
 #: experiences/templates/experiences/experience_detail.html:86
-#: experiences/templates/experiences/search_result.html:449
+#: experiences/templates/experiences/search_result.html:450
 msgid "Cancel"
 msgstr "取消"
 
@@ -2100,13 +2100,17 @@ msgid "edit"
 msgstr "修改"
 
 #: experiences/templates/experiences/search_result.html:114
-#: experiences/templates/experiences/search_result.html:455
+#: experiences/templates/experiences/search_result.html:456
 msgid "More Filters"
 msgstr "更多选项"
 
 #: experiences/templates/experiences/search_result.html:115
 msgid "Apply Filters"
 msgstr "更新"
+
+#: experiences/templates/experiences/search_result.html:227
+msgid "Discover "
+msgstr "探索"
 
 #: experiences/templates/experiences/topic_culture.html:8
 msgid "Tripalocal | Local Culture"

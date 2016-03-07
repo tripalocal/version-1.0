@@ -5,8 +5,8 @@
 
 {%block head %}
     <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
-    <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/transition.min.css" rel="stylesheet">
+    <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
     <title>{%trans "Discover" %} {{ city_display_name }}</title>
 {%endblock%}
 
@@ -224,6 +224,7 @@
             'tags': $("#id_tags").val(),
             'all_tags': $("#id_all_tags").val()
         }, data)).done(function (response) {
+            window.top.document.title = "{% trans 'Discover ' %}" + city;
             $('#ajax-experience-result').html($(response).find('#experience-results'));
             $('#ajax-experience-count').html($(response).find('#experience-count'));
         }).fail(function () {
