@@ -9,6 +9,9 @@ from io import BytesIO
 from django.core.files.storage import default_storage as storage
 
 def isEnglish(s):
+    if s is None:
+        return False
+
     try:
         s.decode('ascii') if isinstance(s, bytes) else s.encode('ascii')
     except UnicodeDecodeError:
@@ -19,6 +22,10 @@ def isEnglish(s):
         return True
 
 def experience_fee_calculator(price, commission_rate):
+    if price is None or commission_rate is None \
+        or commission_rate >=1.00 or commission_rate < 0:
+        return price
+
     if type(price)==int or type(price) == float:
         COMMISSION_PERCENT = round(commission_rate/(1-commission_rate),3)
         return round(price*(1.00+COMMISSION_PERCENT), 0)*(1.00+settings.STRIPE_PRICE_PERCENT) + settings.STRIPE_PRICE_FIXED
@@ -31,9 +38,19 @@ def convert_currency(price, current_currency, target_currency, conversion=None):
     '''
     if not (type(price)==int or type(price) == float or type(price) == decimal.Decimal):
         return price
+
+    if current_currency is None or len(current_currency) == 0 \
+        or target_currency is None or len(target_currency) == 0 \
+        or current_currency.upper() == target_currency.upper():
+        return price
+
+    if conversion and type(conversion) != dict:
+        return price
+
     if not conversion:
         file_name = 'experiences/currency_conversion_rate/' + current_currency.upper() + '.yaml'
         conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
+
     return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
 
 def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, extra_information=None, language=None):
