@@ -58,3 +58,25 @@ class UtilsTest(TestCase):
         self.assertAlmostEqual(400, get_total_price(experience, 2, 0, 0))
         self.assertAlmostEqual(383.48, get_total_price(experience, 2, 1, 3))
         self.assertAlmostEqual(383.48, get_total_price(experience, 0, 1, 3))
+
+    def test_get_timezone(self):
+        self.assertRaises(AttributeError, get_timezone, None)
+        self.assertEqual("Australia/Melbourne", get_timezone(""))
+        self.assertEqual("Australia/Melbourne", get_timezone("melbourne"))
+        self.assertEqual("Australia/Sydney", get_timezone("sydney"))
+
+    def test_email_account_generator(self):
+        email = email_account_generator()
+        self.assertTrue(len(email) == 10 and email.isalnum() and email.islower())
+        email = email_account_generator(0)
+        self.assertTrue(len(email) == 10 and email.isalnum() and email.islower())
+        email = email_account_generator("&)(&98YIO")
+        self.assertTrue(len(email) == 10 and email.isalnum() and email.islower())
+        email = email_account_generator(16, "&)(&98YIO")
+        self.assertTrue(len(email) == 16 and email.isalnum() and email.islower())
+        email = email_account_generator(9, None)
+        self.assertTrue(len(email) == 9 and email.isalnum() and email.islower())
+        email = email_account_generator(30)
+        self.assertTrue(len(email) == 10 and email.isalnum() and email.islower())
+        email = email_account_generator(7, "a")
+        self.assertTrue(email=="aaaaaaa")
