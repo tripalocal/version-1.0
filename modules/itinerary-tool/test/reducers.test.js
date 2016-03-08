@@ -6,10 +6,10 @@ describe('Reducers', () => {
     it('should return the initial state', () => {
       expect(
         reducer(undefined, {})
-      ).to.equal(
+      ).to.eql(
         {
           modal: 'NONE',
-          dates: '',
+          dates: {},
           form: {} 
         }
       )
@@ -21,9 +21,11 @@ describe('Reducers', () => {
           type: 'SHOW_MODAL',
           setting: 'NEW_ITEM'
         })
-      ).to.equal(
+      ).to.eql(
         {
-          modal: 'NEW_ITEM'
+        modal: 'NEW_ITEM',
+        dates: {},
+        form: {}
         }
       )
     })

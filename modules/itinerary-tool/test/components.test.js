@@ -3,6 +3,7 @@ import TestUtils from 'react-addons-test-utils'
 import { isComponentOfType, findAllWithType } from 'react-shallow-testutils'
 import React from 'react'
 import Table from '../app/components/Table'
+import Row from '../app/components/Row'
 import Modal from '../app/components/Modal'
 import AssignHostForm from '../app/components/AssignHostForm'
 import NewItemForm from '../app/components/NewItemForm'
@@ -86,6 +87,28 @@ function setupModal(setting) {
   }
 }
 
+function setupRow() {
+  const props = {
+    date: '2016-03-01',
+    fields: {
+      city: 'Melbourne',
+      experiences: {},
+      transport: {},
+      accommodation: {},
+      restaurants: {}
+    }
+  }
+  let renderer = TestUtils.createRenderer()
+  renderer.render(<Row {...props} />)
+  let output = renderer.getRenderOutput()
+
+  return {
+    props,
+    output,
+    renderer
+  }
+}
+
 describe('Components', () => {
   describe('table', () => {
     it('should render correctly', () => {
@@ -98,15 +121,22 @@ describe('Components', () => {
       expect(thead.type).to.equal('thead')
       expect(tbody.type).to.equal('tbody')
     })
-
+    
   })
 
   describe('row', () => {
     it('should render correctly', () => {
       const { output } = setupRow()
-      expect(output.type).to.equal('tr')
-      expect(output.props.children[])
       
+      expect(output.type).to.equal('tr')
+      expect(output.props.children[0].type).to.equal('td')
+    })
+    it('should render a column for each field', () => {
+      const { output } = setupRow()
+      let columns = output.props.children
+      let fields = columns[1]
+      expect(columns[0].props.children).to.equal('2016-03-01')
+      expect(fields).to.have.lengthOf(5)
     })
   })
 

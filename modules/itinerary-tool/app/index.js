@@ -65,7 +65,7 @@ let initialState = {
     '2016-03-01': {
       city: 'melbourne',
       experiences: {
-        items: ['cool activity', 'another one'],
+        items: [{title: 'great activity', id: 1205}, {title: 'another great one', id:14902}],
         host: '',
         display: 'NORMAL'
       },
@@ -88,7 +88,7 @@ let initialState = {
     '2016-03-02': {
       city: 'melbourne',
       experiences: {
-        items: ['cool activity', 'another one'],
+        items: [{title: 'cool activity', id: 54950}, {title: 'another one', id: 54135}],
         host: '',
         display: 'NORMAL'
       },
@@ -103,7 +103,7 @@ let initialState = {
         display: 'NORMAL'
       },
       restaurants: {
-        items: ['Food Inc.'],
+        items: [{title: 'Food Inc.', id: 12345}],
         host: 'Person',
         display: 'EDIT'
       }

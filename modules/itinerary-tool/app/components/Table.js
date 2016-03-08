@@ -14,15 +14,13 @@ const Table = ({ dates }) => (
       </tr>
     </thead>
     <tbody>
-      {Object.keys(dates).map(date => <Row key={date} date={date} fields={dates.date} />)}
+     {Object.keys(dates).map(date => <Row key={date} date={date} fields={dates[date]} />)}
     </tbody>
   </table>
 )
 
 Table.propTypes = {
-  days: PropTypes.array,
-  handleChange: PropTypes.func,
-  searchItems: PropTypes.func
+  dates: PropTypes.object
 }
 
 export default Table

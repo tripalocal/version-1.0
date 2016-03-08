@@ -1,9 +1,10 @@
 import { connect } from 'react-redux'
 import { initialize } from 'redux-form'
-import fetch from 'fetch'
+import { showModal } from '../actions'
+//import fetch from 'fetch'
 import Modal from '../components/Modal'
 
-const submitForm = (dispatch) => {
+const submitForm = (dispatch, data) => {
   fetch('http://www.tripalocal.com/itinerary', {
     method: 'POST',
     body: JSON.stringify(data)
@@ -22,14 +23,14 @@ const submitForm = (dispatch) => {
 
 const mapStateToProps = (state) => {
   return {
-    type: state.modal,
+    setting: state.modal,
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    handleClose: dispatch(showModal('NONE')),
-    handleSubmit: submitForm(dispatch)
+    handleClose: () => dispatch(showModal('NONE')),
+    handleSubmit: (data) => submitForm(dispatch,data)
   }
 }
 

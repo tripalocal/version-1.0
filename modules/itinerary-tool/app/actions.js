@@ -1,19 +1,15 @@
-export const addItem = (item) => {
+export const updateItems = (date, field, value) => {
   return {
-    type: 'ADD_ITEM',
-
+    type: 'UPDATE_ITEMS',
+    date,
+    field,
+    value
   }
 }
 
 export const newItem = (item) => {
   return {
     type: 'NEW_ITEM'
-  }
-}
-
-export const deleteItem = (item, date) => {
-  return {
-    type: 'DELETE_ITEM'
   }
 }
 

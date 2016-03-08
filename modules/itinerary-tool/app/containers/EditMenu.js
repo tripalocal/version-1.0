@@ -2,12 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { showSelect, showModal } from '../actions'
 
-let EditMenu = ({ dispatch, date, field }) => (
+let EditMenu = ({ dispatch, date, fieldName }) => (
   <ul className="dropdown-menu">
     <li>
       <a href="#" onClick={ e => {
         e.preventDefault()
-        dispatch(showSelect(date, field))
+        dispatch(showSelect(date, fieldName, 'EDIT'))
       }}>
         Edit
       </a>

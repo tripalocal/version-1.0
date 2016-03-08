@@ -6,15 +6,9 @@ import AssignHostForm from './AssignHostForm'
 const Modal = ({setting, handleClose, handleSubmit }) => (
   <ModalContainer onClose={handleClose}>
     <ModalDialog onClose={handleClose}>
-      {(() => {
-        switch(setting) {
-          case 'NEW_ITEM':
-            return <NewItemForm handleSubmit={handleSubmit} />
-            case 'ASSIGN_HOST':
-              return <AssignHostForm handleSubmit={handleSubmit} />
-              default: return
-        }
-      })()}
+      {setting === 'NEW_ITEM'
+        ? <NewItemForm handleSubmit={handleSubmit} />
+        : <AssignHostForm handleSubmit={handleSubmit} />}
     </ModalDialog>
   </ModalContainer>
 )
