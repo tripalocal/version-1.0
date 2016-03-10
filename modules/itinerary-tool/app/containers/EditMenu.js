@@ -15,7 +15,7 @@ let EditMenu = ({ dispatch, date, fieldName }) => (
     <li>
       <a href="#" onClick={ e => {
         e.preventDefault()
-        dispatch(showModal('ASSIGN_HOST'))
+        dispatch(showModal(date, fieldName, 'ASSIGN_HOST'))
       }}>
         Assign host
       </a>

@@ -13,6 +13,7 @@ const Cell = ({ date, field, fieldName, showSelect, hideSelect, getOptions, hand
         labelKey="title"
         valueKey="id"
         onChange={handleChange}
+        clearable={false}
         multi
       />
     : 

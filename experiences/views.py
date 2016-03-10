@@ -3902,8 +3902,24 @@ def itinerary_booking_successful(request, itinerary_id):
 
     return HttpResponseRedirect(GEO_POSTFIX + "itinerary/" + itinerary_id)
 
-def itinerary_tool(request):
+def itinerary_tool(request, id=None):
     context = RequestContext(request)
+    bookings = list(CustomItinerary.objects.get(id=id).booking_set.order_by('datetime').all()) 
+    itinerary = {}
+    for booking in bookings:
+        title = booking.experience.get_information(settings.LANGUAGES[0][0]).title
+        type = booking.experience.type.lower()
+        if type == 'suggestion' or type == 'privateproduct' or type == 'publicproduct' or type == 'private' or type == 'public':
+            type = 'experiences'
+        city = booking.experience.city
+        key = booking.datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime('%Y-%m-%d')
+
+        if key not in itinerary:
+            itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurant': {'items': [], 'host': '', 'display': 'NORMAL'}}})
+
+        itinerary[key][type]['items'].append({'id': id, 'title': title})
+    
+    context['itinerary'] = itinerary
     return render_to_response('experiences/itinerary_tool.html', {}, context)
 
 def campaign(request):

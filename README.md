@@ -73,17 +73,17 @@ static folder ready to be included in the template.
 
 ### To compile source
 1. `cd modules/itinerary-tool`
-2. `npm build`
+2. `npm run build`
 This will compile all the source code from the `app` directory and bundle it 
 into a single minified bundle.js in the `build` directory. You can then `cd` 
 back to the root directory and run the export task explained previously.
 
 ### To Run tests
 1. `cd modules/itinerary-tool`
-2. `npm test`
+2. `npm run test`
 
 ### To run a dev-server with live reloading
 1. `cd modules/itinerary-tool`
-2. `npm start`
+2. `npm run start`
 3. Open a browser to localhost:8080
 4. Happy hacking!

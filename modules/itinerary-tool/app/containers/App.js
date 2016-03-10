@@ -15,7 +15,7 @@ export const App = ({ showModal }) => (
 )
 
 const mapStateToProps = (state) => {
-  return { showModal: state.modal }
+  return { showModal: state.modal['display'] }
 }
 
 export default connect(mapStateToProps)(App)

@@ -8,7 +8,7 @@ describe('Reducers', () => {
         reducer(undefined, {})
       ).to.eql(
         {
-          modal: 'NONE',
+          modal: {date: '', field: '', display: 'NONE'},
           dates: {},
           form: {} 
         }
@@ -19,11 +19,13 @@ describe('Reducers', () => {
       expect(
         reducer({}, {
           type: 'SHOW_MODAL',
+          date: '2016-03-04',
+          field: 'experiences',
           setting: 'NEW_ITEM'
         })
       ).to.eql(
         {
-        modal: 'NEW_ITEM',
+        modal: {date: '2016-03-04', field: 'experiences', display: 'NEW_ITEM'},
         dates: {},
         form: {}
         }
@@ -33,11 +35,18 @@ describe('Reducers', () => {
 
   describe('dates', () => {
     it('should return the initial state', () => {
-
+      expect(
+        reducer(undefined, {})
+      ).to.eql(
+        {
+          modal: {date: '', field: '', display: 'NONE'},
+          dates: {},
+          form: {} 
+        }
+      )
     })
 
     it('should handle SHOW_SELECT', () => {
-
     })
   })
 })

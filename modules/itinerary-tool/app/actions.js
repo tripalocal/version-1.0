@@ -9,19 +9,25 @@ export const updateItems = (date, field, value) => {
 
 export const newItem = (item) => {
   return {
-    type: 'NEW_ITEM'
+    type: 'NEW_ITEM',
+    item
   }
 }
 
-export const assignHost = (host, date) => {
+export const assignHost = (date, field, host) => {
   return {
-    type: 'ASSIGN_HOST'
+    type: 'ASSIGN_HOST',
+    date,
+    field,
+    host
   }
 }
 
-export const showModal = (setting) => {
+export const showModal = (date, field, setting) => {
   return {
     type: 'SHOW_MODAL',
+    date,
+    field,
     setting
   }
 }

@@ -1,4 +1,3 @@
-import './main.css'
 import './react-select.css'
 
 import React from 'react'
@@ -15,52 +14,12 @@ import App from './containers/App'
   `modal` takes a string
   `dates` takes an Immutable.Map object
   =====================================
-
-  {
-    modal: ("NEW_ITEM", "ASSIGN_HOST", "NONE"),
-    dates: {
-      '2016-02-26': { 
-        city: melbourne,
-        experiences: {
-          items: [
-            {
-              id: 12345,
-              title: "Great experience"
-            },
-            ...
-          ],
-          host: "Some person",
-          display: ("EDIT", "NORMAL")
-        },
-        transport: {
-          items: [...],
-          host: "Some person",
-          display: ("EDIT", "NORMAL")
-        },
-        accommodation: {
-          items: [...],
-          host: "Some person",
-          display: ("EDIT", "NORMAL")
-        },
-        restaurants: {
-          items: [...],
-          host: "Some person",
-          display: ("EDIT", "NORMAL")
-        } 
-      },
-      '2016-02-27': {
-        city: melbourne,
-        experiences: {...},
-        ...
-      }, 
-      ...   
-    }
-  }
-
-*/
-
 let initialState = {
-  modal: 'NONE', 
+  modal: {
+    display: 'NONE',
+    date: '',
+    field: ''
+  }, 
   dates: {
     '2016-03-01': {
       city: 'melbourne',
@@ -82,7 +41,7 @@ let initialState = {
       restaurants: {
         items: ['Food Inc.'],
         host: 'Person',
-        display: 'EDIT'
+        display: 'NORMAL'
       }
     },
     '2016-03-02': {
@@ -105,13 +64,13 @@ let initialState = {
       restaurants: {
         items: [{title: 'Food Inc.', id: 12345}],
         host: 'Person',
-        display: 'EDIT'
+        display: 'NORMAL'
       }
     }
   }
 }
-
-let store = createStore(rootReducer, initialState)
+*/
+let store = createStore(rootReducer, window.initialState)
 
 render(
   <Provider store={store}>

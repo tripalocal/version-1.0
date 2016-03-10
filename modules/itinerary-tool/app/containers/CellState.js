@@ -17,7 +17,12 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         callback(null, {
             options: [
                 { id: 12345, title: 'Super Cool' },
-                { id: 2935, title: 'Insanely Great' }
+                { id: 2935, title: 'Insanely Great'},
+                { id: 82938, title: 'Wow Cool' },
+                { id: 1289, title: 'Cool Cool' },
+                { id: 20215, title: 'Great Thang' },
+                { id: 9978, title: 'Wow Ting' },
+                { id: 1245, title: 'Foobar' }
             ],
             complete: true
         });
