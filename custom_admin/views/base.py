@@ -58,7 +58,7 @@ class StatusGenerator:
                         previous_status = previous_status + '_' + ele
                 previous_status = previous_status[1:]
 
-                manipulate_function_name = '_manipulate_' + previous_status + '_booking'
+                manipulate_function_name = '_manipulate_' + previous_status.lower() + '_booking'
                 manipulate_function = getattr(self, manipulate_function_name)
                 manipulate_function(booking)
                 booking.datetime = localtime(booking.datetime)
