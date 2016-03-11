@@ -251,7 +251,7 @@ def search_experience(condition, language="zh", type="experience"):
     result = AbstractExperience.objects.filter(id__in=result)
     return result
 
-def get_available_experiences(exp_type, start_datetime, end_datetime, guest_number=None, city=None, language=None, keywords=None, customer=None, preference=None, currency=None, skip_availability=False, from_id=None):
+def get_available_experiences(exp_type, start_datetime, end_datetime, city, guest_number=None, language=None, keywords=None, customer=None, preference=None, currency=None, skip_availability=False, from_id=None):
     #city/keywords is a string like A,B,C,
     available_options = []
     start_datetime = start_datetime.replace(hour=2)
@@ -564,61 +564,6 @@ def get_available_experiences(exp_type, start_datetime, end_datetime, guest_numb
             selected_newproduct[experience.city.lower()] += 1
 
     return available_options
-
-def experience_availability(request):
-    if not request.user.is_authenticated() or not request.user.is_staff:
-        return HttpResponseRedirect(GEO_POSTFIX)
-
-    context = RequestContext(request)
-    form = ExperienceAvailabilityForm()
-
-    if request.method == 'POST':
-        form = ExperienceAvailabilityForm(request.POST)
-
-        if form.is_valid():
-            start_datetime = form.cleaned_data['start_datetime'] if 'start_datetime' in form.cleaned_data and form.cleaned_data['start_datetime'] != None else pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE))
-            end_datetime = form.cleaned_data['end_datetime'] if 'end_datetime' in form.cleaned_data and form.cleaned_data['end_datetime'] != None else pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone(settings.TIME_ZONE)) + timedelta(days=1)
-            local_timezone = pytz.timezone(settings.TIME_ZONE)
-            available_options = []
-
-            available_options = get_available_experiences('experience', start_datetime, end_datetime)
-
-            #add title
-            dict = {'id':'Id', 'title':'Title', 'host':'Host', 'dates':{}}
-            sdt = start_datetime
-            while (sdt <= end_datetime):
-                dict['dates'][sdt.astimezone(local_timezone).strftime("%Y/%m/%d")] = [{'time_string':sdt.astimezone(local_timezone).strftime("%m/%d")}]
-                sdt += relativedelta(days=1)
-            dict['dates'] = OrderedDict(sorted(dict['dates'].items(), key=lambda t: t[0]))
-            available_options.insert(0,dict)
-
-            #workbook = xlsxwriter.Workbook(os.path.join(os.path.join(settings.PROJECT_ROOT,'xls'), 'Experience availability.xlsx'))
-            #worksheet = workbook.add_worksheet()
-
-            #row = 0
-            #for experience in available_options:
-            #    col = 0
-            #    worksheet.write(row, col, experience['id'])
-            #    col += 1
-            #    worksheet.write(row, col, experience['title'])
-            #    col += 1
-            #    worksheet.write(row, col, experience['host'])
-            #    col += 1
-            #    for date, slots in experience['dates'].items():
-            #        str=''
-            #        for slot in slots:
-            #            str += slot['time_string']
-            #            if 'instant_booking' in slot and slot['instant_booking']:
-            #                str += '(I)'
-            #            str += ' '
-            #        worksheet.write(row, col, str)
-            #        col += 1
-            #    row += 1
-            #workbook.close()
-
-            return render_to_response('experiences/experience_availability.html', {'form':form,'available_options':available_options}, context)
-
-    return render_to_response('experiences/experience_availability.html', {'form':form}, context)
 
 class ExperienceListView(ListView):
     template_name = 'experiences/experience_list.html'
@@ -3205,7 +3150,7 @@ def get_itinerary(type, start_datetime, end_datetime, guest_number, city, langua
         config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_elderly.yaml').replace('\\', '/')))
         config.update(load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/itinerary_configuration/not_for_children.yaml').replace('\\', '/')))
 
-    available_options = get_available_experiences(type, start_datetime, end_datetime, guest_number, city, language, keywords, customer=customer, preference=config, currency=currency, skip_availability=skip_availability, from_id=from_id)
+    available_options = get_available_experiences(type, start_datetime, end_datetime, city, guest_number, language, keywords, customer=customer, preference=config, currency=currency, skip_availability=skip_availability, from_id=from_id)
     itinerary = []
     dt = start_datetime
 

@@ -5,12 +5,14 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-import django, django.conf, Tripalocal_V1
+import django, django.conf, Tripalocal_V1, pytz
 from django.test import TestCase
 from experiences.utils import *
 from experiences.models import *
 from experiences.views import *
 from builtins import ValueError
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 # TODO: Configure your database in settings.py and sync before running tests.
 
@@ -101,3 +103,33 @@ class ViewsTest(TestCase):
         convert_experience_price(request, experience)
         self.assertEqual(0, experience.dynamic_price.find("960.0,614.69,"))
         self.assertEqual("CNY", experience.currency)
+
+        experience = NewProduct.objects.get(id=700013)
+        request.session["custom_currency"] = "AUD"
+        set = convert_experience_price(request, experience)
+        self.assertEqual(2, len(set))
+        self.assertAlmostEqual(278.95, set[0]["optionitem_set"][0]["price"])
+        self.assertEqual("AUD", experience.currency.upper())
+
+        request.session["custom_currency"] = "CNY"
+        set = convert_experience_price(request, experience)
+        self.assertEqual(2, len(set))
+        self.assertAlmostEqual(278.95*4.8, set[0]["optionitem_set"][0]["price"])
+        self.assertEqual("CNY", experience.currency.upper())
+
+    def test_get_available_experiences(self):
+        self.assertRaises(AttributeError, get_available_experiences, None, None, None, None)
+        self.assertRaises(AttributeError, get_available_experiences, None,
+                          pytz.timezone('UTC').localize(datetime.now()),
+                          pytz.timezone('UTC').localize(datetime.now()) + relativedelta(days=1),
+                          None)
+        exps = get_available_experiences("experience",
+                          pytz.timezone('UTC').localize(datetime.now()),
+                          pytz.timezone('UTC').localize(datetime.now()) + relativedelta(days=1),
+                          "Melbourne,")
+        self.assertEqual(70, len(exps))
+        exps = get_available_experiences("experience",
+                          pytz.timezone('UTC').localize(datetime.now()),
+                          pytz.timezone('UTC').localize(datetime.now()) + relativedelta(days=1),
+                          "Melbourne,",1)
+        self.assertEqual(74, len(exps))
