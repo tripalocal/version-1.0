@@ -65,9 +65,10 @@ Make sure you include the following imports at the top if you want to use sass v
 ## Javascript modules
 Javascript apps exist in their own directory under `/modules`.
 
-### To export the build to its corresponding static folder 
+### To compile and export the build to its corresponding static folder 
 `gulp itinerary-tool` where *itinerary-tool* is the name of the module.
 **Note: you have to be at the project root ie. website_v1.0/**
+This task will automagically compile source, optimize/minify the file, rename and export it appropriately. 
 You will find the production ready `itinerary-tool.min.js` in the correct
 static folder ready to be included in the template.
 
@@ -75,8 +76,7 @@ static folder ready to be included in the template.
 1. `cd modules/itinerary-tool`
 2. `npm run build`
 This will compile all the source code from the `app` directory and bundle it 
-into a single minified bundle.js in the `build` directory. You can then `cd` 
-back to the root directory and run the export task explained previously.
+into a single minified bundle.js in the `build` directory.
 
 ### To Run tests
 1. `cd modules/itinerary-tool`

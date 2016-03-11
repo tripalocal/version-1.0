@@ -3915,11 +3915,11 @@ def itinerary_tool(request, id=None):
         key = booking.datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime('%Y-%m-%d')
 
         if key not in itinerary:
-            itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurant': {'items': [], 'host': '', 'display': 'NORMAL'}}})
+            itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}})
 
         itinerary[key][type]['items'].append({'id': id, 'title': title})
     
-    context['itinerary'] = itinerary
+    context['itinerary'] = json.dumps(itinerary)
     return render_to_response('experiences/itinerary_tool.html', {}, context)
 
 def campaign(request):

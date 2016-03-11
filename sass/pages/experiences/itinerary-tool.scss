@@ -4,12 +4,40 @@
 
 */
 
+@import
+  '../../vendor/include-media',
+  '../../utils/variables',
+  '../../utils/mixins',
+  '../../utils/functions',
+  '../../utils/placeholders';
+
 body {
   padding-top: 50px;
 }
 
+.side-banner {
+  display: none;
+}
+
+.zopim {
+  display: none !important;
+}
+
 .container {
-  padding-top: 30px;
-  padding-bottom: 30px;
+  padding: 30px;
   min-height: 100vh;
+  width: 90%;
+}
+
+.btn-default {
+  background-color: $off-white;
+  color: $off-white;
+  &:hover {
+    background-color: $off-white;
+    color: $medium-grey;
+  }
+}
+
+.Select-control {
+  background-color: $off-white !important;
 }

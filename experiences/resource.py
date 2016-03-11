@@ -1554,12 +1554,11 @@ def service_search_text(request, format=None):
     '''
 
     try:
-        data = request.data
+        data = json.loads(request.body.decode('utf-8')) 
         action = data.get('action',None)
         title = data.get('title',None)
         city = data.get('city',None)
         category = data.get('category','all')
-
         if action and action == "clear":
             recent_search("clear")
             return Response(status=status.HTTP_200_OK)
@@ -1609,7 +1608,7 @@ def service_search_text(request, format=None):
             experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
                           list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id')) + \
                           list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Flight','Transfer','Accommodation','Suggestion','Pricing','Restaurnat'], city=city).order_by('id'))
-        elif category.lower() == "products":
+        elif category.lower() == "products" or category.lower() == "experiences":
             experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
                           list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id'))
         else:

@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import Select from 'react-select'
 import EditMenu from '../containers/EditMenu'
 
-const Cell = ({ date, field, fieldName, showSelect, hideSelect, getOptions, handleChange }) => (
+const Cell = ({ date, city, field, fieldName, showSelect, hideSelect, getOptions, handleChange }) => (
   <td>
     { showSelect 
     ? 
@@ -14,6 +14,7 @@ const Cell = ({ date, field, fieldName, showSelect, hideSelect, getOptions, hand
         valueKey="id"
         onChange={handleChange}
         clearable={false}
+        cacheAsyncResults={false}
         multi
       />
     : 

@@ -14,7 +14,8 @@ import App from './containers/App'
   `modal` takes a string
   `dates` takes an Immutable.Map object
   =====================================
-let initialState = {
+  */
+window.initialState = {
   modal: {
     display: 'NONE',
     date: '',
@@ -69,7 +70,7 @@ let initialState = {
     }
   }
 }
-*/
+
 let store = createStore(rootReducer, window.initialState)
 
 render(
