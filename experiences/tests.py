@@ -5,7 +5,7 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-import django, django.conf, Tripalocal_V1, pytz
+import django, django.conf, Tripalocal_V1, pytz, stripe
 from django.test import TestCase
 from experiences.utils import *
 from experiences.models import *
@@ -15,6 +15,18 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 # TODO: Configure your database in settings.py and sync before running tests.
+
+def create_stripe_token():
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    token = stripe.Token.create(
+                card={
+                "number": '4242424242424242',
+                "exp_month": 12,
+                "exp_year": 2017,
+                "cvc": '123'
+                },
+            )
+    return token["id"]
 
 class UtilsTest(TestCase):
     def test_isEnglish(self):
@@ -133,3 +145,25 @@ class ViewsTest(TestCase):
                           pytz.timezone('UTC').localize(datetime.now()) + relativedelta(days=1),
                           "Melbourne,",1)
         self.assertEqual(74, len(exps))
+
+    def test_experience_booking_confirmation(self):
+        token = create_stripe_token()
+
+        response = self.client.post("/experience_booking_confirmation/", {"user_id": 1,
+                                                                    "experience_id": 20,
+                                                                    "date": "2016-03-18",
+                                                                    "time": "15:00",
+                                                                    "adult_number": 2,
+                                                                    "child_number": 3,
+                                                                    "status": "Requested",
+                                                                    "promo_code": None,
+                                                                    "first_name": "first",
+                                                                    "last_name": "last",
+                                                                    "phone_number": "+61 412341234",
+                                                                    "coupon_extra_information": None,
+                                                                    "booking_extra_information": None,
+                                                                    "partner_product_information": "", #"{\"54531\":2, \"57164\":3}",
+                                                                    "custom_currency": "AUD",
+                                                                    "stripeToken": token})
+
+        self.assertContains(response, "Successful Booking", 1, 200)
