@@ -237,10 +237,10 @@ def resort_experiences(experiences, experiences_not_interested, experience_inter
 def search_experience(condition, language="zh", type="experience"):
     cursor = connections['default'].cursor()
     result = []
-    cmds = ["select product_id from experiences_newproducti18n where language='%%s%' and " + \
-           "title like %s or description like '%%s%';",
-           "(select experience_id from experiences_experiencetitle where language=%s and title like '%%s%') union" + \
-           "(select experience_id from experiences_experiencedescription where language=%s and description like '%%s%');"]
+    cmds = ["select product_id from experiences_newproducti18n where language=%s and " + \
+           "(title like %s or description like %s);",
+           "select experience_id from experiences_experiencei18n where language=%s and " + \
+           "(title like %s or description like %s);"]
 
     for cmd in cmds:
         cursor.execute(cmd, [language, condition, condition])

@@ -147,8 +147,28 @@ class ViewsTest(TestCase):
         self.assertEqual(74, len(exps))
 
     def test_experience_booking_confirmation(self):
+        #book a partner product via stripe
         token = create_stripe_token()
+        response = self.client.post("/experience_booking_confirmation/", {"user_id": 1,
+                                                                    "experience_id": 700013,
+                                                                    "date": "2016-03-18",
+                                                                    "time": "15:00",
+                                                                    "adult_number": 2,
+                                                                    "child_number": 3,
+                                                                    "status": "Requested",
+                                                                    "promo_code": "",
+                                                                    "first_name": "first",
+                                                                    "last_name": "last",
+                                                                    "phone_number": "+61 412341234",
+                                                                    "coupon_extra_information": "",
+                                                                    "booking_extra_information": "",
+                                                                    "partner_product_information": "{\"54531\":2, \"57164\":3}",
+                                                                    "custom_currency": "AUD",
+                                                                    "stripeToken": token})
+        self.assertContains(response, "Successful Booking", 1, 200)
 
+        #book an experience via stripe
+        token = create_stripe_token()
         response = self.client.post("/experience_booking_confirmation/", {"user_id": 1,
                                                                     "experience_id": 20,
                                                                     "date": "2016-03-18",
@@ -156,14 +176,16 @@ class ViewsTest(TestCase):
                                                                     "adult_number": 2,
                                                                     "child_number": 3,
                                                                     "status": "Requested",
-                                                                    "promo_code": None,
+                                                                    "promo_code": "",
                                                                     "first_name": "first",
                                                                     "last_name": "last",
                                                                     "phone_number": "+61 412341234",
-                                                                    "coupon_extra_information": None,
-                                                                    "booking_extra_information": None,
-                                                                    "partner_product_information": "", #"{\"54531\":2, \"57164\":3}",
+                                                                    "coupon_extra_information": "",
+                                                                    "booking_extra_information": "",
+                                                                    "partner_product_information": "",
                                                                     "custom_currency": "AUD",
                                                                     "stripeToken": token})
-
         self.assertContains(response, "Successful Booking", 1, 200)
+
+    def test_search_experience(self):
+        self.assertEqual(56, len(search_experience("%Melbourne%", "zh")))
