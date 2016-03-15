@@ -189,3 +189,25 @@ class ViewsTest(TestCase):
 
     def test_search_experience(self):
         self.assertEqual(56, len(search_experience("%Melbourne%", "zh")))
+
+    def test_getAvailableOptions(self):
+        experience = NewProduct.objects.get(id=852)
+        available_options = []
+        available_date = ()
+        available_date = getAvailableOptions(experience, available_options, available_date,
+                                             pytz.timezone(experience.get_timezone()).localize(datetime(2016, 3, 18, 0)))
+        self.assertEqual(31, len(available_date))
+        self.assertEqual(31*14, len(available_options))
+
+    def test_get_related_experiences(self):
+        request = self.client.request(method="GET").wsgi_request
+        request.session["custom_currency"] = "CNY"
+        #has been booked
+        experience = Experience.objects.get(id=20)
+        self.assertEqual(2, len(get_related_experiences(experience, request)))
+        #has been tagged
+        experience = Experience.objects.get(id=30)
+        self.assertEqual(2, len(get_related_experiences(experience, request)))
+        #other
+        experience = NewProduct.objects.get(id=1001)
+        self.assertEqual(2, len(get_related_experiences(experience, request)))
