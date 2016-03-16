@@ -211,3 +211,31 @@ class ViewsTest(TestCase):
         #other
         experience = NewProduct.objects.get(id=1001)
         self.assertEqual(2, len(get_related_experiences(experience, request)))
+
+    def test_get_experience_popularity(self):
+        experience = Experience.objects.get(id=20)
+        #SELECT experience_id, count(experience_id)
+        #FROM app_userpageviewrecord
+        #where time_arrived >= NOW() - INTERVAL 30 DAY and 
+        #(select type from experiences_experience where abstractexperience_ptr_id=experience_id) in ('PRIVATE', 'NONPRIVATE')
+        #group by experience_id 
+        #order by count(experience_id) desc;
+        self.assertAlmostEqual(100-100*5/248, get_experience_popularity(experience))
+
+        experience = Experience.objects.get(id=651)
+        #SELECT experience_id, count(experience_id)
+        #FROM app_userpageviewrecord
+        #where time_arrived >= NOW() - INTERVAL 30 DAY and 
+        #(select type from experiences_experience where abstractexperience_ptr_id=experience_id) in ('ITINERARY')
+        #group by experience_id 
+        #order by count(experience_id) desc;
+        self.assertAlmostEqual(100-100*7/8, get_experience_popularity(experience))
+
+        experience = NewProduct.objects.get(id=852)
+        #SELECT experience_id, count(experience_id)
+        #FROM app_userpageviewrecord
+        #where time_arrived >= NOW() - INTERVAL 30 DAY and experience_id in 
+        #(select abstractexperience_ptr_id from experiences_newproduct)
+        #group by experience_id 
+        #order by count(experience_id) desc;
+        self.assertAlmostEqual(100-100*7/640, get_experience_popularity(experience))

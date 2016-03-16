@@ -861,7 +861,7 @@ def get_experience_popularity(experience):
         if cursor._rows[i][0] == experience.id:
             break
 
-    return 100 - 100*i/int(cursor.rowcount) if int(cursor.rowcount)>0 else 0
+    return 100 - 100*(i+1)/int(cursor.rowcount) if int(cursor.rowcount)>0 else 0
 
 def set_option_items(partner_product_information, experience):
     options = json.loads(partner_product_information)
