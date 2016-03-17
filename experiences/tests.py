@@ -5,7 +5,7 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-import django, django.conf, Tripalocal_V1, pytz, stripe
+import django, django.conf, Tripalocal_V1, pytz, stripe, json
 from django.test import TestCase
 from experiences.utils import *
 from experiences.models import *
@@ -151,7 +151,7 @@ class ViewsTest(TestCase):
         token = create_stripe_token()
         response = self.client.post("/experience_booking_confirmation/", {"user_id": 1,
                                                                     "experience_id": 700013,
-                                                                    "date": "2016-03-18",
+                                                                    "date": (pytz.timezone('UTC').localize(datetime.now()) + relativedelta(days=10)).strftime("%Y-%m-%d"),
                                                                     "time": "15:00",
                                                                     "adult_number": 2,
                                                                     "child_number": 3,
@@ -171,7 +171,7 @@ class ViewsTest(TestCase):
         token = create_stripe_token()
         response = self.client.post("/experience_booking_confirmation/", {"user_id": 1,
                                                                     "experience_id": 20,
-                                                                    "date": "2016-03-18",
+                                                                    "date": (pytz.timezone('UTC').localize(datetime.now()) + relativedelta(days=10)).strftime("%Y-%m-%d"),
                                                                     "time": "15:00",
                                                                     "adult_number": 2,
                                                                     "child_number": 3,
@@ -220,7 +220,7 @@ class ViewsTest(TestCase):
         #(select type from experiences_experience where abstractexperience_ptr_id=experience_id) in ('PRIVATE', 'NONPRIVATE')
         #group by experience_id 
         #order by count(experience_id) desc;
-        self.assertAlmostEqual(100-100*5/248, get_experience_popularity(experience))
+        self.assertAlmostEqual(100-100*4/247, get_experience_popularity(experience))
 
         experience = Experience.objects.get(id=651)
         #SELECT experience_id, count(experience_id)
@@ -239,3 +239,87 @@ class ViewsTest(TestCase):
         #group by experience_id 
         #order by count(experience_id) desc;
         self.assertAlmostEqual(100-100*7/640, get_experience_popularity(experience))
+
+    def test_set_option_items(self):
+        experience = NewProduct.objects.get(id=700013)
+        item_options = set_option_items("{\"54531\":2, \"57164\":3}", experience)
+        self.assertEqual(2, item_options["Flight Upgrade Offer! Pay for a 30 minute flight and receive a 1 hour flight!"]["Adult"])
+
+    def test_checkout_as_guest(self):
+        request = self.client.request(method="POST").wsgi_request
+        request.POST = request.POST.copy()
+        #existing user
+        request.POST["first_name"] = "first"
+        request.POST["last_name"] = "last"
+        request.POST["email"] = "yi.han@tripalocal.com"
+        request.POST["phone_number"] = "0412341234"
+        result = checkout_as_guest(request)
+        self.assertEqual(1, result["user_id"])
+
+        #new user
+        request.POST = request.POST.copy()
+        request.POST["first_name"] = "first"
+        request.POST["last_name"] = "last"
+        request.POST["email"] = "13241234@tripalocal.com"
+        request.POST["phone_number"] = "0412341234"
+        result = checkout_as_guest(request)
+        self.assertEqual(True, result["success"])
+
+    def test_ExperienceDetailView_post(self):
+        request = self.client.request(method="POST").wsgi_request
+        setattr(request, "method", "POST")
+        request.POST = request.POST.copy()
+        vw = ExperienceDetailView()
+        setattr(vw, "kwargs", {})
+        vw.kwargs["pk"] = 20
+
+        #login, missing data
+        request.POST["login"] = "login"
+        request.POST["email"] = "email"
+        response = ExperienceDetailView.post(vw, request, (), {})
+        self.assertEqual("{\"error\": \"Wrong username/password\"}", response.content.decode("utf-8"))
+        #login, complete data, non-existing email
+        request.POST["email"] = "email"
+        request.POST["password"] = "password"
+        response = ExperienceDetailView.post(vw, request, (), {})
+        self.assertEqual("{\"success\": false}", response.content.decode("utf-8"))
+        #login, complete data, wrong password
+        request.POST["email"] = "yi.han@tripalocal.com"
+        request.POST["password"] = "password"
+        response = ExperienceDetailView.post(vw, request, (), {})
+        response = json.loads(response.content.decode("utf-8"))
+        success = response.get("success", False)
+        error = response.get("error", None)
+        self.assertEqual(False, success)
+        self.assertEqual("Wrong username/password", error)
+
+        #load more
+        request.POST.pop("login", None)
+        request.POST["load_more"] = "load_more"
+        request.POST["experience_id"] = 20
+        request.POST["max_date"] = (pytz.timezone('UTC').localize(datetime.now()) + relativedelta(days=10)).strftime("%Y-%m-%d")
+        response = ExperienceDetailView.post(vw, request, (), {})
+        response = json.loads(response.content.decode("utf-8"))
+        success = response.get("success", False)
+        self.assertEqual(True, success)
+
+        request.POST["experience_id"] = 700013
+        response = ExperienceDetailView.post(vw, request, (), {})
+        response = json.loads(response.content.decode("utf-8"))
+        success = response.get("success", False)
+        self.assertEqual(True, success)
+
+        #booking
+        request.POST.pop("load_more", None)
+        request.POST["user_id"] = 1
+        request.POST["first_name"] = ""
+        request.POST["last_name"] = ""
+        request.POST["experience_id"] = 700013
+        request.POST["adult_number"] = 2
+        request.POST["child_number"] = 3
+        request.POST["date"] = (pytz.timezone('UTC').localize(datetime.now()) + relativedelta(days=10)).strftime("%Y-%m-%d")
+        request.POST["time"] = "12:00"
+        request.POST["partner_product_information"] = "{\"54531\":2, \"57164\":3}"
+        response = ExperienceDetailView.post(vw, request, (), {})
+        self.assertContains(response, "Booking Confirmation", 1, 200)
+        self.assertContains(response, "experience/700013/", 1, 200)
