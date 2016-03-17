@@ -1650,4 +1650,3 @@ def service_watermark(request, format=None):
     except Exception as err:
         response = {"success":False}
     return HttpResponse(json.dumps(response),content_type="application/json")
->>>>>>> test-server
