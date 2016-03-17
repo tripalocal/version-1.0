@@ -120,7 +120,7 @@ def get_timezone(city):
     return timezones.get(city.lower(), settings.TIME_ZONE)
 
 def email_account_generator(size=10, chars=string.ascii_lowercase + string.digits):
-    if size is None or type(size) != int or size < 7 or size > 20:
+    if size is None or type(size) != int or size < 4 or size > 20:
         size = 10
     if chars is None or not ''.join(chars).isalnum():
         chars = string.ascii_lowercase + string.digits
