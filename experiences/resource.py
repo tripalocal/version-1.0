@@ -1633,9 +1633,6 @@ def service_search_text(request, format=None):
             return Response({"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
-<<<<<<< HEAD
-        return Response(status=status.HTTP_400_BAD_REQUEST)       
-=======
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
