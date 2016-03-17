@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden, HttpResponseNotAllowed, JsonResponse
-import json, pytz, xlrd, re, os, subprocess, math, logging, ast
+import json, pytz, xlrd, re, os, subprocess, math, logging, ast, PIL
 from django.contrib.auth.models import User
 from datetime import *
 from app.models import *
@@ -33,6 +33,7 @@ from django.views.decorators.csrf import csrf_exempt
 from experiences.constant import  *
 from experiences.telstra_sms_api import send_sms
 from experiences.utils import *
+from django.core.files.storage import default_storage as storage
 
 if settings.LANGUAGE_CODE.lower() != "zh-cn":
     from allauth.socialaccount.providers.facebook.views import fb_complete_login
@@ -1632,4 +1633,24 @@ def service_search_text(request, format=None):
             return Response({"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
+<<<<<<< HEAD
         return Response(status=status.HTTP_400_BAD_REQUEST)       
+=======
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,IsAdminUser))
+def service_watermark(request, format=None):
+    try:
+        for experience in list(Experience.objects.all())+list(NewProduct.objects.all()):
+            for photo in experience.photo_set.all():
+                f = storage.open(photo.directory+photo.name, 'rb')
+                im = PIL.Image.open(f)
+                add_watermark(f, im, "."+photo.name.split(".")[-1], photo.directory, photo.name)
+
+        response = {"success":True}
+    except Exception as err:
+        response = {"success":False}
+    return HttpResponse(json.dumps(response),content_type="application/json")
+>>>>>>> test-server

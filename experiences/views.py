@@ -1,6 +1,6 @@
 ﻿from io import BytesIO
 from urllib.parse import urlencode, unquote
-from app.wechat_payment.api import UnifiedOrderPay, OrderQuery
+from app.wechat_payment.api import UnifiedOrderPay, OrderQuery, Refund
 from app.wechat_payment.utils import dict_to_xml
 from django.core.files.storage import default_storage as storage
 from django.shortcuts import render, render_to_response, redirect
@@ -950,8 +950,6 @@ def checkout_as_guest(request):
                 u.last_name = last_name
                 u.registereduser.phone_number = phone_number
                 u.save()
-            username = u.username
-            password = u.username
         else:
             username = first_name.lower()
             u = User.objects.filter(first_name__iexact = username)
@@ -970,8 +968,8 @@ def checkout_as_guest(request):
             r = RegisteredUser(user = u, phone_number = phone_number)
             r.save()
 
-        u = authenticate(username=username, password=password)
-        login(request, u)
+            u = authenticate(username=username, password=password)
+            login(request, u)
     except Exception as err:
         return {'success':False}
 
@@ -1042,9 +1040,14 @@ class ExperienceDetailView(DetailView):
 
             form = BookingConfirmationForm(request.POST)
             form.data = form.data.copy()
-            form.data['user_id'] = request.user.id
-            form.data['first_name'] = request.user.first_name
-            form.data['last_name'] = request.user.last_name
+            if request.user.is_authenticated():
+                user = request.user
+            else:
+                user = User.objects.get(id=int(form.data['user_id']))
+            form.data['user_id'] = user.id
+            form.data['first_name'] = user.first_name
+            form.data['last_name'] = user.last_name
+
             experience = AbstractExperience.objects.get(id=form.data['experience_id'])
             convert_experience_price(request, experience)
             experience.dollarsign = DollarSign[experience.currency.upper()]
@@ -1066,6 +1069,7 @@ class ExperienceDetailView(DetailView):
             if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0 \
                 and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
                 item_options = set_option_items(form.data['partner_product_information'], experience)
+                form.data['time'] = "09:00"
 
             return render(request, 'experiences/experience_booking_confirmation.html',
                           {'form': form, #'eid':self.object.id,
@@ -1078,7 +1082,7 @@ class ExperienceDetailView(DetailView):
                            'subtotal_price':round(subtotal_price*(1.00+COMMISSION_PERCENT),0),
                            'service_fee':round(subtotal_price*(1.00+COMMISSION_PERCENT)*settings.STRIPE_PRICE_PERCENT+settings.STRIPE_PRICE_FIXED,2),
                            'total_price': experience_fee_calculator(subtotal_price, experience.commission),
-                           'user_email':request.user.email,
+                           'user_email':user.email,
                            'GEO_POSTFIX':settings.GEO_POSTFIX,
                            'LANGUAGE':settings.LANGUAGE_CODE,
                            'commission':COMMISSION_PERCENT + 1,
@@ -1131,7 +1135,7 @@ class ExperienceDetailView(DetailView):
             available_date = getAvailableOptions(experience, available_options, available_date)
 
         if len(available_date) == 0:
-            experience.status="Unlisted"
+            experience.status="Unavailable"
             experience.save()
 
         context['available_options'] = available_options
@@ -1338,12 +1342,18 @@ def update_pageview_statistics(user_id, experience_id, length = None):
 EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 
 @csrf_exempt
-def experience_booking_successful(request, booking_id=None, guest_number=None, booking_datetime=None, price_paid=None, is_instant_booking=False, *args, **kwargs):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
+def experience_booking_successful(request, user_id=None, booking_id=None, guest_number=None, booking_datetime=None, price_paid=None, is_instant_booking=False, *args, **kwargs):
+    #if not request.user.is_authenticated():
+    #    return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
 
-    if (request.GET is None or len(request.GET) == 0) and booking_id is None:
+    if (request.GET is None or len(request.GET) == 0) and (booking_id is None or user_id is None):
         return HttpResponseRedirect(GEO_POSTFIX)
+
+    if not request.user.is_authenticated():
+        user = User.objects.get(id=int(user_id))
+        #return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
+    else:
+        user = request.user
 
     data = request.GET
     if booking_id is not None:
@@ -1357,9 +1367,29 @@ def experience_booking_successful(request, booking_id=None, guest_number=None, b
         price_paid = float(data['price_paid'])
         is_instant_booking = True if data['is_instant_booking'] == "True" else False
 
-    #call Receipt API if the product is from experienceOz
+    #if the product is from experienceOz
+    #call makePurchase API, and then Receipt API
+    purchase_id = None
+    bk_total_price = None
     link = None
-    if booking.whats_included and hasattr(experience, "partner") and experience.partner == "001":
+    if hasattr(experience, "partner") and experience.partner == "001":
+        bk_dt_string = booking.datetime.strftime("%Y-%m-%d%z")
+        bk_dt_string = bk_dt_string[:-2]+":"+bk_dt_string[-2:]
+        phone_number = "123456789"
+        if len(booking.payment.phone_number.split(",")[0]) > 0:
+            phone_number = booking.payment.phone_number.split(",")[0]
+        elif len(booking.payment.phone_number.split(",")) > 1:
+            phone_number = booking.payment.phone_number.split(",")[1]
+        purchase = experienceoz_makepurchase(user.first_name, user.last_name, phone_number, "billing@tripalocal.com", "Australia", "3066",
+                                    experience, bk_dt_string, booking.partner_product, booking.note)
+        if purchase.get("success", False):
+            purchase_id = purchase["purchase_id"]
+            bk_total_price = purchase["price"]
+            booking.whats_included = purchase_id
+            booking.save()
+        else:
+            raise Exception("Errors in calling makePurchase API")
+
         receipt = experienceoz_receipt(booking)
         if receipt.get("success", False):
             link = unquote(receipt["link"])
@@ -1393,12 +1423,15 @@ def experience_booking_confirmation(request):
     set_initial_currency(request)
     display_error = False
 
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
-
     # A HTTP POST?
     if request.method == 'POST':
         form = BookingConfirmationForm(request.POST)
+        if not request.user.is_authenticated():
+            user = User.objects.get(id=int(form.data['user_id']))
+            #return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/")
+        else:
+            user = request.user
+
         form.data = form.data.copy()
         form.data['custom_currency'] = request.session['custom_currency']
         experience = AbstractExperience.objects.get(id=form.data['experience_id'])
@@ -1416,7 +1449,7 @@ def experience_booking_confirmation(request):
         child_number = int(form.data['child_number'])
         experience_price = experience.price
         subtotal_price = get_total_price(experience, adult_number = adult_number, child_number = child_number,
-                                         extra_information=form.data['partner_product_information'])
+                                         extra_information=form.data['partner_product_information'], language=request.LANGUAGE_CODE)
 
         COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
         total_price = experience_fee_calculator(subtotal_price, experience.commission)
@@ -1452,12 +1485,12 @@ def experience_booking_confirmation(request):
             if not settings.DEVELOPMENT:
                 try:
                     mp = Mixpanel(settings.MIXPANEL_TOKEN)
-                    mp.track(request.user.email, 'Clicked on "Refresh"')
+                    mp.track(user.email, 'Clicked on "Refresh"')
                 except Exception as err:
                     pass
 
             return render_to_response('experiences/experience_booking_confirmation.html', {'form': form,
-                                                                           'user_email':request.user.email,
+                                                                           'user_email':user.email,
                                                                            'wrong_promo_code':wrong_promo_code,
                                                                            'coupon':coupon,
                                                                            'experience': experience,
@@ -1478,17 +1511,18 @@ def experience_booking_confirmation(request):
             #submit the form
             display_error = True
             if form.is_valid():
-                request.user.registereduser.phone_number = form.cleaned_data['phone_number']
-                request.user.registereduser.save()
+                if request.user.is_authenticated():
+                    request.user.registereduser.phone_number = form.cleaned_data['phone_number']
+                    request.user.registereduser.save()
 
                 if form.cleaned_data['status'] == 'accepted':
-                    return experience_booking_successful(request,
+                    return experience_booking_successful(request, user.id,
                                                          form.cleaned_data['booking_id'],
                                                          int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
                                                          form.cleaned_data['price_paid'], True)
                 else:
-                    return experience_booking_successful(request,
+                    return experience_booking_successful(request, user.id,
                                                          form.cleaned_data['booking_id'],
                                                          int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
@@ -1496,7 +1530,7 @@ def experience_booking_confirmation(request):
 
             else:
                 return render_to_response('experiences/experience_booking_confirmation.html', {'form': form,
-                                                                           'user_email':request.user.email,
+                                                                           'user_email':user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience,
                                                                            'adult_number':form.data['adult_number'],
@@ -1525,7 +1559,8 @@ def experience_booking_confirmation(request):
                 if total_price > 0.0:
                     #not free
                     response = client.UnionpayClient(config).pay(int(total_price*100),order_id, channel_type='07',#currency_code=CurrencyCode[experience.currency.upper()],
-                                                                 front_url='http://' + settings.ALLOWED_HOSTS[0] + '/experience_booking_successful/?booking_id=' + str(form.cleaned_data['booking_id'])
+                                                                 front_url='http://' + settings.ALLOWED_HOSTS[0] + '/experience_booking_successful/?user_id=' + str(user.id)
+                                                                 + '&booking_id=' + str(form.cleaned_data['booking_id'])
                                                                  + '&guest_number=' + str(adult_number+child_number)
                                                                  + '&booking_datetime=' + form.data['date'].strip()+form.data['time'].strip()
                                                                  + '&price_paid=' + str(total_price)
@@ -1533,7 +1568,7 @@ def experience_booking_confirmation(request):
                     return HttpResponse(response)
                 else:
                     #free
-                    return experience_booking_successful(request,
+                    return experience_booking_successful(request, user.id,
                                                          form.cleaned_data['booking_id'],
                                                          adult_number+child_number,
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
@@ -1542,7 +1577,7 @@ def experience_booking_confirmation(request):
 
             else:
                 return render_to_response('experiences/experience_booking_confirmation.html', {'form': form,
-                                                                           'user_email':request.user.email,
+                                                                           'user_email':user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience,
                                                                            'adult_number':form.data['adult_number'],
@@ -1580,7 +1615,8 @@ def experience_booking_confirmation(request):
                     if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
                         code_url = pay_info['code_url']
                         success_url = 'http://' + settings.ALLOWED_HOSTS[0] \
-                                      + '/experience_booking_successful/?booking_id=' + str(form.cleaned_data['booking_id']) \
+                                      + '/experience_booking_successful/?user_id=' + str(user.id) \
+                                      + '&booking_id=' + str(form.cleaned_data['booking_id']) \
                                       + '&guest_number=' + str(adult_number+child_number) \
                                       + '&booking_datetime=' + form.data['date'].strip() + form.data['time'].strip() \
                                       + '&price_paid=' + str(total_price) + '&is_instant_booking=' \
@@ -1592,7 +1628,7 @@ def experience_booking_confirmation(request):
                         return HttpResponse('<html><body>WeChat Payment Error.</body></html>')
                 else:
                     #free
-                    return experience_booking_successful(request,
+                    return experience_booking_successful(request, user.id,
                                                          form.cleaned_data['booking_id'],
                                                          adult_number+child_number,
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
@@ -1601,7 +1637,7 @@ def experience_booking_confirmation(request):
 
             else:
                 return render_to_response('experiences/experience_booking_confirmation.html', {'form': form,
-                                                                           'user_email':request.user.email,
+                                                                           'user_email':user.email,
                                                                            'display_error':display_error,
                                                                            'experience': experience,
                                                                            'adult_number':form.data['adult_number'],
@@ -1675,17 +1711,22 @@ def saveProfileImage(user, profile, image_file):
 
 def saveExperienceImage(experience, photo, extension, index):
     filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-    dir_name = 'experiences/' + str(experience.id) + '/'
+    dirname = 'experiences/' + str(experience.id) + '/'
 
     photos = Photo.objects.filter(name=filename)
     if len(photos) != 0:
         ph = photos[0]
         photos[0].image.delete()
     else:
-        ph = Photo(name=filename, directory=dir_name, experience=experience)
+        ph = Photo(name=filename, directory=dirname, experience=experience)
 
     ph.image = photo
     ph.save()
+
+    #add watermark
+    f = storage.open(dirname + filename, 'rb')
+    im = PIL.Image.open(f)
+    add_watermark(f, im, extension, dirname, filename)
 
     #create the corresponding thumbnail (force .jpg)
     basewidth = 400
@@ -1694,7 +1735,7 @@ def saveExperienceImage(experience, photo, extension, index):
     if storage.exists(thumb_file_name):
         storage.delete(thumb_file_name)
     try:
-        f = storage.open(dir_name + filename, 'rb')
+        f = storage.open(dirname + filename, 'rb')
         img = Image.open(f)
         f_thumb = storage.open(thumb_file_name, "wb")
         wpercent = (basewidth / float(img.size[0]))
@@ -2106,8 +2147,11 @@ def update_booking(id, accepted, user):
         experience = AbstractExperience.objects.get(id=booking.experience_id)
         exp_information = experience.get_information(settings.LANGUAGES[0][0])
         experience.title = exp_information.title
-        experience.meetup_spot = exp_information.meetup_spot
-        if not experience.get_host().id == user.id:
+        if type(experience) == Experience:
+            experience.meetup_spot = exp_information.meetup_spot
+        else:
+            experience.meetup_spot = exp_information.location
+        if not experience.get_host().id == user.id and not user.is_superuser:
             booking_success = False
             result={'booking_success':booking_success, 'error':'only the host can accept/reject the booking'}
             return result
@@ -2215,27 +2259,32 @@ def update_booking(id, accepted, user):
 
             if not free:
                 payment = Payment.objects.get(booking_id=booking.id)
-
-                if booking.adult_number:
-                    subtotal_price = get_total_price(experience, adult_number=booking.adult_number, child_number=child_number, 
-                                                     extra_information=booking.partner_product)
+                if booking.total_price:
+                    refund_amount = booking.total_price
                 else:
-                    subtotal_price = get_total_price(experience, booking.guest_number, extra_information=booking.partner_product)
+                    if booking.adult_number:
+                        subtotal_price = get_total_price(experience, adult_number=booking.adult_number,
+                                                         child_number=booking.children_number, 
+                                                         extra_information=booking.partner_product)
+                    else:
+                        subtotal_price = get_total_price(experience, booking.guest_number, extra_information=booking.partner_product)
 
-                #refund_amount does not include process fee: the transaction can't be undone
-                COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
-                refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT),0)
+                    #refund_amount does not include process fee: the transaction can't be undone
+                    COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
+                    refund_amount = subtotal_price*(1+COMMISSION_PERCENT)
 
-                if extra_fee <= -1:
-                    refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT), 0) + extra_fee
-                if extra_fee < 0 and extra_fee > -1:
-                    refund_amount = round(subtotal_price*(1+COMMISSION_PERCENT), 0) * (1+extra_fee)
+                    if extra_fee <= -1:
+                        refund_amount = subtotal_price*(1+COMMISSION_PERCENT) + extra_fee
+                    if extra_fee < 0 and extra_fee > -1:
+                        refund_amount = subtotal_price*(1+COMMISSION_PERCENT) * (1+extra_fee)
 
                 if payment.charge_id.startswith('ch_'):
                     #stripe
+                    refund_amount = round(refund_amount, 0)
                     success, response = payment.refund(charge_id=payment.charge_id, amount=int(refund_amount*100))
-                else:
+                elif booking.booking_extra_information and booking.booking_extra_information.startswith("Tripalocal"):
                     #union pay
+                    refund_amount = round(convert_currency(refund_amount, experience.currency, "CNY"), 0)
                     config = load_config(os.path.join(settings.PROJECT_ROOT, 'unionpay/settings.yaml').replace('\\', '/'))
                     response = client.UnionpayClient(config).refund(int(refund_amount*100),
                                                          payment.booking.booking_extra_information.replace("Tripalocal","UPRefund"),
@@ -2245,6 +2294,25 @@ def update_booking(id, accepted, user):
                     if success:
                         booking.refund_id=response['queryId']
                         booking.save()
+                elif booking.booking_extra_information and booking.booking_extra_information.startswith("wx"):
+                    #wechat
+                    refund_amount = round(convert_currency(refund_amount, experience.currency, "CNY"), 0)
+                    rf = Refund(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
+                    try:
+                        response = rf.post(booking.booking_extra_information, booking.booking_extra_information,
+                                           str(int(refund_amount*100)), str(int(refund_amount*100)), "CNY", settings.WECHAT_MCH_ID,
+                                           settings.WECHAT_PAYMENT_CERT)
+                        success = True if response['return_code'] == 'SUCCESS' and response['result_code'] == 'SUCCESS' else False
+                    except Exception as e:
+                        success = False
+                        import logging
+                        logger = logging.getLogger("Tripalocal_V1")
+                        logger.error(e)
+                    if success:
+                        booking.refund_id=response['refund_id']
+                        booking.save()
+                else:
+                    success = False
             else:
                 success = True
 
@@ -2637,40 +2705,10 @@ def manage_listing_photo(request, experience, context):
                     if file._size > EXPERIENCE_IMAGE_SIZE_LIMIT:
                             raise forms.ValidationError(_('Image size exceeds the limit'))
                     extension = '.jpg'
-                    filename = 'experience' + str(experience.id) + '_' + str(index) + extension
-                    dir_name = 'experiences/' + str(experience.id) + '/'
-
-                    photos = Photo.objects.filter(name=filename)
-                    if len(photos) != 0:
-                        photo = photos[0]
-                        photos[0].image.delete()
-                    else:
-                        photo = Photo(name=filename, directory=dir_name, experience=experience)
-
-
-                    photo.image = file
-                    photo.save()
-
-                    #create the corresponding thumbnail (force .jpg)
-                    basewidth = 400
-                    thumb_file_name = 'thumbnails/experiences/experience' + str(experience.id) + '_' + str(index) + '.jpg'
-
-                    if storage.exists(thumb_file_name):
-                        storage.delete(thumb_file_name)
                     try:
-                        f = storage.open(dir_name + filename, 'rb')
-                        img = Image.open(f)
-                        f_thumb = storage.open(thumb_file_name, "wb")
-                        wpercent = (basewidth / float(img.size[0]))
-                        hsize = int((float(img.size[1]) * float(wpercent)))
-                        img = img.resize((basewidth, hsize), PIL.Image.ANTIALIAS)
-                        img_out = BytesIO()
-                        img.save(img_out, format='JPEG')
-                        f_thumb.write(img_out.getvalue())
-                        f_thumb.close()
-                    except:
+                        saveExperienceImage(experience, file, extension, index)
+                    except Exception as err:
                         return HttpResponse(json.dumps({'success': False}), content_type='application/json')
-
 
             experience.save()
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
@@ -2897,7 +2935,6 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
 
             if type == 'product':
                 setProductDisplayPrice(experience)
-
             else:
                 setExperienceDisplayPrice(experience)
                 experience_tags = experience.get_tags(settings.LANGUAGES[0][0])
@@ -2925,7 +2962,6 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 i += 1
                 continue
 
-
             if language is not None and len(language) > 0 and experience.language is not None and len(experience.language) > 0:
                 experience_language = experience.language.split(";")
                 experience_language = [x.lower() for x in experience_language]
@@ -2938,6 +2974,12 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 if not match:
                     i += 1
                     continue
+
+            #hide the duration if the product is from partners, as it might be set incorrectly
+            if hasattr(experience, "partner") and experience.partner is not None and len(experience.partner)>0:
+                experience.show_duration = False
+            else:
+                experience.show_duration = True
 
             if not experience.currency:
                 experience.currency = 'aud'
@@ -3250,24 +3292,23 @@ def custom_itinerary_request(request):
     if request.method == 'POST':
         data = request.POST
         email = data.get('email')
-        fields = data.items()
         message = "<h1>Custom itinerary request</h1>" + \
-                "<p>" + fields['name'] + " has requested an itinerary for " + \
-                fields['guests_adults'] + " adults, " + fields['guests_children'] + " children and " + fields['guests_infants'] + " infants;" + \
-                " from " +  fields['start_date'] + " to " + fields['end_date'] + " with the \
-                following destinations: " + fields['destinations'] + ".</p>" + \
-                "<p>Interests include: " + fields['interests'] + ".</p>" + \
+                "<p>" + data.get('name') + " has requested an itinerary for " + \
+                data.get('guests_adults') + " adults, " + data.get('guests_children') + " children and " + data.get('guests_infants') + " infants;" + \
+                " from " +  data.get('start_date') + " to " + data.get('end_date') + " with the \
+                following destinations: " + data.get('destinations') + ".</p>" + \
+                "<p>Interests include: " + data.get('interests') + ".</p>" + \
                 "<h3>What's included</h3>" + \
-                "<p>Budget: $" + fields['budget'] + "</p>" + \
-                "<p>Accommodation: " + fields['accommodation'] + "</p>" + \
-                "<p>Car driver: " + fields['car_driver'] + "</p>" + \
-                "<p>National flight: " + fields['national_flight'] + "</p>" + \
-                "<p>Service language: " + fields['service_language'] + "</p>" + \
-                "<h3>Requirements</h3><p>" + fields['requirements'] + "</p>" + \
+                "<p>Budget: $" + data.get('budget') + "</p>" + \
+                "<p>Accommodation: " + data.get('accommodation') + "</p>" + \
+                "<p>Car driver: " + data.get('car_driver') + "</p>" + \
+                "<p>National flight: " + data.get('national_flight') + "</p>" + \
+                "<p>Service language: " + data.get('service_language') + "</p>" + \
+                "<h3>Requirements</h3><p>" + data.get('requirements') + "</p>" + \
                 "<h3>Contact details</h3>" + \
-                "<p>Wechat: " + fields['wechat'] + "</p>" + \
-                "<p>Email: " + fields['email'] + "</p>" + \
-                "<p>Mobile: " + fields['mobile'] + "</p>"
+                "<p>Wechat: " + data.get('wechat') + "</p>" + \
+                "<p>Email: " + data.get('email') + "</p>" + \
+                "<p>Mobile: " + data.get('mobile') + "</p>"
         mail.send(
             sender = 'admin@tripalocal.com',
             recipients = ['enquiries@tripalocal.com'],
@@ -3720,7 +3761,10 @@ def itinerary_detail(request,id=None,preview=None):
             item.experience.description = exp_information.description
             item.experience.whatsincluded = item.whats_included
             item.experience.city = _(item.experience.city)
-            key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%Y-%m-%d")
+            if settings.LANGUAGE_CODE == "zh-CN":
+                key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime(_("%d %b %Y")).format(*'年月日')
+            else:
+                key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime("%Y-%m-%d")
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
@@ -3731,7 +3775,10 @@ def itinerary_detail(request,id=None,preview=None):
                 end_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
 
         for date in daterange(start_datetime, end_datetime):
-            date = date.astimezone(pytz.timezone(ci_timezone)).strftime("%Y-%m-%d")
+            if settings.LANGUAGE_CODE == "zh-CN":
+                date = date.astimezone(pytz.timezone(ci_timezone)).strftime(_("%d %b %Y")).format(*'年月日')
+            else:
+                date = date.astimezone(pytz.timezone(ci_timezone)).strftime("%Y-%m-%d")
             if date not in itinerary["days"]:
                 itinerary["days"].update({date:[]})
 
@@ -3746,14 +3793,23 @@ def itinerary_detail(request,id=None,preview=None):
                 continue
             break
         guest_number = ci.get_guest_number()
+        if settings.LANGUAGE_CODE == "zh-CN":
+            start_date = start_datetime.strftime(_("%d %b %Y")).format(*'年月日')
+            end_date = end_datetime.strftime(_("%d %b %Y")).format(*'年月日')
+            discount_deadline = discount_deadline.strftime(_("%d %b %Y")).format(*'年月日')
+        else:
+            start_date = start_datetime.strftime("%d/%m/%Y")
+            end_date = end_datetime.strftime("%d/%m/%Y")
+            discount_deadline = discount_deadline.strftime("%d/%m/%Y")
+
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
                                    "guest_number":guest_number[0],
                                    "adult_number":guest_number[1],
                                    "children_number":guest_number[2],
-                                   "start_date": start_datetime.strftime("%Y-%m-%d"),
-                                   "end_date":end_datetime.strftime("%Y-%m-%d"),
-                                   "discount_deadline":discount_deadline.strftime("%Y-%m-%d"),
+                                   "start_date":start_date,
+                                   "end_date":end_date,
+                                   "discount_deadline":discount_deadline,
                                    "price":price,
                                    "full_price":full_price,
                                    "cover_photo":cover_photo,
@@ -4412,7 +4468,7 @@ def wechat_qr_payment(request):
 def wechat_qr_payment_query(request, out_trade_no):
     order_query = OrderQuery(settings.WECHAT_APPID, settings.WECHAT_MCH_ID, settings.WECHAT_API_KEY)
     pay_info = order_query.post(out_trade_no)
-    if pay_info['return_code'] == 'SUCCESS' and pay_info['result_code'] == 'SUCCESS':
+    if pay_info.get("return_code","") == 'SUCCESS' and pay_info.get("result_code","") == 'SUCCESS':
         trade_state = pay_info['trade_state']
         if trade_state == 'SUCCESS':
             return HttpResponse(json.dumps({'order_paid': True}))

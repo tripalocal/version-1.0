@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-15 16:00+1100\n"
+"POT-Creation-Date: 2016-03-07 11:12+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -136,15 +136,16 @@ msgstr "天"
 msgid "Private"
 msgstr "私人团"
 
-#: app/templates/app/campaign.html:64 app/templates/app/index.html:134
+#: app/templates/app/campaign.html:64 app/templates/app/index.html:140
 msgid "Australia and New Zealand <br> Custom Itineraries"
 msgstr "澳新路线<br>私人订制 "
 
-#: app/templates/app/campaign.html:67 app/templates/app/index.html:137
+#: app/templates/app/campaign.html:67 app/templates/app/index.html:143
 msgid "Save time and effort and let us build your dream trip!"
 msgstr "最本土，最科学的路线"
 
-#: app/templates/app/campaign.html:69 app/templates/app/index.html:139
+#: app/templates/app/campaign.html:69 app/templates/app/index.html:26
+#: app/templates/app/index.html.py:145
 msgid "Request a trip"
 msgstr "我要定制"
 
@@ -202,85 +203,87 @@ msgstr ""
 msgid "Tripalocal | Experience it like a local"
 msgstr "本土客，个性出境游，本地导游，旅游攻略，私人导游，旅行，分享，发现"
 
-#: app/templates/app/index.html:33
+#: app/templates/app/index.html:31
+msgid "Local experiences"
+msgstr "特色体验"
+
+#: app/templates/app/index.html:34
+msgid "Instant price estimate, custom itinerary"
+msgstr "1. 填写要求  2. 即时报价  3. 独一方案"
+
+#: app/templates/app/index.html:35
+msgid "Start Here"
+msgstr "开始定制"
+
+#: app/templates/app/index.html:47
 msgid "City"
 msgstr "城市"
 
-#: app/templates/app/index.html:44
+#: app/templates/app/index.html:56
 msgid "Search"
 msgstr "搜索"
 
-#: app/templates/app/index.html:53 app/templates/app/index.html.py:55
-msgid " to get notified when we launch in more countries."
-msgstr "第一时间了解新增城市请"
-
-#: app/templates/app/index.html:53 app/templates/app/index.html.py:55
-#: app/templates/app/layout.html:165 app/templates/app/layout.html.py:201
-#: app/templates/app/loginpartial.html:60
-msgid "Sign up"
-msgstr "注册"
-
-#: app/templates/app/index.html:66
+#: app/templates/app/index.html:72
 msgid "Discover authentic experiences"
 msgstr "探索本土化的生活轨迹"
 
-#: app/templates/app/index.html:67
+#: app/templates/app/index.html:73
 msgid "Explore local places"
 msgstr "发现当地的吃喝玩乐"
 
-#: app/templates/app/index.html:74
+#: app/templates/app/index.html:80
 msgid "Bring<br>the Kids"
 msgstr "亲子游"
 
-#: app/templates/app/index.html:81
+#: app/templates/app/index.html:87
 msgid "Honeymoon"
 msgstr "蜜月游"
 
-#: app/templates/app/index.html:88
+#: app/templates/app/index.html:94
 msgid "Local<br>Culture"
 msgstr "风土人情"
 
-#: app/templates/app/index.html:98
+#: app/templates/app/index.html:104
 msgid "Outdoor"
 msgstr "户外之旅"
 
-#: app/templates/app/index.html:105
+#: app/templates/app/index.html:111
 msgid "Extreme<br>Experiences"
 msgstr "刺激体验"
 
-#: app/templates/app/index.html:112
+#: app/templates/app/index.html:118
 msgid "Photography<br>Worthy"
 msgstr "风光摄影"
 
-#: app/templates/app/index.html:186
+#: app/templates/app/index.html:192
 msgid "Travel with Tripalocal"
 msgstr "本土客带您去旅行"
 
-#: app/templates/app/index.html:187
+#: app/templates/app/index.html:193
 msgid "See how it works"
 msgstr "了解更多"
 
-#: app/templates/app/index.html:199
+#: app/templates/app/index.html:205
 msgid "Your browser does not support the video tag."
 msgstr "您的浏览器不支持video标签"
 
-#: app/templates/app/index.html:206
+#: app/templates/app/index.html:212
 msgid "Our Community"
 msgstr "我们的社区"
 
-#: app/templates/app/index.html:210
+#: app/templates/app/index.html:216
 msgid "Travelling"
 msgstr "旅行心得"
 
-#: app/templates/app/index.html:215
+#: app/templates/app/index.html:221
 msgid "Hosting"
 msgstr "旅游达人"
 
-#: app/templates/app/index.html:262
+#: app/templates/app/index.html:268
 msgid " From "
 msgstr "到达日期"
 
-#: app/templates/app/index.html:263
+#: app/templates/app/index.html:269
 msgid " To "
 msgstr "离开日期"
 
@@ -359,6 +362,11 @@ msgstr "退出"
 #: app/templates/app/layout.html:162 app/templates/app/layout.html.py:202
 msgid "Login"
 msgstr "登录"
+
+#: app/templates/app/layout.html:165 app/templates/app/layout.html.py:201
+#: app/templates/app/loginpartial.html:60
+msgid "Sign up"
+msgstr "注册"
 
 #: app/templates/app/layout.html:170 app/templates/app/layout.html.py:195
 msgid "Local Experiences"
@@ -743,6 +751,9 @@ msgstr "文件大小超过上限"
 #: app/views.py:761
 msgid "File type is not supported"
 msgstr "不支持该文件类型"
+
+#~ msgid " to get notified when we launch in more countries."
+#~ msgstr "第一时间了解新增城市请"
 
 #~ msgid "Send message"
 #~ msgstr "发信息"

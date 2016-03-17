@@ -107,68 +107,49 @@ h1 {
 .jumbotron {
 
   .homepage-logo {
-    height: 200px;
-    margin: 0 auto;
+    height: 80px;
+    margin: 80px auto 30px auto;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    margin-top: 20px;
     @include media('>tablet') {
-      height: 240px;
-      margin-top: 80px;
+      height: 100px;
+      margin-top: 120px;
       margin-bottom: 50px;
     }
   }
 
   .search-bar {
     width: 225px;
-    height: 95px;
     margin: auto;
     background-color: rgba(black, 0.5);
-    @include border-radius(6px);
     @include media('>tablet') {
-      width: 620px;
-      height: 47px;
+      width: 500px;
     }
 
     .search-location {
       padding: 3px;
+      height: 50px;
       @include media('>tablet') {
         padding-right: 0;
       }
     }
-
-    .search-from, .search-to {
-      display: none;
-      padding: 3px;
-      @include media('>tablet') {
-        display: block;
-        margin: 0;
-        padding-left: 0;
-        padding-right: 0;
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-      }
-    }
-
-    #id_start_date {
-      height: 40px;
-    }
-
-    #id_end_date {
-      border-top-right-radius: 5px;
-      border-bottom-right-radius: 5px;
-      height: 40px;
-    }
-
-    .home-search-button {
-      padding: 3px;
-      border-radius: 2px;
+    
+    .ui.dropdown > .text {
+      font-size: 18px;
     }
 
     .btn-search {
       width: 100%;
-      height: 40px;
+      height: 50px;
+      border-radius: 2px;
+      @include media('<tablet') {
+        margin-top: 3px;
+      }
+    }
+
+    .home-search-button {
+      padding: 3px;
     }
 
   }
@@ -179,8 +160,72 @@ h1 {
   }
 
   @include media('>tablet') {
-    height: 590px;
+    height: 80vh;
   }
+}
+
+// Toggle switch menu
+.homepage-option {
+  display: none;
+}
+
+#custom-itinerary {
+  color: white;
+  background-color: rgba(black, 0.5);
+  border-radius: 3px;
+  width: 500px;
+  padding: 15px;
+  margin: 0 auto;
+  h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: normal;
+  }
+  .btn {
+    border-radius: 2px;
+    height: 40px;
+    line-height: 27px;
+  }
+  @include media('<tablet') {
+    width: 90%;
+  }
+}
+
+.homepage-toggle {
+  color: white;
+  height: 70px;
+  position: relative;
+  @include media('<phablet') {
+    margin: 0 -15px;
+  }
+}
+.switch {
+  width: 100px;
+  margin: 0 15px;
+  display: inline-block;
+}
+.toggle-label {
+  margin: 0;
+  color: rgba(white, 0.5);
+  font-weight: normal;
+  width: 152px;
+  display: inline-block;
+  font-size: 18px;
+  position: relative;
+  cursor: pointer;
+  top: -40%;
+  transform: translateY(50%);
+  transition: color 0.4s;
+  @include media('<phablet') {
+    font-size: 14px;
+    width: 60px;
+    text-align: left;
+  }
+}
+.toggle-label.active {
+  font-weight: 500;
+  color: rgba(white, 1);
 }
 
 // Tease box

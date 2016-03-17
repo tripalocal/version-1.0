@@ -197,12 +197,14 @@ class NewProduct(AbstractExperience):
 
     LISTED = 'Listed'
     UNLISTED = 'Unlisted'
-    INCORRECT = 'API incorrect'
+    UNAVAILABLE = 'Unavailable'
+    INCORRECT = 'Incorrect'
 
     STATUS_CHOICES = (
         (LISTED, 'Listed'),
         (UNLISTED, 'Unlisted'),
-        (INCORRECT, 'API incorrect')
+        (UNAVAILABLE, 'Unavailable'),
+        (INCORRECT, 'Incorrect')
     )
 
     type = models.CharField(max_length=50, default="PublicProduct")
@@ -568,6 +570,7 @@ class Booking(models.Model):
     custom_itinerary = models.ForeignKey(CustomItinerary, null=True, blank=True)
     host = models.ForeignKey(User, null=True, blank=True, related_name='booking_host')
     partner_product = models.TextField(null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.user.email + "--" + self.experience.get_information(settings.LANGUAGES[0][0]).title

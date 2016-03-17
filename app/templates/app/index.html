@@ -13,6 +13,7 @@
     <meta name="description" content="Established in Australia, Tripalocal is an online travel platform dedicated to providing travelers with various unique local experiences. Tripalocal has an international team capable of meeting travelers demands for authentic local insights, themed activities and tailored trips to suit a range of needs.">
     <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
     <link href="{% static 'app/content/homepage.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/transition.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -20,41 +21,46 @@
     <div class="jumbotron">
       <div class="container">
         <div class="homepage-logo"></div>
-          <form id="search_form" action="" method="post">
-            {% csrf_token %}
-
-              <div class="search-bar">
-                <div class="container-fluid">
-                  <div class="row">
-                    <div class="search-location col-sm-6">
-                      <div id="id-city" class="ui selection dropdown">
-                        <input type="hidden" name="city" value="city">
-                          <i class="dropdown icon"></i>
-                          <div class="text">{% trans "City" %}</div>
-                          <div id="city-menu" class="menu"></div>
+        <div class="homepage-menu">
+          <div class="homepage-toggle">
+            <h3 id="label-custom-itinerary" class="toggle-label">{% trans "Request a trip" %}</h3>
+            <div class="switch">
+              <input id="toggle-main" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+              <label for="toggle-main"></label>
+            </div>
+            <h3 id="label-local-experiences" class="toggle-label">{% trans "Local experiences" %}</h3>
+          </div>
+          <div id="custom-itinerary" class="homepage-option">
+            <h3>{% trans "Instant price estimate, custom itinerary" %}</h3>
+            <a class="btn btn-primary" href="{{GEO_POSTFIX}}itinerary/request">{% trans "Start Here" %}</a>
+          </div>
+          <div id="local-experiences" class="homepage-option">
+            <form id="search_form" action="" method="post">
+              {% csrf_token %}
+                <div class="search-bar">
+                  <div class="container-fluid">
+                    <div class="row">
+                      <div class="search-location col-sm-10">
+                        <div id="id-city" class="ui selection dropdown">
+                          <input type="hidden" name="city" value="city">
+                            <i class="dropdown icon"></i>
+                            <div class="text">{% trans "City" %}</div>
+                            <div id="city-menu" class="menu"></div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="search-from col-sm-2">
-                      {{form.start_date}}
-                    </div>
-                    <div class="search-to col-sm-2">
-                      {{form.end_date}}
-                    </div>
-                    <div class="home-search-button col-sm-2">
-                      <input id="search-submit" type="submit" value="{% trans "Search" %}" name="search" class="btn btn-primary btn-search">
+                      <div style="display:none;">
+                        {{form.start_date}}
+                        {{form.end_date}}
+                      </div>
+                      <div class="home-search-button col-sm-2">
+                        <input id="search-submit" type="submit" value="{% trans "Search" %}" name="search" class="btn btn-primary btn-search">
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-            </form>
-            <div>
-            {%if LANGUAGE == "zh-CN"%}
-                <p>{% trans " to get notified when we launch in more countries."%}<a href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a></p>
-            {%else%}
-                <p><a href="{{GEO_POSTFIX}}accounts/signup/?next={{ request.path }}">{% trans "Sign up" %}</a>{% trans " to get notified when we launch in more countries."%}</p>
-            {%endif%}
-            </div>
+              </form>
+          </div>
+        </div>
         </div>
     </div>
     <div class="banner-logos">
@@ -221,8 +227,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/dropdown.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/transition.min.js"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
     {%if LANGUAGE == "zh-CN"%}
@@ -273,7 +279,6 @@
       {
         boxClass:     'scroll-animate',
         animateClass: 'animated',
-        offset:       100,
         mobile:       false,
         live:         true
       }

@@ -3,7 +3,7 @@ from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 
 RATE_CHOICES = [('1','1'), ('2','2'), ('3','3'), ('4','4'), ('5','5')]
-EXPERIENCE_STATUS_CHOICES = {'Listed':True, 'Unlisted':True, 'Submitted':True, 'Draft': True }
+EXPERIENCE_STATUS_CHOICES = {'Listed':True, 'Unlisted':True, 'Submitted':True, 'Draft': True, 'Unavailable':True, 'Incorrect': True }
 BOOKING_STATUS_CHOICES = {'requested':True, 'accepted':True, 'rejected':True, 'no_show': True, 'paid': True, 'deleted':True, 'archived':True, 'unarchived':True}
 Suburbs = (('Melbourne', _('Melbourne, VIC')),('Sydney', _('Sydney, NSW')),('Brisbane', _('Brisbane, QLD')),('Cairns',_('Cairns, QLD')),
             ('Goldcoast',_('Gold coast, QLD')),('Hobart',_('Hobart, TAS')), ('Adelaide', _('Adelaide, SA')),('GRSA', _('Greater South Australia')),
@@ -33,7 +33,7 @@ class BookingForm(forms.Form):
         return data
 
 class ExperienceUploadForm(forms.Form):
-    status = forms.CharField(max_length=10, required=False)
+    status = forms.CharField(max_length=20, required=False)
     commission = forms.FloatField(required=False)
 
     def clean_status(self):

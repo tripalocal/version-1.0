@@ -41,8 +41,8 @@ Location_reverse = ((_('Melbourne'), 'Melbourne'), (_('Sydney'), 'Sydney'),
                     (_('Alice Springs'), 'Alicesprings'),
                     (_('Perth'), 'Perth'),
                     (_('Canberra'),'Canberra'),
-                    (_('Christchurch'), 'Christchurch'), (_('Queenstown'), 'Queenstown'),
-                    (_('Auckland'), 'Auckland'), (_('Wellington'), 'Wellington'),
+                    (_('Queenstown'), 'Queenstown'), #(_('Christchurch'), 'Christchurch'),
+                    (_('Auckland'), 'Auckland'), #(_('Wellington'), 'Wellington'),
                     (_('Whitsundays Island, QLD'), 'Whitsundaysisland'))
 
 #                    (_('Greater South Australia'), 'GRSA'),(_('Greater Victoria'), 'GRVIC'),
@@ -58,13 +58,13 @@ Locations = [(_('Australia'), [('Melbourne', _('Melbourne'), _('Victoria')), ('S
                            ('Goldcoast', _('Gold Coast'), _('Queensland')), ('Hobart', _('Hobart'), _('Tasmania')),
                            ('Adelaide', _('Adelaide'), _('South Australia')),
                            ('Perth', _('Perth'), _('West Australia')),
-                           #('Darwin', _('Darwin'), _('Northern Territory')),
-                           #('Alicesprings', _('Alice Springs'), _('Northern Territory'))
+                           ('Darwin', _('Darwin'), _('Northern Territory')),
+                           ('Alicesprings', _('Alice Springs'), _('Northern Territory'))
                            ]),
-             (_('New Zealand'), [#('Christchurch', _('Christchurch'), _('Canterbury')),
+             (_('New Zealand'), [('Christchurch', _('Christchurch'), _('Canterbury')),
                              ('Queenstown', _('Queenstown'), _('Otago')),
-                             #('Auckland', _('Auckland'), _('Auckland')),
-                             #('Wellington', _('Wellington'), _('Wellington'))
+                             ('Auckland', _('Auckland'), _('Auckland')),
+                             ('Wellington', _('Wellington'), _('Wellington'))
                              ])]
 
 Language=(('None',''),('english;','English'),('english;mandarin;','English+Chinese'),)#('english;translation','English+Chinese translation'),
@@ -451,6 +451,7 @@ class BookingForm(forms.Form):
     status = forms.CharField(initial="Requested")
     #for booking partner products
     partner_product_information = forms.CharField(required = False)
+    phone_number = forms.CharField(max_length=50, required = False)
 
     def __init__(self, available_date, experience_id, user_id, *args, **kwargs):
         super(BookingForm, self).__init__(*args, **kwargs)
@@ -468,6 +469,8 @@ class BookingForm(forms.Form):
         self.fields['time'].widget.attrs.update({'class' : 'booking_form_time'})
         self.fields['partner_product_information'].widget.attrs['readonly'] = True
         self.fields['partner_product_information'].widget = forms.HiddenInput()
+        self.fields['phone_number'].widget.attrs['readonly'] = True
+        self.fields['phone_number'].widget = forms.HiddenInput()
 
 class CreditCardField(forms.IntegerField):
     def clean(self, value):
@@ -607,6 +610,7 @@ class BookingConfirmationForm(forms.Form):
     coupon_extra_information = forms.CharField(max_length=500, required=False)
     booking_extra_information = forms.CharField(widget=forms.Textarea, required=False)
     partner_product_information = forms.CharField(required = False)
+    note = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}), required=False)
     price_paid = forms.DecimalField(max_digits=6, decimal_places=2, required=False)
     custom_currency = forms.CharField(max_length=3, required=True)
 
@@ -662,6 +666,7 @@ class BookingConfirmationForm(forms.Form):
             coupon_extra_information = self.cleaned_data['coupon_extra_information']
             booking_extra_information = self.cleaned_data['booking_extra_information']
             partner_product_information = self.cleaned_data['partner_product_information']
+            note = self.cleaned_data['note']
 
             payment_street1 = self.cleaned_data['street1']
             payment_street2 = self.cleaned_data['street2']
@@ -675,27 +680,7 @@ class BookingConfirmationForm(forms.Form):
             dt = self.cleaned_data['date']
             tm = self.cleaned_data['time']
             bk_dt = local_timezone.localize(datetime(dt.year, dt.month, dt.day, tm.hour, tm.minute))
-
-            #call makePurchase API if the product is from experienceOz
             purchase_id = None
-            bk_total_price = None
-            if partner_product_information and len(partner_product_information) > 0 and \
-                hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
-                bk_dt_string = bk_dt.strftime("%Y-%m-%d%z")
-                bk_dt_string = bk_dt_string[:-2]+":"+bk_dt_string[-2:]
-                phone_number = "123456789"
-                if len(payment_phone_number.split(",")[0]) > 0:
-                    phone_number = payment_phone_number.split(",")[0]
-                elif len(payment_phone_number.split(",")) > 1:
-                    phone_number = payment_phone_number.split(",")[1]
-                purchase = experienceoz_makepurchase(user.first_name, user.last_name, phone_number, "billing@tripalocal.com", payment_country, payment_postcode,
-                                          experience, bk_dt_string, partner_product_information)
-                if purchase.get("success", False):
-                    purchase_id = purchase["purchase_id"]
-                    bk_total_price = purchase["price"]
-                else:
-                    raise forms.ValidationError({"partner_product_information":"Errors in calling makePurchase API"})
-
             bk_dt = bk_dt.astimezone(pytz.timezone("UTC"))
             cp = Coupon.objects.filter(promo_code__iexact = self.cleaned_data['promo_code'],
                                        end_datetime__gt = bk_dt,
@@ -728,7 +713,7 @@ class BookingConfirmationForm(forms.Form):
                              booking_extra_information=booking_extra_information, 
                              coupon_extra_information = coupon_extra_information, coupon = coupon,
                              payment_phone_number = payment_phone_number, stripe_token = stripeToken, currency = currency,
-                             purchase_id = purchase_id)
+                             purchase_id = purchase_id, note = note)
             elif 'UnionPay' in self.data or 'WeChat' in self.data:
                 if coupon:
                     st = "paid" if valid['valid'] and valid['new_price']==0.0 else 'requested'
@@ -739,7 +724,7 @@ class BookingConfirmationForm(forms.Form):
                                         coupon=coupon,
                                         booking_extra_information=booking_extra_information,
                                         partner_product = partner_product_information,
-                                        whats_included = purchase_id)
+                                        whats_included = purchase_id, note = note)
                     if valid['valid'] and valid['new_price']==0.0:
                         send_booking_email_verification(booking, experience, user, instant_booking(experience,dt,tm))
                         sms_notification(booking, experience, user, self.cleaned_data['phone_number'])
@@ -750,7 +735,7 @@ class BookingConfirmationForm(forms.Form):
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="requested",
                                         booking_extra_information=booking_extra_information,
                                         partner_product = partner_product_information,
-                                        whats_included = purchase_id)
+                                        whats_included = purchase_id, note = note)
                 booking.save()
 
                 if not coupon or not valid['valid'] or valid['new_price'] > 0.0:
@@ -859,11 +844,11 @@ class CustomItineraryRequestForm(forms.Form):
     budget = forms.ChoiceField(choices=Budget_Range, widget=forms.Select(attrs={'class':'form-control'}), required=True)
     interests = forms.CharField(required=False)
     whats_included = forms.CharField(widget=forms.TextInput, required=False)
-    requirements = forms.CharField(widget=forms.Textarea(attrs={'class':'text-input', 'rows':'5', 'placeholder':'Click here to list any other requirements you have.'}), required=False)
-    name = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder':'name'}), required=True)
-    wechat = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder': 'wechat'}), required=True)
-    email = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder': 'email'}), required=True)
-    mobile = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder': 'mobile'}), required=True)
+    requirements = forms.CharField(widget=forms.Textarea(attrs={'class':'text-input', 'rows':'5', 'placeholder':_('Click here to list any other requirements you have.')}), required=False)
+    name = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder':_('name')}), required=True)
+    wechat = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder':_('wechat')}), required=True)
+    email = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder':_('email')}), required=True)
+    mobile = forms.CharField(widget=forms.TextInput(attrs={'class':'text-input', 'placeholder':_('mobile')}), required=True)
     def __init__(self, *args, **kwargs):
         super(CustomItineraryRequestForm, self).__init__(*args, **kwargs)
         self.fields['destinations'].widget = forms.HiddenInput()
@@ -995,7 +980,7 @@ class ItineraryBookingForm(forms.Form):
                 booking_extra_information=None,coupon_extra_information=None,coupon=None,
                 payment_street1=None,payment_street2=None,payment_city=None,
                 payment_state=None,payment_country=None,payment_postcode=None,
-                payment_phone_number=None,stripe_token=None,currency=None,purchase_id=None):
+                payment_phone_number=None,stripe_token=None,currency=None,purchase_id=None,note=None):
 
         for i in range(len(ids)):
             extra_fee = 0.00
@@ -1069,12 +1054,12 @@ class ItineraryBookingForm(forms.Form):
                                         coupon=coupon,
                                         booking_extra_information=booking_extra_information,
                                         partner_product = partner_product_information,
-                                        whats_included = purchase_id)
+                                        whats_included = purchase_id, note = note)
                 else:
                     booking = Booking(user = user, experience= experience, guest_number = adult_number+child_number, adult_number = adult_number, children_number = child_number,
                                         datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="paid", booking_extra_information=booking_extra_information,
-                                        partner_product = partner_product_information, whats_included = purchase_id)
+                                        partner_product = partner_product_information, whats_included = purchase_id, note = note)
                 booking.save()
                 #add the user to the guest list
                 if type(experience) == Experience and user not in experience.guests.all():

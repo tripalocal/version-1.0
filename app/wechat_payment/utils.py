@@ -1,4 +1,4 @@
-# -*- coding=utf-8 -*-
+﻿# -*- coding=utf-8 -*-
 
 import hashlib
 import re
@@ -91,5 +91,8 @@ def random_str(randomlength=8):
     return "".join([chars[random.randint(0, len(chars) - 1)] for i in range(randomlength)])
 
 
-def post_xml(url, xml):
-    return requests.post(url, data=xml)
+def post_xml(url, xml, cert=None):
+    if cert:
+        return requests.post(url, data=xml, cert=cert, verify=False)
+    else:
+        return requests.post(url, data=xml)

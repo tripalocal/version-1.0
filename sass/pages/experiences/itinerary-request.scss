@@ -13,171 +13,138 @@
   '../../components/slider';
 
 body {
-  overflow: hidden;
-  padding-top: 50px;
-  @include media('<tablet') {
-    overflow-x: hidden;
-    overflow-y: scroll;
-  }
+  color: $dark-grey;
+}
+
+.side-banner {
+  display: none;
+}
+
+.footer {
+  display: none;
+}
+
+.zopim {
+  display: none;
 }
 
 h1 {
-  font-family: $font-stack-homepage;
-  font-size: 48px;
+  margin-bottom: 15px;
   @include media('<tablet') {
-    font-size: 32px;
+    font-size: 28px;
   }
 }
 
-h2 {
-  @include media('<tablet') {
-    font-size: 16px;
-  }
+.loading {
+  position: absolute;
+  top: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(51,51,51,1);
 }
 
 .container {
-  padding: 50px 0;
-  @include media('<tablet') {
-    padding: 0;
+  @include media('>=desktop') {
+    width: 960px;
   }
 }
 
-.full-height {
-  height: 100vh;
-  padding-top: 30px;
-  padding-bottom: 30px;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  position: relative;
-  @include media('<tablet') {
-    overflow-x: hidden;
-    height: auto;
-    padding: 0;
-  }
+.main-btn {
+  font-size: 18px;
+  font-weight: 300;
+  border-radius: 3px;
+  height: 50px;
+  width: 120px;
+}
 
-  .btn {
-    min-width: 120px;
-    height: 40px;
-    border-radius: 2px;
-    @include card(1);
-  }
-  .btn-bottom {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    @include media('<tablet') {
-      position: relative;
-      margin: 20px auto;
-    }
-  }
-  .btn-top {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .btn-secondary {
+.next-btn {
+  display: none;
+}
+
+.asterisk {
+  font-size: 32px;
+  color: $pink;
+  transition: color 0.4s;
+}
+
+#fp-nav {
+  @include media('<desktop') {
     display: none;
   }
 }
-.middle {
-  color: white;
-  width: 500px;
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  text-shadow: 1px 1px 8px black;
-  -webkit-animation-delay: 1s; /* Chrome, Safari, Opera */
-          animation-delay: 1s;
-  @include media('<tablet') {
-    padding: 15px;
-    transform: none;
-    top: auto;
+
+.fp-tooltip {
+  color: $dark-grey !important;
+  top: -3px !important;
+  font-weight: normal;
+}
+
+#fp-nav ul li {
+  margin: 15px 7px 15px 7px;
+}
+
+#fp-nav ul li a span {
+  background-color: $light-grey;
+  margin: -5px 0 0 -5px;
+  width: 10px;
+  height: 10px;
+  &:hover {
+    background-color: $primary-color;
   }
 }
 
-.center-form {
-  @include media('>=tablet') {
-    width: 400px;
-    padding: 0;
+#fp-nav ul li a.active span {
+  background-color: $primary-color !important;
+  margin: -8px 0 0 -8px !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.form-inline {
+  label {
+    min-width: 140px;
+    @include media('<tablet') {
+      display: block;
+    }
   }
 }
 
-.panel {
-  @include card(1);
-  border: 0;
-  display: none;
-  position: relative;
-  h2 {
-    font-size: 24px;
-    font-family: $font-stack-homepage;
-    display: inline;
-    vertical-align: middle;
+.interest {
+  border-radius: 20px;
+}
+
+.glyphicon {
+  margin-left: 10px;
+}
+
+.form-group {
+  display: inline-block;
+  margin-right: 20px;
+  width: 180px;
+  text-align: left;
+  @include media('<phablet') {
+    margin-right: 10px;
+    width: 155px;
   }
-  p {
-    margin-top: 10px;
+  label {
+    font-weight: 300;
+    font-size: 20px;
   }
-}
-
-.header-icon {
-  margin-right: 10px;
-  width: 32px;
-  height: 32px;
-}
-
-.form-control {
-  width: 100%;
-  height: 40px;
-}
-
-select {
-  min-width: 170px;
-}
-
-.progress-bar {
-  position: fixed;
-  height: 150px;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: none;
-}
-
-.indicator {
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  margin-bottom: 20px;
-  background: white;
-  color: $medium-grey;
-  border-radius: 100px;
-  @include card(1);
-}
-
-.active {
-  color: white;
-  background: $primary-color;
-}
-
-.alert {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  min-width: 400px;
-  margin: 0 auto;
-  display: none;
-  @include media('<tablet') {
-    min-width: 0;
+  select {
     width: 100%;
-    right: 0;
   }
 }
 
-#intro {
-  @include media('<tablet') {
-    margin-bottom: 20px;
+.text-input {
+  font-size: 24px;
+  background-color: inherit;
+  border: 0;
+  width: 100%;
+  color: #7BAABE;
+  &:focus {
+    border: 0;
+    outline: none;
   }
 }
 
@@ -205,25 +172,59 @@ select {
     100% { opacity: 1; }
 }
 
-.slider {
-  width: 80%;
-}
-
-.slider-value {
-  border: 0;
-  width: 65px;
-}
-
-.ui-slider-handle {
-  width: 15px;
-  height: 15px;
-  top: -8px;
-}
-
-.col-sm-3 {
-  text-align: center;
-  margin-top: 10px;
-  p {
-    margin: 0;
+#date-section { 
+  .form-group {
+    position: relative;
+    min-width: 250px;
   }
+}
+
+.bootstrap-datetimepicker-widget {
+  border: 1px solid $light-grey;
+  border-radius: 4px;
+  background-color: white;
+  margin-top: 15px !important;
+  box-shadow: none;
+}
+
+#budget-mount {
+  width: auto;
+  margin-top: -10px;
+  display: inline-block;
+  @include media('<tablet') {
+    margin-bottom: 90px;
+  }
+}
+
+.tooltip-inner {
+  background-color: $primary-color;
+  font-size: 14px;
+  max-width: none;
+  min-height: 30px;
+  line-height: 30px;
+  padding: 3px 15px;
+  display: inline-block;
+}
+
+.tooltip.right {
+  margin-left: 15px;
+}
+
+.tooltip.right .tooltip-arrow {
+  border-right-color: $primary-color;
+}
+
+.tooltip.bottom .tooltip-arrow {
+  border-bottom-color: $primary-color;
+}
+
+.tooltip-extra {
+  @extend .tooltip-inner;
+  display: none;
+  background-color: rgb(255,207,0);
+  color: rgb(184,125,0);
+  position: relative;
+  z-index: -1;
+  margin-left: -10px;
+  border-radius: 4px;
 }

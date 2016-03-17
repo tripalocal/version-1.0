@@ -1,9 +1,12 @@
 import os, pytz, string, random, decimal, requests, json
+from PIL import Image, ImageEnhance
 
 from Tripalocal_V1 import settings
 from unionpay.util.helper import load_config
 from datetime import timedelta, date
 from copy import deepcopy
+from io import BytesIO
+from django.core.files.storage import default_storage as storage
 
 def isEnglish(s):
     try:
@@ -33,7 +36,7 @@ def convert_currency(price, current_currency, target_currency, conversion=None):
         conversion = load_config(os.path.join(settings.PROJECT_ROOT, file_name).replace('\\', '/'))
     return round(float(price)*float(conversion.get(target_currency.upper(), 1.00)), 2)
 
-def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, extra_information=None):
+def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, extra_information=None, language=None):
     '''
     return total price, not including commission or service fee
     either use guest_number, or adult_number + child_number, the latter has a higher priority
@@ -43,7 +46,8 @@ def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, 
         price = 0
         i = 0
         items = json.loads(extra_information)
-        for og in experience.optiongroup_set.all():
+        language = settings.LANGUAGES[0][0] if language is None else language
+        for og in experience.optiongroup_set.filter(language=language):
             for oi in og.optionitem_set.all():
                 if str(oi.original_id) in items.keys():
                     price += oi.price*items.get(str(oi.original_id))
@@ -141,3 +145,73 @@ def recent_search(action, new_search=None):
                     recent_search.dict[k]['max_id'] = v['max_id']
         elif action.lower()=="clear":
             recent_search.dict.clear()
+
+#http://code.activestate.com/recipes/362879-watermark-with-pil/
+def reduce_opacity(im, opacity):
+    """Returns an image with reduced opacity."""
+    assert opacity >= 0 and opacity <= 1
+    if im.mode != 'RGBA':
+        im = im.convert('RGBA')
+    else:
+        im = im.copy()
+    alpha = im.split()[3]
+    alpha = ImageEnhance.Brightness(alpha).enhance(opacity)
+    im.putalpha(alpha)
+    return im
+
+def watermark(im, mark, position, opacity=1):
+    """Adds a watermark to an image."""
+    if opacity < 1:
+        mark = reduce_opacity(mark, opacity)
+    if im.mode != 'RGBA':
+        im = im.convert('RGBA')
+    # create a transparent layer the size of the image and draw the
+    # watermark in that layer.
+    layer = Image.new('RGBA', im.size, (0,0,0,0))
+    if position == 'tile':
+        for y in range(0, im.size[1], mark.size[1]):
+            for x in range(0, im.size[0], mark.size[0]):
+                layer.paste(mark, (x, y))
+    elif position == 'scale':
+        # scale, but preserve the aspect ratio
+        # width of logo / width of image = 1/6
+        # right margin of logo / width of image = 1/30
+        # top margin = right margin
+        ratio = float(mark.size[0]) / float(mark.size[1]) #min(float(im.size[0]) / mark.size[0], float(im.size[1]) / mark.size[1])
+        w = int(im.size[0]/6)
+        h = int(w/ratio)
+        mark = mark.resize((w, h))
+        layer.paste(mark, (int(im.size[0]*29/30 - w), int(im.size[0]/30)))
+    else:
+        layer.paste(mark, position)
+    # composite the watermark with the layer
+    return Image.composite(layer, im, layer)
+
+#im = Image.open('test.png')
+#mark = Image.open('overlay.png')
+#watermark(im, mark, 'tile', 0.5).show()
+#watermark(im, mark, 'scale', 1.0).show()
+#watermark(im, mark, (100, 100), 0.5).show()
+
+def add_watermark(f, im, extension, dirname, filename):
+    #save a copy of the original image
+    filename_org = filename.split(".")[0]+"_original."+filename.split(".")[1]
+    if storage.exists(dirname + filename_org):
+        storage.delete(dirname + filename_org)
+    f_org = storage.open(dirname + filename_org, 'wb')
+    im_out = BytesIO()
+    if extension.lower() == '.jpg':
+        extension = '.jpeg'
+    im.save(im_out, format = extension[1:].upper(), quality=100)
+    f_org.write(im_out.getvalue())
+    f_org.close()
+
+    mark = Image.open(os.path.join(settings.MEDIA_ROOT, 'img/tripalocal_watermark.png').replace('\\', '/'))
+    im = watermark(im, mark, 'scale', 0.5)
+
+    im_out = BytesIO()
+    im.save(im_out, format = extension[1:].upper())
+    f.close()
+    f = storage.open(dirname + filename, 'wb')
+    f.write(im_out.getvalue())
+    f.close()

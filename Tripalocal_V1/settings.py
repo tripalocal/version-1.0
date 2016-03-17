@@ -241,7 +241,8 @@ LOGGING = {
 }
 
 # Specify the default test runner.
-TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+#TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+TEST_RUNNER = 'Tripalocal_V1.testrunner.TripalocalTestRunner'
 
 AUTH_PROFILE_MODULE = "experience.RegisteredUser"
 
@@ -353,6 +354,8 @@ WECHAT_APPID = 'wx57aaa750d440d0d8'
 WECHAT_APPSECRET = '84ecdc9ed6d5ad17b9c029d27b51a65a'
 WECHAT_MCH_ID = '1266572301'
 WECHAT_API_KEY = '34Ds769dYJ458Pd6J387g298RvD78674'
+
+WECHAT_PAYMENT_CERT = ('/home/ubuntu/wechat_cert/apiclient_cert.pem','/home/ubuntu/wechat_cert/apiclient_key.pem')
 
 # Customized settings should always be put at the bottom
 if os.environ.get('ENV_MODE') == 'DEVELOPMENT':
