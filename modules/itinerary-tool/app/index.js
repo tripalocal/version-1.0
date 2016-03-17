@@ -3,7 +3,8 @@ import './react-select.css'
 import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk'
 import rootReducer from './reducers'
 import App from './containers/App'
 
@@ -12,10 +13,11 @@ import App from './containers/App'
   State structure 
   ======================
   `modal` takes a string
-  `dates` takes an Immutable.Map object
+  `dates` takes an object
   =====================================
-  */
+  
 window.initialState = {
+  id: '11111',
   modal: {
     display: 'NONE',
     date: '',
@@ -70,8 +72,8 @@ window.initialState = {
     }
   }
 }
-
-let store = createStore(rootReducer, window.initialState)
+*/
+let store = createStore(rootReducer, window.initialState, applyMiddleware(thunk))
 
 render(
   <Provider store={store}>

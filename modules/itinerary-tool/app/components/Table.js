@@ -14,7 +14,7 @@ const Table = ({ dates }) => (
       </tr>
     </thead>
     <tbody>
-     {Object.keys(dates).map(date => <Row key={date} date={date} fields={dates[date]} />)}
+      {Object.keys(dates).sort((a,b) => new Date(a) - new Date(b)).map(date => <Row key={date} date={date} fields={dates[date]} />)}
     </tbody>
   </table>
 )

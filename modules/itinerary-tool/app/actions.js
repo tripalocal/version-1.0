@@ -40,3 +40,17 @@ export const showSelect = (date, field, setting) => {
     setting
   }
 }
+
+export const saveState = (state) => {
+  return window.submit(state) 
+}
+
+export function updateThenSave(date, field, val) {
+  return (dispatch, getState) => {
+    dispatch(updateItems(date, field, val))
+    setTimeout(() => {
+      const { dates } = getState()
+      dispatch(saveState(dates))
+    }, 1000)
+  }
+}

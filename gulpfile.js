@@ -27,7 +27,7 @@ gulp.task('styles', function() {
 });
 
 // compile itinerary tool
-gulp.task('compile itinerary-tool', function(callback) {
+gulp.task('compile-itinerary-tool', function(callback) {
   process.chdir('modules/itinerary-tool');
   exec('npm run build', function(err, stdout, stderr) {
     console.log(stdout);
@@ -38,7 +38,7 @@ gulp.task('compile itinerary-tool', function(callback) {
 })
 
 // Pipe compiled js into static folders
-gulp.task('export itinerary-tool', ['compile itinerary-tool'], function() {
+gulp.task('itinerary-tool', ['compile-itinerary-tool'], function() {
   console.log('Copying bundle.js to static/experiences/scripts/itinerary-tool.min.js')
   gulp.src('modules/itinerary-tool/build/bundle.js')
     .pipe(rename('itinerary-tool.min.js'))
@@ -48,5 +48,5 @@ gulp.task('export itinerary-tool', ['compile itinerary-tool'], function() {
 // Watch task
 gulp.task('default', function() {
   gulp.watch('sass/**/*.scss', ['styles']);
-  gulp.watch('modules/itinerary-tool/app/**/*.js', ['export itinerary-tool'])
+  gulp.watch('modules/itinerary-tool/app/**/*.js', ['itinerary-tool'])
 });

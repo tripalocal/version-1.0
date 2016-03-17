@@ -15,9 +15,24 @@
 
 {% block scripts %}
   <script>
+    window.itineraryID = {{ itinerary_id }};
     window.initialState = {
       modal: {date: '', field: '', display: 'NONE'},
       dates: {{ itinerary|safe }}
+    }
+    window.submit = function(dates) { 
+      $.ajax({
+        url: '/itinerary/admin/' + window.itineraryID.toString(),
+        type: 'POST',
+        data: {
+          csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
+          dates: JSON.stringify(dates)
+        }      
+      }).done(function(response) {
+        console.log(response);
+      }).fail(function(error) {
+        console.log(error);
+      });
     }
   </script>
   <script src="{% static 'experiences/scripts/itinerary-tool.min.js' %}"></script>

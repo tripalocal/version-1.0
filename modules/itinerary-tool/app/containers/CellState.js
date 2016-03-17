@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { showSelect, updateItems } from '../actions'
+import { showSelect, updateThenSave } from '../actions'
 import Cell from '../components/Cell'
 
 const mapStateToProps = (state, ownProps) => {
@@ -13,7 +13,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   const { date, fieldName, city } = ownProps
   return {
     getOptions: (input) => {
-      return fetch('http://127.0.0.1:8000/search_text/', {
+      return fetch('/search_text/', {
         method: 'post',
         headers: {
           'Accept': 'application/json',
@@ -34,7 +34,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       })
     },
     hideSelect: () => dispatch(showSelect(date, fieldName, 'NORMAL')),
-    handleChange: (val) => dispatch(updateItems(date, fieldName, val))
+    handleChange: (val) => dispatch(updateThenSave(date, fieldName, val))
   }
 }
 
