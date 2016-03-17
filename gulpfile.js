@@ -42,18 +42,9 @@ gulp.task('compile-itinerary-tool', function(callback) {
 // Pipe compiled js into static folders
 gulp.task('itinerary-tool', ['compile-itinerary-tool'], function() {
   console.log('Copying bundle.js to static/experiences/scripts/itinerary-tool.min.js')
-    .pipe(gulp.dest('./app/static/app/content/'))
-    .pipe(browserSync.stream());
-  gulp.src('sass/pages/app/*.scss')
-    .pipe(sass().on('error', sass.logError))
-    .pipe(cssnano())
-    .pipe(gulp.dest('./app/static/app/content/'))
-    .pipe(browserSync.stream());
-  gulp.src('sass/pages/experiences/*.scss')
-    .pipe(sass().on('error', sass.logError))
-    .pipe(cssnano())
-    .pipe(gulp.dest('./experiences/static/experiences/content/'))
-    .pipe(browserSync.stream());
+  gulp.src('modules/itinerary-tool/build/bundle.js')
+    .pipe(rename('itinerary-tool.min.js'))
+    .pipe(gulp.dest('experiences/static/experiences/scripts/'));
 });
 
 // Watch task

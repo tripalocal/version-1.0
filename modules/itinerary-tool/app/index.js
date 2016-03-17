@@ -17,7 +17,6 @@ import App from './containers/App'
   =====================================
   
 window.initialState = {
-  id: '11111',
   modal: {
     display: 'NONE',
     date: '',
