@@ -1555,11 +1555,11 @@ def service_search_text(request, format=None):
     '''
 
     try:
-        data = request.data
+        data = json.loads(request.body.decode('utf-8')) 
         action = data.get('action',None)
         title = data.get('title',None)
         city = data.get('city',None)
-
+        category = data.get('category','all')
         if action and action == "clear":
             recent_search("clear")
             return Response(status=status.HTTP_200_OK)
@@ -1604,9 +1604,18 @@ def service_search_text(request, format=None):
         #update experiences
         max_experience_id = 0
         max_experience_id = recent[title]["max_experience_id"]
-        
-        experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
-                      list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id'))
+
+        if category.lower() == "all":
+            experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id')) + \
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Flight','Transfer','Accommodation','Suggestion','Pricing','Restaurnat'], city=city).order_by('id'))
+        elif category.lower() == "products" or category.lower() == "experiences":
+            experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id'))
+        else:
+            category = category.split(",")
+            experiences = list(Experience.objects.filter(id__gt=max_experience_id, type__in=category, city=city).order_by('id')) + \
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=category, city=city).order_by('id'))
         counter = 0
         for experience in experiences:
             exp_title = experience.get_information(language).title
@@ -1618,12 +1627,15 @@ def service_search_text(request, format=None):
             if counter >= 3:
                 return Response(recent[title], status=status.HTTP_200_OK)
 
-        if counter > 0 or len(recent[title]['daily_itineraries']) > 0:
+        if len(recent[title]['experiences']) > 0 or len(recent[title]['daily_itineraries']) > 0:
             return Response(recent[title], status=status.HTTP_200_OK)
         else:
             return Response({"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}, status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
+<<<<<<< HEAD
+        return Response(status=status.HTTP_400_BAD_REQUEST)       
+=======
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -1641,3 +1653,4 @@ def service_watermark(request, format=None):
     except Exception as err:
         response = {"success":False}
     return HttpResponse(json.dumps(response),content_type="application/json")
+>>>>>>> test-server

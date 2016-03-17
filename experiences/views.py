@@ -203,7 +203,7 @@ def sort_experiences(experiences, customer=None, preference=None):
         experience.popularity = 0.0
         #normalize
         #popularoity = a*pageview+b*match+c*bookings
-        #sort by pupolarity
+        #sort by popularity
         if pageview_max > 0 and hasattr(experience, 'pageview'):
             experience.pageview = float(experience.pageview/pageview_max)
             experience.popularity += 4 * experience.pageview
@@ -3903,9 +3903,60 @@ def itinerary_booking_successful(request, itinerary_id):
 
     return HttpResponseRedirect(GEO_POSTFIX + "itinerary/" + itinerary_id)
 
-def itinerary_tool(request):
+def itinerary_tool(request, id=None):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect(GEO_POSTFIX + "accounts/login/?next=" + GEO_POSTFIX + "itinerary")
+
     context = RequestContext(request)
-    return render_to_response('experiences/itinerary_tool.html', {}, context)
+    if request.method == 'POST':
+        data = request.POST
+        itinerary = json.loads(data.get('dates'))
+        ci = CustomItinerary.objects.get(id=id)
+        if ci.status.lower() == "paid":
+            # cannot edit a paid itinerary
+            return HttpResponseRedirect(GEO_POSTFIX + "itinerary/" + str(ci.id) + "/")
+        guest_number = ci.get_guest_number()[0]
+        adult_number = ci.get_guest_number()[1]
+        children_number = ci.get_guest_number()[2]
+        for booking in ci.booking_set.all():
+            booking.delete()
+        for date, fields in itinerary.items():
+            for field, value in fields.items():
+                if not isinstance(value, str):
+                    for item in value['items']:
+                        experience = AbstractExperience.objects.get(id=str(item['id']))
+                        #save the custom itinerary as draft
+                        local_timezone = pytz.timezone(experience.get_timezone())
+                        bk_date = local_timezone.localize(datetime.strptime(str(date), "%Y-%m-%d"))
+
+                        booking = Booking(user = request.user, experience= experience, guest_number = guest_number, adult_number = adult_number, total_price = (experience.price * guest_number), children_number = children_number,
+                                        datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day)).astimezone(pytz.timezone("UTC")),
+                                        submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
+                        booking.save()
+        ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        ci.save()
+        return HttpResponse(json.dumps({'success':True}), content_type="application/json")
+    else:
+        bookings = list(CustomItinerary.objects.get(id=id).booking_set.order_by('datetime').all()) 
+        itinerary = {}
+        for booking in bookings:
+            title = booking.experience.get_information(settings.LANGUAGES[0][0]).title
+            type = booking.experience.type.lower()
+            if type == 'suggestion' or type == 'privateproduct' or type == 'publicproduct' or type == 'private' or type == 'public':
+                type = 'experiences'
+            if type == 'flight' or type == 'transfer':
+                type = 'transport'
+            city = booking.experience.city
+            key = booking.datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime('%Y-%m-%d')
+
+            if key not in itinerary:
+                itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}})
+
+            itinerary[key][type]['items'].append({'id': booking.experience.id, 'title': title})
+        
+        context['itinerary'] = json.dumps(itinerary)
+        context['itinerary_id'] = id
+        return render_to_response('experiences/itinerary_tool.html', {}, context)
 
 def campaign(request):
     set_initial_currency(request)
