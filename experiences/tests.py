@@ -13,6 +13,7 @@ from experiences.views import *
 from builtins import ValueError
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth.models import AnonymousUser
 
 # TODO: Configure your database in settings.py and sync before running tests.
 
@@ -323,3 +324,32 @@ class ViewsTest(TestCase):
         response = ExperienceDetailView.post(vw, request, (), {})
         self.assertContains(response, "Booking Confirmation", 1, 200)
         self.assertContains(response, "experience/700013/", 1, 200)
+
+    def test_ExperienceDetailView_get_context_data(self):
+        request = self.client.request(method="GET").wsgi_request
+        vw = ExperienceDetailView()
+        experience = Experience.objects.get(id=20)
+        setattr(request, "user", AnonymousUser())
+        setattr(vw, "kwargs", {})
+        setattr(vw, "request", request)
+        setattr(vw, "object", experience)
+        vw.kwargs["experience"] = experience
+        #anonymous
+        context = vw.get_context_data()
+        self.assertEqual("https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_pageview/",
+                         context["pageview_webservice"])
+        self.assertEqual(False, context['in_wishlist'])
+
+        #logged in
+        user = authenticate(username="apptest", password="apptest1234")
+        setattr(request, "user", user)
+        login(request, user)
+        context = vw.get_context_data()
+        self.assertEqual(user.email, context["user_email"])
+
+        #partner product
+        experience = NewProduct.objects.get(id=700013)
+        setattr(vw, "object", experience)
+        vw.kwargs["experience"] = experience
+        context = vw.get_context_data()
+        self.assertEqual(700013, context["experience"].id)
