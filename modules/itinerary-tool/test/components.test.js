@@ -11,11 +11,11 @@ import { ModalContainer, ModalDialog } from 'react-modal-dialog'
 
 function setupTable() {
   let props = {
-    dates: {
+  dates: {
     '2016-03-01': {
       city: 'melbourne',
       experiences: {
-        items: ['cool activity', 'another one'],
+        items: [{title: 'great activity', id: 1205}, {title: 'another great one', id:14902}],
         host: '',
         display: 'NORMAL'
       },
@@ -32,13 +32,13 @@ function setupTable() {
       restaurants: {
         items: ['Food Inc.'],
         host: 'Person',
-        display: 'EDIT'
+        display: 'NORMAL'
       }
     },
     '2016-03-02': {
       city: 'melbourne',
       experiences: {
-        items: ['cool activity', 'another one'],
+        items: [{title: 'cool activity', id: 54950}, {title: 'another one', id: 54135}],
         host: '',
         display: 'NORMAL'
       },
@@ -53,12 +53,13 @@ function setupTable() {
         display: 'NORMAL'
       },
       restaurants: {
-        items: ['Food Inc.'],
+        items: [{title: 'Food Inc.', id: 12345}],
         host: 'Person',
-        display: 'EDIT'
+        display: 'NORMAL'
       }
     }
-  }}
+  }
+}
   let renderer = TestUtils.createRenderer()
   renderer.render(<Table {...props} />)
   let output = renderer.getRenderOutput()
@@ -134,9 +135,8 @@ describe('Components', () => {
     it('should render a column for each field', () => {
       const { output } = setupRow()
       let columns = output.props.children
-      let fields = columns[1]
       expect(columns[0].props.children).to.equal('2016-03-01')
-      expect(fields).to.have.lengthOf(5)
+      expect(columns).to.have.lengthOf(6)
     })
   })
 

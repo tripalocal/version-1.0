@@ -25,6 +25,14 @@ function dates(state = {}, action) {
       return update(state, {
         [action.date]: {[action.field]: {items: {$set: action.value}}} 
       })
+    case 'ADD_DATE':
+      return Object.assign({}, state, {
+        [action.date]: {'city': action.city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}
+      })
+    case 'REMOVE_DATE':
+      return update(state, {
+        [action.date] : {$set: undefined}
+      })
     case 'ASSIGN_HOST':
       return update(state, {
         [action.date]: {[action.field]: {host: {$set: action.host}}}
