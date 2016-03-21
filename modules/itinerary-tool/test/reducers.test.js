@@ -66,5 +66,29 @@ describe('Reducers', () => {
         }
       )
     })
+
+    it('should handle REMOVE_DATE', () => {
+      expect(
+        reducer(
+          {
+            modal: {date: '', field: '', display: 'NONE'},
+            dates: {
+              '2016-03-10': {'city': 'melbourne', 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}
+            },
+            form: {} 
+          },
+          {
+            type: 'REMOVE_DATE',
+            date: '2016-03-10'
+          }
+        )
+      ).to.eql(
+        {
+          modal: {date: '', field: '', display: 'NONE'},
+          dates: {},
+          form: {} 
+        }
+      )
+    })
   })
 })

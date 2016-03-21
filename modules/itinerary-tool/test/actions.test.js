@@ -44,4 +44,13 @@ describe('Actions', () => {
     expect(actions.addDate(date, city, 'BEFORE')).to.eql(expectedActionBefore)
     expect(actions.addDate(date, city, 'AFTER')).to.eql(expectedActionAfter)
   })
+
+  it('should create an action REMOVE_DATE', () => {
+    const date = '2016-03-09'
+    const expectedAction = {
+      type: 'REMOVE_DATE',
+      date
+    }
+    expect(actions.removeDate(date)).to.eql(expectedAction)
+  })
 })
