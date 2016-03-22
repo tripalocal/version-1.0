@@ -1238,16 +1238,20 @@ class ExperienceDetailView(DetailView):
             #annoymous visiters are treated as user 1
             user = User.objects.get(id=1)
 
-        update_pageview_statistics(user.id, experience.id)
+        pageview = update_pageview_statistics(user.id, experience.id)
+        context["pageview_detail_id"] = pageview[1][0]
         time_arrived = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         context['time_arrived'] = time_arrived
         context['pageview_webservice'] = "https://" + settings.ALLOWED_HOSTS[0] + settings.GEO_POSTFIX + "service_pageview/"
         return context
 
-def update_pageview_statistics(user_id, experience_id, length = None):
+def update_pageview_statistics(user_id, experience_id, length = None, detail_id = None):
     '''
-    @length None: arrive, times_viewed++; not None: leave, update average_length
+    @length, detail_id None: arrive, times_viewed++; not None: leave, update average_length
     '''
+    if (length and not detail_id) or (not length and detail_id):
+        return
+
     if length and float(length) < 0:
         length = 0
 
@@ -1257,21 +1261,17 @@ def update_pageview_statistics(user_id, experience_id, length = None):
         record = UserPageViewStatistics(user_id = user_id, experience_id = experience_id,
                                         times_viewed = 0, average_length = 0.0)
 
-    if length:
+    if length and detail_id:
         #leave an experience page
         try:
             length = float(length)
             if length > 300:
                 length = 300 if user_id != 1 else 0
-            record.average_length = float((record.average_length * (record.times_viewed-1) + length) / record.times_viewed)
+            if length > 0:
+                record.average_length = float((record.average_length * (record.times_viewed-1) + length) / record.times_viewed)
 
-            detail = UserPageViewRecord.objects.filter(user_id=user_id, experience_id=experience_id, time_left__isnull=True)
-            if len(detail)>1:
-                for i in range(1,len(detail)):
-                    detail[i].time_left = detail[i].time_arrived
-                    detail[i].save()
-
-            detail[0].time_left = pytz.timezone("UTC").localize(datetime.utcnow())
+            detail = UserPageViewRecord.objects.get(id = detail_id)
+            detail.time_left = pytz.timezone("UTC").localize(datetime.utcnow())
         except BaseException:
             #TODO
             pass
@@ -1283,6 +1283,8 @@ def update_pageview_statistics(user_id, experience_id, length = None):
 
     record.save()
     detail.save()
+
+    return ((record.id, record.times_viewed), (detail.id, detail.time_arrived, detail.time_left))
 
 EXPERIENCE_IMAGE_SIZE_LIMIT = 2097152
 

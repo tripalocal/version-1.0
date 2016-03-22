@@ -1490,7 +1490,7 @@ def service_pageview(request):
 
     try:
         data = request.POST
-        update_pageview_statistics(data['user_id'], data['experience_id'], data['length'])
+        update_pageview_statistics(data['user_id'], data['experience_id'], data['length'], data['detail_id'])
         response={'success':True}
     except Exception as err:
         response={'success':False}

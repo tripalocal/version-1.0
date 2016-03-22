@@ -1089,7 +1089,8 @@ $(function(){
                     "csrfmiddlewaretoken": getCookie('csrftoken'),
                     "user_id": user_id,
                     "experience_id": {{experience.id}},
-                    "length": length
+                    "length": length,
+                    "detail_id": {{pageview_detail_id}},
                 },
                 success: function (data) {},
                 error: function (e) {}

@@ -353,3 +353,20 @@ class ViewsTest(TestCase):
         vw.kwargs["experience"] = experience
         context = vw.get_context_data()
         self.assertEqual(700013, context["experience"].id)
+
+    def test_update_pageview_statistics(self):
+        record = UserPageViewStatistics.objects.get(user_id=1, experience_id = 1)
+        times_viewed = record.times_viewed
+        result = update_pageview_statistics(1, 1)
+        self.assertEqual(times_viewed+1, result[0][1])
+        self.assertTrue(result[1][1] + timedelta(microseconds=100) < pytz.timezone('UTC').localize(datetime.utcnow()))
+        self.assertIsNone(result[1][2])
+
+        result = update_pageview_statistics(1, 197)
+        self.assertEqual(1, result[0][1])
+        self.assertTrue(result[1][1] + timedelta(microseconds=100) < pytz.timezone('UTC').localize(datetime.utcnow()))
+        self.assertIsNone(result[1][2])
+
+        result = update_pageview_statistics(1, 1, 200, 11411)
+        self.assertEqual(times_viewed+1, result[0][1])
+        self.assertTrue(result[1][2] + timedelta(microseconds=100) < pytz.timezone('UTC').localize(datetime.utcnow()))
