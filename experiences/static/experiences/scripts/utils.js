@@ -10,6 +10,6 @@ function isValidName(name) {
 };
 
 function isValidPhoneNumber(number) {
-    var pattern = new RegExp(/^[\+0-9\ ]+$/);
+    var pattern = new RegExp(/^[\+0-9\ ]{10,14}$/);
     return pattern.test(number);
 }

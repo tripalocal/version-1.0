@@ -7,7 +7,7 @@ from io import BytesIO
 from Tripalocal_V1 import settings
 
 APPID = "wx57aaa750d440d0d8"
-APPSECRET = ""
+APPSECRET = "84ecdc9ed6d5ad17b9c029d27b51a65a"
 
 def get_token(APPID, APPSECRET):
     args = {'APPID': APPID,'APPSECRET': APPSECRET}
@@ -29,7 +29,7 @@ def generate_ticket(TOKEN, scene_id, scene_str, permanent=True):
     else:
         args = args_temp
 
-    response = requests.post(url = url_ticket, data = args)
+    response = requests.post(url = url_ticket, data = json.dumps(args))
     ticket = None
     url = None
     if response.status_code == 200 and response.ok:
@@ -39,16 +39,16 @@ def generate_ticket(TOKEN, scene_id, scene_str, permanent=True):
 
 def get_qrcode(ticket,scene_id):
     url_qrcode = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={TICKET}"
-    url_qrcode = url_qrcode.format({"TICKET":ticket})
+    url_qrcode = url_qrcode.format(**{"TICKET":ticket})
     response = requests.get(url_qrcode)
     path = None
-    if response.status_code == 200:
-        file = request.FILES['file']
-        path = os.path.join(os.path.join(settings.PROJECT_ROOT, 'qrcode'),file.name).replace('\\', '/')
+    if response.status_code == 200 and response.ok:
+        filename = "qrcode_" + str(scene_id) + ".jpg"
+        path = os.path.join(os.path.join(settings.MEDIA_ROOT, 'qrcode'),filename).replace('\\', '/')
         with open(path, 'wb') as f:
             for chunk in response.iter_content(1024):
                 f.write(chunk)
-        path = os.path.join('/qrcode',file.name)
+        path = os.path.join('/images/qrcode',filename).replace('\\', '/')
     return path
 
 def qrcode(request):
@@ -58,8 +58,9 @@ def qrcode(request):
     scene_id = request.GET.get("scene_id",None)
     scene_str = request.GET.get("scene_str", None)
     permanent = request.GET.get("permanent", None)
+    permanent = True if permanent and permanent.lower() == "true" else False
     token = get_token(APPID, APPSECRET)
-    if token and scene_id and scene_str and permanent:
+    if token and scene_id and scene_str and permanent is not None:
         ticket = generate_ticket(token, scene_id, scene_str, permanent)
         if ticket:
             path = get_qrcode(ticket, scene_id)

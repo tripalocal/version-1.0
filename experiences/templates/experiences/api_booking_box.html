@@ -21,7 +21,8 @@
         {{ field }}
     {% endfor %}
 
-    <div class="box-section" style="padding-top:0;">
+    <div class="box-section" style="padding-top:0;position:relative;">
+      <div class="loading-calendar"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
       <p style="display:inline; margin-right:10px;">{% trans "Date" %}</p>
       <div class="date-box">{{form.date}}</div>
       <span class="weather" id="weather">-- &deg;C <i class="wi wi-forecast-io-clear-day"></i></span>

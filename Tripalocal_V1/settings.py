@@ -241,7 +241,8 @@ LOGGING = {
 }
 
 # Specify the default test runner.
-TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+#TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+TEST_RUNNER = 'Tripalocal_V1.testrunner.TripalocalTestRunner'
 
 AUTH_PROFILE_MODULE = "experience.RegisteredUser"
 
@@ -337,14 +338,15 @@ AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 STATICFILES_LOCATION = 'static'
 MEDIAFILES_LOCATION = 'images'
 
+AWS_CLOUDFRONT_DOMAIN = "d1ar7cbrvnxsyp.cloudfront.net"
 
 if 'DEFAULT_FILE_STORAGE' in os.environ:
     DEFAULT_FILE_STORAGE = os.environ.get('DEFAULT_FILE_STORAGE')
-    MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+    MEDIA_URL = "https://%s/%s/" % (AWS_CLOUDFRONT_DOMAIN, MEDIAFILES_LOCATION)
 
 if 'STATICFILES_STORAGE' in os.environ:
     STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE')
-    STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
+    STATIC_URL = "https://%s/%s/" % (AWS_CLOUDFRONT_DOMAIN, STATICFILES_LOCATION)
 
 AWS_HEADERS = {'Cache-Control': str('public, max-age=1800')}
 AWS_QUERYSTRING_AUTH = False
@@ -353,6 +355,8 @@ WECHAT_APPID = 'wx57aaa750d440d0d8'
 WECHAT_APPSECRET = '84ecdc9ed6d5ad17b9c029d27b51a65a'
 WECHAT_MCH_ID = '1266572301'
 WECHAT_API_KEY = '34Ds769dYJ458Pd6J387g298RvD78674'
+
+WECHAT_PAYMENT_CERT = ('/home/ubuntu/wechat_cert/apiclient_cert.pem','/home/ubuntu/wechat_cert/apiclient_key.pem')
 
 # Customized settings should always be put at the bottom
 if os.environ.get('ENV_MODE') == 'DEVELOPMENT':

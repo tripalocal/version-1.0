@@ -1,4 +1,4 @@
-from django import template
+﻿from django import template
 import markdown
 
 register = template.Library()
@@ -11,6 +11,12 @@ def clean_text(text, target, start_index):
     while i < len(text) and text[i] == target:
         t += target
         i += 1
+
+    if target == "#" and len(t) < 4:
+        #ignore #,##,###
+        start_index = index+len(t)
+        return (text, start_index)
+
     target = t
 
     #remove " " in front of target

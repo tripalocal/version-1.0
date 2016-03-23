@@ -765,7 +765,7 @@ def saveProfileImage(user, profile, image_file):
     name, extension = os.path.splitext(image_file.name)
     extension = extension.lower()
     if extension in ('.bmp', '.png', '.jpeg', '.jpg') :
-        filename = ('host' + str(user.id) + '_1_' + user.first_name.title().strip() + user.last_name[:1].title() + extension).encode('ascii', 'ignore').decode('ascii')
+        filename = ('host' + str(user.id) + '_1_' + (user.first_name.title().strip() + user.last_name[:1].title()).replace(".","") + extension).encode('ascii', 'ignore').decode('ascii')
         profile.image.delete()
         profile.image_url = dirname + filename
         profile.image = image_file
@@ -780,16 +780,11 @@ def saveProfileImage(user, profile, image_file):
             wpercent = (basewidth/float(w))
             hsize = int((float(h)*float(wpercent)))
             im = im.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
-            im_out = BytesIO()
-            if extension == '.jpg':
-                extension = '.jpeg'
-            im.save(im_out, format = extension[1:].upper())
-            f.close()
-            f = storage.open(dirname + filename, 'wb')
-            f.write(im_out.getvalue())
-            f.close()
+            #add watermark
+            add_watermark(f, im, extension, dirname, filename)
         else:
-            f.close()
+            #add watermark
+            add_watermark(f, im, extension, dirname, filename)
 
 @require_POST
 def email_custom_trip(request):

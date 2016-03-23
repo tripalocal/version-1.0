@@ -132,7 +132,7 @@ class BookingAdmin(admin.ModelAdmin):
         # so it's safe to modify
         #we modify the the queryset
         if obj is not None:
-            form.base_fields['host'].queryset = form.base_fields['host'].queryset.filter(id__in=[e.id for e in obj.experience.hosts.all()])
+            form.base_fields['host'].queryset = form.base_fields['host'].queryset.filter(id=obj.experience.get_host(obj).id)
         return form
 
 # Re-register UserAdmin

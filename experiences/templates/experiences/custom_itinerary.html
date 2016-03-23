@@ -181,7 +181,7 @@
                         <p class='exp-edit' style="display:none;">
                           <a type="button" onclick="edit_item({{experience.id}}, '{{experience.type}}');">{% trans "Edit" %}</a>
                           &middot;
-                          <a type="button" onclick="duplicate_item({{experience.id}}, '{{experience.type}}');">{% trans "Duplicate" %}</a>
+                          <a type="button" onclick="new_copy_item({{experience.id}}, '{{experience.type}}');">{% trans "Duplicate" %}</a>
                           &middot;
                           <a type="button" onclick="delete_item({{experience.id}});">{% trans "Delete" %}</a>
                         </p>
@@ -955,7 +955,7 @@
                 "<p class=\"exp-edit\">" +
                   "<a type=\"button\" onclick=\"edit_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
                   " &middot; " +
-                  "<a type=\"button\" onclick=\"duplicate_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
+                  "<a type=\"button\" onclick=\"new_copy_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
                   " &middot; " +
                   "<a type=\"button\" onclick=\"delete_item(" + data.new_product_id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
                 "</p>" +
@@ -1046,6 +1046,20 @@
                 }
         });
     }
+    
+    function new_copy_item(id, type) {
+      var experience = $(".experience_id_" + id);
+      $("#" + type + "-title").val(experience.find(".exp-info").find("h3").text());
+      $("#" + type + "-details").val($(experience.find(".exp-info").find("p")[0]).text());
+      $("#" + type + "-fixed_price").val(experience.find(".fixed-price").text());
+      $("#" + type + "-fixed_price-min").val(parseFloat(experience.find(".fixed-price-min").text()));
+      $("#" + type + "-fixed_price-max").val(parseFloat(experience.find(".fixed-price-max").text()));
+      $("#" + type + "-price").val($(experience.find(".exp-price").find("h2")[0]).text());
+      $("#" + type + "-price-min").val(experience.find(".price-min").text());
+      $("#" + type + "-price-max").val(experience.find(".price-max").text());
+      $("#" + type + "-notes").val(experience.find(".exp-info").find("label").text());
+     add_item(type);
+    }
 
     function duplicate_item(id, type) {
       var experience = $($(".experience_id_" + id)[0]);
@@ -1070,7 +1084,7 @@
       "<p class=\"exp-edit\">" +
         "<a type=\"button\" onclick=\"edit_item(" + id + ", '" + type + "');\">{% trans "Edit" %}</a>" +
         " &middot; " +
-        "<a type=\"button\" onclick=\"duplicate_item(" + id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
+        "<a type=\"button\" onclick=\"new_copy_item(" + id + ", '" + type + "');\">{% trans "Duplicate" %}</a>" +
         " &middot; " +
         "<a type=\"button\" onclick=\"delete_item(" + id + ", '" + type + "');\">{% trans "Delete" %}</a>" +
       "</p><div class=\"whats-included\">";

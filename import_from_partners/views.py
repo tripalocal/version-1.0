@@ -106,16 +106,38 @@ def import_experienceoz_products(request):
                     else:
                         npi18n = NewProductI18n()
                     npi18n.language = target_language
-                    npi18n.title = product['name'] if product['name'] else ""
                     npi18n.background_info = product['urlSegment'] if product['urlSegment'] else ""
                     np.book_in_advance = product['bookingRequired']
                     if product['bookingNotesRequired']:
                         npi18n.ticket_use_instruction = product['bookingNotesPlaceholder'] if product['bookingNotesPlaceholder'] else ""
-                    npi18n.description = product['description'] if product['description'] else ""
+                    
                     npi18n.combination_options = product['productOptionGroups'] if product['productOptionGroups'] else ""
-                    npi18n.service = product['moreInfo'] if product['moreInfo'] else ""
-                    npi18n.notice = product['hotDealMessage'] if product['hotDealMessage'] else ""
                     npi18n.location = product['primaryRegionUrl'] if product['primaryRegionUrl'] else ""
+
+                    #issue #513: do not sync the Chinese version of the products
+                    if target_language == "zh" and npi18n.product_id == np.id and\
+                        (npi18n.title != product['name'] if product['name'] else "" or \
+                        npi18n.description != product['description'] if product['description'] else "" or \
+                        npi18n.service != product['moreInfo'] if product['moreInfo'] else "" or \
+                        npi18n.notice != product['hotDealMessage'] if product['hotDealMessage'] else ""):
+
+                        tmpi18n = np.newproducti18n_set.filter(product_id=np.id, language="zz")
+                        if len(tmpi18n) > 0:
+                            tmpi18n = tmpi18n[0]
+                        else:
+                            tmpi18n = NewProductI18n()
+                        tmpi18n.language = "zz"
+                        tmpi18n.title = product['name'] if product['name'] else ""
+                        tmpi18n.description = product['description'] if product['description'] else ""
+                        tmpi18n.service = product['moreInfo'] if product['moreInfo'] else ""
+                        tmpi18n.notice = product['hotDealMessage'] if product['hotDealMessage'] else ""
+                        tmpi18n.product = np
+                        tmpi18n.save()
+                    else:
+                        npi18n.title = product['name'] if product['name'] else ""
+                        npi18n.description = product['description'] if product['description'] else ""
+                        npi18n.service = product['moreInfo'] if product['moreInfo'] else ""
+                        npi18n.notice = product['hotDealMessage'] if product['hotDealMessage'] else ""
 
                     npi18n.product = np
                     npi18n.save()

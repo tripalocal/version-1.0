@@ -2,7 +2,8 @@
 {% load i18n %}
 {% load staticfiles %}
 
-<div class="booking-box">
+<div class="booking-box" style="position:relative;">
+    <div class="loading-calendar"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
     <div id="table_date" style="display:none;">
         {% for op in available_options %}
         <p id="date_string_{{forloop.counter0}}" instant="{{op.instant_booking}}"> {{op.date_string}} </p>

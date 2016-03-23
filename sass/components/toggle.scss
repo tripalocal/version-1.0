@@ -1,0 +1,61 @@
+/*
+
+  Toggles and switches
+
+*/
+
+.cmn-toggle {
+  position: absolute;
+  margin-left: -9999px;
+  visibility: hidden;
+}
+.cmn-toggle + label {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+input.cmn-toggle-round-flat + label {
+  padding: 2px;
+  width: 100px;
+  height: 40px;
+  background-color: transparent;
+  border: 1px solid white;
+  border-radius: 40px;
+  transition: background 0.4s;
+}
+input.cmn-toggle-round-flat + label:before,
+input.cmn-toggle-round-flat + label:after {
+  display: block;
+  position: absolute;
+  content: "";
+}
+input.cmn-toggle-round-flat + label:before {
+  top: 2px;
+  left: 2px;
+  bottom: 2px;
+  right: 2px;
+  background-color: transparent;
+  border-radius: 50px;
+  transition: background 0.4s;
+}
+input.cmn-toggle-round-flat + label:after {
+  top: 4px;
+  left: 4px;
+  bottom: 4px;
+  width: 30px;
+  background-color: white;
+  border-radius: 30px;
+  transition: margin 0.4s, background 0.4s;
+}
+
+input.cmn-toggle-round-flat:checked + label {
+  background-color: transparent;
+}
+input.cmn-toggle-round-flat:checked + label:after {
+  margin-left: 60px;
+  background-color: white;
+}
+

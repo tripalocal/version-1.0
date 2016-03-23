@@ -5,6 +5,7 @@
 
 {%block head %}
     <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/transition.min.css" rel="stylesheet">
     <link href="{% static 'experiences/content/search.css' %}" rel="stylesheet">
     <title>{%trans "Discover" %} {{ city_display_name }}</title>
 {%endblock%}
@@ -128,8 +129,8 @@
   {%if LANGUAGE == "zh-CN"%}
   <script type="text/javascript" src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
   {%endif%}
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/dropdown.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.0.7/components/transition.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/dropdown.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/transition.min.js"></script>
   <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
   <script type="text/javascript" src="{% static 'experiences/scripts/jquery.dotdotdot.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'app/scripts/wow.min.js' %}"></script>
@@ -153,7 +154,6 @@
       {
         boxClass:     'scroll-animate',
         animateClass: 'animated',
-        offset:       50,
         mobile:       false,
         live:         true
       }
@@ -223,6 +223,7 @@
             'tags': $("#id_tags").val(),
             'all_tags': $("#id_all_tags").val()
         }, data)).done(function (response) {
+            window.top.document.title = "{% trans 'Discover ' %}" + city;
             $('#ajax-experience-result').html($(response).find('#experience-results'));
             $('#ajax-experience-count').html($(response).find('#experience-count'));
         }).fail(function () {

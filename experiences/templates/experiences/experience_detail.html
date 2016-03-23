@@ -264,7 +264,7 @@
                 <img src="{% static 'experiences/img/itinerary-57.svg' %}" width="35" height="35">
                 <h3>{% trans 'Itineraries' %}</h3>
               </div>
-              <div class="listing-img" style="background-image:linear-gradient(rgba(0, 0, 0, 0.3),rgba(0, 0, 0, 0.3)),url({{ MEDIA_URL }}city/Brisbane.jpg">
+              <div class="listing-img" style="background-image:linear-gradient(rgba(0, 0, 0, 0.3),rgba(0, 0, 0, 0.3)),url({{ MEDIA_URL }}city/Brisbane.jpg);">
                 <div class="listing-img-text">
                   <h1>{% trans "10 Day Trip" %}</h1>
                   <h2>{% trans "Melbourne + Sydney + Gold Coast" %}</h2>
@@ -282,7 +282,6 @@
               </div>
         </div>
     </div>
-    <div class="loading"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
     {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" or experience.type == 'ITINERARY' %}
     <style>
       .affix {
@@ -447,7 +446,7 @@ function setup_datetimepicker(available_dates)
 }
 
 $(function(){
-    $(".loading").hide();
+    $(".loading-calendar").hide();
     var available_dates = {{available_dates|safe}};
     resizeImg();
     mixpanel.track("viewed an experience");
@@ -598,6 +597,7 @@ $(function(){
                         if(data.success)
                         {
                             $('#id_user_id').val(data.user_id);
+                            $('#id_phone_number').val(phone_number+",");
                             var unformattedDate = $("#id_date").val();
                             $("#id_date").val(String(moment(unformattedDate, "DD/MM/YYYY").format("YYYY-MM-DD")));
                             $('[name="csrfmiddlewaretoken"]').val(getCookie('csrftoken'));
@@ -735,7 +735,8 @@ $(function(){
     if(locations.length > 0)
     {
         var map = new google.maps.Map(document.getElementById('experience_map'), {
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            maxZoom: 16,
         });
 
         var infowindow = new google.maps.InfoWindow();
@@ -761,6 +762,8 @@ $(function(){
 
             map.fitBounds(bounds);
         }
+
+        $("#experience_map").show();
     }
     else
     {
@@ -845,7 +848,7 @@ $(function(){
         var max_date = Date.parseExact(enabled_dates[enabled_dates.length-1], "yyyy-MM-dd");
         if(max_date < vd)
         {
-            $(".loading").show();
+            $(".loading-calendar").show();
             $.ajax({
                     type: 'POST',
                     url: "/experience/{{experience.id}}/",
@@ -859,7 +862,7 @@ $(function(){
                     },
                     success: function (data,status,xhr) {
                         var result = data; //$.parseJSON(data)
-                        $(".loading").hide();
+                        $(".loading-calendar").hide();
                         if(data.success)
                         {
                             len = $('p[id^="date_string_"]').length;
@@ -887,7 +890,7 @@ $(function(){
                         }
                     },
                     error: function (e) {
-                        $(".loading").hide();
+                        $(".loading-calendar").hide();
                         alert('{%trans "Please try again later"%}');
                     }
                   })
@@ -1086,7 +1089,8 @@ $(function(){
                     "csrfmiddlewaretoken": getCookie('csrftoken'),
                     "user_id": user_id,
                     "experience_id": {{experience.id}},
-                    "length": length
+                    "length": length,
+                    "detail_id": {{pageview_detail_id}},
                 },
                 success: function (data) {},
                 error: function (e) {}

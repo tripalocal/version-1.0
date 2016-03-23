@@ -9,7 +9,6 @@
   'vendor/bootstrap',
   'vendor/jasny-bootstrap',
   'vendor/semantic-ui-dropdown',
-  'vendor/semantic-ui-transition',
   'vendor/include-media';
 
 // Utilities & helpers
@@ -37,7 +36,8 @@
   'components/checkboxes',
   'components/banners',
   'components/calendar',
-  'components/drag';
+  'components/drag',
+  'components/toggle';
 
 // Layout
 @import
