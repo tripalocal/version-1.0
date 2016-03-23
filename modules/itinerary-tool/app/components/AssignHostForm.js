@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import { reduxForm, initialize } from 'redux-form'
 import { assignHost, showModal } from '../actions'
 
-const AssignHostForm = ({ fields: { host }, handleSubmit, dispatch, date, field }) => (
+const AssignHostForm = ({ fields: { host }, handleSubmit, date, field }) => (
   <form onSubmit={handleSubmit}>
     <div className="form-group">
       <label forName="host">Assign Host</label>

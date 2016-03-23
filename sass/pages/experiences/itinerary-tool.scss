@@ -30,14 +30,26 @@ body {
 }
 
 .btn-default {
-  background-color: $off-white;
+  background-color: transparent;
   color: $off-white;
   &:hover {
-    background-color: $off-white;
+    background-color: transparent;
     color: $medium-grey;
   }
 }
 
 .Select-control {
   background-color: $off-white !important;
+}
+
+.selected {
+  background-color: rgb(230,244,244);
+}
+
+label {
+  margin-right: 15px;
+}
+
+.bar-horizontal {
+  padding-bottom: 20px;
 }

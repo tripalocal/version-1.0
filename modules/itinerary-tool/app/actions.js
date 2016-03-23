@@ -1,15 +1,22 @@
+export const changeTitle = (title) => {
+  return {
+    type: 'CHANGE_TITLE',
+    title
+  }
+}
+
 export const addDate = (date, city, position) => {
   const targetDate = new Date(date)
   let newDate = new Date()
-  if (position === 'BEFORE') {
-    newDate.setDate(targetDate.getDate() - 1)
+  if (position.toUpperCase() === 'BEFORE') {
+    newDate.setTime(targetDate.getTime() - 86400000)
     return {
       type: 'ADD_DATE',
       city,
       date: newDate.toISOString().slice(0,10)
     }
   }
-  newDate.setDate(targetDate.getDate() + 1)
+  newDate.setTime(targetDate.getTime() + 86400000)
   return {
     type: 'ADD_DATE',
     city,
@@ -17,9 +24,35 @@ export const addDate = (date, city, position) => {
   }
 }
 
+export const moveDate = (date, direction) => {
+  const oldDate = new Date(date)
+  const newDate = new Date()
+  if (direction === 'BACK') {
+    newDate.setDate(oldDate.getDate() - 1)
+    return {
+      type: 'MOVE_DATE',
+      oldDate: oldDate.toISOString().slice(0,10),
+      newDate: newDate.toISOString().slice(0,10)
+    }
+  }
+  newDate.setDate(oldDate.getDate() + 1)
+  return {
+    type: 'MOVE_DATE',
+    oldDate: oldDate.toISOString().slice(0,10),
+    newDate: newDate.toISOString().slice(0,10)
+  }
+}
+
 export const removeDate = (date) => {
   return {
     type: 'REMOVE_DATE',
+    date
+  }
+}
+
+export const selectDate = (date) => {
+  return {
+    type: 'SELECT_DATE',
     date
   }
 }

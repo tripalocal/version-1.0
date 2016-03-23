@@ -15,8 +15,9 @@ import App from './containers/App'
   `modal` takes a string
   `dates` takes an object
   =====================================
-  */ 
+   
 window.initialState = {
+  selected: '',
   modal: {
     display: 'NONE',
     date: '',
@@ -71,7 +72,7 @@ window.initialState = {
     }
   }
 }
-
+*/
 let store = createStore(rootReducer, window.initialState, applyMiddleware(thunk))
 
 render(

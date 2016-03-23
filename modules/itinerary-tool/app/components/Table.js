@@ -10,7 +10,6 @@ const Table = ({ dates }) => (
         <th>Activities</th>
         <th>Transport</th>
         <th>Accommodation</th>
-        <th>Restaurants</th>
       </tr>
     </thead>
     <tbody>

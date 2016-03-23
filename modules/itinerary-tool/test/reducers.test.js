@@ -10,7 +10,8 @@ describe('Reducers', () => {
         {
           modal: {date: '', field: '', display: 'NONE'},
           dates: {},
-          form: {} 
+          form: {},
+          selected: ""
         }
       )
     })
@@ -25,9 +26,10 @@ describe('Reducers', () => {
         })
       ).to.eql(
         {
-        modal: {date: '2016-03-04', field: 'experiences', display: 'NEW_ITEM'},
-        dates: {},
-        form: {}
+          modal: {date: '2016-03-04', field: 'experiences', display: 'NEW_ITEM'},
+          dates: {},
+          form: {},
+          selected: ""
         }
       )
     })
@@ -41,7 +43,8 @@ describe('Reducers', () => {
         {
           modal: {date: '', field: '', display: 'NONE'},
           dates: {},
-          form: {} 
+          form: {},
+          selected: ""
         }
       )
     })
@@ -53,16 +56,16 @@ describe('Reducers', () => {
       expect(
         reducer({}, {
           type: 'ADD_DATE',
-          city: 'melbourne',
           date: '2016-03-10'
         })
       ).to.eql(
         {
           modal: {date: '', field: '', display: 'NONE'},
           dates: {
-            '2016-03-10': {'city': 'melbourne', 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}
+            '2016-03-10': {'city': '', 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}
           },
-          form: {} 
+          form: {},
+          selected: ""
         }
       )
     })
@@ -75,7 +78,8 @@ describe('Reducers', () => {
             dates: {
               '2016-03-10': {'city': 'melbourne', 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}
             },
-            form: {} 
+            form: {},
+            selected: ""
           },
           {
             type: 'REMOVE_DATE',
@@ -86,7 +90,39 @@ describe('Reducers', () => {
         {
           modal: {date: '', field: '', display: 'NONE'},
           dates: {},
-          form: {} 
+          form: {},
+          selected: ""
+        }
+      )
+    })
+
+    it('should handle MOVE_DATE', () => {
+      expect(
+        reducer(
+          {
+            modal: {date: '', field: '', display: 'NONE'},
+            dates: {
+              '2016-03-10': {'city': 'melbourne', 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}},
+              '2016-03-11': {'city': 'sydney', 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}
+            },
+            form: {},
+            selected: ""
+          },
+          {
+            type: 'MOVE_DATE',
+            oldDate: '2016-03-10',
+            newDate: '2016-03-11'
+          }
+        )
+      ).to.eql(
+        {
+          modal: {date: '', field: '', display: 'NONE'},
+          dates: {
+            '2016-03-11': {'city': 'melbourne', 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}},
+            '2016-03-10': {'city': 'sydney', 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}
+          },
+          form: {},
+          selected: ""
         }
       )
     })

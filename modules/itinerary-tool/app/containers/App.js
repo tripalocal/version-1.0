@@ -1,12 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Bar from '../components/Bar'
+import TopBar from './TopBar'
+import SideBar from './SideBar'
 import TableState from './TableState'
 import ModalState from './ModalState'
 
 export const App = ({ showModal }) => (
   <div>
-    <Bar />
+    <TopBar />
+    <SideBar />
     <TableState />
     { showModal !== 'NONE'
       ? <ModalState />

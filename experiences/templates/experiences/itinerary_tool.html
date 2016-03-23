@@ -18,7 +18,9 @@
     window.itineraryID = {{ itinerary_id }};
     window.initialState = {
       modal: {date: '', field: '', display: 'NONE'},
-      dates: {{ itinerary|safe }}
+      dates: {{ itinerary|safe }},
+      selected: '',
+      title: 'New Itinerary'
     }
     window.submit = function(dates) { 
       $.ajax({

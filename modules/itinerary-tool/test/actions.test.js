@@ -30,15 +30,12 @@ describe('Actions', () => {
 
   it('should create an action ADD_DATE', () => {
     const date = '2016-03-09'
-    const city = 'melbourne'
     const expectedActionBefore = {
       type: 'ADD_DATE',
-      city,
       date: '2016-03-08'
     }
     const expectedActionAfter = {
       type: 'ADD_DATE',
-      city,
       date: '2016-03-10'
     }
     expect(actions.addDate(date, city, 'BEFORE')).to.eql(expectedActionBefore)
@@ -52,5 +49,21 @@ describe('Actions', () => {
       date
     }
     expect(actions.removeDate(date)).to.eql(expectedAction)
+  })
+
+  it('should create an action MOVE_DATE', () => {
+    const date = '2016-03-09'
+    const expectedActionBack = {
+      type: 'MOVE_DATE',
+      oldDate: '2016-03-09',
+      newDate: '2016-03-08'
+    }
+    const expectedActionForward = {
+      type: 'MOVE_DATE',
+      oldDate: '2016-03-09',
+      newDate: '2016-03-10'
+    }
+    expect(actions.moveDate(date, 'BACK')).to.eql(expectedActionBack)
+    expect(actions.moveDate(date, 'FORWARD')).to.eql(expectedActionForward)
   })
 })
