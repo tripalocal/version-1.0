@@ -156,63 +156,84 @@ def sort_experiences(experiences, customer=None, preference=None):
     '''
     @customer: sort the experiences based on the auto-collected data of the customer
     @preference: sort the experiences based on the specified preference (a dict read from configuration files)
+    otherwise, sort the experiences based on the overall reviews and pageview statistics
     '''
     pageview_max = 0
     match_max = 0
     bookings_max = 0
+    rate_max = 0
 
-    if customer is not None:
-        records = UserPageViewStatistics.objects.filter(user=customer)
-        if records and len(records)>0:
-            #records and experiences shoudld be sorted by id
-            j_last = 0
-            for i in range(len(experiences)):
-                for j in range(j_last, len(records)):
-                    if experiences[i].id == records[j].experience.id:
-                        experiences[i].pageview = records[j].times_viewed * records[j].average_length
-                        if experiences[i].pageview > pageview_max:
-                            pageview_max = experiences[i].pageview
-                        j_last = j+1
-                        break
-                    elif experiences[i].id > records[j].experience.id:
-                        #should not occur, becuase records[j].experience is definitely in experiences
-                        j_last = j+1
-                        continue
-                    else:
-                        break
+    experiences = list(experiences)
+    pageview_records = list(UserPageViewStatistics.objects.filter(experience__in=experiences))
+    bookings = list(Booking.objects.filter(experience__in=experiences))
 
-    if preference is not None:
-        #TODO: in the case where neither customer nor preference is None,
-        #the experiences list only needs to be read once instead of twice
-        for experience in experiences:
-            #get the number of booking times
-            bks = Booking.objects.filter(experience_id = experience.id)
-            if bks is not None:
-                bks = len(bks)
-            else:
-                bks = 0
-            experience.bookings = bks
+    for experience in experiences:
+        #criterion 1: pageview (user only, or overall)
+        if customer is not None:
+            records = [r for r in pageview_records if r.user==customer and r.experience==experience]
+        else:
+            records = [r for r in pageview_records if r.experience.id==experience.id]
+
+        experience.pageview = 0.0
+        for r in records:
+            experience.pageview += r.times_viewed * r.average_length
+            if experience.pageview > pageview_max:
+                pageview_max = experience.pageview
+
+        #criterion 2: user preference
+        if preference is not None:
             experience.match = get_experience_score(preference, experience.get_tags(settings.LANGUAGES[0][0]))
-            if bks > bookings_max:
-                bookings_max = bks
             if experience.match > match_max:
                 match_max = experience.match
+
+        #criterion 3: booking numbers
+        bks = [b for b in bookings if b.experience_id == experience.id]
+        if bks is not None:
+            bks = len(bks)
+        else:
+            bks = 0
+        experience.bookings = bks
+        if bks > bookings_max:
+            bookings_max = bks
+
+        #criterion 4: reviews
+        #put experiences without images to the end
+        counter = 0
+        experience.rate = 0.0
+        photoset = experience.photo_set.all()
+        if photoset!= None and len(photoset) > 0:
+            for review in experience.review_set.all():
+                experience.rate += review.rate
+                counter += 1
+        else:
+            experience.rate = -1
+        if counter > 0:
+            experience.rate /= counter
+        if experience.rate > rate_max:
+            rate_max = experience.rate
 
     sorted = 0
     for experience in experiences:
         experience.popularity = 0.0
         #normalize
-        #popularoity = a*pageview+b*match+c*bookings
+        #popularoity = a*pageview+b*match+c*bookings+d*review
         #sort by popularity
         if pageview_max > 0 and hasattr(experience, 'pageview'):
             experience.pageview = float(experience.pageview/pageview_max)
-            experience.popularity += 4 * experience.pageview
+
         if match_max > 0 and hasattr(experience, 'match'):
             experience.match = float(experience.match/match_max)
-            experience.popularity += 5 * experience.match
+
         if bookings_max > 0 and hasattr(experience, 'bookings'):
             experience.bookings = float(experience.bookings/bookings_max)
-            experience.popularity += 1 * experience.bookings
+
+        if rate_max > 0 and hasattr(experience, 'rate'):
+            experience.rate = float(experience.rate/rate_max)
+
+        if customer:
+            experience.popularity += 4*experience.pageview + 5*experience.match + 1*experience.bookings + 1*experience.rate
+        else:
+            experience.popularity += 1*experience.pageview + 10*experience.rate
 
         i=0
         for i in range(sorted+1):
@@ -2874,7 +2895,9 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
         if is_private_tours:
             experienceList = [exp for exp in experienceList if tagsOnly(_("Private group"), exp)]
 
+        experienceList = sort_experiences(experienceList)
         i = 0
+        counter = 0
         while i < len(experienceList):
             experience = experienceList[i]
             convert_experience_price(request, experience)
@@ -2933,71 +2956,6 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
             experience.dollarsign = DollarSign[experience.currency.upper()]
             experience.currency = str(dict(Currency)[experience.currency.upper()])
 
-            rate = 0.0
-            counter = 0
-
-            photoset = experience.photo_set.all()
-            if type != 'product':
-                image_url = experience.get_host().registereduser.image_url
-
-                if photoset!= None and len(photoset) > 0 and image_url != None and len(image_url) > 0:
-                    for review in experience.review_set.all():
-                        rate += review.rate
-                        counter += 1
-                else:
-                    rate = -1
-
-                if counter > 0:
-                    rate /= counter
-
-                #find the correct index to insert --> sort the list by rate
-                counter = 0
-                if len(rateList) == 0:
-                    rateList.append(rate)
-                    counter = 0
-                else:
-                    for counter in range(0, len(rateList)):
-                        if rateList[counter] < rate:
-                            rateList.insert(counter, rate)
-                            break
-                        elif rateList[counter] > rate:
-                            counter += 1
-                            if counter == len(rateList):
-                                rateList.append(rate)
-                                break
-                        else:
-                            # == --> check instant booking time, unavailable time
-                            if len(experience.instantbookingtimeperiod_set.all()) > 0:
-                                #the exp has set instant booking
-                                while counter < len(rateList) and rateList[counter] == rate and len(cityExperienceList[counter].instantbookingtimeperiod_set.all()) > 0:
-                                    counter += 1
-                                if counter == len(rateList):
-                                    rateList.append(rate)
-                                else:
-                                    rateList.insert(counter, rate)
-                                break
-                            elif not len(experience.blockouttimeperiod_set.all()) > 0:
-                                #the exp has neither set instant booking nor blockout time
-                                while counter < len(rateList) and rateList[counter] == rate:
-                                    counter += 1
-                                if counter == len(rateList):
-                                    rateList.append(rate)
-                                else:
-                                    rateList.insert(counter, rate)
-                                break
-                            else:
-                                #the exp has set blockout time
-                                while counter < len(rateList) and rateList[counter] == rate:
-                                    if len(cityExperienceList[counter].instantbookingtimeperiod_set.all()) > 0 or len(cityExperienceList[counter].blockouttimeperiod_set.all()) > 0:
-                                        counter += 1
-                                    else:
-                                        break
-                                if counter == len(rateList):
-                                    rateList.append(rate)
-                                else:
-                                    rateList.insert(counter, rate)
-                                break
-
             cityExperienceList.insert(counter, experience)
             cityExperienceReviewList.insert(counter, getNReviews(experience.id))
             # Fetch BGImageURL
@@ -3029,6 +2987,7 @@ def SearchView(request, city, start_date=datetime.utcnow().replace(tzinfo=pytz.U
                 formattedTitleList.insert(counter, t)
 
             i += 1
+            counter += 1
 
         if not settings.DEVELOPMENT:
             try:

@@ -196,9 +196,9 @@ class ViewsTest(TestCase):
         available_options = []
         available_date = ()
         available_date = getAvailableOptions(experience, available_options, available_date,
-                                             pytz.timezone(experience.get_timezone()).localize(datetime(2016, 3, 18, 0)))
-        self.assertEqual(31, len(available_date))
-        self.assertEqual(31*14, len(available_options))
+                                             pytz.timezone(experience.get_timezone()).localize(datetime(2016, 4, 18, 0)))
+        self.assertEqual(30, len(available_date))
+        self.assertEqual(30*14, len(available_options))
 
     def test_get_related_experiences(self):
         request = self.client.request(method="GET").wsgi_request
@@ -221,7 +221,7 @@ class ViewsTest(TestCase):
         #(select type from experiences_experience where abstractexperience_ptr_id=experience_id) in ('PRIVATE', 'NONPRIVATE')
         #group by experience_id 
         #order by count(experience_id) desc;
-        self.assertAlmostEqual(100-100*4/247, get_experience_popularity(experience))
+        self.assertAlmostEqual(100-100*4/245, get_experience_popularity(experience))
 
         experience = Experience.objects.get(id=651)
         #SELECT experience_id, count(experience_id)
@@ -230,7 +230,7 @@ class ViewsTest(TestCase):
         #(select type from experiences_experience where abstractexperience_ptr_id=experience_id) in ('ITINERARY')
         #group by experience_id 
         #order by count(experience_id) desc;
-        self.assertAlmostEqual(100-100*7/8, get_experience_popularity(experience))
+        self.assertAlmostEqual(100-100*5/8, get_experience_popularity(experience))
 
         experience = NewProduct.objects.get(id=852)
         #SELECT experience_id, count(experience_id)
@@ -239,7 +239,7 @@ class ViewsTest(TestCase):
         #(select abstractexperience_ptr_id from experiences_newproduct)
         #group by experience_id 
         #order by count(experience_id) desc;
-        self.assertAlmostEqual(100-100*7/640, get_experience_popularity(experience))
+        self.assertAlmostEqual(100-100*5/640, get_experience_popularity(experience))
 
     def test_set_option_items(self):
         experience = NewProduct.objects.get(id=700013)
