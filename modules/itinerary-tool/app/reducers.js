@@ -66,10 +66,13 @@ function dates(state = {}, action) {
       delete newState[action.date]
       return newState
     case 'MOVE_DATE':
-      return update(state, {
-        [action.oldDate] : {$set: state[action.newDate]},
-        [action.newDate] : {$set: state[action.oldDate]}
-      })
+      if (state[action.newDate]) {
+        return update(state, {
+          [action.oldDate] : {$set: state[action.newDate]},
+          [action.newDate] : {$set: state[action.oldDate]}
+        })
+      }
+      return state
     case 'ASSIGN_HOST':
       return update(state, {
         [action.date]: {[action.field]: {host: {$set: action.host}}}

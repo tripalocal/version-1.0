@@ -28,14 +28,14 @@ export const moveDate = (date, direction) => {
   const oldDate = new Date(date)
   const newDate = new Date()
   if (direction === 'BACK') {
-    newDate.setDate(oldDate.getDate() - 1)
+    newDate.setTime(oldDate.getTime() - 86400000)
     return {
       type: 'MOVE_DATE',
       oldDate: oldDate.toISOString().slice(0,10),
       newDate: newDate.toISOString().slice(0,10)
     }
   }
-  newDate.setDate(oldDate.getDate() + 1)
+  newDate.setTime(oldDate.getTime() + 86400000)
   return {
     type: 'MOVE_DATE',
     oldDate: oldDate.toISOString().slice(0,10),
