@@ -989,12 +989,16 @@ class ExperienceDetailView(DetailView):
                     available_options = []
                     available_date = ()
                     if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
-                        for i in range(4): #7 days per time
-                            now = max_date + timedelta(days=1+i*7)
-                            now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
-                            now_string = now_string[:-2] + ":" + now_string[-2:]
-                            original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
-                            available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+                        if experience.partner == PARTNER_IDS["experienceoz"]:
+                            for i in range(4): #7 days per time
+                                now = max_date + timedelta(days=1+i*7)
+                                now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
+                                now_string = now_string[:-2] + ":" + now_string[-2:]
+                                original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
+                                available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+                        elif experience.partner == PARTNER_IDS["rezdy"]:
+                            #TODO
+                            pass
                     else:
                         available_date = getAvailableOptions(experience, available_options, available_date, from_datetime = (max_date+timedelta(days=1)).astimezone(pytz.timezone('UTC')))
                     available_date = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))
@@ -1091,12 +1095,16 @@ class ExperienceDetailView(DetailView):
                 return context
 
         if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
-            for i in range(4): #7 days per time
-                now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2+i*7)
-                now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
-                now_string = now_string[:-2] + ":" + now_string[-2:]
-                original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
-                available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+            if experience.partner == PARTNER_IDS["experienceoz"]:
+                for i in range(4): #7 days per time
+                    now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2+i*7)
+                    now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
+                    now_string = now_string[:-2] + ":" + now_string[-2:]
+                    original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
+                    available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+            elif experience.partner == PARTNER_IDS["rezdy"]:
+                #TODO
+                pass
         else:
             available_date = getAvailableOptions(experience, available_options, available_date)
 
