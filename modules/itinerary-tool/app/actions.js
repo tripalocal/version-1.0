@@ -1,3 +1,61 @@
+export const changeTitle = (title) => {
+  return {
+    type: 'CHANGE_TITLE',
+    title
+  }
+}
+
+export const addDate = (date, city, position) => {
+  const targetDate = new Date(date)
+  if (position.toUpperCase() === 'BEFORE') {
+    return {
+      type: 'ADD_DATE',
+      city,
+      date: targetDate.toISOString().slice(0,10)
+    }
+  }
+  let newDate = new Date()
+  newDate.setTime(targetDate.getTime() + 86400000)
+  return {
+    type: 'ADD_DATE',
+    city,
+    date: newDate.toISOString().slice(0,10)
+  }
+}
+
+export const moveDate = (date, direction) => {
+  const oldDate = new Date(date)
+  const newDate = new Date()
+  if (direction === 'BACK') {
+    newDate.setTime(oldDate.getTime() - 86400000)
+    return {
+      type: 'MOVE_DATE',
+      oldDate: oldDate.toISOString().slice(0,10),
+      newDate: newDate.toISOString().slice(0,10)
+    }
+  }
+  newDate.setTime(oldDate.getTime() + 86400000)
+  return {
+    type: 'MOVE_DATE',
+    oldDate: oldDate.toISOString().slice(0,10),
+    newDate: newDate.toISOString().slice(0,10)
+  }
+}
+
+export const removeDate = (date) => {
+  return {
+    type: 'REMOVE_DATE',
+    date
+  }
+}
+
+export const selectDate = (date) => {
+  return {
+    type: 'SELECT_DATE',
+    date
+  }
+}
+
 export const updateItems = (date, field, value) => {
   return {
     type: 'UPDATE_ITEMS',
@@ -45,8 +103,8 @@ export function updateThenSave(date, field, val) {
   return (dispatch, getState) => {
     dispatch(updateItems(date, field, val))
     setTimeout(() => {
-      const { dates } = getState()
-      window.submit(dates)
+      const { title, dates } = getState()
+      window.submit(title, dates)
     }, 1000)
   }
 }

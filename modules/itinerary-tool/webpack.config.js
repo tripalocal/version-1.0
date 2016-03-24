@@ -28,6 +28,10 @@ const common = {
         include: PATHS.app
       },
       {
+        test: /\.scss$/,
+        loaders: ['style', 'css', 'sass']
+      },
+      {
         test: /\.jsx?$/,
         loaders: ['babel?cacheDirectory'],
         include: PATHS.app

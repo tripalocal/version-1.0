@@ -6,6 +6,7 @@ import Modal from '../components/Modal'
 const mapStateToProps = (state) => {
   return {
     setting: state.modal['display'],
+    date: state.modal['date']
   }
 }
 

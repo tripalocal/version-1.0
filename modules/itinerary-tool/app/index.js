@@ -15,8 +15,9 @@ import App from './containers/App'
   `modal` takes a string
   `dates` takes an object
   =====================================
-  
+   
 window.initialState = {
+  selected: '',
   modal: {
     display: 'NONE',
     date: '',
