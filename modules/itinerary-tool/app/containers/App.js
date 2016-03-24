@@ -6,10 +6,14 @@ import TableState from './TableState'
 import ModalState from './ModalState'
 
 export const App = ({ showModal }) => (
-  <div>
+  <div style={{width: '100%', height: '100%'}}>
     <TopBar />
-    <SideBar />
-    <TableState />
+    <div className="main-section">
+      <div className="main-row">
+        <TableState />
+        <SideBar />
+      </div>
+    </div>
     { showModal !== 'NONE'
       ? <ModalState />
       : null }

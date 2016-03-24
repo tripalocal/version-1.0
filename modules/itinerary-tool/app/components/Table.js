@@ -1,21 +1,25 @@
 import React, { PropTypes } from 'react'
 import Row from './Row'
+import BottomBar from '../containers/BottomBar'
 
 const Table = ({ dates }) => (
-  <table className="table">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>City</th>
-        <th>Activities</th>
-        <th>Transport</th>
-        <th>Accommodation</th>
-      </tr>
-    </thead>
-    <tbody>
-      {Object.keys(dates).sort((a,b) => new Date(a) - new Date(b)).map(date => <Row key={date} date={date} fields={dates[date]} />)}
-    </tbody>
-  </table>
+  <div className="center">
+    <table className="table">
+      <thead>
+        <tr className="table-header">
+          <th>日期</th>
+          <th>城市</th>
+          <th>游玩地点和项目</th>
+          <th>接送机</th>
+          <th>住宿</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.keys(dates).sort((a,b) => new Date(a) - new Date(b)).map(date => <Row key={date} date={date} fields={dates[date]} />)}
+      </tbody>
+    </table>
+    <BottomBar />
+  </div>
 )
 
 Table.propTypes = {

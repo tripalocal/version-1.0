@@ -7,15 +7,14 @@ export const changeTitle = (title) => {
 
 export const addDate = (date, city, position) => {
   const targetDate = new Date(date)
-  let newDate = new Date()
   if (position.toUpperCase() === 'BEFORE') {
-    newDate.setTime(targetDate.getTime() - 86400000)
     return {
       type: 'ADD_DATE',
       city,
-      date: newDate.toISOString().slice(0,10)
+      date: targetDate.toISOString().slice(0,10)
     }
   }
+  let newDate = new Date()
   newDate.setTime(targetDate.getTime() + 86400000)
   return {
     type: 'ADD_DATE',
@@ -104,8 +103,8 @@ export function updateThenSave(date, field, val) {
   return (dispatch, getState) => {
     dispatch(updateItems(date, field, val))
     setTimeout(() => {
-      const { dates } = getState()
-      window.submit(dates)
+      const { title, dates } = getState()
+      window.submit(title, dates)
     }, 1000)
   }
 }

@@ -10,7 +10,7 @@
 
 {% block content %}
   {% csrf_token %}
-  <div id="root" class="container"></div>
+  <div id="root"></div>
 {% endblock %}
 
 {% block scripts %}
@@ -22,12 +22,13 @@
       selected: '',
       title: 'New Itinerary'
     }
-    window.submit = function(dates) { 
+    window.submit = function(title, dates) { 
       $.ajax({
         url: '/itinerary/admin/' + window.itineraryID.toString(),
         type: 'POST',
         data: {
           csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
+          title: title,
           dates: JSON.stringify(dates)
         }      
       }).done(function(response) {
