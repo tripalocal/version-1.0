@@ -24,7 +24,7 @@
     }
     window.submit = function(title, dates) { 
       $.ajax({
-        url: '/itinerary/admin/' + window.itineraryID.toString(),
+        url: '/itinerary/host/' + window.itineraryID.toString(),
         type: 'POST',
         data: {
           csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
@@ -32,7 +32,7 @@
           dates: JSON.stringify(dates)
         }      
       }).done(function(response) {
-        console.log(response);
+        console.log('save itinerary:', response.success);
       }).fail(function(error) {
         console.log(error);
       });

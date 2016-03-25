@@ -33,7 +33,20 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         console.log('fetch failed', exception)
       })
     },
-    hideSelect: () => dispatch(showSelect(date, fieldName, 'NORMAL')),
+    hideSelect: () => {
+      dispatch(showSelect(date, fieldName, 'NORMAL'))
+      fetch('/search_text/', {
+        method: 'post',
+        body: JSON.stringify({
+          csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].getAttribute('value'),
+          action: 'clear'
+        })
+      }).then((response) => {
+        console.log('clear search:', response.statusText)
+      }).catch((exception) => {
+        console.log('clear search failed', exception)
+      })
+    },
     handleChange: (val) => dispatch(updateThenSave(date, fieldName, val))
   }
 }
