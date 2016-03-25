@@ -6,6 +6,7 @@
 {% block head %}
   <title>{% trans 'Itinerary tool' %}</title>
   <link href="{% static 'experiences/content/itinerary-tool.css' %}" rel="stylesheet"/>
+  <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -39,4 +40,15 @@
     }
   </script>
   <script src="{% static 'experiences/scripts/itinerary-tool.min.js' %}"></script>
+  <script src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+  <script src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+  <script src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+  <script>
+    $(document).ready(function() {
+      $("#start-date").datetimepicker({
+        format: 'YYYY-MM-DD', locale: 'zh-CN',
+        minDate: moment()
+      });
+    });
+  </script>
 {% endblock %}
