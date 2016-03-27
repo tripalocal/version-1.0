@@ -3904,7 +3904,7 @@ def itinerary_tool(request, id=None):
                         booking.save()
         ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
         ci.save()
-        return HttpResponse(json.dumps({'success':True}), content_type="application/json")
+        return HttpResponse(json.dumps({'success': 'OK'}), content_type="application/json")
     else:
         bookings = list(CustomItinerary.objects.get(id=id).booking_set.order_by('datetime').all()) 
         itinerary = {}

@@ -11,10 +11,6 @@
   '../../utils/functions',
   '../../utils/placeholders';
 
-body {
-  overflow: hidden
-}
-
 #navbar {
   display: none;
 }
@@ -134,6 +130,11 @@ th {
 .table-header {
   height: 50px;
   background-color: $off-white;
+}
+
+.date-field {
+  position: relative;
+  display: inline-block;
 }
 
 .date-cell {

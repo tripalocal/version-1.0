@@ -14,7 +14,7 @@ const Cell = ({ date, city, field, fieldName, showSelect, hideSelect, getOptions
         valueKey="id"
         onChange={handleChange}
         clearable={false}
-        cacheAsyncResults={false}
+        cache={false}
         multi
       />
     : 

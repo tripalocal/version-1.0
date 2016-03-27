@@ -65,6 +65,13 @@ function dates(state = {}, action) {
       let newState = Object.assign({}, state)
       delete newState[action.date]
       return newState
+    case 'CHANGE_START_DATE':
+      let newDate = new Date(action.date)
+      return Object.keys(state).reduce((newState, key) => {
+        newState[newDate.toISOString().slice(0,10)] = state[key]
+        newDate.setTime(newDate.getTime() + 86400000)
+        return newState
+      }, {})
     case 'MOVE_DATE':
       if (state[action.newDate]) {
         return update(state, {

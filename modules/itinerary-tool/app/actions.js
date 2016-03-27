@@ -5,6 +5,13 @@ export const changeTitle = (title) => {
   }
 }
 
+export const changeStartDate = (date) => {
+  return {
+    type: 'CHANGE_START_DATE',
+    date
+  }
+}
+
 export const addDate = (date, city, position) => {
   const targetDate = new Date(date)
   if (position.toUpperCase() === 'BEFORE') {

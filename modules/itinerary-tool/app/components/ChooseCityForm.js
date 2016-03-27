@@ -10,8 +10,12 @@ const ChooseCityForm = ({ fields: { city, position }, handleSubmit, onSubmit, da
       <option>Melbourne</option>
       <option>Sydney</option>
       <option>Brisbane</option>
-      <option>Gold Coast</option>
+      <option>Goldcoast</option>
       <option>Adelaide</option>
+      <option>Hobart</option>
+      <option>Darwin</option>
+      <option>Wellington</option>
+      <option>Auckland</option>
     </select>
     <label forName="position">前/后</label>
     <select className="form-control" {...position} value={position.value || ''}>
