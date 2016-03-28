@@ -12,6 +12,7 @@ from Tripalocal_V1 import settings
 from xml.etree import ElementTree
 from import_from_partners.utils import *
 from builtins import float
+from unionpay.util.helper import load_config
 
 experienceoz_username = '7254'
 experienceoz_password = 'dHJpcGFsb2NhbFRyaXBhbG9jYWwgUHR5IEx0ZA=='
@@ -359,8 +360,8 @@ def import_rezdy_products(request):
             timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
             for product in products["products"]:
                 counter += 1
-                create_rezdy_product(prodcut)
-                create_rezdy_provider(product)
+                create_rezdy_product(product)
+                create_rezdy_provider(product, request)
 
             if counter < 100:
                 finished = True
@@ -368,26 +369,35 @@ def import_rezdy_products(request):
             finished = True
 
 def create_rezdy_product(product):
-    np = NewProduct()
+    try:
+        np = NewProduct.objects.get(original_id = product['productCode'])
+    except Exception as e:
+        np = NewProduct()
     np.original_id = product['productCode']
     np.currency = product['currency']
     np.price = product['advertisedPrice']
     np.duration = float(product['durationMinutes'])/60.0
     np.commission = 0
     np.guest_number_min = int(product['quantityRequiredMin']) if int(product['quantityRequiredMin']) > 0 else 1
-    np.guest_number_max = int(product['quantityRequiredMax']) if int(product['quantityRequiredMax']) > np.guest_number_min else 10
+    np.guest_number_max = int(product['quantityRequiredMax']) if int(product['quantityRequiredMax']) >= np.guest_number_min else 10
     #TODO: convert timezone to city
-    np.city = product['timezone']
+    np.city = product['timezone'].split("/")[1] if product['timezone'].find("/") > 0 else product['timezone']
     np.save()
 
-    co = Coordinate()
+    try:
+        co = Coordinate.objects.get(experience = np, order = 1)
+    except Exception as e:
+        co = Coordinate()
     co.experience = np
     co.longitude = float(product['longitude'])
     co.latitude = float(product['latitude'])
     co.order = 1
     co.save()
 
-    npi18n = NewProductI18n()
+    try:
+        npi18n = NewProductI18n.objects.get(product = np, language = "en")
+    except Exception as e:
+        npi18n = NewProductI18n()
     npi18n.product = np
     npi18n.language = "en"
     npi18n.title = product['name']
@@ -404,7 +414,7 @@ def create_rezdy_product(product):
     for counter, image in enumerate(product['images']):
         extension = "." + image['itemUrl'].split(".")[-1]
         response = requests.get(image['itemUrl'])
-        if response.status_code == 200:
+        if response.status_code == 200 and response.reason == "OK":
             image_io = BytesIO(response.content)
             image_io.seek(0, 2)  # Seek to the end of the stream, so we can get its length with `image_io.tell()`
             image_file = InMemoryUploadedFile(image_io, None, image['itemUrl'].split("/")[-1], "image", image_io.tell(), None, None)
@@ -412,11 +422,12 @@ def create_rezdy_product(product):
 
     return np
 
-def create_rezdy_provider(product):
-    url = "https://api.rezdy.com/latest/companies/" + product['supplierAlias']
+def create_rezdy_provider(product, request):
+    url = "https://api.rezdy.com/latest/companies/" + product['supplierAlias'] + "?apiKey=97acaed307f441a5a1599a6ecdebffa3"
     response = requests.get(url)
     if response.status_code == 200 and response.reason == "OK":
         supplier = json.loads(response.text)
+        supplier = supplier["companies"][0]
 
         partner_id = PARTNER_IDS['rezdy']
         oid = int(str(product['supplierId']) + partner_id + str(len(partner_id)))
@@ -425,8 +436,8 @@ def create_rezdy_provider(product):
         if len(user) > 0:
             user = user[0]
         else:
-            user = User(id = oid, email = email, username = "rezdy_" + str(product['supplierAlias']),
-                        first_name = supplier['firstName'][:30] if supplier['name'] else "",
+            user = User(id = oid, email = email, username = str(product['supplierAlias'][:30]),
+                        first_name = supplier['firstName'][:30] if supplier['firstName'] else "",
                         last_name = supplier['lastName'],
                         date_joined = datetime.utcnow().replace(tzinfo=pytz.UTC))
 
@@ -434,7 +445,7 @@ def create_rezdy_provider(product):
             user.set_password(user.username)
             user.save()
 
-            bio = supplier.get('companyDescription', None)
+            bio = str(product['supplierAlias']) + "\n" + supplier.get('companyDescription', "")
             user_signed_up.send(sender=user.__class__, request=request, user=user,
                                 partner_operator = True,
                                 image_url = supplier.get('companyLogoUrl', None),

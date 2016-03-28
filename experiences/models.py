@@ -46,7 +46,7 @@ class Provider(models.Model):
     company = models.CharField(max_length=100)
     website = models.CharField(max_length=254, blank=True)
     email = models.CharField(max_length=100, blank=True)
-    phone_number = models.CharField(max_length=15, blank=True)
+    phone_number = models.CharField(max_length=100, blank=True)
     partner = models.CharField(max_length=100, blank=True, null=True)
     location = models.CharField(max_length=500, blank=True, null=True)
 
