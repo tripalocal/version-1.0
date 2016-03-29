@@ -1157,11 +1157,11 @@
         $("#add-" + type + "-btn").click();
         var experience = $($(".experience_id_" + id)[0]);
         var fixed_price = parseFloat(experience.find(".fixed-price").text())
-        var price = parseFloat(experience.find(".price").text());
         var fixed_price_min = parseFloat(experience.find(".fixed-price-min").text());
         var fixed_price_max = parseFloat(experience.find(".fixed-price-max").text());
         var price_min = parseFloat(experience.find(".price-min").text());
         var price_max = parseFloat(experience.find(".price-max").text());
+        var price = (price_min + price_max)/2;
         var title = experience.find(".exp-info").find("h3").text();
         var details = $(experience.find(".exp-info").find("p")[0]).text();
         var notes = experience.find(".exp-info").find("label").text();
