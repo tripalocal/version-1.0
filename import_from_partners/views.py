@@ -430,7 +430,47 @@ def create_rezdy_product(product):
     npi18n.disclaimer = product.get('generalTerms', "")
     #TODO: price options
     npi18n.combination_options = product.get('priceOptions', "")
+    #to keep consistency, create a fake priceGroup (Rezdy doesn't have priceGroup, but only priceOption)
+    og = OptionGroup.objects.filter(product_id=np.id, language=npi18n.language, name=npi18n.title)
+    if len(og) > 0:
+        og = og[0]
+        og.name = npi18n.title
+    else:
+        og = OptionGroup(product=np, name=npi18n.title, language=npi18n.language)
+    og.save()
+    for option in npi18n.combination_options:
+        oi = OptionItem.objects.filter(original_id=option.get("id"), group_id=og.id)
+        if len(oi) > 0:
+            oi = oi[0]
+            oi.name = option.get("label")
+        else:
+            oi = OptionItem(group = og, name = option.get("label"), price = option.get("price"),
+                            min_quantity = option.get("minQuantity", np.guest_number_min),
+                            max_quantity = option.get("maxQuantity", np.guest_number_max),
+                            seats_used = option.get("seatsUsed", 0),
+                            price_type = option.get("priceGroupType", ""),
+                            original_id = option.get("id"))
+        oi.save()
+
     npi18n.whatsincluded = product.get('extras', "")
+    if npi18n.whatsincluded and len(npi18n.whatsincluded):
+        og = OptionGroup.objects.filter(product_id=np.id, language=npi18n.language, name="Extras")
+        if len(og) > 0:
+            og = og[0]
+        else:
+            og = OptionGroup(product=np, name="Extras", language=npi18n.language)
+        og.save()
+        for option in npi18n.whatsincluded:
+            oi = OptionItem.objects.filter(name=option.get("name"), group_id=og.id)
+            if len(oi) > 0:
+                oi = oi[0]
+                oi.name = option.get("name")
+            else:
+                oi = OptionItem(group = og, name = option.get("name"), price = option.get("price"),
+                                description = option.get("description", ""),
+                                price_type = option.get("extraPriceType", ""),
+                                image = option.get("image", ""))
+            oi.save()
     npi18n.save()
 
     #images

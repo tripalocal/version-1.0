@@ -353,6 +353,7 @@ class OptionGroup(models.Model):
     name = models.TextField()
     language = models.CharField(max_length=3, choices=LANG_CHOICES, default=EN)
     original_id = models.IntegerField(blank=True, null=True)
+    type = models.CharField(max_length=30, blank=True, null=True)
 
     def __str__(self):
         return self.name if self.name else ""
@@ -360,9 +361,15 @@ class OptionGroup(models.Model):
 class OptionItem(models.Model):
     group = models.ForeignKey(OptionGroup)
     name = models.TextField()
+    description = models.TextField(blank=True, null=True)
     retail_price = models.FloatField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
     original_id = models.IntegerField(blank=True, null=True)
+    min_quantity = models.IntegerField(blank=True, null=True)
+    max_quantity = models.IntegerField(blank=True, null=True)
+    seats_used = models.IntegerField(blank=True, null=True)
+    price_type = models.CharField(max_length=30, blank=True, null=True)
+    image = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name if self.name else ""
