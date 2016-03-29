@@ -363,6 +363,10 @@ class OptionItem(models.Model):
     retail_price = models.FloatField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
     original_id = models.IntegerField(blank=True, null=True)
+    min_quantity = models.IntegerField(blank=True, null=True)
+    max_quantity = models.IntegerField(blank=True, null=True)
+    seats_used = models.IntegerField(blank=True, null=True)
+    price_type = models.CharField(max_length=30, blank=True, null=True)
 
     def __str__(self):
         return self.name if self.name else ""
