@@ -360,39 +360,62 @@ def import_rezdy_products(request):
             timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
             for product in products["products"]:
                 counter += 1
-                np = create_rezdy_product(product)
-                create_rezdy_provider(np, product, request)
+                np = None
+                try:
+                    np = create_rezdy_product(product)
+                    create_rezdy_provider(np, product, request)
+                except Exception as e:
+                    import logging
+                    logger = logging.getLogger("Tripalocal_V1")
+                    logger.error(str(i) + " " + str(counter) + " " + product['productCode'])
+                    logger.error(e)
+                    pass
+                if np:
+                    try:
+                        create_rezdy_provider(np, product, request)
+                    except Exception as e:
+                        import logging
+                        logger = logging.getLogger("Tripalocal_V1")
+                        logger.error(str(i) + " " + str(counter) + " " + product['productCode'] + " " + str(product['supplierId']))
+                        logger.error(e)
+                        pass
 
             if counter < 100:
                 finished = True
         else:
             finished = True
 
+    return HttpResponseRedirect("/")
+
 def create_rezdy_product(product):
     try:
         np = NewProduct.objects.get(original_id = product['productCode'])
     except Exception as e:
         np = NewProduct()
+    np.status = dict(np.STATUS_CHOICES)["Unlisted"]
     np.original_id = product['productCode']
-    np.currency = product['currency']
-    np.price = product['advertisedPrice']
-    np.duration = float(product['durationMinutes'])/60.0
+    np.currency = product.get('currency', 'AUD')
+    np.price = product.get('advertisedPrice', 0)
+    np.duration = float(product.get('durationMinutes', 0))/60.0
     np.commission = 0
-    np.guest_number_min = int(product['quantityRequiredMin']) if int(product['quantityRequiredMin']) > 0 else 1
-    np.guest_number_max = int(product['quantityRequiredMax']) if int(product['quantityRequiredMax']) >= np.guest_number_min else 10
+    np.guest_number_min = int(product['quantityRequiredMin']) if int(product.get('quantityRequiredMin', 0)) > 0 else 1
+    np.guest_number_max = int(product['quantityRequiredMax']) if int(product.get('quantityRequiredMax', 0)) >= np.guest_number_min else 10
     #TODO: convert timezone to city
-    np.city = product['timezone'].split("/")[1] if product['timezone'].find("/") > 0 else product['timezone']
+    np.city = product.get('timezone', "").split("/")[1] if product.get('timezone',"").find("/") > 0 else product.get('timezone', "")
     np.save()
 
     try:
         co = Coordinate.objects.get(experience = np, order = 1)
     except Exception as e:
         co = Coordinate()
-    co.experience = np
-    co.longitude = float(product['longitude'])
-    co.latitude = float(product['latitude'])
-    co.order = 1
-    co.save()
+    try:
+        co.experience = np
+        co.longitude = float(product['longitude'])
+        co.latitude = float(product['latitude'])
+        co.order = 1
+        co.save()
+    except Exception as e:
+        pass
 
     try:
         npi18n = NewProductI18n.objects.get(product = np, language = "en")
@@ -400,18 +423,21 @@ def create_rezdy_product(product):
         npi18n = NewProductI18n()
     npi18n.product = np
     npi18n.language = "en"
-    npi18n.title = product['name']
-    npi18n.description = product['description']
-    npi18n.highlights = product['shortDescription']
-    npi18n.tips = product['terms']
-    npi18n.disclaimer = product['generalTerms']
+    npi18n.title = product.get('name', "")
+    npi18n.description = product.get('description', "")
+    npi18n.highlights = product.get('shortDescription', "")
+    npi18n.tips = product.get('terms', "")
+    npi18n.disclaimer = product.get('generalTerms', "")
     #TODO: price options
-    npi18n.combination_options = product['priceOptions']
-    npi18n.whatsincluded = product['extras']
+    npi18n.combination_options = product.get('priceOptions', "")
+    npi18n.whatsincluded = product.get('extras', "")
     npi18n.save()
 
     #images
-    for counter, image in enumerate(product['images']):
+    for counter, image in enumerate(product.get('images', {})):
+        if counter >= 10:
+            break
+
         extension = "." + image['itemUrl'].split(".")[-1]
         response = requests.get(image['itemUrl'])
         if response.status_code == 200 and response.reason == "OK":
