@@ -360,8 +360,8 @@ def import_rezdy_products(request):
             timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
             for product in products["products"]:
                 counter += 1
-                create_rezdy_product(product)
-                create_rezdy_provider(product, request)
+                np = create_rezdy_product(product)
+                create_rezdy_provider(np, product, request)
 
             if counter < 100:
                 finished = True
@@ -422,7 +422,7 @@ def create_rezdy_product(product):
 
     return np
 
-def create_rezdy_provider(product, request):
+def create_rezdy_provider(np, product, request):
     url = "https://api.rezdy.com/latest/companies/" + product['supplierAlias'] + "?apiKey=97acaed307f441a5a1599a6ecdebffa3"
     response = requests.get(url)
     if response.status_code == 200 and response.reason == "OK":
@@ -469,6 +469,10 @@ def create_rezdy_provider(product, request):
 
         provider.location = supplier.get('address', None)
         provider.save()
+
+        if len(np.suppliers.filter(user_id=oid)) == 0:
+            np.suppliers.add(provider)
+            np.save()
 
         return provider
     else:
