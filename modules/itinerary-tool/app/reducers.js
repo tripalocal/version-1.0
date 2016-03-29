@@ -11,6 +11,15 @@ function title(state = '', action) {
   }
 }
 
+function guests(state = 1, action) {
+  switch (action.type) {
+    case 'CHANGE_GUESTS':
+      return action.guests
+    default:
+      return state
+  }
+}
+
 function selected(state = '', action) {
   switch (action.type) {
     case 'SELECT_DATE':
@@ -31,6 +40,22 @@ function modal(state = {date: '', field: '', display: 'NONE'}, action) {
         field: {$set: action.field},
         display: {$set: action.setting}
       })
+    default:
+      return state
+  }
+}
+
+function bookings(state=[], action) {
+  switch (action.type) {
+    case 'ADD_BOOKINGS':
+      return update(state, {$push: action.bookings})
+    case 'UPDATE_BOOKING':
+      return state.map((booking) => {
+        if (booking.id === action.id) {
+          return update(booking, {guests: {$set: action.guests}}) 
+        }
+        return booking
+      })  
     default:
       return state
   }
@@ -93,7 +118,9 @@ const rootReducer = combineReducers({
   title,
   selected,
   modal,
+  bookings,
   dates,
+  guests,
   form: formReducer
 })
 

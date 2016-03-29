@@ -16,13 +16,20 @@ import App from './containers/App'
   `dates` takes an object
   =====================================
    
-window.initialState = {
+  window.initialState = {
+  title: 'New Itinerary',
+  startDate: '2016-03-01',
   selected: '',
   modal: {
     display: 'NONE',
     date: '',
     field: ''
-  }, 
+  },
+  bookings: [
+    { id: '', guests: '', price: '' },
+    { id: '', guests: '', price: '' },
+    { id: '', guests: '', price: '' },
+  ],
   dates: {
     '2016-03-01': {
       city: 'melbourne',

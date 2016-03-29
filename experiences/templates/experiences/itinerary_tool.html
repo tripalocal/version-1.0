@@ -20,8 +20,10 @@
     window.initialState = {
       modal: {date: '', field: '', display: 'NONE'},
       dates: {{ itinerary|safe }},
+      bookings: {{ bookings|safe }},
       selected: '',
-      title: 'New Itinerary'
+      title: '',
+      guests: {{ guests }}
     }
     window.submit = function(title, dates) { 
       $.ajax({

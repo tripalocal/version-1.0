@@ -3906,8 +3906,10 @@ def itinerary_tool(request, id=None):
         ci.save()
         return HttpResponse(json.dumps({'success': 'OK'}), content_type="application/json")
     else:
-        bookings = list(CustomItinerary.objects.get(id=id).booking_set.order_by('datetime').all()) 
+        ci = CustomItinerary.objects.get(id=id)
+        bookings = list(ci.booking_set.order_by('datetime').all()) 
         itinerary = {}
+        items = []
         for booking in bookings:
             title = booking.experience.get_information(settings.LANGUAGES[0][0]).title
             type = booking.experience.type.lower()
@@ -3922,9 +3924,12 @@ def itinerary_tool(request, id=None):
                 itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}})
 
             itinerary[key][type]['items'].append({'id': booking.experience.id, 'title': title})
-        
+            items.append({'id': booking.experience.id, 'title': title, 'price': int(booking.experience.price), 'guests': 0}) 
         context['itinerary'] = json.dumps(itinerary)
         context['itinerary_id'] = id
+        context['bookings'] = items
+        context['guests'] = ci.get_guest_number()[0]
+        context['title'] = ci.title
         return render_to_response('experiences/itinerary_tool.html', {}, context)
 
 def campaign(request):
