@@ -22,17 +22,18 @@
       dates: {{ itinerary|safe }},
       bookings: {{ bookings|safe }},
       selected: '',
-      title: '',
+      title: '{{ title }}',
       guests: {{ guests }}
     }
-    window.submit = function(title, dates) { 
+    window.submit = function(title, dates, bookings) { 
       $.ajax({
         url: '/itinerary/host/' + window.itineraryID.toString(),
         type: 'POST',
         data: {
           csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
           title: title,
-          dates: JSON.stringify(dates)
+          dates: JSON.stringify(dates),
+          bookings: JSON.stringify({bookings: bookings})
         }      
       }).done(function(response) {
         console.log('save itinerary:', response.success);
