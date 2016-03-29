@@ -1,47 +1,29 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { updateBooking } from '../actions'
 
-const SideBar = ({ }) => (
+const SideBar = ({ bookings, total, guests, dispatch }) => (
   <div className="side-bar">
     <table className="table">
       <thead>
         <tr className="table-header">
           <th>项目</th>
-          <th>单位</th>
           <th>报价</th>
+          <th>单位</th>
           <th>数量</th>
           <th>小计</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>奥克兰5星</td>
-          <td>每晚</td>
-          <td>300</td>
-          <td>2</td>
-          <td>600</td>
-        </tr>
-        <tr>
-          <td>墨尔本街头美食之旅</td>
-          <td>每晚</td>
-          <td>200</td>
-          <td>1</td>
-          <td>200</td>
-        </tr>
-        <tr>
-          <td>大隐于市的当代艺术馆</td>
-          <td>每晚</td>
-          <td>156</td>
-          <td>5</td>
-          <td>738</td>
-        </tr>
-        <tr>
-          <td>大隐于市的当代艺术馆</td>
-          <td>每晚</td>
-          <td>123</td>
-          <td>5</td>
-          <td>857</td>
-        </tr>
+        {bookings.map(booking => 
+          <tr>
+            <td>{booking.title}</td>
+            <td>每个</td>
+            <td>{booking.price}</td>
+            <td><input value={booking.guests} onChange={e => dispatch(updateBooking(booking.id, e.target.value))} className="form-control" /></td>
+            <td>{booking.guests * booking.price}</td>
+          </tr>
+        )}
       </tbody>
     </table>
     <div className="bottom-bar">
@@ -56,10 +38,10 @@ const SideBar = ({ }) => (
         </thead>
         <tbody>
           <tr>
-            <td>7956</td>
-            <td>8840</td>
-            <td>44200</td>
-            <td>22100</td>
+            <td>{total}</td>
+            <td>{Math.round(total/(1-0.15))}</td>
+            <td>{Math.round(total * 4.91)}</td>
+            <td>{Math.round(total * 4.91 / guests)}</td>
           </tr>
         </tbody>
       </table>
@@ -69,14 +51,12 @@ const SideBar = ({ }) => (
 
 const mapStateToProps = (state) => {
   return {
-
+    bookings: state.bookings,
+    guests: state.guests,
+    total: state.bookings.reduce((previous, current) => {
+      return previous + (current.guests * current.price)  
+    }, 0)
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SideBar)
+export default connect(mapStateToProps)(SideBar)

@@ -12,6 +12,46 @@ export const changeStartDate = (date) => {
   }
 }
 
+export const changeGuests = (guests) => {
+  return {
+    type: 'CHANGE_GUESTS',
+    guests
+  }
+}
+
+export const addBookings = (items) => {
+  return fetch('/get_price/', {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].getAttribute('value'),
+      items: items 
+    })
+  }).then((response) => {
+    return response.json()
+  }).then((json) => {
+    return {
+      type: 'ADD_BOOKINGS',
+      bookings: json.bookings
+    }
+  }).catch((exception) => {
+    console.log('get price error:', exception)
+    return {
+    }
+  })
+}
+
+export const updateBooking = (id, guests) => {
+  return {
+    type: 'UPDATE_BOOKING',
+    id,
+    guests
+  }
+}
+
 export const addDate = (date, city, position) => {
   const targetDate = new Date(date)
   if (position.toUpperCase() === 'BEFORE') {

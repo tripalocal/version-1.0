@@ -1637,6 +1637,20 @@ def service_search_text(request, format=None):
         #TODO
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+@csrf_exempt
+def service_get_price(request, format=None):
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        items = data.get('items')
+        bookings = []
+        for item in items:
+            bookings.append({'id': item['id'], 'title': item['title'], 'guests': 0, 'price': int(AbstractExperience.objects.get(id=str(item['id'])).price)})
+        return HttpResponse(json.dumps({'bookings': bookings}), content_type="application/json")
+    except Exception as err:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['GET'])
 @authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,IsAdminUser))

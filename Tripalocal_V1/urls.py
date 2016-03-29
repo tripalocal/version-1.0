@@ -156,5 +156,6 @@ urlpatterns = patterns('',
     url(r'^qrcode/$', 'wechat.qrcode.qrcode', name='qrcode'),
     url(r'^wechatmsg/$', 'wechat.message.receive_message', name='wechatmsg'),
     url(r'^search_text/$', 'experiences.resource.service_search_text', name='search_text'),
+    url(r'^get_price/$', 'experiences.resource.service_get_price', name='get_price'),
     url(r'^robots.txt/$', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
 )
