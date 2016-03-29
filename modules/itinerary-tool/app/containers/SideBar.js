@@ -8,8 +8,8 @@ const SideBar = ({ bookings, total, guests, dispatch }) => (
       <thead>
         <tr className="table-header">
           <th>项目</th>
-          <th>报价</th>
           <th>单位</th>
+          <th>报价</th>
           <th>数量</th>
           <th>小计</th>
         </tr>

@@ -3879,14 +3879,13 @@ def itinerary_tool(request, id=None):
     context = RequestContext(request)
     if request.method == 'POST':
         data = request.POST
+        title = data.get('title')
         itinerary = json.loads(data.get('dates'))
+        bookings = json.loads(data.get('bookings'))['bookings']
         ci = CustomItinerary.objects.get(id=id)
         if ci.status.lower() == "paid":
             # cannot edit a paid itinerary
             return HttpResponseRedirect(GEO_POSTFIX + "itinerary/" + str(ci.id) + "/")
-        guest_number = ci.get_guest_number()[0]
-        adult_number = ci.get_guest_number()[1]
-        children_number = ci.get_guest_number()[2]
         for booking in ci.booking_set.all():
             booking.delete()
         for date, fields in itinerary.items():
@@ -3897,12 +3896,17 @@ def itinerary_tool(request, id=None):
                         #save the custom itinerary as draft
                         local_timezone = pytz.timezone(experience.get_timezone())
                         bk_date = local_timezone.localize(datetime.strptime(str(date), "%Y-%m-%d"))
-
-                        booking = Booking(user = request.user, experience= experience, guest_number = guest_number, adult_number = adult_number, total_price = (experience.price * guest_number), children_number = children_number,
+                        guest_number = [booking['guests'] for booking in bookings if booking['id'] == item['id']]
+                        if not guest_number:
+                            guest_number = 1
+                        else:
+                            guest_number = int(guest_number[0])
+                        booking = Booking(user = request.user, experience = experience, guest_number = guest_number, total_price = (experience.price * guest_number),
                                         datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                         booking.save()
         ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        ci.title = title
         ci.save()
         return HttpResponse(json.dumps({'success': 'OK'}), content_type="application/json")
     else:
@@ -3924,7 +3928,7 @@ def itinerary_tool(request, id=None):
                 itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}})
 
             itinerary[key][type]['items'].append({'id': booking.experience.id, 'title': title})
-            items.append({'id': booking.experience.id, 'title': title, 'price': int(booking.experience.price), 'guests': 0}) 
+            items.append({'id': booking.experience.id, 'title': title, 'price': int(booking.experience.price), 'guests': booking.guest_number}) 
         context['itinerary'] = json.dumps(itinerary)
         context['itinerary_id'] = id
         context['bookings'] = items

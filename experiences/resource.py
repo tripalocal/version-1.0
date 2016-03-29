@@ -1611,7 +1611,8 @@ def service_search_text(request, format=None):
                           list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Flight','Transfer','Accommodation','Suggestion','Pricing','Restaurant'], city=city).order_by('id'))
         elif category.lower() == "products" or category.lower() == "experiences":
             experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
-                          list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id'))
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id')) + \
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Suggestion'], city=city).order_by('id'))
         elif category.lower() == "transport":
             experiences = list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Flight','Transfer'], city=city).order_by('id'))
         else:

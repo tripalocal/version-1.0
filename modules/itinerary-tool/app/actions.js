@@ -150,8 +150,8 @@ export function updateThenSave(date, field, val) {
   return (dispatch, getState) => {
     dispatch(updateItems(date, field, val))
     setTimeout(() => {
-      const { title, dates } = getState()
-      window.submit(title, dates)
+      const { title, dates, bookings } = getState()
+      window.submit(title, dates, bookings)
     }, 1000)
   }
 }
