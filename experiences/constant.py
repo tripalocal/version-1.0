@@ -24,3 +24,13 @@ class ItineraryStatus():
     Ready = "ready"
     Paid = "paid"
     Allowed_Status = [Deleted, Draft, Ready, Paid]
+
+class ProductType():
+    Private = "PrivateProduct"
+    Public = "PublicProduct"
+    Flight = "Flight"
+    Transfer = "Transfer"
+    Accommodation = "Accommodation"
+    Restaurant = "Restaurant"
+    Suggestion = "Suggestion"
+    Price = "Price"

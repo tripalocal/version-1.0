@@ -147,7 +147,15 @@ def static_vars(**kwargs):
         return func
     return decorate
 
-@static_vars(dict={"Melbourne":{"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}})
+@static_vars(dict={"Melbourne":{"max_experience_id":0,"experiences":[],\
+    "max_product_id":0,"products":[],\
+    "max_flight_id":0,"flights":[],\
+    "max_transfer_id":0,"transfers":[],\
+    "max_accommodation_id":0,"accommodations":[],\
+    "max_restaurant_id":0,"restaurants":[],\
+    "max_suggestion_id":0,"suggestions":[],\
+    "max_price_id":0,"prices":[],\
+    "itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}})
 def recent_search(action, new_search=None):
     '''
     action: get, update, clear
@@ -156,15 +164,15 @@ def recent_search(action, new_search=None):
     if action is not None:
         if action.lower()=="get":
             return recent_search.dict
-        elif action.lower()=="update" and new_search is not None:
-            for k, v in new_search.items():
-                if k not in recent_search.dict:
-                    recent_search.dict[k] = deepcopy(v)
-                else:
-                    for experience in v['experiences']:
-                        if recent_search.dict[k]['max_id'] < experience['id']:
-                            recent_search.dict[k]['experiences'].append(experience)
-                    recent_search.dict[k]['max_id'] = v['max_id']
+        #elif action.lower()=="update" and new_search is not None:
+        #    for k, v in new_search.items():
+        #        if k not in recent_search.dict:
+        #            recent_search.dict[k] = deepcopy(v)
+        #        else:
+        #            for experience in v['experiences']:
+        #                if recent_search.dict[k]['max_id'] < experience['id']:
+        #                    recent_search.dict[k]['experiences'].append(experience)
+        #            recent_search.dict[k]['max_id'] = v['max_id']
         elif action.lower()=="clear":
             recent_search.dict.clear()
 

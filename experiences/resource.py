@@ -1538,6 +1538,18 @@ def service_search_text(request, format=None):
                     [
                         {'id":123, "title":"asdf"}
                     ],
+                "max_product_id":123,
+                "products":
+                    [
+                        {'id":123, "title":"asdf"}
+                    ],
+                "max_flight_id":123,
+                "flights":
+                    [
+                        {'id":123, "title":"asdf"}
+                    ],
+                ...
+                ...
                 "itineraries_last_updated":"2016-01-29 12:00:00",
                 "daily_itineraries":
                     [
@@ -1575,6 +1587,20 @@ def service_search_text(request, format=None):
             recent[title] = {}
             recent[title]["max_experience_id"] = 0
             recent[title]["experiences"] = []
+            recent[title]["max_product_id"] = 0
+            recent[title]["products"] = []
+            recent[title]["max_flight_id"] = 0
+            recent[title]["flights"] = []
+            recent[title]["max_transfer_id"] = 0
+            recent[title]["transfers"] = []
+            recent[title]["max_accommodation_id"] = 0
+            recent[title]["accommodations"] = []
+            recent[title]["max_restaurant_id"] = 0
+            recent[title]["restaurants"] = []
+            recent[title]["max_suggestion_id"] = 0
+            recent[title]["suggestions"] = []
+            recent[title]["max_price_id"] = 0
+            recent[title]["prices"] = []
             recent[title]["itineraries_last_updated"] = datetime(2000,1,1,0,0,0,0).strftime("%Y-%m-%d %H:%M:%S")
             recent[title]["daily_itineraries"] = []
 
@@ -1623,10 +1649,21 @@ def service_search_text(request, format=None):
         for experience in experiences:
             exp_title = experience.get_information(language).title
             if exp_title.lower().find(title) >= 0:
-                recent[title]["max_experience_id"] = experience.id
-                recent[title]["experiences"].append({"id":experience.id,"title":exp_title})
-                #recent_search("update",recent)
-                counter += 1
+                if type(experience) == Experience:
+                    recent[title]["max_experience_id"] = experience.id
+                    recent[title]["experiences"].append({"id":experience.id,"title":exp_title})
+                    #recent_search("update",recent)
+                    counter += 1
+                elif experience.type == ProductType.Private or experience.type == ProductType.Public:
+                    recent[title]["max_product_id"] = experience.id
+                    recent[title]["products"].append({"id":experience.id,"title":exp_title})
+                    #recent_search("update",recent)
+                    counter += 1
+                else:
+                    recent[title]["max_" + experience.type.lower() + "_id"] = experience.id
+                    recent[title][experience.type.lower() + "s"].append({"id":experience.id,"title":exp_title})
+                    #recent_search("update",recent)
+                    counter += 1
             if counter >= 3:
                 return Response(recent[title], status=status.HTTP_200_OK)
 
