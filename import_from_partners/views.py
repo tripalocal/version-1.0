@@ -431,7 +431,7 @@ def create_rezdy_product(product):
     #TODO: price options
     npi18n.combination_options = product.get('priceOptions', "")
     #to keep consistency, create a fake priceGroup (Rezdy doesn't have priceGroup, but only priceOption)
-    og = OptionGroup.objects.filter(product_id=np.id, language=npi18n.language, name=npi18n.title)
+    og = OptionGroup.objects.filter(product_id=np.id, language=npi18n.language).exclude(type="Extras")
     if len(og) > 0:
         og = og[0]
         og.name = npi18n.title
@@ -443,6 +443,11 @@ def create_rezdy_product(product):
         if len(oi) > 0:
             oi = oi[0]
             oi.name = option.get("label")
+            oi.price = option.get("price")
+            oi.min_quantity = option.get("minQuantity", np.guest_number_min)
+            oi.max_quantity = option.get("maxQuantity", np.guest_number_max)
+            oi.seats_used = option.get("seatsUsed", 0)
+            oi.price_type = option.get("priceGroupType", "")
         else:
             oi = OptionItem(group = og, name = option.get("label"), price = option.get("price"),
                             min_quantity = option.get("minQuantity", np.guest_number_min),
@@ -454,17 +459,20 @@ def create_rezdy_product(product):
 
     npi18n.whatsincluded = product.get('extras', "")
     if npi18n.whatsincluded and len(npi18n.whatsincluded):
-        og = OptionGroup.objects.filter(product_id=np.id, language=npi18n.language, name="Extras")
+        og = OptionGroup.objects.filter(product_id=np.id, language=npi18n.language, type="Extras")
         if len(og) > 0:
             og = og[0]
         else:
-            og = OptionGroup(product=np, name="Extras", language=npi18n.language)
+            og = OptionGroup(product=np, name="Extras", language=npi18n.language, type="Extras")
         og.save()
         for option in npi18n.whatsincluded:
             oi = OptionItem.objects.filter(name=option.get("name"), group_id=og.id)
             if len(oi) > 0:
                 oi = oi[0]
                 oi.name = option.get("name")
+                oi.price = option.get("price")
+                oi.description = option.get("description")
+                oi.image = option.get("image")
             else:
                 oi = OptionItem(group = og, name = option.get("name"), price = option.get("price"),
                                 description = option.get("description", ""),
