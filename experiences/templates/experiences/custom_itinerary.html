@@ -1191,6 +1191,10 @@
             item.append("Edit", "Edit");
             item.append("id", id);
 
+            var price_min = parseFloat($("#" + type + "-price-min").val());
+            var price_max = parseFloat($("#" + type + "-price-max").val());
+            var price = (price_min + price_max)/2;
+            $("#" + type + "-price").val(price);
             var ids = ["title", "location", "fixed_price-min", "fixed_price-max", "price-min", "price-max", "fixed_price", "price", "details", "notes"];
             var value = "";
 
