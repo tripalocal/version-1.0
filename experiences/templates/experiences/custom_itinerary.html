@@ -905,6 +905,11 @@
                 item.append([ids[i]], value);
                 j++;
             }
+            else if(ids[i] == "location")
+            {
+                alert("Location can't be empty");
+                return;
+            }
         }
         if(j == 0)
         {
@@ -1204,6 +1209,11 @@
                 {
                     item.append([ids[i]], value);
                     j++;
+                }
+                else if(ids[i] == "location")
+                {
+                    alert("Location can't be empty");
+                    return;
                 }
             }
 
