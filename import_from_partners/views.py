@@ -344,46 +344,54 @@ def import_rezdy_products(request):
     if not request.user.is_authenticated() or not request.user.is_staff:
         return HttpResponseRedirect("/")
 
-    finished = False
-    i=0
-    while not finished:
-        url = "https://api.rezdy.com/latest/products/marketplace?latitude=-32&longitude=147&limit=100&offset=" + str(100*i) + "&apiKey=97acaed307f441a5a1599a6ecdebffa3"
-        response = requests.get(url)
-        if response.status_code == 200 and response.reason == "OK":
-            i += 1
-            file_name = "products_rezdy_" + str(i)
-            open(file_name,'wb').write(response.text.encode("utf-8"))
+    url = "https://api.rezdy.com/latest/products/marketplace?latitude={latitude}&longitude={longitude}&limit=100&offset={offset}&apiKey=97acaed307f441a5a1599a6ecdebffa3"
+    locations = [(-31, 150), (-20, 142), (-38, 145), (-30, 120)]
+    for location in locations:
+        finished = False
+        i=0
+        while not finished:
+            kwargs = {
+                'latitude': location[0],
+                'longitude': location[1],
+                'offset': str(100*i),
+            }
+            url = url.format(**kwargs)
+            response = requests.get(url)
+            if response.status_code == 200 and response.reason == "OK":
+                i += 1
+                file_name = "products_rezdy_" + str(i)
+                open(file_name,'wb').write(response.text.encode("utf-8"))
 
-            products = json.loads(response.text)
-            counter = 0
-            partner_id = PARTNER_IDS['rezdy']
-            timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
-            for product in products["products"]:
-                counter += 1
-                np = None
-                try:
-                    np = create_rezdy_product(product, partner_id)
-                    create_rezdy_provider(np, product, request)
-                except Exception as e:
-                    import logging
-                    logger = logging.getLogger("Tripalocal_V1")
-                    logger.error(str(i) + " " + str(counter) + " " + product['productCode'])
-                    logger.error(e)
-                    pass
-                if np:
+                products = json.loads(response.text)
+                counter = 0
+                partner_id = PARTNER_IDS['rezdy']
+                timezones = load_config(os.path.join(settings.PROJECT_ROOT, 'experiences/time_zone/time_zone.yaml').replace('\\', '/'))
+                for product in products["products"]:
+                    counter += 1
+                    np = None
                     try:
+                        np = create_rezdy_product(product, partner_id)
                         create_rezdy_provider(np, product, request)
                     except Exception as e:
                         import logging
                         logger = logging.getLogger("Tripalocal_V1")
-                        logger.error(str(i) + " " + str(counter) + " " + product['productCode'] + " " + str(product['supplierId']))
+                        logger.error(str(i) + " " + str(counter) + " " + product['productCode'])
                         logger.error(e)
                         pass
+                    if np:
+                        try:
+                            create_rezdy_provider(np, product, request)
+                        except Exception as e:
+                            import logging
+                            logger = logging.getLogger("Tripalocal_V1")
+                            logger.error(str(i) + " " + str(counter) + " " + product['productCode'] + " " + str(product['supplierId']))
+                            logger.error(e)
+                            pass
 
-            if counter < 100:
+                if counter < 100:
+                    finished = True
+            else:
                 finished = True
-        else:
-            finished = True
 
     return HttpResponseRedirect("/")
 
