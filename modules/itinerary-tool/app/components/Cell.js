@@ -14,8 +14,7 @@ const Cell = ({ date, city, field, fieldName, showSelect, hideSelect, getOptions
         valueKey="id"
         onChange={handleChange}
         clearable={false}
-        cache={false}
-        autoload={false}
+        minimumInput={1}
         multi
       />
     : 

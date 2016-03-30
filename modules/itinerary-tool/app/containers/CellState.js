@@ -12,8 +12,8 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   const { date, fieldName, city } = ownProps
   return {
-    getOptions: (input) => {
-      return fetch('/search_text/', {
+    getOptions: (input, callback) => {
+      fetch('/search_text/', {
         method: 'post',
         headers: {
           'Accept': 'application/json',
@@ -28,25 +28,24 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       }).then((response) => {
         return response.json()
       }).then((json) => {
-        return { options: json['experiences'] }
+        if (fieldName === 'experiences') {
+          return json['experiences'].concat(json['suggestions'], json['products'])
+        } else if (fieldName === 'transport') {
+          return json['flights'].concat(json['transfers'])
+        } else if (fieldName === 'accommodation') {
+          return json['accommodations']
+        } else {
+          return []
+        }
+      }).then((results) => {
+        callback(null, {
+          options: results
+        })
       }).catch((exception) => {
         console.log('fetch failed', exception)
       })
     },
-    hideSelect: () => {
-      dispatch(showSelect(date, fieldName, 'NORMAL'))
-      fetch('/search_text/', {
-        method: 'post',
-        body: JSON.stringify({
-          csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].getAttribute('value'),
-          action: 'clear'
-        })
-      }).then((response) => {
-        console.log('clear search:', response.statusText)
-      }).catch((exception) => {
-        console.log('clear search failed', exception)
-      })
-    },
+    hideSelect: () => dispatch(showSelect(date, fieldName, 'NORMAL')),
     handleChange: (val) => dispatch(updateThenSave(updateItems, [date, fieldName, val]))
   }
 }
