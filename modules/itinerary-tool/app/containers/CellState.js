@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { showSelect, updateThenSave } from '../actions'
+import { showSelect, updateItems, updateThenSave } from '../actions'
 import Cell from '../components/Cell'
 
 const mapStateToProps = (state, ownProps) => {
@@ -47,7 +47,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         console.log('clear search failed', exception)
       })
     },
-    handleChange: (val) => dispatch(updateThenSave(date, fieldName, val))
+    handleChange: (val) => dispatch(updateThenSave(updateItems, [date, fieldName, val]))
   }
 }
 

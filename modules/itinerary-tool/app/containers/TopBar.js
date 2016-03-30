@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { changeTitle, changeStartDate, changeGuests } from '../actions'
+import { changeTitle, changeStartDate, changeGuests, updateThenSave } from '../actions'
 
 const TopBar = ({ title, startDate, dispatch }) => (
   <div className="top-bar">
@@ -10,7 +10,7 @@ const TopBar = ({ title, startDate, dispatch }) => (
       <input value={title} className="form-control" name="title" onChange={e => dispatch(changeTitle(e.target.value))}/>
       <label forName="start-date">开始日期</label>
       <div className="date-field">
-        <input className="form-control" id="start-date" name="start-date" onBlur={e => dispatch(changeStartDate(e.target.value))} />
+        <input className="form-control" id="start-date" name="start-date" onBlur={e => dispatch(updateThenSave(changeStartDate, [e.target.value]))} />
       </div>
       <div className="pull-right">
         <select className="form-control" onChange={e => dispatch(changeGuests(e.target.value))}>

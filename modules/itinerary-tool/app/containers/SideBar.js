@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { updateBooking } from '../actions'
+import { updateBooking, updateThenSave } from '../actions'
 
 const SideBar = ({ bookings, total, guests, dispatch }) => (
   <div className="side-bar">
@@ -20,7 +20,7 @@ const SideBar = ({ bookings, total, guests, dispatch }) => (
             <td style={{width: '200px'}}>{booking.title}</td>
             <td>每个</td>
             <td>{booking.price}</td>
-            <td><input value={booking.guests} onChange={e => dispatch(updateBooking(booking.id, e.target.value))} className="form-control" /></td>
+            <td><input value={booking.guests} onChange={e => dispatch(updateThenSave(updateBooking, [booking.id, e.target.value]))} className="form-control" /></td>
             <td>{booking.guests * booking.price}</td>
           </tr>
         )}

@@ -15,6 +15,7 @@ const Cell = ({ date, city, field, fieldName, showSelect, hideSelect, getOptions
         onChange={handleChange}
         clearable={false}
         cache={false}
+        autoload={false}
         multi
       />
     : 

@@ -146,9 +146,9 @@ export const showSelect = (date, field, setting) => {
   }
 }
 
-export function updateThenSave(date, field, val) {
+export function updateThenSave(action, args) {
   return (dispatch, getState) => {
-    dispatch(updateItems(date, field, val))
+    dispatch(action.apply(this, args))
     setTimeout(() => {
       const { title, dates, bookings } = getState()
       window.submit(title, dates, bookings)
