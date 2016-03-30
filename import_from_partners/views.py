@@ -362,7 +362,7 @@ def import_rezdy_products(request):
                 counter += 1
                 np = None
                 try:
-                    np = create_rezdy_product(product)
+                    np = create_rezdy_product(product, partner_id)
                     create_rezdy_provider(np, product, request)
                 except Exception as e:
                     import logging
@@ -387,11 +387,14 @@ def import_rezdy_products(request):
 
     return HttpResponseRedirect("/")
 
-def create_rezdy_product(product):
+def create_rezdy_product(product, partner_id):
     try:
         np = NewProduct.objects.get(original_id = product['productCode'])
     except Exception as e:
         np = NewProduct()
+    np.partner = partner_id
+    np.start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+    np.end_datetime = np.start_datetime + timedelta(weeks = 520)
     np.status = dict(np.STATUS_CHOICES)["Unlisted"]
     np.original_id = product['productCode']
     np.currency = product.get('currency', 'AUD')
