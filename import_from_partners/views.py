@@ -346,7 +346,7 @@ def import_rezdy_products(request):
 
     url = "https://api.rezdy.com/latest/products/marketplace?latitude={latitude}&longitude={longitude}&limit=100&offset={offset}&apiKey=97acaed307f441a5a1599a6ecdebffa3"
     locations = [(-31, 150), (-20, 142), (-38, 145), (-30, 120)]
-    for location in locations:
+    for area, location in enumerate(locations):
         finished = False
         i=0
         while not finished:
@@ -359,7 +359,8 @@ def import_rezdy_products(request):
             response = requests.get(url)
             if response.status_code == 200 and response.reason == "OK":
                 i += 1
-                file_name = "products_rezdy_" + str(i)
+                file_name = os.path.join(settings.PROJECT_ROOT,
+                                      "import_from_partners/rezdy/products_rezdy_" + str(area) + "_" + str(i)).replace('\\', '/')
                 open(file_name,'wb').write(response.text.encode("utf-8"))
 
                 products = json.loads(response.text)
