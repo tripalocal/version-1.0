@@ -15,11 +15,11 @@ const BottomBar = ({ dispatch, showEditRowMenu, selectedDate }) => (
       </button>
       <button className="btn btn-secondary" onClick={e => dispatch(updateThenSave(moveDate, [selectedDate, 'BACK']))}>
         <img src="https://tripalocal-static.s3.amazonaws.com/static/experiences/img/move_before.svg" width="30" height="30"/>
-        后
+        往上移一天 
       </button>
       <button className="btn btn-secondary" onClick={e => dispatch(updateThenSave(moveDate, [selectedDate, 'FORWARD']))}>
         <img src="https://tripalocal-static.s3.amazonaws.com/static/experiences/img/move_after.svg" width="30" height="30"/>
-        前 
+        往下移一天 
       </button>
     </div>
   </div>

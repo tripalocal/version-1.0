@@ -11,6 +11,9 @@
   '../../utils/functions',
   '../../utils/placeholders';
 
+body {
+}
+
 #navbar {
   display: none;
 }
@@ -35,10 +38,10 @@
 
 .btn-default {
   background-color: transparent;
-  color: $off-white;
+  color: $medium-grey;
   &:hover {
     background-color: transparent;
-    color: $medium-grey;
+    color: $dark-grey;
   }
 }
 
@@ -86,6 +89,7 @@
 
   input {
     width: 35px;
+    height: 30px;
   }
 
   .bottom-bar {

@@ -46,7 +46,11 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       })
     },
     hideSelect: () => dispatch(showSelect(date, fieldName, 'NORMAL')),
-    handleChange: (val) => dispatch(updateThenSave(updateItems, [date, fieldName, val]))
+    handleChange: (val) => dispatch(updateThenSave(updateItems, [date, fieldName, val])),
+    handleClick: (e) => {
+      e.preventDefault()
+      dispatch(showSelect(date, fieldName, 'EDIT'))
+    }
   }
 }
 
