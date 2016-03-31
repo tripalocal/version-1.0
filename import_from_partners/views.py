@@ -344,7 +344,7 @@ def import_rezdy_products(request):
     if not request.user.is_authenticated() or not request.user.is_staff:
         return HttpResponseRedirect("/")
 
-    url = "https://api.rezdy.com/latest/products/marketplace?latitude={latitude}&longitude={longitude}&limit=100&offset={offset}&apiKey=97acaed307f441a5a1599a6ecdebffa3"
+    url_template = "https://api.rezdy.com/latest/products/marketplace?latitude={latitude}&longitude={longitude}&limit=100&offset={offset}&apiKey=97acaed307f441a5a1599a6ecdebffa3"
     locations = [(-31, 150), (-20, 142), (-38, 145), (-30, 120)]
     for area, location in enumerate(locations):
         finished = False
@@ -355,7 +355,7 @@ def import_rezdy_products(request):
                 'longitude': location[1],
                 'offset': str(100*i),
             }
-            url = url.format(**kwargs)
+            url = url_template.format(**kwargs)
             response = requests.get(url)
             if response.status_code == 200 and response.reason == "OK":
                 i += 1
