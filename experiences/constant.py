@@ -18,6 +18,8 @@ MESSAGE_NOTIFY = "Tripalocal: {sender_name}"
 
 REQUEST_REMIND_HOST = "Tripalocal: It's been 24 hours since {guest_name} reached out. Please confirm or decline the request as soon as possible."
 
+skyscanner_flight = "http://flight.tripalocal.com/{language}/flights#/result?originplace={origin}&destinationplace={destination}&outbounddate={outbound}&inbounddate={inbound}&cabinclass={cabinclass}&adults={adults}&children={children}&infants={infants}&currency={currency}&newWindow={new}"
+
 class ItineraryStatus():
     Deleted = "deleted"
     Draft = "draft"
@@ -40,7 +42,7 @@ class CityCode():
     Sydney = "SYD"
     Brisbane = "BNE"
     Goldcoast = "OOL"
-    Carins = "CNS"
+    Cairns = "CNS"
     Adelaide = "ADL"
     Canberra = "CBR"
     Perth = "PER"
