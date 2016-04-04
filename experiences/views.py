@@ -3739,21 +3739,6 @@ def itinerary_detail(request,id=None,preview=None):
                          "currency": "CNY",
                          "new": "true"}
                 context["flights"][kwargs["outbound"]] = {"url":skyscanner_flight.format(**kwargs)}
-                #TODO: move to resource --> load async
-                try:
-                    driver.get(skyscanner_flight.format(**kwargs))
-                    WebDriverWait(driver, 30).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, "div.js-cheapest-price.num"),"元"))
-                    #driver.find_element_by_css_selector("a.field-box.search-button.js-search-button").click()
-                    cheapest = driver.find_element_by_css_selector("div.js-cheapest-price.num").get_attribute("innerHTML")
-                    cheapest = ''.join(c for c in cheapest if c.isdigit())
-                    context["flights"][kwargs["outbound"]]["cheapest"] = cheapest
-                except Exception as e:
-                    #try:
-                    #    cheapest = driver.find_element_by_css_selector("div.js-cheapest-price.num").get_attribute("innerHTML")
-                    #    cheapest = ''.join(c for c in cheapest if c.isdigit())
-                    #    context["flights"][kwargs["outbound"]]["cheapest"] = cheapest
-                    #except Exception as e:
-                    context["flights"][kwargs["outbound"]]["cheapest"] = "-1"
             city_last = city
         driver.close()
 
