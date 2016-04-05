@@ -10,7 +10,7 @@ const Table = ({ dates }) => (
           <th>日期</th>
           <th>城市</th>
           <th>游玩地点和项目</th>
-          <th>接送机</th>
+          <th>交通</th>
           <th>住宿</th>
         </tr>
       </thead>

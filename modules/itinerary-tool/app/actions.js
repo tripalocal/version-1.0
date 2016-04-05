@@ -19,6 +19,19 @@ export const changeGuests = (guests) => {
   }
 }
 
+export const changeProfit = (setting) => {
+  if (setting === 'UP') {
+    return {
+      type: 'CHANGE_PROFIT',
+      amount: 5
+    }  
+  }
+  return {
+    type: 'CHANGE_PROFIT',
+    amount: -5
+  }
+}
+
 export const addBookings = (items) => {
   return fetch('/get_price/', {
     method: 'post',
@@ -150,8 +163,8 @@ export function updateThenSave(action, args) {
   return (dispatch, getState) => {
     dispatch(action.apply(this, args))
     setTimeout(() => {
-      const { title, dates, bookings } = getState()
-      window.submit(title, dates, bookings)
+      const { title, dates, bookings, guests, profit } = getState()
+      window.submit(title, dates, bookings, guests, profit)
     }, 1000)
   }
 }

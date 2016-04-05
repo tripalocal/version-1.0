@@ -20,6 +20,18 @@ function guests(state = 1, action) {
   }
 }
 
+function profit(state = 0, action) {
+  switch(action.type) {
+    case 'CHANGE_PROFIT':
+      if (state == 0) {
+        return action.amount > 0 ? (state + action.amount) : 0
+      }
+      return (state + action.amount)
+    default:
+      return state
+  }
+}
+
 function selected(state = '', action) {
   switch (action.type) {
     case 'SELECT_DATE':
@@ -120,6 +132,7 @@ const rootReducer = combineReducers({
   modal,
   bookings,
   dates,
+  profit,
   guests,
   form: formReducer
 })

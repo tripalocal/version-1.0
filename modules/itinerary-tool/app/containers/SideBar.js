@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { updateBooking, updateThenSave } from '../actions'
+import { updateBooking, updateThenSave, changeProfit } from '../actions'
 
-const SideBar = ({ bookings, total, guests, dispatch }) => (
+const SideBar = ({ bookings, total, guests, profit, dispatch }) => (
   <div className="side-bar">
     <table className="table">
       <thead>
@@ -31,7 +31,7 @@ const SideBar = ({ bookings, total, guests, dispatch }) => (
         <thead>
           <tr>
             <th>澳元成本</th> 
-            <th>利润</th> 
+            <th><span className="glyphicon glyphicon-triangle-top" onClick={e => dispatch(changeProfit('UP'))}></span>利润({profit}%)</th> 
             <th>人民币</th> 
             <th>人民币每人</th> 
           </tr>
@@ -39,7 +39,7 @@ const SideBar = ({ bookings, total, guests, dispatch }) => (
         <tbody>
           <tr>
             <td>{total}</td>
-            <td>{Math.round(total/(1-0.15))}</td>
+            <td><span className="glyphicon glyphicon-triangle-bottom" onClick={e => dispatch(changeProfit('DOWN'))}></span>{Math.round(total/(1-(profit/100)))}</td>
             <td>{Math.round(total * 4.91)}</td>
             <td>{Math.round(total * 4.91 / guests)}</td>
           </tr>
@@ -53,6 +53,7 @@ const mapStateToProps = (state) => {
   return {
     bookings: state.bookings,
     guests: state.guests,
+    profit: state.profit,
     total: state.bookings.reduce((previous, current) => {
       return previous + (current.guests * current.price)  
     }, 0)

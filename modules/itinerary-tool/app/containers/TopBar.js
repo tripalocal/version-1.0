@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { changeTitle, changeStartDate, changeGuests, updateThenSave } from '../actions'
 
-const TopBar = ({ title, startDate, dispatch }) => (
+const TopBar = ({ title, startDate, guests, dispatch }) => (
   <div className="top-bar">
     <div className="form-inline">
       <img src="https://tripalocal-static.s3.amazonaws.com/static/img/top_logo-en.svg" width="150" />
@@ -13,7 +13,7 @@ const TopBar = ({ title, startDate, dispatch }) => (
         <input className="form-control" id="start-date" name="start-date" onBlur={e => dispatch(updateThenSave(changeStartDate, [e.target.value]))} />
       </div>
       <div className="pull-right">
-        <select className="form-control" onChange={e => dispatch(changeGuests(e.target.value))}>
+        <select className="form-control" value={guests} onChange={e => dispatch(changeGuests(e.target.value))}>
           <option value="1">1人团</option>
           <option value="2">2人团</option>
           <option value="3">3人团</option>
@@ -32,7 +32,8 @@ const TopBar = ({ title, startDate, dispatch }) => (
 
 const mapStateToProps = (state) => {
   return {
-    title: state.title
+    title: state.title,
+    guests: state.guests
   }
 }
 

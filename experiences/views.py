@@ -3882,6 +3882,9 @@ def itinerary_tool(request, id=None):
         title = data.get('title')
         itinerary = json.loads(data.get('dates'))
         bookings = json.loads(data.get('bookings'))['bookings']
+        start_date = data.get('start_date')
+        guests = data.get('guests')
+        profit = data.get('profit')
         ci = CustomItinerary.objects.get(id=id)
         if ci.status.lower() == "paid":
             # cannot edit a paid itinerary
@@ -3907,6 +3910,9 @@ def itinerary_tool(request, id=None):
                         booking.save()
         ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
         ci.title = title
+        ci.guests = guests
+        ci.profit = profit
+        ci.start_datetime = pytz.timezone("UTC").localize(datetime.strptime(start_date, "%Y-%m-%d"))
         ci.save()
         return HttpResponse(json.dumps({'success': 'OK'}), content_type="application/json")
     else:
@@ -3932,8 +3938,13 @@ def itinerary_tool(request, id=None):
         context['itinerary'] = json.dumps(itinerary)
         context['itinerary_id'] = id
         context['bookings'] = items
-        context['guests'] = ci.get_guest_number()[0]
+        context['guests'] = ci.guests
+        if ci.profit is None:
+            context['profit'] = 15
+        else:
+            context['profit'] = ci.profit
         context['title'] = ci.title
+        context['start_date'] = ci.start_datetime.strftime('%Y-%m-%d')
         return render_to_response('experiences/itinerary_tool.html', {}, context)
 
 def campaign(request):

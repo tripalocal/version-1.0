@@ -450,6 +450,8 @@ class CustomItinerary(models.Model):
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
     cities = models.TextField(null=True, blank=True)
+    profit = models.IntegerField(null=True, blank=True)
+    guests = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.user.username + "--" + self.title

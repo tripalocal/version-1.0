@@ -23,9 +23,10 @@
       bookings: {{ bookings|safe }},
       selected: '',
       title: '{{ title }}',
-      guests: {{ guests }}
+      guests: '{{ guests }}',
+      profit: {{ profit }} 
     }
-    window.submit = function(title, dates, bookings) { 
+    window.submit = function(title, dates, bookings, guests, profit) {
       $.ajax({
         url: '/itinerary/host/' + window.itineraryID.toString(),
         type: 'POST',
@@ -33,7 +34,10 @@
           csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
           title: title,
           dates: JSON.stringify(dates),
-          bookings: JSON.stringify({bookings: bookings})
+          bookings: JSON.stringify({bookings: bookings}),
+          start_date: $("#start-date").val(),
+          guests: guests,
+          profit: profit
         }      
       }).done(function(response) {
         console.log('save itinerary:', response.success);
@@ -51,7 +55,7 @@
       $("#start-date").datetimepicker({
         format: 'YYYY-MM-DD', locale: 'zh-CN',
         minDate: moment()
-      }).val('');
+      });
     });
   </script>
 {% endblock %}
