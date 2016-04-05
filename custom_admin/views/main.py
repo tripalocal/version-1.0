@@ -14,6 +14,7 @@ from custom_admin.views.base import StatusGenerator
 from custom_admin.mail import MailService
 from Tripalocal_V1 import settings
 from experiences.constant import ItineraryStatus
+from import_from_partners.utils import PARTNER_IDS
 
 import pytz
 from datetime import *
@@ -150,9 +151,10 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     template_name = 'custom_admin/partnerproduct.html'
     context_object_name = 'partnerproduct_list'
     paginate_by = None
+    partner = ""
 
     def get_queryset(self):
-        return self.model.objects.exclude(partner__isnull=True).exclude(partner__exact='').order_by('status','id')
+        return self.model.objects.filter(partner=self.partner).order_by('status','id')
 
     def get_context_data(self, **kwargs):
         context = super(PartnerProductView, self).get_context_data(**kwargs)
@@ -203,6 +205,12 @@ class PartnerProductView(AjaxDisptcherProcessorMixin, FormMixin, ListView):
     def _manipulate_post_commission(self, request, experience, **kwargs):
         experience.update_commission(kwargs['form'].cleaned_data['commission'])
         return {'commission': kwargs['form'].cleaned_data['commission']}
+
+class ExperienceozProductView(PartnerProductView):
+    partner = PARTNER_IDS.get("experienceoz")
+
+class RezdyProductView(PartnerProductView):
+    partner = PARTNER_IDS.get("rezdy")
 
 class BookingView(AjaxDisptcherProcessorMixin, BookingInfoMixin, MailSupportMixin, AdminCommonOperation, ListView):
     model = Booking

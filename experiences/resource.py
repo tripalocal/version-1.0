@@ -1,4 +1,4 @@
-from experiences.models import *
+﻿from experiences.models import *
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -34,6 +34,10 @@ from experiences.constant import  *
 from experiences.telstra_sms_api import send_sms
 from experiences.utils import *
 from django.core.files.storage import default_storage as storage
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 if settings.LANGUAGE_CODE.lower() != "zh-cn":
     from allauth.socialaccount.providers.facebook.views import fb_complete_login
@@ -1685,7 +1689,6 @@ def service_get_price(request, format=None):
     except Exception as err:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['GET'])
 @authentication_classes((TokenAuthentication, SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,IsAdminUser))
@@ -1701,3 +1704,38 @@ def service_watermark(request, format=None):
     except Exception as err:
         response = {"success":False}
     return HttpResponse(json.dumps(response),content_type="application/json")
+
+@api_view(['GET'])
+@csrf_exempt
+def service_get_flight_price(request, format=None):
+    try:
+        driver = webdriver.Firefox()
+        data = request.query_params
+        kwargs = {"language":"zh-CN",
+                    "origin": data.get('originplace'),
+                    "destination": data.get('destinationplace'),
+                    "outbound": data.get('outbounddate'),
+                    "inbound": data.get('inbounddate'),
+                    "cabinclass": data.get('cabinclass'),
+                    "adults": data.get('adults'),
+                    "children": data.get('children'),
+                    "infants": data.get('infants'),
+                    "currency": data.get('currency'),
+                    "new": data.get('newWindow')}
+        url = skyscanner_flight.format(**kwargs)
+        driver.get(url)
+        WebDriverWait(driver, 35).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, "div.js-cheapest-price.num"),"元"))
+        #driver.find_element_by_css_selector("a.field-box.search-button.js-search-button").click()
+        cheapest = driver.find_element_by_css_selector("div.js-cheapest-price.num").get_attribute("innerHTML")
+        cheapest = ''.join(c for c in cheapest if c.isdigit())
+        driver.close()
+        return HttpResponse(json.dumps({'cheapest_price': cheapest}), content_type="application/json")
+    except Exception as e:
+        #try:
+        #    cheapest = driver.find_element_by_css_selector("div.js-cheapest-price.num").get_attribute("innerHTML")
+        #    cheapest = ''.join(c for c in cheapest if c.isdigit())
+        #    context["flights"][kwargs["outbound"]]["cheapest"] = cheapest
+        #except Exception as e:
+        if driver:
+            driver.close()
+        return Response(status=status.HTTP_400_BAD_REQUEST)

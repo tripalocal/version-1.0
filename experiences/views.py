@@ -40,6 +40,10 @@ from experiences.utils import *
 from copy import deepcopy
 from import_from_partners.utils import *
 from django.contrib.auth import authenticate, login
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -3489,8 +3493,8 @@ def custom_itinerary(request, id=None, operation=None):
                     ci.id = new_id
                 ci.user = request.user
                 ci.title = form.cleaned_data['title']
-                ci.start_datetime = form.cleaned_data['start_datetime']
-                ci.end_datetime = form.cleaned_data['end_datetime']
+                ci.start_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['start_datetime'])
+                ci.end_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['end_datetime'])
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
                 ci.cities = form.cleaned_data['cities_string']
                 if "ready" in request.POST:
@@ -3662,11 +3666,11 @@ def itinerary_detail(request,id=None,preview=None):
         if ci.start_datetime:
             start_datetime = all_bookings[0].datetime.astimezone(pytz.timezone(ci_timezone))
         else:
-            start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+            raise Exception("Incomplete custom itinerary (start datetime): " + str(ci.id))
         if ci.cities:
             end_datetime = start_datetime + timedelta(days=(len(list(filter(None, ci.cities.split(','))))-1))
         else:
-            end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+            raise Exception("Incomplete custom itinerary (cities): " + str(ci.id))
 
         itinerary = {"title":ci.title, "days":{}, "status":ci.status}
         for item in all_bookings:
@@ -3715,6 +3719,28 @@ def itinerary_detail(request,id=None,preview=None):
             start_date = start_datetime.strftime("%d/%m/%Y")
             end_date = end_datetime.strftime("%d/%m/%Y")
             discount_deadline = discount_deadline.strftime("%d/%m/%Y")
+
+        #add skyscanner flight urls
+        city_last = ""
+        cities = ci.cities.split(",")
+        context["flights"] = {}
+        driver = webdriver.Firefox()
+        for counter, city in enumerate(cities):
+            if len(city) > 0 and len(city_last) > 0 and city != city_last:
+                kwargs = {"language":"zh-CN",
+                         "origin": getattr(CityCode, city_last),
+                         "destination": getattr(CityCode, city),
+                         "outbound": (start_datetime + timedelta(days=counter)).strftime("%Y-%m-%d"),
+                         "inbound": "",
+                         "cabinclass": "Economy",
+                         "adults": guest_number[1],
+                         "children": guest_number[2],
+                         "infants": 0,
+                         "currency": "CNY",
+                         "new": "true"}
+                context["flights"][kwargs["outbound"]] = {"url":skyscanner_flight.format(**kwargs)}
+            city_last = city
+        driver.close()
 
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
