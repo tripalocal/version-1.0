@@ -344,7 +344,7 @@ def import_rezdy_products(request):
     if not request.user.is_authenticated() or not request.user.is_staff:
         return HttpResponseRedirect("/")
 
-    url_template = "https://api.rezdy.com/latest/products/marketplace?latitude={latitude}&longitude={longitude}&limit=100&offset={offset}&apiKey=97acaed307f441a5a1599a6ecdebffa3"
+    url_template = rezdy_api + "products/marketplace?latitude={latitude}&longitude={longitude}&limit=100&offset={offset}&apiKey=" + rezdy_api_key
     locations = [(-31, 150), (-20, 142), (-38, 145), (-30, 120)]
     for area, location in enumerate(locations):
         finished = False
@@ -509,7 +509,7 @@ def create_rezdy_product(product, partner_id):
     return np
 
 def create_rezdy_provider(np, product, request):
-    url = "https://api.rezdy.com/latest/companies/" + product['supplierAlias'] + "?apiKey=97acaed307f441a5a1599a6ecdebffa3"
+    url = rezdy_api + "companies/" + product['supplierAlias'] + "?apiKey=" + rezdy_api_key
     response = requests.get(url)
     if response.status_code == 200 and response.reason == "OK":
         supplier = json.loads(response.text)

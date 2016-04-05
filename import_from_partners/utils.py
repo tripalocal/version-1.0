@@ -8,6 +8,9 @@ USERNAME = "tripalocalapi"
 PASSWORD = "c8EAZbRULywU4PnW"
 service_action = "https://tripalocal.experienceoz.com.au/d/services/API"#"https://www.tmtest.com.au/d/services/API"#
 
+rezdy_api = "https://api.rezdy.com/latest/"
+rezdy_api_key = "97acaed307f441a5a1599a6ecdebffa3"
+
 SOAP_REQUEST_AVAILABILITY = \
 ''' <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Header>
@@ -252,3 +255,34 @@ def experienceoz_receipt(booking):
         return {"success":True, "link":link.text}
     else:
         return {"success":False}
+
+def get_rezdy_availability(available_options, available_date, product_code, start_time_local, end_time_local, limit=100, offset=0):
+    url_template = rezdy_api + \
+                   "availability?productCode={product_code}&startTimeLocal={start_time_local}" + \
+                   "&endTimeLocal={end_time_local}&limit={limit}&offset={offset}&apiKey=" + \
+                   rezdy_api_key
+    kwargs = {
+        'product_code': product_code,
+        'start_time_local': start_time_local,
+        'end_time_local': end_time_local,
+        'limit': limit,
+        'offset': offset,
+    }
+    url = url_template.format(**kwargs)
+    response = requests.get(url)
+    if response.status_code == 200 and response.reason == "OK":
+        sessions = json.loads(response.text)
+        for session in sessions['sessions']:
+            start = datetime.strptime(session['startTimeLocal'], "%Y-%m-%d %H:%M:%S")
+            end = datetime.strptime(session['endTimeLocal'], "%Y-%m-%d %H:%M:%S")
+            for i in range((end-start).days):
+                d = start + timedelta(days=i)
+                dict = {'available_seat': session['seatsAvailable'],
+                        'date_string': d.strftime("%d/%m/%Y"),
+                        'time_string': "00:00",
+                        #'datetime': d,
+                        'instant_booking': False}
+                available_options.append(dict)
+                new_date = ((d.strftime("%d/%m/%Y"), d.strftime("%d/%m/%Y")),)
+                available_date += new_date
+    return available_date
