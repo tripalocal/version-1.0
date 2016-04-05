@@ -91,12 +91,14 @@
     </div>
 
     <div class="container">
-        {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
-            {% include "experiences/product_booking_box.html" %}
-            {% include "experiences/product_description.html" %}
-        {% elif experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' or experience.type == 'ITINERARY' %}
-            {% include "experiences/experience_booking_box.html" %}
-            {% include "experiences/experience_description.html" %}
+        {% if not experience.partner or experience.partner|length == 0 %}
+            {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
+                {% include "experiences/product_booking_box.html" %}
+                {% include "experiences/product_description.html" %}
+            {% elif experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' or experience.type == 'ITINERARY' %}
+                {% include "experiences/experience_booking_box.html" %}
+                {% include "experiences/experience_description.html" %}
+        {% endif %}
         {% else %}
             {% include "experiences/api_booking_box.html" %}
             {% include "experiences/api_description.html" %}

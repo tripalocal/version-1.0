@@ -1001,8 +1001,11 @@ class ExperienceDetailView(DetailView):
                                 original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
                                 available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
                         elif experience.partner == PARTNER_IDS["rezdy"]:
-                            #TODO
-                            pass
+                            now = max_date + timedelta(days=1)
+                            available_date = get_rezdy_availability(available_options, available_date, experience.original_id,
+                                                                    now.strftime('%Y-%m-%d %H:%M:%S'),
+                                                                    (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
+                                                                    limit=100, offset=0)
                     else:
                         available_date = getAvailableOptions(experience, available_options, available_date, from_datetime = (max_date+timedelta(days=1)).astimezone(pytz.timezone('UTC')))
                     available_date = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))

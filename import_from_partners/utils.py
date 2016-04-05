@@ -275,7 +275,7 @@ def get_rezdy_availability(available_options, available_date, product_code, star
         for session in sessions['sessions']:
             start = datetime.strptime(session['startTimeLocal'], "%Y-%m-%d %H:%M:%S")
             end = datetime.strptime(session['endTimeLocal'], "%Y-%m-%d %H:%M:%S")
-            for i in range((end-start).days):
+            for i in range((end-start).days+1):
                 d = start + timedelta(days=i)
                 dict = {'available_seat': session['seatsAvailable'],
                         'date_string': d.strftime("%d/%m/%Y"),
