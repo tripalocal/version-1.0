@@ -87,9 +87,9 @@ def convert_experience_price(request, experience):
             og = {"name":option.name, "optionitem_set":[]}
             for item in option.optionitem_set.all():
                 if hasattr(request, 'session') and 'custom_currency' in request.session and request.session['custom_currency'].lower() != "aud":
-                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id, "price":convert_currency(item.price, "aud", request.session['custom_currency'])})
+                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id if item.original_id else item.name, "price":convert_currency(item.price, "aud", request.session['custom_currency'])})
                 else:
-                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id, "price":item.price})
+                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id if item.original_id else item.name, "price":item.price})
             optiongroup_set.append(og)
         return optiongroup_set
     else:
@@ -892,7 +892,8 @@ def set_option_items(partner_product_information, experience):
     options = json.loads(partner_product_information)
     item_options = {}
     for k, v in options.items():
-        if k != "None":
+        try:
+            int(k)
             ois = OptionItem.objects.filter(original_id=k)
             for oi in ois:
                 if oi.group.language == settings.LANGUAGES[0][0]:
@@ -900,11 +901,11 @@ def set_option_items(partner_product_information, experience):
                         item_options[oi.group.name] = {}
                     item_options[oi.group.name][oi.name] = v
                     break
-        else:
+        except ValueError as e:
             #"Extras" for rezdy products
             #TODO: language
             og = experience.optiongroup_set.filter(type="Extras", language="en")[0]
-            oi = OptionItem.objects.filter(group_id = og.id)[0]
+            oi = OptionItem.objects.filter(group_id = og.id, name = k)[0]
             if oi.group.name not in item_options:
                 item_options[og.name] = {}
             item_options[og.name][oi.name] = v

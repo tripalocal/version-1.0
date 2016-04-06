@@ -63,15 +63,22 @@ def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, 
         price = 0
         i = 0
         items = json.loads(extra_information)
-        if "None" in items.keys():
-            #"Extras" for rezdy product
-            og = experience.optiongroup_set.filter(type="Extras", language="en")[0]
-            oi = og.optionitem_set.all()[0]
-            if oi.price_type.upper() != "FIXED":
-                price = oi.price * items["None"]
-            else:
-                price = oi.price
-            items.pop("None", None)
+        extras = []
+        for k, v in items.items():
+            try:
+                int(k)
+            except ValueError as e:
+                #"Extras" for rezdy product
+                og = experience.optiongroup_set.filter(type="Extras", language="en")[0]
+                oi = og.optionitem_set.filter(name = k)[0]
+                if oi.price_type.upper() != "FIXED":
+                    price = oi.price * v
+                else:
+                    price = oi.price
+                extras.append(k)
+
+        for k in extras:
+            items.pop(k, None)
 
         language = settings.LANGUAGES[0][0] if language is None else language
         for og in experience.optiongroup_set.filter(language=language):

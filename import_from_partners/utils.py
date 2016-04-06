@@ -295,7 +295,8 @@ def new_rezdy_booking(booking, price, currency):
     quantities = []
     extras = []
     for k, v in options.items():
-        if k!="None":
+        try:
+            int(k)
             oi = OptionItem.objects.get(original_id=k)
             oi_dict = {"optionId": oi.original_id,
                        "optionLabel": oi.name,
@@ -303,9 +304,9 @@ def new_rezdy_booking(booking, price, currency):
                        "value": v,
                        }
             quantities.append(oi_dict);
-        else:
+        except ValueError as e:
             og = booking.experience.optiongroup_set.filter(type="Extras", language="en")[0]
-            oi = OptionItem.objects.filter(group_id = og.id)[0]
+            oi = OptionItem.objects.filter(group_id = og.id, name = k)[0]
             extra_dict = {"name":oi.name,
                           "price": oi.price,
                           "quantity": v}
