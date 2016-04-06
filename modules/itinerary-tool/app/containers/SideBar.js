@@ -31,7 +31,7 @@ const SideBar = ({ bookings, total, guests, profit, dispatch }) => (
         <thead>
           <tr>
             <th>澳元成本</th> 
-            <th><span className="glyphicon glyphicon-triangle-top" onClick={e => dispatch(changeProfit('UP'))}></span>利润({profit}%)</th> 
+            <th><span className="glyphicon glyphicon-triangle-top" onClick={e => dispatch(changeProfit('UP'))}></span>利润 ({profit}%)</th> 
             <th>人民币</th> 
             <th>人民币每人</th> 
           </tr>
