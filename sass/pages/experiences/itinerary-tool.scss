@@ -63,6 +63,9 @@ body {
   label {
     margin: 0 30px;
   }
+  .pull-right {
+    margin-top: 8.5px;
+  }
 }
 
 .main-section {
@@ -154,6 +157,7 @@ th {
 .date-cell {
   background-color: $off-white;
   border-right: 1px solid $light-grey;
+  width: 90px;
 }
 
 .badge {

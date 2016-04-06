@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import Select from 'react-select'
 
 const Cell = ({ date, city, field, fieldName, showSelect, hideSelect, getOptions, handleChange, handleClick }) => (
-  <td>
+  <td style={{minWidth: '200px'}}>
     { showSelect 
     ? 
       <Select.Async

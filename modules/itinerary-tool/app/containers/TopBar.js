@@ -12,20 +12,18 @@ const TopBar = ({ title, startDate, guests, dispatch }) => (
       <div className="date-field">
         <input className="form-control" id="start-date" name="start-date" onBlur={e => dispatch(updateThenSave(changeStartDate, [e.target.value]))} />
       </div>
-      <div className="pull-right">
-        <select className="form-control" value={guests} onChange={e => dispatch(changeGuests(e.target.value))}>
-          <option value="1">1人团</option>
-          <option value="2">2人团</option>
-          <option value="3">3人团</option>
-          <option value="4">4人团</option>
-          <option value="5">5人团</option>
-          <option value="6">6人团</option>
-          <option value="7">7人团</option>
-          <option value="8">8人团</option>
-          <option value="9">9人团</option>
-          <option value="10">10人团</option>
-        </select>
-      </div>
+      <select className="form-control pull-right" value={guests} onChange={e => dispatch(changeGuests(e.target.value))}>
+        <option value="1">1人团</option>
+        <option value="2">2人团</option>
+        <option value="3">3人团</option>
+        <option value="4">4人团</option>
+        <option value="5">5人团</option>
+        <option value="6">6人团</option>
+        <option value="7">7人团</option>
+        <option value="8">8人团</option>
+        <option value="9">9人团</option>
+        <option value="10">10人团</option>
+      </select>
     </div> 
   </div>
 )
