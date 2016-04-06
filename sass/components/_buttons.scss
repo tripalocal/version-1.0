@@ -62,12 +62,16 @@
 }
 
 .btn-selectable {
-  color: $light-grey;
-  border: 1px solid $light-grey;
+  color: $medium-grey;
+  border: 1px solid $medium-grey;
   height: 40px;
   line-height: 40px;
   margin: 0 15px 15px 0;
   padding: 0 12px;
+  &:hover {
+    color: $dark-grey;
+    border: 1px solid $dark-grey;
+  }
   &.selected {
     border: 1px solid $primary-color;
     background-color: white;
