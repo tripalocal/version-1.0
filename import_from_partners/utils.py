@@ -8,7 +8,7 @@ USERNAME = "tripalocalapi"
 PASSWORD = "c8EAZbRULywU4PnW"
 service_action = "https://tripalocal.experienceoz.com.au/d/services/API"#"https://www.tmtest.com.au/d/services/API"#
 
-rezdy_api = "https://api.rezdy.com/latest/"
+rezdy_api = "https://api-test.rezdy.com/latest/"
 rezdy_api_key = "97acaed307f441a5a1599a6ecdebffa3"
 
 SOAP_REQUEST_AVAILABILITY = \
@@ -286,3 +286,57 @@ def get_rezdy_availability(available_options, available_date, product_code, star
                 new_date = ((d.strftime("%d/%m/%Y"), d.strftime("%d/%m/%Y")),)
                 available_date += new_date
     return available_date
+
+def new_rezdy_booking(booking, price, currency):
+    submitted_date_string = booking.submitted_datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime("%Y-%m-%d %H:%M:%S")
+    booking_date_string = booking.datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime("%Y-%m-%d %H:%M:%S")
+    options = json.loads(booking.partner_product)
+
+    quantities = []
+    extras = []
+    for k, v in options.items():
+        if k!="None":
+            oi = OptionItem.objects.get(original_id=k)
+            oi_dict = {"optionId": oi.original_id,
+                       "optionLabel": oi.name,
+                       "optionPrice": oi.price,
+                       "value": v,
+                       }
+            quantities.append(oi_dict);
+        else:
+            og = booking.experience.optiongroup_set.filter(type="Extras", language="en")[0]
+            oi = OptionItem.objects.filter(group_id = og.id)[0]
+            extra_dict = {"name":oi.name,
+                          "price": oi.price,
+                          "quantity": v}
+            extras.append(extra_dict)
+
+    product = {"productName": booking.experience.get_information("en").title,
+               "productCode": booking.experience.original_id,
+               "startTimeLocal": booking_date_string,
+               #"endTimeLocal": ,
+               "quantities": quantities,
+               "amount": price,
+               "extras": extras,
+               }
+
+    data = {#"supplierId": supplier_id,
+            #"supplierName": supplier_name,
+            #"resellerId": "",
+            "resellerName":"Tripalocal",
+            "items": [product],
+            "totalAmount": price,
+            "totalCurrency":currency,
+            "totalPaid": price,
+            "totalDue": 0,
+            "dateCreated": submitted_date_string,
+            "dateConfirmed": submitted_date_string,
+            "datePaid": submitted_date_string,
+            "commission": booking.experience.commission,
+            "sendNotifications": "false",
+            }
+    response = requests.post(url=rezdy_api + "bookings", data = data)
+    if response.status_code == 200 and response.reason == "OK":
+        bookings = json.loads(response.text).get("bookings")
+        
+    pass

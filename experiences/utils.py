@@ -57,12 +57,22 @@ def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, 
     '''
     return total price, not including commission or service fee
     either use guest_number, or adult_number + child_number, the latter has a higher priority
-    extra_information: for experienceoz products, it indicates which optionitem is chosen, e.g., {"1243":1, "2344":2}
+    extra_information: for partner products, it indicates which optionitem is chosen, e.g., {"1243":1, "2344":2}
     '''
     if extra_information:
         price = 0
         i = 0
         items = json.loads(extra_information)
+        if "None" in items.keys():
+            #"Extras" for rezdy product
+            og = experience.optiongroup_set.filter(type="Extras", language="en")[0]
+            oi = og.optionitem_set.all()[0]
+            if oi.price_type.upper() != "FIXED":
+                price = oi.price * items["None"]
+            else:
+                price = oi.price
+            items.pop("None", None)
+
         language = settings.LANGUAGES[0][0] if language is None else language
         for og in experience.optiongroup_set.filter(language=language):
             for oi in og.optionitem_set.all():

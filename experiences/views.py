@@ -892,13 +892,22 @@ def set_option_items(partner_product_information, experience):
     options = json.loads(partner_product_information)
     item_options = {}
     for k, v in options.items():
-        ois = OptionItem.objects.filter(original_id=k)
-        for oi in ois:
-            if oi.group.language == settings.LANGUAGES[0][0]:
-                if oi.group.name not in item_options:
-                    item_options[oi.group.name] = {}
-                item_options[oi.group.name][oi.name] = v
-                break
+        if k != "None":
+            ois = OptionItem.objects.filter(original_id=k)
+            for oi in ois:
+                if oi.group.language == settings.LANGUAGES[0][0]:
+                    if oi.group.name not in item_options:
+                        item_options[oi.group.name] = {}
+                    item_options[oi.group.name][oi.name] = v
+                    break
+        else:
+            #"Extras" for rezdy products
+            #TODO: language
+            og = experience.optiongroup_set.filter(type="Extras", language="en")[0]
+            oi = OptionItem.objects.filter(group_id = og.id)[0]
+            if oi.group.name not in item_options:
+                item_options[og.name] = {}
+            item_options[og.name][oi.name] = v
     return item_options
 
 def checkout_as_guest(request):
@@ -1043,8 +1052,7 @@ class ExperienceDetailView(DetailView):
             COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
 
             item_options = None
-            if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0 \
-                and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
+            if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0:
                 item_options = set_option_items(form.data['partner_product_information'], experience)
                 form.data['time'] = "09:00"
 
@@ -1358,7 +1366,7 @@ def experience_booking_successful(request, user_id=None, booking_id=None, guest_
     purchase_id = None
     bk_total_price = None
     link = None
-    if hasattr(experience, "partner") and experience.partner == "001":
+    if hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
         bk_dt_string = booking.datetime.strftime("%Y-%m-%d%z")
         bk_dt_string = bk_dt_string[:-2]+":"+bk_dt_string[-2:]
         phone_number = "123456789"
@@ -1379,6 +1387,13 @@ def experience_booking_successful(request, user_id=None, booking_id=None, guest_
         receipt = experienceoz_receipt(booking)
         if receipt.get("success", False):
             link = unquote(receipt["link"])
+    elif hasattr(experience, "partner") and experience.partner == PARTNER_IDS["rezdy"]:
+        rezdy_booking = new_rezdy_booking(booking, price_paid, request.session["custom_currency"])
+        if rezdy_booking.get("success", False):
+            booking.whats_included = rezdy_booking["orderNumber"]
+            booking.save()
+        else:
+            raise Exception("Errors in calling rezdy booking API (post)")
 
     if not settings.DEVELOPMENT:
         try:
@@ -1442,8 +1457,7 @@ def experience_booking_confirmation(request):
         subtotal_price = round(subtotal_price*(1.00+COMMISSION_PERCENT),0)
 
         item_options = None
-        if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0 \
-            and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
+        if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0:
             item_options = set_option_items(form.data['partner_product_information'], experience)
 
         local_timezone = pytz.timezone(experience.get_timezone())
@@ -1501,18 +1515,19 @@ def experience_booking_confirmation(request):
                     request.user.registereduser.phone_number = form.cleaned_data['phone_number']
                     request.user.registereduser.save()
 
+                total_price = form.cleaned_data['price_paid'] if form.cleaned_data['price_paid'] != -1.0 else total_price
                 if form.cleaned_data['status'] == 'accepted':
                     return experience_booking_successful(request, user.id,
                                                          form.cleaned_data['booking_id'],
                                                          int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
-                                                         form.cleaned_data['price_paid'], True)
+                                                         total_price, True)
                 else:
                     return experience_booking_successful(request, user.id,
                                                          form.cleaned_data['booking_id'],
                                                          int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
-                                                         form.cleaned_data['price_paid'])
+                                                         total_price)
 
             else:
                 return render_to_response('experiences/experience_booking_confirmation.html', {'form': form,
