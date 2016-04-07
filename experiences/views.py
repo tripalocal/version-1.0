@@ -1407,6 +1407,7 @@ def experience_booking_successful(request, user_id=None, booking_id=None, guest_
     experience.title = experience.get_information(settings.LANGUAGES[0][0]).title
 
     return render(request,template,{'experience': experience,
+                                    'host': experience.get_host(),
                                     'price_paid':price_paid,
                                     'guest_number':guest_number,
                                     'booking_datetime':booking_datetime,
