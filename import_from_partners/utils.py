@@ -1,6 +1,7 @@
 import json, os, collections, requests, pytz, base64, sys, string, http.client
 from datetime import *
 from experiences.models import OptionGroup, OptionItem, NewProduct
+from experiences.utils import convert_currency
 from xml.etree import ElementTree
 
 PARTNER_IDS = {"experienceoz":"001", "rezdy":"002"}
@@ -8,7 +9,7 @@ USERNAME = "tripalocalapi"
 PASSWORD = "c8EAZbRULywU4PnW"
 service_action = "https://tripalocal.experienceoz.com.au/d/services/API"#"https://www.tmtest.com.au/d/services/API"#
 
-rezdy_api = "https://api-test.rezdy.com/latest/"
+rezdy_api = "https://api.rezdy.com/latest/"
 rezdy_api_key = "97acaed307f441a5a1599a6ecdebffa3"
 
 SOAP_REQUEST_AVAILABILITY = \
@@ -138,7 +139,7 @@ def get_experienceoz_availability(product_id, start_date, experience, available_
             if status == 'Available':
                 dict = {'available_seat': experience.guest_number_max,
                             'date_string': d.strftime("%d/%m/%Y"),
-                            'time_string': "00:00",
+                            'time_string': "09:00",
                             #'datetime': d,
                             'instant_booking': False}
                 available_options.append(dict)
@@ -279,7 +280,7 @@ def get_rezdy_availability(available_options, available_date, product_code, star
                 d = start + timedelta(days=i)
                 dict = {'available_seat': session['seatsAvailable'],
                         'date_string': d.strftime("%d/%m/%Y"),
-                        'time_string': "00:00",
+                        'time_string': d.strftime("%H:%M"),
                         #'datetime': d,
                         'instant_booking': False}
                 available_options.append(dict)
@@ -288,6 +289,10 @@ def get_rezdy_availability(available_options, available_date, product_code, star
     return available_date
 
 def new_rezdy_booking(booking, price, currency):
+    if currency.upper() != "AUD":
+        price = convert_currency(price, currency, "AUD")
+        currency = "AUD"
+
     submitted_date_string = booking.submitted_datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime("%Y-%m-%d %H:%M:%S")
     booking_date_string = booking.datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime("%Y-%m-%d %H:%M:%S")
     options = json.loads(booking.partner_product)
@@ -336,7 +341,7 @@ def new_rezdy_booking(booking, price, currency):
             "commission": booking.experience.commission,
             "sendNotifications": "false",
             }
-    response = requests.post(url=rezdy_api + "bookings", data = data)
+    response = requests.post(url=rezdy_api + "bookings?apiKey=" + rezdy_api_key, json = data)
     if response.status_code == 200 and response.reason == "OK":
         bookings = json.loads(response.text).get("bookings")
         

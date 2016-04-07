@@ -40,10 +40,6 @@ from experiences.utils import *
 from copy import deepcopy
 from import_from_partners.utils import *
 from django.contrib.auth import authenticate, login
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 MaxPhotoNumber=10
 PROFILE_IMAGE_SIZE_LIMIT = 1048576
@@ -1055,7 +1051,8 @@ class ExperienceDetailView(DetailView):
             item_options = None
             if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0:
                 item_options = set_option_items(form.data['partner_product_information'], experience)
-                form.data['time'] = "09:00"
+                if "time" not in form.data:
+                    form.data['time'] = "09:00"
 
             return render(request, 'experiences/experience_booking_confirmation.html',
                           {'form': form, #'eid':self.object.id,
@@ -3746,7 +3743,6 @@ def itinerary_detail(request,id=None,preview=None):
         city_last = ""
         cities = ci.cities.split(",")
         context["flights"] = {}
-        driver = webdriver.Firefox()
         for counter, city in enumerate(cities):
             if len(city) > 0 and len(city_last) > 0 and city != city_last:
                 kwargs = {"language":"zh-CN",
@@ -3762,7 +3758,6 @@ def itinerary_detail(request,id=None,preview=None):
                          "new": "true"}
                 context["flights"][kwargs["outbound"]] = {"url":skyscanner_flight.format(**kwargs)}
             city_last = city
-        driver.close()
 
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
