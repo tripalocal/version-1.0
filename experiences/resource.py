@@ -1730,12 +1730,12 @@ def service_get_flight_price(request, format=None):
                     "new": data.get('newWindow')}
         url = skyscanner_flight.format(**kwargs)
         driver.get(url)
-        display.stop()
         WebDriverWait(driver, 35).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, "div.js-cheapest-price.num"),"元"))
         #driver.find_element_by_css_selector("a.field-box.search-button.js-search-button").click()
         cheapest = driver.find_element_by_css_selector("div.js-cheapest-price.num").get_attribute("innerHTML")
         cheapest = ''.join(c for c in cheapest if c.isdigit())
         driver.close()
+        display.stop()
         return HttpResponse(json.dumps({'cheapest_price': cheapest}), content_type="application/json")
     except Exception as e:
         #try:
