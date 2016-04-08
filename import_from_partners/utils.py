@@ -1,7 +1,7 @@
 import json, os, collections, requests, pytz, base64, sys, string, http.client
 from datetime import *
 from experiences.models import OptionGroup, OptionItem, NewProduct
-from experiences.utils import convert_currency
+from experiences.utils import convert_currency, get_total_price, experience_fee_calculator
 from xml.etree import ElementTree
 
 PARTNER_IDS = {"experienceoz":"001", "rezdy":"002"}
@@ -289,12 +289,16 @@ def get_rezdy_availability(available_options, available_date, product_code, star
     return available_date
 
 def new_rezdy_booking(booking, price, currency):
-    if currency.upper() != "AUD":
-        price = convert_currency(price, currency, "AUD")
-        currency = "AUD"
+    experience = booking.experience
+    customer = booking.user
+    if currency.upper() != experience.currency:
+        converted = convert_currency(price, currency, experience.currency)
+        minimum = experience_fee_calculator(get_total_price(experience, extra_information = booking.partner_product), experience.commission)
+        price = converted if converted > minimum else minimum
+        currency = experience.currency
 
-    submitted_date_string = booking.submitted_datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime("%Y-%m-%d %H:%M:%S")
-    booking_date_string = booking.datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime("%Y-%m-%d %H:%M:%S")
+    submitted_date_string = booking.submitted_datetime.astimezone(pytz.timezone(experience.get_timezone())).strftime("%Y-%m-%d %H:%M:%S")
+    booking_date_string = booking.datetime.astimezone(pytz.timezone(experience.get_timezone())).strftime("%Y-%m-%d %H:%M:%S")
     options = json.loads(booking.partner_product)
 
     quantities = []
@@ -305,20 +309,20 @@ def new_rezdy_booking(booking, price, currency):
             oi = OptionItem.objects.get(original_id=k)
             oi_dict = {"optionId": oi.original_id,
                        "optionLabel": oi.name,
-                       "optionPrice": oi.price,
+                       #"optionPrice": oi.price,
                        "value": v,
                        }
             quantities.append(oi_dict);
         except ValueError as e:
-            og = booking.experience.optiongroup_set.filter(type="Extras", language="en")[0]
+            og = experience.optiongroup_set.filter(type="Extras", language="en")[0]
             oi = OptionItem.objects.filter(group_id = og.id, name = k)[0]
             extra_dict = {"name":oi.name,
-                          "price": oi.price,
+                          #"price": oi.price,
                           "quantity": v}
             extras.append(extra_dict)
 
-    product = {"productName": booking.experience.get_information("en").title,
-               "productCode": booking.experience.original_id,
+    product = {"productName": experience.get_information("en").title,
+               "productCode": experience.original_id,
                "startTimeLocal": booking_date_string,
                #"endTimeLocal": ,
                "quantities": quantities,
@@ -326,19 +330,20 @@ def new_rezdy_booking(booking, price, currency):
                "extras": extras,
                }
 
-    data = {#"supplierId": supplier_id,
-            #"supplierName": supplier_name,
-            #"resellerId": "",
-            "resellerName":"Tripalocal",
+    data = {#"resellerId": "",
+            #"resellerName":"Tripalocal",
+            "customer": 
+            {
+                "firstName": customer.first_name,
+                "lastName": customer.last_name,
+                "email": customer.email,
+            },
             "items": [product],
-            "totalAmount": price,
-            "totalCurrency":currency,
-            "totalPaid": price,
-            "totalDue": 0,
-            "dateCreated": submitted_date_string,
-            "dateConfirmed": submitted_date_string,
-            "datePaid": submitted_date_string,
-            "commission": booking.experience.commission,
+            #"commission": experience.commission,
+            "creditCard":
+            {
+                "cardToken": booking.whats_included,
+            },
             "sendNotifications": "false",
             }
     response = requests.post(url=rezdy_api + "bookings?apiKey=" + rezdy_api_key, json = data)
