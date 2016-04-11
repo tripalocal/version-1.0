@@ -23,12 +23,12 @@ export const changeProfit = (setting) => {
   if (setting === 'UP') {
     return {
       type: 'CHANGE_PROFIT',
-      amount: 5
+      amount: 1
     }  
   }
   return {
     type: 'CHANGE_PROFIT',
-    amount: -5
+    amount: -1
   }
 }
 
@@ -43,14 +43,17 @@ export const addBookings = (items) => {
       csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].getAttribute('value'),
       items: items 
     })
-  }).then((response) => {
+  })
+  .then((response) => {
     return response.json()
-  }).then((json) => {
+  })
+  .then((json) => {
     return {
       type: 'ADD_BOOKINGS',
       bookings: json.bookings
     }
-  }).catch((exception) => {
+  })
+  .catch((exception) => {
     console.log('get price error:', exception)
     return {
     }
@@ -64,6 +67,15 @@ export const updateBooking = (id, guests) => {
     guests
   }
 }
+
+/* TODO: update bookings after items dynamically
+export function updateItems(date, field, value) {
+  return (dispatch, getState) => {
+    dispatch(addItems(date, field, value))
+   
+  }
+}
+*/
 
 export const addDate = (date, city, position) => {
   const targetDate = new Date(date)
