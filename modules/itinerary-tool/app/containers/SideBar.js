@@ -40,8 +40,8 @@ const SideBar = ({ bookings, total, guests, profit, dispatch }) => (
           <tr>
             <td>{total}</td>
             <td><span className="glyphicon glyphicon-triangle-bottom" onClick={e => dispatch(changeProfit('DOWN'))}></span>{Math.round(total/(1-(profit/100)))}</td>
-            <td>{Math.round(total * 4.91)}</td>
-            <td>{Math.round(total * 4.91 / guests)}</td>
+            <td>{Math.round(total/(1-(profit/100)) * 4.9)}</td>
+            <td>{Math.round(total/(1-(profit/100)) * 4.9 / guests)}</td>
           </tr>
         </tbody>
       </table>
