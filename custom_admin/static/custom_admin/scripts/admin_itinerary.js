@@ -143,7 +143,7 @@ var dommCommEventsCallBack = {
                 "<td id=\"td-status-" + itinerary.id + "\">" +
                     "<p>" + itinerary.status + "</p>" +
                 "</td>" +
-                "<td><p><a href=\"/itinerary/edit/" + itinerary.id + "\" target=\"_blank\">Edit</a></p></td>" +
+                "<td><p><a href=\"/itinerary/edit/" + itinerary.id + "\" target=\"_blank\">Edit</a> / <a href=\"/itinerary/host/" + itinerary.id + "\" target=\"_blank\">Host</a></p></td>" +
             "</tr>";
             $(ni).insertAfter(insert_after);
             insert_after = $("#itinerary-id-" + itinerary.id);
