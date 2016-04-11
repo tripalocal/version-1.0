@@ -1000,7 +1000,7 @@ class ExperienceDetailView(DetailView):
                     available_date = ()
                     if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
                         if experience.partner == PARTNER_IDS["experienceoz"]:
-                            for i in range(4): #7 days per time
+                            for i in range(5): #7 days per time
                                 now = max_date + timedelta(days=1+i*7)
                                 now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
                                 now_string = now_string[:-2] + ":" + now_string[-2:]
@@ -1109,7 +1109,7 @@ class ExperienceDetailView(DetailView):
 
         if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
             if experience.partner == PARTNER_IDS["experienceoz"]:
-                for i in range(4): #7 days per time
+                for i in range(5): #7 days per time
                     now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2+i*7)
                     now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
                     now_string = now_string[:-2] + ":" + now_string[-2:]

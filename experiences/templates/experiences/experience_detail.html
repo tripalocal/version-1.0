@@ -845,6 +845,7 @@ $(function(){
 
     $("#id_date").datetimepicker().on('dp.update', function(e) {
         var vd = e.viewDate._d;
+        vd = new Date(vd.getFullYear(), vd.getMonth() + 1, 0)
         var enabled_dates = $('#id_date').data("DateTimePicker").enabledDates();
         enabled_dates = Object.keys(enabled_dates);
         var max_date = Date.parseExact(enabled_dates[enabled_dates.length-1], "yyyy-MM-dd");
