@@ -461,6 +461,11 @@ class CustomItinerary(models.Model):
         adult_number = 0
         children_number = 0
         booking_set = self.booking_set.all()
+        if len(booking_set) == 0:
+            self.status="deleted"
+            self.save()
+            return (0, 0, 0)
+
         if booking_set[0].adult_number is not None and booking_set[0].adult_number > 0:
             guest_number = self.booking_set.all()[0].adult_number
             adult_number = guest_number
