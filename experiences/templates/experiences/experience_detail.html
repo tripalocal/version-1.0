@@ -851,7 +851,23 @@ $(function(){
         var max_date = Date.parseExact(enabled_dates[enabled_dates.length-1], "yyyy-MM-dd");
         if(max_date < vd)
         {
+            var o_left = "50px";
+            var o_up = "140px";
             $(".loading-calendar").show();
+            if($("#id_date").offset().top - $(window).scrollTop() > 300)
+            {
+                $("#icon_load_more").animate({
+                    'marginLeft' : "+=" + o_left, //moves right
+                    'marginTop' : "-=" + o_up //moves up
+                }, 1);
+            }
+            else
+            {
+                $("#icon_load_more").animate({
+                    'marginLeft' : "+=" + o_left, //moves right
+                    'marginTop' : "+=" + o_up //moves down
+                }, 1);
+            }
             $.ajax({
                     type: 'POST',
                     url: "/experience/{{experience.id}}/",
@@ -866,6 +882,20 @@ $(function(){
                     success: function (data,status,xhr) {
                         var result = data; //$.parseJSON(data)
                         $(".loading-calendar").hide();
+                        if($("#id_date").offset().top - $(window).scrollTop() > 300)
+                        {
+                            $("#icon_load_more").animate({
+                                'marginLeft' : "-=" + o_left, //moves left
+                                'marginTop' : "+=" + o_up //moves down
+                            }, 1);
+                        }
+                        else
+                        {
+                            $("#icon_load_more").animate({
+                                'marginLeft' : "-=" + o_left, //moves left
+                                'marginTop' : "-=" + o_up //moves up
+                            }, 1);
+                        }
                         if(data.success)
                         {
                             len = $('p[id^="date_string_"]').length;
