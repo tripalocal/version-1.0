@@ -1388,7 +1388,7 @@ def experience_booking_successful(request, user_id=None, booking_id=None, guest_
     elif hasattr(experience, "partner") and experience.partner == PARTNER_IDS["rezdy"]:
         rezdy_booking = new_rezdy_booking(booking, price_paid, request.session["custom_currency"])
         if rezdy_booking.get("success", False):
-            booking.whats_included = rezdy_booking["orderNumber"]
+            booking.whats_included = rezdy_booking["booking"]["orderNumber"]
             booking.save()
         else:
             raise Exception("Errors in calling rezdy booking API (post)")

@@ -9,8 +9,8 @@ USERNAME = "tripalocalapi"
 PASSWORD = "c8EAZbRULywU4PnW"
 service_action = "https://tripalocal.experienceoz.com.au/d/services/API"#"https://www.tmtest.com.au/d/services/API"#
 
-rezdy_api = "https://api.rezdy.com/latest/"
-rezdy_api_key = "97acaed307f441a5a1599a6ecdebffa3"
+rezdy_api = "https://api.rezdy.com/latest/"#"https://api-test.rezdy.com/latest/"#
+rezdy_api_key = "97acaed307f441a5a1599a6ecdebffa3"#"29ea28ed92ef45cc9026a566c15c78b3"#
 
 SOAP_REQUEST_AVAILABILITY = \
 ''' <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -327,8 +327,9 @@ def new_rezdy_booking(booking, price, currency):
                #"endTimeLocal": ,
                "quantities": quantities,
                "amount": price,
-               "extras": extras,
                }
+    if len(extras):
+           product["extras"] = extras
 
     data = {#"resellerId": "",
             #"resellerName":"Tripalocal",
@@ -347,7 +348,9 @@ def new_rezdy_booking(booking, price, currency):
             "sendNotifications": "false",
             }
     response = requests.post(url=rezdy_api + "bookings?apiKey=" + rezdy_api_key, json = data)
-    if response.status_code == 200 and response.reason == "OK":
+    if response.status_code == 200 and response.reason == "OK" and json.loads(response.text)["requestStatus"]["success"]:
         bookings = json.loads(response.text).get("bookings")
-        
-    pass
+        if len(bookings):
+            return {"success":True, "booking": json.dumps(bookings[0])}
+
+    return {"success":False}
