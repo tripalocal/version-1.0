@@ -16,6 +16,17 @@
 
 {% block scripts %}
   <script>
+    window.CITY_NAMES = {
+      'Melbourne': '墨尔本',
+      'Sydney': '悉尼',
+      'Brisbane': '布里斯班',
+      'Goldcoast': '黄金海岸',
+      'Adelaide': '阿德莱德',
+      'Hobart': '霍巴特',
+      'Darwin': '达尔文',
+      'Wellington': '惠灵顿',
+      'Auckland': '奥克兰'
+    }
     window.itineraryID = {{ itinerary_id }};
     window.initialState = {
       modal: {date: '', field: '', display: 'NONE'},

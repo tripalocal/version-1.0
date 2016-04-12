@@ -6,7 +6,7 @@ import { selectDate } from '../actions'
 export const Row = ({ date, isSelected, fields, dispatch }) => (
   <tr className={isSelected} onClick={e => dispatch(selectDate(date))}>
     <td className="date-cell">{date}</td>
-    <td>{fields['city']}</td>
+    <td>{window.CITY_NAMES[fields['city']]}</td>
     <CellState date={date} city={fields['city']} key={date + 'experiences'} fieldName="experiences" field={fields['experiences']} />
     <CellState date={date} city={fields['city']} key={date + 'transport'} fieldName="transport" field={fields['transport']} />
     <CellState date={date} city={fields['city']} key={date + 'accommodation'} fieldName="accommodation" field={fields['accommodation']} />
