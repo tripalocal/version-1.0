@@ -48,9 +48,14 @@
               {{option.name}}
             </span>
             <select class="option-amount" option_id="{{option.original_id}}">
+              {% if option.type != "FIXED" %} 
               {% for i in available_options.0.available_seat|numeric_forloop %}
               <option value="{{i}}">{{i}}</option>
               {% endfor %}
+              {% else %}
+              <option value="0">0</option>
+              <option value="1">1</option>
+              {% endif %}
             </select>
             <span class="option-price">
               {{experience.dollarsign}}{{option.price|floatformat:"0"}}

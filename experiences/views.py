@@ -83,9 +83,12 @@ def convert_experience_price(request, experience):
             og = {"name":option.name, "optionitem_set":[]}
             for item in option.optionitem_set.all():
                 if hasattr(request, 'session') and 'custom_currency' in request.session and request.session['custom_currency'].lower() != "aud":
-                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id if item.original_id else item.name, "price":convert_currency(item.price, "aud", request.session['custom_currency'])})
+                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id if item.original_id else item.name,
+                                                 "price":convert_currency(item.price, "aud", request.session['custom_currency']),
+                                                 "type":item.price_type})
                 else:
-                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id if item.original_id else item.name, "price":item.price})
+                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id if item.original_id else item.name,
+                                                 "price":item.price, "type":item.price_type})
             optiongroup_set.append(og)
         return optiongroup_set
     else:
