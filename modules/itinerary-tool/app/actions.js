@@ -19,6 +19,14 @@ export const changeGuests = (guests) => {
   }
 }
 
+export const changePrice = (id, price) => {
+  return {
+    type: 'CHANGE_PRICE',
+    id,
+    price
+  }
+}
+
 export const changeProfit = (setting) => {
   if (setting === 'UP') {
     return {

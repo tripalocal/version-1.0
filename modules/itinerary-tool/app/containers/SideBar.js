@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { updateBooking, updateThenSave, changeProfit } from '../actions'
+import { updateBooking, updateThenSave, changeProfit, changePrice } from '../actions'
 
 const SideBar = ({ bookings, total, guests, profit, dispatch }) => (
   <div className="side-bar">
@@ -19,7 +19,7 @@ const SideBar = ({ bookings, total, guests, profit, dispatch }) => (
           <tr>
             <td style={{width: '200px'}}>{booking.title}</td>
             <td>每个</td>
-            <td>{booking.price}</td>
+            <td><input style={{width: '50px'}} value={booking.price} onChange={e => dispatch(updateThenSave(changePrice, [booking.id, e.target.value]))} className="form-control" /></td>
             <td><input value={booking.guests} onChange={e => dispatch(updateThenSave(updateBooking, [booking.id, e.target.value]))} className="form-control" /></td>
             <td>{booking.guests * booking.price}</td>
           </tr>
@@ -31,7 +31,7 @@ const SideBar = ({ bookings, total, guests, profit, dispatch }) => (
         <thead>
           <tr>
             <th>澳元成本</th> 
-            <th><span className="glyphicon glyphicon-triangle-top" onClick={e => dispatch(changeProfit('UP'))}></span>利润 ({profit}%)</th> 
+            <th><span className="glyphicon glyphicon-triangle-top" onClick={ e => dispatch(changeProfit('UP'))}></span>利润 ({profit}%)</th> 
             <th>人民币</th> 
             <th>人民币每人</th> 
           </tr>

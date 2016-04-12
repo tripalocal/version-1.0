@@ -67,7 +67,14 @@ function bookings(state=[], action) {
           return update(booking, {guests: {$set: action.guests}}) 
         }
         return booking
-      })  
+      })
+    case 'CHANGE_PRICE':
+      return state.map((booking) => {
+        if (booking.id === action.id) {
+          return update(booking, {price: {$set: action.price}})
+        }
+        return booking
+      })
     default:
       return state
   }

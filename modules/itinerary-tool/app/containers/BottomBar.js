@@ -13,9 +13,6 @@ const BottomBar = ({ dispatch, showEditRowMenu, selectedDate }) => (
         <img src="https://tripalocal-static.s3.amazonaws.com/static/experiences/img/delete.svg" width="30" height="30"/>
         删除当天 
       </button>
-      <button className="btn btn-secondary" onClick={e => dispatch(showModal(selectedDate, 'ASSIGN_HOST'))}>
-          
-      </button>
       <button className="btn btn-secondary" onClick={e => dispatch(updateThenSave(moveDate, [selectedDate, 'BACK']))}>
         <img src="https://tripalocal-static.s3.amazonaws.com/static/experiences/img/move_before.svg" width="30" height="30"/>
         往上移一天 

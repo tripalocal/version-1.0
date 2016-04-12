@@ -3944,11 +3944,16 @@ def itinerary_tool(request, id=None):
                         local_timezone = pytz.timezone(experience.get_timezone())
                         bk_date = local_timezone.localize(datetime.strptime(str(date), "%Y-%m-%d"))
                         guest_number = [booking['guests'] for booking in bookings if booking['id'] == item['id']]
+                        price = [booking['price'] for booking in bookings if booking['id'] == item['id']]
                         if not guest_number:
                             guest_number = 1
                         else:
                             guest_number = int(guest_number[0])
-                        booking = Booking(user = request.user, experience = experience, guest_number = guest_number, total_price = (experience.price * guest_number),
+                        if not price:
+                            price = experience.price
+                        else:
+                            price = int(price[0])
+                        booking = Booking(user = request.user, experience = experience, guest_number = guest_number, total_price = (price * guest_number),
                                         datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                         booking.save()
@@ -3978,11 +3983,14 @@ def itinerary_tool(request, id=None):
                 itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}})
 
             itinerary[key][type]['items'].append({'id': booking.experience.id, 'title': title})
-            items.append({'id': booking.experience.id, 'title': title, 'price': int(booking.experience.price), 'guests': booking.guest_number}) 
+            items.append({'id': booking.experience.id, 'title': title, 'price': int(booking.total_price/booking.guest_number), 'guests': booking.guest_number}) 
         context['itinerary'] = json.dumps(itinerary)
         context['itinerary_id'] = id
         context['bookings'] = items
-        context['guests'] = ci.guests
+        if ci.guests is 'None':
+            context['guests'] = 1
+        else:
+            context['guests'] = ci.guests
         if ci.profit is None:
             context['profit'] = 15
         else:
