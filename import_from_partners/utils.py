@@ -349,8 +349,7 @@ def new_rezdy_booking(booking, price, currency):
             }
     response = requests.post(url=rezdy_api + "bookings?apiKey=" + rezdy_api_key, json = data)
     if response.status_code == 200 and response.reason == "OK" and json.loads(response.text)["requestStatus"]["success"]:
-        bookings = json.loads(response.text).get("bookings")
-        if len(bookings):
-            return {"success":True, "booking": json.dumps(bookings[0])}
+        bking = json.loads(response.text).get("booking")
+        return {"success":True, "booking": bking}
 
     return {"success":False}
