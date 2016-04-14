@@ -257,7 +257,7 @@ def experienceoz_receipt(booking):
     else:
         return {"success":False}
 
-def get_rezdy_availability(available_options, available_date, product_code, start_time_local, end_time_local, limit=100, offset=0):
+def get_rezdy_availability(experience_timezone, available_options, available_date, product_code, start_time_local, end_time_local, limit=100, offset=0):
     url_template = rezdy_api + \
                    "availability?productCode={product_code}&startTimeLocal={start_time_local}" + \
                    "&endTimeLocal={end_time_local}&limit={limit}&offset={offset}&apiKey=" + \
@@ -271,21 +271,22 @@ def get_rezdy_availability(available_options, available_date, product_code, star
     }
     url = url_template.format(**kwargs)
     response = requests.get(url)
-    if response.status_code == 200 and response.reason == "OK":
+    if response.status_code == 200 and response.reason == "OK" and json.loads(response.text)["requestStatus"]["success"]:
         sessions = json.loads(response.text)
         for session in sessions['sessions']:
-            start = datetime.strptime(session['startTimeLocal'], "%Y-%m-%d %H:%M:%S")
-            end = datetime.strptime(session['endTimeLocal'], "%Y-%m-%d %H:%M:%S")
-            for i in range((end-start).days+1):
-                d = start + timedelta(days=i)
-                dict = {'available_seat': session['seatsAvailable'],
-                        'date_string': d.strftime("%d/%m/%Y"),
-                        'time_string': d.strftime("%H:%M"),
-                        #'datetime': d,
-                        'instant_booking': False}
-                available_options.append(dict)
-                new_date = ((d.strftime("%d/%m/%Y"), d.strftime("%d/%m/%Y")),)
-                available_date += new_date
+            if "startTimeLocal" in session and "endTimeLocal" in session:
+                d = experience_timezone.localize(datetime.strptime(session['startTimeLocal'], "%Y-%m-%d %H:%M:%S"))
+            else:
+                d = datetime.strptime(session['startTime'], "%Y-%m-%dT%H:%M:%SZ")
+                d = pytz.timezone('UTC').localize(d).astimezone(experience_timezone)
+            dict = {'available_seat': session['seatsAvailable'],
+                    'date_string': d.strftime("%d/%m/%Y"),
+                    'time_string': d.strftime("%H:%M"),
+                    #'datetime': d,
+                    'instant_booking': False}
+            available_options.append(dict)
+            new_date = ((d.strftime("%d/%m/%Y"), d.strftime("%d/%m/%Y")),)
+            available_date += new_date
     return available_date
 
 def new_rezdy_booking(booking, price, currency):
@@ -345,6 +346,15 @@ def new_rezdy_booking(booking, price, currency):
             {
                 "cardToken": booking.whats_included,
             },
+            #"payments": [
+            #    {
+            #        "type": "CREDITCARD",
+            #        "amount": price,
+            #        "currency": "USD",
+            #        "date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            #        "label": "Payment processed by Tripalocal"
+            #    }
+            #],
             "sendNotifications": "false",
             }
     response = requests.post(url=rezdy_api + "bookings?apiKey=" + rezdy_api_key, json = data)

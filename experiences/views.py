@@ -997,24 +997,38 @@ class ExperienceDetailView(DetailView):
                 try:
                     data = request.POST
                     experience = AbstractExperience.objects.get(id=data["experience_id"])
+                    local_timezone = pytz.timezone(experience.get_timezone())
                     max_date = data["max_date"]
-                    max_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(max_date, "%Y-%m-%d"))
+                    max_date = local_timezone.localize(datetime.strptime(max_date, "%Y-%m-%d"))
+                    #view_date is the last day of the month
+                    view_date = data["view_date"]
+                    #change to the 1st day of the next month
+                    view_date = local_timezone.localize(datetime.strptime(view_date, "%Y-%m-%d")) + timedelta(days=1)
+                    #the calendar displays up to 13 days in the next month
+                    view_date += timedelta(days=(13-view_date.weekday()))
                     available_options = []
                     available_date = ()
                     if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
                         if experience.partner == PARTNER_IDS["experienceoz"]:
-                            for i in range(5): #7 days per time
-                                now = max_date + timedelta(days=1+i*7)
+                            #experience loads 7 days per time
+                            now = max_date + timedelta(days=1)
+                            while now < view_date:
                                 now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
                                 now_string = now_string[:-2] + ":" + now_string[-2:]
                                 original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
                                 available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+                                now = local_timezone.localize(datetime.strptime(available_options[-1]["date_string"] + available_options[-1]["time_string"],
+                                                                                 "%d/%m/%Y%H:%M")) + timedelta(days=1)
                         elif experience.partner == PARTNER_IDS["rezdy"]:
+                            #rezdy loads 100 sessions per time
                             now = max_date + timedelta(days=1)
-                            available_date = get_rezdy_availability(available_options, available_date, experience.original_id,
-                                                                    now.strftime('%Y-%m-%d %H:%M:%S'),
-                                                                    (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
-                                                                    limit=100, offset=0)
+                            while now < view_date:
+                                available_date = get_rezdy_availability(local_timezone, available_options, available_date, experience.original_id,
+                                                                        now.strftime('%Y-%m-%d %H:%M:%S'),
+                                                                        (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
+                                                                        limit=100, offset=0)
+                                now = local_timezone.localize(datetime.strptime(available_options[-1]["date_string"] + available_options[-1]["time_string"],
+                                                                                 "%d/%m/%Y%H:%M")) + timedelta(hours=1)
                     else:
                         available_date = getAvailableOptions(experience, available_options, available_date, from_datetime = (max_date+timedelta(days=1)).astimezone(pytz.timezone('UTC')))
                     available_date = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))
@@ -1111,19 +1125,30 @@ class ExperienceDetailView(DetailView):
                 return context
 
         if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
+            start_of_next_month = (local_timezone.localize(datetime.now())+timedelta(days=31)).replace(day=1,hour=0,minute=0,second=0)
+            #the calendar displays up to 13 days in the next month
+            end_date = start_of_next_month + timedelta(days=(13-start_of_next_month.weekday()))
+
             if experience.partner == PARTNER_IDS["experienceoz"]:
-                for i in range(5): #7 days per time
-                    now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2+i*7)
+                #experience loads 7 days per time
+                now = local_timezone.localize(datetime.now()) + timedelta(days=1)
+                while now < end_date:
                     now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
                     now_string = now_string[:-2] + ":" + now_string[-2:]
                     original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
                     available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+                    now = local_timezone.localize(datetime.strptime(available_options[-1]["date_string"] + available_options[-1]["time_string"],
+                                                                                 "%d/%m/%Y%H:%M")) + timedelta(days=1)
             elif experience.partner == PARTNER_IDS["rezdy"]:
-                now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2)
-                available_date = get_rezdy_availability(available_options, available_date, experience.original_id,
-                                                        now.strftime('%Y-%m-%d %H:%M:%S'),
-                                                        (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
-                                                        limit=100, offset=0)
+                #rezdy loads 100 sessions per time
+                now = local_timezone.localize(datetime.now()) + timedelta(days=1)
+                while now < end_date:
+                    available_date = get_rezdy_availability(local_timezone, available_options, available_date, experience.original_id,
+                                                            now.strftime('%Y-%m-%d %H:%M:%S'),
+                                                            (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
+                                                            limit=100, offset=0)
+                    now = local_timezone.localize(datetime.strptime(available_options[-1]["date_string"] + available_options[-1]["time_string"],
+                                                                                 "%d/%m/%Y%H:%M")) + timedelta(hours=1)
         else:
             available_date = getAvailableOptions(experience, available_options, available_date)
 
