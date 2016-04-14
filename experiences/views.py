@@ -1003,12 +1003,11 @@ class ExperienceDetailView(DetailView):
                     local_timezone = pytz.timezone(experience.get_timezone())
                     max_date = data["max_date"]
                     max_date = local_timezone.localize(datetime.strptime(max_date, "%Y-%m-%d"))
-                    #view_date is the last day of the month
-                    view_date = data["view_date"]
+                    #data["view_date"] is the last day of the month
                     #change to the 1st day of the next month
-                    view_date = local_timezone.localize(datetime.strptime(view_date, "%Y-%m-%d")) + timedelta(days=1)
+                    view_date_original = local_timezone.localize(datetime.strptime(data["view_date"], "%Y-%m-%d")) + timedelta(days=1)
                     #the calendar displays up to 13 days in the next month
-                    view_date += timedelta(days=(13-view_date.weekday()))
+                    view_date = view_date_original + timedelta(days=(13-view_date_original.weekday()))
                     available_options = []
                     available_date = ()
                     if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
@@ -1016,7 +1015,7 @@ class ExperienceDetailView(DetailView):
                             #experience loads 7 days per time
                             now = max_date + timedelta(days=1)
                             #performance tradeoff: when the first day is Monday/Tuesday, most of the time it's fine to call the api one time less
-                            if view_date.weekday() < 2:
+                            if view_date_original.weekday() < 2:
                                 view_date = view_date - timedelta(days=7)
                             while now < view_date:
                                 now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
