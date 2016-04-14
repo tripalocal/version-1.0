@@ -46,7 +46,7 @@ class Provider(models.Model):
     company = models.CharField(max_length=100)
     website = models.CharField(max_length=254, blank=True)
     email = models.CharField(max_length=100, blank=True)
-    phone_number = models.CharField(max_length=15, blank=True)
+    phone_number = models.CharField(max_length=100, blank=True)
     partner = models.CharField(max_length=100, blank=True, null=True)
     location = models.CharField(max_length=500, blank=True, null=True)
 
@@ -240,6 +240,7 @@ class NewProduct(AbstractExperience):
     partner = models.CharField(max_length=100, blank=True, null=True)
     related_products = models.ManyToManyField("NewProduct", related_name="newproduct_related", blank=True, null=True)
     note = models.TextField(blank=True, null=True)
+    original_id = models.TextField(blank=True, null=True)
 
     def __str__(self):
         t = self.get_information(settings.LANGUAGES[0][0]).title
@@ -352,6 +353,7 @@ class OptionGroup(models.Model):
     name = models.TextField()
     language = models.CharField(max_length=3, choices=LANG_CHOICES, default=EN)
     original_id = models.IntegerField(blank=True, null=True)
+    type = models.CharField(max_length=30, blank=True, null=True)
 
     def __str__(self):
         return self.name if self.name else ""
@@ -359,9 +361,15 @@ class OptionGroup(models.Model):
 class OptionItem(models.Model):
     group = models.ForeignKey(OptionGroup)
     name = models.TextField()
+    description = models.TextField(blank=True, null=True)
     retail_price = models.FloatField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
     original_id = models.IntegerField(blank=True, null=True)
+    min_quantity = models.IntegerField(blank=True, null=True)
+    max_quantity = models.IntegerField(blank=True, null=True)
+    seats_used = models.IntegerField(blank=True, null=True)
+    price_type = models.CharField(max_length=30, blank=True, null=True)
+    image = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name if self.name else ""
@@ -442,6 +450,8 @@ class CustomItinerary(models.Model):
     start_datetime = models.DateTimeField(null=True, blank=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
     cities = models.TextField(null=True, blank=True)
+    profit = models.IntegerField(null=True, blank=True)
+    guests = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.user.username + "--" + self.title
@@ -451,6 +461,11 @@ class CustomItinerary(models.Model):
         adult_number = 0
         children_number = 0
         booking_set = self.booking_set.all()
+        if len(booking_set) == 0:
+            self.status="deleted"
+            self.save()
+            return (0, 0, 0)
+
         if booking_set[0].adult_number is not None and booking_set[0].adult_number > 0:
             guest_number = self.booking_set.all()[0].adult_number
             adult_number = guest_number

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-07 11:12+1100\n"
+"POT-Creation-Date: 2016-04-06 14:15+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,7 +41,7 @@ msgstr "姓氏"
 msgid "Last Name"
 msgstr "姓氏"
 
-#: app/templates/app/aboutus.html:6
+#: app/templates/app/aboutus.html:6 app/tests.py:42
 msgid "Tripalocal | About Us"
 msgstr "关于本土客 | 关于我们"
 
@@ -149,7 +149,7 @@ msgstr "最本土，最科学的路线"
 msgid "Request a trip"
 msgstr "我要定制"
 
-#: app/templates/app/contactus.html:6
+#: app/templates/app/contactus.html:6 app/tests.py:37
 msgid "Tripalocal | Contact us"
 msgstr "本土客 | 联系我们"
 
@@ -199,7 +199,7 @@ msgstr ""
 "<a href=\"https://www.tripalocal.com/cn\" target=\"_blank\">本土客</a>带您体"
 "检最原汁原味的旅行!"
 
-#: app/templates/app/index.html:8
+#: app/templates/app/index.html:8 app/tests.py:15 app/tests.py:19
 msgid "Tripalocal | Experience it like a local"
 msgstr "本土客，个性出境游，本地导游，旅游攻略，私人导游，旅行，分享，发现"
 
@@ -699,6 +699,12 @@ msgstr "您用 %(user_email)注册的账户已经激活。"
 #: app/templates/app/registration_successful.html:95
 msgid "Show me around"
 msgstr "去主页逛逛"
+
+#: app/tests.py:22 app/tests.py:26 app/tests.py:29 app/tests.py:32
+#, fuzzy
+#| msgid "Melbourne"
+msgid "Discover Melbourne"
+msgstr "墨尔本"
 
 #: app/views.py:51
 msgid "Cairns"

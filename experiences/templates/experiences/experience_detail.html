@@ -91,15 +91,18 @@
     </div>
 
     <div class="container">
-        {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
-            {% include "experiences/product_booking_box.html" %}
-            {% include "experiences/product_description.html" %}
-        {% elif experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' or experience.type == 'ITINERARY' %}
-            {% include "experiences/experience_booking_box.html" %}
-            {% include "experiences/experience_description.html" %}
-        {% else %}
+        {% if experience.partner == "001"%} {# experienceoz #}
             {% include "experiences/api_booking_box.html" %}
             {% include "experiences/api_description.html" %}
+        {% elif experience.partner == "002"%} {# rezdy #}
+            {% include "experiences/api_booking_box.html" %}
+            {% include "experiences/product_description.html" %}
+        {% elif experience.type == "PublicProduct" or experience.type == "PrivateProduct" %} {# new product #}
+            {% include "experiences/product_booking_box.html" %}
+            {% include "experiences/product_description.html" %}
+        {% elif experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' or experience.type == 'ITINERARY' %} {# experience #}
+            {% include "experiences/experience_booking_box.html" %}
+            {% include "experiences/experience_description.html" %}
         {%endif%}
     </div>
 
@@ -401,7 +404,7 @@ function setup_time_seat()
         }
         else
         {
-            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + '>' + $("#time_string_"+i).text().trim() + '</option>');
+            $("#id_time").append('<option value=' + $("#time_string_"+i).text().trim() + ' selected>' + $("#time_string_"+i).text().trim() + '</option>');
         }
     }
 
@@ -843,12 +846,29 @@ $(function(){
 
     $("#id_date").datetimepicker().on('dp.update', function(e) {
         var vd = e.viewDate._d;
+        vd = new Date(vd.getFullYear(), vd.getMonth() + 1, 0)
         var enabled_dates = $('#id_date').data("DateTimePicker").enabledDates();
         enabled_dates = Object.keys(enabled_dates);
         var max_date = Date.parseExact(enabled_dates[enabled_dates.length-1], "yyyy-MM-dd");
         if(max_date < vd)
         {
+            var o_left = "50px";
+            var o_up = "140px";
             $(".loading-calendar").show();
+            if($("#id_date").offset().top - $(window).scrollTop() > 300)
+            {
+                $("#icon_load_more").animate({
+                    'marginLeft' : "+=" + o_left, //moves right
+                    'marginTop' : "-=" + o_up //moves up
+                }, 1);
+            }
+            else
+            {
+                $("#icon_load_more").animate({
+                    'marginLeft' : "+=" + o_left, //moves right
+                    'marginTop' : "+=" + o_up //moves down
+                }, 1);
+            }
             $.ajax({
                     type: 'POST',
                     url: "/experience/{{experience.id}}/",
@@ -863,6 +883,20 @@ $(function(){
                     success: function (data,status,xhr) {
                         var result = data; //$.parseJSON(data)
                         $(".loading-calendar").hide();
+                        if($("#id_date").offset().top - $(window).scrollTop() > 300)
+                        {
+                            $("#icon_load_more").animate({
+                                'marginLeft' : "-=" + o_left, //moves left
+                                'marginTop' : "+=" + o_up //moves down
+                            }, 1);
+                        }
+                        else
+                        {
+                            $("#icon_load_more").animate({
+                                'marginLeft' : "-=" + o_left, //moves left
+                                'marginTop' : "-=" + o_up //moves up
+                            }, 1);
+                        }
                         if(data.success)
                         {
                             len = $('p[id^="date_string_"]').length;

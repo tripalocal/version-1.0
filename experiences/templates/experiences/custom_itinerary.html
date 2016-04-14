@@ -905,6 +905,11 @@
                 item.append([ids[i]], value);
                 j++;
             }
+            else if(ids[i] == "location")
+            {
+                alert("Location can't be empty");
+                return;
+            }
         }
         if(j == 0)
         {
@@ -1157,11 +1162,11 @@
         $("#add-" + type + "-btn").click();
         var experience = $($(".experience_id_" + id)[0]);
         var fixed_price = parseFloat(experience.find(".fixed-price").text())
-        var price = parseFloat(experience.find(".price").text());
         var fixed_price_min = parseFloat(experience.find(".fixed-price-min").text());
         var fixed_price_max = parseFloat(experience.find(".fixed-price-max").text());
         var price_min = parseFloat(experience.find(".price-min").text());
         var price_max = parseFloat(experience.find(".price-max").text());
+        var price = (price_min + price_max)/2;
         var title = experience.find(".exp-info").find("h3").text();
         var details = $(experience.find(".exp-info").find("p")[0]).text();
         var notes = experience.find(".exp-info").find("label").text();
@@ -1191,6 +1196,10 @@
             item.append("Edit", "Edit");
             item.append("id", id);
 
+            var price_min = parseFloat($("#" + type + "-price-min").val());
+            var price_max = parseFloat($("#" + type + "-price-max").val());
+            var price = (price_min + price_max)/2;
+            $("#" + type + "-price").val(price);
             var ids = ["title", "location", "fixed_price-min", "fixed_price-max", "price-min", "price-max", "fixed_price", "price", "details", "notes"];
             var value = "";
 
@@ -1200,6 +1209,11 @@
                 {
                     item.append([ids[i]], value);
                     j++;
+                }
+                else if(ids[i] == "location")
+                {
+                    alert("Location can't be empty");
+                    return;
                 }
             }
 

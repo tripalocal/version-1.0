@@ -83,9 +83,12 @@ def convert_experience_price(request, experience):
             og = {"name":option.name, "optionitem_set":[]}
             for item in option.optionitem_set.all():
                 if hasattr(request, 'session') and 'custom_currency' in request.session and request.session['custom_currency'].lower() != "aud":
-                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id, "price":convert_currency(item.price, "aud", request.session['custom_currency'])})
+                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id if item.original_id else item.name,
+                                                 "price":convert_currency(item.price, "aud", request.session['custom_currency']),
+                                                 "type":item.price_type})
                 else:
-                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id, "price":item.price})
+                    og["optionitem_set"].append({"name":item.name, "original_id":item.original_id if item.original_id else item.name,
+                                                 "price":item.price, "type":item.price_type})
             optiongroup_set.append(og)
         return optiongroup_set
     else:
@@ -888,13 +891,23 @@ def set_option_items(partner_product_information, experience):
     options = json.loads(partner_product_information)
     item_options = {}
     for k, v in options.items():
-        ois = OptionItem.objects.filter(original_id=k)
-        for oi in ois:
-            if oi.group.language == settings.LANGUAGES[0][0]:
-                if oi.group.name not in item_options:
-                    item_options[oi.group.name] = {}
-                item_options[oi.group.name][oi.name] = v
-                break
+        try:
+            int(k)
+            ois = OptionItem.objects.filter(original_id=k)
+            for oi in ois:
+                if oi.group.language == settings.LANGUAGES[0][0]:
+                    if oi.group.name not in item_options:
+                        item_options[oi.group.name] = {}
+                    item_options[oi.group.name][oi.name] = v
+                    break
+        except ValueError as e:
+            #"Extras" for rezdy products
+            #TODO: language
+            og = experience.optiongroup_set.filter(type="Extras", language="en")[0]
+            oi = OptionItem.objects.filter(group_id = og.id, name = k)[0]
+            if oi.group.name not in item_options:
+                item_options[og.name] = {}
+            item_options[og.name][oi.name] = v
     return item_options
 
 def checkout_as_guest(request):
@@ -989,12 +1002,19 @@ class ExperienceDetailView(DetailView):
                     available_options = []
                     available_date = ()
                     if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
-                        for i in range(4): #7 days per time
-                            now = max_date + timedelta(days=1+i*7)
-                            now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
-                            now_string = now_string[:-2] + ":" + now_string[-2:]
-                            original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
-                            available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+                        if experience.partner == PARTNER_IDS["experienceoz"]:
+                            for i in range(5): #7 days per time
+                                now = max_date + timedelta(days=1+i*7)
+                                now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
+                                now_string = now_string[:-2] + ":" + now_string[-2:]
+                                original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
+                                available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+                        elif experience.partner == PARTNER_IDS["rezdy"]:
+                            now = max_date + timedelta(days=1)
+                            available_date = get_rezdy_availability(available_options, available_date, experience.original_id,
+                                                                    now.strftime('%Y-%m-%d %H:%M:%S'),
+                                                                    (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
+                                                                    limit=100, offset=0)
                     else:
                         available_date = getAvailableOptions(experience, available_options, available_date, from_datetime = (max_date+timedelta(days=1)).astimezone(pytz.timezone('UTC')))
                     available_date = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))
@@ -1032,10 +1052,10 @@ class ExperienceDetailView(DetailView):
             COMMISSION_PERCENT = round(experience.commission/(1-experience.commission),3)
 
             item_options = None
-            if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0 \
-                and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
+            if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0:
                 item_options = set_option_items(form.data['partner_product_information'], experience)
-                form.data['time'] = "09:00"
+                if "time" not in form.data:
+                    form.data['time'] = "09:00"
 
             return render(request, 'experiences/experience_booking_confirmation.html',
                           {'form': form, #'eid':self.object.id,
@@ -1091,12 +1111,19 @@ class ExperienceDetailView(DetailView):
                 return context
 
         if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
-            for i in range(4): #7 days per time
-                now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2+i*7)
-                now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
-                now_string = now_string[:-2] + ":" + now_string[-2:]
-                original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
-                available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+            if experience.partner == PARTNER_IDS["experienceoz"]:
+                for i in range(5): #7 days per time
+                    now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2+i*7)
+                    now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
+                    now_string = now_string[:-2] + ":" + now_string[-2:]
+                    original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
+                    available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+            elif experience.partner == PARTNER_IDS["rezdy"]:
+                now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2)
+                available_date = get_rezdy_availability(available_options, available_date, experience.original_id,
+                                                        now.strftime('%Y-%m-%d %H:%M:%S'),
+                                                        (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
+                                                        limit=100, offset=0)
         else:
             available_date = getAvailableOptions(experience, available_options, available_date)
 
@@ -1340,7 +1367,7 @@ def experience_booking_successful(request, user_id=None, booking_id=None, guest_
     purchase_id = None
     bk_total_price = None
     link = None
-    if hasattr(experience, "partner") and experience.partner == "001":
+    if hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
         bk_dt_string = booking.datetime.strftime("%Y-%m-%d%z")
         bk_dt_string = bk_dt_string[:-2]+":"+bk_dt_string[-2:]
         phone_number = "123456789"
@@ -1361,6 +1388,13 @@ def experience_booking_successful(request, user_id=None, booking_id=None, guest_
         receipt = experienceoz_receipt(booking)
         if receipt.get("success", False):
             link = unquote(receipt["link"])
+    elif hasattr(experience, "partner") and experience.partner == PARTNER_IDS["rezdy"]:
+        rezdy_booking = new_rezdy_booking(booking, price_paid, request.session["custom_currency"])
+        if rezdy_booking.get("success", False):
+            booking.whats_included = rezdy_booking["booking"]["orderNumber"]
+            booking.save()
+        else:
+            raise Exception("Errors in calling rezdy booking API (post)")
 
     if not settings.DEVELOPMENT:
         try:
@@ -1376,6 +1410,7 @@ def experience_booking_successful(request, user_id=None, booking_id=None, guest_
     experience.title = experience.get_information(settings.LANGUAGES[0][0]).title
 
     return render(request,template,{'experience': experience,
+                                    'host': experience.get_host(),
                                     'price_paid':price_paid,
                                     'guest_number':guest_number,
                                     'booking_datetime':booking_datetime,
@@ -1424,8 +1459,7 @@ def experience_booking_confirmation(request):
         subtotal_price = round(subtotal_price*(1.00+COMMISSION_PERCENT),0)
 
         item_options = None
-        if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0 \
-            and hasattr(experience, "partner") and experience.partner == PARTNER_IDS["experienceoz"]:
+        if 'partner_product_information' in form.data and len(form.data['partner_product_information'])>0:
             item_options = set_option_items(form.data['partner_product_information'], experience)
 
         local_timezone = pytz.timezone(experience.get_timezone())
@@ -1483,18 +1517,19 @@ def experience_booking_confirmation(request):
                     request.user.registereduser.phone_number = form.cleaned_data['phone_number']
                     request.user.registereduser.save()
 
+                total_price = form.cleaned_data['price_paid'] if form.cleaned_data['price_paid'] != -1.0 else total_price
                 if form.cleaned_data['status'] == 'accepted':
                     return experience_booking_successful(request, user.id,
                                                          form.cleaned_data['booking_id'],
                                                          int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
-                                                         form.cleaned_data['price_paid'], True)
+                                                         total_price, True)
                 else:
                     return experience_booking_successful(request, user.id,
                                                          form.cleaned_data['booking_id'],
                                                          int(form.data['adult_number'])+int(form.data['child_number']),
                                                          datetime.strptime(form.data['date'] + " " + form.data['time'], "%Y-%m-%d %H:%M"),
-                                                         form.cleaned_data['price_paid'])
+                                                         total_price)
 
             else:
                 return render_to_response('experiences/experience_booking_confirmation.html', {'form': form,
@@ -3481,8 +3516,8 @@ def custom_itinerary(request, id=None, operation=None):
                     ci.id = new_id
                 ci.user = request.user
                 ci.title = form.cleaned_data['title']
-                ci.start_datetime = form.cleaned_data['start_datetime']
-                ci.end_datetime = form.cleaned_data['end_datetime']
+                ci.start_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['start_datetime'])
+                ci.end_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['end_datetime'])
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
                 ci.cities = form.cleaned_data['cities_string']
                 if "ready" in request.POST:
@@ -3654,11 +3689,11 @@ def itinerary_detail(request,id=None,preview=None):
         if ci.start_datetime:
             start_datetime = all_bookings[0].datetime.astimezone(pytz.timezone(ci_timezone))
         else:
-            start_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+            raise Exception("Incomplete custom itinerary (start datetime): " + str(ci.id))
         if ci.cities:
             end_datetime = start_datetime + timedelta(days=(len(list(filter(None, ci.cities.split(','))))-1))
         else:
-            end_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+            raise Exception("Incomplete custom itinerary (cities): " + str(ci.id))
 
         itinerary = {"title":ci.title, "days":{}, "status":ci.status}
         for item in all_bookings:
@@ -3707,6 +3742,26 @@ def itinerary_detail(request,id=None,preview=None):
             start_date = start_datetime.strftime("%d/%m/%Y")
             end_date = end_datetime.strftime("%d/%m/%Y")
             discount_deadline = discount_deadline.strftime("%d/%m/%Y")
+
+        #add skyscanner flight urls
+        city_last = ""
+        cities = ci.cities.split(",")
+        context["flights"] = {}
+        for counter, city in enumerate(cities):
+            if len(city) > 0 and len(city_last) > 0 and city != city_last:
+                kwargs = {"language":"zh-CN",
+                         "origin": getattr(CityCode, city_last),
+                         "destination": getattr(CityCode, city),
+                         "outbound": (start_datetime + timedelta(days=counter)).strftime("%Y-%m-%d"),
+                         "inbound": "",
+                         "cabinclass": "Economy",
+                         "adults": guest_number[1],
+                         "children": guest_number[2],
+                         "infants": 0,
+                         "currency": "CNY",
+                         "new": "true"}
+                context["flights"][kwargs["outbound"]] = {"url":skyscanner_flight.format(**kwargs)}
+            city_last = city
 
         return render_to_response('experiences/itinerary_detail.html',
                                   {'itinerary':itinerary, "itinerary_id":ci.id,
@@ -3871,14 +3926,16 @@ def itinerary_tool(request, id=None):
     context = RequestContext(request)
     if request.method == 'POST':
         data = request.POST
+        title = data.get('title')
         itinerary = json.loads(data.get('dates'))
+        bookings = json.loads(data.get('bookings'))['bookings']
+        start_date = data.get('start_date')
+        guests = data.get('guests')
+        profit = data.get('profit')
         ci = CustomItinerary.objects.get(id=id)
         if ci.status.lower() == "paid":
             # cannot edit a paid itinerary
             return HttpResponseRedirect(GEO_POSTFIX + "itinerary/" + str(ci.id) + "/")
-        guest_number = ci.get_guest_number()[0]
-        adult_number = ci.get_guest_number()[1]
-        children_number = ci.get_guest_number()[2]
         for booking in ci.booking_set.all():
             booking.delete()
         for date, fields in itinerary.items():
@@ -3889,17 +3946,32 @@ def itinerary_tool(request, id=None):
                         #save the custom itinerary as draft
                         local_timezone = pytz.timezone(experience.get_timezone())
                         bk_date = local_timezone.localize(datetime.strptime(str(date), "%Y-%m-%d"))
-
-                        booking = Booking(user = request.user, experience= experience, guest_number = guest_number, adult_number = adult_number, total_price = (experience.price * guest_number), children_number = children_number,
+                        guest_number = [booking['guests'] for booking in bookings if booking['id'] == item['id']]
+                        price = [booking['price'] for booking in bookings if booking['id'] == item['id']]
+                        if not guest_number:
+                            guest_number = 1
+                        else:
+                            guest_number = int(guest_number[0])
+                        if not price:
+                            price = experience.price
+                        else:
+                            price = int(price[0])
+                        booking = Booking(user = request.user, experience = experience, guest_number = guest_number, total_price = (price * guest_number),
                                         datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                         booking.save()
         ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
+        ci.title = title
+        ci.guests = guests
+        ci.profit = profit
+        ci.start_datetime = pytz.timezone("UTC").localize(datetime.strptime(start_date, "%Y-%m-%d"))
         ci.save()
-        return HttpResponse(json.dumps({'success':True}), content_type="application/json")
+        return HttpResponse(json.dumps({'success': 'OK'}), content_type="application/json")
     else:
-        bookings = list(CustomItinerary.objects.get(id=id).booking_set.order_by('datetime').all()) 
+        ci = CustomItinerary.objects.get(id=id)
+        bookings = list(ci.booking_set.order_by('datetime').all()) 
         itinerary = {}
+        items = []
         for booking in bookings:
             title = booking.experience.get_information(settings.LANGUAGES[0][0]).title
             type = booking.experience.type.lower()
@@ -3914,20 +3986,31 @@ def itinerary_tool(request, id=None):
                 itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}})
 
             itinerary[key][type]['items'].append({'id': booking.experience.id, 'title': title})
-        
+            items.append({'id': booking.experience.id, 'title': title, 'price': int(booking.total_price/booking.guest_number), 'guests': booking.guest_number}) 
         context['itinerary'] = json.dumps(itinerary)
         context['itinerary_id'] = id
+        context['bookings'] = items
+        if ci.guests is 'None':
+            context['guests'] = 1
+        else:
+            context['guests'] = ci.guests
+        if ci.profit is None:
+            context['profit'] = 15
+        else:
+            context['profit'] = ci.profit
+        context['title'] = ci.title
+        context['start_date'] = ci.start_datetime.strftime('%Y-%m-%d')
         return render_to_response('experiences/itinerary_tool.html', {}, context)
 
 def campaign(request):
     set_initial_currency(request)
     # NOTE: in the future, we should define these topics globally
-    family = AbstractExperience.objects.filter(id__in=[2611,2561,2581])
-    romance = AbstractExperience.objects.filter(id__in=[3031,2411,2341])
-    culture = AbstractExperience.objects.filter(id__in=[2871,991,2171])
-    outdoor = AbstractExperience.objects.filter(id__in=[2141,2371,2241])
-    extreme = AbstractExperience.objects.filter(id__in=[862,2441,2481])
-    photography = AbstractExperience.objects.filter(id__in=[872,2921,1111])
+    family = AbstractExperience.objects.filter(id__in=[464,2041,26580013,44940013,60230013,33070013,44560013,51790013,87840013,69,408,2551,2671,1571,2561,21580013,31630013,31650013,70550013,76380013,56490013,87350013,1611,20910013,40440013,72360013,70950013,70970013,75690013,84090013,5170013,41390013,58900013,83950013,56280013,56260013,56290013,64060013,63690013,64780013,64770013,64760013,64740013,69540013,75360013,75920013,75900013,85970013,10320013,12200013,58480013,67140013,67120013,67110013,2371,45990013,64040013,64310013,64180013,65340013,56380013,64300013,44110013,75770013,84620013,73960013,81420013,68710013])
+    romance = AbstractExperience.objects.filter(id__in=[25730013,25720013,25710013,43650013,43660013,52230013,60430013,40770013,40750013,40740013,40700013,88030013,302,71,28680013,55270013,58330013,70570013,76380013,19940013,20770013,20780013,20810013,20850013,24730013,58760013,58660013,62840013,84100013,58750013,89110013,89100013,41400013,54680013,58910013,62200013,82660013,82670013,62630013,87830013,87870013,73050013,83650013,83670013,83340013,84340013,89060013,39860013,44110013,62260013,63980013,63970013,34600013,34590013,62340013,73630013,83290013,83790013,77420013,83110013,38000013,75180013,65080013,73970013,81350013,81400013,81440013,81410013,84120013,56150013])
+    culture = AbstractExperience.objects.filter(id__in=[68690013,52490013,52480013,52500013,64160013,72460013,1981,2021,2,54,106,1591,1971,24460013,88880013,23250013,24180013,55260013,73610013,81360013,45490013,45450013,68970013,32,37,19980013,45030013,52470013,58630013,62850013,48380013,52070013,52120013,55790013,12200013,12210013,67130013,80330013,12180013,12220013,12230013,7420013,65370013,65350013,83660013,82090013,77330013,32550013,40510013,67760013,42410013,81390013,81380013,69140013])
+    outdoor = AbstractExperience.objects.filter(id__in=[69530013,75120013,26680013,51780013,51770013,70180013,70190013,70200013,33140013,33110013,44570013,44950013,83100013,87980013,87920013,88020013,88000013,41170013,87210013,209,981,1581,2571,2581,2591,2421,42590013,34220013,73940013,78130013,87340013,87320013,87360013,2351,1651,56350013,60340013,62640013,62860013,73270013,73490013,88560013,80740013,83980013,83970013,18380013,32110013,32150013,67380013,75530013,830013,25100013,41360013,41370013,45090013,45110013,46820013,56270013,61480013,66610013,5220013,45130013,53520013,64050013,64100013,78190013,84130013,84830013,84820013,10320013,58130013,58180013,58420013,58490013,58520013,58510013,80250013,10880013,29640013,58190013,58570013,64320013,64140013,64070013,65380013,64150013,73070013,83850013,35220013,44230013,59830013,63980013,65510013,73870013,74660013,82550013,82560013,33800013,33790013,61970013,83520013,83480013,40530013,56590013,56370013,85480013,68410013,68390013,68580013,38650013,32390013,69570013,66020013,66580013,69000013,56100013,78200013,78230013])
+    extreme = AbstractExperience.objects.filter(id__in=[85620013,85610013,85600013,45370013,45380013,45390013,79520013,81670013,84000013,87880013,88010013,852,2441,862,882,24140013,57140013,72180013,34350013,87250013,2291,2381,2411,17260013,70980013,78960013,81510013,84510013,1031,1641,700013,5380013,5390013,25560013,29210013,29220013,29280013,40120013,40130013,40140013,8980013,20250013,64020013,84550013,84570013,86510013,89460013,89450013,89440013,89430013,2081,9280013,10930013,11100013,29620013,29730013,58010013,58230013,80300013,58020013,80320013,10920013,11120013,10900013,10890013,53500013,58200013,77090013,86590013,51180013,51170013,48070013,48060013,62900013,65300013,69420013,69400013,72370013,83860013,58940013,74620013,74510013,74650013,77270013,77280013,77310013,78400013,87190013,80210013,80180013,37640013,43780013,43790013,81370013,89200013])
+    photography = AbstractExperience.objects.filter(id__in=[75160013,81800013,33000013,44920013,33020013,33080013,44960013,40810013,87990013,41180013,882,1581,1681,2421,2531,23290013,24140013,24180013,29400013,31630013,69170013,78130013,87340013,2351,2681,1651,20880013,20910013,40440013,73270013,72290013,83990013,58770013,87510013,87500013,1621,67400013,67390013,830013,25100013,29210013,29220013,40120013,40130013,40140013,41360013,41370013,41380013,41420013,5230013,64090013,68000013,82590013,84550013,9280013,29620013,29730013,58010013,80310013,37810013,58210013,65300013,48030013,48080013,48030013,82080013,16460013,44230013,37090013,38930013,77210013,77230013,83900013,40510013,69220013,69230013,85260013,42450013,42440013,42410013,73950013,32380013,32480013,32500013,32510013,41340013,43780013,43790013,68990013,56120013,78320013,81370013])
     topics = [family, romance, culture, outdoor, extreme, photography]
     for experienceList in topics:
         i=0
@@ -3973,7 +4056,7 @@ def campaign(request):
 
 def topic_family(request):
     set_initial_currency(request)
-    experienceList = AbstractExperience.objects.filter(id__in=[911,2041,464,69,408])
+    experienceList = AbstractExperience.objects.filter(id__in=[464,2041,26580013,44940013,60230013,33070013,44560013,51790013,87840013,69,408,2551,2671,1571,2561,21580013,31630013,31650013,70550013,76380013,56490013,87350013,1611,20910013,40440013,72360013,70950013,70970013,75690013,84090013,5170013,41390013,58900013,83950013,56280013,56260013,56290013,64060013,63690013,64780013,64770013,64760013,64740013,69540013,75360013,75920013,75900013,85970013,10320013,12200013,58480013,67140013,67120013,67110013,2371,45990013,64040013,64310013,64180013,65340013,56380013,64300013,44110013,75770013,84620013,73960013,81420013,68710013])
     i=0
     while i < len(experienceList):
         experience = experienceList[i]
@@ -4017,7 +4100,7 @@ def topic_family(request):
 
 def topic_romance(request):
     set_initial_currency(request)
-    experienceList = AbstractExperience.objects.filter(id__in=[209,302,911,921,71,852,862,1021])
+    experienceList = AbstractExperience.objects.filter(id__in=[25730013,25720013,25710013,43650013,43660013,52230013,60430013,40770013,40750013,40740013,40700013,88030013,302,71,28680013,55270013,58330013,70570013,76380013,19940013,20770013,20780013,20810013,20850013,24730013,58760013,58660013,62840013,84100013,58750013,89110013,89100013,41400013,54680013,58910013,62200013,82660013,82670013,62630013,87830013,87870013,73050013,83650013,83670013,83340013,84340013,89060013,39860013,44110013,62260013,63980013,63970013,34600013,34590013,62340013,73630013,83290013,83790013,77420013,83110013,38000013,75180013,65080013,73970013,81350013,81400013,81440013,81410013,84120013,56150013])
     i=0
     while i < len(experienceList):
         experience = experienceList[i]
@@ -4062,7 +4145,7 @@ def topic_romance(request):
 
 def topic_culture(request):
     set_initial_currency(request)
-    experienceList = AbstractExperience.objects.filter(id__in=[981,1591,911,921,54,106,2,32,37])
+    experienceList = AbstractExperience.objects.filter(id__in=[68690013,52490013,52480013,52500013,64160013,72460013,1981,2021,2,54,106,1591,1971,24460013,88880013,23250013,24180013,55260013,73610013,81360013,45490013,45450013,68970013,32,37,19980013,45030013,52470013,58630013,62850013,48380013,52070013,52120013,55790013,12200013,12210013,67130013,80330013,12180013,12220013,12230013,7420013,65370013,65350013,83660013,82090013,77330013,32550013,40510013,67760013,42410013,81390013,81380013,69140013])
     i=0
     while i < len(experienceList):
         experience = experienceList[i]
@@ -4106,7 +4189,7 @@ def topic_culture(request):
 
 def topic_outdoor(request):
     set_initial_currency(request)
-    experienceList = AbstractExperience.objects.filter(id__in=[1581,862,2291,2351,1641,882,2671,2551,2441,1971,2591,2571,2581,2371])
+    experienceList = AbstractExperience.objects.filter(id__in=[69530013,75120013,26680013,51780013,51770013,70180013,70190013,70200013,33140013,33110013,44570013,44950013,83100013,87980013,87920013,88020013,88000013,41170013,87210013,209,981,1581,2571,2581,2591,2421,42590013,34220013,73940013,78130013,87340013,87320013,87360013,2351,1651,56350013,60340013,62640013,62860013,73270013,73490013,88560013,80740013,83980013,83970013,18380013,32110013,32150013,67380013,75530013,830013,25100013,41360013,41370013,45090013,45110013,46820013,56270013,61480013,66610013,5220013,45130013,53520013,64050013,64100013,78190013,84130013,84830013,84820013,10320013,58130013,58180013,58420013,58490013,58520013,58510013,80250013,10880013,29640013,58190013,58570013,64320013,64140013,64070013,65380013,64150013,73070013,83850013,35220013,44230013,59830013,63980013,65510013,73870013,74660013,82550013,82560013,33800013,33790013,61970013,83520013,83480013,40530013,56590013,56370013,85480013,68410013,68390013,68580013,38650013,32390013,69570013,66020013,66580013,69000013,56100013,78200013,78230013])
     i=0
     while i < len(experienceList):
         experience = experienceList[i]
@@ -4150,7 +4233,7 @@ def topic_outdoor(request):
 
 def topic_extreme(request):
     set_initial_currency(request)
-    experienceList = AbstractExperience.objects.filter(id__in=[2441,1981,2021,852,2411,2381,2291,1031,2361,2081])
+    experienceList = AbstractExperience.objects.filter(id__in=[85620013,85610013,85600013,45370013,45380013,45390013,79520013,81670013,84000013,87880013,88010013,852,2441,862,882,24140013,57140013,72180013,34350013,87250013,2291,2381,2411,17260013,70980013,78960013,81510013,84510013,1031,1641,700013,5380013,5390013,25560013,29210013,29220013,29280013,40120013,40130013,40140013,8980013,20250013,64020013,84550013,84570013,86510013,89460013,89450013,89440013,89430013,2081,9280013,10930013,11100013,29620013,29730013,58010013,58230013,80300013,58020013,80320013,10920013,11120013,10900013,10890013,53500013,58200013,77090013,86590013,51180013,51170013,48070013,48060013,62900013,65300013,69420013,69400013,72370013,83860013,58940013,74620013,74510013,74650013,77270013,77280013,77310013,78400013,87190013,80210013,80180013,37640013,43780013,43790013,81370013,89200013])
     i=0
     while i < len(experienceList):
         experience = experienceList[i]
@@ -4194,7 +4277,7 @@ def topic_extreme(request):
 
 def topic_photography(request):
     set_initial_currency(request)
-    experienceList = AbstractExperience.objects.filter(id__in=[2081,2591,2531,2551,2561,2421,1681,1571,862,2681,2411,1651,1611,1621])
+    experienceList = AbstractExperience.objects.filter(id__in=[75160013,81800013,33000013,44920013,33020013,33080013,44960013,40810013,87990013,41180013,882,1581,1681,2421,2531,23290013,24140013,24180013,29400013,31630013,69170013,78130013,87340013,2351,2681,1651,20880013,20910013,40440013,73270013,72290013,83990013,58770013,87510013,87500013,1621,67400013,67390013,830013,25100013,29210013,29220013,40120013,40130013,40140013,41360013,41370013,41380013,41420013,5230013,64090013,68000013,82590013,84550013,9280013,29620013,29730013,58010013,80310013,37810013,58210013,65300013,48030013,48080013,48030013,82080013,16460013,44230013,37090013,38930013,77210013,77230013,83900013,40510013,69220013,69230013,85260013,42450013,42440013,42410013,73950013,32380013,32480013,32500013,32510013,41340013,43780013,43790013,68990013,56120013,78320013,81370013])
     i=0
     while i < len(experienceList):
         experience = experienceList[i]

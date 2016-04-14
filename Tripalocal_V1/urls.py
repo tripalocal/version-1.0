@@ -19,7 +19,7 @@ from django.contrib import admin
 from rest_framework.authtoken import views
 
 from app.decorators import superuser_required
-from custom_admin.views.main import BookingView, BookingArchiveView, ExperienceView, PaymentView, NewProductView, ItineraryView, PartnerProductView
+from custom_admin.views.main import BookingView, BookingArchiveView, ExperienceView, PaymentView, NewProductView, ItineraryView, ExperienceozProductView, RezdyProductView
 from django.conf.urls import *
 from django.views.i18n import javascript_catalog
 
@@ -94,7 +94,7 @@ urlpatterns = patterns('',
     url(r'^itinerary/request/$', 'experiences.views.custom_itinerary_request'),
     url(r'^itinerary/new/$', custom_itinerary, {'operation': 'new'}, name="custom_itinerary"),
     url(r'^itinerary/edit/(?P<id>\d+)/$', custom_itinerary, name='custom_itinerary'),
-    url(r'^itinerary/admin/(?P<id>\d+)/?$', 'experiences.views.itinerary_tool', name='itinerary_tool'),
+    url(r'^itinerary/host/(?P<id>\d+)/?$', 'experiences.views.itinerary_tool', name='itinerary_tool'),
     url(r'^itinerary/(?P<id>\d+)/$', itinerary_detail, name='itinerary_detail'),
     url(r'^itinerary/preview/(?P<id>\d+)/$', itinerary_detail,{'preview': 'true'}, name='itinerary_detail'),
     url(r'^service_search/$', 'experiences.resource.service_search', name='service_search'),
@@ -125,6 +125,7 @@ urlpatterns = patterns('',
     url(r'^update_files/$', 'experiences.resource.update_files'),
     url(r'^service_weather/$', 'experiences.resource.service_weather', name='service_wishlist'),
     url(r'^service_watermark/$', 'experiences.resource.service_watermark', name='service_watermark'),
+    url(r'^service_get_flight_price/$', 'experiences.resource.service_get_flight_price', name='service_get_flight_price'),
 
     url(r'^custom_admin/$', staff_member_required(ItineraryView.as_view()), name='custom_admin_index'),
     url(r'^custom_admin/booking$', staff_member_required(BookingView.as_view()), name='admin_booking'),
@@ -133,7 +134,8 @@ urlpatterns = patterns('',
     url(r'^custom_admin/payment/$', staff_member_required(PaymentView.as_view()), name='admin_payment'),
     url(r'^custom_admin/experience/$', staff_member_required(ExperienceView.as_view()), name='admin_experience'),
     url(r'^custom_admin/newproduct/$', staff_member_required(NewProductView.as_view()), name='admin_newproduct'),
-    url(r'^custom_admin/partnerproduct/$', staff_member_required(PartnerProductView.as_view()), name='admin_partnerproduct'),
+    url(r'^custom_admin/experienceozproduct/$', staff_member_required(ExperienceozProductView.as_view()), name='admin_experienceozproduct'),
+    url(r'^custom_admin/rezdyproduct/$', staff_member_required(RezdyProductView.as_view()), name='admin_rezdyproduct'),
     url(r'^custom_admin/itinerary/$', staff_member_required(ItineraryView.as_view()), name='admin_itinerary'),
     url(r'^multidaytrip/$','experiences.views.multi_day_trip'),
     url(r'^family/$','experiences.views.topic_family'),
@@ -153,8 +155,10 @@ urlpatterns = patterns('',
     url(r'^wechat_qr_payment_query/(?P<out_trade_no>.*)/$', 'experiences.views.wechat_qr_payment_query', name='wechat_qr_payment_query'),
     url(r'^import_experienceoz_products/$', 'import_from_partners.views.import_experienceoz_products', name='import_experienceoz_products'),
     url(r'^import_experienceoz_operators/$', 'import_from_partners.views.import_experienceoz_operators', name='import_experienceoz_operators'),
+    url(r'^import_rezdy_products/$', 'import_from_partners.views.import_rezdy_products', name='import_rezdy_products'),
     url(r'^qrcode/$', 'wechat.qrcode.qrcode', name='qrcode'),
     url(r'^wechatmsg/$', 'wechat.message.receive_message', name='wechatmsg'),
     url(r'^search_text/$', 'experiences.resource.service_search_text', name='search_text'),
+    url(r'^get_price/$', 'experiences.resource.service_get_price', name='get_price'),
     url(r'^robots.txt/$', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
 )

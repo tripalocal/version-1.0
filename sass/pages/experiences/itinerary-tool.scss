@@ -12,7 +12,14 @@
   '../../utils/placeholders';
 
 body {
-  padding-top: 50px;
+}
+
+#navbar {
+  display: none;
+}
+
+.footer {
+  display: none;
 }
 
 .side-banner {
@@ -23,21 +30,174 @@ body {
   display: none !important;
 }
 
-.container {
-  padding: 30px;
-  min-height: 100vh;
-  width: 90%;
+#root {
+  height: 100vh;
+  width: 100%;
+  padding: 0;
 }
 
 .btn-default {
-  background-color: $off-white;
-  color: $off-white;
+  background-color: transparent;
+  color: $medium-grey;
   &:hover {
-    background-color: $off-white;
-    color: $medium-grey;
+    background-color: transparent;
+    color: $dark-grey;
   }
 }
 
 .Select-control {
   background-color: $off-white !important;
 }
+
+
+.top-bar {
+  z-index: 2;
+  padding: 10px 30px;
+  margin: 0;
+  background-color: white;
+  width: 100vw;
+  border-bottom: 1px solid $light-grey;
+  img {
+    margin: 0 15px;
+  }
+  label {
+    margin: 0 30px;
+  }
+  .pull-right {
+    margin-top: 8.5px;
+  }
+}
+
+.main-section {
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+
+.main-row {
+  display: table-row;
+}
+
+.side-bar {
+  display: table-cell;
+  width: 400px;
+  background-color: $off-white;
+  border-left: 1px solid $light-grey;
+  td {
+    border: 0 !important;
+  }
+  table {
+    border-bottom: 0;
+  }
+
+  input {
+    width: 35px;
+    height: 30px;
+  }
+
+  .bottom-bar {
+    width: inherit;
+    th {
+      font-size: 12px;
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+    td {
+      font-size: 16px;
+      border-bottom: 0;
+      padding-top: 0;
+    }
+    .glyphicon {
+      color: $light-grey;
+      font-size: 14px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+  }
+}
+
+.center {
+  display: table-cell;
+  tr {
+    background-color: white;
+  }
+  .table-header {
+    height: 50px;
+    background-color: $off-white;
+  }
+  .selected {
+    background-color: rgb(230,244,244);
+  }
+}
+
+.table {
+  border-bottom: 1px solid $light-grey;
+}
+
+
+td {
+  vertical-align: middle !important;
+}
+
+th {
+  font-weight: normal !important;
+  vertical-align: middle !important;
+}
+
+.table-header {
+  height: 50px;
+  background-color: $off-white;
+}
+
+.date-field {
+  position: relative;
+  display: inline-block;
+}
+
+.date-cell {
+  background-color: $off-white;
+  border-right: 1px solid $light-grey;
+  width: 90px;
+}
+
+.badge {
+  background-color: $off-white;
+  border: 1px solid $light-grey;
+  color: $slate-grey;
+  padding: 5px 10px;
+  font-weight: normal;
+}
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  height: 70px;
+  width: 100%;
+  background-color: white;
+  border-top: 1px solid $light-grey;
+}
+
+.edit-row {
+  left: 0;
+  right: 400px;
+  width: auto;
+  .menu {
+    height: 100%;
+    text-align: center;
+  }
+  .btn {
+    width: 100px;
+    height: 100%;
+    margin: 0 15px;
+    border: 0;
+    img {
+      display: block;
+      margin: 0 auto;
+    }
+    &:hover {
+      background-color: white;
+      border: 0;
+    }
+  }
+}
+

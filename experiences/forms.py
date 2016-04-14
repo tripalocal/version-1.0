@@ -714,6 +714,8 @@ class BookingConfirmationForm(forms.Form):
                              coupon_extra_information = coupon_extra_information, coupon = coupon,
                              payment_phone_number = payment_phone_number, stripe_token = stripeToken, currency = currency,
                              purchase_id = purchase_id, note = note)
+                booking.whats_included = self.data['stripeToken'] #required by rezdy booking api; will be replaced by order id later
+                booking.save()
             elif 'UnionPay' in self.data or 'WeChat' in self.data:
                 if coupon:
                     st = "paid" if valid['valid'] and valid['new_price']==0.0 else 'requested'

@@ -1,6 +1,7 @@
 {% load mathfilters %}
 {% load i18n %}
 {% load staticfiles %}
+{% load experiences_filters %}
 
 <div class="booking-box">
   <div id="table_date" style="display:none;">
@@ -22,7 +23,7 @@
     {% endfor %}
 
     <div class="box-section" style="padding-top:0;position:relative;">
-      <div class="loading-calendar"><img src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
+      <div class="loading-calendar"><img id="icon_load_more" src="{% static 'experiences/img/loading.svg' %}" width="32px" height="32px" class="ajax-loader"/></div>
       <p style="display:inline; margin-right:10px;">{% trans "Date" %}</p>
       <div class="date-box">{{form.date}}</div>
       <span class="weather" id="weather">-- &deg;C <i class="wi wi-forecast-io-clear-day"></i></span>
@@ -47,9 +48,14 @@
               {{option.name}}
             </span>
             <select class="option-amount" option_id="{{option.original_id}}">
-              {% for i in "0123456789" %}
+              {% if option.type != "FIXED" %} 
+              {% for i in available_options.0.available_seat|numeric_forloop %}
               <option value="{{i}}">{{i}}</option>
               {% endfor %}
+              {% else %}
+              <option value="0">0</option>
+              <option value="1">1</option>
+              {% endif %}
             </select>
             <span class="option-price">
               {{experience.dollarsign}}{{option.price|floatformat:"0"}}

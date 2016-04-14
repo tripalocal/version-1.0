@@ -6,34 +6,67 @@
 {% block head %}
   <title>{% trans 'Itinerary tool' %}</title>
   <link href="{% static 'experiences/content/itinerary-tool.css' %}" rel="stylesheet"/>
+  <link href="{% static 'bootstrap3_datetime/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
   {% csrf_token %}
-  <div id="root" class="container"></div>
+  <div id="root"></div>
 {% endblock %}
 
 {% block scripts %}
   <script>
+    window.CITY_NAMES = {
+      'Melbourne': '墨尔本',
+      'Sydney': '悉尼',
+      'Brisbane': '布里斯班',
+      'Goldcoast': '黄金海岸',
+      'Adelaide': '阿德莱德',
+      'Hobart': '霍巴特',
+      'Darwin': '达尔文',
+      'Wellington': '惠灵顿',
+      'Auckland': '奥克兰'
+    }
     window.itineraryID = {{ itinerary_id }};
     window.initialState = {
       modal: {date: '', field: '', display: 'NONE'},
-      dates: {{ itinerary|safe }}
+      dates: {{ itinerary|safe }},
+      bookings: {{ bookings|safe }},
+      selected: '',
+      title: '{{ title }}',
+      guests: '{{ guests }}',
+      profit: {{ profit }} 
     }
-    window.submit = function(dates) { 
+    window.submit = function(title, dates, bookings, guests, profit) {
       $.ajax({
-        url: '/itinerary/admin/' + window.itineraryID.toString(),
+        url: '/itinerary/host/' + window.itineraryID.toString(),
         type: 'POST',
         data: {
           csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
-          dates: JSON.stringify(dates)
+          title: title,
+          dates: JSON.stringify(dates),
+          bookings: JSON.stringify({bookings: bookings}),
+          start_date: $("#start-date").val(),
+          guests: guests,
+          profit: profit
         }      
       }).done(function(response) {
-        console.log(response);
+        console.log('save itinerary:', response.success);
       }).fail(function(error) {
         console.log(error);
       });
     }
   </script>
   <script src="{% static 'experiences/scripts/itinerary-tool.min.js' %}"></script>
+  <script src="{% static 'bootstrap3_datetime/js/moment.min.js' %}"></script>
+  <script src="{% static 'bootstrap3_datetime/js/bootstrap-datetimepicker.min.js' %}"></script>
+  <script src="{% static 'bootstrap3_datetime/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+  <script>
+    $(document).ready(function() {
+      $("#start-date").datetimepicker({
+        format: 'YYYY-MM-DD', locale: 'zh-CN',
+        defaultDate: '{{ start_date }}'
+      });
+    });
+  </script>
 {% endblock %}

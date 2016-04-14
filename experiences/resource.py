@@ -1,4 +1,4 @@
-from experiences.models import *
+﻿from experiences.models import *
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -34,6 +34,12 @@ from experiences.constant import  *
 from experiences.telstra_sms_api import send_sms
 from experiences.utils import *
 from django.core.files.storage import default_storage as storage
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+from pyvirtualdisplay import Display
 
 if settings.LANGUAGE_CODE.lower() != "zh-cn":
     from allauth.socialaccount.providers.facebook.views import fb_complete_login
@@ -1538,6 +1544,18 @@ def service_search_text(request, format=None):
                     [
                         {'id":123, "title":"asdf"}
                     ],
+                "max_product_id":123,
+                "products":
+                    [
+                        {'id":123, "title":"asdf"}
+                    ],
+                "max_flight_id":123,
+                "flights":
+                    [
+                        {'id":123, "title":"asdf"}
+                    ],
+                ...
+                ...
                 "itineraries_last_updated":"2016-01-29 12:00:00",
                 "daily_itineraries":
                     [
@@ -1575,6 +1593,20 @@ def service_search_text(request, format=None):
             recent[title] = {}
             recent[title]["max_experience_id"] = 0
             recent[title]["experiences"] = []
+            recent[title]["max_product_id"] = 0
+            recent[title]["products"] = []
+            recent[title]["max_flight_id"] = 0
+            recent[title]["flights"] = []
+            recent[title]["max_transfer_id"] = 0
+            recent[title]["transfers"] = []
+            recent[title]["max_accommodation_id"] = 0
+            recent[title]["accommodations"] = []
+            recent[title]["max_restaurant_id"] = 0
+            recent[title]["restaurants"] = []
+            recent[title]["max_suggestion_id"] = 0
+            recent[title]["suggestions"] = []
+            recent[title]["max_price_id"] = 0
+            recent[title]["prices"] = []
             recent[title]["itineraries_last_updated"] = datetime(2000,1,1,0,0,0,0).strftime("%Y-%m-%d %H:%M:%S")
             recent[title]["daily_itineraries"] = []
 
@@ -1608,10 +1640,13 @@ def service_search_text(request, format=None):
         if category.lower() == "all":
             experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
                           list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id')) + \
-                          list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Flight','Transfer','Accommodation','Suggestion','Pricing','Restaurnat'], city=city).order_by('id'))
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Flight','Transfer','Accommodation','Suggestion','Pricing','Restaurant'], city=city).order_by('id'))
         elif category.lower() == "products" or category.lower() == "experiences":
             experiences = list(Experience.objects.filter(id__gt=max_experience_id, status='Listed', city=city).exclude(type='ITINERARY').order_by('id')) + \
-                          list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id'))
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, status='Listed', city=city).order_by('id')) + \
+                          list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Suggestion'], city=city).order_by('id'))
+        elif category.lower() == "transport":
+            experiences = list(NewProduct.objects.filter(id__gt=max_experience_id, type__in=['Flight','Transfer'], city=city).order_by('id'))
         else:
             category = category.split(",")
             experiences = list(Experience.objects.filter(id__gt=max_experience_id, type__in=category, city=city).order_by('id')) + \
@@ -1620,19 +1655,40 @@ def service_search_text(request, format=None):
         for experience in experiences:
             exp_title = experience.get_information(language).title
             if exp_title.lower().find(title) >= 0:
-                recent[title]["max_experience_id"] = experience.id
-                recent[title]["experiences"].append({"id":experience.id,"title":exp_title})
-                #recent_search("update",recent)
-                counter += 1
+                if type(experience) == Experience:
+                    recent[title]["max_experience_id"] = experience.id
+                    recent[title]["experiences"].append({"id":experience.id,"title":exp_title})
+                    #recent_search("update",recent)
+                    counter += 1
+                elif experience.type == ProductType.Private or experience.type == ProductType.Public:
+                    recent[title]["max_product_id"] = experience.id
+                    recent[title]["products"].append({"id":experience.id,"title":exp_title})
+                    #recent_search("update",recent)
+                    counter += 1
+                else:
+                    recent[title]["max_" + experience.type.lower() + "_id"] = experience.id
+                    recent[title][experience.type.lower() + "s"].append({"id":experience.id,"title":exp_title})
+                    #recent_search("update",recent)
+                    counter += 1
             if counter >= 3:
                 return Response(recent[title], status=status.HTTP_200_OK)
 
-        if len(recent[title]['experiences']) > 0 or len(recent[title]['daily_itineraries']) > 0:
-            return Response(recent[title], status=status.HTTP_200_OK)
-        else:
-            return Response({"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}, status=status.HTTP_200_OK)
+        return Response(recent[title], status=status.HTTP_200_OK)
     except Exception as err:
         #TODO
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@csrf_exempt
+def service_get_price(request, format=None):
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        items = data.get('items')
+        bookings = []
+        for item in items:
+            bookings.append({'id': item['id'], 'title': item['title'], 'guests': 0, 'price': int(AbstractExperience.objects.get(id=str(item['id'])).price)})
+        return HttpResponse(json.dumps({'bookings': bookings}), content_type="application/json")
+    except Exception as err:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -1650,3 +1706,49 @@ def service_watermark(request, format=None):
     except Exception as err:
         response = {"success":False}
     return HttpResponse(json.dumps(response),content_type="application/json")
+
+@api_view(['GET'])
+@csrf_exempt
+def service_get_flight_price(request, format=None):
+    try:
+        display = Display(visible=0, size=(1024, 768))
+        display.start()
+        #profile = FirefoxProfile("/home/ubuntu/.mozilla/firefox/fi5udj8w.default")
+        #driver = webdriver.Firefox(firefox_profile=profile)
+        driver = webdriver.Firefox()
+        data = request.query_params
+        kwargs = {"language":"zh-CN",
+                    "origin": data.get('originplace'),
+                    "destination": data.get('destinationplace'),
+                    "outbound": data.get('outbounddate'),
+                    "inbound": data.get('inbounddate'),
+                    "cabinclass": data.get('cabinclass'),
+                    "adults": data.get('adults'),
+                    "children": data.get('children'),
+                    "infants": data.get('infants'),
+                    "currency": data.get('currency'),
+                    "new": data.get('newWindow')}
+        url = skyscanner_flight.format(**kwargs)
+        driver.get(url)
+        WebDriverWait(driver, 35).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, "div.js-cheapest-price.num"),"元"))
+        #driver.find_element_by_css_selector("a.field-box.search-button.js-search-button").click()
+        cheapest = driver.find_element_by_css_selector("div.js-cheapest-price.num").get_attribute("innerHTML")
+        cheapest = ''.join(c for c in cheapest if c.isdigit())
+        driver.close()
+        display.stop()
+        return HttpResponse(json.dumps({'cheapest_price': cheapest}), content_type="application/json")
+    except Exception as e:
+        #try:
+        #    cheapest = driver.find_element_by_css_selector("div.js-cheapest-price.num").get_attribute("innerHTML")
+        #    cheapest = ''.join(c for c in cheapest if c.isdigit())
+        #    context["flights"][kwargs["outbound"]]["cheapest"] = cheapest
+        #except Exception as e:
+        try:
+            driver.close()
+        except NameError:
+            pass
+        try:
+            display.stop()
+        except NameError:
+            pass
+        return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -15,14 +15,14 @@ alicesprings: Australia/North
 grnt: Australia/North
 perth: Australia/Perth
 grwa: Australia/West
+canberra: Australia/Canberra
 christchurch: NZ
 queenstown: NZ
 auckland: NZ
 wellington: NZ
 
-#Australia/ACT
+#canberra: Australia/ACT
 #Australia/Broken_Hill
-#Australia/Canberra
 #Australia/Currie
 #Australia/Eucla
 #Australia/LHI

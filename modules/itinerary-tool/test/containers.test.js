@@ -26,11 +26,11 @@ describe('Containers', () => {
     })
     it('should not show modal if modal state is NONE', () => {
       const { output } = setupApp('NONE')
-      expect(output.props.children[2]).to.be.null
+      expect(output.props.children[3]).to.be.null
     })
     it('should show modal if modal state is not NONE', () => {
       const { output } = setupApp('NEW_ITEM')
-      expect(output.props.children[2]).to.not.be.null
+      expect(output.props.children[3]).to.not.be.null
     })
   })
 })

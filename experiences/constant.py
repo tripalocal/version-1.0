@@ -18,9 +18,38 @@ MESSAGE_NOTIFY = "Tripalocal: {sender_name}"
 
 REQUEST_REMIND_HOST = "Tripalocal: It's been 24 hours since {guest_name} reached out. Please confirm or decline the request as soon as possible."
 
+skyscanner_flight = "http://flight.tripalocal.com/{language}/flights#/result?originplace={origin}&destinationplace={destination}&outbounddate={outbound}&inbounddate={inbound}&cabinclass={cabinclass}&adults={adults}&children={children}&infants={infants}&currency={currency}&newWindow={new}"
+
 class ItineraryStatus():
     Deleted = "deleted"
     Draft = "draft"
     Ready = "ready"
     Paid = "paid"
     Allowed_Status = [Deleted, Draft, Ready, Paid]
+
+class ProductType():
+    Private = "PrivateProduct"
+    Public = "PublicProduct"
+    Flight = "Flight"
+    Transfer = "Transfer"
+    Accommodation = "Accommodation"
+    Restaurant = "Restaurant"
+    Suggestion = "Suggestion"
+    Price = "Price"
+
+class CityCode():
+    Melbourne = "MEL"
+    Sydney = "SYD"
+    Brisbane = "BNE"
+    Goldcoast = "OOL"
+    Cairns = "CNS"
+    Adelaide = "ADL"
+    Canberra = "CBR"
+    Perth = "PER"
+    Darwin = "DRW"
+    Hobart = "HBA"
+    Alicesprings = "ASP"
+    Queenstown = "ZQN"
+    Auckland = "AKL"
+    Christchurch= "CHC"
+    Wellington = "WLG"

@@ -57,12 +57,29 @@ def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, 
     '''
     return total price, not including commission or service fee
     either use guest_number, or adult_number + child_number, the latter has a higher priority
-    extra_information: for experienceoz products, it indicates which optionitem is chosen, e.g., {"1243":1, "2344":2}
+    extra_information: for partner products, it indicates which optionitem is chosen, e.g., {"1243":1, "2344":2}
     '''
     if extra_information:
         price = 0
         i = 0
         items = json.loads(extra_information)
+        extras = []
+        for k, v in items.items():
+            try:
+                int(k)
+            except ValueError as e:
+                #"Extras" for rezdy product
+                og = experience.optiongroup_set.filter(type="Extras", language="en")[0]
+                oi = og.optionitem_set.filter(name = k)[0]
+                if oi.price_type.upper() != "FIXED":
+                    price += oi.price * v
+                else:
+                    price += oi.price
+                extras.append(k)
+
+        for k in extras:
+            items.pop(k, None)
+
         language = settings.LANGUAGES[0][0] if language is None else language
         for og in experience.optiongroup_set.filter(language=language):
             for oi in og.optionitem_set.all():
@@ -147,7 +164,15 @@ def static_vars(**kwargs):
         return func
     return decorate
 
-@static_vars(dict={"Melbourne":{"max_experience_id":0,"experiences":[],"itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}})
+@static_vars(dict={"Melbourne":{"max_experience_id":0,"experiences":[],\
+    "max_product_id":0,"products":[],\
+    "max_flight_id":0,"flights":[],\
+    "max_transfer_id":0,"transfers":[],\
+    "max_accommodation_id":0,"accommodations":[],\
+    "max_restaurant_id":0,"restaurants":[],\
+    "max_suggestion_id":0,"suggestions":[],\
+    "max_price_id":0,"prices":[],\
+    "itineraries_last_updated":"2000-01-01 00:00:00","daily_itineraries":[]}})
 def recent_search(action, new_search=None):
     '''
     action: get, update, clear
@@ -156,15 +181,15 @@ def recent_search(action, new_search=None):
     if action is not None:
         if action.lower()=="get":
             return recent_search.dict
-        elif action.lower()=="update" and new_search is not None:
-            for k, v in new_search.items():
-                if k not in recent_search.dict:
-                    recent_search.dict[k] = deepcopy(v)
-                else:
-                    for experience in v['experiences']:
-                        if recent_search.dict[k]['max_id'] < experience['id']:
-                            recent_search.dict[k]['experiences'].append(experience)
-                    recent_search.dict[k]['max_id'] = v['max_id']
+        #elif action.lower()=="update" and new_search is not None:
+        #    for k, v in new_search.items():
+        #        if k not in recent_search.dict:
+        #            recent_search.dict[k] = deepcopy(v)
+        #        else:
+        #            for experience in v['experiences']:
+        #                if recent_search.dict[k]['max_id'] < experience['id']:
+        #                    recent_search.dict[k]['experiences'].append(experience)
+        #            recent_search.dict[k]['max_id'] = v['max_id']
         elif action.lower()=="clear":
             recent_search.dict.clear()
 

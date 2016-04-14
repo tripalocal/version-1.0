@@ -307,7 +307,11 @@
         }
 
         var handler = StripeCheckout.configure({
+                            {% if experience.partner == "002" %}
+                            key: 'pk_live_u97uquryvV6hj2FnTPj3p5r6',
+                            {% else %}
                             key: 'pk_live_62VE04d61Te70oh7IB7dqfjm',
+                            {% endif %}
                             image: '{% static 'img/tripalocal_logo_stripe.jpg'%}',
                             locale: '{{LANGUAGE}}',
                             token: function(token) {

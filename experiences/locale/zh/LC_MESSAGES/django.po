@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-07 11:12+1100\n"
+"POT-Creation-Date: 2016-04-06 14:15+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: experiences/templates/experiences/custom_itinerary.html:179
 #: experiences/templates/experiences/custom_itinerary_left_section.html:31
 #: experiences/templates/experiences/custom_itinerary_left_section.html:80
-#: experiences/templates/experiences/experience_detail.html:255
+#: experiences/templates/experiences/experience_detail.html:257
 #: experiences/templates/experiences/experience_results.html:45
 #: experiences/templates/experiences/topic_culture.html:43
 #: experiences/templates/experiences/topic_extreme.html:43
@@ -291,7 +291,7 @@ msgstr "预定次数"
 
 #: experiences/forms.py:834
 #: experiences/templates/experiences/topic_outdoor.html:13
-#: experiences/views.py:4008
+#: experiences/views.py:4025
 msgid "Outdoor"
 msgstr "户外运动"
 
@@ -336,15 +336,15 @@ msgid "mobile"
 msgstr "移动电话"
 
 #: experiences/forms.py:899 experiences/forms.py:1297 experiences/forms.py:1301
-#: experiences/resource.py:1387 experiences/views.py:2115
-#: experiences/views.py:2123 experiences/views.py:2127
+#: experiences/resource.py:1391 experiences/views.py:2101
+#: experiences/views.py:2109 experiences/views.py:2113
+#: experiences/views.py:2364 experiences/views.py:2369
 #: experiences/views.py:2378 experiences/views.py:2383
-#: experiences/views.py:2392 experiences/views.py:2397
 #, python-format
 msgid "%s"
 msgstr ""
 
-#: experiences/forms.py:1167 experiences/views.py:4361
+#: experiences/forms.py:1167 experiences/views.py:4378
 msgid "[Tripalocal] Your booking request has been sent"
 msgstr "【本土客】 您的预约已经发送"
 
@@ -359,11 +359,11 @@ msgstr " 预约了您的体验"
 #: experiences/forms.py:1184 experiences/forms.py:1198
 #: experiences/forms.py:1218 experiences/forms.py:1230
 #: experiences/forms.py:1242 experiences/forms.py:1266
-#: experiences/resource.py:262 experiences/resource.py:286
-#: experiences/resource.py:298 experiences/resource.py:310
-#: experiences/views.py:2182 experiences/views.py:2198
-#: experiences/views.py:2210 experiences/views.py:2237
-#: experiences/views.py:2335 experiences/views.py:2346
+#: experiences/resource.py:266 experiences/resource.py:290
+#: experiences/resource.py:302 experiences/resource.py:314
+#: experiences/views.py:2168 experiences/views.py:2184
+#: experiences/views.py:2196 experiences/views.py:2223
+#: experiences/views.py:2321 experiences/views.py:2332
 msgid "Tripalocal <"
 msgstr "本土客 <"
 
@@ -372,33 +372,33 @@ msgid "[Tripalocal] Your booking request is sent to the host"
 msgstr "【本土客】 您的预约已经发送"
 
 #: experiences/forms.py:1217 experiences/forms.py:1265
-#: experiences/resource.py:261 experiences/resource.py:285
-#: experiences/views.py:2181 experiences/views.py:2236
+#: experiences/resource.py:265 experiences/resource.py:289
+#: experiences/views.py:2167 experiences/views.py:2222
 msgid "[Tripalocal] Booking confirmed"
 msgstr "【本土客】 预订确认"
 
 #: experiences/forms.py:1229 experiences/forms.py:1241
-#: experiences/resource.py:297 experiences/resource.py:309
-#: experiences/views.py:2197 experiences/views.py:2209
+#: experiences/resource.py:301 experiences/resource.py:313
+#: experiences/views.py:2183 experiences/views.py:2195
 msgid "[Tripalocal] Booking reminder"
 msgstr "【本土客】 预订提醒"
 
-#: experiences/forms.py:1253 experiences/resource.py:273
-#: experiences/views.py:2224
+#: experiences/forms.py:1253 experiences/resource.py:277
+#: experiences/views.py:2210
 msgid "[Tripalocal] How was your experience?"
 msgstr "【本土客】 您对我们的体验还满意吗？"
 
-#: experiences/forms.py:1287 experiences/views.py:2176
-#: experiences/views.py:2330
+#: experiences/forms.py:1287 experiences/views.py:2162
+#: experiences/views.py:2316
 msgid "%H:%M %d %b %Y"
 msgstr "%Y{0}%m{1}%d{2}%H:%M"
 
-#: experiences/resource.py:213
+#: experiences/resource.py:217
 msgid "[Tripalocal] Successfully registered"
 msgstr "【本土客】 注册成功"
 
 #: experiences/templates/experiences/1111.html:26
-#: experiences/templates/experiences/experience_detail.html:233
+#: experiences/templates/experiences/experience_detail.html:235
 #: experiences/templates/experiences/experience_results.html:25
 #: experiences/templates/experiences/topic_culture.html:24
 #: experiences/templates/experiences/topic_extreme.html:24
@@ -422,7 +422,7 @@ msgstr "%(currency)s/人起"
 
 #: experiences/templates/experiences/1111.html:44
 #: experiences/templates/experiences/experience_description.html:19
-#: experiences/templates/experiences/experience_detail.html:254
+#: experiences/templates/experiences/experience_detail.html:256
 #: experiences/templates/experiences/experience_results.html:44
 #: experiences/templates/experiences/product_description.html:8
 #: experiences/templates/experiences/topic_culture.html:42
@@ -438,7 +438,7 @@ msgstr "小时"
 #: experiences/templates/experiences/experience_booking_box.html:33
 #: experiences/templates/experiences/experience_booking_box.html:35
 #: experiences/templates/experiences/experience_description.html:19
-#: experiences/templates/experiences/experience_detail.html:254
+#: experiences/templates/experiences/experience_detail.html:256
 #: experiences/templates/experiences/experience_results.html:44
 #: experiences/templates/experiences/product_description.html:8
 #: experiences/templates/experiences/topic_culture.html:42
@@ -450,19 +450,19 @@ msgstr "小时"
 msgid "days"
 msgstr "天"
 
-#: experiences/templates/experiences/api_booking_box.html:26
+#: experiences/templates/experiences/api_booking_box.html:27
 #: experiences/templates/experiences/experience_booking_box.html:62
 #: experiences/templates/experiences/product_booking_box.html:35
 #: experiences/templates/experiences/search_result.html:45
 msgid "Date"
 msgstr "日期"
 
-#: experiences/templates/experiences/api_booking_box.html:63
-#: experiences/templates/experiences/experience_detail.html:943
+#: experiences/templates/experiences/api_booking_box.html:64
+#: experiences/templates/experiences/experience_detail.html:947
 msgid "Please select date and ticket type"
 msgstr "请选择日期和门票"
 
-#: experiences/templates/experiences/api_booking_box.html:65
+#: experiences/templates/experiences/api_booking_box.html:66
 msgid "Please contact customer support via wechat QR code and quote ID "
 msgstr "48小时内预定需要2次确认，请扫码联系微信客服告知体验号码："
 
@@ -488,7 +488,7 @@ msgid "Tips"
 msgstr "贴心提示"
 
 #: experiences/templates/experiences/api_description.html:69
-#: experiences/templates/experiences/custom_itinerary_request.html:98
+#: experiences/templates/experiences/custom_itinerary_request.html:99
 #: experiences/templates/experiences/product_description.html:70
 msgid "What's included"
 msgstr "票价包括"
@@ -578,7 +578,7 @@ msgid " Day"
 msgstr "天"
 
 #: experiences/templates/experiences/custom_itinerary.html:109
-#: experiences/templates/experiences/custom_itinerary.html:1250
+#: experiences/templates/experiences/custom_itinerary.html:1264
 #: experiences/templates/experiences/custom_itinerary_left_section.html:191
 #: experiences/templates/experiences/custom_itinerary_left_section.html:282
 #: experiences/templates/experiences/custom_itinerary_left_section.html:373
@@ -597,7 +597,7 @@ msgstr "添加"
 #: experiences/templates/experiences/custom_itinerary_left_section.html:563
 #: experiences/templates/experiences/custom_itinerary_left_section.html:644
 #: experiences/templates/experiences/experience_detail.html:86
-#: experiences/templates/experiences/search_result.html:450
+#: experiences/templates/experiences/search_result.html:449
 msgid "Cancel"
 msgstr "取消"
 
@@ -634,8 +634,8 @@ msgid "hr(s)"
 msgstr "小时"
 
 #: experiences/templates/experiences/custom_itinerary.html:182
-#: experiences/templates/experiences/custom_itinerary.html:956
-#: experiences/templates/experiences/custom_itinerary.html:1085
+#: experiences/templates/experiences/custom_itinerary.html:961
+#: experiences/templates/experiences/custom_itinerary.html:1090
 #: experiences/templates/experiences/custom_itinerary_left_section.html:118
 #: experiences/templates/experiences/custom_itinerary_left_section.html:211
 #: experiences/templates/experiences/custom_itinerary_left_section.html:302
@@ -646,8 +646,8 @@ msgid "Edit"
 msgstr "修改"
 
 #: experiences/templates/experiences/custom_itinerary.html:184
-#: experiences/templates/experiences/custom_itinerary.html:958
-#: experiences/templates/experiences/custom_itinerary.html:1087
+#: experiences/templates/experiences/custom_itinerary.html:963
+#: experiences/templates/experiences/custom_itinerary.html:1092
 #: experiences/templates/experiences/custom_itinerary_left_section.html:120
 #: experiences/templates/experiences/custom_itinerary_left_section.html:213
 #: experiences/templates/experiences/custom_itinerary_left_section.html:304
@@ -658,8 +658,8 @@ msgid "Duplicate"
 msgstr "复制"
 
 #: experiences/templates/experiences/custom_itinerary.html:186
-#: experiences/templates/experiences/custom_itinerary.html:960
-#: experiences/templates/experiences/custom_itinerary.html:1089
+#: experiences/templates/experiences/custom_itinerary.html:965
+#: experiences/templates/experiences/custom_itinerary.html:1094
 #: experiences/templates/experiences/custom_itinerary_left_section.html:122
 #: experiences/templates/experiences/custom_itinerary_left_section.html:215
 #: experiences/templates/experiences/custom_itinerary_left_section.html:306
@@ -679,8 +679,8 @@ msgid "per person"
 msgstr "每人"
 
 #: experiences/templates/experiences/custom_itinerary.html:238
-#: experiences/templates/experiences/custom_itinerary.html:1012
-#: experiences/templates/experiences/custom_itinerary.html:1140
+#: experiences/templates/experiences/custom_itinerary.html:1017
+#: experiences/templates/experiences/custom_itinerary.html:1145
 #: experiences/templates/experiences/custom_itinerary_left_section.html:137
 #: experiences/templates/experiences/custom_itinerary_left_section.html:228
 #: experiences/templates/experiences/custom_itinerary_left_section.html:319
@@ -691,8 +691,8 @@ msgid "base"
 msgstr "底价"
 
 #: experiences/templates/experiences/custom_itinerary.html:245
-#: experiences/templates/experiences/custom_itinerary.html:1019
-#: experiences/templates/experiences/custom_itinerary.html:1147
+#: experiences/templates/experiences/custom_itinerary.html:1024
+#: experiences/templates/experiences/custom_itinerary.html:1152
 #: experiences/templates/experiences/custom_itinerary_left_section.html:144
 #: experiences/templates/experiences/custom_itinerary_left_section.html:235
 #: experiences/templates/experiences/custom_itinerary_left_section.html:326
@@ -716,17 +716,17 @@ msgstr "刷新"
 msgid "Delete Location"
 msgstr "删除该目的地"
 
-#: experiences/templates/experiences/custom_itinerary.html:919
-#: experiences/templates/experiences/custom_itinerary.html:1216
+#: experiences/templates/experiences/custom_itinerary.html:924
+#: experiences/templates/experiences/custom_itinerary.html:1230
 msgid "Image size exceeds the limit (2M)"
 msgstr "图片大小超过上限(2M)"
 
-#: experiences/templates/experiences/custom_itinerary.html:924
-#: experiences/templates/experiences/custom_itinerary.html:1221
+#: experiences/templates/experiences/custom_itinerary.html:929
+#: experiences/templates/experiences/custom_itinerary.html:1235
 msgid "Invalid image type"
 msgstr "不支持的图片类型"
 
-#: experiences/templates/experiences/custom_itinerary.html:1186
+#: experiences/templates/experiences/custom_itinerary.html:1191
 msgid "Save"
 msgstr "保存"
 
@@ -790,193 +790,197 @@ msgid "Choose some locations you would like to visit on this trip."
 msgstr "目前我们可以服务澳洲，新西兰。请填写您要去的城市。"
 
 #: experiences/templates/experiences/custom_itinerary_request.html:43
-#: experiences/templates/experiences/custom_itinerary_request.html:52
-#: experiences/templates/experiences/custom_itinerary_request.html:71
-#: experiences/templates/experiences/custom_itinerary_request.html:92
-#: experiences/templates/experiences/custom_itinerary_request.html:133
-#: experiences/templates/experiences/custom_itinerary_request.html:141
-#: experiences/templates/experiences/custom_itinerary_request.html:166
+msgid "Hamilton Island"
+msgstr "哈密尔顿岛"
+
+#: experiences/templates/experiences/custom_itinerary_request.html:44
+#: experiences/templates/experiences/custom_itinerary_request.html:53
+#: experiences/templates/experiences/custom_itinerary_request.html:72
+#: experiences/templates/experiences/custom_itinerary_request.html:93
+#: experiences/templates/experiences/custom_itinerary_request.html:134
+#: experiences/templates/experiences/custom_itinerary_request.html:142
+#: experiences/templates/experiences/custom_itinerary_request.html:167
 msgid "Next"
 msgstr "下一步"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:49
+#: experiences/templates/experiences/custom_itinerary_request.html:50
 msgid "Select the start and end dates of your trip"
 msgstr "请选择您行程的开始和结束日期"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:50
+#: experiences/templates/experiences/custom_itinerary_request.html:51
 msgid "Start Date"
 msgstr "开始日期"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:51
+#: experiences/templates/experiences/custom_itinerary_request.html:52
 msgid "End Date"
 msgstr "结束日期"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:58
+#: experiences/templates/experiences/custom_itinerary_request.html:59
 msgid "How many adults will be travelling?<br>Any children or infants?"
 msgstr "本次旅行共多少人？有儿童吗？"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:60
+#: experiences/templates/experiences/custom_itinerary_request.html:61
 msgid "Adults"
 msgstr "成人"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:64
+#: experiences/templates/experiences/custom_itinerary_request.html:65
 msgid "Children (2-12)"
 msgstr "儿童（2-12周岁）"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:68
+#: experiences/templates/experiences/custom_itinerary_request.html:69
 msgid "Infants (< 2)"
 msgstr "婴儿（小于2周岁）"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:77
+#: experiences/templates/experiences/custom_itinerary_request.html:78
 msgid ""
 "What kind of things are you interested in?<br>Check the topics that interest "
 "you."
 msgstr "您对什么感兴趣呢？请选择感兴趣的主题。"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:78
+#: experiences/templates/experiences/custom_itinerary_request.html:79
 msgid "food & wine"
 msgstr "美食美酒"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:79
+#: experiences/templates/experiences/custom_itinerary_request.html:80
 msgid "photography"
 msgstr "风光摄影"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:80
+#: experiences/templates/experiences/custom_itinerary_request.html:81
 msgid "history & culture"
 msgstr "历史人文"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:81
+#: experiences/templates/experiences/custom_itinerary_request.html:82
 msgid "architecture"
 msgstr "经典建筑"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:82
+#: experiences/templates/experiences/custom_itinerary_request.html:83
 msgid "for couples"
 msgstr "蜜月旅拍"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:83
+#: experiences/templates/experiences/custom_itinerary_request.html:84
 msgid "outdoor & nature"
 msgstr "户外探险"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:84
+#: experiences/templates/experiences/custom_itinerary_request.html:85
 msgid "shopping"
 msgstr "购物扫货"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:85
+#: experiences/templates/experiences/custom_itinerary_request.html:86
 msgid "sports & leisure"
 msgstr "运动休闲"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:86
+#: experiences/templates/experiences/custom_itinerary_request.html:87
 msgid "extreme fun"
 msgstr "刺激享乐"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:87
+#: experiences/templates/experiences/custom_itinerary_request.html:88
 msgid "events"
 msgstr "赛事庆典"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:88
+#: experiences/templates/experiences/custom_itinerary_request.html:89
 msgid "health & beauty"
 msgstr "美容保健"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:89
+#: experiences/templates/experiences/custom_itinerary_request.html:90
 msgid "livability research"
 msgstr "移民考察"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:90
+#: experiences/templates/experiences/custom_itinerary_request.html:91
 msgid "education"
 msgstr "名校游学"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:91
+#: experiences/templates/experiences/custom_itinerary_request.html:92
 msgid "local experiences"
 msgstr "特色体验"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:98
+#: experiences/templates/experiences/custom_itinerary_request.html:99
 msgid "Please fill in more fields for a live update."
 msgstr "估计费用：请填写更多信息"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:100
+#: experiences/templates/experiences/custom_itinerary_request.html:101
 msgid "Car + Driver"
 msgstr "私人车导"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:102
-#: experiences/templates/experiences/custom_itinerary_request.html:110
-#: experiences/templates/experiences/custom_itinerary_request.html:118
-#: experiences/templates/experiences/custom_itinerary_request.html:130
+#: experiences/templates/experiences/custom_itinerary_request.html:103
+#: experiences/templates/experiences/custom_itinerary_request.html:111
+#: experiences/templates/experiences/custom_itinerary_request.html:119
+#: experiences/templates/experiences/custom_itinerary_request.html:131
 msgid "none"
 msgstr "不需要"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:103
+#: experiences/templates/experiences/custom_itinerary_request.html:104
 msgid "infrequent"
 msgstr "小部分"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:104
+#: experiences/templates/experiences/custom_itinerary_request.html:105
 msgid "frequent"
 msgstr "大部分"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:105
+#: experiences/templates/experiences/custom_itinerary_request.html:106
 msgid "entire trip"
 msgstr "全程"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:108
+#: experiences/templates/experiences/custom_itinerary_request.html:109
 msgid "Accommodation"
 msgstr "住宿"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:111
+#: experiences/templates/experiences/custom_itinerary_request.html:112
 msgid "3 star"
 msgstr "3星级"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:112
+#: experiences/templates/experiences/custom_itinerary_request.html:113
 msgid "4 star"
 msgstr "4星级"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:113
+#: experiences/templates/experiences/custom_itinerary_request.html:114
 msgid "5 star"
 msgstr "5星级"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:116
+#: experiences/templates/experiences/custom_itinerary_request.html:117
 msgid "National Flight"
 msgstr "境内机票"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:119
+#: experiences/templates/experiences/custom_itinerary_request.html:120
 msgid "economy"
 msgstr "经济舱"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:122
+#: experiences/templates/experiences/custom_itinerary_request.html:123
 msgid "Service Language"
 msgstr "语言"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:124
+#: experiences/templates/experiences/custom_itinerary_request.html:125
 msgid "chinese"
 msgstr "中文"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:125
+#: experiences/templates/experiences/custom_itinerary_request.html:126
 msgid "english"
 msgstr "英文"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:128
+#: experiences/templates/experiences/custom_itinerary_request.html:129
 msgid "Airport Transfer"
 msgstr "接送机"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:131
+#: experiences/templates/experiences/custom_itinerary_request.html:132
 msgid "yes"
 msgstr "是"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:139
+#: experiences/templates/experiences/custom_itinerary_request.html:140
 msgid "Anything else you would like to let us know?"
 msgstr "您还有什么其他要求吗？"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:147
+#: experiences/templates/experiences/custom_itinerary_request.html:148
 msgid "Almost done!<br>Please leave us your contact details below."
 msgstr "请留下您的联系方式。"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:172
+#: experiences/templates/experiences/custom_itinerary_request.html:173
 msgid "Make sure you've filled in all the "
 msgstr "请填写所有"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:172
+#: experiences/templates/experiences/custom_itinerary_request.html:173
 msgid "sections"
 msgstr "项目"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:173
+#: experiences/templates/experiences/custom_itinerary_request.html:174
 msgid ""
 "A travel consultant will call you within 4 hours and an itinerary will be "
 "sent to you within 48 hours. We will call you between 9am - 9pm Beijing "
@@ -985,54 +989,54 @@ msgstr ""
 "请留下你的信息以便联系。我们的行程定制顾问会在收到您信息的4小时内电话联系您，"
 "进一步沟通定制需求，电话联系您的时间为北京时间早9点至晚9点。"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:174
+#: experiences/templates/experiences/custom_itinerary_request.html:175
 #: experiences/templates/experiences/review_experience.html:85
 msgid "Submit"
 msgstr "提交"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:267
+#: experiences/templates/experiences/custom_itinerary_request.html:268
 msgid "Start"
 msgstr "开始日期"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:267
+#: experiences/templates/experiences/custom_itinerary_request.html:268
 msgid "Destinations"
 msgstr "目的地"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:267
+#: experiences/templates/experiences/custom_itinerary_request.html:268
 msgid "Dates"
 msgstr "日期"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:267
+#: experiences/templates/experiences/custom_itinerary_request.html:268
 #: experiences/templates/experiences/product_booking_box.html:43
 msgid "Guests"
 msgstr "人数"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:267
+#: experiences/templates/experiences/custom_itinerary_request.html:268
 #: experiences/templates/experiences/search_result.html:97
 msgid "Interests"
 msgstr "兴趣"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:267
+#: experiences/templates/experiences/custom_itinerary_request.html:268
 msgid "Whats Included"
 msgstr "票价包括"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:267
+#: experiences/templates/experiences/custom_itinerary_request.html:268
 msgid "Extras"
 msgstr "额外"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:267
+#: experiences/templates/experiences/custom_itinerary_request.html:268
 msgid "Contact"
 msgstr "联系"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:267
+#: experiences/templates/experiences/custom_itinerary_request.html:268
 msgid "Done!"
 msgstr "完成"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:361
+#: experiences/templates/experiences/custom_itinerary_request.html:362
 msgid "Your request has been submitted!"
 msgstr "谢谢咨询！"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:361
+#: experiences/templates/experiences/custom_itinerary_request.html:362
 msgid ""
 "Please keep an eye on our phone call within 4 hours. We will call you "
 "between 9am - 9pm Beijing time."
@@ -1040,34 +1044,34 @@ msgstr ""
 "请在4小时内注意你的手机。我们在墨尔本总部的电话联系时间为北京时间早9点至晚9"
 "点。"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:367
+#: experiences/templates/experiences/custom_itinerary_request.html:368
 msgid "There was an error with sending your request"
 msgstr "发送你的要求时出现一个错误"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:368
-#: experiences/templates/experiences/experience_detail.html:566
-#: experiences/templates/experiences/experience_detail.html:612
-#: experiences/templates/experiences/experience_detail.html:679
-#: experiences/templates/experiences/experience_detail.html:892
-#: experiences/templates/experiences/experience_detail.html:1041
+#: experiences/templates/experiences/custom_itinerary_request.html:369
+#: experiences/templates/experiences/experience_detail.html:568
+#: experiences/templates/experiences/experience_detail.html:614
+#: experiences/templates/experiences/experience_detail.html:681
+#: experiences/templates/experiences/experience_detail.html:896
+#: experiences/templates/experiences/experience_detail.html:1045
 msgid "Please try again later"
 msgstr "请稍后再试"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:554
+#: experiences/templates/experiences/custom_itinerary_request.html:555
 msgid "Our custom itinerary service starts from $1000"
 msgstr "低于私人定制服务最低消费－私人定制服务从¥5000元走起"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:560
+#: experiences/templates/experiences/custom_itinerary_request.html:561
 msgid "Starts from $"
 msgstr "¥"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:560
-#: experiences/templates/experiences/experience_detail.html:233
+#: experiences/templates/experiences/custom_itinerary_request.html:561
+#: experiences/templates/experiences/experience_detail.html:235
 #: experiences/templates/experiences/experience_results.html:25
 msgid "/person"
 msgstr "/人起"
 
-#: experiences/templates/experiences/custom_itinerary_request.html:573
+#: experiences/templates/experiences/custom_itinerary_request.html:574
 msgid "Add 2 extra people for only $"
 msgstr "加两个人 ¥"
 
@@ -1362,19 +1366,19 @@ msgid "Time"
 msgstr "时间"
 
 #: experiences/templates/experiences/experience_booking_box.html:75
-#: experiences/templates/experiences/experience_detail.html:945
+#: experiences/templates/experiences/experience_detail.html:949
 #: experiences/templates/experiences/product_booking_box.html:56
 msgid "Request"
 msgstr "预订"
 
 #: experiences/templates/experiences/experience_booking_box.html:88
-#: experiences/templates/experiences/experience_detail.html:1031
+#: experiences/templates/experiences/experience_detail.html:1035
 #: experiences/templates/experiences/product_booking_box.html:83
 msgid "Save to Wishlist"
 msgstr "保存至兴趣列表"
 
 #: experiences/templates/experiences/experience_booking_box.html:93
-#: experiences/templates/experiences/experience_detail.html:1022
+#: experiences/templates/experiences/experience_detail.html:1026
 #: experiences/templates/experiences/product_booking_box.html:88
 msgid "Saved to Wishlist"
 msgstr "已保存至兴趣列表"
@@ -1665,62 +1669,62 @@ msgstr "密码"
 msgid "Continue"
 msgstr "继续"
 
-#: experiences/templates/experiences/experience_detail.html:109
+#: experiences/templates/experiences/experience_detail.html:111
 msgid "About the host,"
 msgstr "介绍 —— "
 
-#: experiences/templates/experiences/experience_detail.html:118
+#: experiences/templates/experiences/experience_detail.html:120
 msgid "More"
 msgstr "展开"
 
-#: experiences/templates/experiences/experience_detail.html:124
+#: experiences/templates/experiences/experience_detail.html:126
 msgid "Trust"
 msgstr "验证"
 
-#: experiences/templates/experiences/experience_detail.html:129
-#: experiences/templates/experiences/experience_detail.html:143
+#: experiences/templates/experiences/experience_detail.html:131
+#: experiences/templates/experiences/experience_detail.html:145
 msgid "Verified"
 msgstr "已验证"
 
-#: experiences/templates/experiences/experience_detail.html:135
+#: experiences/templates/experiences/experience_detail.html:137
 msgid "Reviews"
 msgstr "评论数"
 
-#: experiences/templates/experiences/experience_detail.html:142
+#: experiences/templates/experiences/experience_detail.html:144
 msgid "Phone"
 msgstr "电话"
 
-#: experiences/templates/experiences/experience_detail.html:154
+#: experiences/templates/experiences/experience_detail.html:156
 msgid " Review(s)"
 msgstr "条评论"
 
-#: experiences/templates/experiences/experience_detail.html:213
+#: experiences/templates/experiences/experience_detail.html:215
 msgid "People also booked"
 msgstr "您还可能对这些体验感兴趣"
 
-#: experiences/templates/experiences/experience_detail.html:221
+#: experiences/templates/experiences/experience_detail.html:223
 msgid "Travel with Locals"
 msgstr "旅游达人"
 
-#: experiences/templates/experiences/experience_detail.html:226
+#: experiences/templates/experiences/experience_detail.html:228
 msgid "Local Experiences"
 msgstr "特色体验"
 
-#: experiences/templates/experiences/experience_detail.html:265
+#: experiences/templates/experiences/experience_detail.html:267
 msgid "Itineraries"
 msgstr "精品路线"
 
-#: experiences/templates/experiences/experience_detail.html:269
+#: experiences/templates/experiences/experience_detail.html:271
 #: experiences/templates/experiences/multi_day_trip.html:80
 msgid "10 Day Trip"
 msgstr "10日私人精品游"
 
-#: experiences/templates/experiences/experience_detail.html:270
+#: experiences/templates/experiences/experience_detail.html:272
 #: experiences/templates/experiences/multi_day_trip.html:81
 msgid "Melbourne + Sydney + Gold Coast"
 msgstr "墨尔本 + 悉尼 + 黄金海岸"
 
-#: experiences/templates/experiences/experience_detail.html:274
+#: experiences/templates/experiences/experience_detail.html:276
 #: experiences/templates/experiences/multi_day_trip.html:36
 #: experiences/templates/experiences/multi_day_trip.html:47
 #: experiences/templates/experiences/multi_day_trip.html:65
@@ -1728,8 +1732,8 @@ msgstr "墨尔本 + 悉尼 + 黄金海岸"
 msgid "Include 1 night accommodation"
 msgstr "包括1晚住宿"
 
-#: experiences/templates/experiences/experience_detail.html:276
-#: experiences/templates/experiences/experience_detail.html:281
+#: experiences/templates/experiences/experience_detail.html:278
+#: experiences/templates/experiences/experience_detail.html:283
 #: experiences/templates/experiences/multi_day_trip.html:67
 #: experiences/templates/experiences/multi_day_trip.html:72
 #: experiences/templates/experiences/multi_day_trip.html:85
@@ -1737,47 +1741,47 @@ msgstr "包括1晚住宿"
 msgid "View details"
 msgstr "查看路线"
 
-#: experiences/templates/experiences/experience_detail.html:279
+#: experiences/templates/experiences/experience_detail.html:281
 #: experiences/templates/experiences/multi_day_trip.html:70
 #: experiences/templates/experiences/multi_day_trip.html:88
 msgid "Includes all accommodation"
 msgstr "包括全部住宿"
 
-#: experiences/templates/experiences/experience_detail.html:296
+#: experiences/templates/experiences/experience_detail.html:298
 msgid "The experience has expired, or has not been approved."
 msgstr "该体验已结束，或仍在审核中。"
 
-#: experiences/templates/experiences/experience_detail.html:510
+#: experiences/templates/experiences/experience_detail.html:512
 msgid "Please select coordinate, time and guest number"
 msgstr "请选择坐标，时间和人数"
 
-#: experiences/templates/experiences/experience_detail.html:608
+#: experiences/templates/experiences/experience_detail.html:610
 msgid "Please try a different email address."
 msgstr "请更换一个邮箱"
 
-#: experiences/templates/experiences/experience_detail.html:660
-#: experiences/templates/experiences/experience_detail.html:1018
+#: experiences/templates/experiences/experience_detail.html:662
+#: experiences/templates/experiences/experience_detail.html:1022
 msgid "The experience has been added to your wishlist"
 msgstr "该体验已成功加入您的兴趣列表"
 
-#: experiences/templates/experiences/experience_detail.html:667
-#: experiences/templates/experiences/experience_detail.html:1027
+#: experiences/templates/experiences/experience_detail.html:669
+#: experiences/templates/experiences/experience_detail.html:1031
 msgid "The experience has been removed from your wishlist"
 msgstr "该体验已成功从您的兴趣列表中移除"
 
-#: experiences/templates/experiences/experience_detail.html:945
+#: experiences/templates/experiences/experience_detail.html:949
 msgid "total price of "
 msgstr "总价格为"
 
-#: experiences/templates/experiences/experience_detail.html:1032
+#: experiences/templates/experiences/experience_detail.html:1036
 msgid "Save now, plan later"
 msgstr ""
 
-#: experiences/templates/experiences/experience_detail.html:1052
+#: experiences/templates/experiences/experience_detail.html:1056
 msgid "- Less"
 msgstr "收起"
 
-#: experiences/templates/experiences/experience_detail.html:1060
+#: experiences/templates/experiences/experience_detail.html:1064
 msgid "+ More"
 msgstr "展开"
 
@@ -2100,7 +2104,7 @@ msgid "edit"
 msgstr "修改"
 
 #: experiences/templates/experiences/search_result.html:114
-#: experiences/templates/experiences/search_result.html:456
+#: experiences/templates/experiences/search_result.html:455
 msgid "More Filters"
 msgstr "更多选项"
 
@@ -2108,7 +2112,7 @@ msgstr "更多选项"
 msgid "Apply Filters"
 msgstr "更新"
 
-#: experiences/templates/experiences/search_result.html:227
+#: experiences/templates/experiences/search_result.html:226
 msgid "Discover "
 msgstr "探索"
 
@@ -2117,7 +2121,7 @@ msgid "Tripalocal | Local Culture"
 msgstr "本土客 风土人情"
 
 #: experiences/templates/experiences/topic_culture.html:13
-#: experiences/views.py:4008
+#: experiences/views.py:4025
 msgid "Local Culture"
 msgstr "风土人情"
 
@@ -2126,7 +2130,7 @@ msgid "Tripalocal | Extreme Experiences"
 msgstr "【本土客】 刺激体验"
 
 #: experiences/templates/experiences/topic_extreme.html:13
-#: experiences/views.py:4008
+#: experiences/views.py:4025
 msgid "Extreme Experiences"
 msgstr "刺激体验"
 
@@ -2135,7 +2139,7 @@ msgid "Tripalocal | Bring the Kids"
 msgstr "【本土客】 亲子游"
 
 #: experiences/templates/experiences/topic_family.html:13
-#: experiences/views.py:4008
+#: experiences/views.py:4025
 msgid "Bring the Kids"
 msgstr "亲子游"
 
@@ -2148,7 +2152,7 @@ msgid "Tripalocal | Photography Worthy"
 msgstr "本土客 | 风光摄影"
 
 #: experiences/templates/experiences/topic_photography.html:13
-#: experiences/views.py:4008
+#: experiences/views.py:4025
 msgid "Photography Worthy"
 msgstr "风光摄影"
 
@@ -2157,7 +2161,7 @@ msgid "Tripalocal | Honeymoon"
 msgstr "本土客 蜜月游"
 
 #: experiences/templates/experiences/topic_romance.html:13
-#: experiences/views.py:4008
+#: experiences/views.py:4025
 msgid "Honeymoon"
 msgstr "蜜月游"
 
@@ -2210,45 +2214,45 @@ msgid ""
 "image in WeChat"
 msgstr "如果你不在微信浏览器，请储存以上二维图片在微信中长按"
 
-#: experiences/views.py:1672 experiences/views.py:2002
-#: experiences/views.py:2024 experiences/views.py:2706
-#: experiences/views.py:3381 experiences/views.py:3449
+#: experiences/views.py:1658 experiences/views.py:1988
+#: experiences/views.py:2010 experiences/views.py:2692
+#: experiences/views.py:3305 experiences/views.py:3373
 msgid "Image size exceeds the limit"
 msgstr "图片大小超过上限"
 
-#: experiences/views.py:1674 experiences/views.py:2004
-#: experiences/views.py:2026 experiences/views.py:3383
-#: experiences/views.py:3451
+#: experiences/views.py:1660 experiences/views.py:1990
+#: experiences/views.py:2012 experiences/views.py:3307
+#: experiences/views.py:3375
 msgid "File type is not supported"
 msgstr "不支持的文件类型"
 
-#: experiences/views.py:1943
+#: experiences/views.py:1929
 msgid "Experience with the same Id already exists"
 msgstr "该Id已分配给其他体验"
 
-#: experiences/views.py:2334
+#: experiences/views.py:2320
 msgid "[Tripalocal] Your experience is cancelled"
 msgstr "【本土客】 您预订的体验已经取消"
 
-#: experiences/views.py:2345
+#: experiences/views.py:2331
 msgid "[Tripalocal] Cancellation confirmed"
 msgstr "【本土客】 确认取消"
 
-#: experiences/views.py:2924
+#: experiences/views.py:2910
 msgid "Kids Friendly"
 msgstr "亲子夏令营"
 
-#: experiences/views.py:2926
+#: experiences/views.py:2912
 msgid "Host with Car"
 msgstr "领路人自驾"
 
-#: experiences/views.py:2928
+#: experiences/views.py:2914
 msgid "Private group"
 msgstr "私人团"
 
-#: experiences/views.py:3765 experiences/views.py:3779
-#: experiences/views.py:3797 experiences/views.py:3798
-#: experiences/views.py:3799
+#: experiences/views.py:3689 experiences/views.py:3703
+#: experiences/views.py:3721 experiences/views.py:3722
+#: experiences/views.py:3723
 msgid "%d %b %Y"
 msgstr "%Y{0}%m{1}%d{2}"
 

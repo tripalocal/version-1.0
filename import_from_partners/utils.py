@@ -1,12 +1,16 @@
 import json, os, collections, requests, pytz, base64, sys, string, http.client
 from datetime import *
 from experiences.models import OptionGroup, OptionItem, NewProduct
+from experiences.utils import convert_currency, get_total_price, experience_fee_calculator
 from xml.etree import ElementTree
 
-PARTNER_IDS = {"experienceoz":"001"}
+PARTNER_IDS = {"experienceoz":"001", "rezdy":"002"}
 USERNAME = "tripalocalapi"
 PASSWORD = "c8EAZbRULywU4PnW"
 service_action = "https://tripalocal.experienceoz.com.au/d/services/API"#"https://www.tmtest.com.au/d/services/API"#
+
+rezdy_api = "https://api.rezdy.com/latest/"#"https://api-test.rezdy.com/latest/"#
+rezdy_api_key = "97acaed307f441a5a1599a6ecdebffa3"#"29ea28ed92ef45cc9026a566c15c78b3"#
 
 SOAP_REQUEST_AVAILABILITY = \
 ''' <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -135,7 +139,7 @@ def get_experienceoz_availability(product_id, start_date, experience, available_
             if status == 'Available':
                 dict = {'available_seat': experience.guest_number_max,
                             'date_string': d.strftime("%d/%m/%Y"),
-                            'time_string': "00:00",
+                            'time_string': "09:00",
                             #'datetime': d,
                             'instant_booking': False}
                 available_options.append(dict)
@@ -252,3 +256,100 @@ def experienceoz_receipt(booking):
         return {"success":True, "link":link.text}
     else:
         return {"success":False}
+
+def get_rezdy_availability(available_options, available_date, product_code, start_time_local, end_time_local, limit=100, offset=0):
+    url_template = rezdy_api + \
+                   "availability?productCode={product_code}&startTimeLocal={start_time_local}" + \
+                   "&endTimeLocal={end_time_local}&limit={limit}&offset={offset}&apiKey=" + \
+                   rezdy_api_key
+    kwargs = {
+        'product_code': product_code,
+        'start_time_local': start_time_local,
+        'end_time_local': end_time_local,
+        'limit': limit,
+        'offset': offset,
+    }
+    url = url_template.format(**kwargs)
+    response = requests.get(url)
+    if response.status_code == 200 and response.reason == "OK":
+        sessions = json.loads(response.text)
+        for session in sessions['sessions']:
+            start = datetime.strptime(session['startTimeLocal'], "%Y-%m-%d %H:%M:%S")
+            end = datetime.strptime(session['endTimeLocal'], "%Y-%m-%d %H:%M:%S")
+            for i in range((end-start).days+1):
+                d = start + timedelta(days=i)
+                dict = {'available_seat': session['seatsAvailable'],
+                        'date_string': d.strftime("%d/%m/%Y"),
+                        'time_string': d.strftime("%H:%M"),
+                        #'datetime': d,
+                        'instant_booking': False}
+                available_options.append(dict)
+                new_date = ((d.strftime("%d/%m/%Y"), d.strftime("%d/%m/%Y")),)
+                available_date += new_date
+    return available_date
+
+def new_rezdy_booking(booking, price, currency):
+    experience = booking.experience
+    customer = booking.user
+    if currency.upper() != experience.currency:
+        converted = convert_currency(price, currency, experience.currency)
+        minimum = experience_fee_calculator(get_total_price(experience, extra_information = booking.partner_product), experience.commission)
+        price = converted if converted > minimum else minimum
+        currency = experience.currency
+
+    submitted_date_string = booking.submitted_datetime.astimezone(pytz.timezone(experience.get_timezone())).strftime("%Y-%m-%d %H:%M:%S")
+    booking_date_string = booking.datetime.astimezone(pytz.timezone(experience.get_timezone())).strftime("%Y-%m-%d %H:%M:%S")
+    options = json.loads(booking.partner_product)
+
+    quantities = []
+    extras = []
+    for k, v in options.items():
+        try:
+            int(k)
+            oi = OptionItem.objects.get(original_id=k)
+            oi_dict = {"optionId": oi.original_id,
+                       "optionLabel": oi.name,
+                       #"optionPrice": oi.price,
+                       "value": v,
+                       }
+            quantities.append(oi_dict);
+        except ValueError as e:
+            og = experience.optiongroup_set.filter(type="Extras", language="en")[0]
+            oi = OptionItem.objects.filter(group_id = og.id, name = k)[0]
+            extra_dict = {"name":oi.name,
+                          #"price": oi.price,
+                          "quantity": v}
+            extras.append(extra_dict)
+
+    product = {"productName": experience.get_information("en").title,
+               "productCode": experience.original_id,
+               "startTimeLocal": booking_date_string,
+               #"endTimeLocal": ,
+               "quantities": quantities,
+               "amount": price,
+               }
+    if len(extras):
+           product["extras"] = extras
+
+    data = {#"resellerId": "",
+            #"resellerName":"Tripalocal",
+            "customer": 
+            {
+                "firstName": customer.first_name,
+                "lastName": customer.last_name,
+                "email": customer.email,
+            },
+            "items": [product],
+            #"commission": experience.commission,
+            "creditCard":
+            {
+                "cardToken": booking.whats_included,
+            },
+            "sendNotifications": "false",
+            }
+    response = requests.post(url=rezdy_api + "bookings?apiKey=" + rezdy_api_key, json = data)
+    if response.status_code == 200 and response.reason == "OK" and json.loads(response.text)["requestStatus"]["success"]:
+        bking = json.loads(response.text).get("booking")
+        return {"success":True, "booking": bking}
+
+    return {"success":False}
