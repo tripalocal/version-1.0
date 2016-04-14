@@ -79,7 +79,10 @@ def convert_experience_price(request, experience):
 
     if hasattr(experience, "optiongroup_set") and len(experience.optiongroup_set.all()) > 0:
         optiongroup_set = []
-        for option in experience.optiongroup_set.filter(language=settings.LANGUAGES[0][0]):
+        exp_optiongroup_set = experience.optiongroup_set.filter(language=settings.LANGUAGES[0][0])
+        if len(exp_optiongroup_set) == 0:
+            exp_optiongroup_set = experience.optiongroup_set.all()
+        for option in exp_optiongroup_set:
             og = {"name":option.name, "optionitem_set":[]}
             for item in option.optionitem_set.all():
                 if hasattr(request, 'session') and 'custom_currency' in request.session and request.session['custom_currency'].lower() != "aud":
@@ -1012,6 +1015,9 @@ class ExperienceDetailView(DetailView):
                         if experience.partner == PARTNER_IDS["experienceoz"]:
                             #experience loads 7 days per time
                             now = max_date + timedelta(days=1)
+                            #performance tradeoff: when the first day is Monday/Tuesday, most of the time it's fine to call the api one time less
+                            if view_date.weekday() < 2:
+                                view_date = view_date - timedelta(days=7)
                             while now < view_date:
                                 now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
                                 now_string = now_string[:-2] + ":" + now_string[-2:]
