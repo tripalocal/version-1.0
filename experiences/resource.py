@@ -1710,6 +1710,9 @@ def service_watermark(request, format=None):
 @api_view(['GET'])
 @csrf_exempt
 def service_get_flight_price(request, format=None):
+    '''
+    http://tripalocal.com/service_get_flight_price/?language=zh-CN&originplace=MEL&destinationplace=SYD&outbounddate=2016-07-01&inbounddate=&cabinclass=Economy&adults=1&children=0&infants=0&currency=CNY&newWindow=true
+    '''
     try:
         try:
             #for windows
