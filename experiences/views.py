@@ -1014,9 +1014,6 @@ class ExperienceDetailView(DetailView):
                         if experience.partner == PARTNER_IDS["experienceoz"]:
                             #experience loads 7 days per time
                             now = max_date + timedelta(days=1)
-                            #performance tradeoff: when the first day is Monday/Tuesday, most of the time it's fine to call the api one time less
-                            if view_date_original.weekday() < 2:
-                                view_date = view_date - timedelta(days=7)
                             while now < view_date:
                                 now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
                                 now_string = now_string[:-2] + ":" + now_string[-2:]
@@ -1141,7 +1138,7 @@ class ExperienceDetailView(DetailView):
                     now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
                     now_string = now_string[:-2] + ":" + now_string[-2:]
                     original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
-                    available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+                    available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date, True)
                     now = local_timezone.localize(datetime.strptime(available_options[-1]["date_string"] + available_options[-1]["time_string"],
                                                                                  "%d/%m/%Y%H:%M")) + timedelta(days=1)
             elif experience.partner == PARTNER_IDS["rezdy"]:

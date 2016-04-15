@@ -111,7 +111,7 @@ def convert_location(city):
                 'port-stephens':'GRNSW','wa-other':'GRWA','kaikoura':'Canterbury'}
     return locations.get(city, city)
 
-def get_experienceoz_availability(product_id, start_date, experience, available_options, available_date):
+def get_experienceoz_availability(product_id, start_date, experience, available_options, available_date, sync=False):
 
     form_kwargs = {
         'username': USERNAME,
@@ -155,14 +155,15 @@ def get_experienceoz_availability(product_id, start_date, experience, available_
                         oi_id = oi.get("id")
                         oi_name = oi[0].text
                         price = float(oi[1].text)
-                        try:
-                            existing_ois = OptionItem.objects.filter(original_id=oi.get("id"))
-                            for existing_oi in existing_ois:
-                                if existing_oi.price != price:
-                                    existing_oi.price = price
-                                    existing_oi.save()
-                        except OptionItem.DoesNotExist:
-                            pass
+                        if sync:
+                            try:
+                                existing_ois = OptionItem.objects.filter(original_id=oi.get("id"))
+                                for existing_oi in existing_ois:
+                                    if existing_oi.price != price:
+                                        existing_oi.price = price
+                                        existing_oi.save()
+                            except OptionItem.DoesNotExist:
+                                pass
     return available_date
 
 def experienceoz_makepurchase(first_name, last_name, number, email, country, postcode, product, booking_date, booking_extra_information, note=None):

@@ -873,7 +873,7 @@ $(function(){
                     type: 'POST',
                     url: "/experience/{{experience.id}}/",
                     dataType: 'json',
-                    timeout: 15000,
+                    timeout: 10000,
                     data: {
                         "csrfmiddlewaretoken": getCookie('csrftoken'),
                         "experience_id": {{experience.id}},
