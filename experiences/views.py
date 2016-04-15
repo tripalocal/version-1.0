@@ -1022,8 +1022,7 @@ class ExperienceDetailView(DetailView):
                                 now_string = now_string[:-2] + ":" + now_string[-2:]
                                 original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
                                 available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
-                                now = local_timezone.localize(datetime.strptime(available_options[-1]["date_string"] + available_options[-1]["time_string"],
-                                                                                 "%d/%m/%Y%H:%M")) + timedelta(days=1)
+                                now += timedelta(days=7)
                         elif experience.partner == PARTNER_IDS["rezdy"]:
                             #rezdy loads 100 sessions per time
                             now = max_date + timedelta(days=1)
@@ -1142,8 +1141,7 @@ class ExperienceDetailView(DetailView):
                     now_string = now_string[:-2] + ":" + now_string[-2:]
                     original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
                     available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date, True)
-                    now = local_timezone.localize(datetime.strptime(available_options[-1]["date_string"] + available_options[-1]["time_string"],
-                                                                                 "%d/%m/%Y%H:%M")) + timedelta(days=1)
+                    now += timedelta(days=7)
             elif experience.partner == PARTNER_IDS["rezdy"]:
                 #rezdy loads 100 sessions per time
                 now = local_timezone.localize(datetime.now()) + timedelta(days=1)
