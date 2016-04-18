@@ -1710,9 +1710,16 @@ def service_watermark(request, format=None):
 @api_view(['GET'])
 @csrf_exempt
 def service_get_flight_price(request, format=None):
+    '''
+    http://tripalocal.com/service_get_flight_price/?language=zh-CN&originplace=MEL&destinationplace=SYD&outbounddate=2016-07-01&inbounddate=&cabinclass=Economy&adults=1&children=0&infants=0&currency=CNY&newWindow=true
+    '''
     try:
-        display = Display(visible=0, size=(1024, 768))
-        display.start()
+        try:
+            #for windows
+            display = Display(visible=0, size=(1024, 768))
+            display.start()
+        except Exception as e:
+            pass
         #profile = FirefoxProfile("/home/ubuntu/.mozilla/firefox/fi5udj8w.default")
         #driver = webdriver.Firefox(firefox_profile=profile)
         driver = webdriver.Firefox()
@@ -1730,12 +1737,15 @@ def service_get_flight_price(request, format=None):
                     "new": data.get('newWindow')}
         url = skyscanner_flight.format(**kwargs)
         driver.get(url)
-        WebDriverWait(driver, 35).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, "div.js-cheapest-price.num"),"元"))
+        WebDriverWait(driver, 30).until(EC.text_to_be_present_in_element((By.CLASS_NAME, "js-cheapest-price"),"元"))
         #driver.find_element_by_css_selector("a.field-box.search-button.js-search-button").click()
-        cheapest = driver.find_element_by_css_selector("div.js-cheapest-price.num").get_attribute("innerHTML")
+        cheapest = driver.find_element_by_class_name("js-cheapest-price").get_attribute("innerHTML")
         cheapest = ''.join(c for c in cheapest if c.isdigit())
         driver.close()
-        display.stop()
+        try:
+            display.stop()
+        except NameError:
+            pass
         return HttpResponse(json.dumps({'cheapest_price': cheapest}), content_type="application/json")
     except Exception as e:
         #try:

@@ -91,17 +91,18 @@
     </div>
 
     <div class="container">
-        {% if not experience.partner or experience.partner|length == 0 %}
-            {% if experience.type == "PublicProduct" or experience.type == "PrivateProduct" %}
-                {% include "experiences/product_booking_box.html" %}
-                {% include "experiences/product_description.html" %}
-            {% elif experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' or experience.type == 'ITINERARY' %}
-                {% include "experiences/experience_booking_box.html" %}
-                {% include "experiences/experience_description.html" %}
-        {% endif %}
-        {% else %}
+        {% if experience.partner == "001"%} {# experienceoz #}
             {% include "experiences/api_booking_box.html" %}
             {% include "experiences/api_description.html" %}
+        {% elif experience.partner == "002"%} {# rezdy #}
+            {% include "experiences/api_booking_box.html" %}
+            {% include "experiences/product_description.html" %}
+        {% elif experience.type == "PublicProduct" or experience.type == "PrivateProduct" %} {# new product #}
+            {% include "experiences/product_booking_box.html" %}
+            {% include "experiences/product_description.html" %}
+        {% elif experience.type == 'PRIVATE' or experience.type == 'NONPRIVATE' or experience.type == 'ITINERARY' %} {# experience #}
+            {% include "experiences/experience_booking_box.html" %}
+            {% include "experiences/experience_description.html" %}
         {%endif%}
     </div>
 
@@ -872,11 +873,12 @@ $(function(){
                     type: 'POST',
                     url: "/experience/{{experience.id}}/",
                     dataType: 'json',
-                    timeout: 10000,
+                    timeout: 15000,
                     data: {
                         "csrfmiddlewaretoken": getCookie('csrftoken'),
                         "experience_id": {{experience.id}},
                         "max_date": max_date.toString("yyyy-MM-dd"),
+                        "view_date": vd.toString("yyyy-MM-dd"),
                         "load_more": "load_more",
                     },
                     success: function (data,status,xhr) {
@@ -924,6 +926,20 @@ $(function(){
                     },
                     error: function (e) {
                         $(".loading-calendar").hide();
+                        if($("#id_date").offset().top - $(window).scrollTop() > 300)
+                        {
+                            $("#icon_load_more").animate({
+                                'marginLeft' : "-=" + o_left, //moves left
+                                'marginTop' : "+=" + o_up //moves down
+                            }, 1);
+                        }
+                        else
+                        {
+                            $("#icon_load_more").animate({
+                                'marginLeft' : "-=" + o_left, //moves left
+                                'marginTop' : "-=" + o_up //moves up
+                            }, 1);
+                        }
                         alert('{%trans "Please try again later"%}');
                     }
                   })

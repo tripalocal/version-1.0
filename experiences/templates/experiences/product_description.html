@@ -15,7 +15,7 @@
         <h3>{% trans "Overview" %}</h3>
       </div>
       <div class="col-sm-9">
-          {{ experience.description|linebreaks }}
+          {{ experience.description|safe|linebreaks }}
       </div>
     </div>
 
@@ -25,7 +25,7 @@
         <h3>{% trans "Highlights" %}</h3>
       </div>
       <div class="col-sm-9" id="div_experience_highlights">
-          {{ experience.highlights|linebreaks }}
+          {{ experience.highlights|safe|linebreaks }}
       </div>
     </div>
     {% endif %}
@@ -36,7 +36,7 @@
         <h3>{% trans "Description" %}</h3>
       </div>
       <div class="col-sm-9">
-        {{ experience.service|linebreaks }}
+        {{ experience.service|safe|linebreaks }}
       </div>
     </div>
     {% endif %}
@@ -47,7 +47,7 @@
         <h3>{% trans "Schedule" %}</h3>
       </div>
       <div class="col-sm-9">
-        {{ experience.schedule|linebreaks }}
+        {{ experience.schedule|safe|linebreaks }}
       </div>
     </div>
     {% endif %}
@@ -58,8 +58,8 @@
         <h3>{% trans "Tips" %}</h3>
       </div>
       <div class="col-sm-9">
-          {{ experience.tips|linebreaks }}
-          {{ experience.notice|linebreaks }}
+          {{ experience.tips|safe|linebreaks }}
+          {{ experience.notice|safe|linebreaks }}
       </div>
     </div>
     {% endif %}
@@ -70,7 +70,7 @@
         <h3>{% trans "What's included" %}</h3>
       </div>
       <div class="col-sm-9">
-          {{ experience.whatsincluded|linebreaks }}
+          {{ experience.whatsincluded|safe|linebreaks }}
       </div>
     </div>
     {% endif %}
@@ -81,7 +81,7 @@
         <h3>{% trans "Pickup detail" %}</h3>
       </div>
       <div class="col-sm-9">
-          {{ experience.pickup_detail|linebreaks }}
+          {{ experience.pickup_detail|safe|linebreaks }}
       </div>
     </div>
     {% endif %}
@@ -92,7 +92,7 @@
         <h3 style="font-size: 10px;">{% trans "Disclaimer" %}</h3>
       </div>
       <div class="col-sm-9" style="font-size: 10px;">
-          {{ experience.disclaimer|linebreaks }}
+          {{ experience.disclaimer|safe|linebreaks }}
       </div>
     </div>
     {% endif %}
@@ -103,7 +103,7 @@
         <h3 style="font-size: 10px;">{% trans "Refund policy" %}</h3>
       </div>
       <div class="col-sm-9" style="font-size: 10px;">
-          {{ experience.refund_policy|linebreaks }}
+          {{ experience.refund_policy|safe|linebreaks }}
       </div>
     </div>
     {% endif %}
@@ -114,7 +114,7 @@
         <h3 style="font-size: 10px;">{% trans "Insurance" %}</h3>
       </div>
       <div class="col-sm-9" style="font-size: 10px;">
-          {{ experience.insurance|linebreaks }}
+          {{ experience.insurance|safe|linebreaks }}
       </div>
     </div>
     {% endif %}

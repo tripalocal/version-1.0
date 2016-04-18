@@ -72,9 +72,9 @@ def get_total_price(experience, guest_number=0, adult_number=0, child_number=0, 
                 og = experience.optiongroup_set.filter(type="Extras", language="en")[0]
                 oi = og.optionitem_set.filter(name = k)[0]
                 if oi.price_type.upper() != "FIXED":
-                    price = oi.price * v
+                    price += oi.price * v
                 else:
-                    price = oi.price
+                    price += oi.price
                 extras.append(k)
 
         for k in extras:
