@@ -39,7 +39,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
-from pyvirtualdisplay import Display
 
 if settings.LANGUAGE_CODE.lower() != "zh-cn":
     from allauth.socialaccount.providers.facebook.views import fb_complete_login
@@ -1714,6 +1713,7 @@ def service_get_flight_price(request, format=None):
     http://tripalocal.com/service_get_flight_price/?language=zh-CN&originplace=MEL&destinationplace=SYD&outbounddate=2016-07-01&inbounddate=&cabinclass=Economy&adults=1&children=0&infants=0&currency=CNY&newWindow=true
     '''
     try:
+        from pyvirtualdisplay import Display
         try:
             #for windows
             display = Display(visible=0, size=(1024, 768))
