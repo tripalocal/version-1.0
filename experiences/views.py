@@ -3945,6 +3945,7 @@ def itinerary_tool(request, id=None):
                         bk_date = local_timezone.localize(datetime.strptime(str(date), "%Y-%m-%d"))
                         guest_number = [booking['guests'] for booking in bookings if booking['id'] == item['id']]
                         price = [booking['price'] for booking in bookings if booking['id'] == item['id']]
+                        host = [booking['host'] for booking in bookings if booking['id'] == item['id']]
                         if not guest_number:
                             guest_number = 1
                         else:
@@ -3980,10 +3981,14 @@ def itinerary_tool(request, id=None):
             key = booking.datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime('%Y-%m-%d')
 
             if key not in itinerary:
-                itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}})
+                itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'display': 'NORMAL' }, 'transport': {'items': [], 'display': 'NORMAL'}, 'accommodation': {'items': [], 'display': 'NORMAL'}, 'restaurants': {'items': [], 'display': 'NORMAL'}}})
 
             itinerary[key][type]['items'].append({'id': booking.experience.id, 'title': title})
-            items.append({'id': booking.experience.id, 'title': title, 'price': int(booking.total_price/booking.guest_number), 'guests': booking.guest_number}) 
+            if booking.host is None:
+                host = 'None'
+            else:
+                host = booking.host.get_short_name()
+            items.append({'id': booking.experience.id, 'title': title, 'price': int(booking.total_price/booking.guest_number), 'guests': booking.guest_number, 'host': host}) 
         context['itinerary'] = json.dumps(itinerary)
         context['itinerary_id'] = id
         context['bookings'] = items

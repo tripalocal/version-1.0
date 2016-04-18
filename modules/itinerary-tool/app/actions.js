@@ -152,11 +152,10 @@ export const newItem = (item) => {
   }
 }
 
-export const assignHost = (date, field, host) => {
+export const assignHost = (id, host) => {
   return {
     type: 'ASSIGN_HOST',
-    date,
-    field,
+    id,
     host
   }
 }

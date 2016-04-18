@@ -5,6 +5,7 @@ import Cell from '../components/Cell'
 const mapStateToProps = (state, ownProps) => {
   const { date, fieldName } = ownProps
   return {
+    bookings: state.bookings,
     showSelect: state.dates[date][fieldName]['display'] === 'EDIT' ? true : false
   }
 }
