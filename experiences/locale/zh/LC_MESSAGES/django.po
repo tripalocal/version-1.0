@@ -982,12 +982,9 @@ msgstr "项目"
 
 #: experiences/templates/experiences/custom_itinerary_request.html:174
 msgid ""
-"A travel consultant will call you within 4 hours and an itinerary will be "
-"sent to you within 48 hours. We will call you between 9am - 9pm Beijing "
-"time. Itinerary will be sent to you 48 hours after the phone call."
+"Please make sure you have left your contact details and we will be in touch."
 msgstr ""
-"请留下你的信息以便联系。我们的行程定制顾问会在收到您信息的4小时内电话联系您，"
-"进一步沟通定制需求，电话联系您的时间为北京时间早9点至晚9点。"
+"请留下你的信息以便联系。"
 
 #: experiences/templates/experiences/custom_itinerary_request.html:175
 #: experiences/templates/experiences/review_experience.html:85
