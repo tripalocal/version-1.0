@@ -410,7 +410,7 @@ msgstr "联系我们"
 
 #: templates/app/layout.html:236
 msgid "Press"
-msgstr ""
+msgstr "新闻资讯"
 
 #: templates/app/layout.html:244
 msgid "Travel"
