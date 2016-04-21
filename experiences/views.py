@@ -3985,7 +3985,7 @@ def itinerary_tool(request, id=None):
                             price = experience.price
                         else:
                             price = int(price[0])
-                        booking = Booking(user = request.user, experience = experience, guest_number = guest_number, total_price = (price * guest_number),
+                        booking = Booking(user = request.user, host = User.objects.get(username=host), experience = experience, guest_number = guest_number, total_price = (price * guest_number),
                                         datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                         booking.save()
