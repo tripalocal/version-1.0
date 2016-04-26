@@ -1685,9 +1685,11 @@ def service_get_price(request, format=None):
         items = data.get('items')
         bookings = []
         for item in items:
-            bookings.append({'id': item['id'], 'title': item['title'], 'guests': 0, 'price': int(AbstractExperience.objects.get(id=str(item['id'])).price)})
+            experience = AbstractExperience.objects.get(id=str(item))
+            bookings.append({'id': str(item), 'title': experience.get_information(settings.LANGUAGES[0][0]).title, 'guests': '1', 'host': '', 'price': str(int(experience.price))})
         return HttpResponse(json.dumps({'bookings': bookings}), content_type="application/json")
     except Exception as err:
+        print(err)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])

@@ -3985,7 +3985,7 @@ def itinerary_tool(request, id=None):
                             price = experience.price
                         else:
                             price = int(price[0])
-                        booking = Booking(user = request.user, experience = experience, guest_number = guest_number, total_price = (price * guest_number),
+                        booking = Booking(user = request.user, host = User.objects.get(username=host), experience = experience, guest_number = guest_number, total_price = (price * guest_number),
                                         datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                         booking.save()
@@ -4019,11 +4019,15 @@ def itinerary_tool(request, id=None):
                 host = 'None'
             else:
                 host = booking.host.get_short_name()
-            items.append({'id': booking.experience.id, 'title': title, 'price': int(booking.total_price/booking.guest_number), 'guests': booking.guest_number, 'host': host}) 
+            if booking.total_price is None:
+                total_price = 0
+            else:
+                total_price = booking.total_price
+            items.append({'id': booking.experience.id, 'title': title, 'price': int(total_price/booking.guest_number), 'guests': booking.guest_number, 'host': host}) 
         context['itinerary'] = json.dumps(itinerary)
         context['itinerary_id'] = id
         context['bookings'] = items
-        if ci.guests is 'None':
+        if ci.guests is None:
             context['guests'] = 1
         else:
             context['guests'] = ci.guests
