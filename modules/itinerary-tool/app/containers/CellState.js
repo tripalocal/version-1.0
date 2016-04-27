@@ -1,5 +1,6 @@
 import { connect } from 'react-redux'
 import { showSelect, updateItems, updateThenSave } from '../actions'
+import 'whatwg-fetch'
 import Cell from '../components/Cell'
 
 const mapStateToProps = (state, ownProps) => {

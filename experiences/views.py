@@ -977,7 +977,7 @@ class ExperienceDetailView(DetailView):
                     data = request.POST #request.query_params['data']
 
                     if "email" not in data or "password" not in data:
-                        result = {"error":"Wrong username/password"} 
+                        result = {"error":"Wrong username/password"}
                         return HttpResponse(json.dumps(result), content_type="application/json")
 
                     email = data['email']
@@ -1178,7 +1178,7 @@ class ExperienceDetailView(DetailView):
         uid = self.request.user.id if self.request.user.is_authenticated() else None
         context['form'] = BookingForm(available_date, experience.id, uid)
         context['available_dates'] = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))
-        
+
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
 
@@ -2295,7 +2295,7 @@ def update_booking(id, accepted, user):
                 else:
                     if booking.adult_number:
                         subtotal_price = get_total_price(experience, adult_number=booking.adult_number,
-                                                         child_number=booking.children_number, 
+                                                         child_number=booking.children_number,
                                                          extra_information=booking.partner_product)
                     else:
                         subtotal_price = get_total_price(experience, booking.guest_number, extra_information=booking.partner_product)
@@ -3485,7 +3485,7 @@ def custom_itinerary(request, id=None, operation=None):
                     context['restaurant'] = []
                     context['suggestion'] = []
                     context['pricing'] = []
-                
+
                     types = ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]
                     pds = list(NewProduct.objects.filter(type__in=types, city__in=city_list).order_by('-id'))
                     for pd in pds:
@@ -3985,7 +3985,12 @@ def itinerary_tool(request, id=None):
                             price = experience.price
                         else:
                             price = int(price[0])
-                        booking = Booking(user = request.user, host = User.objects.get(username=host), experience = experience, guest_number = guest_number, total_price = (price * guest_number),
+                        try:
+                            host_placeholder = User.objects.get(username=host)
+                        except:
+                            host_placeholder = None
+
+                        booking = Booking(user = request.user, host = host_placeholder, experience = experience, guest_number = guest_number, total_price = (price * guest_number),
                                         datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                         booking.save()
@@ -3998,7 +4003,7 @@ def itinerary_tool(request, id=None):
         return HttpResponse(json.dumps({'success': 'OK'}), content_type="application/json")
     else:
         ci = CustomItinerary.objects.get(id=id)
-        bookings = list(ci.booking_set.order_by('datetime').all()) 
+        bookings = list(ci.booking_set.order_by('datetime').all())
         itinerary = {}
         items = []
         for booking in bookings:
@@ -4023,7 +4028,7 @@ def itinerary_tool(request, id=None):
                 total_price = 0
             else:
                 total_price = booking.total_price
-            items.append({'id': booking.experience.id, 'title': title, 'price': int(total_price/booking.guest_number), 'guests': booking.guest_number, 'host': host}) 
+            items.append({'id': booking.experience.id, 'title': title, 'price': int(total_price/booking.guest_number), 'guests': booking.guest_number, 'host': host})
         context['itinerary'] = json.dumps(itinerary)
         context['itinerary_id'] = id
         context['bookings'] = items
