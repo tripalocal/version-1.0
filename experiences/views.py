@@ -3544,8 +3544,10 @@ def custom_itinerary(request, id=None, operation=None):
                     ci.id = new_id
                 ci.user = request.user
                 ci.title = form.cleaned_data['title']
-                ci.start_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['start_datetime'])
-                ci.end_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['end_datetime'])
+                ci.start_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['start_datetime']) \
+                    if is_datetime_naive(form.cleaned_data['start_datetime']) else form.cleaned_data['start_datetime']
+                ci.end_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['end_datetime']) \
+                    if is_datetime_naive(form.cleaned_data['end_datetime']) else form.cleaned_data['end_datetime']
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
                 ci.cities = form.cleaned_data['cities_string']
                 if "ready" in request.POST:
