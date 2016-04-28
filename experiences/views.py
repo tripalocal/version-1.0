@@ -3544,10 +3544,6 @@ def custom_itinerary(request, id=None, operation=None):
                     ci.id = new_id
                 ci.user = request.user
                 ci.title = form.cleaned_data['title']
-                ci.start_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['start_datetime']) \
-                    if is_datetime_naive(form.cleaned_data['start_datetime']) else form.cleaned_data['start_datetime']
-                ci.end_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['end_datetime']) \
-                    if is_datetime_naive(form.cleaned_data['end_datetime']) else form.cleaned_data['end_datetime']
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
                 ci.cities = form.cleaned_data['cities_string']
                 if "ready" in request.POST:
@@ -3570,6 +3566,14 @@ def custom_itinerary(request, id=None, operation=None):
                                     datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                     submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                     booking.save()
+
+                ci.start_datetime = pytz.timezone(ci.get_timezone()).localize(form.cleaned_data['start_datetime']).astimezone(pytz.timezone("UTC")) \
+                    if is_datetime_naive(form.cleaned_data['start_datetime']) else \
+                    form.cleaned_data['start_datetime'].replace(tzinfo=pytz.timezone(ci.get_timezone())).astimezone(pytz.timezone("UTC"))
+                ci.end_datetime = pytz.timezone(ci.get_timezone()).localize(form.cleaned_data['end_datetime']).astimezone(pytz.timezone("UTC")) \
+                    if is_datetime_naive(form.cleaned_data['end_datetime']) else \
+                    form.cleaned_data['end_datetime'].replace(tzinfo=pytz.timezone(ci.get_timezone())).astimezone(pytz.timezone("UTC"))
+                ci.save()
 
                 if "draft" in request.POST:
                     return HttpResponseRedirect(GEO_POSTFIX+"itinerary/preview/"+str(ci.id)+"/")
@@ -3714,7 +3718,7 @@ def itinerary_detail(request,id=None,preview=None):
         discount_deadline = ci.submitted_datetime + timedelta(days=7)
 
         all_bookings = list(ci.booking_set.order_by('datetime').all())
-        ci_timezone = all_bookings[0].experience.get_timezone()
+        ci_timezone = ci.get_timezone()
 
         if ci.start_datetime:
             start_datetime = all_bookings[0].datetime.astimezone(pytz.timezone(ci_timezone))
@@ -3731,7 +3735,6 @@ def itinerary_detail(request,id=None,preview=None):
             item.experience.title = exp_information.title
             item.experience.description = exp_information.description
             item.experience.whatsincluded = item.whats_included
-            item.experience.city = _(item.experience.city)
             if settings.LANGUAGE_CODE == "zh-CN":
                 key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime(_("%d %b %Y")).format(*'年月日')
             else:
@@ -3739,6 +3742,7 @@ def itinerary_detail(request,id=None,preview=None):
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
+            item.experience.city = _(item.experience.city)
 
             if start_datetime > item.datetime:
                 start_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))

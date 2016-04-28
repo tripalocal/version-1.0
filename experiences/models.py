@@ -543,6 +543,13 @@ class CustomItinerary(models.Model):
                 bking.status = new_status
                 bking.save()
 
+    def get_timezone(self):
+        bks = self.booking_set.all()
+        if len(bks) > 0:
+            return bks[0].experience.get_timezone()
+        else:
+            return settings.TIME_ZONE
+
 class CustomItineraryRequest(models.Model):
     is_first_time = models.BooleanField(default=True)
     destinations = models.TextField()
