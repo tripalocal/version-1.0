@@ -873,11 +873,12 @@ $(function(){
                     type: 'POST',
                     url: "/experience/{{experience.id}}/",
                     dataType: 'json',
-                    timeout: 10000,
+                    timeout: 15000,
                     data: {
                         "csrfmiddlewaretoken": getCookie('csrftoken'),
                         "experience_id": {{experience.id}},
                         "max_date": max_date.toString("yyyy-MM-dd"),
+                        "view_date": vd.toString("yyyy-MM-dd"),
                         "load_more": "load_more",
                     },
                     success: function (data,status,xhr) {
@@ -925,6 +926,20 @@ $(function(){
                     },
                     error: function (e) {
                         $(".loading-calendar").hide();
+                        if($("#id_date").offset().top - $(window).scrollTop() > 300)
+                        {
+                            $("#icon_load_more").animate({
+                                'marginLeft' : "-=" + o_left, //moves left
+                                'marginTop' : "+=" + o_up //moves down
+                            }, 1);
+                        }
+                        else
+                        {
+                            $("#icon_load_more").animate({
+                                'marginLeft' : "-=" + o_left, //moves left
+                                'marginTop' : "-=" + o_up //moves up
+                            }, 1);
+                        }
                         alert('{%trans "Please try again later"%}');
                     }
                   })

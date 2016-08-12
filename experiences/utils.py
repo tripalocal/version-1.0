@@ -262,3 +262,6 @@ def add_watermark(f, im, extension, dirname, filename):
     f = storage.open(dirname + filename, 'wb')
     f.write(im_out.getvalue())
     f.close()
+
+def is_datetime_naive(d):
+    return (d.tzinfo is None or d.tzinfo.utcoffset(d) is None)

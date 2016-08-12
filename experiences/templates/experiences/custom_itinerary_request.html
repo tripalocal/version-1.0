@@ -171,7 +171,7 @@
   <div class="section">
     <div class="container" id="success-page">
       <h1>{% trans "Make sure you've filled in all the " %} <span class="asterisk">*{% trans "sections" %}</span></h1>
-      <h2>{% trans "A travel consultant will call you within 4 hours and an itinerary will be sent to you within 48 hours. We will call you between 9am - 9pm Beijing time. Itinerary will be sent to you 48 hours after the phone call." %}</h2>
+      <h2>{% trans "Please make sure you have left your contact details and we will be in touch." %}</h2>
       <button id="submit-btn" class="btn btn-primary main-btn animated infinite pulse">{% trans "Submit" %}</button>
     </div>
   </div>
@@ -550,6 +550,9 @@ function updateBudget() {
 			min += (cities * 200);
 			max += (cities * 200);
 	}
+
+  min *= 1.4;
+  max *= 1.4;
 
   if (min < 1000) {
     $('#budget-mount').attr('data-original-title', '{% trans "Our custom itinerary service starts from $1000"%}');

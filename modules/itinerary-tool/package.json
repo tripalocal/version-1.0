@@ -29,7 +29,6 @@
     "webpack-merge": "^0.7.3"
   },
   "dependencies": {
-    "fetch": "^1.0.1",
     "immutable": "^3.7.6",
     "react": "^0.14.7",
     "react-addons-update": "^0.14.7",

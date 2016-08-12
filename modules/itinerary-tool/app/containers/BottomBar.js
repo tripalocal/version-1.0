@@ -9,10 +9,6 @@ const BottomBar = ({ dispatch, showEditRowMenu, selectedDate }) => (
         <img src="https://tripalocal-static.s3.amazonaws.com/static/experiences/img/day_after.svg" width="30" height="30"/>
         加一天 
       </button>
-      <button className="btn btn-secondary" onClick={e => dispatch(updateThenSave(removeDate, [selectedDate]))}>
-        <img src="https://tripalocal-static.s3.amazonaws.com/static/experiences/img/delete.svg" width="30" height="30"/>
-        删除当天 
-      </button>
       <button className="btn btn-secondary" onClick={e => dispatch(updateThenSave(moveDate, [selectedDate, 'BACK']))}>
         <img src="https://tripalocal-static.s3.amazonaws.com/static/experiences/img/move_before.svg" width="30" height="30"/>
         往上移一天 
@@ -20,6 +16,14 @@ const BottomBar = ({ dispatch, showEditRowMenu, selectedDate }) => (
       <button className="btn btn-secondary" onClick={e => dispatch(updateThenSave(moveDate, [selectedDate, 'FORWARD']))}>
         <img src="https://tripalocal-static.s3.amazonaws.com/static/experiences/img/move_after.svg" width="30" height="30"/>
         往下移一天 
+      </button>
+      <button className="btn btn-secondary" onClick={e => dispatch(showModal(selectedDate, '', 'ASSIGN_HOST'))}>
+        <img src="https://tripalocal-static.s3.amazonaws.com/static/experiences/img/profile.svg" width="30" height="30"/>
+        分配工作
+      </button>
+      <button className="btn btn-secondary" onClick={e => dispatch(updateThenSave(removeDate, [selectedDate]))}>
+        <img src="https://tripalocal-static.s3.amazonaws.com/static/experiences/img/delete.svg" width="30" height="30"/>
+        删除当天 
       </button>
     </div>
   </div>

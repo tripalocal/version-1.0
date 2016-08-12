@@ -79,7 +79,10 @@ def convert_experience_price(request, experience):
 
     if hasattr(experience, "optiongroup_set") and len(experience.optiongroup_set.all()) > 0:
         optiongroup_set = []
-        for option in experience.optiongroup_set.filter(language=settings.LANGUAGES[0][0]):
+        exp_optiongroup_set = experience.optiongroup_set.filter(language=settings.LANGUAGES[0][0])
+        if len(exp_optiongroup_set) == 0:
+            exp_optiongroup_set = experience.optiongroup_set.all()
+        for option in exp_optiongroup_set:
             og = {"name":option.name, "optionitem_set":[]}
             for item in option.optionitem_set.all():
                 if hasattr(request, 'session') and 'custom_currency' in request.session and request.session['custom_currency'].lower() != "aud":
@@ -974,7 +977,7 @@ class ExperienceDetailView(DetailView):
                     data = request.POST #request.query_params['data']
 
                     if "email" not in data or "password" not in data:
-                        result = {"error":"Wrong username/password"} 
+                        result = {"error":"Wrong username/password"}
                         return HttpResponse(json.dumps(result), content_type="application/json")
 
                     email = data['email']
@@ -997,24 +1000,39 @@ class ExperienceDetailView(DetailView):
                 try:
                     data = request.POST
                     experience = AbstractExperience.objects.get(id=data["experience_id"])
+                    local_timezone = pytz.timezone(experience.get_timezone())
                     max_date = data["max_date"]
-                    max_date = pytz.timezone(experience.get_timezone()).localize(datetime.strptime(max_date, "%Y-%m-%d"))
+                    max_date = local_timezone.localize(datetime.strptime(max_date, "%Y-%m-%d"))
+                    #data["view_date"] is the last day of the month
+                    #change to the 1st day of the next month
+                    view_date_original = local_timezone.localize(datetime.strptime(data["view_date"], "%Y-%m-%d")) + timedelta(days=1)
+                    #the calendar displays up to 13 days in the next month
+                    view_date = view_date_original + timedelta(days=(13-view_date_original.weekday()))
                     available_options = []
                     available_date = ()
                     if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
                         if experience.partner == PARTNER_IDS["experienceoz"]:
-                            for i in range(5): #7 days per time
-                                now = max_date + timedelta(days=1+i*7)
+                            #experience loads 7 days per time
+                            now = max_date + timedelta(days=1)
+                            #performance tradeoff: when the first day is Monday/Tuesday, most of the time it's fine to call the api one time less
+                            if view_date_original.weekday() < 2:
+                                view_date = view_date - timedelta(days=7)
+                            while now < view_date:
                                 now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
                                 now_string = now_string[:-2] + ":" + now_string[-2:]
                                 original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
                                 available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+                                now += timedelta(days=7)
                         elif experience.partner == PARTNER_IDS["rezdy"]:
+                            #rezdy loads 100 sessions per time
                             now = max_date + timedelta(days=1)
-                            available_date = get_rezdy_availability(available_options, available_date, experience.original_id,
-                                                                    now.strftime('%Y-%m-%d %H:%M:%S'),
-                                                                    (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
-                                                                    limit=100, offset=0)
+                            while now < view_date:
+                                available_date = get_rezdy_availability(local_timezone, available_options, available_date, experience.original_id,
+                                                                        now.strftime('%Y-%m-%d %H:%M:%S'),
+                                                                        (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
+                                                                        limit=100, offset=0)
+                                now = local_timezone.localize(datetime.strptime(available_options[-1]["date_string"] + available_options[-1]["time_string"],
+                                                                                 "%d/%m/%Y%H:%M")) + timedelta(hours=1)
                     else:
                         available_date = getAvailableOptions(experience, available_options, available_date, from_datetime = (max_date+timedelta(days=1)).astimezone(pytz.timezone('UTC')))
                     available_date = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))
@@ -1111,19 +1129,29 @@ class ExperienceDetailView(DetailView):
                 return context
 
         if type(experience) is NewProduct and experience.partner is not None and len(experience.partner) > 0:
+            start_of_next_month = (local_timezone.localize(datetime.now())+timedelta(days=31)).replace(day=1,hour=0,minute=0,second=0)
+            #the calendar displays up to 13 days in the next month
+            end_date = start_of_next_month + timedelta(days=(13-start_of_next_month.weekday()))
+
             if experience.partner == PARTNER_IDS["experienceoz"]:
-                for i in range(5): #7 days per time
-                    now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2+i*7)
+                #experience loads 7 days per time
+                now = local_timezone.localize(datetime.now()) + timedelta(days=1)
+                while now < end_date:
                     now_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]+now.strftime("%z")
                     now_string = now_string[:-2] + ":" + now_string[-2:]
                     original_id = str(experience.id)[:-(len(str(experience.partner))+1)]
-                    available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date)
+                    available_date = get_experienceoz_availability(original_id, now_string, experience, available_options, available_date, True)
+                    now += timedelta(days=7)
             elif experience.partner == PARTNER_IDS["rezdy"]:
-                now = pytz.timezone(experience.get_timezone()).localize(datetime.now()) + timedelta(days=2)
-                available_date = get_rezdy_availability(available_options, available_date, experience.original_id,
-                                                        now.strftime('%Y-%m-%d %H:%M:%S'),
-                                                        (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
-                                                        limit=100, offset=0)
+                #rezdy loads 100 sessions per time
+                now = local_timezone.localize(datetime.now()) + timedelta(days=1)
+                while now < end_date:
+                    available_date = get_rezdy_availability(local_timezone, available_options, available_date, experience.original_id,
+                                                            now.strftime('%Y-%m-%d %H:%M:%S'),
+                                                            (now + timedelta(weeks=12)).strftime('%Y-%m-%d %H:%M:%S'),
+                                                            limit=100, offset=0)
+                    now = local_timezone.localize(datetime.strptime(available_options[-1]["date_string"] + available_options[-1]["time_string"],
+                                                                                 "%d/%m/%Y%H:%M")) + timedelta(hours=1)
         else:
             available_date = getAvailableOptions(experience, available_options, available_date)
 
@@ -1150,7 +1178,7 @@ class ExperienceDetailView(DetailView):
         uid = self.request.user.id if self.request.user.is_authenticated() else None
         context['form'] = BookingForm(available_date, experience.id, uid)
         context['available_dates'] = list(map(lambda x: datetime.strptime(x[0], "%d/%m/%Y").strftime("%Y-%m-%d"), list(available_date)))
-        
+
         if float(experience.duration).is_integer():
             experience.duration = int(experience.duration)
 
@@ -2267,7 +2295,7 @@ def update_booking(id, accepted, user):
                 else:
                     if booking.adult_number:
                         subtotal_price = get_total_price(experience, adult_number=booking.adult_number,
-                                                         child_number=booking.children_number, 
+                                                         child_number=booking.children_number,
                                                          extra_information=booking.partner_product)
                     else:
                         subtotal_price = get_total_price(experience, booking.guest_number, extra_information=booking.partner_product)
@@ -3457,7 +3485,7 @@ def custom_itinerary(request, id=None, operation=None):
                     context['restaurant'] = []
                     context['suggestion'] = []
                     context['pricing'] = []
-                
+
                     types = ["Flight", "Transfer", "Accommodation", "Restaurant", "Suggestion", "Pricing"]
                     pds = list(NewProduct.objects.filter(type__in=types, city__in=city_list).order_by('-id'))
                     for pd in pds:
@@ -3516,8 +3544,6 @@ def custom_itinerary(request, id=None, operation=None):
                     ci.id = new_id
                 ci.user = request.user
                 ci.title = form.cleaned_data['title']
-                ci.start_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['start_datetime'])
-                ci.end_datetime = pytz.timezone(settings.TIME_ZONE).localize(form.cleaned_data['end_datetime'])
                 ci.submitted_datetime = pytz.timezone("UTC").localize(datetime.utcnow())
                 ci.cities = form.cleaned_data['cities_string']
                 if "ready" in request.POST:
@@ -3540,6 +3566,14 @@ def custom_itinerary(request, id=None, operation=None):
                                     datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day, bk_time.hour, bk_time.minute)).astimezone(pytz.timezone("UTC")),
                                     submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                     booking.save()
+
+                ci.start_datetime = pytz.timezone(ci.get_timezone()).localize(form.cleaned_data['start_datetime']).astimezone(pytz.timezone("UTC")) \
+                    if is_datetime_naive(form.cleaned_data['start_datetime']) else \
+                    form.cleaned_data['start_datetime'].replace(tzinfo=pytz.timezone(ci.get_timezone())).astimezone(pytz.timezone("UTC"))
+                ci.end_datetime = pytz.timezone(ci.get_timezone()).localize(form.cleaned_data['end_datetime']).astimezone(pytz.timezone("UTC")) \
+                    if is_datetime_naive(form.cleaned_data['end_datetime']) else \
+                    form.cleaned_data['end_datetime'].replace(tzinfo=pytz.timezone(ci.get_timezone())).astimezone(pytz.timezone("UTC"))
+                ci.save()
 
                 if "draft" in request.POST:
                     return HttpResponseRedirect(GEO_POSTFIX+"itinerary/preview/"+str(ci.id)+"/")
@@ -3684,7 +3718,7 @@ def itinerary_detail(request,id=None,preview=None):
         discount_deadline = ci.submitted_datetime + timedelta(days=7)
 
         all_bookings = list(ci.booking_set.order_by('datetime').all())
-        ci_timezone = all_bookings[0].experience.get_timezone()
+        ci_timezone = ci.get_timezone()
 
         if ci.start_datetime:
             start_datetime = all_bookings[0].datetime.astimezone(pytz.timezone(ci_timezone))
@@ -3701,7 +3735,6 @@ def itinerary_detail(request,id=None,preview=None):
             item.experience.title = exp_information.title
             item.experience.description = exp_information.description
             item.experience.whatsincluded = item.whats_included
-            item.experience.city = _(item.experience.city)
             if settings.LANGUAGE_CODE == "zh-CN":
                 key = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone())).strftime(_("%d %b %Y")).format(*'年月日')
             else:
@@ -3709,6 +3742,7 @@ def itinerary_detail(request,id=None,preview=None):
             if key not in itinerary["days"]:
                 itinerary["days"].update({key:[]})
             itinerary["days"][key].append(item.experience)
+            item.experience.city = _(item.experience.city)
 
             if start_datetime > item.datetime:
                 start_datetime = item.datetime.astimezone(pytz.timezone(item.experience.get_timezone()))
@@ -3948,6 +3982,7 @@ def itinerary_tool(request, id=None):
                         bk_date = local_timezone.localize(datetime.strptime(str(date), "%Y-%m-%d"))
                         guest_number = [booking['guests'] for booking in bookings if booking['id'] == item['id']]
                         price = [booking['price'] for booking in bookings if booking['id'] == item['id']]
+                        host = [booking['host'] for booking in bookings if booking['id'] == item['id']]
                         if not guest_number:
                             guest_number = 1
                         else:
@@ -3956,7 +3991,12 @@ def itinerary_tool(request, id=None):
                             price = experience.price
                         else:
                             price = int(price[0])
-                        booking = Booking(user = request.user, experience = experience, guest_number = guest_number, total_price = (price * guest_number),
+                        try:
+                            host_placeholder = User.objects.get(username=host)
+                        except:
+                            host_placeholder = None
+
+                        booking = Booking(user = request.user, host = host_placeholder, experience = experience, guest_number = guest_number, total_price = (price * guest_number),
                                         datetime = local_timezone.localize(datetime(bk_date.year, bk_date.month, bk_date.day)).astimezone(pytz.timezone("UTC")),
                                         submitted_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC), status="draft", custom_itinerary=ci)
                         booking.save()
@@ -3969,7 +4009,7 @@ def itinerary_tool(request, id=None):
         return HttpResponse(json.dumps({'success': 'OK'}), content_type="application/json")
     else:
         ci = CustomItinerary.objects.get(id=id)
-        bookings = list(ci.booking_set.order_by('datetime').all()) 
+        bookings = list(ci.booking_set.order_by('datetime').all())
         itinerary = {}
         items = []
         for booking in bookings:
@@ -3983,14 +4023,22 @@ def itinerary_tool(request, id=None):
             key = booking.datetime.astimezone(pytz.timezone(booking.experience.get_timezone())).strftime('%Y-%m-%d')
 
             if key not in itinerary:
-                itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}})
+                itinerary.update({key: {'city': city, 'experiences': { 'items': [], 'display': 'NORMAL' }, 'transport': {'items': [], 'display': 'NORMAL'}, 'accommodation': {'items': [], 'display': 'NORMAL'}, 'restaurants': {'items': [], 'display': 'NORMAL'}}})
 
             itinerary[key][type]['items'].append({'id': booking.experience.id, 'title': title})
-            items.append({'id': booking.experience.id, 'title': title, 'price': int(booking.total_price/booking.guest_number), 'guests': booking.guest_number}) 
+            if booking.host is None:
+                host = 'None'
+            else:
+                host = booking.host.get_short_name()
+            if booking.total_price is None:
+                total_price = 0
+            else:
+                total_price = booking.total_price
+            items.append({'id': booking.experience.id, 'title': title, 'price': int(total_price/booking.guest_number), 'guests': booking.guest_number, 'host': host})
         context['itinerary'] = json.dumps(itinerary)
         context['itinerary_id'] = id
         context['bookings'] = items
-        if ci.guests is 'None':
+        if ci.guests is None:
             context['guests'] = 1
         else:
             context['guests'] = ci.guests

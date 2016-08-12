@@ -75,6 +75,13 @@ function bookings(state=[], action) {
         }
         return booking
       })
+    case 'ASSIGN_HOST':
+      return state.map((booking) => {
+        if (booking.id === action.id) {
+          return update(booking, {host: {$set: action.host}})
+        }
+        return booking
+      })
     default:
       return state
   }
@@ -100,10 +107,10 @@ function dates(state = {}, action) {
           }
           newState[thisDate.toISOString().slice(0,10)] = state[key]
           return newState 
-        }, {[action.date]: {'city': action.city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}})
+        }, {[action.date]: {'city': action.city, 'experiences': { 'items': [], 'display': 'NORMAL' }, 'transport': {'items': [], 'display': 'NORMAL'}, 'accommodation': {'items': [], 'display': 'NORMAL'}, 'restaurants': {'items': [], 'display': 'NORMAL'}}})
       }
       return Object.assign({}, state, {
-        [action.date]: {'city': action.city, 'experiences': { 'items': [], 'host': '', 'display': 'NORMAL' }, 'transport': {'items': [], 'host': '', 'display': 'NORMAL'}, 'accommodation': {'items': [], 'host': '', 'display': 'NORMAL'}, 'restaurants': {'items': [], 'host': '', 'display': 'NORMAL'}}
+        [action.date]: {'city': action.city, 'experiences': { 'items': [], 'display': 'NORMAL' }, 'transport': {'items': [], 'display': 'NORMAL'}, 'accommodation': {'items': [], 'display': 'NORMAL'}, 'restaurants': {'items': [], 'display': 'NORMAL'}}
       })
     case 'REMOVE_DATE':
       let newState = Object.assign({}, state)
@@ -124,10 +131,6 @@ function dates(state = {}, action) {
         })
       }
       return state
-    case 'ASSIGN_HOST':
-      return update(state, {
-        [action.date]: {[action.field]: {host: {$set: action.host}}}
-      })
     default:
       return state
   }

@@ -17,7 +17,7 @@ const SideBar = ({ bookings, total, guests, profit, dispatch }) => (
       <tbody>
         {bookings.map(booking => 
           <tr>
-            <td style={{width: '200px'}}>{booking.title}</td>
+            <td style={{width: '180px'}}>{booking.title}</td>
             <td>每个</td>
             <td><input style={{width: '50px'}} value={booking.price} onChange={e => dispatch(updateThenSave(changePrice, [booking.id, e.target.value]))} className="form-control" /></td>
             <td><input value={booking.guests} onChange={e => dispatch(updateThenSave(updateBooking, [booking.id, e.target.value]))} className="form-control" /></td>

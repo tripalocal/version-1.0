@@ -1,39 +1,37 @@
 import React, { PropTypes } from 'react'
-import { reduxForm, initialize } from 'redux-form'
+import { connect } from 'react-redux'
 import { assignHost, showModal } from '../actions'
 
-const AssignHostForm = ({ fields: { host }, handleSubmit, date, field }) => (
-  <form onSubmit={handleSubmit}>
+const AssignHostForm = ({ bookings, handleChange }) => (
+  <div>
+    <h2>分配工作</h2>
+  {bookings.map(booking => 
     <div className="form-group">
-      <label forName="host">Assign Host</label>
-      <select className="form-control" name="host" {...host}>
-        <option>Bob</option>
-        <option>Sally</option>
+      <label>{booking.title}</label>
+      <select value={booking.host} className="form-control" onChange={e => handleChange(booking.id, e.target.value)}>
+        <option selected value="None" label="不分配">不分配</option>
+        <option value="tripalocal" label="本土客">本土客</option>
+        <option value="host1" label="司导1">司导1</option>
+        <option value="host2" label="司导2">司导2</option>
+        <option value="host3" label="司导3">司导3</option>
+        <option value="host4" label="司导4">司导4</option>
       </select>
-    </div>
-    <button className="btn btn-primary" type="submit">Submit</button>
-  </form>
+    </div>)}
+  </div>
 )
 
 const mapStateToProps = (state) => {
   return {
-    date: state.modal['date'],
-    field: state.modal['display']
+    bookings: state.bookings
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    handleSubmit: (event, data) => {
-      event.preventDefault()
-      dispatch(assignHost(date, field, data['host']))
-      dispatch(showModal('NONE'))
-      dispatch(initialize('assignHost', {}))
+    handleChange: (id, val) => {
+      dispatch(assignHost(id, val))
     }
   }
 }
 
-export default reduxForm({
-  form: 'assignHost',
-  fields: ['host']
-}, mapStateToProps, mapDispatchToProps)(AssignHostForm)
+export default connect(mapStateToProps, mapDispatchToProps)(AssignHostForm)

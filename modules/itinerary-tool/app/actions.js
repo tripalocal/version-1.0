@@ -1,3 +1,5 @@
+import 'whatwg-fetch'
+
 export const changeTitle = (title) => {
   return {
     type: 'CHANGE_TITLE',
@@ -40,32 +42,11 @@ export const changeProfit = (setting) => {
   }
 }
 
-export const addBookings = (items) => {
-  return fetch('/get_price/', {
-    method: 'post',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].getAttribute('value'),
-      items: items 
-    })
-  })
-  .then((response) => {
-    return response.json()
-  })
-  .then((json) => {
-    return {
-      type: 'ADD_BOOKINGS',
-      bookings: json.bookings
-    }
-  })
-  .catch((exception) => {
-    console.log('get price error:', exception)
-    return {
-    }
-  })
+export const addBookings = (bookings) => {
+  return {
+    type: 'ADD_BOOKINGS',
+    bookings: bookings
+  }
 }
 
 export const updateBooking = (id, guests) => {
@@ -76,14 +57,41 @@ export const updateBooking = (id, guests) => {
   }
 }
 
-/* TODO: update bookings after items dynamically
 export function updateItems(date, field, value) {
   return (dispatch, getState) => {
-    dispatch(addItems(date, field, value))
-   
+    const { bookings } = getState()
+    const bookingIDs = bookings.map(booking => booking.id)
+    let newBookings = value.filter(item => {
+      return (!(bookingIDs.indexOf(item.id) > -1))
+    }).map(item => item.id)
+    if (newBookings.length > 0) {
+      console.log(newBookings)
+      return fetch('/get_price/', {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items: newBookings 
+        })
+      })
+      .then((response) => {
+        return response.json()
+      })
+      .then((json) => {
+        dispatch(addBookings(json.bookings))
+      })
+      .then(() => {
+        dispatch(addItems(date, field, value))
+      })
+      .catch((exception) => {
+        console.log('get price error:', exception)
+      })
+    }
   }
 }
-*/
+
 
 export const addDate = (date, city, position) => {
   const targetDate = new Date(date)
@@ -136,7 +144,7 @@ export const selectDate = (date) => {
   }
 }
 
-export const updateItems = (date, field, value) => {
+export const addItems = (date, field, value) => {
   return {
     type: 'UPDATE_ITEMS',
     date,
@@ -152,11 +160,10 @@ export const newItem = (item) => {
   }
 }
 
-export const assignHost = (date, field, host) => {
+export const assignHost = (id, host) => {
   return {
     type: 'ASSIGN_HOST',
-    date,
-    field,
+    id,
     host
   }
 }
