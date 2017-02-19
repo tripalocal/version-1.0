@@ -21,7 +21,7 @@ from django.dispatch import receiver
 from app.forms import HomepageSearchForm, UserProfileForm, UserCalendarForm
 from app.models import *
 from django.contrib import messages
-import string, random, pytz, subprocess, geoip2.database, requests, PIL
+import string, random, pytz, subprocess, geoip2.database, requests, PIL, re
 from mixpanel import Mixpanel
 from Tripalocal_V1 import settings
 from experiences.views import SearchView, set_initial_currency, convert_experience_price
@@ -790,6 +790,9 @@ def saveProfileImage(user, profile, image_file):
 def email_custom_trip(request):
     email = request.POST.get("email", "Blank")
     message = request.POST.get("message", "Blank")
+	
+    if not re.match("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
+        return HttpResponse('')
 
     mail.send(
         sender = 'admin@tripalocal.com',
@@ -798,7 +801,7 @@ def email_custom_trip(request):
         message=message,
     )
 
-    return HttpResponse(json.dumps({}))
+    return HttpResponse('')
 
 def create_wx_trade_no(mch_id):
     system_time = strftime("%Y%m%d%H%M%S", gmtime())
